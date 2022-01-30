@@ -12,8 +12,8 @@ import {
     SecretStorage,
     window,
 } from 'vscode';
-import { TenantCredentials } from '../models/TenantInfo';
-import { EndpointUtil, isEmpty } from '../utils';
+import { TenantCredentials, TenantToken } from '../models/TenantInfo';
+import { EndpointUtil, hydrate, isEmpty } from '../utils';
 import { TenantService } from './TenantService';
 
 class SailPointIdentityNowPatSession implements AuthenticationSession {
@@ -65,7 +65,6 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
 
     private ensureInitialized(): void {
         if (this.initializedDisposable === undefined) {
-            //void this.cacheTokenFromStorage();
 
             this.initializedDisposable = Disposable.from(
                 // This onDidChange event happens when the secret storage changes in _any window_ since
@@ -73,13 +72,13 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
                 this.secretStorage.onDidChange(e => {
                     if (e.key.startsWith(SailPointIdentityNowAuthenticationProvider.SECRET_AT_PREFIX)
                         || e.key.startsWith(SailPointIdentityNowAuthenticationProvider.SECRET_PAT_PREFIX)) {
-                        void this.checkForUpdates();
+                        //void this.checkForUpdates();
                     }
                 }),
                 // This fires when the user initiates a "silent" auth flow via the Accounts menu.
                 authentication.onDidChangeSessions(e => {
                     if (e.provider.id === SailPointIdentityNowAuthenticationProvider.id) {
-                        void this.checkForUpdates();
+                        //void this.checkForUpdates();
                     }
                 }),
             );
@@ -96,6 +95,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
         const changed: AuthenticationSession[] = [];
 
         const previousToken = await this.currentToken;
+        /*
         const session = (await this.getSessions())[0];
 
         if (session?.accessToken && !previousToken) {
@@ -109,6 +109,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
         }
 
         this._onDidChangeSessions.fire({ added: added, removed: removed, changed: changed });
+        */
     }
 
 
@@ -129,32 +130,56 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
         }
         for (let index = 0; index < _scopes.length; index++) {
             const tenantName = _scopes[index];
-            const session = await this.getSessionByTenant(tenantName);
+            const session: SailPointIdentityNowPatSession | null = await this.getSessionByTenant(tenantName);
             if (session !== null) {
                 result.push(session);
             }
         }
+        console.log("< getSessions");
         return result;
     }
 
     async getSessionByTenant(tenantName: string): Promise<SailPointIdentityNowPatSession | null> {
+        console.log("> getSessionByTenant", tenantName);
         const credentialsStr = await this.secretStorage.get(this.getPatKey(tenantName));
         if (credentialsStr !== undefined) {
 
             const credentials = JSON.parse(credentialsStr) as TenantCredentials;
-            const accessToken = await this.secretStorage.get(this.getAccessTokenKey(tenantName));
-            if (!isEmpty(accessToken)) {
-                return new Promise((resolve) => new SailPointIdentityNowPatSession(tenantName,
+            const tokenStr = await this.secretStorage.get(this.getAccessTokenKey(tenantName)) || "";
+
+            if (!isEmpty(tokenStr)) {
+                let token: TenantToken | null = null;
+                try {
+                    const tokenJson:any = JSON.parse(tokenStr);
+                    token = new TenantToken(
+                        tokenJson.accessToken,
+                        tokenJson.expires,
+                        {
+                            clientId: tokenJson.client.clientId,
+                            clientSecret: tokenJson.client.clientSecret
+                        });
+                } catch(err) {
+                    console.log("WARNING: could not parse Token: ", err);
+                }
+                if (token === null || token.expired()) {
+                    console.log("INFO: accessToken is expired. Updating Access Token");
+                    token = await this.createAccessToken(tenantName, credentials.clientId, credentials.clientSecret);
+                }
+                console.log("< getSessionByTenant for", tenantName);
+
+                return new SailPointIdentityNowPatSession(tenantName,
                     credentials.clientId,
-                    accessToken as string,
+                    token.accessToken,
                     this.getSessionId(tenantName)
-                ));
+                );
+
             } else {
-                console.log("WARNING: no accessToken for tenant ", tenantName);
+                console.log("WARNING: no token for tenant ", tenantName);
             }
         } else {
             console.log("WARNING: no credentials for tenant ", tenantName);
         }
+        console.log("< getSessionByTenant null");
         return null;
     }
 
@@ -174,23 +199,18 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
         this.ensureInitialized();
 
         // Prompt for the PAT.
-        const clientId = await this.askPATClientId();
+        const clientId = await this.askPATClientId() || "";
         if (isEmpty(clientId)) {
             throw new Error('Client ID is required');
         }
 
-        const clientSecret = await this.askPATClientSecret();
+        const clientSecret = await this.askPATClientSecret() || "";
         if (isEmpty(clientSecret)) {
             throw new Error('Client Secret is required');
         }
 
-        const idnAuth = new ClientOAuth2({
-            clientId: clientId,
-            clientSecret: clientSecret,
-            accessTokenUri: EndpointUtil.getAccessTokenUrl(tenantName)
-        });
-        const resp = await idnAuth.credentials.getToken();
-        console.log('Successfully logged in to IdentityNow');
+
+        const token = await this.createAccessToken(tenantName, clientId, clientSecret);
 
         // Don't set `currentToken` here, since we want to fire the proper events in the `checkForUpdates` call
         await this.secretStorage.store(this.getPatKey(tenantName), JSON.stringify({
@@ -198,13 +218,36 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
             clientSecret: clientSecret
         }));
 
-        await this.secretStorage.store(this.getAccessTokenKey(tenantName), resp.accessToken);
-
-        return new SailPointIdentityNowPatSession(tenantName, clientId as string, resp.accessToken, this.getSessionId(tenantName));
+        return new SailPointIdentityNowPatSession(tenantName, clientId, token.accessToken, this.getSessionId(tenantName));
+    }
+    /**
+     * Create an access Token and update secret storage
+     * @param tenantName 
+     * @param clientId 
+     * @param clientSecret 
+     */
+    async createAccessToken(tenantName: string, clientId: string, clientSecret: string): Promise<TenantToken> {
+        const idnAuth = new ClientOAuth2({
+            clientId: clientId,
+            clientSecret: clientSecret,
+            accessTokenUri: EndpointUtil.getAccessTokenUrl(tenantName)
+        });
+        const oauth2token = await idnAuth.credentials.getToken();
+        console.log('Successfully logged in to IdentityNow');
+        // To prevent issue with JSON.stringify and circular conversion
+        const token = new TenantToken(
+            oauth2token.accessToken,
+            oauth2token.expiresIn(Number(oauth2token.data.expires_in)),
+            {
+                clientId: clientId,
+                clientSecret: clientSecret
+            });
+        await this.secretStorage.store(this.getAccessTokenKey(tenantName), JSON.stringify(token));
+        return token;
     }
 
     /**
-     * Returns the key for the ClientID/ClientSecret (PAT )
+     * Returns the key for the ClientID/ClientSecret (PAT) in the secret storage
      * @param tenantName 
      * @returns The key
      */
@@ -213,6 +256,11 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
             + tenantName;
     }
 
+    /**
+     * Returns the key for the access token in the secret storage
+     * @param tenantName 
+     * @returns 
+     */
     private getAccessTokenKey(tenantName: string): string {
         return SailPointIdentityNowAuthenticationProvider.SECRET_AT_PREFIX
             + tenantName;
@@ -230,7 +278,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
 
     // This function is called when the end user signs out of the account.
     async removeSession(_sessionId: string): Promise<void> {
-        console.log(">removeSession for", _sessionId);
+        console.log("> removeSession for", _sessionId);
         const tenantName = this.getTenantNameFromSessionId(_sessionId);
         // Remove PAT or just AccessToken?
         await this.secretStorage.delete(this.getAccessTokenKey(tenantName));

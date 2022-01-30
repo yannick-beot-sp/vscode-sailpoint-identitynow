@@ -25,8 +25,11 @@ export class TenantService {
     }
 
     public setTenant(value: TenantInfo) {
-        const tenants = this.storage.get<string[]>(TenantService.ALL_TENANTS_KEY);
-        if (tenants?.indexOf(value.name) === -1) {
+        let tenants = this.storage.get<string[]>(TenantService.ALL_TENANTS_KEY);
+        if (tenants===undefined) {
+            tenants = [];
+        }
+        if (tenants.indexOf(value.name) === -1) {
             tenants.push(value.name);
             this.storage.update(TenantService.ALL_TENANTS_KEY, tenants);
         }
