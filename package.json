@@ -38,8 +38,51 @@
 			{
 				"command": "vscode-sailpoint-identitynow.add-tenant",
 				"title": "IdentityNow: Add tenant"
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.remove-tenant",
+				"title": "Remove tenant"
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.refresh-tenants",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
 			}
-		]
+		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "vscode-sailpoint-identitynow.remove-tenant",
+					"when": "never"
+				}
+			],
+			"view/title": [
+				{
+					"command": "vscode-sailpoint-identitynow.refresh-tenants",
+					"when": "view == vscode-sailpoint-identitynow.view",
+					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "vscode-sailpoint-identitynow.remove-tenant",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.refresh-tenants",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == sources",
+					"group": "inline"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.refresh-tenants",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /TransformsTreeItem$/i",
+					"group": "inline"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

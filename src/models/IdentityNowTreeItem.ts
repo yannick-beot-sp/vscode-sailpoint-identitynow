@@ -8,12 +8,15 @@ import { Command, TreeItem, TreeItemCollapsibleState } from 'vscode';
  * Containers for sources
  */
 export class TenantTreeItem extends TreeItem {
+    public readonly tenantName: string;
 
     constructor(
-        public readonly tenantName: string
+        tenantName: string
     ) {
         super(tenantName, TreeItemCollapsibleState.Collapsed);
+        this.tenantName = tenantName;
     }
+    contextValue = 'tenant';
     iconPath = {
         light: path.join(__filename, '..', '..', '..', 'resources', 'sailpoint.svg'),
         dark: path.join(__filename, '..', '..', '..', 'resources', 'sailpoint.svg')
@@ -30,6 +33,7 @@ export class SourcesTreeItem extends TreeItem {
     ) {
         super('Sources', TreeItemCollapsibleState.Collapsed);
     }
+    contextValue = 'sources';
     iconPath = {
         light: path.join(__filename, '..', '..', '..', 'resources', 'light', 'folder.svg'),
         dark: path.join(__filename, '..', '..', '..', 'resources', 'dark', 'folder.svg')
@@ -45,6 +49,7 @@ export class SourceTreeItem extends TreeItem {
     ) {
         super(label, TreeItemCollapsibleState.None);
     }
+    contextValue = 'source';
     iconPath = {
         light: path.join(__filename, '..', '..', '..', 'resources', 'light', 'source.svg'),
         dark: path.join(__filename, '..', '..', '..', 'resources', 'dark', 'source.svg')
@@ -62,6 +67,7 @@ export class TransformsTreeItem extends TreeItem {
     ) {
         super('Transforms', TreeItemCollapsibleState.None);
     }
+    contextValue = 'transforms';
     iconPath = {
         light: path.join(__filename, '..', '..', '..', 'resources', 'light', 'folder.svg'),
         dark: path.join(__filename, '..', '..', '..', 'resources', 'dark', 'folder.svg')

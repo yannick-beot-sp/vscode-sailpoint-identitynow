@@ -146,11 +146,11 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
 
             const credentials = JSON.parse(credentialsStr) as TenantCredentials;
             const tokenStr = await this.secretStorage.get(this.getAccessTokenKey(tenantName)) || "";
-
+            let token: TenantToken | null = null;
             if (!isEmpty(tokenStr)) {
-                let token: TenantToken | null = null;
+
                 try {
-                    const tokenJson:any = JSON.parse(tokenStr);
+                    const tokenJson: any = JSON.parse(tokenStr);
                     token = new TenantToken(
                         tokenJson.accessToken,
                         tokenJson.expires,
@@ -158,26 +158,27 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
                             clientId: tokenJson.client.clientId,
                             clientSecret: tokenJson.client.clientSecret
                         });
-                } catch(err) {
+                } catch (err) {
                     console.log("WARNING: could not parse Token: ", err);
                 }
-                if (token === null || token.expired()) {
-                    console.log("INFO: accessToken is expired. Updating Access Token");
-                    token = await this.createAccessToken(tenantName, credentials.clientId, credentials.clientSecret);
-                }
-                console.log("< getSessionByTenant for", tenantName);
-
-                return new SailPointIdentityNowPatSession(tenantName,
-                    credentials.clientId,
-                    token.accessToken,
-                    this.getSessionId(tenantName)
-                );
-
             } else {
-                console.log("WARNING: no token for tenant ", tenantName);
+                console.log("WARNING: no token for tenant", tenantName);
             }
+            if (token === null || token.expired()) {
+                console.log("INFO: accessToken is expired. Updating Access Token");
+                token = await this.createAccessToken(tenantName, credentials.clientId, credentials.clientSecret);
+            }
+            console.log("< getSessionByTenant for", tenantName);
+
+            return new SailPointIdentityNowPatSession(tenantName,
+                credentials.clientId,
+                token.accessToken,
+                this.getSessionId(tenantName)
+            );
+
+
         } else {
-            console.log("WARNING: no credentials for tenant ", tenantName);
+            console.log("WARNING: no credentials for tenant", tenantName);
         }
         console.log("< getSessionByTenant null");
         return null;

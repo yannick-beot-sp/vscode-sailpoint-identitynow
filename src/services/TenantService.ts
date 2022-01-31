@@ -26,7 +26,7 @@ export class TenantService {
 
     public setTenant(value: TenantInfo) {
         let tenants = this.storage.get<string[]>(TenantService.ALL_TENANTS_KEY);
-        if (tenants===undefined) {
+        if (tenants === undefined) {
             tenants = [];
         }
         if (tenants.indexOf(value.name) === -1) {
@@ -36,4 +36,19 @@ export class TenantService {
 
         this.storage.update(TenantService.TENANT_PREFIX + value.name, value);
     }
+
+    public removeTenant(tenantName: string) {
+        let tenants = this.storage.get<string[]>(TenantService.ALL_TENANTS_KEY);
+        if (tenants === undefined) {
+            tenants = [];
+        }
+        const index = tenants.indexOf(tenantName);
+
+        if (index > -1) {
+            tenants.splice(index, 1);
+            this.storage.update(TenantService.ALL_TENANTS_KEY, tenants);
+        }
+        this.storage.update(TenantService.TENANT_PREFIX + tenantName, null);
+    }
+
 }
