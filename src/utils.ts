@@ -2,6 +2,18 @@ export function isEmpty(strValue: string | null | undefined): boolean {
     return (!strValue || strValue.trim() === "" || (strValue.trim()).length === 0);
 }
 
+export function delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export function withQuery(url: string, params: any) {
+    let query = Object.keys(params)
+        .filter(k => params[k] !== undefined)
+        .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+        .join('&');
+    url += (url.indexOf('?') === -1 ? '?' : '&') + query;
+    return url;
+}
 
 export class EndpointUtil {
 

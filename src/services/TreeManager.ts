@@ -1,8 +1,9 @@
-import { authentication, window, TreeItem, commands } from "vscode";
-import { DialogResponses, IActionContext, UserCancelledError } from 'vscode-azureextensionui';
-import { TenantTreeItem } from "../models/IdentityNowTreeItem";
+import { authentication, window, commands, ProgressLocation } from "vscode";
+import { SourceTreeItem, TenantTreeItem } from "../models/IdentityNowTreeItem";
+import { delay } from "../utils";
 import { IdentityNowDataProvider } from "../views/IdentityNowDataProvider";
 import { SailPointIdentityNowAuthenticationProvider } from "./AuthenticationProvider";
+import { IdentityNowClient } from "./IdentityNowClient";
 import { TenantService } from "./TenantService";
 
 export class TreeManager {
@@ -12,8 +13,6 @@ export class TreeManager {
         private readonly tenantService: TenantService,
         private readonly authProvider: SailPointIdentityNowAuthenticationProvider
     ) { }
-
-
 
     public async removeTenant(item: TenantTreeItem): Promise<void> {
         console.log("> removeTenant", item);
@@ -27,7 +26,7 @@ export class TreeManager {
             `Are you sure you want to delete tenant ${tenantName}?`,
             ...["Yes", "No"]
         );
-        if (response!=="Yes") {
+        if (response !== "Yes") {
             console.log("< removeTenant: no delete");
         }
 
@@ -38,5 +37,41 @@ export class TreeManager {
         this.tenantService.removeTenant(tenantName);
         commands.executeCommand("vscode-sailpoint-identitynow.refresh-tenants");
         window.showInformationMessage(`Successfully deleted tenant ${tenantName}`);
+    }
+
+    public async aggregateSource(item: SourceTreeItem, disableOptimization = false): Promise<void> {
+        console.log("> aggregateSource", item, disableOptimization);
+        // assessing that item is a SourceTreeItem
+        if (item === undefined || !(item instanceof SourceTreeItem)) {
+            console.log("WARNING: aggregateSource: invalid item", item);
+            throw new Error("aggregateSource: invalid item");
+        }
+        const client = new IdentityNowClient(item.tenantName);
+        window.withProgress({
+            location: ProgressLocation.Notification,
+            title: `Aggregation of ${item.label}`,
+            cancellable: false
+        }, async (progress, token) => {
+            const job = await client.startAggregation(item.ccId);
+            console.log("job =", job);
+            let task: any | null = null;
+            do {
+                await delay(5000);
+                task = await client.getAggregationJob(item.ccId, job.task.id);
+                console.log("task =", task);
+
+            } while (task !== null && task.status === "PENDING");
+            if (task !== null) {
+                if (task.status === "SUCCESS") {
+                    window.showInformationMessage(`Source ${task.object.displayName} successfully aggregated`);
+                } else if (task.status === "WARNING") {
+                    window.showWarningMessage(
+                        `Warning during aggregation of ${task.object.displayName}: ${task.details?.messages?.Warn}`);
+                } else {
+                    window.showErrorMessage(
+                        `Aggregation of ${task.object.displayName} failed: ${task.status}: ${task.details?.messages?.Error}`);
+                }
+            };
+        });
     }
 }

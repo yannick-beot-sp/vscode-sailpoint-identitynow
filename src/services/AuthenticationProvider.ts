@@ -139,7 +139,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
         return result;
     }
 
-    async getSessionByTenant(tenantName: string): Promise<SailPointIdentityNowPatSession | null> {
+    private async getSessionByTenant(tenantName: string): Promise<SailPointIdentityNowPatSession | null> {
         console.log("> getSessionByTenant", tenantName);
         const credentialsStr = await this.secretStorage.get(this.getPatKey(tenantName));
         if (credentialsStr !== undefined) {

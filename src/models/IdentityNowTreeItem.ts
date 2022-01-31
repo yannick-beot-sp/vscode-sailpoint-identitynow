@@ -45,7 +45,8 @@ export class SourceTreeItem extends TreeItem {
     constructor(
         public readonly tenantName: string,
         label: string,
-        public readonly id: string
+        public readonly id: string,
+        public readonly ccId: Number,
     ) {
         super(label, TreeItemCollapsibleState.None);
     }
