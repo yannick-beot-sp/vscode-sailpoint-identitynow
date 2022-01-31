@@ -57,6 +57,28 @@ export class IdentityNowClient {
         return res;
     }
 
+    public async resetSource(sourceID: Number): Promise<any> {
+        console.log('> IdentityNowClient.resetSource', sourceID);
+        const endpoint = EndpointUtil.getCCUrl(this.tenantName) + '/source/reset/' + sourceID;
+        const headers = await this.prepareHeaders();
+        headers['Content-Type'] = 'application/x-www-form-urlencoded';
+
+        const req = await fetch(endpoint, {
+            method: 'POST',
+            headers: headers
+        });
+        if (!req.ok) {
+            let detail = req.statusText;
+            if (req.status === 400) {
+                const res = await req.json();
+                detail = res.exception_message;
+            }
+            throw new Error("Could not reset source: " + detail);
+        }
+        const res = await req.json();
+        return res;
+    }
+
     public async getAggregationJob(sourceID: Number, taskId: string, jobType = AggregationJob.CLOUD_ACCOUNT_AGGREGATION): Promise<any> {
         console.log('> getAggregationJob', sourceID, taskId, jobType);
         let endpoint = EndpointUtil.getCCUrl(this.tenantName) + '/event/list';
@@ -91,8 +113,8 @@ export class IdentityNowClient {
 
 }
 
-
 export enum AggregationJob {
     CLOUD_ACCOUNT_AGGREGATION,
-    ENTITLEMENT_AGGREGATION
+    ENTITLEMENT_AGGREGATION,
+    SOURCE_RESET
 }

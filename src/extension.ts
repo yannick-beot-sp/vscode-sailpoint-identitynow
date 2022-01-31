@@ -57,6 +57,9 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand('vscode-sailpoint-identitynow.aggregate-source-disable-optimization',
 			(tenantTreeItem) => treeManager.aggregateSource(tenantTreeItem, true)));
+	context.subscriptions.push(
+		vscode.commands.registerCommand("vscode-sailpoint-identitynow.reset-source",
+			(tenantTreeItem) => treeManager.resetSource(tenantTreeItem)));
 }
 
 // this method is called when your extension is deactivated

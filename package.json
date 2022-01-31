@@ -29,8 +29,7 @@
 				{
 					"id": "vscode-sailpoint-identitynow.view",
 					"name": "IdentityNow Tenants",
-					"icon": "resources/sailpoint.svg",
-					"contextualTitle": "Package Explorer"
+					"icon": "resources/sailpoint.svg"
 				}
 			]
 		},
@@ -58,6 +57,10 @@
 			{
 				"command": "vscode-sailpoint-identitynow.aggregate-source-disable-optimization",
 				"title": "Aggregate source without optimization"
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.reset-source",
+				"title": "Reset source"
 			}
 		],
 		"menus": {
@@ -72,6 +75,10 @@
 				},
 				{
 					"command": "vscode-sailpoint-identitynow.aggregate-source-disable-optimization",
+					"when": "never"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.reset-source",
 					"when": "never"
 				}
 			],
@@ -98,6 +105,10 @@
 				},
 				{
 					"command": "vscode-sailpoint-identitynow.aggregate-source-disable-optimization",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.reset-source",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
 				},
 				{

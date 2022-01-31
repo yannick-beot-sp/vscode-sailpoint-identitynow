@@ -3,7 +3,7 @@ import { SourceTreeItem, TenantTreeItem } from "../models/IdentityNowTreeItem";
 import { delay } from "../utils";
 import { IdentityNowDataProvider } from "../views/IdentityNowDataProvider";
 import { SailPointIdentityNowAuthenticationProvider } from "./AuthenticationProvider";
-import { IdentityNowClient } from "./IdentityNowClient";
+import { AggregationJob, IdentityNowClient } from "./IdentityNowClient";
 import { TenantService } from "./TenantService";
 
 export class TreeManager {
@@ -52,7 +52,7 @@ export class TreeManager {
             title: `Aggregation of ${item.label}`,
             cancellable: false
         }, async (progress, token) => {
-            const job = await client.startAggregation(item.ccId);
+            const job = await client.startAggregation(item.ccId, disableOptimization);
             console.log("job =", job);
             let task: any | null = null;
             do {
@@ -70,6 +70,49 @@ export class TreeManager {
                 } else {
                     window.showErrorMessage(
                         `Aggregation of ${task.object.displayName} failed: ${task.status}: ${task.details?.messages?.Error}`);
+                }
+            };
+        });
+    }
+
+    public async resetSource(item: SourceTreeItem): Promise<void> {
+        console.log("> resetSource", item);
+        // assessing that item is a SourceTreeItem
+        if (item === undefined || !(item instanceof SourceTreeItem)) {
+            console.log("WARNING: resetSource: invalid item", item);
+            throw new Error("aggregateSource: invalid item");
+        }
+        const client = new IdentityNowClient(item.tenantName);
+        window.withProgress({
+            location: ProgressLocation.Notification,
+            title: `Reset of ${item.label}`,
+            cancellable: false
+        }, async (progress, token) => {
+            let job = null;
+            try {
+                job = await client.resetSource(item.ccId);
+            } catch (err) {
+                window.showErrorMessage('' + err);
+                return;
+            }
+            console.log("job =", job);
+            
+            let task: any | null = null;
+            do {
+                await delay(5000);
+                task = await client.getAggregationJob(item.ccId, job.id, AggregationJob.SOURCE_RESET);
+                console.log("task =", task);
+
+            } while (task !== null && task.status === "PENDING");
+            if (task !== null) {
+                if (task.status === "SUCCESS") {
+                    window.showInformationMessage(`Source ${task.object.displayName} successfully reset`);
+                } else if (task.status === "WARNING") {
+                    window.showWarningMessage(
+                        `Warning during reset of ${task.object.displayName}: ${task.details?.messages?.Warn}`);
+                } else {
+                    window.showErrorMessage(
+                        `Reset of ${task.object.displayName} failed: ${task.status}: ${task.details?.messages?.Error}`);
                 }
             };
         });
