@@ -13,7 +13,8 @@ import {
     window,
 } from 'vscode';
 import { TenantCredentials, TenantToken } from '../models/TenantInfo';
-import { EndpointUtil, hydrate, isEmpty } from '../utils';
+import { isEmpty } from '../utils';
+import { EndpointUtils } from '../utils/EndpointUtils';
 import { TenantService } from './TenantService';
 
 class SailPointIdentityNowPatSession implements AuthenticationSession {
@@ -231,7 +232,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
         const idnAuth = new ClientOAuth2({
             clientId: clientId,
             clientSecret: clientSecret,
-            accessTokenUri: EndpointUtil.getAccessTokenUrl(tenantName)
+            accessTokenUri: EndpointUtils.getAccessTokenUrl(tenantName)
         });
         const oauth2token = await idnAuth.credentials.getToken();
         console.log('Successfully logged in to IdentityNow');

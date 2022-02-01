@@ -1,5 +1,6 @@
 import path = require('path');
-import { Command, TreeItem, TreeItemCollapsibleState } from 'vscode';
+import { Command, TreeItem, TreeItemCollapsibleState, Uri } from 'vscode';
+import { getResourceUri } from '../utils/UriUtils';
 
 
 
@@ -40,16 +41,37 @@ export class SourcesTreeItem extends TreeItem {
     };
 }
 
-export class SourceTreeItem extends TreeItem {
-
+export class IdentityNowResourceTreeItem extends TreeItem {
+    public readonly uri: Uri;
     constructor(
         public readonly tenantName: string,
         label: string,
+        resourceType: string,
         public readonly id: string,
+        collapsible: TreeItemCollapsibleState
+    ) {
+        super(label, collapsible);
+        this.uri = getResourceUri(tenantName, resourceType, id, label);
+    }
+    command = {
+        title: "open",
+        command: "vscode-sailpoint-identitynow.open-source",
+        arguments: [this]
+    };
+}
+
+export class SourceTreeItem extends IdentityNowResourceTreeItem {
+
+    constructor(
+        tenantName: string,
+        label: string,
+        id: string,
         public readonly ccId: Number,
     ) {
-        super(label, TreeItemCollapsibleState.None);
+        super(tenantName, label, 'sources', id, TreeItemCollapsibleState.None);
+
     }
+
     contextValue = 'source';
     iconPath = {
         light: path.join(__filename, '..', '..', '..', 'resources', 'light', 'source.svg'),

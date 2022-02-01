@@ -96,7 +96,7 @@ export class TreeManager {
                 return;
             }
             console.log("job =", job);
-            
+
             let task: any | null = null;
             do {
                 await delay(5000);

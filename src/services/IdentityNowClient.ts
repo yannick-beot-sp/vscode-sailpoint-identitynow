@@ -1,8 +1,9 @@
 import { authentication } from "vscode";
-import { withQuery, EndpointUtil } from "../utils";
+import { EndpointUtils } from "../utils/EndpointUtils";
 import { SailPointIdentityNowAuthenticationProvider } from "./AuthenticationProvider";
 import 'isomorphic-fetch';
 import 'isomorphic-form-data';
+import { withQuery } from "../utils/UriUtils";
 
 // import FormData = require('form-data');
 
@@ -14,7 +15,26 @@ export class IdentityNowClient {
 
     public async getSources(): Promise<any> {
         console.log('> getSources');
-        const endpoint = EndpointUtil.getV3Url(this.tenantName) + '/sources?sorters=name';
+        const endpoint = EndpointUtils.getV3Url(this.tenantName) + '/sources?sorters=name';
+        // process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; 
+        console.log('endpoint = ' + endpoint);
+        const headers = await this.prepareHeaders();
+        const req = await fetch(endpoint, {
+            headers: headers
+        });
+
+        if (!req.ok) {
+
+            throw new Error(req.statusText);
+        }
+        const res = await req.json();
+
+        return res;
+    }
+
+    public async getSource(id: string): Promise<any> {
+        console.log('> getSource', id);
+        const endpoint = EndpointUtils.getV3Url(this.tenantName) + '/sources/' + id;
         // process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; 
         console.log('endpoint = ' + endpoint);
         const headers = await this.prepareHeaders();
@@ -22,6 +42,36 @@ export class IdentityNowClient {
             headers: headers
         });
         if (!req.ok) {
+            if (req.status === 404) {
+                return null;
+            }
+            throw new Error(req.statusText);
+        }
+        const res = await req.json();
+
+        return res;
+    }
+
+    public async updateSource(id: string, data: string): Promise<any> {
+        console.log('> updateSource', id);
+        const endpoint = EndpointUtils.getV3Url(this.tenantName) + '/sources/' + id;
+        console.log('endpoint = ' + endpoint);
+        const headers = await this.prepareHeaders();
+        const req = await fetch(endpoint, {
+            method: 'PUT',
+            headers: headers,
+            body: data
+        });
+
+        if (!req.ok) {
+            if (req.status === 404) {
+                return null;
+            }
+            if (req.status === 400) {
+                const details = await req.json();
+                const detail = details?.messages?.text || req.statusText;
+                throw new Error(detail);
+            }
             throw new Error(req.statusText);
         }
         const res = await req.json();
@@ -38,7 +88,7 @@ export class IdentityNowClient {
     }
 
     public async startAggregation(sourceID: Number, disableOptimization = false): Promise<any> {
-        const endpoint = EndpointUtil.getCCUrl(this.tenantName) + '/source/loadAccounts/' + sourceID;
+        const endpoint = EndpointUtils.getCCUrl(this.tenantName) + '/source/loadAccounts/' + sourceID;
         const headers = await this.prepareHeaders();
 
         var formData = new FormData();
@@ -59,7 +109,7 @@ export class IdentityNowClient {
 
     public async resetSource(sourceID: Number): Promise<any> {
         console.log('> IdentityNowClient.resetSource', sourceID);
-        const endpoint = EndpointUtil.getCCUrl(this.tenantName) + '/source/reset/' + sourceID;
+        const endpoint = EndpointUtils.getCCUrl(this.tenantName) + '/source/reset/' + sourceID;
         const headers = await this.prepareHeaders();
         headers['Content-Type'] = 'application/x-www-form-urlencoded';
 
@@ -81,7 +131,7 @@ export class IdentityNowClient {
 
     public async getAggregationJob(sourceID: Number, taskId: string, jobType = AggregationJob.CLOUD_ACCOUNT_AGGREGATION): Promise<any> {
         console.log('> getAggregationJob', sourceID, taskId, jobType);
-        let endpoint = EndpointUtil.getCCUrl(this.tenantName) + '/event/list';
+        let endpoint = EndpointUtils.getCCUrl(this.tenantName) + '/event/list';
         const headers = await this.prepareHeaders();
         const queryParams = {
             page: 1,

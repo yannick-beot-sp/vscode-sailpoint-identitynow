@@ -2,6 +2,8 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { AddTenantCommand } from './commands/addTenant';
+import { OpenSourceCommand } from './commands/openSource';
+import { IdentityNowResourceProvider } from './files/IdentityNowResourceProvider';
 import { SailPointIdentityNowAuthenticationProvider } from './services/AuthenticationProvider';
 import { TenantService } from './services/TenantService';
 import { TreeManager } from './services/TreeManager';
@@ -33,7 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
 	));
 
 
-	const addTenantCommand: AddTenantCommand = new AddTenantCommand(tenantService);
+	const addTenantCommand = new AddTenantCommand(tenantService);
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
@@ -60,6 +62,17 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand("vscode-sailpoint-identitynow.reset-source",
 			(tenantTreeItem) => treeManager.resetSource(tenantTreeItem)));
+
+	const openSourceCommand = new OpenSourceCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand("vscode-sailpoint-identitynow.open-source",
+			openSourceCommand.execute));
+
+	context.subscriptions.push(
+		vscode.workspace.registerFileSystemProvider(
+			'idn',
+			new IdentityNowResourceProvider()
+	));
 }
 
 // this method is called when your extension is deactivated

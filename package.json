@@ -51,6 +51,10 @@
 				}
 			},
 			{
+				"command": "vscode-sailpoint-identitynow.open-source",
+				"title": "Open source"
+			},
+			{
 				"command": "vscode-sailpoint-identitynow.aggregate-source",
 				"title": "Aggregate source"
 			},
@@ -71,6 +75,10 @@
 				},
 				{
 					"command": "vscode-sailpoint-identitynow.aggregate-source",
+					"when": "never"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.open-source",
 					"when": "never"
 				},
 				{
@@ -109,6 +117,10 @@
 				},
 				{
 					"command": "vscode-sailpoint-identitynow.reset-source",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.open-source",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
 				},
 				{
