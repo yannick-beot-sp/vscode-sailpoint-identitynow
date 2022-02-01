@@ -32,10 +32,14 @@ export class IdentityNowClient {
         return res;
     }
 
-    public async getSource(id: string): Promise<any> {
-        console.log('> getSource', id);
-        const endpoint = EndpointUtils.getV3Url(this.tenantName) + '/sources/' + id;
-        // process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; 
+    /**
+     * 
+     * @param path Generic method to get resource
+     * @returns 
+     */
+    public async getResource(path: string): Promise<any> {
+        console.log('> getResource', path);
+        const endpoint = EndpointUtils.getV3Url(this.tenantName) + path;
         console.log('endpoint = ' + endpoint);
         const headers = await this.prepareHeaders();
         const req = await fetch(endpoint, {
@@ -52,9 +56,32 @@ export class IdentityNowClient {
         return res;
     }
 
-    public async updateSource(id: string, data: string): Promise<any> {
-        console.log('> updateSource', id);
-        const endpoint = EndpointUtils.getV3Url(this.tenantName) + '/sources/' + id;
+    /**
+     * NOTE: "List transforms" endpoint does not support sorters yet
+     * @returns return all transforms
+     */
+    public async getTransforms(): Promise<any> {
+        console.log('> getTransforms');
+        const endpoint = EndpointUtils.getV3Url(this.tenantName) + '/transforms';
+        console.log('endpoint = ' + endpoint);
+        const headers = await this.prepareHeaders();
+        const req = await fetch(endpoint, {
+            headers: headers
+        });
+
+        if (!req.ok) {
+
+            throw new Error(req.statusText);
+        }
+        const res = await req.json();
+
+        return res;
+    }
+
+
+    public async updateResource(path: string, data: string): Promise<any> {
+        console.log('> updateResource', path);
+        const endpoint = EndpointUtils.getV3Url(this.tenantName) + path;
         console.log('endpoint = ' + endpoint);
         const headers = await this.prepareHeaders();
         const req = await fetch(endpoint, {
@@ -69,7 +96,7 @@ export class IdentityNowClient {
             }
             if (req.status === 400) {
                 const details = await req.json();
-                const detail = details?.messages?.text || req.statusText;
+                const detail = details?.messages[0]?.text || req.statusText;
                 throw new Error(detail);
             }
             throw new Error(req.statusText);
@@ -82,7 +109,9 @@ export class IdentityNowClient {
     private async prepareHeaders(): Promise<any> {
         const session = await authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [this.tenantName]);
         return {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
             "Authorization": `Bearer ${session?.accessToken}`,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
             "Content-Type": "application/json"
         };
     }
@@ -164,7 +193,10 @@ export class IdentityNowClient {
 }
 
 export enum AggregationJob {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     CLOUD_ACCOUNT_AGGREGATION,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     ENTITLEMENT_AGGREGATION,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     SOURCE_RESET
 }

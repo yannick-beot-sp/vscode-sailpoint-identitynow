@@ -10,7 +10,7 @@ export function withQuery(url: string, params: any): string {
 }
 
 export function getResourceUri(tenantName: string, v3resourceType: string, id: string, name: string): Uri {
-    const baseUri = Uri.from({ scheme: "idn", authority: tenantName, path: '/v3' });
+    const baseUri = Uri.from({ scheme: "idn", authority: tenantName, path: '/' });
     return Uri.joinPath(
         baseUri,
         v3resourceType,
@@ -22,6 +22,22 @@ export function getResourceUri(tenantName: string, v3resourceType: string, id: s
 export function getIdByUri(uri: Uri): string | null {
     const path = uri.path || "";
     const found = path.match(/^\/.+\/(.*?)\/.*?/);
+    // Found including the whole match and the group
+    // cf. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/match
+    if (found && found.length === 2) {
+        return found[1];
+    }
+    return null;
+}
+
+/**
+ * Will remove the "name" part
+ * @param uri 
+ * @returns 
+ */
+export function getPathByUri(uri: Uri): string | null {
+    const path = uri.path || "";
+    const found = path.match(/^(\/.+)\/.*?$/);
     // Found including the whole match and the group
     // cf. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/match
     if (found && found.length === 2) {

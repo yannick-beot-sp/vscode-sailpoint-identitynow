@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { Disposable, Event, FileChangeEvent, FileStat, FileSystemProvider, FileType, Uri } from "vscode";
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { str2Uint8Array, toTimestamp, uint8Array2Str } from '../utils';
-import { getIdByUri } from '../utils/UriUtils';
+import { getIdByUri, getPathByUri } from '../utils/UriUtils';
 
 export class IdentityNowResourceProvider implements FileSystemProvider {
     private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
@@ -40,24 +40,19 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
         console.log('> IdentityNowResourceProvider.lookupResource', uri);
         const tenantName = uri.authority;
         console.log('tenantName =', tenantName);
-        const id = getIdByUri(uri);
-        console.log('id =', id);
-
-        if (!id || !id.match(/[a-f0-9]{32}/)) {
-            throw new Error("No id found or invalid:" + id);
+        const path = getPathByUri(uri);
+        console.log('path =', path);
+        if (!path) {
+            throw Error("Invalid uri:" + uri);
         }
+
         const client = new IdentityNowClient(tenantName);
 
-        if (uri.path.match('sources')) {
-            const data = await client.getSource(id);
-            if (!data) {
-                throw vscode.FileSystemError.FileNotFound(uri);
-            }
-            return data;
-        } else if (uri.path.match('transforms')) {
-            throw new Error("Method not implemented.");
+        const data = await client.getResource(path);
+        if (!data) {
+            throw vscode.FileSystemError.FileNotFound(uri);
         }
-        throw new Error("Unsupported URI: " + uri);
+        return data;
     }
 
     async writeFile(uri: Uri, content: Uint8Array, options: { create: boolean; overwrite: boolean; }): void | Thenable<void> {
@@ -65,29 +60,27 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 
         const tenantName = uri.authority;
         console.log('tenantName =', tenantName);
-        const id = getIdByUri(uri);
-        console.log('id =', id);
-
-        if (!id || !id.match(/[a-f0-9]{32}/)) {
-            throw new Error("No id found or invalid:" + id);
+        const path = getPathByUri(uri);
+        console.log('path =', path);
+        if (!path) {
+            throw Error("Invalid uri:" + uri);
         }
         const client = new IdentityNowClient(tenantName);
+        let data = uint8Array2Str(content);
 
-        if (uri.path.match('sources')) {
-            const data = uint8Array2Str(content);
-            /*
-            if (options.create) {
-                throw new Error("Create source not implemented.");
-            }*/
-            const updatedData = await client.updateSource(id, data);
-            if (!updatedData) {
-                throw vscode.FileSystemError.FileNotFound(uri);
-            }
-            return;
-        } else if (uri.path.match('transforms')) {
-            throw new Error("transforms not implemented.");
+        // Need to update the content to remove id and internal properties from the payload
+        // to prevent a bad request error
+        if (path.match("transform")) {
+            let transform = JSON.parse(data);
+            delete transform.id;
+            delete transform.internal;
+            data=JSON.stringify(transform);
         }
-        throw new Error("Unsupported URI: " + uri);
+
+        const updatedData = await client.updateResource(path, data);
+        if (!updatedData) {
+            throw vscode.FileSystemError.FileNotFound(uri);
+        }
     }
     delete(uri: Uri, options: { recursive: boolean; }): void | Thenable<void> {
         throw new Error("Method delete not implemented.");

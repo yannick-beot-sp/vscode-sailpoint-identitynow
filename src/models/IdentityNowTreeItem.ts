@@ -88,7 +88,7 @@ export class TransformsTreeItem extends TreeItem {
     constructor(
         public readonly tenantName: string
     ) {
-        super('Transforms', TreeItemCollapsibleState.None);
+        super('Transforms', TreeItemCollapsibleState.Collapsed);
     }
     contextValue = 'transforms';
     iconPath = {
@@ -96,3 +96,22 @@ export class TransformsTreeItem extends TreeItem {
         dark: path.join(__filename, '..', '..', '..', 'resources', 'dark', 'folder.svg')
     };
 }
+
+export class TransformTreeItem extends IdentityNowResourceTreeItem {
+
+    constructor(
+        tenantName: string,
+        label: string,
+        id: string
+    ) {
+        super(tenantName, label, 'transforms', id, TreeItemCollapsibleState.None);
+
+    }
+
+    contextValue = 'transform';
+    iconPath = {
+        light: path.join(__filename, '..', '..', '..', 'resources', 'light', 'transform.svg'),
+        dark: path.join(__filename, '..', '..', '..', 'resources', 'dark', 'transform.svg')
+    };
+}
+

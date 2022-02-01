@@ -1,5 +1,5 @@
 import { EventEmitter, ExtensionContext, TreeDataProvider, TreeItem, Event } from 'vscode';
-import { SourcesTreeItem, SourceTreeItem, TenantTreeItem, TransformsTreeItem } from '../models/IdentityNowTreeItem';
+import { SourcesTreeItem, SourceTreeItem, TenantTreeItem, TransformsTreeItem, TransformTreeItem } from '../models/IdentityNowTreeItem';
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { TenantService } from '../services/TenantService';
 
@@ -39,7 +39,15 @@ export class IdentityNowDataProvider implements TreeDataProvider<TreeItem> {
                 }
             }
         } else if (item instanceof TransformsTreeItem) {
-
+            const client = new IdentityNowClient(item.tenantName);
+            const transforms = await client.getTransforms();
+            if (transforms !== undefined && transforms instanceof Array) {
+                transforms.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1);
+                for (let index = 0; index < transforms.length; index++) {
+                    const element = transforms[index];
+                    results.push(new TransformTreeItem(item.tenantName, element.name, element.id));
+                }
+            }
         }
         console.log("< getChildren", results);
         return results;
