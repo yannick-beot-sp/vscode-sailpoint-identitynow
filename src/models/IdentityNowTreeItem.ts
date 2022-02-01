@@ -20,7 +20,7 @@ export class TenantTreeItem extends TreeItem {
     contextValue = 'tenant';
     iconPath = {
         light: path.join(__filename, '..', '..', '..', 'resources', 'sailpoint.svg'),
-        dark: path.join(__filename, '..', '..', '..', 'resources', 'sailpoint.svg')
+        dark: path.join(__filename, '..', '..', '..', 'resources', 'dark', 'sailpoint.svg')
     };
 }
 

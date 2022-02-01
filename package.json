@@ -52,7 +52,7 @@
 			},
 			{
 				"command": "vscode-sailpoint-identitynow.open-source",
-				"title": "Open source"
+				"title": "Open"
 			},
 			{
 				"command": "vscode-sailpoint-identitynow.aggregate-source",
@@ -124,9 +124,8 @@
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
 				},
 				{
-					"command": "vscode-sailpoint-identitynow.refresh-tenants",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /TransformsTreeItem$/i",
-					"group": "inline"
+					"command": "vscode-sailpoint-identitynow.open-source",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == transform"
 				}
 			]
 		}
