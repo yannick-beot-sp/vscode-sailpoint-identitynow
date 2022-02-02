@@ -1,4 +1,4 @@
-import { EventEmitter, ExtensionContext, TreeDataProvider, TreeItem, Event } from 'vscode';
+import { EventEmitter, ExtensionContext, TreeDataProvider, TreeItem, Event, TreeItemCollapsibleState, ThemeIcon } from 'vscode';
 import { SourcesTreeItem, SourceTreeItem, TenantTreeItem, TransformsTreeItem, TransformTreeItem } from '../models/IdentityNowTreeItem';
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { TenantService } from '../services/TenantService';
@@ -54,6 +54,13 @@ export class IdentityNowDataProvider implements TreeDataProvider<TreeItem> {
     }
 
     getTreeItem(item: TreeItem): TreeItem {
+        if (item.contextValue === "sources" || item.contextValue === "transforms") {
+           if (item.collapsibleState === TreeItemCollapsibleState.Expanded) {
+                item.iconPath =  new ThemeIcon('folder-opened');
+            } else {
+                item.iconPath = new ThemeIcon('folder');
+            }
+        }
         return item;
     }
 }

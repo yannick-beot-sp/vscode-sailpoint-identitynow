@@ -35,10 +35,11 @@ export class SourcesTreeItem extends TreeItem {
         super('Sources', TreeItemCollapsibleState.Collapsed);
     }
     contextValue = 'sources';
+    /*
     iconPath = {
         light: path.join(__filename, '..', '..', '..', 'resources', 'light', 'folder.svg'),
         dark: path.join(__filename, '..', '..', '..', 'resources', 'dark', 'folder.svg')
-    };
+    };*/
 }
 
 export class IdentityNowResourceTreeItem extends TreeItem {
@@ -91,10 +92,11 @@ export class TransformsTreeItem extends TreeItem {
         super('Transforms', TreeItemCollapsibleState.Collapsed);
     }
     contextValue = 'transforms';
+    /*
     iconPath = {
         light: path.join(__filename, '..', '..', '..', 'resources', 'light', 'folder.svg'),
         dark: path.join(__filename, '..', '..', '..', 'resources', 'dark', 'folder.svg')
-    };
+    };*/
 }
 
 export class TransformTreeItem extends IdentityNowResourceTreeItem {

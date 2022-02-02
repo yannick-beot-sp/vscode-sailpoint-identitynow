@@ -43,12 +43,9 @@
 				"title": "Remove tenant"
 			},
 			{
-				"command": "vscode-sailpoint-identitynow.refresh-tenants",
+				"command": "vscode-sailpoint-identitynow.refresh",
 				"title": "IdentityNow: Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
+				"icon": "$(refresh)"
 			},
 			{
 				"command": "vscode-sailpoint-identitynow.open-source",
@@ -65,6 +62,11 @@
 			{
 				"command": "vscode-sailpoint-identitynow.reset-source",
 				"title": "Reset source"
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.new-transform",
+				"title": "New transform",
+				"icon": "$(add)"
 			}
 		],
 		"menus": {
@@ -88,11 +90,15 @@
 				{
 					"command": "vscode-sailpoint-identitynow.reset-source",
 					"when": "never"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.new-transform",
+					"when": "never"
 				}
 			],
 			"view/title": [
 				{
-					"command": "vscode-sailpoint-identitynow.refresh-tenants",
+					"command": "vscode-sailpoint-identitynow.refresh",
 					"when": "view == vscode-sailpoint-identitynow.view",
 					"group": "navigation"
 				}
@@ -103,7 +109,7 @@
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
 				},
 				{
-					"command": "vscode-sailpoint-identitynow.refresh-tenants",
+					"command": "vscode-sailpoint-identitynow.refresh",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == sources",
 					"group": "inline"
 				},
@@ -122,6 +128,16 @@
 				{
 					"command": "vscode-sailpoint-identitynow.open-source",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.new-transform",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == transforms",
+					"group": "inline"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.refresh",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == transforms",
+					"group": "inline"
 				},
 				{
 					"command": "vscode-sailpoint-identitynow.open-source",
