@@ -22,12 +22,13 @@ export class TreeManager {
             throw new Error("removeTenant: invalid item");
         }
         const tenantName = item.tenantName || "";
-        const response = await window.showInformationMessage(
+        const response = await window.showWarningMessage(
             `Are you sure you want to delete tenant ${tenantName}?`,
             ...["Yes", "No"]
         );
         if (response !== "Yes") {
             console.log("< removeTenant: no delete");
+            return;
         }
 
         const session = await authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [tenantName], { createIfNone: false });
