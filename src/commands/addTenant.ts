@@ -1,4 +1,4 @@
-import { window, ExtensionContext, authentication } from 'vscode';
+import { window, ExtensionContext, authentication, commands } from 'vscode';
 import { SailPointIdentityNowAuthenticationProvider } from '../services/AuthenticationProvider';
 import { TenantService } from '../services/TenantService';
 import { isEmpty } from '../utils';
@@ -30,17 +30,17 @@ export class AddTenantCommand {
 
     async execute(context: ExtensionContext): Promise<void> {
 
-        let tenantName = await this.askTenant();
+        let tenantName = await this.askTenant() || "";
         if (isEmpty(tenantName)) {
             return;
         }
-        tenantName = tenantName?.toLowerCase() as string;
+        tenantName = tenantName.toLowerCase();
 
         const session = await authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [tenantName], { createIfNone: true });
         if (!isEmpty(session.accessToken)) {
             window.showInformationMessage(`Tenant ${tenantName} added!`);
             this.tenantService.setTenant({name:tenantName, apiUrl:''});
-            // console.log({ "accessToken": session.accessToken });
+            commands.executeCommand("vscode-sailpoint-identitynow.refresh-tenants");
         }
     }
 }
