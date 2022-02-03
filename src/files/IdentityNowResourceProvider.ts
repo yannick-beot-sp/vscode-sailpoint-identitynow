@@ -14,7 +14,7 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
         return new vscode.Disposable(() => { });
     }
 
-    async stat(uri: Uri): FileStat | Thenable<FileStat> {
+    async stat(uri: Uri): Promise<FileStat> {
         console.log('> IdentityNowResourceProvider.stat', uri);
         // Not optimized here but do not 
         const data = await this.lookupResource(uri);
@@ -31,7 +31,7 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
     createDirectory(uri: Uri): void | Thenable<void> {
         throw new Error("Method createDirectory not implemented.");
     }
-    async readFile(uri: Uri): Uint8Array | Thenable<Uint8Array> {
+    async readFile(uri: Uri): Promise<Uint8Array> {
         console.log('> IdentityNowResourceProvider.readFile', uri);
         const data = await this.lookupResource(uri);
         return str2Uint8Array(convertToText(data));
@@ -61,7 +61,7 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
         return data;
     }
 
-    async writeFile(uri: Uri, content: Uint8Array, options: { create: boolean; overwrite: boolean; }): void | Thenable<void> {
+    async writeFile(uri: Uri, content: Uint8Array, options: { create: boolean; overwrite: boolean; }): Promise<void> {
         console.log('> IdentityNowResourceProvider.writeFile', uri, options);
 
         const tenantName = uri.authority;

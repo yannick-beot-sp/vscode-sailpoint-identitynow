@@ -1,5 +1,4 @@
-import path = require('path');
-import { TreeItem, TreeItemCollapsibleState, Uri } from 'vscode';
+import { ExtensionContext, TreeItem, TreeItemCollapsibleState, Uri } from 'vscode';
 import { getResourceUri } from '../utils/UriUtils';
 import * as commands from '../commands/constants';
 
@@ -10,19 +9,19 @@ import * as commands from '../commands/constants';
  * Containers for sources
  */
 export class TenantTreeItem extends TreeItem {
-    public readonly tenantName: string;
 
     constructor(
-        tenantName: string
+        public readonly tenantName: string,
+        context: ExtensionContext
     ) {
         super(tenantName, TreeItemCollapsibleState.Collapsed);
-        this.tenantName = tenantName;
+        this.iconPath = {
+            light: context.asAbsolutePath('resources/sailpoint.svg'),
+            dark:  context.asAbsolutePath('resources/dark/sailpoint.svg')
+        };
     }
     contextValue = 'tenant';
-    iconPath = {
-        light: path.join(__filename, '..', '..', '..', 'resources', 'sailpoint.svg'),
-        dark: path.join(__filename, '..', '..', '..', 'resources', 'dark', 'sailpoint.svg')
-    };
+    
 }
 
 /**
@@ -36,11 +35,6 @@ export class SourcesTreeItem extends TreeItem {
         super('Sources', TreeItemCollapsibleState.Collapsed);
     }
     contextValue = 'sources';
-    /*
-    iconPath = {
-        light: path.join(__filename, '..', '..', '..', 'resources', 'light', 'folder.svg'),
-        dark: path.join(__filename, '..', '..', '..', 'resources', 'dark', 'folder.svg')
-    };*/
 }
 
 export class IdentityNowResourceTreeItem extends TreeItem {
@@ -69,16 +63,18 @@ export class SourceTreeItem extends IdentityNowResourceTreeItem {
         label: string,
         id: string,
         public readonly ccId: Number,
+        context: ExtensionContext
     ) {
         super(tenantName, label, 'sources', id, TreeItemCollapsibleState.None);
-
+        this.iconPath = {
+            light: context.asAbsolutePath('resources/light/source.svg'),
+            dark:  context.asAbsolutePath('resources/dark/source.svg')
+        };
     }
 
     contextValue = 'source';
-    iconPath = {
-        light: path.join(__filename, '..', '..', '..', 'resources', 'light', 'source.svg'),
-        dark: path.join(__filename, '..', '..', '..', 'resources', 'dark', 'source.svg')
-    };
+    
+        
 }
 
 
@@ -93,11 +89,7 @@ export class TransformsTreeItem extends TreeItem {
         super('Transforms', TreeItemCollapsibleState.Collapsed);
     }
     contextValue = 'transforms';
-    /*
-    iconPath = {
-        light: path.join(__filename, '..', '..', '..', 'resources', 'light', 'folder.svg'),
-        dark: path.join(__filename, '..', '..', '..', 'resources', 'dark', 'folder.svg')
-    };*/
+   
 }
 
 export class TransformTreeItem extends IdentityNowResourceTreeItem {
@@ -105,16 +97,16 @@ export class TransformTreeItem extends IdentityNowResourceTreeItem {
     constructor(
         tenantName: string,
         label: string,
-        id: string
+        id: string,
+        context: ExtensionContext
     ) {
         super(tenantName, label, 'transforms', id, TreeItemCollapsibleState.None);
-
+        this.iconPath = {
+            light:  Uri.joinPath(context.extensionUri, 'resources', 'light', 'transform.svg'),
+            dark:  Uri.joinPath(context.extensionUri, 'resources', 'dark', 'transform.svg')
+        };
     }
 
     contextValue = 'transform';
-    iconPath = {
-        light: path.join(__filename, '..', '..', '..', 'resources', 'light', 'transform.svg'),
-        dark: path.join(__filename, '..', '..', '..', 'resources', 'dark', 'transform.svg')
-    };
 }
 

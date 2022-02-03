@@ -2,8 +2,13 @@
 
 All notable changes to the "vscode-sailpoint-identitynow" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
-
 ## [Unreleased]
 
-- Initial release
+[0.0.1] - 2022/02/03
+### Added
+- Add tenant with Personal Access Token (PAT) authentication
+- Remove tenant
+- Open Sources and Transforms
+- Save Sources and Transforms
+- Create Transform
+- Remove Transform

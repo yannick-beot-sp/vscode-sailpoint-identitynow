@@ -12,7 +12,6 @@ export class IdentityNowDataProvider implements TreeDataProvider<TreeItem> {
         private readonly tenantService: TenantService) {
     }
 
-    // refresh(emitter: TreeItem | undefined | null | void): void {
     refresh(): void {
         console.log('> IdentityNowDataProvider.refresh');
         this._onDidChangeTreeData.fire();
@@ -25,7 +24,7 @@ export class IdentityNowDataProvider implements TreeDataProvider<TreeItem> {
             const tenants = this.tenantService.getTenants().sort();
             for (let index = 0; index < tenants.length; index++) {
                 const tenantName = tenants[index];
-                results.push(new TenantTreeItem(tenantName));
+                results.push(new TenantTreeItem(tenantName, this.context));
             }
 
         } else if (item instanceof TenantTreeItem) {
@@ -37,7 +36,7 @@ export class IdentityNowDataProvider implements TreeDataProvider<TreeItem> {
             if (sources !== undefined && sources instanceof Array) {
                 for (let index = 0; index < sources.length; index++) {
                     const element = sources[index];
-                    results.push(new SourceTreeItem(item.tenantName, element.name, element.id, element.connectorAttributes.cloudExternalId));
+                    results.push(new SourceTreeItem(item.tenantName, element.name, element.id, element.connectorAttributes.cloudExternalId, this.context));
                 }
             }
         } else if (item instanceof TransformsTreeItem) {
@@ -47,7 +46,7 @@ export class IdentityNowDataProvider implements TreeDataProvider<TreeItem> {
                 transforms.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1);
                 for (let index = 0; index < transforms.length; index++) {
                     const element = transforms[index];
-                    results.push(new TransformTreeItem(item.tenantName, element.name, element.id));
+                    results.push(new TransformTreeItem(item.tenantName, element.name, element.id, this.context));
                 }
             }
         }
@@ -57,12 +56,14 @@ export class IdentityNowDataProvider implements TreeDataProvider<TreeItem> {
 
     getTreeItem(item: TreeItem): TreeItem {
         if (item.contextValue === "sources" || item.contextValue === "transforms") {
+            // Manage folder icon for sources & transforms
             if (item.collapsibleState === TreeItemCollapsibleState.Expanded) {
                 item.iconPath = new ThemeIcon('folder-opened');
             } else {
                 item.iconPath = new ThemeIcon('folder');
             }
         }
+        // Otherwise, already TreeItem, so simply return the item as is
         return item;
     }
 }
