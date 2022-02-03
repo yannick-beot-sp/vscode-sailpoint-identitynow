@@ -1,4 +1,5 @@
-import { window, ExtensionContext, authentication, commands } from 'vscode';
+import * as vscode from 'vscode';
+import * as commands from './constants';
 import { SailPointIdentityNowAuthenticationProvider } from '../services/AuthenticationProvider';
 import { TenantService } from '../services/TenantService';
 import { isEmpty } from '../utils';
@@ -7,10 +8,10 @@ import { isEmpty } from '../utils';
 export class AddTenantCommand {
 
 
-    constructor(private readonly tenantService: TenantService){}
+    constructor(private readonly tenantService: TenantService) { }
 
     async askTenant(): Promise<string | undefined> {
-        const result = await window.showInputBox({
+        const result = await vscode.window.showInputBox({
             value: '',
             ignoreFocusOut: true,
             placeHolder: 'company or company.identitynow.com',
@@ -28,7 +29,7 @@ export class AddTenantCommand {
     }
 
 
-    async execute(context: ExtensionContext): Promise<void> {
+    async execute(context: vscode.ExtensionContext): Promise<void> {
 
         let tenantName = await this.askTenant() || "";
         if (isEmpty(tenantName)) {
@@ -36,11 +37,11 @@ export class AddTenantCommand {
         }
         tenantName = tenantName.toLowerCase();
 
-        const session = await authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [tenantName], { createIfNone: true });
+        const session = await vscode.authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [tenantName], { createIfNone: true });
         if (!isEmpty(session.accessToken)) {
-            window.showInformationMessage(`Tenant ${tenantName} added!`);
-            this.tenantService.setTenant({name:tenantName, apiUrl:''});
-            commands.executeCommand("vscode-sailpoint-identitynow.refresh");
+            vscode.window.showInformationMessage(`Tenant ${tenantName} added!`);
+            this.tenantService.setTenant({ name: tenantName, apiUrl: '' });
+            vscode.commands.executeCommand(commands.REFRESH);
         }
     }
 }

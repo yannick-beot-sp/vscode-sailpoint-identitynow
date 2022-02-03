@@ -48,8 +48,13 @@
 				"icon": "$(refresh)"
 			},
 			{
-				"command": "vscode-sailpoint-identitynow.open-source",
+				"command": "vscode-sailpoint-identitynow.open-resource",
 				"title": "Open"
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.remove-resource",
+				"title": "Delete",
+				"icon": "$(trash)"
 			},
 			{
 				"command": "vscode-sailpoint-identitynow.aggregate-source",
@@ -80,7 +85,11 @@
 					"when": "never"
 				},
 				{
-					"command": "vscode-sailpoint-identitynow.open-source",
+					"command": "vscode-sailpoint-identitynow.open-resource",
+					"when": "never"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.remove-resource",
 					"when": "never"
 				},
 				{
@@ -126,7 +135,7 @@
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
 				},
 				{
-					"command": "vscode-sailpoint-identitynow.open-source",
+					"command": "vscode-sailpoint-identitynow.open-resource",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
 				},
 				{
@@ -140,7 +149,11 @@
 					"group": "inline@2"
 				},
 				{
-					"command": "vscode-sailpoint-identitynow.open-source",
+					"command": "vscode-sailpoint-identitynow.open-resource",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == transform"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.remove-resource",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == transform"
 				}
 			]

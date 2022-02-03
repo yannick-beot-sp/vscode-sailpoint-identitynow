@@ -1,6 +1,7 @@
 import path = require('path');
-import { Command, TreeItem, TreeItemCollapsibleState, Uri } from 'vscode';
+import { TreeItem, TreeItemCollapsibleState, Uri } from 'vscode';
 import { getResourceUri } from '../utils/UriUtils';
+import * as commands from '../commands/constants';
 
 
 
@@ -56,7 +57,7 @@ export class IdentityNowResourceTreeItem extends TreeItem {
     }
     command = {
         title: "open",
-        command: "vscode-sailpoint-identitynow.open-source",
+        command: commands.OPEN_RESOURCE,
         arguments: [this]
     };
 }

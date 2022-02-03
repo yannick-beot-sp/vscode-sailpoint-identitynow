@@ -124,6 +124,31 @@ export class IdentityNowClient {
         return res;
     }
 
+    public async deleteResource(path: string): Promise<void> {
+        console.log('> IdentityNowClient.deleteResource', path);
+        const endpoint = EndpointUtils.getV3Url(this.tenantName) + path;
+        console.log('endpoint = ' + endpoint);
+        const headers = await this.prepareHeaders();
+        const req = await fetch(endpoint, {
+            method: 'DELETE',
+            headers: headers
+        });
+
+        if (!req.ok) {
+            if (req.status === 404) {
+                throw new Error("Resource not found");
+            }
+            if (req.status === 400) {
+                const details = await req.json();
+                const detail = details?.messages[0]?.text || req.statusText;
+                throw new Error(detail);
+            }
+            throw new Error(req.statusText);
+        }
+       
+        console.log('< IdentityNowClient.deleteResource');
+    }
+
     public async updateResource(path: string, data: string): Promise<any> {
         console.log('> updateResource', path);
         const endpoint = EndpointUtils.getV3Url(this.tenantName) + path;

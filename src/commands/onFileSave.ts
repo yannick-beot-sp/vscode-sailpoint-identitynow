@@ -1,13 +1,14 @@
 import * as vscode from 'vscode';
+import { URL_PREFIX } from '../constants';
 import { TransformsTreeItem } from '../models/IdentityNowTreeItem';
 import { IdentityNowClient } from '../services/IdentityNowClient';
-import { convertToText } from '../utils';
-import { getIdByUri, getNameByUri, getResourceTypeByUri, getResourceUri } from '../utils/UriUtils';
+import { getIdByUri, getResourceTypeByUri, getResourceUri } from '../utils/UriUtils';
+import * as commands from './constants';
 
 
 export async function onFileSaved(document: vscode.TextDocument) {
     console.log("> onFileSaved", document);
-    if (document.uri.scheme !== "idn") {
+    if (document.uri.scheme !== URL_PREFIX) {
         return;
     }
 
@@ -15,7 +16,7 @@ export async function onFileSaved(document: vscode.TextDocument) {
         const olduri = document.uri;
         // Refresh tree
         const node = new TransformsTreeItem(olduri.authority);
-        vscode.commands.executeCommand("vscode-sailpoint-identitynow.refresh", node);
+        vscode.commands.executeCommand(commands.REFRESH, node);
 
         //////////////////////////////////////////
         // Get generated transform to get the ID

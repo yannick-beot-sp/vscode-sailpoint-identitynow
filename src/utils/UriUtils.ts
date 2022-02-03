@@ -1,5 +1,6 @@
 import { Uri } from "vscode";
 import * as path from 'path';
+import { URL_PREFIX } from "../constants";
 
 export function withQuery(url: string, params: any): string {
     let query = Object.keys(params)
@@ -19,7 +20,7 @@ export function withQuery(url: string, params: any): string {
  * @returns 
  */
 export function getResourceUri(tenantName: string, v3resourceType: string, id: string, name: string): Uri {
-    const baseUri = Uri.from({ scheme: "idn", authority: tenantName, path: '/' });
+    const baseUri = Uri.from({ scheme: URL_PREFIX, authority: tenantName, path: '/' });
     return Uri.joinPath(
         baseUri,
         v3resourceType,

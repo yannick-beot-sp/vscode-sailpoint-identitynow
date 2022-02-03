@@ -1,4 +1,5 @@
-import { authentication, window, commands, ProgressLocation } from "vscode";
+import * as vscode from 'vscode';
+import * as commands from '../commands/constants';
 import { SourceTreeItem, TenantTreeItem } from "../models/IdentityNowTreeItem";
 import { delay } from "../utils";
 import { IdentityNowDataProvider } from "../views/IdentityNowDataProvider";
@@ -22,8 +23,9 @@ export class TreeManager {
             throw new Error("removeTenant: invalid item");
         }
         const tenantName = item.tenantName || "";
-        const response = await window.showWarningMessage(
+        const response = await vscode.window.showWarningMessage(
             `Are you sure you want to delete tenant ${tenantName}?`,
+            {modal:true},
             ...["Yes", "No"]
         );
         if (response !== "Yes") {
@@ -31,13 +33,13 @@ export class TreeManager {
             return;
         }
 
-        const session = await authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [tenantName], { createIfNone: false });
+        const session = await vscode.authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [tenantName], { createIfNone: false });
         if (session !== undefined) {
             this.authProvider.removeSession(session.id);
         }
         this.tenantService.removeTenant(tenantName);
-        commands.executeCommand("vscode-sailpoint-identitynow.refresh");
-        window.showInformationMessage(`Successfully deleted tenant ${tenantName}`);
+        await vscode.commands.executeCommand(commands.REFRESH);
+        await vscode.window.showInformationMessage(`Successfully deleted tenant ${tenantName}`);
     }
 
     public async aggregateSource(item: SourceTreeItem, disableOptimization = false): Promise<void> {
@@ -48,8 +50,8 @@ export class TreeManager {
             throw new Error("aggregateSource: invalid item");
         }
         const client = new IdentityNowClient(item.tenantName);
-        window.withProgress({
-            location: ProgressLocation.Notification,
+        vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
             title: `Aggregation of ${item.label}`,
             cancellable: false
         }, async (progress, token) => {
@@ -64,12 +66,12 @@ export class TreeManager {
             } while (task !== null && task.status === "PENDING");
             if (task !== null) {
                 if (task.status === "SUCCESS") {
-                    window.showInformationMessage(`Source ${task.object.displayName} successfully aggregated`);
+                    vscode.window.showInformationMessage(`Source ${task.object.displayName} successfully aggregated`);
                 } else if (task.status === "WARNING") {
-                    window.showWarningMessage(
+                    vscode.window.showWarningMessage(
                         `Warning during aggregation of ${task.object.displayName}: ${task.details?.messages?.Warn}`);
                 } else {
-                    window.showErrorMessage(
+                    vscode.window.showErrorMessage(
                         `Aggregation of ${task.object.displayName} failed: ${task.status}: ${task.details?.messages?.Error}`);
                 }
             };
@@ -84,8 +86,8 @@ export class TreeManager {
             throw new Error("aggregateSource: invalid item");
         }
         const client = new IdentityNowClient(item.tenantName);
-        window.withProgress({
-            location: ProgressLocation.Notification,
+        vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
             title: `Reset of ${item.label}`,
             cancellable: false
         }, async (progress, token) => {
@@ -93,7 +95,7 @@ export class TreeManager {
             try {
                 job = await client.resetSource(item.ccId);
             } catch (err) {
-                window.showErrorMessage('' + err);
+                vscode.window.showErrorMessage('' + err);
                 return;
             }
             console.log("job =", job);
@@ -107,12 +109,12 @@ export class TreeManager {
             } while (task !== null && task.status === "PENDING");
             if (task !== null) {
                 if (task.status === "SUCCESS") {
-                    window.showInformationMessage(`Source ${task.object.displayName} successfully reset`);
+                    vscode.window.showInformationMessage(`Source ${task.object.displayName} successfully reset`);
                 } else if (task.status === "WARNING") {
-                    window.showWarningMessage(
+                    vscode.window.showWarningMessage(
                         `Warning during reset of ${task.object.displayName}: ${task.details?.messages?.Warn}`);
                 } else {
-                    window.showErrorMessage(
+                    vscode.window.showErrorMessage(
                         `Reset of ${task.object.displayName} failed: ${task.status}: ${task.details?.messages?.Error}`);
                 }
             };
