@@ -1,8 +1,9 @@
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { Disposable, Event, FileChangeEvent, FileStat, FileSystemProvider, FileType, Uri } from "vscode";
 import { IdentityNowClient } from '../services/IdentityNowClient';
-import { str2Uint8Array, toTimestamp, uint8Array2Str } from '../utils';
-import { getIdByUri, getPathByUri } from '../utils/UriUtils';
+import { convertToText, str2Uint8Array, toTimestamp, uint8Array2Str } from '../utils';
+import { getIdByUri, getNameByUri, getPathByUri } from '../utils/UriUtils';
 
 export class IdentityNowResourceProvider implements FileSystemProvider {
     private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
@@ -21,7 +22,7 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
             type: FileType.File,
             ctime: toTimestamp(data.created),
             mtime: toTimestamp(data.modified),
-            size: JSON.stringify(data, null, 4).length
+            size: convertToText(data).length
         };
     }
     readDirectory(uri: Uri): [string, FileType][] | Thenable<[string, FileType][]> {
@@ -33,22 +34,27 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
     async readFile(uri: Uri): Uint8Array | Thenable<Uint8Array> {
         console.log('> IdentityNowResourceProvider.readFile', uri);
         const data = await this.lookupResource(uri);
-        return str2Uint8Array(JSON.stringify(data, null, 4));
+        return str2Uint8Array(convertToText(data));
     }
 
     private async lookupResource(uri: Uri): Promise<any> {
         console.log('> IdentityNowResourceProvider.lookupResource', uri);
         const tenantName = uri.authority;
         console.log('tenantName =', tenantName);
-        const path = getPathByUri(uri);
-        console.log('path =', path);
-        if (!path) {
+        const resourcePath = getPathByUri(uri);
+        console.log('path =', resourcePath);
+        if (!resourcePath) {
             throw Error("Invalid uri:" + uri);
+        }
+        const id = getIdByUri(uri);
+        if (id === '00000000000000000000000000000000') {
+            console.log('New file');
+            return { "name": getNameByUri(uri) };
         }
 
         const client = new IdentityNowClient(tenantName);
 
-        const data = await client.getResource(path);
+        const data = await client.getResource(resourcePath);
         if (!data) {
             throw vscode.FileSystemError.FileNotFound(uri);
         }
@@ -60,28 +66,43 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 
         const tenantName = uri.authority;
         console.log('tenantName =', tenantName);
-        const path = getPathByUri(uri);
-        console.log('path =', path);
-        if (!path) {
+        const resourcePath = getPathByUri(uri);
+        console.log('path =', resourcePath);
+        if (!resourcePath) {
             throw Error("Invalid uri:" + uri);
         }
         const client = new IdentityNowClient(tenantName);
         let data = uint8Array2Str(content);
 
-        // Need to update the content to remove id and internal properties from the payload
-        // to prevent a bad request error
-        if (path.match("transform")) {
-            let transform = JSON.parse(data);
-            delete transform.id;
-            delete transform.internal;
-            data=JSON.stringify(transform);
-        }
+        const id = path.posix.basename(resourcePath);
+        if (id === '00000000000000000000000000000000') {
+            console.log('New file');
+            if (resourcePath.match("transform")) {
+                const createdData = await client.createResource('/transforms', data);
+            } else {
+                throw new Error("Cannot save: invalid uri " + uri);
+            }
 
-        const updatedData = await client.updateResource(path, data);
-        if (!updatedData) {
-            throw vscode.FileSystemError.FileNotFound(uri);
+            this._emitter.fire([({ type: vscode.FileChangeType.Created, uri })]);
+        } else {
+
+            // Need to update the content to remove id and internal properties from the payload
+            // to prevent a bad request error
+            if (resourcePath.match("transform")) {
+                let transform = JSON.parse(data);
+                delete transform.id;
+                delete transform.internal;
+                data = JSON.stringify(transform);
+            }
+
+            const updatedData = await client.updateResource(resourcePath, data);
+            if (!updatedData) {
+                throw vscode.FileSystemError.FileNotFound(uri);
+            }
+            this._emitter.fire([({ type: vscode.FileChangeType.Changed, uri })]);
         }
     }
+
     delete(uri: Uri, options: { recursive: boolean; }): void | Thenable<void> {
         throw new Error("Method delete not implemented.");
     }

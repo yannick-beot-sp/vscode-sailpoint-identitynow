@@ -36,7 +36,7 @@ export class TreeManager {
             this.authProvider.removeSession(session.id);
         }
         this.tenantService.removeTenant(tenantName);
-        commands.executeCommand("vscode-sailpoint-identitynow.refresh-tenants");
+        commands.executeCommand("vscode-sailpoint-identitynow.refresh");
         window.showInformationMessage(`Successfully deleted tenant ${tenantName}`);
     }
 

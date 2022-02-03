@@ -40,7 +40,7 @@ export class AddTenantCommand {
         if (!isEmpty(session.accessToken)) {
             window.showInformationMessage(`Tenant ${tenantName} added!`);
             this.tenantService.setTenant({name:tenantName, apiUrl:''});
-            commands.executeCommand("vscode-sailpoint-identitynow.refresh-tenants");
+            commands.executeCommand("vscode-sailpoint-identitynow.refresh");
         }
     }
 }

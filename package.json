@@ -132,12 +132,12 @@
 				{
 					"command": "vscode-sailpoint-identitynow.new-transform",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == transforms",
-					"group": "inline"
+					"group": "inline@1"
 				},
 				{
 					"command": "vscode-sailpoint-identitynow.refresh",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == transforms",
-					"group": "inline"
+					"group": "inline@2"
 				},
 				{
 					"command": "vscode-sailpoint-identitynow.open-source",

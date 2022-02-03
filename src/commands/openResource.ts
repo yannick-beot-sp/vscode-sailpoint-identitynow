@@ -1,18 +1,18 @@
 import * as vscode from 'vscode';
 import { IdentityNowResourceTreeItem } from "../models/IdentityNowTreeItem";
-import { getCancelPromise } from '../utils/PromiseUtils';
 
-export class OpenSourceCommand {
-
-
+/**
+ * Command used to open a source or a transform
+ */
+export class OpenResourceCommand {
 
     async execute(node?: IdentityNowResourceTreeItem, nodes?: IdentityNowResourceTreeItem[]): Promise<void> {
 
-        console.log("> OpenSourceCommand.execute", node);
+        console.log("> OpenResourceCommand.execute", node);
         // assessing that item is a SourceTreeItem
         if (node === undefined || !(node instanceof IdentityNowResourceTreeItem)) {
-            console.log("WARNING: OpenSourceCommand: invalid item", node);
-            throw new Error("OpenSourceCommand: invalid item");
+            console.log("WARNING: OpenResourceCommand: invalid item", node);
+            throw new Error("OpenResourceCommand: invalid item");
         }
 
         await vscode.window.withProgress({

@@ -78,6 +78,51 @@ export class IdentityNowClient {
         return res;
     }
 
+    public async getTransformByName(name: string): Promise<any> {
+        console.log('> getTransformByName', name);
+        let endpoint = EndpointUtils.getV3Url(this.tenantName) + '/transforms';
+        endpoint = withQuery(endpoint, { filters: `name eq "${name}"` });
+        console.log('endpoint = ' + endpoint);
+        const headers = await this.prepareHeaders();
+        const req = await fetch(endpoint, {
+            headers: headers
+        });
+
+        if (!req.ok) {
+
+            throw new Error(req.statusText);
+        }
+        const res = await req.json();
+
+        return res;
+    }
+
+    public async createResource(path: string, data: string): Promise<any> {
+        console.log('> IdentityNowClient.createResource', path);
+        const endpoint = EndpointUtils.getV3Url(this.tenantName) + path;
+        console.log('endpoint = ' + endpoint);
+        const headers = await this.prepareHeaders();
+        const req = await fetch(endpoint, {
+            method: 'POST',
+            headers: headers,
+            body: data
+        });
+
+        if (!req.ok) {
+            if (req.status === 404) {
+                return null;
+            }
+            if (req.status === 400) {
+                const details = await req.json();
+                const detail = details?.messages[0]?.text || req.statusText;
+                throw new Error(detail);
+            }
+            throw new Error(req.statusText);
+        }
+        const res = await req.json();
+        console.log('< IdentityNowClient.createResource', res);
+        return res;
+    }
 
     public async updateResource(path: string, data: string): Promise<any> {
         console.log('> updateResource', path);

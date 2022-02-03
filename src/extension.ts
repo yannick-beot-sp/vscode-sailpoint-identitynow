@@ -2,7 +2,9 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { AddTenantCommand } from './commands/addTenant';
-import { OpenSourceCommand } from './commands/openSource';
+import { NewTransformCommand } from './commands/newTransform';
+import { onFileSaved } from './commands/onFileSave';
+import { OpenResourceCommand } from './commands/openResource';
 import { IdentityNowResourceProvider } from './files/IdentityNowResourceProvider';
 import { SailPointIdentityNowAuthenticationProvider } from './services/AuthenticationProvider';
 import { TenantService } from './services/TenantService';
@@ -44,7 +46,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const identityNowDataProvider = new IdentityNowDataProvider(context, tenantService);
 	vscode.window.registerTreeDataProvider('vscode-sailpoint-identitynow.view', identityNowDataProvider);
-	vscode.commands.registerCommand('vscode-sailpoint-identitynow.refresh-tenants', () => identityNowDataProvider.refresh());
+	vscode.commands.registerCommand('vscode-sailpoint-identitynow.refresh', identityNowDataProvider.refresh, identityNowDataProvider);
 
 
 	const treeManager = new TreeManager(identityNowDataProvider, tenantService, authProvider);
@@ -63,16 +65,23 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand("vscode-sailpoint-identitynow.reset-source",
 			(tenantTreeItem) => treeManager.resetSource(tenantTreeItem)));
 
-	const openSourceCommand = new OpenSourceCommand();
+	const openResourceCommand = new OpenResourceCommand();
 	context.subscriptions.push(
 		vscode.commands.registerCommand("vscode-sailpoint-identitynow.open-source",
-			openSourceCommand.execute));
+			openResourceCommand.execute));
 
 	context.subscriptions.push(
 		vscode.workspace.registerFileSystemProvider(
 			'idn',
 			new IdentityNowResourceProvider()
-	));
+		));
+
+	const newTransformCommand = new NewTransformCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand("vscode-sailpoint-identitynow.new-transform",
+			newTransformCommand.execute, newTransformCommand));
+
+	vscode.workspace.onDidSaveTextDocument(onFileSaved);
 }
 
 // this method is called when your extension is deactivated

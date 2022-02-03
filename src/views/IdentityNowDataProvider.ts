@@ -12,7 +12,9 @@ export class IdentityNowDataProvider implements TreeDataProvider<TreeItem> {
         private readonly tenantService: TenantService) {
     }
 
+    // refresh(emitter: TreeItem | undefined | null | void): void {
     refresh(): void {
+        console.log('> IdentityNowDataProvider.refresh');
         this._onDidChangeTreeData.fire();
     }
 
@@ -55,8 +57,8 @@ export class IdentityNowDataProvider implements TreeDataProvider<TreeItem> {
 
     getTreeItem(item: TreeItem): TreeItem {
         if (item.contextValue === "sources" || item.contextValue === "transforms") {
-           if (item.collapsibleState === TreeItemCollapsibleState.Expanded) {
-                item.iconPath =  new ThemeIcon('folder-opened');
+            if (item.collapsibleState === TreeItemCollapsibleState.Expanded) {
+                item.iconPath = new ThemeIcon('folder-opened');
             } else {
                 item.iconPath = new ThemeIcon('folder');
             }

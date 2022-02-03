@@ -25,3 +25,8 @@ export function toTimestamp(strDate: string): number {
     var datum = Date.parse(strDate);
     return datum / 1000;
 }
+
+
+export function convertToText(data:any):string {
+    return JSON.stringify(data, null, 4);
+}
