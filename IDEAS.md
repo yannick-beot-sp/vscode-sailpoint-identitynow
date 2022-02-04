@@ -3,3 +3,4 @@
 - delete resource object
 - add transform from command palette, with tenant quickpick
 - Manage rules
+- Manage workflows

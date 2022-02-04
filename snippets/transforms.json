@@ -1,0 +1,317 @@
+{
+    "Account Attribute": {
+        "prefix": [
+            "tr-acc"
+        ],
+        "body": [
+            "{\n    \"type\": \"accountAttribute\",\n    \"attributes\": {\n        \"sourceName\": \"$1\",\n        \"attributeName\": \"$2\"\n    }\n}"
+        ],
+        "description": "The account attribute transform is designed to look up an account for a particular source on an identity, and return a specific attribute value from that account. (ref)[https://community.sailpoint.com/t5/IdentityNow-Wiki/IdentityNow-Transforms-Account-Attribute/ta-p/180541]"
+    },
+    "Base64 Decode": {
+        "prefix": [
+            "tr-b64-dec"
+        ],
+        "body": [
+            "{\n    \"type\": \"base64Decode\",\n    \"attributes\": {\n        \"input\": {}\n    }\n}"
+        ],
+        "description": "The base64 decode transform allows you to take incoming data from a source that has been encoded using a Base64-based text encoding scheme, and render it in its original binary format."
+    },
+    "Base64 Encode": {
+        "prefix": [
+            "tr-b64-enc"
+        ],
+        "body": [
+            "{\n    \"type\": \"base64Encode\",\n    \"attributes\": {\n        \"input\": {}\n    }\n}"
+        ],
+        "description": "The base64 encode transform allows you to take incoming data from a source and encode it using a Base64-based text encoding scheme."
+    },
+    "Concatenation": {
+        "prefix": [
+            "tr-concat"
+        ],
+        "body": [
+            "{\n    \"type\": \"concat\",\n    \"attributes\": {\n        \"values\": [\n           $1\n        ]\n    }\n}"
+        ],
+        "description": "The concatenation transform can be used to join two or more string values together into a combined output."
+    },
+    "Conditional": {
+        "prefix": [
+            "tr-cond"
+        ],
+        "body": [
+            "{\n    \"type\": \"conditional\",\n    \"attributes\": {\n        \"expression\": \"\\$$1 eq $2\",\n        \"positiveCondition\": \"true\",\n        \"negativeCondition\": \"false\",\n        \"$1\" : $0\n    }\n}"
+        ],
+        "description": "The conditional transform allows you to output different values depending on simple conditional logic."
+    },
+    "Date Compare": {
+        "prefix": [
+            "tr-date-comp"
+        ],
+        "body": [
+            "{\n    \"type\": \"dateCompare\",\n    \"attributes\": {\n        \"firstDate\": $1,\n        \"secondDate\": $2,\n        \"operator\": \"gt\",\n        \"positiveCondition\": \"\",\n        \"negativeCondition\": \"\"\n    }\n}"
+        ],
+        "description": "The date compare transform allows you to easily compare two dates."
+    },
+    "Date Format": {
+        "prefix": [
+            "tr-date-format"
+        ],
+        "body": [
+            "{\n    \"type\": \"dateFormat\",\n    \"attributes\": {\n        \"inputFormat\": \"$1\",\n        \"outputFormat\": \"$2\"\n    }\n}"
+        ],
+        "description": "The date format transform allows you to easily convert datetime strings from one format to another."
+    },
+    "Date Math": {
+        "prefix": [
+            "tr-date-math"
+        ],
+        "body": [
+            "{\n    \"type\": \"dateMath\",\n    \"attributes\": {\n        \"expression\": \"$1\",\n        \"roundUp\": true,\n        \"input\": {$2}\n    }\n}"
+        ],
+        "description": "The date math transform allows you to add, subtract and round components of a timestamp to or from an incoming value."
+    },
+    "Decompose Diacritial Marks": {
+        "prefix": [
+            "tr-diacritic"
+        ],
+        "body": [
+            "{\n    \"type\": \"decomposeDiacriticalMarks\",\n    \"attributes\": {\n        \"input\": $1\n    }\n}"
+        ],
+        "description": "The decompose diacritical marks transform allows you to clean or standardize symbols that are used within language to inform the reader how to say or pronounce a letter."
+    },
+    "E164 Phone": {
+        "prefix": [
+            "tr-phone"
+        ],
+        "body": [
+            "{\n    \"type\": \"e164phone\",\n    \"attributes\": {\n        \"input\": $1\n    }\n}"
+        ],
+        "description": "The e164phone transform is a transform to convert an incoming phone number string into an E164-compatible number."
+    },
+    "First Valid": {
+        "prefix": [
+            "tr-first"
+        ],
+        "body": [
+            "{\n    \"type\": \"firstValid\",\n    \"attributes\": {\n        \"values\": [\n            $1\n        ]\n    }\n}"
+        ],
+        "description": "The first valid transform is useful for quickly doing an if/then/else operation on several different data points to return the first piece of data that is not null."
+    },
+    "Generate Random String": {
+        "prefix": [
+            "tr-rand-string"
+        ],
+        "body": [
+            "{\n    \"type\": \"rule\",\n    \"attributes\": {\n        \"name\": \"Cloud Services Deployment Utility\",\n        \"operation\": \"generateRandomString\",\n        \"includeNumbers\": \"true\",\n        \"includeSpecialChars\": \"true\",\n        \"length\": \"16\"\n    }\n}"
+        ],
+        "description": "The generate random string transform allows you to easily generate a random string of any length"
+    },
+    "Get End of String": {
+        "prefix": [
+            "tr-end"
+        ],
+        "body": [
+            "{\n    \"type\": \"rule\",\n    \"attributes\": {\n        \"name\": \"Cloud Services Deployment Utility\",\n        \"operation\": \"getEndOfString\",\n        \"numChars\": \"4\"\n    }\n}"
+        ],
+        "description": "The get end of string transform allows you to easily get the rightmost N characters of a string."
+    },
+    "Get Reference Identity Attribute": {
+        "prefix": [
+            "tr-refattr"
+        ],
+        "body": [
+            "{\n    \"type\": \"rule\",\n    \"attributes\": {\n        \"name\": \"Cloud Services Deployment Utility\",\n        \"operation\": \"getReferenceIdentityAttribute\",\n        \"uid\": \"manager\",\n        \"attributeName\": \"email\"\n    }\n}"
+        ],
+        "description": "The get reference identity attribute transform allows you to easily get the identity attribute of another user from within a given identity's calculation."
+    },
+    "Identity Attribute": {
+        "prefix": [
+            "tr-id"
+        ],
+        "body": [
+            "{\n    \"type\": \"identityAttribute\",\n    \"attributes\": {\n        \"name\": \"${1:email}\"\n    }\n}"
+        ],
+        "description": "The identity attribute transform can be used to get the value of a user's identity attribute."
+    },
+    "Index Of": {
+        "prefix": [
+            "tr-indexof"
+        ],
+        "body": [
+            "{\n    \"type\": \"indexOf\",\n    \"attributes\": {\n        \"substring\": \"$1\",\n        \"input\": $2,\n    }\n}"
+        ],
+        "description": "An index of transform can be used to get the location of a specific substring within in an incoming value."
+    },
+    "ISO3166": {
+        "prefix": [
+            "tr-iso3166"
+        ],
+        "body": [
+            "{\n    \"type\": \"iso3166\",\n    \"attributes\": {\n        \"format\" : \"${1|alpha2,alpha3,numeric|}\",\n        \"input\": $2\n    }\n}"
+        ],
+        "description": "The iso3166 transform converts an incoming string into an ISO 3166 country code value."
+    },
+    "Last Index Of": {
+        "prefix": [
+            "tr-last-index"
+        ],
+        "body": [
+            "{\n    \"type\": \"lastIndexOf\",\n    \"attributes\": {\n        \"substring\": \"$1\",\n        \"input\": $2,\n    }\n}"
+        ],
+        "description": "A last index of transform can be used to get the last location of a specific substring within in an incoming value."
+    },
+    "Left Pad": {
+        "prefix": [
+            "tr-leftpad"
+        ],
+        "body": [
+            "{\n    \"type\": \"leftPad\",\n    \"attributes\": {\n        \"padding\": \"${1:x}\",\n        \"length\": \"${2:7}\",\n        \"input\": $0\n    }\n}"
+        ],
+        "description": "The left pad transform allows you to pad an incoming string with a user-supplied character out to a specific number of characters."
+    },
+    "Lookup": {
+        "prefix": [
+            "tr-lookup"
+        ],
+        "body": [
+            "{\n    \"type\": \"lookup\",\n    \"attributes\": {\n        \"table\": {\n            \"$1\": \"$2\",\n            \"default\": \"\"\n        }\n    }\n}"
+        ],
+        "description": "A lookup transform takes in incoming string value and compares it to a list of key-value pairs to determine which output to return."
+    },
+    "Lower": {
+        "prefix": [
+            "tr-lower"
+        ],
+        "body": [
+            "{\n    \"type\": \"lower\",\n    \"attributes\": {\n        \"input\": $1\n    }\n}"
+        ],
+        "description": "The lower transform is a simple transform to convert an input string into all lowercase letters."
+    },
+    "Name Normalizer": {
+        "prefix": [
+            "tr-norm"
+        ],
+        "body": [
+            "{\n    \"type\": \"normalizeNames\",\n    \"attributes\": {\n        \"input\": $1\n    }\n}"
+        ],
+        "description": "The name normalizer transform allows you to clean or standardize the spelling of strings coming in from source systems. "
+    },
+    "Random Alphanumeric": {
+        "prefix": [
+            "tr-rand-alphanum"
+        ],
+        "body": [
+            "{\n    \"type\": \"randomAlphaNumeric\",\n    \"attributes\": {\n        \"length\": ${1:10}\n    }\n}"
+        ],
+        "description": "The random alphanumeric transform allows you to easily generate a random string of any length, comprised of both numbers and letters (lowercase as well as uppercase)."
+    },
+    "Random Numeric": {
+        "prefix": [
+            "tr-rand-num"
+        ],
+        "body": [
+            "{\n    \"type\": \"randomNumeric\",\n    \"attributes\": {\n        \"length\": ${1:10}\n    }\n}"
+        ],
+        "description": "The random numeric transform allows you to easily generate a random number of any length."
+    },
+    "Reference": {
+        "prefix": [
+            "tr-ref"
+        ],
+        "body": [
+            "{\n    \"type\": \"reference\",\n    \"attributes\": {\n        \"id\": \"$1\"\n    }\n}"
+        ],
+        "description": "The reference transform allows you to re-use a transform that has already been written within another transform."
+    },
+    "Replace All": {
+        "prefix": [
+            "tr-replace-all"
+        ],
+        "body": [
+            "{\n    \"type\": \"replaceAll\",\n    \"attributes\": {\n        \"table\": {\n            \"$1\": \"$2\"\n        },\n        \"input\": $0\n    }\n}"
+        ],
+        "description": "The replace all transform is much like the replace transform, except that it can perform multiple replace operations on the incoming data instead of just one pattern."
+    },
+    "Replace": {
+        "prefix": [
+            "tr-replace"
+        ],
+        "body": [
+            "{\n    \"type\": \"replace\",\n    \"attributes\": {\n        \"regex\": \"$1\",\n        \"replacement\": \"$2\",\n        \"input\": $0\n    }\n}"
+        ],
+        "description": "The replace transform can be used to find a given pattern of characters within incoming data and replace all instances of those characters with alternate values."
+    },
+    "Right Pad": {
+        "prefix": [
+            "tr-rightpad"
+        ],
+        "body": [
+            "{\n    \"type\": \"rightPad\",\n    \"attributes\": {\n        \"padding\": \"${1:x}\",\n        \"length\": \"${2:7}\",\n        \"input\": $0\n    }\n}"
+        ],
+        "description": "The right pad transform allows you to pad an incoming string with a user-supplied character out to a specific number of characters."
+    },
+    "Rule": {
+        "prefix": [
+            "tr-rule"
+        ],
+        "body": [
+            "{\n    \"type\": \"rule\",\n    \"attributes\": {\n        \"name\": \"$1\",\n        \"operation\": \"$2\",\n        \"input\": $0\n    }\n}"
+        ],
+        "description": "The rule transform allows you to re-use code contained within a Generic rule that either is not possible via transforms alone, or is too complex to maintain via Seaspray."
+    },
+    "Split": {
+        "prefix": [
+            "tr-split"
+        ],
+        "body": [
+            "{\n    \"type\": \"split\",\n    \"attributes\": {\n        \"delimiter\": \"${1:,}\",\n        \"index\": ${2:5},\n        \"throw\": ${3|true,false|},\n        \"input\": $0\n    }\n}"
+        ],
+        "description": "The split transform allows you to use a specific character or regex string as a delimiter, and convert a single incoming string value into an array of values."
+    },
+    "Static": {
+        "prefix": [
+            "tr-static"
+        ],
+        "body": [
+            "{\n    \"type\": \"static\",\n    \"attributes\": {\n        \"value\": \"$1\"\n    }\n}"
+        ],
+        "description": "A static transform may be used to return a fixed string value or, more commonly, to evaluate Velocity Template Language."
+    },
+    "Substring": {
+        "prefix": [
+            "tr-sub"
+        ],
+        "body": [
+            "{\n    \"type\": \"substring\",\n    \"attributes\": {\n        \"begin\": {\n            \"type\": \"indexOf\",\n            \"attributes\": {\n                \"substring\": \"$1\"\n            }\n        },\n        \"beginOffset\": 1,\n        \"end\": {\n            \"type\": \"lastIndexOf\",\n            \"attributes\": {\n                \"substring\": \"2\"\n            }\n        }\n    }\n  }"
+        ],
+        "description": "A substring transform can be used to get the inner portion of a string that is passed into the transform."
+    },
+    "Trim": {
+        "prefix": [
+            "tr-trim"
+        ],
+        "body": [
+            "{\n    \"type\": \"trim\",\n    \"attributes\": {\n        \"input\": $1\n    }\n}"
+        ],
+        "description": "The trim transform is a simple transform to trim whitespaces from both the beginning and ending of an input string."
+    },
+    "Upper": {
+        "prefix": [
+            "tr-upper"
+        ],
+        "body": [
+            "{\n    \"type\": \"upper\",\n    \"attributes\": {\n        \"input\": $1\n    }\n}"
+        ],
+        "description": "The upper transform is a simple transform to convert an input string into all uppercase letters."
+    },
+    "UUID Generator": {
+        "prefix": [
+            "tr-uuid"
+        ],
+        "body": [
+            "{\n    \"type\": \"uuid\"\n}"
+        ],
+        "description": ""
+    }
+}

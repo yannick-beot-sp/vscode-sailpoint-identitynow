@@ -17,6 +17,7 @@
 		"vscode": "^1.63.0"
 	},
 	"categories": [
+		"Snippets",
 		"Other"
 	],
 	"keywords": [
@@ -38,7 +39,7 @@
 		"onFileSystem:idn"
 	],
 	"license": "TBD",
-	"main": "./out/main.js",
+	"main": "./out/extension.js",
 	"contributes": {
 		"viewsContainers": {
 			"activitybar": [
@@ -60,14 +61,14 @@
 		},
 		"viewsWelcome": [
 			{
-				"view":"vscode-sailpoint-identitynow.view",
+				"view": "vscode-sailpoint-identitynow.view",
 				"contents": "No tenant.\n[Add Tenant](command:vscode-sailpoint-identitynow.add-tenant)"
 			}
 		],
 		"commands": [
 			{
 				"command": "vscode-sailpoint-identitynow.add-tenant",
-				"title": "IdentityNow: Add tenant"
+				"title": "IdentityNow: Add tenant..."
 			},
 			{
 				"command": "vscode-sailpoint-identitynow.remove-tenant",
@@ -188,11 +189,17 @@
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == transform"
 				}
 			]
-		}
+		},
+		"snippets": [
+			{
+				"language": "json",
+				"path": "./snippets/transforms.json"
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run esbuild-base -- --minify",
-		"esbuild-base": "rimraf out && esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
+		"esbuild-base": "rimraf out && esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
 		"esbuild": "npm run esbuild-base -- --sourcemap",
 		"esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
 		"test-compile": "tsc -p ./",
@@ -200,7 +207,8 @@
 		"watch": "tsc -watch -p ./",
 		"pretest": "npm run compile && npm run lint",
 		"lint": "eslint src --ext ts",
-		"test": "node ./out/test/runTest.js"
+		"test": "node ./out/test/runTest.js",
+		"clean": "rimraf out"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.2.0",

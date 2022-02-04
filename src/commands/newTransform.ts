@@ -35,11 +35,11 @@ export class NewTransformCommand {
             throw new Error("NewTransformCommand.execute: invalid node");
         }
         const tenantName = tenant.tenantName || "";
-
-        let transformName = await this.askTransformName() || "";
         if (isEmpty(tenantName)) {
             return;
         }
+        let transformName = await this.askTransformName() || "";
+
 
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,

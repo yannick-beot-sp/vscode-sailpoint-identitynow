@@ -28,5 +28,8 @@ export function toTimestamp(strDate: string): number {
 
 
 export function convertToText(data:any):string {
-    return JSON.stringify(data, null, 4);
+    if (data) {
+        return JSON.stringify(data, null, 4);
+    }
+    return '';
 }

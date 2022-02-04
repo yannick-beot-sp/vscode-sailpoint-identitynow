@@ -49,7 +49,7 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
         const id = getIdByUri(uri);
         if (id === '00000000000000000000000000000000') {
             console.log('New file');
-            return { "name": getNameByUri(uri) };
+            return '';
         }
 
         const client = new IdentityNowClient(tenantName);
