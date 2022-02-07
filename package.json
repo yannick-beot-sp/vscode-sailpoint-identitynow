@@ -195,7 +195,13 @@
 				"language": "json",
 				"path": "./snippets/transforms.json"
 			}
-		]
+		],
+		"jsonValidation": [
+			{
+			  "fileMatch": "idn://**/schemas/**/*",
+			  "url": "./schemas/schemas.schemas.json"
+			}
+		  ]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run esbuild-base -- --minify",

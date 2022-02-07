@@ -1,5 +1,4 @@
 import ClientOAuth2 = require('client-oauth2');
-import { cpuUsage } from 'process';
 import {
     authentication,
     AuthenticationProvider,
@@ -234,6 +233,8 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
             clientSecret: clientSecret,
             accessTokenUri: EndpointUtils.getAccessTokenUrl(tenantName)
         });
+        console.log('> createAccessToken', tenantName, clientId);
+        
         const oauth2token = await idnAuth.credentials.getToken();
         console.log('Successfully logged in to IdentityNow');
         // To prevent issue with JSON.stringify and circular conversion

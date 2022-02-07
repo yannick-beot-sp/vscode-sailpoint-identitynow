@@ -1,0 +1,285 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://developer.sailpoint.com/schemas/schema.json",
+    "title": "Schema",
+    "description": "Schema of a source",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "type": "string",
+            "description": "The id of the Schema.",
+            "example": "2c9180835d191a86015d28455b4a2329"
+        },
+        "name": {
+            "type": "string",
+            "description": "The name of the Schema.",
+            "example": "account"
+        },
+        "nativeObjectType": {
+            "type": "string",
+            "description": "The name of the object type on the native system that the schema represents.",
+            "example": "User"
+        },
+        "identityAttribute": {
+            "type": "string",
+            "description": "The name of the attribute used to calculate the unique identifier for an object in the schema.",
+            "example": "sAMAccountName"
+        },
+        "displayAttribute": {
+            "type": "string",
+            "description": "The name of the attribute used to calculate the display value for an object in the schema.",
+            "example": "distinguishedName"
+        },
+        "hierarchyAttribute": {
+            "type": [
+                "string",
+                "null"
+            ],
+            "description": "The name of the attribute whose values represent other objects in a hierarchy. Only relevant to group schemas.",
+            "example": "memberOf"
+        },
+        "includePermissions": {
+            "type": "boolean",
+            "description": "Flag indicating whether or not the include permissions with the object data when aggregating the schema.",
+            "example": false
+        },
+        "features": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/features"
+            },
+            "description": "The features that the schema supports.",
+            "example": [
+                "PROVISIONING",
+                "NO_PERMISSIONS_PROVISIONING",
+                "GROUPS_HAVE_MEMBERS"
+            ]
+        },
+        "configuration": {
+            "type": "object",
+            "description": "Holds any extra configuration data that the schema may require.",
+            "example": {
+                "groupMemberAttribute": "member"
+            }
+        },
+        "attributes": {
+            "type": "array",
+            "description": "The attribute definitions which form the schema.",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the attribute.",
+                        "example": "sAMAccountName"
+                    },
+                    "type": {
+                        "description": "The type of the attribute.",
+                        "example": "string",
+                        "type": "string",
+                        "enum": [
+                            "STRING",
+                            "LONG",
+                            "INT",
+                            "BOOLEAN"
+                        ]
+                    },
+                    "schema": {
+                        "$ref": "#/definitions/reference",
+                        "description": "A reference to the schema on the source to which the values of the attribute map.",
+                        "example": {
+                            "type": "CONNECTOR_SCHEMA",
+                            "id": "2c9180866166b5b0016167c32ef31a66",
+                            "name": "group"
+                        }
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "A human-readable description of the attribute."
+                    },
+                    "isMultiValued": {
+                        "type": "boolean",
+                        "description": "Flag indicating whether or not the attribute is multi-valued.",
+                        "example": false
+                    },
+                    "isEntitlement": {
+                        "type": "boolean",
+                        "description": "Flag indicating whether or not the attribute is an entitlement.",
+                        "example": false
+                    },
+                    "isGroup": {
+                        "type": "boolean",
+                        "description": "Flag indicating whether or not the attribute represents a group.",
+                        "example": false,
+                        "readOnly": true
+                    }
+                },
+                "defaultSnippets": [
+                    {
+                        "label": "New attribute",
+                        "description": "Add",
+                        "body": {
+                            "name": "$1",
+                            "type": "STRING",
+                            "schema": null,
+                            "description": null,
+                            "isMulti": false,
+                            "isEntitlement": false,
+                            "isGroup": false
+                        }
+                    }
+                ]
+            },
+            "example": [
+                {
+                    "name": "sAMAccountName",
+                    "type": "string",
+                    "isMultiValued": false,
+                    "isEntitlement": false,
+                    "isGroup": false
+                },
+                {
+                    "name": "memberOf",
+                    "type": "string",
+                    "description": "Group membership",
+                    "isMultiValued": true,
+                    "isEntitlement": true,
+                    "isGroup": true
+                }
+            ]
+        },
+        "created": {
+            "type": "string",
+            "description": "The date the Schema was created.",
+            "format": "date-time",
+            "example": "2019-12-24T22:32:58.104Z"
+        },
+        "modified": {
+            "type": [
+                "string",
+                "null"
+            ],
+            "description": "The date the Schema was last modified.",
+            "format": "date-time",
+            "example": "2019-12-31T20:22:28.104Z"
+        }
+    },
+    "definitions": {
+        "features": {
+            "type": "string",
+            "enum": [
+                "AUTHENTICATE",
+                "COMPOSITE",
+                "DIRECT_PERMISSIONS",
+                "DISCOVER_SCHEMA",
+                "ENABLE",
+                "MANAGER_LOOKUP",
+                "NO_RANDOM_ACCESS",
+                "PROXY",
+                "SEARCH",
+                "TEMPLATE",
+                "UNLOCK",
+                "UNSTRUCTURED_TARGETS",
+                "SHAREPOINT_TARGET",
+                "PROVISIONING",
+                "GROUP_PROVISIONING",
+                "SYNC_PROVISIONING",
+                "PASSWORD",
+                "CURRENT_PASSWORD",
+                "ACCOUNT_ONLY_REQUEST",
+                "ADDITIONAL_ACCOUNT_REQUEST",
+                "NO_AGGREGATION",
+                "GROUPS_HAVE_MEMBERS",
+                "NO_PERMISSIONS_PROVISIONING",
+                "NO_GROUP_PERMISSIONS_PROVISIONING",
+                "NO_UNSTRUCTURED_TARGETS_PROVISIONING",
+                "NO_DIRECT_PERMISSIONS_PROVISIONING"
+            ],
+            "description": "Optional features that can be supported by an source.\n* AUTHENTICATE: The source supports pass-through authentication.\n* COMPOSITE: The source supports composite source creation.\n* DIRECT_PERMISSIONS: The source supports returning DirectPermissions.\n* DISCOVER_SCHEMA: The source supports discovering schemas for users and groups.\n* ENABLE The source supports reading if an account is enabled or disabled.\n* MANAGER_LOOKUP: The source supports looking up managers as they are encountered in a feed. This is the opposite of NO_RANDOM_ACCESS.\n* NO_RANDOM_ACCESS: The source does not support random access and the getObject() methods should not be called and expected to perform.\n* PROXY: The source can serve as a proxy for another source. When an source has a proxy, all connector calls made with that source are redirected through the connector for the proxy source.\n* SEARCH\n* TEMPLATE\n* UNLOCK: The source supports reading if an account is locked or unlocked.\n* UNSTRUCTURED_TARGETS: The source supports returning unstructured Targets.\n* SHAREPOINT_TARGET: The source supports returning unstructured Target data for SharePoint. It will be typically used by AD, LDAP sources.\n* PROVISIONING: The source can both read and write accounts. Having this feature implies that the provision() method is implemented. It also means that direct and target permissions can also be provisioned if they can be returned by aggregation.\n* GROUP_PROVISIONING: The source can both read and write groups. Having this feature implies that the provision() method is implemented.\n* SYNC_PROVISIONING: The source can provision accounts synchronously.\n* PASSWORD: The source can provision password changes. Since sources can never read passwords, this is should only be used in conjunction with the PROVISIONING feature.\n* CURRENT_PASSWORD: Some source types support verification of the current password\n* ACCOUNT_ONLY_REQUEST: The source supports requesting accounts without entitlements.\n* ADDITIONAL_ACCOUNT_REQUEST: The source supports requesting additional accounts.\n* NO_AGGREGATION: A source that does not support aggregation.\n* GROUPS_HAVE_MEMBERS: The source models group memberships with a member attribute on the group object rather than a groups attribute on the account object. This effects the implementation of delta account aggregation.\n* NO_PERMISSIONS_PROVISIONING: Indicates that the connector cannot provision direct or target permissions for accounts. When DIRECT_PERMISSIONS and PROVISIONING features are present, it is assumed that the connector can also provision direct permissions. This feature disables that assumption and causes permission request to be converted to work items for accounts.\n* NO_GROUP_PERMISSIONS_PROVISIONING: Indicates that the connector cannot provision direct or target permissions for groups. When DIRECT_PERMISSIONS and PROVISIONING features are present, it is assumed that the connector can also provision direct permissions. This feature disables that assumption and causes permission request to be converted to work items for groups.\n* NO_UNSTRUCTURED_TARGETS_PROVISIONING: This string will be replaced by NO_GROUP_PERMISSIONS_PROVISIONING and NO_PERMISSIONS_PROVISIONING.\n* NO_DIRECT_PERMISSIONS_PROVISIONING: This string will be replaced by NO_GROUP_PERMISSIONS_PROVISIONING and NO_PERMISSIONS_PROVISIONING."
+        },
+        "reference": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "ACCOUNT_CORRELATION_CONFIG",
+                        "ACCESS_PROFILE",
+                        "ACCESS_REQUEST_APPROVAL",
+                        "ACCOUNT",
+                        "APPLICATION",
+                        "CAMPAIGN",
+                        "CAMPAIGN_FILTER",
+                        "CERTIFICATION",
+                        "CLUSTER",
+                        "CONNECTOR_SCHEMA",
+                        "ENTITLEMENT",
+                        "GOVERNANCE_GROUP",
+                        "IDENTITY",
+                        "IDENTITY_PROFILE",
+                        "IDENTITY_REQUEST",
+                        "LIFECYCLE_STATE",
+                        "PASSWORD_POLICY",
+                        "ROLE",
+                        "RULE",
+                        "SOD_POLICY",
+                        "SOURCE",
+                        "TAG_CATEGORY",
+                        "TASK_RESULT",
+                        "REPORT_RESULT",
+                        "SOD_VIOLATION",
+                        "ACCOUNT_ACTIVITY"
+                    ],
+                    "description": "DTO type.",
+                    "example": "IDENTITY"
+                },
+                "id": {
+                    "type": "string",
+                    "description": "ID of the object to which this reference applies",
+                    "example": "2c91808568c529c60168cca6f90c1313"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Human-readable display name of the object to which this reference applies",
+                    "example": "William Wilson"
+                }
+            }
+        }
+    },
+    "required": [
+        "nativeObjectType",
+        "identityAttribute",
+        "displayAttribute",
+        "hierarchyAttribute",
+        "includePermissions",
+        "features",
+        "attributes",
+        "name"
+    ],
+    "defaultSnippets": [
+        {
+            "label": "New schema",
+            "description": "Create a new schema",
+            "body": {
+                "name": "$1",
+                "nativeObjectType": "$2",
+                "identityAttribute": "$3",
+                "displayAttribute": "$4",
+                "hierarchyAttribute": null,
+                "includePermissions": false,
+                "features": [],
+                "configuration": {},
+                "attributes": [
+                    "^$0"
+                ]
+            }
+        }
+    ]
+}
