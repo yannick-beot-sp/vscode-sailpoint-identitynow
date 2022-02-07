@@ -200,6 +200,10 @@
 			{
 			  "fileMatch": "idn://**/schemas/**/*",
 			  "url": "./schemas/schemas.schemas.json"
+			},
+			{
+			  "fileMatch": "idn://**/provisioning-policies/**/*",
+			  "url": "./schemas/provisioning-policies.schemas.json"
 			}
 		  ]
 	},

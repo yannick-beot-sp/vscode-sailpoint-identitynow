@@ -1,0 +1,104 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://developer.sailpoint.com/schemas/provisioning-policy.json",
+  "title": "Provisioning Policy",
+  "description": "Schema of a provisioning policy",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "usageType": {
+      "type": "string",
+      "nullable": false,
+      "enum": [
+        "CREATE",
+        "UPDATE",
+        "DELETE",
+        "ASSIGN",
+        "UNASSIGN",
+        "CREATE_GROUP",
+        "UPDATE_GROUP",
+        "DELETE_GROUP",
+        "REGISTER",
+        "CREATE_IDENTITY",
+        "UPDATE_IDENTITY",
+        "EDIT_GROUP",
+        "ENABLE",
+        "DISABLE",
+        "UNLOCK",
+        "CHANGE_PASSWORD"
+      ]
+    },
+    "fields": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the attribute.",
+            "example": "userName"
+          },
+          "transform": {
+            "type": "object"
+          },
+          "attributes": {
+            "type": "object"
+          },
+          "isRequired": {
+            "type": "boolean",
+            "readOnly": true,
+            "description": "Flag indicating whether or not the attribute is required.",
+            "default": false
+          },
+          "type": {
+            "type": "string",
+            "description": "The type of the attribute.",
+            "example": "string"
+          },
+          "isMultiValued": {
+            "type": "boolean",
+            "description": "Flag indicating whether or not the attribute is multi-valued.",
+            "default": false
+          }
+        },
+        "defaultSnippets": [
+          {
+            "label": "New field",
+            "description": "Create a new field",
+            "body": {
+              "name": "$1",
+              "transform": "^$0",
+              "attributes": {},
+              "isRequired": false,
+              "type": "string",
+              "isMultiValued": false
+            }
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "defaultSnippets": [
+    {
+      "label": "New provisioning policy",
+      "description": "Create a new provisioning policy",
+      "body": {
+        "name": "Account",
+        "description": null,
+        "usageType": "CREATE",
+        "fields": [
+          "^$0"
+        ]
+      }
+    }
+  ]
+}
