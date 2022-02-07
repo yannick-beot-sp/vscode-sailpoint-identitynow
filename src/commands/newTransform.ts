@@ -12,14 +12,14 @@ export class NewTransformCommand {
             value: '',
             ignoreFocusOut: true,
             placeHolder: 'Transform name',
-            prompt: "Enter the transforme name",
+            prompt: "Enter the transform name",
             title: 'IdentityNow',
             validateInput: text => {
                 const regex = new RegExp('^[a-z0-9]+$', 'i');
                 if (regex.test(text)) {
                     return null;
                 }
-                return "Invalid tenant name";
+                return "Invalid transform name";
             }
         });
         return result;

@@ -121,7 +121,7 @@
                 "defaultSnippets": [
                     {
                         "label": "New attribute",
-                        "description": "Add",
+                        "description": "Add new attribute",
                         "body": {
                             "name": "$1",
                             "type": "STRING",
