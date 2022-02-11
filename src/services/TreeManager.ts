@@ -78,6 +78,7 @@ export class TreeManager {
         });
     }
 
+
     public async resetSource(item: SourceTreeItem): Promise<void> {
         console.log("> resetSource", item);
         // assessing that item is a SourceTreeItem
@@ -85,6 +86,17 @@ export class TreeManager {
             console.log("WARNING: resetSource: invalid item", item);
             throw new Error("aggregateSource: invalid item");
         }
+
+        const response = await vscode.window.showWarningMessage(
+            `Are you sure you want to reset ${item.label}?`,
+            { modal: true },
+            ...["Yes", "No"]
+        );
+        if (response !== "Yes") {
+            console.log("< resetSource: no reset");
+            return;
+        }
+        
         const client = new IdentityNowClient(item.tenantName);
         vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
