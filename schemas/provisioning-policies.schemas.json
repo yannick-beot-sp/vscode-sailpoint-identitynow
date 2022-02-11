@@ -10,7 +10,10 @@
       "type": "string"
     },
     "description": {
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "usageType": {
       "type": "string",

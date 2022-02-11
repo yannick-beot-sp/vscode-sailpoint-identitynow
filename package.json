@@ -36,6 +36,8 @@
 		"onCommand:vscode-sailpoint-identitynow.aggregate-source-disable-optimization",
 		"onCommand:vscode-sailpoint-identitynow.reset-source",
 		"onCommand:vscode-sailpoint-identitynow.new-transform",
+		"onCommand:vscode-sailpoint-identitynow.new-provisioning-policy",
+		"onCommand:vscode-sailpoint-identitynow.new-schema",
 		"onFileSystem:idn"
 	],
 	"license": "TBD",
@@ -68,7 +70,8 @@
 		"commands": [
 			{
 				"command": "vscode-sailpoint-identitynow.add-tenant",
-				"title": "IdentityNow: Add tenant..."
+				"title": "IdentityNow: Add tenant...",
+				"icon": "$(add)"
 			},
 			{
 				"command": "vscode-sailpoint-identitynow.remove-tenant",
@@ -104,6 +107,16 @@
 				"command": "vscode-sailpoint-identitynow.new-transform",
 				"title": "New transform",
 				"icon": "$(add)"
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.new-provisioning-policy",
+				"title": "New provisioning policy",
+				"icon": "$(add)"
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.new-schema",
+				"title": "New Schema",
+				"icon": "$(add)"
 			}
 		],
 		"menus": {
@@ -135,9 +148,22 @@
 				{
 					"command": "vscode-sailpoint-identitynow.new-transform",
 					"when": "never"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.new-provisioning-policy",
+					"when": "never"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.new-schema",
+					"when": "never"
 				}
 			],
 			"view/title": [
+				{
+					"command": "vscode-sailpoint-identitynow.add-tenant",
+					"when": "view == vscode-sailpoint-identitynow.view",
+					"group": "navigation"
+				},
 				{
 					"command": "vscode-sailpoint-identitynow.refresh",
 					"when": "view == vscode-sailpoint-identitynow.view",
@@ -187,6 +213,16 @@
 				{
 					"command": "vscode-sailpoint-identitynow.remove-resource",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == transform"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.new-provisioning-policy",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == provisioning-policies",
+					"group": "inline"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.new-schema",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == schemas",
+					"group": "inline"
 				}
 			]
 		},
@@ -198,14 +234,14 @@
 		],
 		"jsonValidation": [
 			{
-			  "fileMatch": "idn://**/schemas/**/*",
-			  "url": "./schemas/schemas.schemas.json"
+				"fileMatch": "idn://**/schemas/**/*",
+				"url": "./schemas/schemas.schemas.json"
 			},
 			{
-			  "fileMatch": "idn://**/provisioning-policies/**/*",
-			  "url": "./schemas/provisioning-policies.schemas.json"
+				"fileMatch": "idn://**/provisioning-policies/**/*",
+				"url": "./schemas/provisioning-policies.schemas.json"
 			}
-		  ]
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run esbuild-base -- --minify",

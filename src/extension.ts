@@ -13,6 +13,8 @@ import { TreeManager } from './services/TreeManager';
 import { IdentityNowDataProvider } from './views/IdentityNowDataProvider';
 import { URL_PREFIX } from './constants';
 import { deleteResource } from './commands/deleteResource';
+import { newProvisioningPolicy } from './commands/newProvisioningPolicy';
+import { newSchema } from './commands/newSchema';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -87,6 +89,13 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.NEW_TRANSFORM,
 			newTransformCommand.execute, newTransformCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_PROVISIONING_POLICY,
+			newProvisioningPolicy));
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_SCHEMA,
+			newSchema));
 
 	vscode.workspace.onDidSaveTextDocument(onFileSaved);
 }

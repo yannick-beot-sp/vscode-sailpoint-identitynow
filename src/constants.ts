@@ -1,1 +1,2 @@
 export const URL_PREFIX = 'idn';
+export const NEW_ID = '00000000000000000000000000000000';

@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { Disposable, Event, FileChangeEvent, FileStat, FileSystemProvider, FileType, Uri } from "vscode";
+import { NEW_ID } from '../constants';
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { convertToText, str2Uint8Array, toTimestamp, uint8Array2Str } from '../utils';
 import { getIdByUri, getNameByUri, getPathByUri } from '../utils/UriUtils';
@@ -47,7 +48,7 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
             throw Error("Invalid uri:" + uri);
         }
         const id = getIdByUri(uri);
-        if (id === '00000000000000000000000000000000') {
+        if (id === NEW_ID) {
             console.log('New file');
             return '';
         }
@@ -75,10 +76,12 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
         let data = uint8Array2Str(content);
 
         const id = path.posix.basename(resourcePath);
-        if (id === '00000000000000000000000000000000') {
+        if (id === NEW_ID) {
             console.log('New file');
             if (resourcePath.match("transform")) {
                 const createdData = await client.createResource('/transforms', data);
+            } else if (resourcePath.match("schemas") || resourcePath.match("provisioning-policies")) {
+                const createdData = await client.createResource(path.posix.dirname(resourcePath), data);
             } else {
                 throw new Error("Cannot save: invalid uri " + uri);
             }

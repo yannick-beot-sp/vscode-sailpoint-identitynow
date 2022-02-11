@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { NEW_ID } from '../constants';
 import { TransformsTreeItem } from "../models/IdentityNowTreeItem";
 import { isEmpty } from '../utils';
 import { getResourceUri } from '../utils/UriUtils';
@@ -39,7 +40,9 @@ export class NewTransformCommand {
             return;
         }
         let transformName = await this.askTransformName() || "";
-
+        if (isEmpty(transformName)) {
+            return;
+        }
 
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
@@ -47,7 +50,7 @@ export class NewTransformCommand {
             cancellable: false
         }, async (task, token) => {
 
-            const newUri = getResourceUri(tenantName, 'transforms', '00000000000000000000000000000000', transformName);
+            const newUri = getResourceUri(tenantName, 'transforms', NEW_ID, transformName);
 
             let document = await vscode.workspace.openTextDocument(newUri);
             document = await vscode.languages.setTextDocumentLanguage(document, 'json');
