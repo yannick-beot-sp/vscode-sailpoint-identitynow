@@ -220,9 +220,17 @@
 					"group": "inline"
 				},
 				{
+					"command": "vscode-sailpoint-identitynow.remove-resource",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == provisioning-policy"
+				},
+				{
 					"command": "vscode-sailpoint-identitynow.new-schema",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == schemas",
 					"group": "inline"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.remove-resource",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == schema"
 				}
 			]
 		},
