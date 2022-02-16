@@ -16,7 +16,7 @@ export class NewTransformCommand {
             prompt: "Enter the transform name",
             title: 'IdentityNow',
             validateInput: text => {
-                const regex = new RegExp('^[a-z0-9]+$', 'i');
+                const regex = new RegExp('^[a-z0-9 ]+$', 'i');
                 if (regex.test(text)) {
                     return null;
                 }

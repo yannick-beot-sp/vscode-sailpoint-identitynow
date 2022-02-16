@@ -2,7 +2,7 @@
 	"name": "vscode-sailpoint-identitynow",
 	"displayName": "SailPoint IdentityNow",
 	"description": "Customize SailPoint IdentityNow",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"publisher": "vscode-sailpoint-identitynow",
 	"icon": "resources/sailpoint.png",
 	"bugs": {

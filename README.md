@@ -1,16 +1,35 @@
 # SailPoint IdentityNow for Visual Studio Code
 
-The SailPoint IdentityNow extension makes it easy to create, edit, delete sources and transforms in your tenant.
+The SailPoint IdentityNow extension makes it easy to:
+
+- create, edit, delete sources
+- create, edit, delete transforms
+- create, edit, delete provisioning policy of a source
+- create, edit, delete schemas of a source
+
+Several tenants can used at the same time
 
 ## Installation
 
 The VSIX can be installed from the extension menu. Press `Ctrl`+`Shift`+`X` and in the menu, click `Install from VSIX...`.
+
+## Add new tennant
+
+The extension supports several tenants.
+
+Open the **Command Palette** with `Ctrl+Shift+P` (Windows or Linux) or `Cmd+Shift+P` (macOS) to find the command "IdentityNow: Add tenant...".
+
+Alternatively, you can click on the `+` in the SailPoint view.
+
+![Snippets for transforms](resources/readme/add-tenant.gif){ style="display: block; margin: 0 auto" }
 
 ## Extension Settings
 
 At this moment, there is no configuration settings for this extension.
 
 ## Snippets
+
+![Snippets for transforms](resources/readme/snippet-transforms.gif)
 
 ### Transforms
 
