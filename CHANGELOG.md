@@ -4,6 +4,7 @@ All notable changes to the "vscode-sailpoint-identitynow" extension will be docu
 
 ## [Unreleased]
 
+[0.0.2] - 2022/02/16
 ### Added
 - Support for source schemas
 - Support for provision policies
