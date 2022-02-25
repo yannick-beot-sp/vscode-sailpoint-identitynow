@@ -2,7 +2,7 @@
 	"name": "vscode-sailpoint-identitynow",
 	"displayName": "SailPoint IdentityNow",
 	"description": "Customize SailPoint IdentityNow",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"publisher": "vscode-sailpoint-identitynow",
 	"icon": "resources/sailpoint.png",
 	"bugs": {
@@ -231,6 +231,14 @@
 				{
 					"command": "vscode-sailpoint-identitynow.remove-resource",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == schema"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.open-resource",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == workflow"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.remove-resource",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == workflow"
 				}
 			]
 		},

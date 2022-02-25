@@ -14,16 +14,17 @@ export function withQuery(url: string, params: any): string {
 /**
  * Construct the Uri for an IdentityNow resource
  * @param tenantName 
- * @param v3resourceType 
+ * @param resourceType 
  * @param id 
  * @param name 
  * @returns 
  */
-export function getResourceUri(tenantName: string, v3resourceType: string, id: string, name: string): Uri {
+export function getResourceUri(tenantName: string, resourceType: string, id: string, name: string, beta = false): Uri {
     const baseUri = Uri.from({ scheme: URL_PREFIX, authority: tenantName, path: '/' });
     return Uri.joinPath(
         baseUri,
-        v3resourceType,
+        (beta ? 'beta' : 'v3'),
+        resourceType,
         id,
         name
     );

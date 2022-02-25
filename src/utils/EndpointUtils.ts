@@ -1,7 +1,7 @@
 export class EndpointUtils {
 
     public static getBaseUrl(tenantName: string): string {
-        let baseApiUrl = `https://${tenantName}.api.identitynow.com/`;
+        let baseApiUrl = `https://${tenantName}.api.identitynow.com`;
 
         if (tenantName.indexOf('.') > 0) {
             baseApiUrl = tenantName.replace(/([a-z0-9][a-z0-9-]+)\.(.*)/, "https://$1.api.$2/");
@@ -11,21 +11,21 @@ export class EndpointUtils {
 
     public static getAccessTokenUrl(tenantName: string): string {
         const baseApiUrl = this.getBaseUrl(tenantName);
-        return baseApiUrl + 'oauth/token';
+        return baseApiUrl + '/oauth/token';
     }
 
     public static getV3Url(tenantName: string): string {
         const baseApiUrl = this.getBaseUrl(tenantName);
-        return baseApiUrl + 'v3';
+        return baseApiUrl + '/v3';
     }
 
     public static getBetaUrl(tenantName: string): string {
         const baseApiUrl = this.getBaseUrl(tenantName);
-        return baseApiUrl + 'beta';
+        return baseApiUrl + '/beta';
     }
 
     public static getCCUrl(tenantName: string): string {
         const baseApiUrl = this.getBaseUrl(tenantName);
-        return baseApiUrl + 'cc/api';
+        return baseApiUrl + '/cc/api';
     }
 }

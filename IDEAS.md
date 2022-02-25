@@ -1,6 +1,4 @@
-- snippets for transforms
 - schema for transforms or source, extracted from swagger
-- delete resource object
 - add transform from command palette, with tenant quickpick
 - Manage rules
 - Manage workflows

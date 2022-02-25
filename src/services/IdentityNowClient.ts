@@ -39,7 +39,8 @@ export class IdentityNowClient {
      */
     public async getResource(path: string): Promise<any> {
         console.log('> getResource', path);
-        const endpoint = EndpointUtils.getV3Url(this.tenantName) + path;
+        let endpoint = EndpointUtils.getBaseUrl(this.tenantName);
+        endpoint += path;
         console.log('endpoint = ' + endpoint);
         const headers = await this.prepareHeaders();
         const req = await fetch(endpoint, {
@@ -145,13 +146,13 @@ export class IdentityNowClient {
             }
             throw new Error(req.statusText);
         }
-       
+
         console.log('< IdentityNowClient.deleteResource');
     }
 
     public async updateResource(path: string, data: string): Promise<any> {
         console.log('> updateResource', path);
-        const endpoint = EndpointUtils.getV3Url(this.tenantName) + path;
+        const endpoint = EndpointUtils.getBaseUrl(this.tenantName) + path;
         console.log('endpoint = ' + endpoint);
         const headers = await this.prepareHeaders();
         const req = await fetch(endpoint, {

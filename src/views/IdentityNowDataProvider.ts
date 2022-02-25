@@ -1,5 +1,5 @@
 import { EventEmitter, ExtensionContext, TreeDataProvider, TreeItem, Event, TreeItemCollapsibleState, ThemeIcon } from 'vscode';
-import { ProvisioningPoliciesTreeItem, ProvisioningPolicyTreeItem, SchemasTreeItem, SchemaTreeItem, SourcesTreeItem, SourceTreeItem, TenantTreeItem, TransformsTreeItem, TransformTreeItem } from '../models/IdentityNowTreeItem';
+import { ProvisioningPoliciesTreeItem, ProvisioningPolicyTreeItem, SchemasTreeItem, SchemaTreeItem, SourcesTreeItem, SourceTreeItem, TenantTreeItem, TransformsTreeItem, TransformTreeItem, WorkflowsTreeItem, WorkflowTreeItem } from '../models/IdentityNowTreeItem';
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { TenantService } from '../services/TenantService';
 import { getIdByUri, getPathByUri, getResourceUri } from '../utils/UriUtils';
@@ -23,21 +23,21 @@ export class IdentityNowDataProvider implements TreeDataProvider<TreeItem> {
         const results: TreeItem[] = [];
         if (item === undefined) {
             const tenants = this.tenantService.getTenants().sort();
-            for (let index = 0; index < tenants.length; index++) {
-                const tenantName = tenants[index];
-                results.push(new TenantTreeItem(tenantName, this.context));
+            if (tenants !== undefined && tenants instanceof Array) {
+                for (let tenantName of tenants) {
+                    results.push(new TenantTreeItem(tenantName, this.context));
+                }
             }
-
         } else if (item instanceof TenantTreeItem) {
             results.push(new SourcesTreeItem(item.tenantName));
             results.push(new TransformsTreeItem(item.tenantName));
+            results.push(new WorkflowsTreeItem(item.tenantName));
         } else if (item instanceof SourcesTreeItem) {
             const client = new IdentityNowClient(item.tenantName);
             const sources = await client.getSources();
             if (sources !== undefined && sources instanceof Array) {
-                for (let index = 0; index < sources.length; index++) {
-                    const element = sources[index];
-                    results.push(new SourceTreeItem(item.tenantName, element.name, element.id, element.connectorAttributes.cloudExternalId, this.context));
+                for (let source of sources) {
+                    results.push(new SourceTreeItem(item.tenantName, source.name, source.id, source.connectorAttributes.cloudExternalId, this.context));
                 }
             }
         } else if (item instanceof TransformsTreeItem) {
@@ -88,6 +88,16 @@ export class IdentityNowDataProvider implements TreeDataProvider<TreeItem> {
                     );
                 }
             }
+        } else if (item instanceof WorkflowsTreeItem) {
+            const client = new IdentityNowClient(item.tenantName);
+            const workflows = await client.getResource('/beta/workflows');
+            // Not possible to sort endpoint side
+            if (workflows !== undefined && workflows instanceof Array) {
+                workflows.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1);
+                for (let workflow of workflows) {
+                    results.push(new WorkflowTreeItem(item.tenantName, workflow.name, workflow.id, this.context));
+                }
+            }
         }
         console.log("< getChildren", results);
         return results;
@@ -97,7 +107,8 @@ export class IdentityNowDataProvider implements TreeDataProvider<TreeItem> {
         if (item.contextValue === "sources"
             || item.contextValue === "transforms"
             || item.contextValue === "schemas"
-            || item.contextValue === "provisioning-policies") {
+            || item.contextValue === "provisioning-policies"
+            || item.contextValue === "workflows") {
             // Manage folder icon for sources & transforms
             if (item.collapsibleState === TreeItemCollapsibleState.Expanded) {
                 item.iconPath = new ThemeIcon('folder-opened');

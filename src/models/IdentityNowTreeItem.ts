@@ -45,10 +45,11 @@ export class IdentityNowResourceTreeItem extends TreeItem {
         public readonly id: string,
         collapsible: TreeItemCollapsibleState,
         public readonly subResourceType: string = "",
-        public readonly subId: string = ""
+        public readonly subId: string = "",
+        public readonly beta = false,
     ) {
         super(label, collapsible);
-        this.uri = getResourceUri(tenantName, resourceType, id, label);
+        this.uri = getResourceUri(tenantName, resourceType, id, label, beta);
         if (subResourceType && subId) {
             this.uri = this.uri.with({
                 path: path.posix.join(getPathByUri(this.uri) || "", subResourceType, subId, label)
@@ -124,14 +125,12 @@ export class SchemasTreeItem extends TreeItem {
     constructor(
         public readonly tenantName: string,
         public readonly parentUri: Uri
-
     ) {
         super('Schemas', TreeItemCollapsibleState.Collapsed);
     }
 
     contextValue = 'schemas';
 }
-
 
 export class SchemaTreeItem extends IdentityNowResourceTreeItem {
 
@@ -157,7 +156,6 @@ export class ProvisioningPoliciesTreeItem extends TreeItem {
     constructor(
         public readonly tenantName: string,
         public readonly parentUri: Uri
-
     ) {
         super('Provisioning Policies', TreeItemCollapsibleState.Collapsed);
     }
@@ -185,3 +183,33 @@ export class ProvisioningPolicyTreeItem extends IdentityNowResourceTreeItem {
     contextValue = 'provisioning-policy';
 }
 
+/**
+ * Containers for workflows
+ */
+export class WorkflowsTreeItem extends TreeItem {
+
+    constructor(
+        public readonly tenantName: string,
+    ) {
+        super('Workflows', TreeItemCollapsibleState.Collapsed);
+    }
+
+    contextValue = 'workflows';
+}
+
+export class WorkflowTreeItem extends IdentityNowResourceTreeItem {
+    constructor(
+        tenantName: string,
+        label: string,
+        id: string,
+        context: ExtensionContext
+    ) {
+        super(tenantName, label, 'workflows', id, TreeItemCollapsibleState.None, undefined, undefined, true);
+        this.iconPath = {
+            light: context.asAbsolutePath('resources/light/workflow.svg'),
+            dark: context.asAbsolutePath('resources/dark/workflow.svg')
+        };
+    }
+
+    contextValue = 'workflow';
+}
