@@ -100,7 +100,7 @@ export class IdentityNowClient {
 
     public async createResource(path: string, data: string): Promise<any> {
         console.log('> IdentityNowClient.createResource', path);
-        const endpoint = EndpointUtils.getV3Url(this.tenantName) + path;
+        const endpoint = EndpointUtils.getBaseUrl(this.tenantName) + path;
         console.log('endpoint = ' + endpoint);
         const headers = await this.prepareHeaders();
         const req = await fetch(endpoint, {

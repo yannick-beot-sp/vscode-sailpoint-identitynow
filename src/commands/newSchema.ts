@@ -15,7 +15,7 @@ async function askSchemaName(): Promise<string | undefined> {
         prompt: "Enter the schema name",
         title: 'IdentityNow',
         validateInput: text => {
-            const regex = new RegExp('^[a-z]+$');
+            const regex = new RegExp('^[A-Za-z]+$');
             if (regex.test(text)) {
                 return null;
             }
