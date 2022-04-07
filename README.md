@@ -2,10 +2,11 @@
 
 The SailPoint IdentityNow extension makes it easy to:
 
-- create, edit, delete sources
+- edit, aggregate or reset sources
 - create, edit, delete transforms
 - create, edit, delete provisioning policy of a source
 - create, edit, delete schemas of a source
+- export config of a tenant
 
 Several tenants can used at the same time
 
@@ -96,6 +97,10 @@ This extension includes the following snippets for schemas:
 None
 
 ## Release Notes
+
+### 0.0.3 
+
+
 
 ### 0.0.2
 

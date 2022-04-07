@@ -15,6 +15,7 @@ import { URL_PREFIX } from './constants';
 import { deleteResource } from './commands/deleteResource';
 import { newProvisioningPolicy } from './commands/newProvisioningPolicy';
 import { newSchema } from './commands/newSchema';
+import { exportConfig } from './commands/exportConfig';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -78,6 +79,9 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.REMOVE_RESOURCE,
 			deleteResource));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_CONFIG,
+			exportConfig));
 
 	context.subscriptions.push(
 		vscode.workspace.registerFileSystemProvider(

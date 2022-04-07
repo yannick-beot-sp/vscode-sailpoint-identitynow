@@ -261,6 +261,65 @@ export class IdentityNowClient {
         return null;
     }
 
+
+    /**
+     * 
+     * cf. https://developer.sailpoint.com/apis/beta/#operation/spConfigExport
+     * @returns jobId
+     */
+    public async startExportJob(objectTypes: string[], objectOptions = {}): Promise<string> {
+        console.log('> startExportJob', objectTypes);
+        let endpoint = EndpointUtils.getBetaUrl(this.tenantName);
+        endpoint += '/sp-config/export';
+        console.log('endpoint = ' + endpoint);
+
+        const headers = await this.prepareHeaders();
+
+        const payload = {
+            "description": `Export Job vscode ${(new Date()).toISOString()}`,
+            "includeTypes": objectTypes,
+            "objectOptions": objectOptions
+        };
+
+        console.log('startExportJob: requesting', payload);
+        const req = await fetch(endpoint, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(payload)
+        });
+        if (!req.ok) {
+            throw new Error(req.statusText);
+        }
+        const res = await req.json();
+        const jobId = res.jobId;
+        console.log('< startExportJob. jobId =', jobId);
+        return jobId;
+    }
+
+    /**
+     * cf. https://developer.sailpoint.com/apis/beta/#operation/spConfigExportJobStatus
+     * @param jobId 
+     * @returns 
+     */
+    public async getExportJobStatus(jobId: String): Promise<any> {
+        console.log('> getExportJobStatus', jobId);
+        const path = '/beta/sp-config/export/' + jobId;
+        console.log('path = ' + path);
+        return this.getResource(path);
+    }
+
+    /**
+     * cf. https://developer.sailpoint.com/apis/beta/#operation/spConfigExportDownload
+     * @param jobId 
+     * @returns 
+     */
+    public async getExportJobResult(jobId: String): Promise<any> {
+        console.log('> getExportJobResult', jobId);
+        const path =  '/beta/sp-config/export/' + jobId + '/download';
+        console.log('path = ' + path);
+        return this.getResource(path);
+    }
+
 }
 
 export enum AggregationJob {

@@ -78,6 +78,10 @@
 				"title": "Remove tenant"
 			},
 			{
+				"command": "vscode-sailpoint-identitynow.export-config",
+				"title": "Export config"
+			},
+			{
 				"command": "vscode-sailpoint-identitynow.refresh",
 				"title": "IdentityNow: Refresh",
 				"icon": "$(refresh)"
@@ -173,6 +177,10 @@
 			"view/item/context": [
 				{
 					"command": "vscode-sailpoint-identitynow.remove-tenant",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.export-config",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
 				},
 				{

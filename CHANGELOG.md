@@ -4,6 +4,14 @@ All notable changes to the "vscode-sailpoint-identitynow" extension will be docu
 
 ## [Unreleased]
 
+### Added
+- Export of tenant config
+- Add support for workflows
+
+### Fixed
+- Error during deletion of tenant
+
+
 [0.0.2] - 2022/02/16
 ### Added
 - Support for source schemas
@@ -11,7 +19,6 @@ All notable changes to the "vscode-sailpoint-identitynow" extension will be docu
 - Schema and snippets for source schemas
 - Schema and snippets for provisioning policies
 - Snippets for transforms
-
 
 [0.0.1] - 2022/02/03
 ### Added
