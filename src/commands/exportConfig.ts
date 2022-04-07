@@ -107,8 +107,8 @@ async function exportConfig(tenantName: string): Promise<void> {
     let workspaceFolder = '';
     if (vscode.workspace.workspaceFolders !== undefined) {
         workspaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath.replace(/\\/g, "/");
-        exportFolder = workspaceFolder + '/exportedObjects';
-        exportFile = workspaceFolder + '/identitynowconfig-' + toDateSuffix() + '.json';
+        exportFolder = path.join(workspaceFolder, 'exportedObjects');
+        exportFile = path.join(workspaceFolder, 'identitynowconfig-' + tenantName + '-' + toDateSuffix() + '.json');
     }
     if (exportSingle) {
         exportFile = await vscode.window.showInputBox({
