@@ -2,10 +2,11 @@
 
 The SailPoint IdentityNow extension makes it easy to:
 
-- create, edit, delete sources
+- edit, aggregate or reset sources
 - create, edit, delete transforms
 - create, edit, delete provisioning policy of a source
 - create, edit, delete schemas of a source
+- export config of a tenant
 
 Several tenants can used at the same time
 
@@ -13,7 +14,7 @@ Several tenants can used at the same time
 
 The VSIX can be installed from the extension menu. Press `Ctrl`+`Shift`+`X` and in the menu, click `Install from VSIX...`.
 
-## Add new tennant
+## Add new tenant
 
 The extension supports several tenants.
 
@@ -21,7 +22,14 @@ Open the **Command Palette** with `Ctrl+Shift+P` (Windows or Linux) or `Cmd+Shif
 
 Alternatively, you can click on the `+` in the SailPoint view.
 
-![Snippets for transforms](resources/readme/add-tenant.gif){ style="display: block; margin: 0 auto" }
+![Add tenant](resources/readme/add-tenant.gif)
+
+## Export config of a tenant
+
+In the SailPoint view, right-click on a tenant to export config.
+Or, from the **Command Palette**, find the command "IdentityNow: Export config...".
+
+![Export config](resources/readme/export-config.gif)
 
 ## Extension Settings
 
@@ -96,6 +104,13 @@ This extension includes the following snippets for schemas:
 None
 
 ## Release Notes
+
+### 0.0.3 
+
+Workflows for ever!
+
+- Export of tenant config
+- Add support for workflows
 
 ### 0.0.2
 

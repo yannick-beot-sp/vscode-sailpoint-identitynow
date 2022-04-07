@@ -48,7 +48,10 @@ export class TenantService {
             tenants.splice(index, 1);
             this.storage.update(TenantService.ALL_TENANTS_KEY, tenants);
         }
-        this.storage.update(TenantService.TENANT_PREFIX + tenantName, null);
+        const tenantKey = TenantService.TENANT_PREFIX + tenantName;
+        if (this.storage.get(tenantKey) !== undefined) {
+            this.storage.update(TenantService.TENANT_PREFIX + tenantName, null);
+        }
     }
 
 }

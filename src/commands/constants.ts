@@ -1,7 +1,10 @@
 export const OPEN_RESOURCE = 'vscode-sailpoint-identitynow.open-resource';
 export const REMOVE_RESOURCE = 'vscode-sailpoint-identitynow.remove-resource';
 export const REFRESH = 'vscode-sailpoint-identitynow.refresh';
+export const ADD_TENANT = 'vscode-sailpoint-identitynow.add-tenant';
 export const REMOVE_TENANT = 'vscode-sailpoint-identitynow.remove-tenant';
+export const EXPORT_CONFIG_VIEW = 'vscode-sailpoint-identitynow.export-config.view';
+export const EXPORT_CONFIG_PALETTE = 'vscode-sailpoint-identitynow.export-config.palette';
 export const AGGREGATE = 'vscode-sailpoint-identitynow.aggregate-source';
 export const AGGREGATE_DISABLE_OPTIMIZATION = 'vscode-sailpoint-identitynow.aggregate-source-disable-optimization';
 export const RESET_SOURCE = 'vscode-sailpoint-identitynow.reset-source';

@@ -25,17 +25,20 @@ export class TreeManager {
         const tenantName = item.tenantName || "";
         const response = await vscode.window.showWarningMessage(
             `Are you sure you want to delete tenant ${tenantName}?`,
-            {modal:true},
+            { modal: true },
             ...["Yes", "No"]
         );
         if (response !== "Yes") {
             console.log("< removeTenant: no delete");
             return;
         }
-
-        const session = await vscode.authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [tenantName], { createIfNone: false });
-        if (session !== undefined) {
-            this.authProvider.removeSession(session.id);
+        try {
+            const session = await vscode.authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [tenantName], { createIfNone: false });
+            if (session !== undefined) {
+                this.authProvider.removeSession(session.id);
+            }
+        } catch(err) {
+            console.error("Session for ", tenantName, "does not exist:", err);
         }
         this.tenantService.removeTenant(tenantName);
         await vscode.commands.executeCommand(commands.REFRESH);
@@ -96,7 +99,7 @@ export class TreeManager {
             console.log("< resetSource: no reset");
             return;
         }
-        
+
         const client = new IdentityNowClient(item.tenantName);
         vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,

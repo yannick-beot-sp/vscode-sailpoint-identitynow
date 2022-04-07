@@ -29,6 +29,8 @@
 		"onView:vscode-sailpoint-identitynow.view",
 		"onCommand:vscode-sailpoint-identitynow.add-tenant",
 		"onCommand:vscode-sailpoint-identitynow.remove-tenant",
+		"onCommand:vscode-sailpoint-identitynow.export-config.view",
+		"onCommand:vscode-sailpoint-identitynow.export-config.palette",
 		"onCommand:vscode-sailpoint-identitynow.refresh",
 		"onCommand:vscode-sailpoint-identitynow.open-resource",
 		"onCommand:vscode-sailpoint-identitynow.remove-resource",
@@ -78,6 +80,16 @@
 				"title": "Remove tenant"
 			},
 			{
+				"command": "vscode-sailpoint-identitynow.export-config.view",
+				"title": "Export config...",
+				"icon": "$(export)"
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.export-config.palette",
+				"title": "IdentityNow: Export config...",
+				"icon": "$(export)"
+			},
+			{
 				"command": "vscode-sailpoint-identitynow.refresh",
 				"title": "IdentityNow: Refresh",
 				"icon": "$(refresh)"
@@ -122,7 +134,7 @@
 		"menus": {
 			"commandPalette": [
 				{
-					"command": "vscode-sailpoint-identitynow.remove-tenant",
+					"command": "vscode-sailpoint-identitynow.export-config.view",
 					"when": "never"
 				},
 				{
@@ -173,6 +185,10 @@
 			"view/item/context": [
 				{
 					"command": "vscode-sailpoint-identitynow.remove-tenant",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.export-config.view",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
 				},
 				{

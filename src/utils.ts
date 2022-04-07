@@ -26,6 +26,17 @@ export function toTimestamp(strDate: string): number {
     return datum / 1000;
 }
 
+/**
+ * Used to create a timestamp-based suffix for files.
+ * It is modified from the ISO8601 string to remove ':' and second
+ */
+export function toDateSuffix(): string {
+    var date = new Date();
+    let str = date.toISOString(); //"2011-12-19T15:28:46.493Z"
+    str= str.replaceAll(':','-');
+    str= str.replaceAll(/\..*/g,'');
+    return str;
+}
 
 export function convertToText(data:any):string {
     if (data) {
