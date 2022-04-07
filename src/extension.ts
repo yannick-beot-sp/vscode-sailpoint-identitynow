@@ -15,7 +15,7 @@ import { URL_PREFIX } from './constants';
 import { deleteResource } from './commands/deleteResource';
 import { newProvisioningPolicy } from './commands/newProvisioningPolicy';
 import { newSchema } from './commands/newSchema';
-import { exportConfig } from './commands/exportConfig';
+import * as exportConfig from './commands/exportConfig';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -44,12 +44,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	const addTenantCommand = new AddTenantCommand(tenantService);
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('vscode-sailpoint-identitynow.add-tenant', addTenantCommand.execute, addTenantCommand);
-	context.subscriptions.push(disposable);
-
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.ADD_TENANT, addTenantCommand.execute, 
+			addTenantCommand));
+			
 	const identityNowDataProvider = new IdentityNowDataProvider(context, tenantService);
 	vscode.window.registerTreeDataProvider('vscode-sailpoint-identitynow.view', identityNowDataProvider);
 	vscode.commands.registerCommand(commands.REFRESH, identityNowDataProvider.refresh, identityNowDataProvider);
@@ -80,9 +78,14 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.REMOVE_RESOURCE,
 			deleteResource));
 	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.EXPORT_CONFIG,
-			exportConfig));
+		vscode.commands.registerCommand(commands.EXPORT_CONFIG_VIEW,
+			exportConfig.exportConfigView));
 
+	const exportConfigPaletteCommand = new exportConfig.ExportConfigPalette(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_CONFIG_PALETTE, 
+			exportConfigPaletteCommand.execute, exportConfigPaletteCommand));
+	
 	context.subscriptions.push(
 		vscode.workspace.registerFileSystemProvider(
 			URL_PREFIX,

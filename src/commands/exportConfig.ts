@@ -5,6 +5,8 @@ import { ObjectTypeItem } from '../models/ConfigQuickPickItem';
 import { delay, toDateSuffix } from '../utils';
 import * as fs from 'fs';
 import path = require('path');
+import { TenantService } from '../services/TenantService';
+
 
 
 
@@ -47,14 +49,44 @@ const exportTypeItems = [
     }
 ];
 
-export async function exportConfig(node?: TenantTreeItem): Promise<void> {
-
+export async function exportConfigView(node?: TenantTreeItem): Promise<void> {
 
     // assessing that item is a IdentityNowResourceTreeItem
     if (node === undefined || !(node instanceof TenantTreeItem)) {
-        console.log("WARNING: deleteResource: invalid item", node);
-        throw new Error("deleteResource: invalid item");
+        console.log("WARNING: exportConfig: invalid item", node);
+        throw new Error("exportConfig: invalid item");
     }
+
+    exportConfig(node.tenantName);
+}
+
+export class ExportConfigPalette {
+    constructor(
+        private readonly tenantService: TenantService
+    ) { }
+
+    async execute() {
+
+        console.log("> exportConfigPalette.execute");
+        const tenants = this.tenantService.getTenants().sort();
+        let tenantName: string | undefined = '';
+        if (tenants.length < 1) {
+            return;
+        } else if (tenants.length === 1) {
+            tenantName = tenants[0];
+        } else {
+            tenantName = await vscode.window.showQuickPick(tenants, { placeHolder: `From which tenant do you want to export the config?` });
+            if (tenantName === undefined) {
+                console.log("exportConfigPalette: no tenant");
+                return;
+            }
+        }
+        console.log("exportConfigPalette: tenant = ", tenantName);
+        exportConfig(tenantName as string);
+    }
+}
+
+async function exportConfig(tenantName: string): Promise<void> {
 
     const exportTypeItem = await vscode.window.showQuickPick<vscode.QuickPickItem>(exportTypeItems, {
         ignoreFocusOut: false,
@@ -62,8 +94,10 @@ export async function exportConfig(node?: TenantTreeItem): Promise<void> {
         canPickMany: false,
 
     });
+    console.log("exportConfig: exportTypeItem=", exportTypeItem);
     if (exportTypeItem === undefined) {
         console.log("< exportConfig: no exportTypeItem");
+        return;
     }
     const exportSingle = exportTypeItem?.label === "Single file";
 
@@ -90,7 +124,7 @@ export async function exportConfig(node?: TenantTreeItem): Promise<void> {
 
         if (fs.existsSync(exportFile)) {
             const answer = await vscode.window.showQuickPick(["No", "Yes"], { placeHolder: `The file already exists, do you want to overwrite it?` });
-            if (answer === "No") {
+            if (answer === undefined || answer === "No") {
                 console.log("< exportConfig: do not overwrite file");
                 return;
             }
@@ -111,7 +145,7 @@ export async function exportConfig(node?: TenantTreeItem): Promise<void> {
         }
         else {
             const answer = await vscode.window.showQuickPick(["No", "Yes"], { placeHolder: `The folder already exists, do you want to overwrite files?` });
-            if (answer === "No") {
+            if (answer === undefined || answer === "No") {
                 console.log("< exportConfig: do not overwrite");
                 return;
             }
@@ -131,10 +165,10 @@ export async function exportConfig(node?: TenantTreeItem): Promise<void> {
         return;
     }
 
-    const client = new IdentityNowClient(node.tenantName);
+    const client = new IdentityNowClient(tenantName);
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
-        title: `Exporting configuration from ${node.tenantName}...`,
+        title: `Exporting configuration from ${tenantName}...`,
         cancellable: false
     }, async (task, token) => {
 
@@ -169,5 +203,5 @@ export async function exportConfig(node?: TenantTreeItem): Promise<void> {
             }
         }
     });
-    await vscode.window.showInformationMessage(`Successfully exported configuration from ${node.tenantName}`);
+    await vscode.window.showInformationMessage(`Successfully exported configuration from ${tenantName}`);
 }
