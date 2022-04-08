@@ -95,7 +95,7 @@ export class IdentityNowDataProvider implements TreeDataProvider<TreeItem> {
             if (workflows !== undefined && workflows instanceof Array) {
                 workflows.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1);
                 for (let workflow of workflows) {
-                    results.push(new WorkflowTreeItem(item.tenantName, workflow.name, workflow.id, this.context));
+                    results.push(new WorkflowTreeItem(item.tenantName, workflow.name, workflow.id, workflow.enabled, this.context));
                 }
             }
         }
@@ -115,6 +115,16 @@ export class IdentityNowDataProvider implements TreeDataProvider<TreeItem> {
             } else {
                 item.iconPath = new ThemeIcon('folder');
             }
+        } else if (item.contextValue === "enabledWorkflow") {
+            item.iconPath = {
+                light: this.context.asAbsolutePath('resources/light/workflow-enabled.svg'),
+                dark: this.context.asAbsolutePath('resources/dark/workflow-enabled.svg')
+            };
+        } else if (item.contextValue === "disabledWorkflow") {
+            item.iconPath = {
+                light: this.context.asAbsolutePath('resources/light/workflow-disabled.svg'),
+                dark: this.context.asAbsolutePath('resources/dark/workflow-disabled.svg')
+            };
         }
         // Otherwise, already TreeItem, so simply return the item as is
         return item;

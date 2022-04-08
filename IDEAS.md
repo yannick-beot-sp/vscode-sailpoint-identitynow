@@ -3,3 +3,4 @@
 - Manage rules
 - Manage workflows
 - Diff between tenants
+- Manage ETS

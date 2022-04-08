@@ -250,11 +250,11 @@
 				},
 				{
 					"command": "vscode-sailpoint-identitynow.open-resource",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == workflow"
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /workflow$/i"
 				},
 				{
 					"command": "vscode-sailpoint-identitynow.remove-resource",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == workflow"
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /workflow$/i"
 				}
 			]
 		},
