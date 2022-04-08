@@ -16,6 +16,7 @@ import { deleteResource } from './commands/deleteResource';
 import { newProvisioningPolicy } from './commands/newProvisioningPolicy';
 import { newSchema } from './commands/newSchema';
 import * as exportConfig from './commands/exportConfig';
+import { disableWorkflow, enableWorkflow } from './commands/workflow';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -45,9 +46,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const addTenantCommand = new AddTenantCommand(tenantService);
 	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.ADD_TENANT, addTenantCommand.execute, 
+		vscode.commands.registerCommand(commands.ADD_TENANT, addTenantCommand.execute,
 			addTenantCommand));
-			
+
 	const identityNowDataProvider = new IdentityNowDataProvider(context, tenantService);
 	vscode.window.registerTreeDataProvider('vscode-sailpoint-identitynow.view', identityNowDataProvider);
 	vscode.commands.registerCommand(commands.REFRESH, identityNowDataProvider.refresh, identityNowDataProvider);
@@ -78,14 +79,20 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.REMOVE_RESOURCE,
 			deleteResource));
 	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.ENABLE_WORKFLOW,
+			enableWorkflow));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.DISABLE_WORKFLOW,
+			disableWorkflow));
+	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_CONFIG_VIEW,
 			exportConfig.exportConfigView));
 
 	const exportConfigPaletteCommand = new exportConfig.ExportConfigPalette(tenantService);
 	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.EXPORT_CONFIG_PALETTE, 
+		vscode.commands.registerCommand(commands.EXPORT_CONFIG_PALETTE,
 			exportConfigPaletteCommand.execute, exportConfigPaletteCommand));
-	
+
 	context.subscriptions.push(
 		vscode.workspace.registerFileSystemProvider(
 			URL_PREFIX,

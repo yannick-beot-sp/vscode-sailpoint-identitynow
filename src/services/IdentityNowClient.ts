@@ -177,6 +177,34 @@ export class IdentityNowClient {
         return res;
     }
 
+    public async patchResource(path: string, data: string): Promise<any> {
+        console.log('> patchResource', path);
+        const endpoint = EndpointUtils.getBaseUrl(this.tenantName) + path;
+        console.log('endpoint = ' + endpoint);
+        const headers = await this.prepareHeaders();
+        headers['Content-Type'] = 'application/json-patch+json';
+        const req = await fetch(endpoint, {
+            method: 'PATCH',
+            headers: headers,
+            body: data
+        });
+
+        if (!req.ok) {
+            if (req.status === 404) {
+                return null;
+            }
+            if (req.status === 400) {
+                const details = await req.json();
+                const detail = details?.messages[0]?.text || req.statusText;
+                throw new Error(detail);
+            }
+            throw new Error(req.statusText);
+        }
+        const res = await req.json();
+
+        return res;
+    }
+
     private async prepareHeaders(): Promise<any> {
         const session = await authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [this.tenantName]);
         return {
@@ -315,9 +343,29 @@ export class IdentityNowClient {
      */
     public async getExportJobResult(jobId: String): Promise<any> {
         console.log('> getExportJobResult', jobId);
-        const path =  '/beta/sp-config/export/' + jobId + '/download';
+        const path = '/beta/sp-config/export/' + jobId + '/download';
         console.log('path = ' + path);
         return this.getResource(path);
+    }
+
+    /**
+     * cf. https://developer.sailpoint.com/apis/beta/#operation/patchWorkflow
+     * @param jobId 
+     * @returns 
+     */
+    public async updateWorkflowStatus(path: string, status: boolean): Promise<void> {
+        console.log('> updateWorkflowStatus', path, status);
+
+        const payload = [
+            {
+                "op": "replace",
+                "path": "/enabled",
+                "value": status
+            }
+        ];
+
+        await this.patchResource(path, JSON.stringify(payload));
+        console.log('< updateWorkflowStatus');
     }
 
 }

@@ -40,6 +40,8 @@
 		"onCommand:vscode-sailpoint-identitynow.new-transform",
 		"onCommand:vscode-sailpoint-identitynow.new-provisioning-policy",
 		"onCommand:vscode-sailpoint-identitynow.new-schema",
+		"onCommand:vscode-sailpoint-identitynow.workflow.enable",
+		"onCommand:vscode-sailpoint-identitynow.workflow.disable",
 		"onFileSystem:idn"
 	],
 	"license": "TBD",
@@ -129,6 +131,16 @@
 				"command": "vscode-sailpoint-identitynow.new-schema",
 				"title": "New Schema",
 				"icon": "$(add)"
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.workflow.enable",
+				"title": "Enable",
+				"icon": "$(debug-start)"
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.workflow.disable",
+				"title": "Disable",
+				"icon": "$(debug-stop)"
 			}
 		],
 		"menus": {
@@ -167,6 +179,14 @@
 				},
 				{
 					"command": "vscode-sailpoint-identitynow.new-schema",
+					"when": "never"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.workflow.enable",
+					"when": "never"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.workflow.disable",
 					"when": "never"
 				}
 			],
@@ -255,6 +275,14 @@
 				{
 					"command": "vscode-sailpoint-identitynow.remove-resource",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /workflow$/i"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.workflow.enable",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == disabledWorkflow"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.workflow.disable",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == enabledWorkflow"
 				}
 			]
 		},
