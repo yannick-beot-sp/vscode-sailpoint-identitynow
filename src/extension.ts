@@ -17,6 +17,7 @@ import { newProvisioningPolicy } from './commands/newProvisioningPolicy';
 import { newSchema } from './commands/newSchema';
 import * as exportConfig from './commands/exportConfig';
 import { disableWorkflow, enableWorkflow } from './commands/workflow';
+import { viewWorkflowExecutionHistory } from './commands/viewWorkflowExecutionHistory';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -85,6 +86,9 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.DISABLE_WORKFLOW,
 			disableWorkflow));
 	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.VIEW_WORKFLOW_EXECUTION_HISTORY,
+			viewWorkflowExecutionHistory));
+	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_CONFIG_VIEW,
 			exportConfig.exportConfigView));
 
@@ -116,3 +120,5 @@ export function activate(context: vscode.ExtensionContext) {
 
 // this method is called when your extension is deactivated
 export function deactivate() { }
+
+

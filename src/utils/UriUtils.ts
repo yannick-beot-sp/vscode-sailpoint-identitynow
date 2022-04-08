@@ -31,6 +31,23 @@ export function getResourceUri(tenantName: string, resourceType: string, id: str
 }
 
 
+/**
+ * Construct the Uri for a Workflow Execution Detail
+ * @param tenantName 
+ * @param executionId 
+ * @returns 
+ */
+export function getWorkflowExecutionDetailUri(tenantName: string, executionId: string): Uri {
+    // NOTE: the returned URI must end with a "label". 
+    // In this case, I will use the executionId as this information is not present in the detail itself in contrary to time info
+    const baseUri = Uri.from({
+        scheme: URL_PREFIX,
+        authority: tenantName,
+        path: `/beta/workflow-executions/${executionId}/history/${executionId}`
+    });
+    return baseUri;
+}
+
 export function getIdByUri(uri: Uri): string | null {
     const path = uri.path || "";
     const found = path.match(/^\/.+\/(.*?)\/.*?/);

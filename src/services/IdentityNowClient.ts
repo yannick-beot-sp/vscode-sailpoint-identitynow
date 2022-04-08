@@ -4,6 +4,7 @@ import { SailPointIdentityNowAuthenticationProvider } from "./AuthenticationProv
 import 'isomorphic-fetch';
 import 'isomorphic-form-data';
 import { withQuery } from "../utils/UriUtils";
+import { WorkflowExecution } from "../models/workflow";
 
 // import FormData = require('form-data');
 
@@ -366,6 +367,18 @@ export class IdentityNowClient {
 
         await this.patchResource(path, JSON.stringify(payload));
         console.log('< updateWorkflowStatus');
+    }
+
+    /**
+     * cf. https://developer.sailpoint.com/apis/beta/#operation/listWorkflowExecutions
+     * @param workflowId 
+     * @returns 
+     */
+    public async getWorkflowExecutionHistory(workflowId: string): Promise<WorkflowExecution[]> {
+        console.log('> getWorkflowExecutionHistory', workflowId);
+        const path = `/beta/workflows/${workflowId}/executions`;
+        console.log("path =", path);
+        return await this.getResource(path);
     }
 
 }

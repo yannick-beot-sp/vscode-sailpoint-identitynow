@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as commands from './constants';
-import { IdentityNowResourceTreeItem, TransformsTreeItem, WorkflowsTreeItem, WorkflowTreeItem } from '../models/IdentityNowTreeItem';
+import { WorkflowsTreeItem, WorkflowTreeItem } from '../models/IdentityNowTreeItem';
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { getPathByUri } from '../utils/UriUtils';
 
@@ -28,8 +28,8 @@ async function updateWorkflowStatus(node: WorkflowTreeItem, enable: boolean): Pr
         console.log("WARNING: updateWorkflowStatus: invalid item", node);
         throw new Error("updateWorkflowStatus: invalid item");
     }
-
     const client = new IdentityNowClient(node.tenantName);
+    
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: `${enable ? 'Enabling' : 'Disabling'} workflow...`,
@@ -39,5 +39,5 @@ async function updateWorkflowStatus(node: WorkflowTreeItem, enable: boolean): Pr
         const workflowsNode = new WorkflowsTreeItem(node.uri.authority);
         await vscode.commands.executeCommand(commands.REFRESH, workflowsNode);
     });
-
+    console.log("< updateWorkflowStatus");
 }
