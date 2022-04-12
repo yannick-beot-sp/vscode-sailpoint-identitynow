@@ -11,6 +11,9 @@
     var workflows = [];
     var triggers = [];
 
+    // true when payload is equal to an example => can be easily overwritten
+    var isExamplePayload = false;
+
 
     // const oldState = vscode.getState() || { colors: [] };
 
@@ -28,6 +31,7 @@
     workflowDropDown.addEventListener('change', onWorkflowDropDownChange);
     const payloadTextarea = document.getElementById(PAYLOAD_TEXTAREA_ID);
     payloadTextarea.addEventListener('input', toggleSubmitButton);
+    payloadTextarea.addEventListener('input', () => { isExamplePayload = false; });
     const submitButton = document.getElementById(SUBMIT_BUTTON_ID);
     submitButton.addEventListener('click', onButtonSubmit);
     setVSCodeMessageListener();
@@ -101,7 +105,7 @@
         var workflowId = event.target.value;
         console.log('onWorkflowDropDownChange - workflowId =', workflowId);
 
-        if (workflowId && !payloadTextarea.value) {
+        if (workflowId && (!payloadTextarea.value || isExamplePayload)) {
             // continue if workflowId is not null && payload is not already set
             const workflow = workflows.find(w => w.id === workflowId);
             console.log('onWorkflowDropDownChange - workflow =', workflow);
@@ -110,6 +114,7 @@
                 var trigger = triggers.find(t => t.id === workflow.triggerAttributes.id && t.type === workflow.triggerType);
                 if (trigger) {
                     payloadTextarea.value = JSON.stringify(trigger.inputExample, null, 2);
+                    isExamplePayload = true;
                 }
             }
         }

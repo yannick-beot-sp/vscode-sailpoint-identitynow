@@ -19,7 +19,7 @@ import * as exportConfig from './commands/exportConfig';
 import { disableWorkflow, enableWorkflow } from './commands/workflow';
 import { viewWorkflowExecutionHistory } from './commands/viewWorkflowExecutionHistory';
 import { WorkflowTesterWebviewViewProvider } from './views/WorkflowTesterWebviewViewProvider';
-import { testWorkflow, TestWorkflowCommand } from './commands/testWorkflow';
+import { TestWorkflowCommand } from './commands/testWorkflow';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
