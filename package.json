@@ -47,6 +47,7 @@
 		"onCommand:vscode-sailpoint-identitynow.workflow.enable",
 		"onCommand:vscode-sailpoint-identitynow.workflow.disable",
 		"onCommand:vscode-sailpoint-identitynow.workflow.view-execution-history",
+		"onCommand:vscode-sailpoint-identitynow.workflow.test",
 		"onView:vscode-sailpoint-identitynow.workflow.test-view",
 		"onFileSystem:idn"
 	],
@@ -149,6 +150,11 @@
 				"icon": "$(debug-start)"
 			},
 			{
+				"command": "vscode-sailpoint-identitynow.workflow.test",
+				"title": "Test workflow...",
+				"icon": "$(test-view-icon)"
+			},
+			{
 				"command": "vscode-sailpoint-identitynow.workflow.disable",
 				"title": "Disable",
 				"icon": "$(debug-stop)"
@@ -202,6 +208,10 @@
 				},
 				{
 					"command": "vscode-sailpoint-identitynow.workflow.disable",
+					"when": "never"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.workflow.test",
 					"when": "never"
 				},
 				{
@@ -306,6 +316,10 @@
 				{
 					"command": "vscode-sailpoint-identitynow.workflow.view-execution-history",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /workflow$/i"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.workflow.test",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /XXX$/i"
 				}
 			]
 		},

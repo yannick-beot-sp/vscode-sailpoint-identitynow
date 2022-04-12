@@ -69,13 +69,13 @@
     }
 
     function onButtonSubmit(event) {
-        vscode.postMessage({ 
-            command: 'testWorkflow', 
+        vscode.postMessage({
+            command: 'testWorkflow',
             tenant: tenantDropDown.value,
             workflowId: workflowDropDown.value,
             workflowName: workflowDropDown.selectedOptions[0].text,
             payload: payloadTextarea.value
-         });
+        });
     }
     /**
      * Requests the list of workflows when tenant is changed
@@ -86,6 +86,8 @@
         if (tenant) {
             vscode.postMessage({ command: 'getWorkflows', tenant: tenant });
             vscode.postMessage({ command: 'getWorkflowTriggers', tenant: tenant });
+        } else {
+            workflowDropDown.disabled = true;
         }
         toggleSubmitButton();
     }
@@ -115,8 +117,25 @@
     }
 
     function setWorkflowDropDownValues(payload) {
-        var workflowDropDown = document.getElementById(WORKFLOW_DROPDOWN_ID);
-        workflowDropDown.innerHTML = ''; //remove all options
+        console.log('setWorkflowDropDownValues: payload =', payload);
+
+        if (tenantDropDown.value !== payload.tenant) {
+            console.log('setWorkflowDropDownValues: updating tenant dropdown');
+            tenantDropDown.options.forEach(opt => {
+                if (opt.value === payload.tenant) { opt.selected = true; }
+            });
+            // need to refresh triggers if not the same tenant, just in case
+            vscode.postMessage({ command: 'getWorkflowTriggers', tenant: payload.tenant });
+        } else if (triggers.length < 1) {
+            vscode.postMessage({ command: 'getWorkflowTriggers', tenant: payload.tenant });
+        }
+
+
+        // workflowDropDown.innerHTML = ''; //remove all options
+        for (var o of document.querySelectorAll(`#${WORKFLOW_DROPDOWN_ID} > option`)) {
+            o.remove();
+        }
+
         workflowDropDown.disabled = false;
         var opt = document.createElement("option");
         opt.value = "";
@@ -126,19 +145,32 @@
         workflowDropDown.appendChild(opt);
         workflows = payload.workflows;
         if (workflows && Array.isArray(workflows) && workflows.length > 0) {
+            console.log('setWorkflowDropDownValues: Looping on available workflows');
+            console.log('setWorkflowDropDownValues: payload.selected =', payload.selected);
             for (let index = 0; index < workflows.length; index++) {
                 const workflow = workflows[index];
                 opt = document.createElement("option");
                 opt.value = workflow.id;
                 opt.textContent = workflow.name;
-
-                if (payload.selected && payload.selected === workflow.id) {
-                    opt.selected = true;
-                }
+                // issues https://github.com/microsoft/vscode-webview-ui-toolkit/issues/332
+                // if (payload.selected && payload.selected === workflow.id) {
+                //     opt.selected = true;
+                //     // opt.selected = "selected";
+                //     // opt.setAttribute("selected", "selected");
+                //     console.log('setWorkflowDropDownValues: payload.selected!');
+                // }
 
                 workflowDropDown.appendChild(opt);
             }
+            // for (var opt of document.querySelectorAll(`#${WORKFLOW_DROPDOWN_ID} > option`)) {
+            //     if (payload.selected && payload.selected === opt.value) {
+            //         opt.selected = true;
+            //         console.log('setWorkflowDropDownValues: payload.selected!');
+            //     } 
+            // };
         }
+
+
     }
 
 }());

@@ -19,6 +19,7 @@ import * as exportConfig from './commands/exportConfig';
 import { disableWorkflow, enableWorkflow } from './commands/workflow';
 import { viewWorkflowExecutionHistory } from './commands/viewWorkflowExecutionHistory';
 import { WorkflowTesterWebviewViewProvider } from './views/WorkflowTesterWebviewViewProvider';
+import { testWorkflow, TestWorkflowCommand } from './commands/testWorkflow';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -87,6 +88,8 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.DISABLE_WORKFLOW,
 			disableWorkflow));
+
+
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.VIEW_WORKFLOW_EXECUTION_HISTORY,
 			viewWorkflowExecutionHistory));
@@ -119,6 +122,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const workflowTester = new WorkflowTesterWebviewViewProvider(context, tenantService);
 	workflowTester.activate();
+
+	const testWorkflowCommand = new TestWorkflowCommand(workflowTester);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.TEST_WORKFLOW,
+			testWorkflowCommand.execute, testWorkflowCommand));
 
 	vscode.workspace.onDidSaveTextDocument(onFileSaved);
 }

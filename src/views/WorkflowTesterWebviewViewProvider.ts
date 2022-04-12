@@ -9,6 +9,7 @@ import { getWorkflowExecutionDetailUri } from '../utils/UriUtils';
 
 export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProvider {
 
+
     private _view?: vscode.WebviewView;
     private _extensionUri: vscode.Uri;
 
@@ -66,25 +67,7 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
             switch (command) {
                 case 'getWorkflows':
                     {
-                        const client = new IdentityNowClient(data.tenant);
-                        const workflows = await client.getWorflows();
-                        // subset of info from workflows
-                        const workflowModels = workflows.map(w => ({
-                            id: w.id,
-                            name: w.name,
-                            triggerType: w.trigger.type,
-                            triggerAttributes: w.trigger.attributes
-                        }));
-
-                        if (this._view) {
-                            this._view.webview.postMessage({
-                                command: 'setWorkflows',
-                                payload: JSON.stringify({
-                                    workflows: workflowModels
-                                })
-
-                            });
-                        }
+                        this.showWorkflow(data.tenant);
                         break;
                     }
                 case 'getWorkflowTriggers':
@@ -139,16 +122,33 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
         });
     }
 
-    public addColor() {
-        if (this._view) {
-            this._view.show?.(true); // `show` is not implemented in 1.49 but is for 1.50 insiders
-            this._view.webview.postMessage({ type: 'addColor' });
-        }
-    }
+    public async showWorkflow(tenantName: string, workflowId?: string) {
 
-    public clearColors() {
         if (this._view) {
-            this._view.webview.postMessage({ type: 'clearColors' });
+            this._view.show?.(true);
+            const client = new IdentityNowClient(tenantName);
+
+            const workflows = await client.getWorflows();
+            // subset of info from workflows
+            const workflowModels = workflows.map(w => ({
+                id: w.id,
+                name: w.name,
+                triggerType: w.trigger.type,
+                triggerAttributes: w.trigger.attributes
+            }));
+
+            const payload: any = {
+                tenant: tenantName,
+                workflows: workflowModels
+            };
+            if (workflowId) {
+                payload.selected = workflowId;
+            }
+
+            this._view.webview.postMessage({
+                command: 'setWorkflows',
+                payload: JSON.stringify(payload)
+            });
         }
     }
 
