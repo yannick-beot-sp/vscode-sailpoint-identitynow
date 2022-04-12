@@ -4,7 +4,7 @@ import { SailPointIdentityNowAuthenticationProvider } from "./AuthenticationProv
 import 'isomorphic-fetch';
 import 'isomorphic-form-data';
 import { withQuery } from "../utils/UriUtils";
-import { WorkflowExecution } from "../models/workflow";
+import { Workflow, WorkflowExecution } from "../models/workflow";
 
 // import FormData = require('form-data');
 
@@ -380,6 +380,47 @@ export class IdentityNowClient {
         console.log("path =", path);
         return await this.getResource(path);
     }
+/**
+ * cf. https://developer.sailpoint.com/apis/beta/#operation/getWorkflowExecution
+ * @param workflowExecutionId 
+ * @returns 
+ */
+    public async getWorkflowExecution(workflowExecutionId:string): Promise<WorkflowExecution> {
+        console.log('> getWorkflowExecution', workflowExecutionId);
+        const path = `/beta/workflow-executions/${workflowExecutionId}`;
+        console.log("path =", path);
+        return await this.getResource(path);
+    }
+
+    public async getWorflows(): Promise<Workflow[]> {
+        const workflows = await this.getResource('/beta/workflows');
+        if (workflows === undefined || !Array.isArray(workflows)) {
+            return [];
+        }
+        workflows.sort((a:Workflow, b:Workflow) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1);
+        return workflows;
+    }
+
+    public async getWorflowTriggers(): Promise<Workflow[]> {
+        const workflowTriggers = await this.getResource('/beta/workflow-library/triggers');
+        if (workflowTriggers === undefined || !Array.isArray(workflowTriggers)) {
+            return [];
+        }
+        return workflowTriggers;
+    }
+
+    public async testWorkflow(workflowId:string, payload:any): Promise<string> {
+        console.log('> testWorkflow', workflowId, payload);
+        const path = `/beta/workflows/${workflowId}/test`;
+        
+        const workflowExecutionDetail = await this.createResource(path, JSON.stringify({
+            input: payload
+        }));
+        
+        return workflowExecutionDetail.workflowExecutionId;
+    }
+
+    
 
 }
 

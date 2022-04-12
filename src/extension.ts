@@ -18,6 +18,7 @@ import { newSchema } from './commands/newSchema';
 import * as exportConfig from './commands/exportConfig';
 import { disableWorkflow, enableWorkflow } from './commands/workflow';
 import { viewWorkflowExecutionHistory } from './commands/viewWorkflowExecutionHistory';
+import { WorkflowTesterWebviewViewProvider } from './views/WorkflowTesterWebviewViewProvider';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -51,7 +52,8 @@ export function activate(context: vscode.ExtensionContext) {
 			addTenantCommand));
 
 	const identityNowDataProvider = new IdentityNowDataProvider(context, tenantService);
-	vscode.window.registerTreeDataProvider('vscode-sailpoint-identitynow.view', identityNowDataProvider);
+	vscode.window.registerTreeDataProvider(commands.TREE_VIEW, identityNowDataProvider);
+
 	vscode.commands.registerCommand(commands.REFRESH, identityNowDataProvider.refresh, identityNowDataProvider);
 
 
@@ -114,6 +116,9 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.NEW_SCHEMA,
 			newSchema));
+
+	const workflowTester = new WorkflowTesterWebviewViewProvider(context, tenantService);
+	workflowTester.activate();
 
 	vscode.workspace.onDidSaveTextDocument(onFileSaved);
 }

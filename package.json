@@ -16,6 +16,10 @@
 	"engines": {
 		"vscode": "^1.63.0"
 	},
+	"extensionKind": [
+		"ui",
+		"workspace"
+	],
 	"categories": [
 		"Snippets",
 		"Other"
@@ -43,6 +47,7 @@
 		"onCommand:vscode-sailpoint-identitynow.workflow.enable",
 		"onCommand:vscode-sailpoint-identitynow.workflow.disable",
 		"onCommand:vscode-sailpoint-identitynow.workflow.view-execution-history",
+		"onView:vscode-sailpoint-identitynow.workflow.test-view",
 		"onFileSystem:idn"
 	],
 	"license": "TBD",
@@ -63,6 +68,11 @@
 					"id": "vscode-sailpoint-identitynow.view",
 					"name": "IdentityNow Tenants",
 					"icon": "resources/sailpoint.svg"
+				},
+				{
+					"id": "vscode-sailpoint-identitynow.workflow.test-view",
+					"type": "webview",
+					"name": "Workflow tester"
 				}
 			]
 		},
@@ -346,6 +356,7 @@
 		"typescript": "^4.5.4"
 	},
 	"dependencies": {
+		"@vscode/webview-ui-toolkit": "^1.0.0",
 		"client-oauth2": "^4.3.3",
 		"isomorphic-fetch": "^3.0.0",
 		"isomorphic-form-data": "^2.0.0"

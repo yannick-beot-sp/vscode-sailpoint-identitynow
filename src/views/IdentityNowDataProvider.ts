@@ -90,14 +90,9 @@ export class IdentityNowDataProvider implements TreeDataProvider<TreeItem> {
             }
         } else if (item instanceof WorkflowsTreeItem) {
             const client = new IdentityNowClient(item.tenantName);
-            const workflows = await client.getResource('/beta/workflows');
-            // Not possible to sort endpoint side
-            if (workflows !== undefined && workflows instanceof Array) {
-                workflows.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1);
-                for (let workflow of workflows) {
-                    results.push(new WorkflowTreeItem(item.tenantName, workflow.name, workflow.id, workflow.enabled, this.context));
-                }
-            }
+            const workflows = await client.getWorflows();
+            const workflowTreeItems = workflows.map(w=>new WorkflowTreeItem(item.tenantName, w.name, w.id, w.enabled, this.context));
+            results.push(...workflowTreeItems);
         }
         console.log("< getChildren", results);
         return results;
