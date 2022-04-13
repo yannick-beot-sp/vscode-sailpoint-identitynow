@@ -7,7 +7,6 @@ import { isEmpty } from '../utils';
 
 export class AddTenantCommand {
 
-
     constructor(private readonly tenantService: TenantService) { }
 
     async askTenant(): Promise<string | undefined> {
