@@ -13,13 +13,9 @@ export class TenantTreeItem extends TreeItem {
         context: ExtensionContext
     ) {
         super(tenantName, TreeItemCollapsibleState.Collapsed);
-        this.iconPath = {
-            light: context.asAbsolutePath('resources/sailpoint.svg'),
-            dark: context.asAbsolutePath('resources/dark/sailpoint.svg')
-        };
     }
+    iconPath = new ThemeIcon('organization');
     contextValue = 'tenant';
-
 }
 
 /**
