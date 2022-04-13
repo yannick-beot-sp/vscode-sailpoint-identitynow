@@ -4,7 +4,7 @@
 	"description": "Customize SailPoint IdentityNow",
 	"version": "0.0.3",
 	"publisher": "vscode-sailpoint-identitynow",
-	"icon": "resources/sailpoint.png",
+	"icon": "resources/idn.png",
 	"bugs": {
 		"url": "https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues"
 	},

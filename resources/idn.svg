@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="250"
+   height="250"
+   version="1.1"
+   enable-background="new 0 0 1215 250"
+   xml:space="preserve"
+   id="svg831"
+   sodipodi:docname="idn.svg"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs835"><rect
+     x="9.0011614"
+     y="88.269454"
+     width="201.21951"
+     height="78.397213"
+     id="rect2591" /></defs><sodipodi:namedview
+   id="namedview833"
+   pagecolor="#505050"
+   bordercolor="#eeeeee"
+   borderopacity="1"
+   inkscape:pageshadow="0"
+   inkscape:pageopacity="0"
+   inkscape:pagecheckerboard="0"
+   showgrid="false"
+   inkscape:zoom="3.444"
+   inkscape:cx="124.85482"
+   inkscape:cy="125"
+   inkscape:window-width="1920"
+   inkscape:window-height="1121"
+   inkscape:window-x="2391"
+   inkscape:window-y="-9"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="svg831" />
+ 
+
+<text
+   xml:space="preserve"
+   id="text2589"
+   style="font-size:40px;line-height:1.25;font-family:Eina02-Bold;-inkscape-font-specification:Eina02-Bold;white-space:pre;shape-inside:url(#rect2591);fill:#007acc;fill-opacity:1"
+   transform="matrix(2.388988,0,0,2.3700086,17.920992,-135.20213)"><tspan
+     x="9.0019531"
+     y="124.26953"
+     id="tspan5880"><tspan
+       style="font-family:Eina01-SemiBold;-inkscape-font-specification:Eina01-SemiBold"
+       id="tspan5878">IDN</tspan></tspan></text><ellipse
+   style="fill:none;fill-opacity:1;stroke:#007acc;stroke-width:11.8529;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill;stop-color:#000000"
+   id="path6923"
+   cx="125"
+   cy="125"
+   rx="116.51217"
+   ry="116.22181" /></svg>
