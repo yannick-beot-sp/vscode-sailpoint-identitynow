@@ -21,6 +21,12 @@ jobs:
     #   if: runner.os == 'Linux'
     # - run: npm test
     #   if: runner.os != 'Linux'
+    - name: compile and create vsix
+      run: npm run package
+    - name: upload vsix as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        path: ${{github.workspace}}/vscode-sailpoint-identitynow-*.vsix
     - name: Publish
       if: success() && startsWith( github.ref, 'refs/tags/releases/')
       run: npm run deploy

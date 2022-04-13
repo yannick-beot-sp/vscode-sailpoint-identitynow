@@ -352,7 +352,8 @@
 		"lint": "eslint src --ext ts",
 		"test": "node ./out/test/runTest.js",
 		"clean": "rimraf out",
-		"deploy": "vsce publish"
+		"deploy": "vsce publish",
+		"package": "vsce package"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.2.0",
@@ -368,7 +369,8 @@
 		"glob": "^7.2.0",
 		"mocha": "^9.1.3",
 		"rimraf": "^3.0.2",
-		"typescript": "^4.5.4"
+		"typescript": "^4.5.4",
+		"vsce": "^2.7.0"
 	},
 	"dependencies": {
 		"@vscode/webview-ui-toolkit": "^1.0.0",
