@@ -13,13 +13,9 @@ export class TenantTreeItem extends TreeItem {
         context: ExtensionContext
     ) {
         super(tenantName, TreeItemCollapsibleState.Collapsed);
-        this.iconPath = {
-            light: context.asAbsolutePath('resources/sailpoint.svg'),
-            dark: context.asAbsolutePath('resources/dark/sailpoint.svg')
-        };
     }
+    iconPath = new ThemeIcon('organization');
     contextValue = 'tenant';
-
 }
 
 /**
@@ -202,14 +198,10 @@ export class WorkflowTreeItem extends IdentityNowResourceTreeItem {
         tenantName: string,
         label: string,
         id: string,
+        public enabled: boolean,
         context: ExtensionContext
     ) {
         super(tenantName, label, 'workflows', id, TreeItemCollapsibleState.None, undefined, undefined, true);
-        this.iconPath = {
-            light: context.asAbsolutePath('resources/light/workflow.svg'),
-            dark: context.asAbsolutePath('resources/dark/workflow.svg')
-        };
+        this.contextValue = enabled ? 'enabledWorkflow' : 'disabledWorkflow';
     }
-
-    contextValue = 'workflow';
 }

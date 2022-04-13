@@ -4,7 +4,7 @@
 	"description": "Customize SailPoint IdentityNow",
 	"version": "0.0.3",
 	"publisher": "vscode-sailpoint-identitynow",
-	"icon": "resources/sailpoint.png",
+	"icon": "resources/idn.png",
 	"bugs": {
 		"url": "https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues"
 	},
@@ -16,6 +16,10 @@
 	"engines": {
 		"vscode": "^1.63.0"
 	},
+	"extensionKind": [
+		"ui",
+		"workspace"
+	],
 	"categories": [
 		"Snippets",
 		"Other"
@@ -40,9 +44,14 @@
 		"onCommand:vscode-sailpoint-identitynow.new-transform",
 		"onCommand:vscode-sailpoint-identitynow.new-provisioning-policy",
 		"onCommand:vscode-sailpoint-identitynow.new-schema",
+		"onCommand:vscode-sailpoint-identitynow.workflow.enable",
+		"onCommand:vscode-sailpoint-identitynow.workflow.disable",
+		"onCommand:vscode-sailpoint-identitynow.workflow.view-execution-history",
+		"onCommand:vscode-sailpoint-identitynow.workflow.test",
+		"onView:vscode-sailpoint-identitynow.workflow.test-view",
 		"onFileSystem:idn"
 	],
-	"license": "TBD",
+	"license": "MIT",
 	"main": "./out/extension.js",
 	"contributes": {
 		"viewsContainers": {
@@ -50,7 +59,7 @@
 				{
 					"id": "sailpoint",
 					"title": "SailPoint IdentityNow",
-					"icon": "resources/sailpoint.svg"
+					"icon": "resources/idn.svg"
 				}
 			]
 		},
@@ -59,7 +68,12 @@
 				{
 					"id": "vscode-sailpoint-identitynow.view",
 					"name": "IdentityNow Tenants",
-					"icon": "resources/sailpoint.svg"
+					"icon": "resources/idn.svg"
+				},
+				{
+					"id": "vscode-sailpoint-identitynow.workflow.test-view",
+					"type": "webview",
+					"name": "Workflow tester"
 				}
 			]
 		},
@@ -129,6 +143,25 @@
 				"command": "vscode-sailpoint-identitynow.new-schema",
 				"title": "New Schema",
 				"icon": "$(add)"
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.workflow.enable",
+				"title": "Enable",
+				"icon": "$(debug-start)"
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.workflow.test",
+				"title": "Test workflow...",
+				"icon": "$(test-view-icon)"
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.workflow.disable",
+				"title": "Disable",
+				"icon": "$(debug-stop)"
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.workflow.view-execution-history",
+				"title": "View execution history..."
 			}
 		],
 		"menus": {
@@ -167,6 +200,22 @@
 				},
 				{
 					"command": "vscode-sailpoint-identitynow.new-schema",
+					"when": "never"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.workflow.enable",
+					"when": "never"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.workflow.disable",
+					"when": "never"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.workflow.test",
+					"when": "never"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.workflow.view-execution-history",
 					"when": "never"
 				}
 			],
@@ -250,11 +299,27 @@
 				},
 				{
 					"command": "vscode-sailpoint-identitynow.open-resource",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == workflow"
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /workflow$/i"
 				},
 				{
 					"command": "vscode-sailpoint-identitynow.remove-resource",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == workflow"
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /workflow$/i"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.workflow.enable",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == disabledWorkflow"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.workflow.disable",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == enabledWorkflow"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.workflow.view-execution-history",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /workflow$/i"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.workflow.test",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /XXX$/i"
 				}
 			]
 		},
@@ -305,6 +370,7 @@
 		"typescript": "^4.5.4"
 	},
 	"dependencies": {
+		"@vscode/webview-ui-toolkit": "^1.0.0",
 		"client-oauth2": "^4.3.3",
 		"isomorphic-fetch": "^3.0.0",
 		"isomorphic-form-data": "^2.0.0"

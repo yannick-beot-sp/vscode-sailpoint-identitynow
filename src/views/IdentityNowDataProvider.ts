@@ -90,14 +90,9 @@ export class IdentityNowDataProvider implements TreeDataProvider<TreeItem> {
             }
         } else if (item instanceof WorkflowsTreeItem) {
             const client = new IdentityNowClient(item.tenantName);
-            const workflows = await client.getResource('/beta/workflows');
-            // Not possible to sort endpoint side
-            if (workflows !== undefined && workflows instanceof Array) {
-                workflows.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1);
-                for (let workflow of workflows) {
-                    results.push(new WorkflowTreeItem(item.tenantName, workflow.name, workflow.id, this.context));
-                }
-            }
+            const workflows = await client.getWorflows();
+            const workflowTreeItems = workflows.map(w=>new WorkflowTreeItem(item.tenantName, w.name, w.id, w.enabled, this.context));
+            results.push(...workflowTreeItems);
         }
         console.log("< getChildren", results);
         return results;
@@ -115,6 +110,16 @@ export class IdentityNowDataProvider implements TreeDataProvider<TreeItem> {
             } else {
                 item.iconPath = new ThemeIcon('folder');
             }
+        } else if (item.contextValue === "enabledWorkflow") {
+            item.iconPath = {
+                light: this.context.asAbsolutePath('resources/light/workflow-enabled.svg'),
+                dark: this.context.asAbsolutePath('resources/dark/workflow-enabled.svg')
+            };
+        } else if (item.contextValue === "disabledWorkflow") {
+            item.iconPath = {
+                light: this.context.asAbsolutePath('resources/light/workflow-disabled.svg'),
+                dark: this.context.asAbsolutePath('resources/dark/workflow-disabled.svg')
+            };
         }
         // Otherwise, already TreeItem, so simply return the item as is
         return item;

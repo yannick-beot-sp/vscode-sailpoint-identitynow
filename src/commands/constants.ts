@@ -11,3 +11,10 @@ export const RESET_SOURCE = 'vscode-sailpoint-identitynow.reset-source';
 export const NEW_TRANSFORM = 'vscode-sailpoint-identitynow.new-transform';
 export const NEW_PROVISIONING_POLICY = 'vscode-sailpoint-identitynow.new-provisioning-policy';
 export const NEW_SCHEMA = 'vscode-sailpoint-identitynow.new-schema';
+export const ENABLE_WORKFLOW = 'vscode-sailpoint-identitynow.workflow.enable';
+export const DISABLE_WORKFLOW = 'vscode-sailpoint-identitynow.workflow.disable';
+export const TEST_WORKFLOW = 'vscode-sailpoint-identitynow.workflow.test';
+export const VIEW_WORKFLOW_EXECUTION_HISTORY = 'vscode-sailpoint-identitynow.workflow.view-execution-history';
+
+export const TREE_VIEW = 'vscode-sailpoint-identitynow.view';
+export const WORKFLOW_TESTER_VIEW = 'vscode-sailpoint-identitynow.workflow.test-view';

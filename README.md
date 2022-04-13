@@ -1,12 +1,16 @@
 # SailPoint IdentityNow for Visual Studio Code
 
+> This extension is not developed, maintained or supported by SailPoint. 
+> It is a community effort to help manage IdentityNow from Visual Studio Code.
+
 The SailPoint IdentityNow extension makes it easy to:
 
-- edit, aggregate or reset sources
-- create, edit, delete transforms
-- create, edit, delete provisioning policy of a source
-- create, edit, delete schemas of a source
+- view, edit, aggregate or reset sources
+- view, create, edit, delete transforms
+- view, create, edit, delete provisioning policy of a source
+- view, create, edit, delete schemas of a source
 - export config of a tenant
+- view, edit, enable, disable and test workflows and view execution history
 
 Several tenants can used at the same time
 
@@ -31,9 +35,11 @@ Or, from the **Command Palette**, find the command "IdentityNow: Export config..
 
 ![Export config](resources/readme/export-config.gif)
 
-## Extension Settings
+## Workflow management
 
-At this moment, there is no configuration settings for this extension.
+The extension allows you to test the workflow:
+
+![Export config](resources/readme/test-workflow.gif)
 
 ## Snippets
 
@@ -99,6 +105,10 @@ This extension includes the following snippets for schemas:
 | `New provisioning policy` | Create a new provisioning policy |
 | `New field`               | Create a new field               |
 
+## Extension Settings
+
+At this moment, there is no configuration settings for this extension.
+
 ## Known Issues
 
 None
@@ -111,6 +121,7 @@ Workflows for ever!
 
 - Export of tenant config
 - Add support for workflows
+- Add workflow tester
 
 ### 0.0.2
 
