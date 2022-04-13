@@ -51,7 +51,7 @@
 		"onView:vscode-sailpoint-identitynow.workflow.test-view",
 		"onFileSystem:idn"
 	],
-	"license": "TBD",
+	"license": "MIT",
 	"main": "./out/extension.js",
 	"contributes": {
 		"viewsContainers": {
@@ -59,7 +59,7 @@
 				{
 					"id": "sailpoint",
 					"title": "SailPoint IdentityNow",
-					"icon": "resources/sailpoint.svg"
+					"icon": "resources/idn.svg"
 				}
 			]
 		},
@@ -68,7 +68,7 @@
 				{
 					"id": "vscode-sailpoint-identitynow.view",
 					"name": "IdentityNow Tenants",
-					"icon": "resources/sailpoint.svg"
+					"icon": "resources/idn.svg"
 				},
 				{
 					"id": "vscode-sailpoint-identitynow.workflow.test-view",
