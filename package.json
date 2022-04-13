@@ -3,7 +3,7 @@
 	"displayName": "SailPoint IdentityNow",
 	"description": "Customize SailPoint IdentityNow",
 	"version": "0.0.3",
-	"publisher": "vscode-sailpoint-identitynow",
+	"publisher": "yannick-beot-sp",
 	"icon": "resources/idn.png",
 	"bugs": {
 		"url": "https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues"
@@ -351,7 +351,8 @@
 		"pretest": "npm run compile && npm run lint",
 		"lint": "eslint src --ext ts",
 		"test": "node ./out/test/runTest.js",
-		"clean": "rimraf out"
+		"clean": "rimraf out",
+		"deploy": "vsce publish"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.2.0",
