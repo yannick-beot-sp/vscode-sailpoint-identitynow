@@ -4,7 +4,7 @@ on:
     branches:
       - main
     tags:
-      - '*'
+      - '**'
 jobs:
   build:
     runs-on: windows-latest
