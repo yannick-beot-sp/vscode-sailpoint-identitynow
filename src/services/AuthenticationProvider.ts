@@ -41,6 +41,7 @@ class SailPointIdentityNowPatSession implements AuthenticationSession {
 }
 
 export class SailPointIdentityNowAuthenticationProvider implements AuthenticationProvider, Disposable {
+
     private static SECRET_PAT_PREFIX = "IDENTITYNOW_SECRET_PAT_";
     private static SECRET_AT_PREFIX = "IDENTITYNOW_SECRET_AT_";
     static id = 'SailPointIdentityNowPAT';
@@ -285,6 +286,11 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
         const tenantName = this.getTenantNameFromSessionId(_sessionId);
         // Remove PAT or just AccessToken?
         await this.secretStorage.delete(this.getAccessTokenKey(tenantName));
+    }
+
+    async removePat(tenantName: string) {
+        console.log("> removePat for", tenantName);
+        await this.secretStorage.delete(this.getPatKey(tenantName));
     }
 
     private async askPATClientId(): Promise<string | undefined> {
