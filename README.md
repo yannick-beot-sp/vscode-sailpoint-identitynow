@@ -26,24 +26,24 @@ Open the **Command Palette** with `Ctrl+Shift+P` (Windows or Linux) or `Cmd+Shif
 
 Alternatively, you can click on the `+` in the SailPoint view.
 
-![Add tenant](resources/readme/add-tenant.gif)
+![Add tenant](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/add-tenant.gif)
 
 ## Export config of a tenant
 
 In the SailPoint view, right-click on a tenant to export config.
 Or, from the **Command Palette**, find the command "IdentityNow: Export config...".
 
-![Export config](resources/readme/export-config.gif)
+![Export config](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/export-config.gif)
 
 ## Workflow management
 
 The extension allows you to test the workflow:
 
-![Export config](resources/readme/test-workflow.gif)
+![Export config](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/test-workflow.gif)
 
 ## Snippets
 
-![Snippets for transforms](resources/readme/snippet-transforms.gif)
+![Snippets for transforms](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/snippet-transforms.gif)
 
 ### Transforms
 
