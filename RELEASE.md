@@ -4,8 +4,9 @@ This document presents the release process, just to not forget.
 
 == Checklist
 
-- [ ] Update README.md
-- [ ] Update CHANGELOG.md
+- [ ] Update `README.md`
+- [ ] Update `CHANGELOG.md`
+- [ ] Update version in `package.json`
 
 == Publish in the marketplace and GitHub Release
 

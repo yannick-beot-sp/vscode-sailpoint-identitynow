@@ -6,6 +6,11 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [0.0.4] - 2022/04/14
+
+### Fixed
+- Regexp for client secret (63 or 64 characters)
+
 ## [0.0.3] - 2022/04/13
 ### Added
 - Export of tenant config
