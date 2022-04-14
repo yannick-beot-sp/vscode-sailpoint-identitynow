@@ -6,6 +6,11 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [0.0.5] - 2022/04/14
+### Fixed
+- Regexp for tenant, with or without domain
+- Remove PAT when removing tenant
+
 ## [0.0.4] - 2022/04/14
 
 ### Fixed

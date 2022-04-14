@@ -115,10 +115,14 @@ None
 
 ## Release Notes
 
+## 0.0.5
+Fixed:
+- Regexp for tenant, with or without domain
+- Remove PAT when removing tenant
+
 ### 0.0.4
 
 Fix regexp for PAT secret
-
 
 ### 0.0.3 
 
