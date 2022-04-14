@@ -315,7 +315,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
             prompt: 'Enter a Personal Access Token (PAT) Secret.',
             title: 'IdentityNow',
             validateInput: text => {
-                const regex = new RegExp('^[a-f0-9]{64}$');
+                const regex = new RegExp('^[a-f0-9]{63,64}$');
                 if (regex.test(text)) {
                     return null;
                 }
