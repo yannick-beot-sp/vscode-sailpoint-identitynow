@@ -1,8 +1,10 @@
 import * as vscode from 'vscode';
 import { NEW_ID } from '../constants';
 import { TransformsTreeItem } from "../models/IdentityNowTreeItem";
+import { TransformQuickPickItem } from '../models/TransformQuickPickItem';
 import { isEmpty } from '../utils';
 import { getResourceUri } from '../utils/UriUtils';
+const transforms = require('../../snippets/transforms.json');
 
 /**
  * Command used to open a source or a transform
@@ -26,6 +28,24 @@ export class NewTransformCommand {
         return result;
     }
 
+    async askTransformType(): Promise<TransformQuickPickItem | undefined> {
+
+        const transformPickList = Object.keys(transforms)
+            .map((k: any) => ({
+                "label": k,
+                "detail": transforms[k].description,
+                "template": transforms[k].newtemplate
+            }))
+            .sort(((a, b) => (a.label > b.label) ? 1 : -1));
+
+        const transform = await vscode.window.showQuickPick(transformPickList, {
+            ignoreFocusOut: false,
+            title: "Transform to use",
+            canPickMany: false
+        });
+        return transform;
+    }
+
     async execute(tenant: TransformsTreeItem): Promise<void> {
 
         console.log("> NewTransformCommand.execute", tenant);
@@ -44,6 +64,11 @@ export class NewTransformCommand {
             return;
         }
 
+        const transform = await this.askTransformType();
+        if (!transform) {
+            return;
+        }
+
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: 'Creating File...',
@@ -51,15 +76,15 @@ export class NewTransformCommand {
         }, async (task, token) => {
 
             const newUri = getResourceUri(tenantName, 'transforms', NEW_ID, transformName);
-
             let document = await vscode.workspace.openTextDocument(newUri);
             document = await vscode.languages.setTextDocumentLanguage(document, 'json');
-
-            if (token.isCancellationRequested) {
-                return;
-            }
             await vscode.window.showTextDocument(document, { preview: true });
 
+            const edit = new vscode.WorkspaceEdit();
+
+            const strContent = transform.template.replaceAll("{TRANSFORM_NAME}", transformName);
+            edit.insert(newUri, new vscode.Position(0, 0), strContent);
+            let success = await vscode.workspace.applyEdit(edit);
         });
     }
 }
