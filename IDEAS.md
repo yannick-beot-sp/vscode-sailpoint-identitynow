@@ -4,3 +4,4 @@
 - Manage ETS
 - Better error management during save
 - Bring telemetry
+- Have log
