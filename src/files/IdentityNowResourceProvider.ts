@@ -79,7 +79,7 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
         if (id === NEW_ID) {
             console.log('New file');
             if (resourcePath.match("transform")) {
-                const createdData = await client.createResource('/transforms', data);
+                const createdData = await client.createResource('/v3/transforms', data);
             } else if (resourcePath.match("schemas") || resourcePath.match("provisioning-policies")) {
                 const createdData = await client.createResource(path.posix.dirname(resourcePath), data);
             } else {

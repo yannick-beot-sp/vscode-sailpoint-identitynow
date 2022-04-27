@@ -6,10 +6,6 @@ import 'isomorphic-form-data';
 import { withQuery } from "../utils/UriUtils";
 import { Workflow, WorkflowExecution } from "../models/workflow";
 
-// import FormData = require('form-data');
-
-
-
 export class IdentityNowClient {
 
     constructor(private readonly tenantName: string) { };

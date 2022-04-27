@@ -14,7 +14,7 @@ async function askProvisioningPolicyName(): Promise<string | undefined> {
         prompt: "Enter the provisioning policy name",
         title: 'IdentityNow',
         validateInput: text => {
-            const regex = new RegExp('^[a-z]+$');
+            const regex = new RegExp('^[a-z]+$', 'i');
             if (regex.test(text)) {
                 return null;
             }

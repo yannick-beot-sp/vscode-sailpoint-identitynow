@@ -6,6 +6,11 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [0.0.6] - 2022/04/27
+### Fixed
+- Regexp for provisioning policy
+- Issue #3 with new transform
+
 ## [0.0.5] - 2022/04/14
 ### Fixed
 - Regexp for tenant, with or without domain

@@ -115,6 +115,11 @@ None
 
 ## Release Notes
 
+## [0.0.6]
+Fixed:
+- Regexp for provisioning policy
+- Issue #3 with new transform
+
 ## 0.0.5
 Fixed:
 - Regexp for tenant, with or without domain

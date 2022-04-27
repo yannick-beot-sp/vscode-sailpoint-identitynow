@@ -41,12 +41,12 @@ export async function onFileSaved(document: vscode.TextDocument) {
             return;
         }
 
-        const oldid = getIdByUri(document.uri);
+        const oldid = getIdByUri(olduri);
         // Check old id and new id and check the active window Uri
         // Close the active window to open the 'new' uri with the id
         if (oldid !== data[0].id && olduri === vscode.window.activeTextEditor?.document.uri) {
             await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
-            const newUri = getResourceUri(olduri.authority, (getResourceTypeByUri(olduri) || ""), data[0].id, data[0].name);
+            const newUri = getResourceUri(olduri.authority, 'transforms', data[0].id, data[0].name);
             
             // Open document and then show document to force JSON
             let document = await vscode.workspace.openTextDocument(newUri);
