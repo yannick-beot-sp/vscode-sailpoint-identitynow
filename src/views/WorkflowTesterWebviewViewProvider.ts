@@ -165,12 +165,17 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
         const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'views', 'workflow', 'main.css'));
 
 
-        let tenantOptions = '<vscode-option value=""></vscode-option>';
         const tenantNames = this._tenantService.getTenants();
-        for (const tenantName of tenantNames) {
-            tenantOptions += `<vscode-option value="${tenantName}">${tenantName}</vscode-option>`;
-        }
 
+        let tenantOptions = '';
+        if (tenantNames.length !== 1) {
+            // Add default empty value, to force to choose one tenant
+            tenantOptions = '<vscode-option value=""></vscode-option>';
+        } else {
+            for (const tenantName of tenantNames) {
+                tenantOptions += `<vscode-option value="${tenantName}">${tenantName}</vscode-option>`;
+            }
+        }
         return `<!DOCTYPE html>
 			<html lang="en">
 			<head>

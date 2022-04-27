@@ -1,6 +1,7 @@
 - schema for transforms or source, extracted from swagger
 - add transform from command palette, with tenant quickpick
 - Manage rules
-- Manage workflows
-- Diff between tenants
 - Manage ETS
+- Better error management during save
+- Bring telemetry
+- Have log

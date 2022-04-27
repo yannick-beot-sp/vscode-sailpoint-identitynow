@@ -6,6 +6,7 @@
         "body": [
             "{\n    \"type\": \"accountAttribute\",\n    \"attributes\": {\n        \"sourceName\": \"$1\",\n        \"attributeName\": \"$2\"\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"accountAttribute\",\n    \"attributes\": {\n        \"sourceName\": \"\",\n        \"attributeName\": \"\"\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The account attribute transform is designed to look up an account for a particular source on an identity, and return a specific attribute value from that account. (ref)[https://community.sailpoint.com/t5/IdentityNow-Wiki/IdentityNow-Transforms-Account-Attribute/ta-p/180541]"
     },
     "Base64 Decode": {
@@ -15,6 +16,7 @@
         "body": [
             "{\n    \"type\": \"base64Decode\",\n    \"attributes\": {\n        \"input\": {}\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"base64Decode\",\n    \"attributes\": {\n        \"input\": {}\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The base64 decode transform allows you to take incoming data from a source that has been encoded using a Base64-based text encoding scheme, and render it in its original binary format."
     },
     "Base64 Encode": {
@@ -24,6 +26,7 @@
         "body": [
             "{\n    \"type\": \"base64Encode\",\n    \"attributes\": {\n        \"input\": {}\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"base64Encode\",\n    \"attributes\": {\n        \"input\": {}\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The base64 encode transform allows you to take incoming data from a source and encode it using a Base64-based text encoding scheme."
     },
     "Concatenation": {
@@ -33,6 +36,7 @@
         "body": [
             "{\n    \"type\": \"concat\",\n    \"attributes\": {\n        \"values\": [\n           $1\n        ]\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"concat\",\n    \"attributes\": {\n        \"values\": [\n           \n        ]\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The concatenation transform can be used to join two or more string values together into a combined output."
     },
     "Conditional": {
@@ -40,8 +44,9 @@
             "tr-cond"
         ],
         "body": [
-            "{\n    \"type\": \"conditional\",\n    \"attributes\": {\n        \"expression\": \"\\$$1 eq $2\",\n        \"positiveCondition\": \"true\",\n        \"negativeCondition\": \"false\",\n        \"$1\" : $0\n    }\n}"
+            "{\n    \"type\": \"conditional\",\n    \"attributes\": {\n        \"expression\": \"\\$$1 eq $2\",\n        \"positiveCondition\": \"true\",\n        \"negativeCondition\": \"false\",\n        \"$1\": $0\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"conditional\",\n    \"attributes\": {\n        \"expression\": \" eq \",\n        \"positiveCondition\": \"true\",\n        \"negativeCondition\": \"false\",\n        \"\": \n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The conditional transform allows you to output different values depending on simple conditional logic."
     },
     "Date Compare": {
@@ -51,6 +56,7 @@
         "body": [
             "{\n    \"type\": \"dateCompare\",\n    \"attributes\": {\n        \"firstDate\": $1,\n        \"secondDate\": $2,\n        \"operator\": \"gt\",\n        \"positiveCondition\": \"\",\n        \"negativeCondition\": \"\"\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"dateCompare\",\n    \"attributes\": {\n        \"firstDate\": ,\n        \"secondDate\": ,\n        \"operator\": \"gt\",\n        \"positiveCondition\": \"\",\n        \"negativeCondition\": \"\"\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The date compare transform allows you to easily compare two dates."
     },
     "Date Format": {
@@ -60,6 +66,7 @@
         "body": [
             "{\n    \"type\": \"dateFormat\",\n    \"attributes\": {\n        \"inputFormat\": \"$1\",\n        \"outputFormat\": \"$2\"\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"dateFormat\",\n    \"attributes\": {\n        \"inputFormat\": \"\",\n        \"outputFormat\": \"\"\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The date format transform allows you to easily convert datetime strings from one format to another."
     },
     "Date Math": {
@@ -69,6 +76,7 @@
         "body": [
             "{\n    \"type\": \"dateMath\",\n    \"attributes\": {\n        \"expression\": \"$1\",\n        \"roundUp\": true,\n        \"input\": {$2}\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"dateMath\",\n    \"attributes\": {\n        \"expression\": \"\",\n        \"roundUp\": true,\n        \"input\": {\n            \n        }\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The date math transform allows you to add, subtract and round components of a timestamp to or from an incoming value."
     },
     "Decompose Diacritial Marks": {
@@ -78,6 +86,7 @@
         "body": [
             "{\n    \"type\": \"decomposeDiacriticalMarks\",\n    \"attributes\": {\n        \"input\": $1\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"decomposeDiacriticalMarks\",\n    \"attributes\": {\n        \"input\": \n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The decompose diacritical marks transform allows you to clean or standardize symbols that are used within language to inform the reader how to say or pronounce a letter."
     },
     "E164 Phone": {
@@ -87,6 +96,7 @@
         "body": [
             "{\n    \"type\": \"e164phone\",\n    \"attributes\": {\n        \"input\": $1\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"e164phone\",\n    \"attributes\": {\n        \"input\": \n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The e164phone transform is a transform to convert an incoming phone number string into an E164-compatible number."
     },
     "First Valid": {
@@ -96,6 +106,7 @@
         "body": [
             "{\n    \"type\": \"firstValid\",\n    \"attributes\": {\n        \"values\": [\n            $1\n        ]\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"firstValid\",\n    \"attributes\": {\n        \"values\": [\n            \n        ]\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The first valid transform is useful for quickly doing an if/then/else operation on several different data points to return the first piece of data that is not null."
     },
     "Generate Random String": {
@@ -105,6 +116,7 @@
         "body": [
             "{\n    \"type\": \"rule\",\n    \"attributes\": {\n        \"name\": \"Cloud Services Deployment Utility\",\n        \"operation\": \"generateRandomString\",\n        \"includeNumbers\": \"true\",\n        \"includeSpecialChars\": \"true\",\n        \"length\": \"16\"\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"rule\",\n    \"attributes\": {\n        \"name\": \"Cloud Services Deployment Utility\",\n        \"operation\": \"generateRandomString\",\n        \"includeNumbers\": \"true\",\n        \"includeSpecialChars\": \"true\",\n        \"length\": \"16\"\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The generate random string transform allows you to easily generate a random string of any length"
     },
     "Get End of String": {
@@ -114,6 +126,7 @@
         "body": [
             "{\n    \"type\": \"rule\",\n    \"attributes\": {\n        \"name\": \"Cloud Services Deployment Utility\",\n        \"operation\": \"getEndOfString\",\n        \"numChars\": \"4\"\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"rule\",\n    \"attributes\": {\n        \"name\": \"Cloud Services Deployment Utility\",\n        \"operation\": \"getEndOfString\",\n        \"numChars\": \"4\"\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The get end of string transform allows you to easily get the rightmost N characters of a string."
     },
     "Get Reference Identity Attribute": {
@@ -123,6 +136,7 @@
         "body": [
             "{\n    \"type\": \"rule\",\n    \"attributes\": {\n        \"name\": \"Cloud Services Deployment Utility\",\n        \"operation\": \"getReferenceIdentityAttribute\",\n        \"uid\": \"manager\",\n        \"attributeName\": \"email\"\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"rule\",\n    \"attributes\": {\n        \"name\": \"Cloud Services Deployment Utility\",\n        \"operation\": \"getReferenceIdentityAttribute\",\n        \"uid\": \"manager\",\n        \"attributeName\": \"email\"\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The get reference identity attribute transform allows you to easily get the identity attribute of another user from within a given identity's calculation."
     },
     "Identity Attribute": {
@@ -132,6 +146,7 @@
         "body": [
             "{\n    \"type\": \"identityAttribute\",\n    \"attributes\": {\n        \"name\": \"${1:email}\"\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"identityAttribute\",\n    \"attributes\": {\n        \"name\": \"email\"\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The identity attribute transform can be used to get the value of a user's identity attribute."
     },
     "Index Of": {
@@ -141,6 +156,7 @@
         "body": [
             "{\n    \"type\": \"indexOf\",\n    \"attributes\": {\n        \"substring\": \"$1\",\n        \"input\": $2,\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"indexOf\",\n    \"attributes\": {\n        \"substring\": \"\",\n        \"input\": ,\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "An index of transform can be used to get the location of a specific substring within in an incoming value."
     },
     "ISO3166": {
@@ -150,6 +166,7 @@
         "body": [
             "{\n    \"type\": \"iso3166\",\n    \"attributes\": {\n        \"format\" : \"${1|alpha2,alpha3,numeric|}\",\n        \"input\": $2\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"iso3166\",\n    \"attributes\": {\n        \"format\" : \"alpha2\",\n        \"input\": \n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The iso3166 transform converts an incoming string into an ISO 3166 country code value."
     },
     "Last Index Of": {
@@ -159,6 +176,7 @@
         "body": [
             "{\n    \"type\": \"lastIndexOf\",\n    \"attributes\": {\n        \"substring\": \"$1\",\n        \"input\": $2,\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"lastIndexOf\",\n    \"attributes\": {\n        \"substring\": \"\",\n        \"input\": ,\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "A last index of transform can be used to get the last location of a specific substring within in an incoming value."
     },
     "Left Pad": {
@@ -168,6 +186,7 @@
         "body": [
             "{\n    \"type\": \"leftPad\",\n    \"attributes\": {\n        \"padding\": \"${1:x}\",\n        \"length\": \"${2:7}\",\n        \"input\": $0\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"leftPad\",\n    \"attributes\": {\n        \"padding\": \"x\",\n        \"length\": \"7\",\n        \"input\": \n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The left pad transform allows you to pad an incoming string with a user-supplied character out to a specific number of characters."
     },
     "Lookup": {
@@ -177,6 +196,7 @@
         "body": [
             "{\n    \"type\": \"lookup\",\n    \"attributes\": {\n        \"table\": {\n            \"$1\": \"$2\",\n            \"default\": \"\"\n        }\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"lookup\",\n    \"attributes\": {\n        \"table\": {\n            \"\": \"\",\n            \"default\": \"\"\n        }\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "A lookup transform takes in incoming string value and compares it to a list of key-value pairs to determine which output to return."
     },
     "Lower": {
@@ -186,6 +206,7 @@
         "body": [
             "{\n    \"type\": \"lower\",\n    \"attributes\": {\n        \"input\": $1\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"lower\",\n    \"attributes\": {\n        \"input\": \n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The lower transform is a simple transform to convert an input string into all lowercase letters."
     },
     "Name Normalizer": {
@@ -195,6 +216,7 @@
         "body": [
             "{\n    \"type\": \"normalizeNames\",\n    \"attributes\": {\n        \"input\": $1\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"normalizeNames\",\n    \"attributes\": {\n        \"input\": \n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The name normalizer transform allows you to clean or standardize the spelling of strings coming in from source systems. "
     },
     "Random Alphanumeric": {
@@ -204,6 +226,7 @@
         "body": [
             "{\n    \"type\": \"randomAlphaNumeric\",\n    \"attributes\": {\n        \"length\": ${1:10}\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"randomAlphaNumeric\",\n    \"attributes\": {\n        \"length\": 10\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The random alphanumeric transform allows you to easily generate a random string of any length, comprised of both numbers and letters (lowercase as well as uppercase)."
     },
     "Random Numeric": {
@@ -213,6 +236,7 @@
         "body": [
             "{\n    \"type\": \"randomNumeric\",\n    \"attributes\": {\n        \"length\": ${1:10}\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"randomNumeric\",\n    \"attributes\": {\n        \"length\": 10\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The random numeric transform allows you to easily generate a random number of any length."
     },
     "Reference": {
@@ -222,6 +246,7 @@
         "body": [
             "{\n    \"type\": \"reference\",\n    \"attributes\": {\n        \"id\": \"$1\"\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"reference\",\n    \"attributes\": {\n        \"id\": \"\"\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The reference transform allows you to re-use a transform that has already been written within another transform."
     },
     "Replace All": {
@@ -231,6 +256,7 @@
         "body": [
             "{\n    \"type\": \"replaceAll\",\n    \"attributes\": {\n        \"table\": {\n            \"$1\": \"$2\"\n        },\n        \"input\": $0\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"replaceAll\",\n    \"attributes\": {\n        \"table\": {\n            \"\": \"\"\n        },\n        \"input\": \n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The replace all transform is much like the replace transform, except that it can perform multiple replace operations on the incoming data instead of just one pattern."
     },
     "Replace": {
@@ -238,8 +264,9 @@
             "tr-replace"
         ],
         "body": [
-            "{\n    \"type\": \"replace\",\n    \"attributes\": {\n        \"regex\": \"$1\",\n        \"replacement\": \"$2\",\n        \"input\": $0\n    }\n}"
+            "{\n    \"type\": \"replace\",\n    \"attributes\": {\n        \"regex\": \"$1\",\n        \"replacement\": \"$2\",\n        \"input\": \n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"replace\",\n    \"attributes\": {\n        \"regex\": \"\",\n        \"replacement\": \"\",\n        \"input\": $0\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The replace transform can be used to find a given pattern of characters within incoming data and replace all instances of those characters with alternate values."
     },
     "Right Pad": {
@@ -249,6 +276,7 @@
         "body": [
             "{\n    \"type\": \"rightPad\",\n    \"attributes\": {\n        \"padding\": \"${1:x}\",\n        \"length\": \"${2:7}\",\n        \"input\": $0\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"rightPad\",\n    \"attributes\": {\n        \"padding\": \"x\",\n        \"length\": \"7\",\n        \"input\": \n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The right pad transform allows you to pad an incoming string with a user-supplied character out to a specific number of characters."
     },
     "Rule": {
@@ -258,6 +286,7 @@
         "body": [
             "{\n    \"type\": \"rule\",\n    \"attributes\": {\n        \"name\": \"$1\",\n        \"operation\": \"$2\",\n        \"input\": $0\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"rule\",\n    \"attributes\": {\n        \"name\": \"\",\n        \"operation\": \"\",\n        \"input\": \n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The rule transform allows you to re-use code contained within a Generic rule that either is not possible via transforms alone, or is too complex to maintain via Seaspray."
     },
     "Split": {
@@ -267,6 +296,7 @@
         "body": [
             "{\n    \"type\": \"split\",\n    \"attributes\": {\n        \"delimiter\": \"${1:,}\",\n        \"index\": ${2:5},\n        \"throw\": ${3|true,false|},\n        \"input\": $0\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"split\",\n    \"attributes\": {\n        \"delimiter\": \",\",\n        \"index\": 5,\n        \"throw\": 3,\n        \"input\": \n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The split transform allows you to use a specific character or regex string as a delimiter, and convert a single incoming string value into an array of values."
     },
     "Static": {
@@ -276,6 +306,7 @@
         "body": [
             "{\n    \"type\": \"static\",\n    \"attributes\": {\n        \"value\": \"$1\"\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"static\",\n    \"attributes\": {\n        \"value\": \"\"\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "A static transform may be used to return a fixed string value or, more commonly, to evaluate Velocity Template Language."
     },
     "Substring": {
@@ -283,8 +314,9 @@
             "tr-sub"
         ],
         "body": [
-            "{\n    \"type\": \"substring\",\n    \"attributes\": {\n        \"begin\": {\n            \"type\": \"indexOf\",\n            \"attributes\": {\n                \"substring\": \"$1\"\n            }\n        },\n        \"beginOffset\": 1,\n        \"end\": {\n            \"type\": \"lastIndexOf\",\n            \"attributes\": {\n                \"substring\": \"2\"\n            }\n        }\n    }\n  }"
+            "{\n    \"type\": \"substring\",\n    \"attributes\": {\n        \"begin\": {\n            \"type\": \"indexOf\",\n            \"attributes\": {\n                \"substring\": \"$1\"\n            }\n        },\n        \"beginOffset\": 1,\n        \"end\": {\n            \"type\": \"lastIndexOf\",\n            \"attributes\": {\n                \"substring\": \"$2\"\n            }\n        }\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"substring\",\n    \"attributes\": {\n        \"begin\": {\n            \"type\": \"indexOf\",\n            \"attributes\": {\n                \"substring\": \"\"\n            }\n        },\n        \"beginOffset\": 1,\n        \"end\": {\n            \"type\": \"lastIndexOf\",\n            \"attributes\": {\n                \"substring\": \"\"\n            }\n        }\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "A substring transform can be used to get the inner portion of a string that is passed into the transform."
     },
     "Trim": {
@@ -294,6 +326,7 @@
         "body": [
             "{\n    \"type\": \"trim\",\n    \"attributes\": {\n        \"input\": $1\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"trim\",\n    \"attributes\": {\n        \"input\": \n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The trim transform is a simple transform to trim whitespaces from both the beginning and ending of an input string."
     },
     "Upper": {
@@ -303,6 +336,7 @@
         "body": [
             "{\n    \"type\": \"upper\",\n    \"attributes\": {\n        \"input\": $1\n    }\n}"
         ],
+        "newtemplate": "{\n    \"type\": \"upper\",\n    \"attributes\": {\n        \"input\": \n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The upper transform is a simple transform to convert an input string into all uppercase letters."
     },
     "UUID Generator": {
@@ -312,6 +346,7 @@
         "body": [
             "{\n    \"type\": \"uuid\"\n}"
         ],
-        "description": ""
+        "newtemplate": "{\n    \"type\": \"uuid\",\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
+        "description": "The UUID generator is a simple transform allows you to create a universal unique id (UUID) in the form of a 36-character string."
     }
 }

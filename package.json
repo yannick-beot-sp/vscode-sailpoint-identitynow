@@ -282,7 +282,12 @@
 				{
 					"command": "vscode-sailpoint-identitynow.new-provisioning-policy",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == provisioning-policies",
-					"group": "inline"
+					"group": "inline@1"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.refresh",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == provisioning-policies",
+					"group": "inline@2"
 				},
 				{
 					"command": "vscode-sailpoint-identitynow.remove-resource",
@@ -291,11 +296,21 @@
 				{
 					"command": "vscode-sailpoint-identitynow.new-schema",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == schemas",
-					"group": "inline"
+					"group": "inline@1"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.refresh",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == schemas",
+					"group": "inline@2"
 				},
 				{
 					"command": "vscode-sailpoint-identitynow.remove-resource",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == schema"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.refresh",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == workflows",
+					"group": "inline"
 				},
 				{
 					"command": "vscode-sailpoint-identitynow.open-resource",

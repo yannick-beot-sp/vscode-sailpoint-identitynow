@@ -14,17 +14,6 @@
     // true when payload is equal to an example => can be easily overwritten
     var isExamplePayload = false;
 
-
-    // const oldState = vscode.getState() || { colors: [] };
-
-    // /** @type {Array<{ value: string }>} */
-    // let colors = oldState.colors;
-
-    // updateColorList(colors);
-
-    // document.querySelector('.add-color-button').addEventListener('click', () => {
-    //     addColor();
-    // });
     const tenantDropDown = document.getElementById(TENANT_DROPDOWN_ID);
     tenantDropDown.addEventListener('change', onTenantDropDownChange);
     const workflowDropDown = document.getElementById(WORKFLOW_DROPDOWN_ID);
@@ -36,9 +25,17 @@
     submitButton.addEventListener('click', onButtonSubmit);
     setVSCodeMessageListener();
 
+    // on load, check if there is only one value/tenant. Load workflows if tenant already selected
+    const tenant = tenantDropDown.value;
+    if (tenant) {
+        vscode.postMessage({ command: 'getWorkflows', tenant: tenant });
+        vscode.postMessage({ command: 'getWorkflowTriggers', tenant: tenant });
+    }
 
-    // Sets up an event listener to listen for messages passed from the extension context
-    // and executes code based on the message that is recieved
+    /**
+     * Sets up an event listener to listen for messages passed from the extension context
+     * and executes code based on the message that is recieved
+     */
     function setVSCodeMessageListener() {
         window.addEventListener("message", (event) => {
             const command = event.data.command;
@@ -81,6 +78,7 @@
             payload: payloadTextarea.value
         });
     }
+
     /**
      * Requests the list of workflows when tenant is changed
      * @param {*} event 
@@ -135,8 +133,6 @@
             vscode.postMessage({ command: 'getWorkflowTriggers', tenant: payload.tenant });
         }
 
-
-        // workflowDropDown.innerHTML = ''; //remove all options
         for (var o of document.querySelectorAll(`#${WORKFLOW_DROPDOWN_ID} > option`)) {
             o.remove();
         }
