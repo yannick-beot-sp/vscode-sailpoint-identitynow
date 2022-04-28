@@ -6,13 +6,15 @@ import { IdentityNowDataProvider } from "../views/IdentityNowDataProvider";
 import { SailPointIdentityNowAuthenticationProvider } from "./AuthenticationProvider";
 import { AggregationJob, IdentityNowClient } from "./IdentityNowClient";
 import { TenantService } from "./TenantService";
+import { TransformEvaluator } from './TransformEvaluator';
 
 export class TreeManager {
 
     constructor(
         private readonly dataProvider: IdentityNowDataProvider,
         private readonly tenantService: TenantService,
-        private readonly authProvider: SailPointIdentityNowAuthenticationProvider
+        private readonly authProvider: SailPointIdentityNowAuthenticationProvider,
+        private readonly transformEvaluator : TransformEvaluator,
     ) { }
 
     public async removeTenant(item: TenantTreeItem): Promise<void> {
@@ -136,4 +138,10 @@ export class TreeManager {
             };
         });
     }
+
+    public async evaluateTransform(item: SourceTreeItem): Promise<void> {
+        console.log("> NewTransformCommand.evaluate", item);
+
+        this.transformEvaluator.evaluate(item);
+    };
 }
