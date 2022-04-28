@@ -6,10 +6,12 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
-### Changed
+## [0.0.7] - 2022/04/28
+### Added
 - Add step to creation of transform to have a non-empty file
 - If only 1 tenant, automatically selected in the workflow tester
-- Added refresh button in the view
+- Added refresh buttons in the view
+- Add the capacity to evaluate transforms [#7](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/7)
 
 ## [0.0.6] - 2022/04/27
 ### Fixed

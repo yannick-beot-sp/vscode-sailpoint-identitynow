@@ -5,16 +5,17 @@
 
 The SailPoint IdentityNow extension makes it easy to:
 
-- view, edit, aggregate or reset sources
-- view, create, edit, delete transforms
-- view, create, edit, delete provisioning policy of a source
-- view, create, edit, delete schemas of a source
-- export config of a tenant
-- view, edit, enable, disable and test workflows and view execution history
-
-Several tenants can used at the same time
+- Connect to several tenants
+- Export config of a tenant
+- View, edit, aggregate or reset sources
+- View, create, edit, delete, and test transforms
+- View, create, edit, delete provisioning policies of a source
+- View, create, edit, delete schemas of a source
+- View, edit, enable, disable, and test workflows and view execution history
 
 ## Installation
+
+Go to the extension menu or press `Ctrl`+`Shift`+`X` and look for the extension "IdentityNow". Click on the button `Install`.
 
 The VSIX can be installed from the extension menu. Press `Ctrl`+`Shift`+`X` and in the menu, click `Install from VSIX...`.
 
@@ -115,12 +116,24 @@ None
 
 ## Release Notes
 
+### 0.0.7
+
+Transforms are the best!
+
+Added:
+- Add step to creation of transform to have a non-empty file
+- If only 1 tenant, automatically selected in the workflow tester
+- Added refresh buttons in the view
+- Add the capacity to evaluate transforms
+
 ### 0.0.6
+
 Fixed:
 - Regexp for provisioning policy
 - Issue #3 with new transform
 
 ### 0.0.5
+
 Fixed:
 - Regexp for tenant, with or without domain
 - Remove PAT when removing tenant
