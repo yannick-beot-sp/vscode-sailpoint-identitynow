@@ -20,6 +20,7 @@ import { disableWorkflow, enableWorkflow } from './commands/workflow';
 import { viewWorkflowExecutionHistory } from './commands/viewWorkflowExecutionHistory';
 import { WorkflowTesterWebviewViewProvider } from './views/WorkflowTesterWebviewViewProvider';
 import { TestWorkflowCommand } from './commands/testWorkflow';
+import { TransformEvaluator } from './services/TransformEvaluator';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -46,7 +47,6 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	));
 
-
 	const addTenantCommand = new AddTenantCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.ADD_TENANT, addTenantCommand.execute,
@@ -57,9 +57,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 	vscode.commands.registerCommand(commands.REFRESH, identityNowDataProvider.refresh, identityNowDataProvider);
 
+	const transformEvaluator = new TransformEvaluator();
+	const treeManager = new TreeManager(identityNowDataProvider, tenantService, authProvider, transformEvaluator);
 
-	const treeManager = new TreeManager(identityNowDataProvider, tenantService, authProvider);
-
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM_EDITOR, transformEvaluator.evaluate, transformEvaluator));
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.REMOVE_TENANT,
@@ -73,6 +75,9 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.RESET_SOURCE,
 			(tenantTreeItem) => treeManager.resetSource(tenantTreeItem)));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM,
+			(tenantTreeItem) => treeManager.evaluateTransform(tenantTreeItem)));
 
 	const openResourceCommand = new OpenResourceCommand();
 	context.subscriptions.push(

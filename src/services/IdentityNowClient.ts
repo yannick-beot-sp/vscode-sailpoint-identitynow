@@ -1,3 +1,4 @@
+import * as vscode from 'vscode';
 import { authentication } from "vscode";
 import { EndpointUtils } from "../utils/EndpointUtils";
 import { SailPointIdentityNowAuthenticationProvider } from "./AuthenticationProvider";
@@ -5,6 +6,7 @@ import 'isomorphic-fetch';
 import 'isomorphic-form-data';
 import { withQuery } from "../utils/UriUtils";
 import { Workflow, WorkflowExecution } from "../models/workflow";
+import { convertToText } from '../utils';
 
 export class IdentityNowClient {
 
@@ -286,6 +288,128 @@ export class IdentityNowClient {
         return null;
     }
 
+    public async getSourceId(sourceName: string): Promise<string> {
+        /*
+            sourceName - A reference to the source to search for accounts.
+
+            This is a reference by a source's display name attribute (e.g. Active Directory). If the display name is updated, this reference will also need to be updated.
+
+            As an alternative an applicationId or applicationName can be provided instead.
+
+            applicationId - This is a reference by a source's external GUID/ID attribute (e.g. "ff8081815a8b3925015a8b6adac901ff")
+            applicationName - This is a reference by a source's immutable name attribute (e.g. "Active Directory [source]")
+        */
+        console.log('> getSourceId', sourceName);
+        let endpoint = EndpointUtils.getV3Url(this.tenantName) + '/sources?filters=name eq "' + sourceName + '" or id eq "' + sourceName + '"';
+        console.log('endpoint = ' + endpoint);
+
+        const headers = await this.prepareHeaders();
+        let sourceId = await fetch(endpoint, {
+            headers: headers
+        }).then(async function(response) {
+            if (response.status === 200) {
+                let json = await response.json();
+
+                if (json !== undefined) {
+                    if (json.length > 0) {
+                        if (json[0].id !== undefined) {
+                            return json[0].id;
+                        }
+                    } else {
+                        console.error(response.statusText);
+                        vscode.window.showErrorMessage(`Source '${sourceName}' does not exist`);
+                        return;
+                    }
+                }
+            } else {
+                console.error(response.statusText);
+                vscode.window.showErrorMessage(`${endpoint} --> ${response.statusText}`);
+                return;
+            }
+        }).catch(function(error) {
+            console.log(error);
+        });
+ 
+        return sourceId;
+    }
+    
+    public async getIdentity(identityNameOrId: string): Promise<any> {
+        console.log('> getIdentity', identityNameOrId);
+        let endpoint = EndpointUtils.getV3Url(this.tenantName) + '/search';
+        console.log('endpoint = ' + endpoint);
+
+        const headers = await this.prepareHeaders();
+
+        const data = {
+            "indices": [
+                "identities"
+            ],
+            "query": {
+                "query": "\"" + identityNameOrId + "\"",
+                "fields": [
+                    "name",
+                    "displayName",
+                    "id"
+                ]
+            }
+        };
+        
+        let identity = await fetch(endpoint, {
+            headers: headers,
+            method: 'POST',
+            body: convertToText(data)
+        }).then(async function(response) {
+            if (response.status === 200) {
+                let json = await response.json();
+
+                if (json !== undefined) {
+                    if (json.length > 0) {
+                        return json[0];
+                    }
+                } 
+            } else {
+                console.error(response.statusText);
+                vscode.window.showErrorMessage(`${endpoint} --> ${response.statusText}`);
+                return;
+            }
+        }).catch(function(error) {
+            console.log(error);
+        });
+
+        if (identity !== undefined) {
+            return identity;
+        }        
+    }
+
+    public async getAccount(nativeIdentity: string, sourceId: string): Promise<any> {
+        console.log('> getAccount', nativeIdentity, sourceId);
+        let endpoint = EndpointUtils.getV3Url(this.tenantName) + '/accounts?filters=sourceId eq "' + sourceId + '" and nativeIdentity eq "' + nativeIdentity + '"';
+        console.log('endpoint = ' + endpoint);
+
+        const headers = await this.prepareHeaders();
+        
+        let account = await fetch(endpoint, {
+            headers: headers
+        }).then(async function(response) {
+            if (response.status === 200) {
+                let json = await response.json();
+
+                if (json !== undefined) {
+                    if (json.length > 0) {
+                        return json[0];
+                    }
+                } 
+            } else {
+                console.error(response.statusText);
+                vscode.window.showErrorMessage(`${endpoint} --> ${response.statusText}`);
+                return;
+            }
+        }).catch(function(error) {
+            console.log(error);
+        });
+
+        return account;
+    }
 
     /**
      * 

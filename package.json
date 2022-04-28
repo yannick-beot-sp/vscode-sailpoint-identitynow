@@ -49,6 +49,8 @@
 		"onCommand:vscode-sailpoint-identitynow.workflow.view-execution-history",
 		"onCommand:vscode-sailpoint-identitynow.workflow.test",
 		"onView:vscode-sailpoint-identitynow.workflow.test-view",
+		"onCommand:vscode-sailpoint-identitynow.transform.evaluate",
+		"onCommand:vscode-sailpoint-identitynow.transform.evaluate.editor",
 		"onFileSystem:idn"
 	],
 	"license": "MIT",
@@ -162,6 +164,14 @@
 			{
 				"command": "vscode-sailpoint-identitynow.workflow.view-execution-history",
 				"title": "View execution history..."
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.transform.evaluate",
+				"title": "Evaluate"
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.transform.evaluate.editor",
+				"title": "Evaluate"
 			}
 		],
 		"menus": {
@@ -216,6 +226,10 @@
 				},
 				{
 					"command": "vscode-sailpoint-identitynow.workflow.view-execution-history",
+					"when": "never"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.transform.evaluate",
 					"when": "never"
 				}
 			],
@@ -335,8 +349,18 @@
 				{
 					"command": "vscode-sailpoint-identitynow.workflow.test",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /XXX$/i"
+				},
+				{
+				  "command": "vscode-sailpoint-identitynow.transform.evaluate",
+				  "when": "view == vscode-sailpoint-identitynow.view && viewItem == transform"
 				}
-			]
+			],
+			"editor/context": [
+				{
+				  "command": "vscode-sailpoint-identitynow.transform.evaluate.editor",
+				  "when": "resourcePath =~ /transforms/"
+				}
+			  ]
 		},
 		"snippets": [
 			{
