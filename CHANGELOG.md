@@ -6,6 +6,9 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+### Fixed
+- #6 update regexp for transform names
+
 ## [0.0.7] - 2022/04/28
 ### Added
 - Add step to creation of transform to have a non-empty file
