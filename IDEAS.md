@@ -5,3 +5,4 @@
 - Better error management during save
 - Bring telemetry
 - Have log
+- Update accounts for CSV or NELM source
