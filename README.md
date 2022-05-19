@@ -116,6 +116,13 @@ None
 
 ## Release Notes
 
+### 0.0.8
+
+Transforms for ever!
+
+- New transforms (E.164 Phone, Random Alphanumeric Random Numeric,  Replace All, Rule, UUID Generator), cf. [#8](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/8)
+- #6 update regexp for transform names
+
 ### 0.0.7
 
 Transforms are the best!

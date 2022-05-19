@@ -6,7 +6,13 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [0.0.8] - 2022/05/19
+### Added
+
+- New transforms (E.164 Phone, Random Alphanumeric Random Numeric,  Replace All, Rule, UUID Generator), [#8](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/8)
+
 ### Fixed
+
 - #6 update regexp for transform names
 
 ## [0.0.7] - 2022/04/28
