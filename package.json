@@ -351,16 +351,16 @@
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /XXX$/i"
 				},
 				{
-				  "command": "vscode-sailpoint-identitynow.transform.evaluate",
-				  "when": "view == vscode-sailpoint-identitynow.view && viewItem == transform"
+					"command": "vscode-sailpoint-identitynow.transform.evaluate",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == transform"
 				}
 			],
 			"editor/context": [
 				{
-				  "command": "vscode-sailpoint-identitynow.transform.evaluate.editor",
-				  "when": "resourcePath =~ /transforms/"
+					"command": "vscode-sailpoint-identitynow.transform.evaluate.editor",
+					"when": "resourcePath =~ /transforms/"
 				}
-			  ]
+			]
 		},
 		"snippets": [
 			{

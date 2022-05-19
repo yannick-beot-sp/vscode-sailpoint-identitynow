@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { isEmpty } from '../utils';
 import { OpenResourceCommand } from "../commands/openResource";
-import { ATTRIBUTES } from '../models/attributes';
+import { ATTRIBUTES } from '../models/TransformAttributes';
+import { COUNTRYCODES } from '../models/CountryCodes';
 import { IdentityNowClient } from './IdentityNowClient';
 import { VALID_DATE_FORMATS, VALID_OPERATORS } from '../constants';
 
@@ -81,6 +82,10 @@ export class TransformEvaluator {
                 }
             }
 
+            if (transformType === 'rule') {
+                transformType += ':' + attributes.operation;
+            }
+            
             let requiresInput: boolean = await this.requiresInput(transformType);
 
             if (requiresInput) {
@@ -148,6 +153,8 @@ export class TransformEvaluator {
     }
 
     async getTransformType(transform: any): Promise<string> {
+        console.log("> getTransformType", transform);
+
         let transformType = transform.type;
         let message: string;
 
@@ -156,6 +163,12 @@ export class TransformEvaluator {
             console.error(message);
             vscode.window.showErrorMessage(message);
         } else {
+            if (transformType === 'rule') {
+                if ((transform.attributes !== undefined) && (transform.attributes.operation !== undefined)) {
+                    transformType += ":" + transform.attributes.operation;
+                }
+            } 
+
             let isValidTransformType: boolean = await this.isValidTransformType(transformType);
 
             if (!isValidTransformType) {
@@ -172,6 +185,7 @@ export class TransformEvaluator {
     }
 
     async isValidTransformType(transformType: string): Promise<boolean> {
+        console.log("> isValidTransformType", transformType);
         let isValidTransformType: boolean = false;
 
         if (Object.keys(ATTRIBUTES).indexOf(transformType) !== -1) {
@@ -182,7 +196,7 @@ export class TransformEvaluator {
     }
 
     async requiresInput(transformType: string): Promise<boolean> {
-        console.log("> Requires input", transformType);
+        console.log("> requiresInput", transformType);
         let result:boolean = true;
 
         if ((ATTRIBUTES[transformType].required.indexOf('input') === -1) && ((ATTRIBUTES[transformType].optional.indexOf('input') === -1))) {
@@ -229,6 +243,10 @@ export class TransformEvaluator {
         console.log("> evaluateTransformOfType", transformType, attributes);
         let result: any = undefined;
 
+        if (transformType.startsWith('rule')) {
+            transformType = 'rule';
+        }
+
         switch (transformType) {
             case 'accountAttribute':
                 result = await this.accountAttribute(attributes);
@@ -250,6 +268,9 @@ export class TransformEvaluator {
                 break;
             case 'dateFormat':
                 result = await this.dateFormat(attributes);
+                break;
+            case 'e164phone':
+                result = await this.e164phone(attributes);
                 break;
             case 'firstValid':
                 result = await this.firstValid(attributes);
@@ -275,11 +296,23 @@ export class TransformEvaluator {
             case 'lower':
                 result = await this.lower(attributes);
                 break;
+            case 'randomAlphaNumeric':
+                result = await this.randomAlphaNumeric(attributes);
+                break;
+            case 'randomNumeric':
+                result = await this.randomNumeric(attributes);
+                break;
+            case 'replaceAll':
+                result = await this.replaceAll(attributes);
+                break;
             case 'replace':
                 result = await this.replace(attributes);
                 break;
             case 'rightPad':
                 result = await this.rightPad(attributes);
+                break;
+            case 'rule':
+                result = await this.rule(attributes);
                 break;
             case 'split':
                 result = await this.split(attributes);
@@ -291,10 +324,13 @@ export class TransformEvaluator {
                 result = await this.substring(attributes);
                 break;
             case 'trim':
-                    result = await this.trim(attributes);
-                    break;
+                result = await this.trim(attributes);
+                break;
             case 'upper':
                 result = await this.upper(attributes);
+                break;
+            case 'uuid':
+                result = await this.uuid(attributes);
                 break;
             default:
                 let message = "Transform '" + transformType + "' not yet implemented";
@@ -335,6 +371,45 @@ export class TransformEvaluator {
                     console.error(message);
                     vscode.window.showErrorMessage(message);
                     return;
+                }
+            }
+        }
+
+        let requiresInput: boolean = await this.requiresInput(transformType);
+
+        if (requiresInput) {
+            if ((attributes === null) || (attributes === undefined)) {
+                this.input = await this.askInput(transformType);
+
+                if (isEmpty(this.input)) {
+                    return;
+                }
+            } else {
+                if (attributes.input !== undefined) {
+                    if (typeof attributes.input === 'object') {
+                        this.input = await this.evaluateChildTransform(attributes.input);
+                    } else {
+                        this.input = attributes.input;
+                    }
+                } else {
+                    this.input = await this.askInput(transformType) ;
+
+                    if (isEmpty(this.input)) {
+                        return;
+                    }
+                }
+            }
+
+            console.log(">>> Input: " + this.input);
+        } else {
+            if (attributes !== undefined) {
+                if (attributes.input !== undefined) {
+                    if (attributes.input !== null) {
+                        message = "Transforms of type '" + transformType + "' do not require attribute 'input'";
+                        console.error(message);
+                        vscode.window.showErrorMessage(message);
+                        return;
+                    }
                 }
             }
         }
@@ -812,6 +887,44 @@ export class TransformEvaluator {
         console.log("Exiting dateFormat. result=" + result);
         return result;
     }
+
+    async e164phone(attributes:any) {
+        console.log("Entering method e164phone");
+        let result = undefined;
+        let defaultRegion;
+
+        if (attributes.defaultRegion !== undefined) {
+            defaultRegion = attributes.defaultRegion;
+
+            console.log(`>>> Optional attribute 'defaultRegion': '${defaultRegion}'`);
+
+            if (defaultRegion.length !== 2) {
+                let message = `The format of the 'defaultRegion' attribute should be in ISO 3166-1 alpha-2 format`;
+                console.error(message);
+                vscode.window.showErrorMessage(message);
+                console.log("Exiting e164phone. result=" + result);
+                return;
+            }
+
+            if (Object.keys(COUNTRYCODES).indexOf(defaultRegion) === -1) {
+                let message = `Invalid defaultRegion '${defaultRegion}'`;
+                console.error(message);
+                vscode.window.showErrorMessage(message);
+                console.log("Exiting e164phone. result=" + result);
+                return;
+            } 
+        } else {
+            defaultRegion = 'US';
+        }
+
+        let searchPattern = new RegExp('[^0-9]', 'g');        
+        result = this.input.replace(searchPattern, '');
+
+        result = '+' + COUNTRYCODES[defaultRegion].countryCode + result;
+
+        console.log("Exiting e164phone. result=" + result);
+        return result;
+    }
     
     async firstValid(attributes:any) {
         console.log("Entering method firstValid");
@@ -848,6 +961,106 @@ export class TransformEvaluator {
         }
 
         console.log("Exiting firstValid. result=" + result);
+        return result;
+    }
+
+    async generateRandomString(attributes:any) {
+        console.log("------------------------------------------------------------------------------------------");
+        console.log("Entering method generateRandomString");
+        let result:any = undefined;
+
+        let includeNumbers = attributes.includeNumbers;
+
+        console.log(">>> Required attribute 'includeNumbers': '" + includeNumbers + "'");
+
+        if ((includeNumbers !== 'true') && (includeNumbers !== 'false')) {
+            let message = `Attribute includeNumbers must be either "true" or "false"`;
+            console.error(message);
+            vscode.window.showErrorMessage(message);
+            console.log("Exiting generateRandomString. result=" + result);
+            return;
+        }
+
+        let includeSpecialChars = attributes.includeSpecialChars;
+
+        console.log(">>> Required attribute 'includeSpecialChars': '" + includeSpecialChars + "'");
+
+        if ((includeSpecialChars !== 'true') && (includeSpecialChars !== 'false')) {
+            let message = `Attribute includeSpecialChars must be either "true" or "false"`;
+            console.error(message);
+            vscode.window.showErrorMessage(message);
+            console.log("Exiting generateRandomString. result=" + result);
+            return;
+        }
+
+        let length = attributes.length;
+
+        console.log(">>> Required attribute 'length': '" + length + "'");
+
+        let lengthNumber = parseInt(length);
+        
+        if (isNaN(lengthNumber)) {
+            let message = `Attribute 'length' must be a number`;
+            console.error(message);
+            vscode.window.showErrorMessage(message);
+            console.log("Exiting generateRandomString. result=" + result);
+            return;
+        }
+
+        if (lengthNumber > 450) {
+            let message = `Maximum allowable length is 450 characters`;
+            console.error(message);
+            vscode.window.showErrorMessage(message);
+            console.log("Exiting generateRandomString. result=" + result);
+            return;
+        }
+
+        let availableChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        
+        if (includeNumbers === 'true') {
+            availableChars += '0123456789';
+        }
+
+        if (includeSpecialChars === 'true') {
+            availableChars += '!@#$%&*()+<>?';
+        }
+        
+        console.log('availableChars=' + availableChars);
+
+        result = Array(lengthNumber).join().split(',').map(function() { return availableChars.charAt(Math.floor(Math.random() * availableChars.length)); }).join('');
+
+        console.log("Exiting generateRandomString. result=" + result);
+        return result;
+    }
+
+    async getEndOfString(attributes:any) {
+        console.log("------------------------------------------------------------------------------------------");
+        console.log("Entering method getEndOfString");
+        let result:any = undefined;
+
+        let numChars = attributes.numChars;
+
+        console.log(">>> Required attribute 'numChars': '" + numChars + "'");
+
+        //numChars - This specifies how many of the rightmost characters within the incoming string should be returned; if the value of numChars is greater than the string length, the transform will return null
+
+        let numCharsNumber = parseInt(numChars);
+        
+        if (isNaN(numCharsNumber)) {
+            let message = `Attribute 'numChars' must be a number`;
+            console.error(message);
+            vscode.window.showErrorMessage(message);
+            console.log("Exiting getEndOfString. result=" + result);
+            return;
+        }
+
+        if (numCharsNumber > this.input.length) {
+            result = null;
+        } else {
+            result = this.input.substring(this.input.length - numCharsNumber);
+        }
+        
+        console.log("Exiting getEndOfString. result=" + result);
         return result;
     }
 
@@ -993,10 +1206,6 @@ export class TransformEvaluator {
 
         console.log(">>> Required attribute 'table': '" + table + "'");
 
-        if (this.input === undefined) {
-            return;
-        }
-
         result = table[this.input];
 
         if (result === undefined) {
@@ -1020,6 +1229,120 @@ export class TransformEvaluator {
         return result;
     }
 
+    async randomAlphaNumeric(attributes:any) {
+        console.log("------------------------------------------------------------------------------------------");
+        console.log("Entering method randomAlphaNumeric");
+        let result;
+
+        let length:any = attributes.length;
+
+        if (length === undefined) {
+            length = 32;
+        } else {
+            console.log(">>> Option attribute 'length': '" + length + "'");
+        }
+        
+        if (typeof length  === 'string') {
+            let message = `Attribute 'length' must be a number`;
+            console.error(message);
+            vscode.window.showErrorMessage(message);
+            console.log("Exiting randomAlphaNumeric. result=" + result);
+            return;
+        }
+
+        if (length < 0) {
+            let message = `Attribute 'length' must be a must be a positive number`;
+            console.error(message);
+            vscode.window.showErrorMessage(message);
+            console.log("Exiting generateRandomString. result=" + result);
+            return;
+        }
+
+        if (length > 450) {
+            let message = `Maximum allowable length is 450 characters`;
+            console.error(message);
+            vscode.window.showErrorMessage(message);
+            console.log("Exiting generateRandomString. result=" + result);
+            return;
+        }
+
+        let availableChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        
+        result = Array(length).join().split(',').map(function() { return availableChars.charAt(Math.floor(Math.random() * availableChars.length)); }).join('');
+
+        console.log("Exiting randomAlphaNumeric. result=" + result);
+        return result;
+    }
+    
+    async randomNumeric(attributes:any) {
+        console.log("------------------------------------------------------------------------------------------");
+        console.log("Entering method randomNumeric");
+        let result;
+
+        let length:any = attributes.length;
+
+        if (length === undefined) {
+            length = 32;
+        } else {
+            console.log(">>> Option attribute 'length': '" + length + "'");
+        }
+        
+        if (typeof length  === 'string') {
+            let message = `Attribute 'length' must be a number`;
+            console.error(message);
+            vscode.window.showErrorMessage(message);
+            console.log("Exiting randomNumeric. result=" + result);
+            return;
+        }
+
+        if (length < 0) {
+            let message = `Attribute 'length' must be a must be a positive number`;
+            console.error(message);
+            vscode.window.showErrorMessage(message);
+            console.log("Exiting generateRandomString. result=" + result);
+            return;
+        }
+
+        if (length > 450) {
+            let message = `Maximum allowable length is 450 characters`;
+            console.error(message);
+            vscode.window.showErrorMessage(message);
+            console.log("Exiting generateRandomString. result=" + result);
+            return;
+        }
+
+        let availableChars = '0123456789';
+        
+        result = Array(length).join().split(',').map(function() { return availableChars.charAt(Math.floor(Math.random() * availableChars.length)); }).join('');
+
+        console.log("Exiting randomNumeric. result=" + result);
+        return result;
+    }
+
+    async replaceAll(attributes:any) {
+        console.log("------------------------------------------------------------------------------------------");
+        console.log("Entering method replaceAll");
+        let result:string = 'undefined';
+
+        let table = attributes.table;
+
+        console.log(">>> Required attribute 'table': '" + table + "'");
+
+        let tempResult = this.input;
+
+        for (let regex of Object.keys(table)) {
+            console.log(regex + " --> " + table[regex]);
+            let searchPattern = new RegExp(regex, 'g');
+            console.log('searchPattern', searchPattern);
+            tempResult = tempResult.replace(searchPattern, table[regex]);
+        }
+
+        result = tempResult;
+
+        console.log("Exiting replaceAll. result=" + result);
+        return result;
+    }
+
     async replace(attributes:any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method replace");
@@ -1027,12 +1350,13 @@ export class TransformEvaluator {
 
         let regex:string = attributes.regex;
         console.log(">>> Required attribute 'regex': '" + regex + "'");
-console.error('It does not work properly with regex');
+
         let replacement:string = attributes.replacement;
         console.log(">>> Required attribute 'replacement': '" + replacement + "'");
 
-        result = this.input.replace(regex, replacement);
-        
+        let searchPattern = new RegExp(regex, 'g');
+        result = this.input.replace(searchPattern, replacement);
+
         console.log("Exiting replace. result=" + result);
         return result;
     }
@@ -1056,6 +1380,37 @@ console.error('It does not work properly with regex');
         result = this.input.padEnd(length, padding);
         
         console.log("Exiting rightPad. result=" + result);
+        return result;
+    }
+
+    async rule(attributes:any) {
+        console.log("------------------------------------------------------------------------------------------");
+        console.log("Entering method rule");
+        let result:any = undefined;
+
+        let name = attributes.name;
+
+        if (name !== 'Cloud Services Deployment Utility') {
+            let message = "Invalid attributes.name '" + name + "'. This must always be set to 'Cloud Services Deployment Utility'";
+            console.error(message);
+            vscode.window.showErrorMessage(message);
+        } else {
+            let operation = attributes.operation;
+
+            switch (operation) {
+                case 'generateRandomString':
+                    result = await this.generateRandomString(attributes);
+                    break;
+                case 'getEndOfString':
+                    result = await this.getEndOfString(attributes);
+                    break;
+                default:
+                    let message = "Invalid operation '" + operation + "'";
+                    vscode.window.showErrorMessage(message);
+            }
+        }
+        
+        console.log("Exiting rule. result=" + result);
         return result;
     }
 
@@ -1100,17 +1455,18 @@ console.error('It does not work properly with regex');
         let value:string = attributes.value;
         console.log(">>> Required attribute 'value': '" + value + "'");
 
-        if (value !== null) {
-            if (value.startsWith("$")) {
-                console.log(">>> Optional attribute variable '" + value.replace('$', '') + "': '" + attributes[value.replace('$', '')] + "'");
-            } else {
-                result = value;
-            }
+        if (value.startsWith("$")) {
+            result = await this.evaluateChildTransform(attributes[value.replace('$', '')]);
+            console.log(">>> Optional attribute variable '" + value.replace('$', '') + "': '" + result + "'");
+        } else if (value.startsWith("#")) {
+            let message = `Velocity template is not yet implemented`;
+            console.error(message);
+            vscode.window.showErrorMessage(message);
+            console.log("Exiting static. result=" + result);
+            return;
         } else {
-            result = null;
+            result = value;
         }
-
-        console.error("Pending to be completed. Use map to store keys and values");
         
         console.log("Exiting static. result=" + result);
         return result;
@@ -1205,4 +1561,17 @@ console.error('It does not work properly with regex');
         return result;
     }
 
+    async uuid(attributes:any) {
+        console.log("------------------------------------------------------------------------------------------");
+        console.log("Entering method uuid");
+        let result:string = 'undefined';
+
+        result = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+
+        console.log("Exiting uuid. result=" + result);
+        return result;
+    }
 }
