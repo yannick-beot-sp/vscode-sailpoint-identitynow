@@ -88,7 +88,7 @@ export const ATTRIBUTES:any = {
         'optional': ['requiresPeriodicRefresh', 'length']
     },
     'replaceAll': {
-        'required': ['MISSING'],
+        'required': ['table'],
         'optional': ['requiresPeriodicRefresh', 'input']
     },
     'replace': {
@@ -99,9 +99,13 @@ export const ATTRIBUTES:any = {
         'required': ['length'],
         'optional': ['requiresPeriodicRefresh', 'padding', 'input']
     },
-    'rule': {
-        'required': ['name'],
+    'rule:generateRandomString': {
+        'required': ['name', 'operation', 'includeNumbers', 'includeSpecialChars'],
         'optional': ['MISSING', 'requiresPeriodicRefresh']
+    },
+    'rule:getEndOfString': {
+        'required': ['name', 'operation', 'numChars'],
+        'optional': ['requiresPeriodicRefresh', 'input']
     },
     'split': {
         'required': ['delimiter', 'index'],
