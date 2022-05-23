@@ -18,9 +18,17 @@ export class NewTransformCommand {
             prompt: "Enter the transform name",
             title: 'IdentityNow',
             validateInput: text => {
+                if (text && text.length > 50) {
+                    return "Transform name cannot exceed 50 characters.";
+                }
+
+                if (text === '') {
+                    return "You must provide a transform name.";
+                }
+
                 // '+' removed from allowed character as known issue during search/filter of transform 
                 // If search/filter is failing, the transform is not properly closed and reopened
-                const regex = new RegExp('^[a-z0-9 _:;,={}@()#-|^%$!?.*]+$', 'i');
+                const regex = new RegExp('^[a-z0-9 _:;,={}@()#-|^%$!?.*]{1,50}$', 'i');
                 if (regex.test(text)) {
                     return null;
                 }
