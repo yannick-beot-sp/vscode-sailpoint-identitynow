@@ -211,7 +211,7 @@ export class TransformEvaluator {
         let placeHolder = "Input text";
         let prompt:string = "Enter the text you want to use as transform's input";
 
-        if ((transformType === 'accountAttribute') || (transformType === 'identityAttribute')) {
+        if ((transformType === 'accountAttribute') || (transformType === 'identityAttribute') || (transformType === 'rule:getReferenceIdentityAttribute')) {
             placeHolder = "Identity's username";
             prompt = "Enter the username of the identity you want to evaluate";
         } 
@@ -917,7 +917,7 @@ export class TransformEvaluator {
             defaultRegion = 'US';
         }
 
-        let searchPattern = new RegExp('[^0-9]', 'g');        
+        let searchPattern = new RegExp('[^0-9]', 'g');
         result = this.input.replace(searchPattern, '');
 
         result = '+' + COUNTRYCODES[defaultRegion].countryCode + result;
@@ -1042,8 +1042,6 @@ export class TransformEvaluator {
 
         console.log(">>> Required attribute 'numChars': '" + numChars + "'");
 
-        //numChars - This specifies how many of the rightmost characters within the incoming string should be returned; if the value of numChars is greater than the string length, the transform will return null
-
         let numCharsNumber = parseInt(numChars);
         
         if (isNaN(numCharsNumber)) {
@@ -1064,22 +1062,97 @@ export class TransformEvaluator {
         return result;
     }
 
-    async indexOf(attributes:any) {
+    async getReferenceIdentityAttribute(attributes:any) {
         console.log("------------------------------------------------------------------------------------------");
-        console.log("Entering method indexOf");
-        let result = 0;
+        console.log("Entering method getReferenceIdentityAttribute");
+        let result:any = undefined;
 
-        let substring = attributes.substring;
+        let uid = attributes.uid;
+        console.log(">>> Required attribute 'uid': '" + uid + "'");
 
-        if (typeof substring === 'object') {
-            substring = await this.evaluateChildTransform(substring);
+        let attributeName = attributes.attributeName;
+        console.log(">>> Required attribute 'attributeName': '" + attributeName + "'");
+
+        const client = new IdentityNowClient(this.tenantName);
+
+        if (uid === 'manager') {
+            this.input = await this.askInput("rule:getReferenceIdentityAttribute");
+            
+            let identity = await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Notification,
+                title: `Getting identity '${this.input}'...`,
+                cancellable: false
+            }, async (task, token) => {
+                let identity = await client.getIdentity(this.input);
+                return identity;      
+            }); 
+    
+            if (identity === undefined) {
+                let message = `Identity '${this.input}' couldn't be found`;
+                console.error(message);
+                vscode.window.showErrorMessage(message);
+                return;
+            }
+    
+            if (identity.manager === undefined) {
+                let message = `Missing or invalid value for identity '${this.input}' attribute 'manager'`;
+                vscode.window.showErrorMessage(message);
+                return;
+            }
+
+
+            if (identity.manager.name !== undefined) {
+                let manager = await vscode.window.withProgress({
+                    location: vscode.ProgressLocation.Notification,
+                    title: `Getting identity '${identity.manager.name}'...`,
+                    cancellable: false
+                }, async (task, token) => {
+                    let manager = await client.getIdentity(identity.manager.name);
+                    return manager;      
+                }); 
+        
+                if (manager === undefined) {
+                    let message = `Identity '${identity.manager.name}' couldn't be found`;
+                    console.error(message);
+                    vscode.window.showErrorMessage(message);
+                    return;
+                }
+        
+                if (manager[attributeName] === undefined) {
+                    let message = `Missing or invalid value for identity '${attributeName}' attribute 'manager'`;
+                    vscode.window.showErrorMessage(message);
+                    return;
+                }
+
+                result = manager[attributeName];
+            }
+        } else {
+            let identity = await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Notification,
+                title: `Getting identity '${uid}'...`,
+                cancellable: false
+            }, async (task, token) => {
+                let identity = await client.getIdentity(uid);
+                return identity;      
+            }); 
+    
+            if (identity === undefined) {
+                let message = `Identity '${uid}' couldn't be found`;
+                console.error(message);
+                vscode.window.showErrorMessage(message);
+                return;
+            }
+    
+            if (identity[attributeName] === undefined) {
+                let message = `Missing or invalid value for identity '${uid}' attribute '${attributeName}'`;
+                vscode.window.showErrorMessage(message);
+                return;
+            }
+
+            result = identity[attributeName];
         }
-        
-        console.log(">>> Required attribute 'substring': '" + substring + "'");
-        
-        result = this.input.indexOf(substring);
 
-        console.log("Exiting indexOf. result=" + result);
+        console.log("Exiting getReferenceIdentityAttribute. result=" + result);
         return result;
     }
 
@@ -1127,6 +1200,25 @@ export class TransformEvaluator {
         result = identity.attributes[name];
         
         console.log("Exiting identityAttribute. result=" + result);
+        return result;
+    }
+
+    async indexOf(attributes:any) {
+        console.log("------------------------------------------------------------------------------------------");
+        console.log("Entering method indexOf");
+        let result = 0;
+
+        let substring = attributes.substring;
+
+        if (typeof substring === 'object') {
+            substring = await this.evaluateChildTransform(substring);
+        }
+        
+        console.log(">>> Required attribute 'substring': '" + substring + "'");
+        
+        result = this.input.indexOf(substring);
+
+        console.log("Exiting indexOf. result=" + result);
         return result;
     }
 
@@ -1403,6 +1495,9 @@ export class TransformEvaluator {
                     break;
                 case 'getEndOfString':
                     result = await this.getEndOfString(attributes);
+                    break;
+                case 'getReferenceIdentityAttribute':
+                    result = await this.getReferenceIdentityAttribute(attributes);
                     break;
                 default:
                     let message = "Invalid operation '" + operation + "'";

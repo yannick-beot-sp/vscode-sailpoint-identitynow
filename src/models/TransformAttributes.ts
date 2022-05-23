@@ -107,6 +107,10 @@ export const ATTRIBUTES:any = {
         'required': ['name', 'operation', 'numChars'],
         'optional': ['requiresPeriodicRefresh', 'input']
     },
+    'rule:getReferenceIdentityAttribute': {
+        'required': ['name', 'operation', 'uid', 'attributeName'],
+        'optional': ['requiresPeriodicRefresh']
+    },
     'split': {
         'required': ['delimiter', 'index'],
         'optional': ['requiresPeriodicRefresh', 'throws', 'input']
