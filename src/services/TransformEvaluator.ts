@@ -302,6 +302,9 @@ export class TransformEvaluator {
             case 'randomNumeric':
                 result = await this.randomNumeric(attributes);
                 break;
+            case 'reference':
+                result = await this.reference(attributes);
+                break;
             case 'replaceAll':
                 result = await this.replaceAll(attributes);
                 break;
@@ -1408,6 +1411,40 @@ export class TransformEvaluator {
         result = Array(length).join().split(',').map(function() { return availableChars.charAt(Math.floor(Math.random() * availableChars.length)); }).join('');
 
         console.log("Exiting randomNumeric. result=" + result);
+        return result;
+    }
+
+    async reference(attributes:any) {
+        console.log("------------------------------------------------------------------------------------------");
+        console.log("Entering method reference");
+        let result = undefined;
+
+        let id = attributes.id;
+        console.log(">>> Required attribute 'id': '" + id + "'");
+
+        const client = new IdentityNowClient(this.tenantName);
+
+        let data: any = await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: `Getting transform '${id}' ...`,
+            cancellable: false
+        }, async (task, token) => {
+            let data = await client.getTransformByName(id);
+            return data;
+        });
+
+        let transform = data[0];
+
+        if (transform === undefined) {
+            let message = "Transform '" + id + "' does not exist";
+            console.error(message);
+            vscode.window.showErrorMessage(message);
+            return;
+        } else {
+            result = this.evaluateChildTransform(transform);
+        }
+
+        console.log("Exiting reference. result=" + result);
         return result;
     }
 

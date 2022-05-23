@@ -85,7 +85,7 @@ export const ATTRIBUTES:any = {
     },
     'reference': {
         'required': ['id'],
-        'optional': ['requiresPeriodicRefresh', 'length']
+        'optional': ['requiresPeriodicRefresh']
     },
     'replaceAll': {
         'required': ['table'],
