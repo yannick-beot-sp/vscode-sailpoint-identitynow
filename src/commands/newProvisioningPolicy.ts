@@ -50,7 +50,7 @@ export async function newProvisioningPolicy(treeItem: ProvisioningPoliciesTreeIt
         cancellable: false
     }, async (task, token) => {
 
-        let newUri = treeItem.parentUri.with({
+        let newUri = treeItem.parentUri?.with({
             path: path.posix.join(
                 getPathByUri(treeItem.parentUri) || "",
                 'provisioning-policies',
@@ -58,6 +58,7 @@ export async function newProvisioningPolicy(treeItem: ProvisioningPoliciesTreeIt
                 'CREATE'
             )
         });
+        if (!newUri) { return; }
         const data = {
             "name": provisioningPolicyName,
             "description": null,
@@ -68,7 +69,7 @@ export async function newProvisioningPolicy(treeItem: ProvisioningPoliciesTreeIt
             newUri,
             str2Uint8Array(JSON.stringify(data))
         );
-        newUri = treeItem.parentUri.with({
+        newUri = treeItem.parentUri?.with({
             path: path.posix.join(
                 getPathByUri(treeItem.parentUri) || "",
                 'provisioning-policies',
@@ -76,6 +77,7 @@ export async function newProvisioningPolicy(treeItem: ProvisioningPoliciesTreeIt
                 provisioningPolicyName
             )
         });
+        if (!newUri) { return; }
         let document = await vscode.workspace.openTextDocument(newUri);
         document = await vscode.languages.setTextDocumentLanguage(document, 'json');
 
