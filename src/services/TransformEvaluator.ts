@@ -1499,7 +1499,7 @@ export class TransformEvaluator {
 
         const client = new IdentityNowClient(this.tenantName);
 
-        let data: any = await vscode.window.withProgress({
+        let transform: any = await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Getting transform '${id}' ...`,
             cancellable: false
@@ -1507,8 +1507,6 @@ export class TransformEvaluator {
             let data = await client.getTransformByName(id);
             return data;
         });
-
-        let transform = data[0];
 
         if (transform === undefined) {
             let message = "Transform '" + id + "' does not exist";

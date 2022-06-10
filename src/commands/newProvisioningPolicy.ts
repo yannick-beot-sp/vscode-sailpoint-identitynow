@@ -13,13 +13,24 @@ async function askProvisioningPolicyName(): Promise<string | undefined> {
         placeHolder: 'Provisioning Policy name',
         prompt: "Enter the provisioning policy name",
         title: 'IdentityNow',
-        validateInput: text => {
-            const regex = new RegExp('^[a-z]+$', 'i');
+        validateInput: text =>
+        {
+            if (text && text.length > 50) {
+                return "Provisioning Policy name cannot exceed 50 characters.";
+            }
+
+            if (text === '') {
+                return "You must provide a Provisioning Policy name.";
+            }
+
+            // '+' removed from allowed character as known issue during search/filter of transform 
+            // If search/filter is failing, the transform is not properly closed and reopened
+            const regex = new RegExp('^[a-z0-9 _:;,={}@()#-|^%$!?.*]{1,50}$', 'i');
             if (regex.test(text)) {
                 return null;
             }
             return "Invalid Provisioning Policy name";
-        }
+        } 
     });
     return result;
 }

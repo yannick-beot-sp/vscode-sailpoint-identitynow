@@ -1,0 +1,443 @@
+[
+    {
+        "name": "After Operation Rule for Web Services connector",
+        "description": "This rule is used by the Web Services connector to update parsed resource object. Create List of Objects which will later converted to Resource object.",
+        "type": "WebServiceAfterOperationRule",
+        "signature": {
+            "input": [
+                {
+                    "name": "application",
+                    "description": "The application whose data file is being processed.",
+                    "type": null
+                },
+                {
+                    "name": "requestEndPoint",
+                    "description": "The current request information contain header, body ,response object",
+                    "type": null
+                },
+                {
+                    "name": "processedResponseObject",
+                    "description": "Response Object processed by the Web services connector",
+                    "type": null
+                },
+                {
+                    "name": "rawResponseObject",
+                    "description": "Response Object returned from the end system",
+                    "type": null
+                },
+                {
+                    "name": "restClient",
+                    "description": "REST Client Object",
+                    "type": null
+                }
+            ],
+            "output": {
+                "name": "Update Account/Group List",
+                "description": "Update information Map contains parsed list of accounts",
+                "type": null
+            }
+        },
+        "sourceCode": {
+            "version": "1.0",
+            "script": "// source code"
+        },
+        "attributes": {
+            "sourceVersion": "1.0"
+        }
+    },
+    {
+        "name": "Before Operation Rule for Web Services Connector",
+        "description": "This rule is used by the  Web Services connector before performing any operation like testconnection, aggregation, etc.",
+        "type": "WebServiceBeforeOperationRule",
+        "signature": {
+            "input": [
+                {
+                    "name": "application",
+                    "description": "The application whose data file is being processed.",
+                    "type": null
+                },
+                {
+                    "name": "requestEndPoint",
+                    "description": "The current request information contain header, body, context url, method type, response attribute map,\n          successful response code\n        ",
+                    "type": null
+                },
+                {
+                    "name": "oldResponseMap",
+                    "description": "earlier response object ",
+                    "type": null
+                },
+                {
+                    "name": "restClient",
+                    "description": "REST Client Object",
+                    "type": null
+                }
+            ],
+            "output": {
+                "name": "EndPoint",
+                "description": "Updated EndPoint Object",
+                "type": null
+            }
+        },
+        "sourceCode": {
+            "version": "1.0",
+            "script": "// source code"
+        },
+        "attributes": {
+            "sourceVersion": "1.0"
+        }
+    },
+    {
+        "name": "JDBC Provision Rule",
+        "description": "This JDBC rule can process account creation requests, deletion requests, and modification requests that pertain to the role attribute. It logs debug messages if other account request types are submitted.",
+        "type": "JDBCProvision",
+        "signature": {
+            "input": [
+                {
+                    "name": "log",
+                    "description": "The log object associated with the SailPointContext.",
+                    "type": null
+                },
+                {
+                    "name": "context",
+                    "description": "A sailpoint.api.SailPointContext object that can be used to query the database if necessary.\n  ",
+                    "type": null
+                },
+                {
+                    "name": "application",
+                    "description": "The application whose data file is being processed.",
+                    "type": null
+                },
+                {
+                    "name": "schema",
+                    "description": "The Schema currently in use.",
+                    "type": null
+                },
+                {
+                    "name": "connection",
+                    "description": "A connection object to connect to database.",
+                    "type": null
+                },
+                {
+                    "name": "plan",
+                    "description": "The ProvisioningPlan created against the JDBC application.",
+                    "type": null
+                }
+            ],
+            "output": {
+                "name": "result",
+                "description": "A Provisioning Result object is desirable to return the status.IT can be a new object or part of  Provisioning Plan",
+                "type": null
+            }
+        },
+        "sourceCode": {
+            "version": "1.0",
+            "script": "// source code"
+        },
+        "attributes": {
+            "sourceVersion": "1.0"
+        }
+    },
+    {
+        "name": "PowerShell Before Creation Rule",
+        "description": "Executes PowerShell commands on the IQService component before a source account is created.",
+        "type": "ConnectorBeforeCreate",
+        "signature": {
+            "input": [],
+            "output": null
+        },
+        "sourceCode": {
+            "version": "1.0",
+            "script": "// source code"
+        },
+        "attributes": {
+            "ObjectOrientedScript": "true",
+            "extension": ".ps1",
+            "sourceVersion": "1.0",
+            "disabled": "false",
+            "program": "powershell.exe",
+            "timeout": "300"
+        }
+    },
+    {
+        "name": "PowerShell Before Modify Rule",
+        "description": "Executes PowerShell commands on the IQService component before a source account is modified.",
+        "type": "ConnectorBeforeModify",
+        "signature": {
+            "input": [],
+            "output": null
+        },
+        "sourceCode": {
+            "version": "1.0",
+            "script": "// source code"
+        },
+        "attributes": {
+            "ObjectOrientedScript": "true",
+            "extension": ".ps1",
+            "sourceVersion": "1.0",
+            "disabled": "false",
+            "program": "powershell.exe",
+            "timeout": "300"
+        }
+    },
+    {
+        "name": "PowerShell Before Delete Rule",
+        "description": "Executes PowerShell commands on the IQService component before a source account is deleted.",
+        "type": "ConnectorBeforeDelete",
+        "signature": {
+            "input": [],
+            "output": null
+        },
+        "sourceCode": {
+            "version": "1.0",
+            "script": "// source code"
+        },
+        "attributes": {
+            "ObjectOrientedScript": "true",
+            "extension": ".ps1",
+            "sourceVersion": "1.0",
+            "disabled": "false",
+            "program": "powershell.exe",
+            "timeout": "300"
+        }
+    },
+    {
+        "name": "PowerShell After Creation Rule",
+        "description": "Executes PowerShell commands on the IQService component after a source account is created.",
+        "type": "ConnectorAfterCreate",
+        "signature": {
+            "input": [],
+            "output": null
+        },
+        "sourceCode": {
+            "version": "1.0",
+            "script": "// source code"
+        },
+        "attributes": {
+            "ObjectOrientedScript": "true",
+            "extension": ".ps1",
+            "sourceVersion": "1.0",
+            "disabled": "false",
+            "program": "powershell.exe",
+            "timeout": "300"
+        }
+    },
+    {
+        "name": "PowerShell After Modify Rule",
+        "description": "Executes PowerShell commands on the IQService component after a source account is modified.",
+        "type": "ConnectorAfterModify",
+        "signature": {
+            "input": [],
+            "output": null
+        },
+        "sourceCode": {
+            "version": "1.0",
+            "script": "// source code"
+        },
+        "attributes": {
+            "ObjectOrientedScript": "true",
+            "extension": ".ps1",
+            "sourceVersion": "1.0",
+            "disabled": "false",
+            "program": "powershell.exe",
+            "timeout": "300"
+        }
+    },
+    {
+        "name": "PowerShell After Delete Rule",
+        "description": "Executes PowerShell commands on the IQService component after a source account is deleted.",
+        "type": "ConnectorAfterDelete",
+        "signature": {
+            "input": [],
+            "output": null
+        },
+        "sourceCode": {
+            "version": "1.0",
+            "script": "// source code"
+        },
+        "attributes": {
+            "ObjectOrientedScript": "true",
+            "extension": ".ps1",
+            "sourceVersion": "1.0",
+            "disabled": "false",
+            "program": "powershell.exe",
+            "timeout": "300"
+        }
+    },
+    {
+        "name": "Delimited File BuildMap Rule",
+        "description": "A BuildMap rule is used to manipulate the raw input data (provided via the rows and columns in the file) and build a map out of the incoming data.",
+        "type": "BuildMap",
+        "signature": {
+            "input": [
+                {
+                    "name": "col",
+                    "description": "An ordered list of the column names from the file’s header record or specified Columns list.",
+                    "type": null
+                },
+                {
+                    "name": "record",
+                    "description": "An ordered list of the values for the current record (parsed based on the specified delimiter)",
+                    "type": null
+                },
+                {
+                    "name": "application",
+                    "description": "The source object sent to the connector from IdentityNow.",
+                    "type": null
+                },
+                {
+                    "name": "schema",
+                    "description": "A reference to the Schema object for the Delimited File source being read.",
+                    "type": null
+                }
+            ],
+            "output": null
+        },
+        "sourceCode": {
+            "version": "1.0",
+            "script": "// source code"
+        },
+        "attributes": {
+            "sourceVersion": "1.0"
+        }
+    },
+    {
+        "name": "JDBC BuildMap Rule",
+        "description": "This rule is used by the JDBC connector to build a map representation of the Resultset",
+        "type": "JDBCBuildMap",
+        "signature": {
+            "input": [
+                {
+                    "name": "log",
+                    "description": "The log object associated with the SailPointContext.",
+                    "type": null
+                },
+                {
+                    "name": "context",
+                    "description": "A sailpoint.api.SailPointContext object that can be used to query the database if necessary.",
+                    "type": null
+                },
+                {
+                    "name": "application",
+                    "description": "The application whose data file is being processed.",
+                    "type": null
+                },
+                {
+                    "name": "state",
+                    "description": "A Map containing state information.",
+                    "type": null
+                },
+                {
+                    "name": "result",
+                    "description": "The ResultSet from database.",
+                    "type": null
+                },
+                {
+                    "name": "connection",
+                    "description": "A connection object to connect to database.",
+                    "type": null
+                }
+            ],
+            "output": {
+                "name": "map",
+                "description": "A Map of the resource object assembled from the data.",
+                "type": null
+            }
+        },
+        "sourceCode": {
+            "version": "1.0",
+            "script": "// source code"
+        },
+        "attributes": {
+            "sourceVersion": "1.0"
+        }
+    },
+    {
+        "name": "SAP Build Map Rule",
+        "description": "Calculates and transforms data from SAP during the aggregation process. Additionally, can perform additional calls back to the SAP system using SAP BAPI calls.",
+        "type": "SAPBuildMap",
+        "signature": {
+            "input": [
+                {
+                    "name": "object",
+                    "description": "A reference to a SailPoint attributes object (basically a Map object with some added convenience methods) that holds the attributes that have been built up by the default connector implementation. The rule should modify this object to change, add or remove attributes from the map.",
+                    "type": null
+                },
+                {
+                    "name": "connector",
+                    "description": "A reference to the current SAP Connector",
+                    "type": null
+                },
+                {
+                    "name": "state",
+                    "description": "A Map that can be used to store and share data between executions of this rule during a single aggregation run.",
+                    "type": null
+                },
+                {
+                    "name": "application",
+                    "description": "The application whose data file is being processed.",
+                    "type": null
+                },
+                {
+                    "name": "schema",
+                    "description": "A reference to the Schema object for the Delimited File source being read.",
+                    "type": null
+                }
+            ],
+            "output": null
+        },
+        "sourceCode": {
+            "version": "1.0",
+            "script": "// cf. https://community.sailpoint.com/t5/IdentityNow-Articles/IdentityNow-Rule-Guide-SAP-BuildMap-Rule/ta-p/77343"
+        },
+        "attributes": {
+            "sourceVersion": "1.0"
+        }
+    },
+    {
+        "name": "SAP HR Provisioning Modify Rule",
+        "description": "This rule is used to perform SAP HR modification operations during provisioning. This is often used for attribute sync to custom SAP HR attributes.",
+        "type": "SAPBuildMap",
+        "signature": {
+            "input": [
+                {
+                    "name": "application",
+                    "description": "The application whose data file is being processed.",
+                    "type": null
+                },
+                {
+                    "name": "schema",
+                    "description": "A reference to the Schema object for the Delimited File source being read.",
+                    "type": null
+                },
+                {
+                    "name": "destination",
+                    "description": "A connected and ready to use SAP destination object that can be used to call BAPI function modules and call to SAP tables.",
+                    "type": null
+                },
+                {
+                    "name": "plan",
+                    "description": "Provisioning plan containing the provisioning request(s)",
+                    "type": null
+                },
+                {
+                    "name": "request",
+                    "description": "AccountRequest being processed; always null for this global rule; only set for SapHrOperationProvisioning",
+                    "type": null
+                },
+                {
+                    "name": "connector",
+                    "description": "A reference to the current SAP Connector",
+                    "type": null
+                }
+            ],
+            "output": null
+        },
+        "sourceCode": {
+            "version": "1.0",
+            "script": "// cf. https://community.sailpoint.com/t5/IdentityNow-Wiki/IdentityNow-Rule-Guide-SAP-HR-Provisioning-Modify-Rule/ta-p/77306"
+        },
+        "attributes": {
+            "sourceVersion": "1.0"
+        }
+    }
+]

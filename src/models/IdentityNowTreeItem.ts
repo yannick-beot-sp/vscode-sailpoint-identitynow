@@ -3,6 +3,7 @@ import { getIdByUri, getPathByUri, getResourceUri } from '../utils/UriUtils';
 import * as commands from '../commands/constants';
 import path = require('path');
 import { IdentityNowClient } from '../services/IdentityNowClient';
+import { compareByName } from '../utils';
 
 /**
  * Base class to expose getChildren and updateIcon methods
@@ -39,6 +40,7 @@ export class TenantTreeItem extends BaseTreeItem {
         results.push(new SourcesTreeItem(this.tenantName));
         results.push(new TransformsTreeItem(this.tenantName));
         results.push(new WorkflowsTreeItem(this.tenantName));
+        results.push(new RulesTreeItem(this.tenantName));
         return new Promise(resolve => resolve(results));
     }
 }
@@ -170,7 +172,7 @@ export class TransformsTreeItem extends FolderTreeItem {
         const client = new IdentityNowClient(this.tenantName);
         const transforms = await client.getTransforms();
         if (transforms !== undefined && transforms instanceof Array) {
-            transforms.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1);
+            transforms.sort(compareByName);
             for (let index = 0; index < transforms.length; index++) {
                 const element = transforms[index];
                 results.push(new TransformTreeItem(this.tenantName, element.name, element.id));
@@ -219,7 +221,7 @@ export class SchemasTreeItem extends FolderTreeItem {
         const schemaPath = getPathByUri(this.parentUri) + '/schemas';
         const schemas = await client.getResource(schemaPath);
         if (schemas !== undefined && schemas instanceof Array) {
-            schemas.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1)
+            schemas.sort(compareByName)
                 .map(element =>
                     new SchemaTreeItem(
                         this.tenantName,
@@ -267,8 +269,7 @@ export class ProvisioningPoliciesTreeItem extends FolderTreeItem {
         const provisioningPolicies = await client.getResource(provisioningPoliciesPath);
         if (provisioningPolicies !== undefined && provisioningPolicies instanceof Array) {
             results = provisioningPolicies
-                .sort(
-                    (a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1)
+                .sort(compareByName)
                 .map(provisioningPolicy =>
                     new ProvisioningPolicyTreeItem(
                         this.tenantName,
@@ -352,3 +353,40 @@ export class WorkflowTreeItem extends IdentityNowResourceTreeItem {
         }
     }
 }
+
+
+/**
+ * Containers for workflows
+ */
+ export class RulesTreeItem extends FolderTreeItem {
+
+    constructor(
+        public readonly tenantName: string,
+    ) {
+        super('Rules', 'connector-rules');
+    }
+
+    async getChildren(): Promise<BaseTreeItem[]> {
+        const client = new IdentityNowClient(this.tenantName);
+        const rules = await client.getConnectorRules();
+        const ruleTreeItems = rules.map(r =>
+            new RuleTreeItem(this.tenantName, r.name, r.id));
+        return ruleTreeItems;
+    }
+}
+
+export class RuleTreeItem extends IdentityNowResourceTreeItem {
+    contextValue = 'connector-rule';
+
+    constructor(
+        tenantName: string,
+        label: string,
+        id: string,
+    ) {
+        super(tenantName, label, 'connector-rules', id, TreeItemCollapsibleState.None, undefined, undefined, true);
+    }
+
+    iconPath = new ThemeIcon('file-code');
+}
+
+

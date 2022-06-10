@@ -6,7 +6,8 @@ import 'isomorphic-fetch';
 import 'isomorphic-form-data';
 import { withQuery } from "../utils/UriUtils";
 import { Workflow, WorkflowExecution } from "../models/workflow";
-import { convertToText } from '../utils';
+import { compareByName, convertToText } from '../utils';
+import { ConnectorRule } from '../models/connectorRule';
 
 export class IdentityNowClient {
 
@@ -93,6 +94,12 @@ export class IdentityNowClient {
             throw new Error(req.statusText);
         }
         const res = await req.json();
+
+
+        if (!res || !(res instanceof Array) || res.length !== 1) {
+            console.log("getTransformByName returns ", res);
+            throw new Error('Could not find transform "' + name + '"');
+        }
 
         return res;
     }
@@ -306,7 +313,7 @@ export class IdentityNowClient {
         const headers = await this.prepareHeaders();
         let sourceId = await fetch(endpoint, {
             headers: headers
-        }).then(async function(response) {
+        }).then(async function (response) {
             if (response.status === 200) {
                 let json = await response.json();
 
@@ -326,13 +333,13 @@ export class IdentityNowClient {
                 vscode.window.showErrorMessage(`${endpoint} --> ${response.statusText}`);
                 return;
             }
-        }).catch(function(error) {
+        }).catch(function (error) {
             console.log(error);
         });
- 
+
         return sourceId;
     }
-    
+
     public async getIdentity(identityNameOrId: string): Promise<any> {
         console.log('> getIdentity', identityNameOrId);
         let endpoint = EndpointUtils.getV3Url(this.tenantName) + '/search';
@@ -353,12 +360,12 @@ export class IdentityNowClient {
                 ]
             }
         };
-        
+
         let identity = await fetch(endpoint, {
             headers: headers,
             method: 'POST',
             body: convertToText(data)
-        }).then(async function(response) {
+        }).then(async function (response) {
             if (response.status === 200) {
                 let json = await response.json();
 
@@ -366,19 +373,19 @@ export class IdentityNowClient {
                     if (json.length > 0) {
                         return json[0];
                     }
-                } 
+                }
             } else {
                 console.error(response.statusText);
                 vscode.window.showErrorMessage(`${endpoint} --> ${response.statusText}`);
                 return;
             }
-        }).catch(function(error) {
+        }).catch(function (error) {
             console.log(error);
         });
 
         if (identity !== undefined) {
             return identity;
-        }        
+        }
     }
 
     public async getAccount(nativeIdentity: string, sourceId: string): Promise<any> {
@@ -387,10 +394,10 @@ export class IdentityNowClient {
         console.log('endpoint = ' + endpoint);
 
         const headers = await this.prepareHeaders();
-        
+
         let account = await fetch(endpoint, {
             headers: headers
-        }).then(async function(response) {
+        }).then(async function (response) {
             if (response.status === 200) {
                 let json = await response.json();
 
@@ -398,13 +405,13 @@ export class IdentityNowClient {
                     if (json.length > 0) {
                         return json[0];
                     }
-                } 
+                }
             } else {
                 console.error(response.statusText);
                 vscode.window.showErrorMessage(`${endpoint} --> ${response.statusText}`);
                 return;
             }
-        }).catch(function(error) {
+        }).catch(function (error) {
             console.log(error);
         });
 
@@ -500,12 +507,12 @@ export class IdentityNowClient {
         console.log("path =", path);
         return await this.getResource(path);
     }
-/**
- * cf. https://developer.sailpoint.com/apis/beta/#operation/getWorkflowExecution
- * @param workflowExecutionId 
- * @returns 
- */
-    public async getWorkflowExecution(workflowExecutionId:string): Promise<WorkflowExecution> {
+    /**
+     * cf. https://developer.sailpoint.com/apis/beta/#operation/getWorkflowExecution
+     * @param workflowExecutionId 
+     * @returns 
+     */
+    public async getWorkflowExecution(workflowExecutionId: string): Promise<WorkflowExecution> {
         console.log('> getWorkflowExecution', workflowExecutionId);
         const path = `/beta/workflow-executions/${workflowExecutionId}`;
         console.log("path =", path);
@@ -517,7 +524,7 @@ export class IdentityNowClient {
         if (workflows === undefined || !Array.isArray(workflows)) {
             return [];
         }
-        workflows.sort((a:Workflow, b:Workflow) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1);
+        workflows.sort(compareByName);
         return workflows;
     }
 
@@ -529,18 +536,38 @@ export class IdentityNowClient {
         return workflowTriggers;
     }
 
-    public async testWorkflow(workflowId:string, payload:any): Promise<string> {
+    public async testWorkflow(workflowId: string, payload: any): Promise<string> {
         console.log('> testWorkflow', workflowId, payload);
         const path = `/beta/workflows/${workflowId}/test`;
-        
+
         const workflowExecutionDetail = await this.createResource(path, JSON.stringify({
             input: payload
         }));
-        
+
         return workflowExecutionDetail.workflowExecutionId;
     }
 
-    
+    public async getConnectorRules(): Promise<ConnectorRule[]> {
+        const rules = await this.getResource('/beta/connector-rules');
+        if (rules === undefined || !Array.isArray(rules)) {
+            return [];
+        }
+        rules.sort(compareByName);
+        return rules;
+    }
+
+    /**
+     * At this moment, it is not possible to get a rule by filtering on the name
+     * The filtering must be done client-side
+     * @param name 
+     * @returns 
+     */
+    public async getConnectorRuleByName(name: string): Promise<ConnectorRule | undefined> {
+        console.log('> getConnectorRuleByName', name);
+        const rules = await this.getConnectorRules();
+        return rules.find(r => r.name === name);
+    }
+
 
 }
 

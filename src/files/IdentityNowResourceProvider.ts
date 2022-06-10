@@ -80,7 +80,9 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
             console.log('New file');
             if (resourcePath.match("transform")) {
                 const createdData = await client.createResource('/v3/transforms', data);
-            } else if (resourcePath.match("schemas") || resourcePath.match("provisioning-policies")) {
+            } else if (resourcePath.match("schemas")
+                || resourcePath.match("provisioning-policies")
+                || resourcePath.match("connector-rules")) {
                 const createdData = await client.createResource(path.posix.dirname(resourcePath), data);
             } else {
                 throw new Error("Cannot save: invalid uri " + uri);
