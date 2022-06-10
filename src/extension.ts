@@ -139,10 +139,12 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.NEW_CONNECTOR_RULE,
 			newConnectorRuleCommand.execute, newConnectorRuleCommand));
-
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.UPLOAD_CONNECTOR_RULE,
 			newConnectorRuleCommand.upload, newConnectorRuleCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.VALIDATE_CONNECTOR_RULE,
+			newConnectorRuleCommand.validateScript, newConnectorRuleCommand));
 
 
 	vscode.workspace.onDidSaveTextDocument(onFileSaved);

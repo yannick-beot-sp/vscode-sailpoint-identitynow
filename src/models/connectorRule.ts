@@ -33,3 +33,16 @@ export interface ConnectorRule {
   }
   
   export interface Attributes {}
+
+
+  export interface ValidationResult {
+    state: string
+    details: Detail[]
+  }
+  
+  export interface Detail {
+    line: number
+    column: number
+    messsage: string
+  }
+  

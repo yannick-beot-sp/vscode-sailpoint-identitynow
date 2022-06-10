@@ -53,6 +53,7 @@
 		"onCommand:vscode-sailpoint-identitynow.transform.evaluate.editor",
 		"onCommand:vscode-sailpoint-identitynow.new-connector-rule",
 		"onCommand:vscode-sailpoint-identitynow.connector-rule.upload",
+		"onCommand:vscode-sailpoint-identitynow.connector-rule.validate",
 		"onFileSystem:idn"
 	],
 	"license": "MIT",
@@ -183,6 +184,10 @@
 			{
 				"command": "vscode-sailpoint-identitynow.connector-rule.upload",
 				"title": "IdentityNow: Upload this code to a rule..."
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.connector-rule.validate",
+				"title": "IdentityNow: Validate this code..."
 			}
 		],
 		"menus": {
@@ -391,6 +396,9 @@
 				},
 				{
 					"command": "vscode-sailpoint-identitynow.connector-rule.upload"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.connector-rule.validate"
 				}
 			]
 		},

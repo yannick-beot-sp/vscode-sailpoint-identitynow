@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import { NEW_ID } from '../constants';
 import { ConnectorRule } from '../models/connectorRule';
 import { RulesTreeItem } from "../models/IdentityNowTreeItem";
-import { TransformQuickPickItem } from '../models/TransformQuickPickItem';
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { TenantService } from '../services/TenantService';
 import { compareByName, isEmpty } from '../utils';
@@ -77,6 +76,35 @@ export class ConnectorRuleCommand {
         await vscode.window.showTextDocument(document, { preview: false, preserveFocus: true });
 
     }
+
+    async validateScript() {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            console.error('No editor');
+            return;
+        }
+
+        const selection = getSelectionContent(editor);
+        if (!selection) {
+            return;
+        }
+        const tenantName = await chooseTenant(this.tenantService, 'Choose a tenant to validate the script');
+        console.log("validateScript: tenant = ", tenantName);
+        if (!tenantName) {
+            return;
+        }
+        const client = new IdentityNowClient(tenantName);
+        const res = await client.validateConnectorRule(selection);
+
+        if (res.state === "OK") {
+            await vscode.window.showInformationMessage('The script is valid');
+        } else {
+            let  message = "Could not validate script. ";
+            message += res.details?.map(detail => `${detail.line}:${detail.column}: ${detail.messsage}`).join('\n') ?? "";
+            await vscode.window.showErrorMessage(message);
+        }
+    }
+
 
     private async chooseExistingRule(client: IdentityNowClient): Promise<ConnectorRule | undefined> {
         const rules = await client.getConnectorRules();

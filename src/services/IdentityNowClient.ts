@@ -7,7 +7,7 @@ import 'isomorphic-form-data';
 import { withQuery } from "../utils/UriUtils";
 import { Workflow, WorkflowExecution } from "../models/workflow";
 import { compareByName, convertToText } from '../utils';
-import { ConnectorRule } from '../models/connectorRule';
+import { ConnectorRule, ValidationResult } from '../models/connectorRule';
 
 export class IdentityNowClient {
 
@@ -569,7 +569,7 @@ export class IdentityNowClient {
     }
 
 
-    public async validateConnectorRule(script: string): Promise<any> {
+    public async validateConnectorRule(script: string): Promise<ValidationResult> {
         console.log('> validateConnectorRule', script);
 
         const payload = {
@@ -577,26 +577,26 @@ export class IdentityNowClient {
             script
         };
 
-        const endpoint = EndpointUtils.getBetaUrl(this.tenantName) + 'connector-rules/validate';
+        const endpoint = EndpointUtils.getBetaUrl(this.tenantName) + '/connector-rules/validate';
         console.log('endpoint = ' + endpoint);
         const headers = await this.prepareHeaders();
-        const req = await fetch(endpoint, {
+        const resp = await fetch(endpoint, {
             method: 'POST',
             headers: headers,
             body: JSON.stringify(payload)
         });
 
-        if (!req.ok) {  
-            if (req.status === 500) {
-                const details = await req.json();
-                const detail = details?.messages[0]?.text || req.statusText;
+        if (!resp.ok) {  
+            if (resp.status === 500) {
+                const details = await resp.json();
+                const detail = details?.messages[0]?.text || resp.statusText;
                 throw new Error(detail);
             }
-            throw new Error(req.statusText);
+            throw new Error(resp.statusText);
         }
-        const res = await req.json();
-        console.log('< validateConnectorRule', res);
-        return res;
+        const jsonBody = await resp.json();
+        console.log('< validateConnectorRule', jsonBody);
+        return jsonBody;
     }
 
 
