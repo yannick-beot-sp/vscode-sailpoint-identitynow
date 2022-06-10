@@ -6,6 +6,7 @@ import { delay, toDateSuffix } from '../utils';
 import * as fs from 'fs';
 import path = require('path');
 import { TenantService } from '../services/TenantService';
+import { chooseTenant } from '../utils/vsCodeHelpers';
 
 
 
@@ -66,22 +67,12 @@ export class ExportConfigPalette {
     ) { }
 
     async execute() {
-
         console.log("> exportConfigPalette.execute");
-        const tenants = this.tenantService.getTenants().sort();
-        let tenantName: string | undefined = '';
-        if (tenants.length < 1) {
-            return;
-        } else if (tenants.length === 1) {
-            tenantName = tenants[0];
-        } else {
-            tenantName = await vscode.window.showQuickPick(tenants, { placeHolder: `From which tenant do you want to export the config?` });
-            if (tenantName === undefined) {
-                console.log("exportConfigPalette: no tenant");
-                return;
-            }
-        }
+        const tenantName = await chooseTenant(this.tenantService, 'From which tenant do you want to export the config?');
         console.log("exportConfigPalette: tenant = ", tenantName);
+        if (!tenantName) {
+            return;
+        }
         exportConfig(tenantName as string);
     }
 }

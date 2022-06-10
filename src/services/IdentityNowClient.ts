@@ -569,6 +569,37 @@ export class IdentityNowClient {
     }
 
 
+    public async validateConnectorRule(script: string): Promise<any> {
+        console.log('> validateConnectorRule', script);
+
+        const payload = {
+            "version": "1.0",
+            script
+        };
+
+        const endpoint = EndpointUtils.getBetaUrl(this.tenantName) + 'connector-rules/validate';
+        console.log('endpoint = ' + endpoint);
+        const headers = await this.prepareHeaders();
+        const req = await fetch(endpoint, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(payload)
+        });
+
+        if (!req.ok) {  
+            if (req.status === 500) {
+                const details = await req.json();
+                const detail = details?.messages[0]?.text || req.statusText;
+                throw new Error(detail);
+            }
+            throw new Error(req.statusText);
+        }
+        const res = await req.json();
+        console.log('< validateConnectorRule', res);
+        return res;
+    }
+
+
 }
 
 export enum AggregationJob {

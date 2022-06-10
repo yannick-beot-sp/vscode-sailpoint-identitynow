@@ -134,7 +134,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.TEST_WORKFLOW,
 			testWorkflowCommand.execute, testWorkflowCommand));
 
-    const newConnectorRuleCommand = new ConnectorRuleCommand();
+	const newConnectorRuleCommand = new ConnectorRuleCommand(tenantService);
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.NEW_CONNECTOR_RULE,
@@ -144,7 +144,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.UPLOAD_CONNECTOR_RULE,
 			newConnectorRuleCommand.upload, newConnectorRuleCommand));
 
-	
+
 	vscode.workspace.onDidSaveTextDocument(onFileSaved);
 }
 

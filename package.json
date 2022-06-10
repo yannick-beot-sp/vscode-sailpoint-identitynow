@@ -182,7 +182,7 @@
 			},
 			{
 				"command": "vscode-sailpoint-identitynow.connector-rule.upload",
-				"title": "Upload this code to a rule..."
+				"title": "IdentityNow: Upload this code to a rule..."
 			}
 		],
 		"menus": {
