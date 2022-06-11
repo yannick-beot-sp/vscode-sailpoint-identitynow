@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { TenantService } from "../services/TenantService";
 
 
-export async function chooseTenant(tenantService: TenantService, title:string): Promise<string|undefined> {
+export async function chooseTenant(tenantService: TenantService, title: string): Promise<string | undefined> {
 	console.log("> chooseTenant");
 	const tenants = tenantService.getTenants().sort();
 	let tenantName: string | undefined = '';
@@ -21,7 +21,7 @@ export async function chooseTenant(tenantService: TenantService, title:string): 
 	return tenantName;
 }
 
-export function getSelectionContent(editor: vscode.TextEditor): string|undefined {
+export function getSelectionContent(editor: vscode.TextEditor): string | undefined {
 	var selections = editor.selections;
 
 	if (!selections
@@ -30,8 +30,18 @@ export function getSelectionContent(editor: vscode.TextEditor): string|undefined
 			&& selections[0].isSingleLine
 			&& selections[0].start.character === selections[0].end.character)
 	) {
-		return undefined;
+		return editor.document.getText(getFullDocumentRange(editor));
 	}
 
 	return editor.document.getText(selections[0]);
+}
+
+
+export function getFullDocumentRange(editor: vscode.TextEditor): vscode.Selection {
+	if (editor.document.lineCount > 0) {
+		let lineCount = editor.document.lineCount;
+		return new vscode.Selection(0, 0, lineCount - 1, editor.document.lineAt(lineCount - 1).text.length);
+	}
+
+	return new vscode.Selection(0, 0, 0, 0);
 }
