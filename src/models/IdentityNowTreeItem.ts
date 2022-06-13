@@ -221,7 +221,7 @@ export class SchemasTreeItem extends FolderTreeItem {
         const schemaPath = getPathByUri(this.parentUri) + '/schemas';
         const schemas = await client.getResource(schemaPath);
         if (schemas !== undefined && schemas instanceof Array) {
-            schemas.sort(compareByName)
+            results = schemas.sort(compareByName)
                 .map(element =>
                     new SchemaTreeItem(
                         this.tenantName,
