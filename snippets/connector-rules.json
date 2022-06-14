@@ -358,6 +358,11 @@
         "signature": {
             "input": [
                 {
+                    "name": "destination",
+                    "description": "A connected/ready to use com.sap.conn.jco.JCoDestination object that can be used to call bapi, function modules and call to SAP tables. This is the main object used in making BAPI calls using the JCo interface. This destination object is shared with the connector implementation and the connector controls the destination's lifecycle.",
+                    "type": null
+                },
+                {
                     "name": "object",
                     "description": "A reference to a SailPoint attributes object (basically a Map object with some added convenience methods) that holds the attributes that have been built up by the default connector implementation. The rule should modify this object to change, add or remove attributes from the map.",
                     "type": null
@@ -394,9 +399,9 @@
         }
     },
     {
-        "name": "SAP HR Provisioning Modify Rule",
+        "name": "SAP HR Provisioning Rule",
         "description": "This rule is used to perform SAP HR modification operations during provisioning. This is often used for attribute sync to custom SAP HR attributes.",
-        "type": "SAPBuildMap",
+        "type": "SapHrOperationProvisioning",
         "signature": {
             "input": [
                 {
@@ -435,6 +440,235 @@
         "sourceCode": {
             "version": "1.0",
             "script": "// cf. https://community.sailpoint.com/t5/IdentityNow-Wiki/IdentityNow-Rule-Guide-SAP-HR-Provisioning-Modify-Rule/ta-p/77306"
+        },
+        "attributes": {
+            "sourceVersion": "1.0"
+        }
+    },
+    {
+        "name": "SAP HR Provisioning Rule",
+        "description": "Rule to aggregate the supervisor of the employee using custom code. Use this if there is a need to customize determining the supervisor of employees in SAP HR i.e. if the out-of-box supported OOSP and SS models are not in use in SAP-HR. The arguments \"employeeID\" and \"position\" can be used to determine the supervisor of the employee.",
+        "type": "SAPHRManagerRule",
+        "signature": {
+            "input": [
+                {
+                    "name": "destination",
+                    "description": "A connected and ready to use com.sap.conn.jco.JCoDestination object that can be used to invoke SAP BAPIs using JCo Interface. Use it to call SAP BAPIs and Function Modules. This destination object is shared with the connector implementation and the connector controls the destination's lifecycle.",
+                    "type": null
+                },
+                {
+                    "name": "application",
+                    "description": "The application whose data file is being processed.",
+                    "type": null
+                },
+                {
+                    "name": "schema",
+                    "description": "The schema that represents the object.",
+                    "type": null
+                },
+                {
+                    "name": "state",
+                    "description": "A map object that can be used to store data during the iteration process.",
+                    "type": null
+                },
+                {
+                    "name": "employeeID",
+                    "description": "Employee ID of the employee.",
+                    "type": null
+                },
+                {
+                    "name": "objectType",
+                    "description": "Object type of the schema(i.e. account).",
+                    "type": null
+                },
+                {
+                    "name": "position",
+                    "description": "Position ID of the employee.",
+                    "type": null
+                },
+                {
+                    "name": "connector",
+                    "description": "A reference to the current SAP Connector",
+                    "type": null
+                }
+            ],
+            "output": {
+                "name": "supervisor",
+                "description": "Supervisor ID of the employee.",
+                "type": null
+            }
+        },
+        "sourceCode": {
+            "version": "1.0",
+            "script": "// code"
+        },
+        "attributes": {
+            "sourceVersion": "1.0"
+        }
+    },
+    {
+        "name": "SuccessFactors Provisioning Rule",
+        "description": "Rule to provision attributes in SuccessFactors",
+        "type": "SuccessFactorsOperationProvisioning",
+        "signature": {
+            "input": [
+                {
+                    "name": "application",
+                    "description": "The application whose data file is being processed.",
+                    "type": null
+                },
+                {
+                    "name": "schema",
+                    "description": "The schema that represents the object.",
+                    "type": null
+                },
+                {
+                    "name": "plan",
+                    "description": "The ProvisioningPlan created against the SuccessFactors application.",
+                    "type": null
+                },
+                {
+                    "name": "request",
+                    "description": "The ProvisioningRequest created against the SuccessFactors application.",
+                    "type": null
+                },
+                {
+                    "name": "connector",
+                    "description": "A reference to the current SuccessFactors Connector",
+                    "type": null
+                },
+                {
+                    "name": "provisionMap",
+                    "description": "ProvisionMap object created against SuccessFactors application which holds information for business phone, business email and username.",
+                    "type": null
+                },
+                {
+                    "name": "successFactorsRestSession",
+                    "description": "A connected/ready to use successFactorsRestSession object which can be used for making calls to SuccessFactors ODATA API. This object already has the valid Bearer token.",
+                    "type": null
+                }
+            ],
+            "output": {
+                "name": "result",
+                "description": "A Provisioning Result object is desirable to return the status. It can be a new object or part of Provisioning Plan",
+                "type": null
+            }
+        },
+        "sourceCode": {
+            "version": "1.0",
+            "script": "// code"
+        },
+        "attributes": {
+            "sourceVersion": "1.0"
+        }
+    },
+    {
+        "name": "PeopleSoft HRMS Provisioning Rule",
+        "description": "Rule to provision attributes in PeopleSoft HRMS",
+        "type": "PeopleSoftHRMSOperationProvisioning",
+        "signature": {
+            "input": [
+                {
+                    "name": "log",
+                    "description": "The log object associated with the SailPointContext.",
+                    "type": null
+                },
+                {
+                    "name": "context",
+                    "description": "A sailpoint.api.SailPointContext object that can be used to query the database if necessary.\n  ",
+                    "type": null
+                },
+                {
+                    "name": "application",
+                    "description": "The application whose data file is being processed.",
+                    "type": null
+                },
+                {
+                    "name": "schema",
+                    "description": "The schema that represents the object.",
+                    "type": null
+                },
+                {
+                    "name": "plan",
+                    "description": "The ProvisioningPlan created against the PeopleSoft HRMS application.",
+                    "type": null
+                },
+                {
+                    "name": "request",
+                    "description": "The ProvisioningRequest created against the PeopleSoft HRMS application.",
+                    "type": null
+                },
+                {
+                    "name": "connector",
+                    "description": "The PeopleSofthrms connector that is being used to communicate with PeopleSofthrms. This class is here for convenience as there are many utility methods that make calling Function Modules and doing table lookup easier.",
+                    "type": null
+                },
+                {
+                    "name": "session",
+                    "description": "The session object.",
+                    "type": null
+                }
+            ],
+            "output": {
+                "name": "result",
+                "description": "A Provisioning Result object is desirable to return the status. It  can be a new object or part of Provisioning Plan",
+                "type": null
+            }
+        },
+        "sourceCode": {
+            "version": "1.0",
+            "script": "// code"
+        },
+        "attributes": {
+            "sourceVersion": "1.0"
+        }
+    }, {
+        "name": "PeopleSoft HRMS Build Map Rule",
+        "description": "This rule can be used to customize the PeopleSoft resource object that the connectors build by default.",
+        "type": "PeopleSoftHRMSBuildMap",
+        "signature": {
+            "input": [
+                {
+                    "name": "context",
+                    "description": "A sailpoint.api.SailPointContext object that can be used to query the database if necessary.\n  ",
+                    "type": null
+                },
+                {
+                    "name": "application",
+                    "description": "The application object being used to connect to the PeopleSoft system.",
+                    "type": null
+                },
+                {
+                    "name": "schema",
+                    "description": "The schema that represents the object we are building for aggregation.",
+                    "type": null
+                },
+                {
+                    "name": "connection",
+                    "description": "Connection to the application database.",
+                    "type": null
+                },
+                {
+                    "name": "identity",
+                    "description": "An identity in context of aggregation.",
+                    "type": null
+                },
+                {
+                    "name": "connector",
+                    "description": "A reference to the current SAP Connector",
+                    "type": null
+                },
+                {
+                    "name": "map",
+                    "description": "The result of the return map dependent on the rule itself.",
+                    "type": null
+                }
+            ],
+            "output": null
+        },
+        "sourceCode": {
+            "version": "1.0",
+            "script": "// code"
         },
         "attributes": {
             "sourceVersion": "1.0"
