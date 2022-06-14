@@ -100,8 +100,8 @@ export class IdentityNowClient {
             console.log("getTransformByName returns ", res);
             throw new Error('Could not find transform "' + name + '"');
         }
-
-        return res;
+        // returning only one transform
+        return res[0];
     }
 
     public async createResource(path: string, data: string): Promise<any> {
