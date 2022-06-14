@@ -3,7 +3,7 @@ import { authentication } from "vscode";
 import { EndpointUtils } from "../utils/EndpointUtils";
 import { SailPointIdentityNowAuthenticationProvider } from "./AuthenticationProvider";
 import 'isomorphic-fetch';
-import 'isomorphic-form-data';
+const FormData = require('form-data');
 import { withQuery } from "../utils/UriUtils";
 import { Workflow, WorkflowExecution } from "../models/workflow";
 import { compareByName, convertToText } from '../utils';
@@ -109,24 +109,24 @@ export class IdentityNowClient {
         const endpoint = EndpointUtils.getBaseUrl(this.tenantName) + path;
         console.log('endpoint = ' + endpoint);
         const headers = await this.prepareHeaders();
-        const req = await fetch(endpoint, {
+        const resp = await fetch(endpoint, {
             method: 'POST',
             headers: headers,
             body: data
         });
 
-        if (!req.ok) {
-            if (req.status === 404) {
+        if (!resp.ok) {
+            if (resp.status === 404) {
                 return null;
             }
-            if (req.status === 400) {
-                const details = await req.json();
-                const detail = details?.messages[0]?.text || req.statusText;
+            if (resp.status === 400) {
+                const details: any = await resp.json();
+                const detail = details?.messages[0]?.text || resp.statusText;
                 throw new Error(detail);
             }
-            throw new Error(req.statusText);
+            throw new Error(resp.statusText);
         }
-        const res = await req.json();
+        const res = await resp.json();
         console.log('< IdentityNowClient.createResource', res);
         return res;
     }
@@ -136,21 +136,21 @@ export class IdentityNowClient {
         const endpoint = EndpointUtils.getBaseUrl(this.tenantName) + path;
         console.log('endpoint = ' + endpoint);
         const headers = await this.prepareHeaders();
-        const req = await fetch(endpoint, {
+        const resp = await fetch(endpoint, {
             method: 'DELETE',
             headers: headers
         });
 
-        if (!req.ok) {
-            if (req.status === 404) {
+        if (!resp.ok) {
+            if (resp.status === 404) {
                 throw new Error("Resource not found");
             }
-            if (req.status === 400) {
-                const details = await req.json();
-                const detail = details?.messages[0]?.text || req.statusText;
+            if (resp.status === 400) {
+                const details: any = await resp.json();
+                const detail = details?.messages[0]?.text || resp.statusText;
                 throw new Error(detail);
             }
-            throw new Error(req.statusText);
+            throw new Error(resp.statusText);
         }
 
         console.log('< IdentityNowClient.deleteResource');
@@ -161,24 +161,24 @@ export class IdentityNowClient {
         const endpoint = EndpointUtils.getBaseUrl(this.tenantName) + path;
         console.log('endpoint = ' + endpoint);
         const headers = await this.prepareHeaders();
-        const req = await fetch(endpoint, {
+        const resp = await fetch(endpoint, {
             method: 'PUT',
             headers: headers,
             body: data
         });
 
-        if (!req.ok) {
-            if (req.status === 404) {
+        if (!resp.ok) {
+            if (resp.status === 404) {
                 return null;
             }
-            if (req.status === 400) {
-                const details = await req.json();
-                const detail = details?.messages[0]?.text || req.statusText;
+            if (resp.status === 400) {
+                const details: any = await resp.json();
+                const detail = details?.messages[0]?.text || resp.statusText;
                 throw new Error(detail);
             }
-            throw new Error(req.statusText);
+            throw new Error(resp.statusText);
         }
-        const res = await req.json();
+        const res = await resp.json();
 
         return res;
     }
@@ -200,7 +200,7 @@ export class IdentityNowClient {
                 return null;
             }
             if (req.status === 400) {
-                const details = await req.json();
+                const details: any = await req.json();
                 const detail = details?.messages[0]?.text || req.statusText;
                 throw new Error(detail);
             }
@@ -222,13 +222,24 @@ export class IdentityNowClient {
     }
 
     public async startAggregation(sourceID: Number, disableOptimization = false): Promise<any> {
+        console.log('> IdentityNowClient.startAggregation');
         const endpoint = EndpointUtils.getCCUrl(this.tenantName) + '/source/loadAccounts/' + sourceID;
-        const headers = await this.prepareHeaders();
+        // const endpoint = 'https://webhook.site/9bd2674b-2c53-4cd0-8b04-bfd2571b8678';
+        console.log('endpoint = ' + endpoint);
+        let headers = await this.prepareHeaders();
 
         var formData = new FormData();
         if (disableOptimization) {
+            console.log('disableOptimization = true');
             formData.append('disableOptimization', 'true');
         }
+        const formHeaders = formData.getHeaders();
+        headers = {
+            ...formHeaders,
+            ...headers
+        };
+
+
         const req = await fetch(endpoint, {
             method: 'POST',
             headers: headers,
@@ -254,7 +265,7 @@ export class IdentityNowClient {
         if (!req.ok) {
             let detail = req.statusText;
             if (req.status === 400) {
-                const res = await req.json();
+                const res: any = await req.json();
                 detail = res.exception_message;
             }
             throw new Error("Could not reset source: " + detail);
@@ -282,7 +293,7 @@ export class IdentityNowClient {
         if (!req.ok) {
             throw new Error("Could not start aggregation:" + req.statusText);
         }
-        const tasks = await req.json();
+        const tasks: any = await req.json();
         if (tasks && tasks.items && tasks.items instanceof Array) {
             for (let index = 0; index < tasks.items.length; index++) {
                 const task = tasks.items[index];
@@ -315,7 +326,7 @@ export class IdentityNowClient {
             headers: headers
         }).then(async function (response) {
             if (response.status === 200) {
-                let json = await response.json();
+                let json: any = await response.json();
 
                 if (json !== undefined) {
                     if (json.length > 0) {
@@ -367,7 +378,7 @@ export class IdentityNowClient {
             body: convertToText(data)
         }).then(async function (response) {
             if (response.status === 200) {
-                let json = await response.json();
+                let json: any = await response.json();
 
                 if (json !== undefined) {
                     if (json.length > 0) {
@@ -399,7 +410,7 @@ export class IdentityNowClient {
             headers: headers
         }).then(async function (response) {
             if (response.status === 200) {
-                let json = await response.json();
+                let json: any = await response.json();
 
                 if (json !== undefined) {
                     if (json.length > 0) {
@@ -446,7 +457,7 @@ export class IdentityNowClient {
         if (!req.ok) {
             throw new Error(req.statusText);
         }
-        const res = await req.json();
+        const res: any = await req.json();
         const jobId = res.jobId;
         console.log('< startExportJob. jobId =', jobId);
         return jobId;
@@ -586,15 +597,15 @@ export class IdentityNowClient {
             body: JSON.stringify(payload)
         });
 
-        if (!resp.ok) {  
+        if (!resp.ok) {
             if (resp.status === 500) {
-                const details = await resp.json();
+                const details: any = await resp.json();
                 const detail = details?.messages[0]?.text || resp.statusText;
                 throw new Error(detail);
             }
             throw new Error(resp.statusText);
         }
-        const jsonBody = await resp.json();
+        const jsonBody: any = await resp.json();
         console.log('< validateConnectorRule', jsonBody);
         return jsonBody;
     }
