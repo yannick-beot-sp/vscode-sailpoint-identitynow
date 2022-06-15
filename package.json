@@ -54,6 +54,8 @@
 		"onCommand:vscode-sailpoint-identitynow.new-connector-rule",
 		"onCommand:vscode-sailpoint-identitynow.connector-rule.upload",
 		"onCommand:vscode-sailpoint-identitynow.connector-rule.validate",
+		"onCommand:vscode-sailpoint-identitynow.connector-rule.export-script.editor",
+		"onCommand:vscode-sailpoint-identitynow.connector-rule.export-script.view",
 		"onFileSystem:idn"
 	],
 	"license": "MIT",
@@ -188,6 +190,14 @@
 			{
 				"command": "vscode-sailpoint-identitynow.connector-rule.validate",
 				"title": "IdentityNow: Validate this code..."
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.connector-rule.export-script.editor",
+				"title": "IdentityNow: Export the script from this rule..."
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.connector-rule.export-script.view",
+				"title": "Export the script..."
 			}
 		],
 		"menus": {
@@ -387,6 +397,10 @@
 				{
 					"command": "vscode-sailpoint-identitynow.remove-resource",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rule"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.connector-rule.export-script.view",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rule"
 				}
 			],
 			"editor/context": [
@@ -399,6 +413,10 @@
 				},
 				{
 					"command": "vscode-sailpoint-identitynow.connector-rule.validate"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.connector-rule.export-script.editor",
+					"when": "resourcePath =~ /idn://.*/connector-rules/.*/"
 				}
 			]
 		},

@@ -105,6 +105,47 @@ export class ConnectorRuleCommand {
         }
     }
 
+    async newRule(tenant: RulesTreeItem): Promise<void> {
+
+        console.log("> NewConnectorRuleCommand.newRule", tenant);
+
+        // assessing that item is a TenantTreeItem
+        if (tenant === undefined || !(tenant instanceof RulesTreeItem)) {
+            console.log("WARNING: NewConnectorRuleCommand.newRule: invalid node", tenant);
+            throw new Error("NewConnectorRuleCommand.newRule: invalid node");
+        }
+        const tenantName = tenant.tenantName || "";
+        if (isEmpty(tenantName)) {
+            return;
+        }
+        let ruleName = await this.askRuleName() || "";
+        if (isEmpty(ruleName)) {
+            return;
+        }
+
+        const rule = await this.askRuleType();
+        if (!rule) {
+            return;
+        }
+
+        await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: 'Creating File...',
+            cancellable: false
+        }, async (task, token) => {
+
+            const newUri = getResourceUri(tenantName, 'connector-rules', NEW_ID, ruleName, true);
+            let document = await vscode.workspace.openTextDocument(newUri);
+            document = await vscode.languages.setTextDocumentLanguage(document, 'json');
+            await vscode.window.showTextDocument(document, { preview: true });
+
+            const edit = new vscode.WorkspaceEdit();
+            rule.name = ruleName;
+            const strContent = JSON.stringify(rule, null, 4);
+            edit.insert(newUri, new vscode.Position(0, 0), strContent);
+            let success = await vscode.workspace.applyEdit(edit);
+        });
+    }
 
     private async chooseExistingRule(client: IdentityNowClient): Promise<ConnectorRule | undefined> {
         const rules = await client.getConnectorRules();
@@ -177,47 +218,5 @@ export class ConnectorRuleCommand {
 
     private async askRuleType(): Promise<ConnectorRule | undefined> {
         return await this.showPickRule(rules, 'Connector rule type');
-    }
-
-    async execute(tenant: RulesTreeItem): Promise<void> {
-
-        console.log("> NewConnectorRuleCommand.execute", tenant);
-
-        // assessing that item is a TenantTreeItem
-        if (tenant === undefined || !(tenant instanceof RulesTreeItem)) {
-            console.log("WARNING: NewConnectorRuleCommand.execute: invalid node", tenant);
-            throw new Error("NewConnectorRuleCommand.execute: invalid node");
-        }
-        const tenantName = tenant.tenantName || "";
-        if (isEmpty(tenantName)) {
-            return;
-        }
-        let ruleName = await this.askRuleName() || "";
-        if (isEmpty(ruleName)) {
-            return;
-        }
-
-        const rule = await this.askRuleType();
-        if (!rule) {
-            return;
-        }
-
-        await vscode.window.withProgress({
-            location: vscode.ProgressLocation.Notification,
-            title: 'Creating File...',
-            cancellable: false
-        }, async (task, token) => {
-
-            const newUri = getResourceUri(tenantName, 'connector-rules', NEW_ID, ruleName, true);
-            let document = await vscode.workspace.openTextDocument(newUri);
-            document = await vscode.languages.setTextDocumentLanguage(document, 'json');
-            await vscode.window.showTextDocument(document, { preview: true });
-
-            const edit = new vscode.WorkspaceEdit();
-            rule.name = ruleName;
-            const strContent = JSON.stringify(rule, null, 4);
-            edit.insert(newUri, new vscode.Position(0, 0), strContent);
-            let success = await vscode.workspace.applyEdit(edit);
-        });
     }
 }

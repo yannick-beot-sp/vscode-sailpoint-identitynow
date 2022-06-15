@@ -6,7 +6,7 @@ import { delay, toDateSuffix } from '../utils';
 import * as fs from 'fs';
 import path = require('path');
 import { TenantService } from '../services/TenantService';
-import { chooseTenant } from '../utils/vsCodeHelpers';
+import { chooseTenant, confirmFileOverwrite } from '../utils/vsCodeHelpers';
 
 
 
@@ -112,14 +112,9 @@ async function exportConfig(tenantName: string): Promise<void> {
             console.log("< exportConfig: no file");
             return;
         }
-
-        if (fs.existsSync(exportFile)) {
-            const answer = await vscode.window.showQuickPick(["No", "Yes"], { placeHolder: `The file already exists, do you want to overwrite it?` });
-            if (answer === undefined || answer === "No") {
-                console.log("< exportConfig: do not overwrite file");
-                return;
-            }
-            fs.unlinkSync(exportFile);
+        const overwrite = await confirmFileOverwrite(exportFile);
+        if (!overwrite) {
+            return;
         }
     } else {
         exportFolder = await vscode.window.showInputBox({

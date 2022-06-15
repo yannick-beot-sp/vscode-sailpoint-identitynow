@@ -567,6 +567,11 @@ export class IdentityNowClient {
         return rules;
     }
 
+    public async getConnectorRuleById(id: string): Promise<ConnectorRule| undefined> {
+        const rule = await this.getResource('/beta/connector-rules/' + id);
+        return rule;
+    }
+
     /**
      * At this moment, it is not possible to get a rule by filtering on the name
      * The filtering must be done client-side

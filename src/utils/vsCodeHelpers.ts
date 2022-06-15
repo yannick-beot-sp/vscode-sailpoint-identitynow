@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { TenantService } from "../services/TenantService";
-
+import * as fs from 'fs';
 
 export async function chooseTenant(tenantService: TenantService, title: string): Promise<string | undefined> {
 	console.log("> chooseTenant");
@@ -44,4 +44,21 @@ export function getFullDocumentRange(editor: vscode.TextEditor): vscode.Selectio
 	}
 
 	return new vscode.Selection(0, 0, 0, 0);
+}
+
+/**
+ * If the file already exists, request confirmation to overwrite the content of the file. It actually deletes it.
+ * @returns true if user is OK for overwriting
+ */
+export async function confirmFileOverwrite(exportFile: string): Promise<boolean> {
+	if (fs.existsSync(exportFile)) {
+		const answer = await vscode.window.showQuickPick(["No", "Yes"], { placeHolder: 'The file already exists, do you want to overwrite it?' });
+		if (answer === undefined || answer === "No") {
+			console.log("< confirmFileOverwrite: do not overwrite file");
+			return false;
+		}
+		fs.unlinkSync(exportFile);
+	}
+	console.log("< confirmFileOverwrite: overwrite file");
+	return true;
 }
