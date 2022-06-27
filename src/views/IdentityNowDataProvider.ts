@@ -1,13 +1,13 @@
 import { EventEmitter, ExtensionContext, TreeDataProvider, TreeItem, Event, TreeItemCollapsibleState, ThemeIcon } from 'vscode';
-import { ProvisioningPoliciesTreeItem, ProvisioningPolicyTreeItem, SchemasTreeItem, SchemaTreeItem, SourcesTreeItem, SourceTreeItem, TenantTreeItem, TransformsTreeItem, TransformTreeItem, WorkflowsTreeItem, WorkflowTreeItem } from '../models/IdentityNowTreeItem';
+import { BaseTreeItem, TenantTreeItem } from '../models/IdentityNowTreeItem';
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { TenantService } from '../services/TenantService';
 import { getIdByUri, getPathByUri, getResourceUri } from '../utils/UriUtils';
 
-export class IdentityNowDataProvider implements TreeDataProvider<TreeItem> {
+export class IdentityNowDataProvider implements TreeDataProvider<BaseTreeItem> {
 
-    private _onDidChangeTreeData: EventEmitter<TreeItem | undefined | null | void> = new EventEmitter<TreeItem | undefined | null | void>();
-    readonly onDidChangeTreeData?: Event<TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
+    private _onDidChangeTreeData: EventEmitter<BaseTreeItem | undefined | null | void> = new EventEmitter<BaseTreeItem | undefined | null | void>();
+    readonly onDidChangeTreeData?: Event<BaseTreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
     constructor(private readonly context: ExtensionContext,
         private readonly tenantService: TenantService) {
@@ -18,110 +18,32 @@ export class IdentityNowDataProvider implements TreeDataProvider<TreeItem> {
         this._onDidChangeTreeData.fire();
     }
 
-    async getChildren(item?: TreeItem): Promise<TreeItem[]> {
+    async getChildren(item?: BaseTreeItem): Promise<BaseTreeItem[]> {
         console.log("> getChildren", item);
-        const results: TreeItem[] = [];
         if (item === undefined) {
+            const results: BaseTreeItem[] = [];
             const tenants = this.tenantService.getTenants().sort();
             if (tenants !== undefined && tenants instanceof Array) {
                 for (let tenantName of tenants) {
                     results.push(new TenantTreeItem(tenantName, this.context));
                 }
             }
-        } else if (item instanceof TenantTreeItem) {
-            results.push(new SourcesTreeItem(item.tenantName));
-            results.push(new TransformsTreeItem(item.tenantName));
-            results.push(new WorkflowsTreeItem(item.tenantName));
-        } else if (item instanceof SourcesTreeItem) {
-            const client = new IdentityNowClient(item.tenantName);
-            const sources = await client.getSources();
-            if (sources !== undefined && sources instanceof Array) {
-                for (let source of sources) {
-                    results.push(new SourceTreeItem(item.tenantName, source.name, source.id, source.connectorAttributes.cloudExternalId, this.context));
-                }
-            }
-        } else if (item instanceof TransformsTreeItem) {
-            const client = new IdentityNowClient(item.tenantName);
-            const transforms = await client.getTransforms();
-            if (transforms !== undefined && transforms instanceof Array) {
-                transforms.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1);
-                for (let index = 0; index < transforms.length; index++) {
-                    const element = transforms[index];
-                    results.push(new TransformTreeItem(item.tenantName, element.name, element.id, this.context));
-                }
-            }
-        } else if (item instanceof SourceTreeItem) {
-            results.push(new SchemasTreeItem(item.tenantName, item.uri));
-            results.push(new ProvisioningPoliciesTreeItem(item.tenantName, item.uri));
-        } else if (item instanceof SchemasTreeItem) {
-            const client = new IdentityNowClient(item.tenantName);
-            const schemaPath = getPathByUri(item.parentUri) + '/schemas';
-            const schemas = await client.getResource(schemaPath);
-            if (schemas !== undefined && schemas instanceof Array) {
-                schemas.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1);
-                for (let index = 0; index < schemas.length; index++) {
-                    const element = schemas[index];
-                    results.push(
-                        new SchemaTreeItem(
-                            item.tenantName,
-                            element.name,
-                            getIdByUri(item.parentUri) || "",
-                            element.id)
-                    );
-                }
-            }
-        } else if (item instanceof ProvisioningPoliciesTreeItem) {
-            const client = new IdentityNowClient(item.tenantName);
-            const provisioningPoliciesPath = getPathByUri(item.parentUri) + '/provisioning-policies';
-            const provisioningPolicies = await client.getResource(provisioningPoliciesPath);
-            if (provisioningPolicies !== undefined && provisioningPolicies instanceof Array) {
-                provisioningPolicies.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1);
-                for (let index = 0; index < provisioningPolicies.length; index++) {
-                    const element = provisioningPolicies[index];
-                    results.push(
-                        new ProvisioningPolicyTreeItem(
-                            item.tenantName,
-                            element.name,
-                            getIdByUri(item.parentUri) || "",
-                            element.usageType,
-                            this.context)
-                    );
-                }
-            }
-        } else if (item instanceof WorkflowsTreeItem) {
-            const client = new IdentityNowClient(item.tenantName);
-            const workflows = await client.getWorflows();
-            const workflowTreeItems = workflows.map(w=>new WorkflowTreeItem(item.tenantName, w.name, w.id, w.enabled, this.context));
-            results.push(...workflowTreeItems);
+            console.log("< getChildren", results);
+            return results;
+        } else if (item.collapsibleState === TreeItemCollapsibleState.None) {
+            console.log("< getChildren []");
+            return [];
+        } else {
+            const results = await item.getChildren();
+            console.log("< getChildren", results);
+            return results;
         }
-        console.log("< getChildren", results);
-        return results;
     }
 
-    getTreeItem(item: TreeItem): TreeItem {
-        if (item.contextValue === "sources"
-            || item.contextValue === "transforms"
-            || item.contextValue === "schemas"
-            || item.contextValue === "provisioning-policies"
-            || item.contextValue === "workflows") {
-            // Manage folder icon for sources & transforms
-            if (item.collapsibleState === TreeItemCollapsibleState.Expanded) {
-                item.iconPath = new ThemeIcon('folder-opened');
-            } else {
-                item.iconPath = new ThemeIcon('folder');
-            }
-        } else if (item.contextValue === "enabledWorkflow") {
-            item.iconPath = {
-                light: this.context.asAbsolutePath('resources/light/workflow-enabled.svg'),
-                dark: this.context.asAbsolutePath('resources/dark/workflow-enabled.svg')
-            };
-        } else if (item.contextValue === "disabledWorkflow") {
-            item.iconPath = {
-                light: this.context.asAbsolutePath('resources/light/workflow-disabled.svg'),
-                dark: this.context.asAbsolutePath('resources/dark/workflow-disabled.svg')
-            };
-        }
-        // Otherwise, already TreeItem, so simply return the item as is
+    getTreeItem(item: BaseTreeItem): TreeItem {
+        console.log("> getTreeItem", item);
+        item.updateIcon(this.context);
+        console.log("after update", item);
         return item;
     }
 }

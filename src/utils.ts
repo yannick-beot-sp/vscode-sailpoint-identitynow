@@ -44,3 +44,5 @@ export function convertToText(data:any):string {
     }
     return '';
 }
+
+export const compareByName = (a:any, b:any) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1;

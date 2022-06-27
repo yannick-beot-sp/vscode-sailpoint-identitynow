@@ -3,10 +3,11 @@ import { authentication } from "vscode";
 import { EndpointUtils } from "../utils/EndpointUtils";
 import { SailPointIdentityNowAuthenticationProvider } from "./AuthenticationProvider";
 import 'isomorphic-fetch';
-import 'isomorphic-form-data';
+const FormData = require('form-data');
 import { withQuery } from "../utils/UriUtils";
 import { Workflow, WorkflowExecution } from "../models/workflow";
-import { convertToText } from '../utils';
+import { compareByName, convertToText } from '../utils';
+import { ConnectorRule, ValidationResult } from '../models/connectorRule';
 
 export class IdentityNowClient {
 
@@ -94,7 +95,13 @@ export class IdentityNowClient {
         }
         const res = await req.json();
 
-        return res;
+
+        if (!res || !(res instanceof Array) || res.length !== 1) {
+            console.log("getTransformByName returns ", res);
+            throw new Error('Could not find transform "' + name + '"');
+        }
+        // returning only one transform
+        return res[0];
     }
 
     public async createResource(path: string, data: string): Promise<any> {
@@ -102,24 +109,24 @@ export class IdentityNowClient {
         const endpoint = EndpointUtils.getBaseUrl(this.tenantName) + path;
         console.log('endpoint = ' + endpoint);
         const headers = await this.prepareHeaders();
-        const req = await fetch(endpoint, {
+        const resp = await fetch(endpoint, {
             method: 'POST',
             headers: headers,
             body: data
         });
 
-        if (!req.ok) {
-            if (req.status === 404) {
+        if (!resp.ok) {
+            if (resp.status === 404) {
                 return null;
             }
-            if (req.status === 400) {
-                const details = await req.json();
-                const detail = details?.messages[0]?.text || req.statusText;
+            if (resp.status === 400) {
+                const details: any = await resp.json();
+                const detail = details?.messages[0]?.text || resp.statusText;
                 throw new Error(detail);
             }
-            throw new Error(req.statusText);
+            throw new Error(resp.statusText);
         }
-        const res = await req.json();
+        const res = await resp.json();
         console.log('< IdentityNowClient.createResource', res);
         return res;
     }
@@ -129,21 +136,21 @@ export class IdentityNowClient {
         const endpoint = EndpointUtils.getBaseUrl(this.tenantName) + path;
         console.log('endpoint = ' + endpoint);
         const headers = await this.prepareHeaders();
-        const req = await fetch(endpoint, {
+        const resp = await fetch(endpoint, {
             method: 'DELETE',
             headers: headers
         });
 
-        if (!req.ok) {
-            if (req.status === 404) {
+        if (!resp.ok) {
+            if (resp.status === 404) {
                 throw new Error("Resource not found");
             }
-            if (req.status === 400) {
-                const details = await req.json();
-                const detail = details?.messages[0]?.text || req.statusText;
+            if (resp.status === 400) {
+                const details: any = await resp.json();
+                const detail = details?.messages[0]?.text || resp.statusText;
                 throw new Error(detail);
             }
-            throw new Error(req.statusText);
+            throw new Error(resp.statusText);
         }
 
         console.log('< IdentityNowClient.deleteResource');
@@ -154,24 +161,24 @@ export class IdentityNowClient {
         const endpoint = EndpointUtils.getBaseUrl(this.tenantName) + path;
         console.log('endpoint = ' + endpoint);
         const headers = await this.prepareHeaders();
-        const req = await fetch(endpoint, {
+        const resp = await fetch(endpoint, {
             method: 'PUT',
             headers: headers,
             body: data
         });
 
-        if (!req.ok) {
-            if (req.status === 404) {
+        if (!resp.ok) {
+            if (resp.status === 404) {
                 return null;
             }
-            if (req.status === 400) {
-                const details = await req.json();
-                const detail = details?.messages[0]?.text || req.statusText;
+            if (resp.status === 400) {
+                const details: any = await resp.json();
+                const detail = details?.messages[0]?.text || resp.statusText;
                 throw new Error(detail);
             }
-            throw new Error(req.statusText);
+            throw new Error(resp.statusText);
         }
-        const res = await req.json();
+        const res = await resp.json();
 
         return res;
     }
@@ -193,7 +200,7 @@ export class IdentityNowClient {
                 return null;
             }
             if (req.status === 400) {
-                const details = await req.json();
+                const details: any = await req.json();
                 const detail = details?.messages[0]?.text || req.statusText;
                 throw new Error(detail);
             }
@@ -215,13 +222,24 @@ export class IdentityNowClient {
     }
 
     public async startAggregation(sourceID: Number, disableOptimization = false): Promise<any> {
+        console.log('> IdentityNowClient.startAggregation');
         const endpoint = EndpointUtils.getCCUrl(this.tenantName) + '/source/loadAccounts/' + sourceID;
-        const headers = await this.prepareHeaders();
+        // const endpoint = 'https://webhook.site/9bd2674b-2c53-4cd0-8b04-bfd2571b8678';
+        console.log('endpoint = ' + endpoint);
+        let headers = await this.prepareHeaders();
 
         var formData = new FormData();
         if (disableOptimization) {
+            console.log('disableOptimization = true');
             formData.append('disableOptimization', 'true');
         }
+        const formHeaders = formData.getHeaders();
+        headers = {
+            ...formHeaders,
+            ...headers
+        };
+
+
         const req = await fetch(endpoint, {
             method: 'POST',
             headers: headers,
@@ -247,7 +265,7 @@ export class IdentityNowClient {
         if (!req.ok) {
             let detail = req.statusText;
             if (req.status === 400) {
-                const res = await req.json();
+                const res: any = await req.json();
                 detail = res.exception_message;
             }
             throw new Error("Could not reset source: " + detail);
@@ -275,7 +293,7 @@ export class IdentityNowClient {
         if (!req.ok) {
             throw new Error("Could not start aggregation:" + req.statusText);
         }
-        const tasks = await req.json();
+        const tasks: any = await req.json();
         if (tasks && tasks.items && tasks.items instanceof Array) {
             for (let index = 0; index < tasks.items.length; index++) {
                 const task = tasks.items[index];
@@ -306,9 +324,9 @@ export class IdentityNowClient {
         const headers = await this.prepareHeaders();
         let sourceId = await fetch(endpoint, {
             headers: headers
-        }).then(async function(response) {
+        }).then(async function (response) {
             if (response.status === 200) {
-                let json = await response.json();
+                let json: any = await response.json();
 
                 if (json !== undefined) {
                     if (json.length > 0) {
@@ -326,13 +344,13 @@ export class IdentityNowClient {
                 vscode.window.showErrorMessage(`${endpoint} --> ${response.statusText}`);
                 return;
             }
-        }).catch(function(error) {
+        }).catch(function (error) {
             console.log(error);
         });
- 
+
         return sourceId;
     }
-    
+
     public async getIdentity(identityNameOrId: string): Promise<any> {
         console.log('> getIdentity', identityNameOrId);
         let endpoint = EndpointUtils.getV3Url(this.tenantName) + '/search';
@@ -353,32 +371,32 @@ export class IdentityNowClient {
                 ]
             }
         };
-        
+
         let identity = await fetch(endpoint, {
             headers: headers,
             method: 'POST',
             body: convertToText(data)
-        }).then(async function(response) {
+        }).then(async function (response) {
             if (response.status === 200) {
-                let json = await response.json();
+                let json: any = await response.json();
 
                 if (json !== undefined) {
                     if (json.length > 0) {
                         return json[0];
                     }
-                } 
+                }
             } else {
                 console.error(response.statusText);
                 vscode.window.showErrorMessage(`${endpoint} --> ${response.statusText}`);
                 return;
             }
-        }).catch(function(error) {
+        }).catch(function (error) {
             console.log(error);
         });
 
         if (identity !== undefined) {
             return identity;
-        }        
+        }
     }
 
     public async getAccount(nativeIdentity: string, sourceId: string): Promise<any> {
@@ -387,24 +405,24 @@ export class IdentityNowClient {
         console.log('endpoint = ' + endpoint);
 
         const headers = await this.prepareHeaders();
-        
+
         let account = await fetch(endpoint, {
             headers: headers
-        }).then(async function(response) {
+        }).then(async function (response) {
             if (response.status === 200) {
-                let json = await response.json();
+                let json: any = await response.json();
 
                 if (json !== undefined) {
                     if (json.length > 0) {
                         return json[0];
                     }
-                } 
+                }
             } else {
                 console.error(response.statusText);
                 vscode.window.showErrorMessage(`${endpoint} --> ${response.statusText}`);
                 return;
             }
-        }).catch(function(error) {
+        }).catch(function (error) {
             console.log(error);
         });
 
@@ -439,7 +457,7 @@ export class IdentityNowClient {
         if (!req.ok) {
             throw new Error(req.statusText);
         }
-        const res = await req.json();
+        const res: any = await req.json();
         const jobId = res.jobId;
         console.log('< startExportJob. jobId =', jobId);
         return jobId;
@@ -500,12 +518,12 @@ export class IdentityNowClient {
         console.log("path =", path);
         return await this.getResource(path);
     }
-/**
- * cf. https://developer.sailpoint.com/apis/beta/#operation/getWorkflowExecution
- * @param workflowExecutionId 
- * @returns 
- */
-    public async getWorkflowExecution(workflowExecutionId:string): Promise<WorkflowExecution> {
+    /**
+     * cf. https://developer.sailpoint.com/apis/beta/#operation/getWorkflowExecution
+     * @param workflowExecutionId 
+     * @returns 
+     */
+    public async getWorkflowExecution(workflowExecutionId: string): Promise<WorkflowExecution> {
         console.log('> getWorkflowExecution', workflowExecutionId);
         const path = `/beta/workflow-executions/${workflowExecutionId}`;
         console.log("path =", path);
@@ -517,7 +535,7 @@ export class IdentityNowClient {
         if (workflows === undefined || !Array.isArray(workflows)) {
             return [];
         }
-        workflows.sort((a:Workflow, b:Workflow) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1);
+        workflows.sort(compareByName);
         return workflows;
     }
 
@@ -529,18 +547,74 @@ export class IdentityNowClient {
         return workflowTriggers;
     }
 
-    public async testWorkflow(workflowId:string, payload:any): Promise<string> {
+    public async testWorkflow(workflowId: string, payload: any): Promise<string> {
         console.log('> testWorkflow', workflowId, payload);
         const path = `/beta/workflows/${workflowId}/test`;
-        
+
         const workflowExecutionDetail = await this.createResource(path, JSON.stringify({
             input: payload
         }));
-        
+
         return workflowExecutionDetail.workflowExecutionId;
     }
 
-    
+    public async getConnectorRules(): Promise<ConnectorRule[]> {
+        const rules = await this.getResource('/beta/connector-rules');
+        if (rules === undefined || !Array.isArray(rules)) {
+            return [];
+        }
+        rules.sort(compareByName);
+        return rules;
+    }
+
+    public async getConnectorRuleById(id: string): Promise<ConnectorRule| undefined> {
+        const rule = await this.getResource('/beta/connector-rules/' + id);
+        return rule;
+    }
+
+    /**
+     * At this moment, it is not possible to get a rule by filtering on the name
+     * The filtering must be done client-side
+     * @param name 
+     * @returns 
+     */
+    public async getConnectorRuleByName(name: string): Promise<ConnectorRule | undefined> {
+        console.log('> getConnectorRuleByName', name);
+        const rules = await this.getConnectorRules();
+        return rules.find(r => r.name === name);
+    }
+
+
+    public async validateConnectorRule(script: string): Promise<ValidationResult> {
+        console.log('> validateConnectorRule', script);
+
+        const payload = {
+            "version": "1.0",
+            script
+        };
+
+        const endpoint = EndpointUtils.getBetaUrl(this.tenantName) + '/connector-rules/validate';
+        console.log('endpoint = ' + endpoint);
+        const headers = await this.prepareHeaders();
+        const resp = await fetch(endpoint, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(payload)
+        });
+
+        if (!resp.ok) {
+            if (resp.status === 500) {
+                const details: any = await resp.json();
+                const detail = details?.messages[0]?.text || resp.statusText;
+                throw new Error(detail);
+            }
+            throw new Error(resp.statusText);
+        }
+        const jsonBody: any = await resp.json();
+        console.log('< validateConnectorRule', jsonBody);
+        return jsonBody;
+    }
+
 
 }
 

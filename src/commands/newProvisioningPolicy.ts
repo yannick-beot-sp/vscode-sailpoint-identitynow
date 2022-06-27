@@ -13,13 +13,24 @@ async function askProvisioningPolicyName(): Promise<string | undefined> {
         placeHolder: 'Provisioning Policy name',
         prompt: "Enter the provisioning policy name",
         title: 'IdentityNow',
-        validateInput: text => {
-            const regex = new RegExp('^[a-z]+$', 'i');
+        validateInput: text =>
+        {
+            if (text && text.length > 50) {
+                return "Provisioning Policy name cannot exceed 50 characters.";
+            }
+
+            if (text === '') {
+                return "You must provide a Provisioning Policy name.";
+            }
+
+            // '+' removed from allowed character as known issue during search/filter of transform 
+            // If search/filter is failing, the transform is not properly closed and reopened
+            const regex = new RegExp('^[a-z0-9 _:;,={}@()#-|^%$!?.*]{1,50}$', 'i');
             if (regex.test(text)) {
                 return null;
             }
             return "Invalid Provisioning Policy name";
-        }
+        } 
     });
     return result;
 }
@@ -50,7 +61,7 @@ export async function newProvisioningPolicy(treeItem: ProvisioningPoliciesTreeIt
         cancellable: false
     }, async (task, token) => {
 
-        let newUri = treeItem.parentUri.with({
+        let newUri = treeItem.parentUri?.with({
             path: path.posix.join(
                 getPathByUri(treeItem.parentUri) || "",
                 'provisioning-policies',
@@ -58,6 +69,7 @@ export async function newProvisioningPolicy(treeItem: ProvisioningPoliciesTreeIt
                 'CREATE'
             )
         });
+        if (!newUri) { return; }
         const data = {
             "name": provisioningPolicyName,
             "description": null,
@@ -68,7 +80,7 @@ export async function newProvisioningPolicy(treeItem: ProvisioningPoliciesTreeIt
             newUri,
             str2Uint8Array(JSON.stringify(data))
         );
-        newUri = treeItem.parentUri.with({
+        newUri = treeItem.parentUri?.with({
             path: path.posix.join(
                 getPathByUri(treeItem.parentUri) || "",
                 'provisioning-policies',
@@ -76,6 +88,7 @@ export async function newProvisioningPolicy(treeItem: ProvisioningPoliciesTreeIt
                 provisioningPolicyName
             )
         });
+        if (!newUri) { return; }
         let document = await vscode.workspace.openTextDocument(newUri);
         document = await vscode.languages.setTextDocumentLanguage(document, 'json');
 

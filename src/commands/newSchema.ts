@@ -52,7 +52,7 @@ export async function newSchema(treeItem: SchemasTreeItem): Promise<void> {
         cancellable: false
     }, async (task, token) => {
 
-        const newUri = treeItem.parentUri.with({
+        const newUri = treeItem.parentUri?.with({
             path: path.posix.join(
                 getPathByUri(treeItem.parentUri) || "",
                 'schemas',
@@ -61,6 +61,7 @@ export async function newSchema(treeItem: SchemasTreeItem): Promise<void> {
             )
         });
         console.log('newSchema: newUri =', newUri);
+        if (!newUri) { return; }
         let document = await vscode.workspace.openTextDocument(newUri);
         // const untitled = vscode.Uri.parse(newUri).with({ scheme: 'untitled' });
         // let document = await vscode.workspace.openTextDocument(untitled);

@@ -51,6 +51,11 @@
 		"onView:vscode-sailpoint-identitynow.workflow.test-view",
 		"onCommand:vscode-sailpoint-identitynow.transform.evaluate",
 		"onCommand:vscode-sailpoint-identitynow.transform.evaluate.editor",
+		"onCommand:vscode-sailpoint-identitynow.new-connector-rule",
+		"onCommand:vscode-sailpoint-identitynow.connector-rule.upload",
+		"onCommand:vscode-sailpoint-identitynow.connector-rule.validate",
+		"onCommand:vscode-sailpoint-identitynow.connector-rule.export-script.editor",
+		"onCommand:vscode-sailpoint-identitynow.connector-rule.export-script.view",
 		"onFileSystem:idn"
 	],
 	"license": "MIT",
@@ -172,6 +177,27 @@
 			{
 				"command": "vscode-sailpoint-identitynow.transform.evaluate.editor",
 				"title": "Evaluate this transform..."
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.new-connector-rule",
+				"title": "New connector rule",
+				"icon": "$(add)"
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.connector-rule.upload",
+				"title": "IdentityNow: Upload this code to a rule..."
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.connector-rule.validate",
+				"title": "IdentityNow: Validate this code..."
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.connector-rule.export-script.editor",
+				"title": "IdentityNow: Export the script from this rule..."
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.connector-rule.export-script.view",
+				"title": "Export the script..."
 			}
 		],
 		"menus": {
@@ -353,12 +379,44 @@
 				{
 					"command": "vscode-sailpoint-identitynow.transform.evaluate",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == transform"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.new-connector-rule",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rules",
+					"group": "inline@1"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.refresh",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rules",
+					"group": "inline@2"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.open-resource",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rule"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.remove-resource",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rule"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.connector-rule.export-script.view",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rule"
 				}
 			],
 			"editor/context": [
 				{
 					"command": "vscode-sailpoint-identitynow.transform.evaluate.editor",
 					"when": "resourcePath =~ /transforms/"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.connector-rule.upload"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.connector-rule.validate"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.connector-rule.export-script.editor",
+					"when": "resourcePath =~ /idn://.*/connector-rules/.*/"
 				}
 			]
 		},
@@ -395,6 +453,7 @@
 	"devDependencies": {
 		"@types/glob": "^7.2.0",
 		"@types/isomorphic-fetch": "^0.0.35",
+		"@types/isomorphic-form-data": "^2.0.0",
 		"@types/mocha": "^9.0.0",
 		"@types/node": "14.x",
 		"@types/vscode": "^1.63.0",

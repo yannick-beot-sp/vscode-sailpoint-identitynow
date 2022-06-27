@@ -21,6 +21,8 @@ import { viewWorkflowExecutionHistory } from './commands/viewWorkflowExecutionHi
 import { WorkflowTesterWebviewViewProvider } from './views/WorkflowTesterWebviewViewProvider';
 import { TestWorkflowCommand } from './commands/testWorkflow';
 import { TransformEvaluator } from './services/TransformEvaluator';
+import { ConnectorRuleCommand } from './commands/connectorRuleCommand';
+import { exportScriptEditor, exportScriptView } from './commands/exportScriptFromRule';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -133,6 +135,24 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.TEST_WORKFLOW,
 			testWorkflowCommand.execute, testWorkflowCommand));
 
+	const newConnectorRuleCommand = new ConnectorRuleCommand(tenantService);
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_CONNECTOR_RULE,
+			newConnectorRuleCommand.newRule, newConnectorRuleCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.UPLOAD_CONNECTOR_RULE,
+			newConnectorRuleCommand.upload, newConnectorRuleCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.VALIDATE_CONNECTOR_RULE,
+			newConnectorRuleCommand.validateScript, newConnectorRuleCommand));
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_CONNECTOR_RULE_SCRIPT_EDITOR,
+			exportScriptEditor));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_CONNECTOR_RULE_SCRIPT_VIEW,
+			exportScriptView));
 	vscode.workspace.onDidSaveTextDocument(onFileSaved);
 }
 
