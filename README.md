@@ -37,7 +37,7 @@ Or, from the **Command Palette**, find the command "IdentityNow: Export config..
 
 ![Export config](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/export-config.gif)
 
-## Workflow management
+## Rule management
 
 The extension allows you to manage rules and upload the script to a new or existing rule:
 
