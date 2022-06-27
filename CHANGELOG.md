@@ -5,6 +5,9 @@ All notable changes to the "vscode-sailpoint-identitynow" extension will be docu
 This changelog is following the recommended format by [keepachangelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
+
+## [0.0.9] - 2022/06/27
+
 ### Added
 - Support for connector rules: creation, deletion, update, export, import
 

@@ -123,6 +123,11 @@ None
 
 ## Release Notes
 
+### 0.0.9
+
+- Support for connector rules: creation, deletion, update, export, import
+- Aggregation without optimization was not working properly
+
 ### 0.0.8
 
 Transforms for ever!
