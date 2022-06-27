@@ -22,3 +22,10 @@ To create the tag:
 git tag releases/v0.0.3
 git push origin --tags
 ```
+
+== Remove a tag locally and remotely
+
+```
+git tag -d releases/v0.0.3
+git push --delete origin releases/v0.0.3
+```
