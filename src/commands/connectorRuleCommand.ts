@@ -7,6 +7,7 @@ import { TenantService } from '../services/TenantService';
 import { compareByName, isEmpty } from '../utils';
 import { getResourceUri } from '../utils/UriUtils';
 import { chooseTenant, getSelectionContent } from '../utils/vsCodeHelpers';
+import * as commands from './constants';
 const rules: ConnectorRule[] = require('../../snippets/connector-rules.json');
 
 /**
@@ -67,13 +68,16 @@ export class ConnectorRuleCommand {
                 return;
             }
             rule.sourceCode.script = selection;
+            rule.name = ruleName;
             const data = await client.createResource('/beta/connector-rules', JSON.stringify(rule));
             newUri = getResourceUri(tenantName, 'connector-rules', data.id, data.name, true);
         }
         // Open document and then show document to force JSON
         let document = await vscode.workspace.openTextDocument(newUri);
         document = await vscode.languages.setTextDocumentLanguage(document, 'json');
-        await vscode.window.showTextDocument(document, { preview: false, preserveFocus: true });
+        vscode.window.showTextDocument(document, { preview: false, preserveFocus: true });
+        const rulesNode = new RulesTreeItem(tenantName);
+        vscode.commands.executeCommand(commands.REFRESH, rulesNode);
 
     }
 

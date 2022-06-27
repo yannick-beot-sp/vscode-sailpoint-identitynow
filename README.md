@@ -12,6 +12,7 @@ The SailPoint IdentityNow extension makes it easy to:
 - View, create, edit, delete provisioning policies of a source
 - View, create, edit, delete schemas of a source
 - View, edit, enable, disable, and test workflows and view execution history
+- View, create, edit, delete connector rules and export/import the script of a rule
 
 ## Installation
 
@@ -35,6 +36,12 @@ In the SailPoint view, right-click on a tenant to export config.
 Or, from the **Command Palette**, find the command "IdentityNow: Export config...".
 
 ![Export config](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/export-config.gif)
+
+## Workflow management
+
+The extension allows you to manage rules and upload the script to a new or existing rule:
+
+![Export config](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/rules-management.gif)
 
 ## Workflow management
 
