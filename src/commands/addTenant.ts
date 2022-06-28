@@ -3,6 +3,7 @@ import * as commands from './constants';
 import { SailPointIdentityNowAuthenticationProvider } from '../services/AuthenticationProvider';
 import { TenantService } from '../services/TenantService';
 import { isEmpty } from '../utils';
+import { askDisplayName } from '../utils/vsCodeHelpers';
 
 
 export class AddTenantCommand {
@@ -28,22 +29,6 @@ export class AddTenantCommand {
         return result;
     }
 
-    async askDisplayName(tenantName: string): Promise<string | undefined> {
-        const result = await vscode.window.showInputBox({
-            value: tenantName,
-            ignoreFocusOut: true,
-            placeHolder: 'company',
-            prompt: "Enter a display name for this tenant",
-            title: 'IdentityNow',
-            validateInput: text => {
-                if (isEmpty(text)) {
-                    return "Display name must not be empty";
-                }
-            }
-        });
-        return result;
-    }
-
 
     async execute(context: vscode.ExtensionContext): Promise<void> {
 
@@ -52,22 +37,32 @@ export class AddTenantCommand {
             return;
         }
 
-        const displayName = await this.askDisplayName(tenantName) || "";
+        let displayName = await askDisplayName(tenantName) || "";
+        displayName = displayName.trim();
         if (isEmpty(displayName)) {
             return;
         }
 
         tenantName = tenantName.toLowerCase();
-        const tenantId = require('crypto').randomUUID().replaceAll('-','');
-        const session = await vscode.authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [tenantId], { createIfNone: true });
-        if (!isEmpty(session.accessToken)) {
-            vscode.window.showInformationMessage(`Tenant ${tenantName} added!`);
-            this.tenantService.setTenant({
-                id: tenantId,
-                name: displayName,
-                tenantName: tenantName
-            });
-            vscode.commands.executeCommand(commands.REFRESH);
+        const tenantId = require('crypto').randomUUID().replaceAll('-', '');
+        this.tenantService.setTenant({
+            id: tenantId,
+            name: displayName,
+            tenantName: tenantName
+        });
+        let session: vscode.AuthenticationSession;
+        try {
+            session = await vscode.authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [tenantId], { createIfNone: true });
+            if (session !== undefined && !isEmpty(session.accessToken)) {
+                await vscode.commands.executeCommand(commands.REFRESH);
+                await vscode.window.showInformationMessage(`Tenant ${displayName} added!`);
+            } else {
+                this.tenantService.removeTenant(tenantId);
+            }
+        } catch (err: any) {
+            console.error(err);
+            this.tenantService.removeTenant(tenantId);
+            vscode.window.showErrorMessage(err.message);
         }
     }
 }

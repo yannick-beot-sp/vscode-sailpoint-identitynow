@@ -31,7 +31,7 @@ export class TenantTreeItem extends BaseTreeItem {
         public readonly tenantName: string
     ) {
         super(tenantLabel, TreeItemCollapsibleState.Collapsed);
-
+        this.tooltip = tenantName;
     }
     iconPath = new ThemeIcon('organization');
     contextValue = 'tenant';

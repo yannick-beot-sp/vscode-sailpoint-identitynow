@@ -3,6 +3,7 @@ import { TenantService } from "../services/TenantService";
 import * as fs from 'fs';
 import { TenantInfo } from "../models/TenantInfo";
 import { TenantInfoQuickPickItem } from "../models/TenantInfoQuickPickItem";
+import { isEmpty } from "../utils";
 
 export async function chooseTenant(tenantService: TenantService, title: string): Promise<TenantInfo | undefined> {
 	console.log("> chooseTenant");
@@ -74,4 +75,21 @@ export async function confirmFileOverwrite(exportFile: string): Promise<boolean>
 	}
 	console.log("< confirmFileOverwrite: overwrite file");
 	return true;
+}
+
+
+export async function askDisplayName(tenantName: string): Promise<string | undefined> {
+	const result = await vscode.window.showInputBox({
+		value: tenantName,
+		ignoreFocusOut: true,
+		placeHolder: 'company',
+		prompt: "Enter a display name for this tenant",
+		title: 'IdentityNow',
+		validateInput: text => {
+			if (isEmpty(text) || isEmpty(text.trim()) ) {
+				return "Display name must not be empty";
+			}
+		}
+	});
+	return result;
 }
