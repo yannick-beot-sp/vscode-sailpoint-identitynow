@@ -128,7 +128,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
         }
         for (let index = 0; index < _scopes.length; index++) {
             const tenantId = _scopes[index];
-            const session: SailPointIdentityNowPatSession | null = await this.getSessionByTenant(tenantId);
+            const session = await this.getSessionByTenant(tenantId);
             if (session !== null) {
                 result.push(session);
             }

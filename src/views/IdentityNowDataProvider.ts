@@ -1,8 +1,6 @@
-import { EventEmitter, ExtensionContext, TreeDataProvider, TreeItem, Event, TreeItemCollapsibleState, ThemeIcon } from 'vscode';
+import { EventEmitter, ExtensionContext, TreeDataProvider, TreeItem, Event, TreeItemCollapsibleState } from 'vscode';
 import { BaseTreeItem, TenantTreeItem } from '../models/IdentityNowTreeItem';
-import { IdentityNowClient } from '../services/IdentityNowClient';
 import { TenantService } from '../services/TenantService';
-import { getIdByUri, getPathByUri, getResourceUri } from '../utils/UriUtils';
 
 export class IdentityNowDataProvider implements TreeDataProvider<BaseTreeItem> {
 

@@ -24,14 +24,14 @@ export async function deleteResource(node?: IdentityNowResourceTreeItem): Promis
         return;
     }
 
-    const client = new IdentityNowClient(node.tenantName);
+    const client = new IdentityNowClient(node.tenantId,  node.tenantName);
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: `Deleting ${node.contextValue}...`,
         cancellable: false
     }, async (task, token) => {
         await client.deleteResource(getPathByUri(node.uri) || "");
-        const transformsNode = new TransformsTreeItem(node.uri.authority);
+        const transformsNode = new TransformsTreeItem(node.tenantId,  node.tenantName);
         await vscode.commands.executeCommand(commands.REFRESH, transformsNode);
     });
     await vscode.window.showInformationMessage(`Successfully deleted ${node.contextValue} ${node.label}`);

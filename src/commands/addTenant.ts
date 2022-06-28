@@ -52,18 +52,18 @@ export class AddTenantCommand {
             return;
         }
 
-        let displayName = await this.askDisplayName(tenantName) || "";
+        const displayName = await this.askDisplayName(tenantName) || "";
         if (isEmpty(displayName)) {
             return;
         }
 
         tenantName = tenantName.toLowerCase();
-
-        const session = await vscode.authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [tenantName], { createIfNone: true });
+        const tenantId = require('crypto').randomUUID().replaceAll('-','');
+        const session = await vscode.authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [tenantId], { createIfNone: true });
         if (!isEmpty(session.accessToken)) {
             vscode.window.showInformationMessage(`Tenant ${tenantName} added!`);
             this.tenantService.setTenant({
-                id: require('crypto').randomUUID(),
+                id: tenantId,
                 name: displayName,
                 tenantName: tenantName
             });

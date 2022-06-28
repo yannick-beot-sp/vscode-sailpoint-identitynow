@@ -36,13 +36,24 @@ export class TenantService {
         }
 
         // As not all tenantInfo will have an id, changing the id/key in the storages
-        if (tenantInfo && !tenantInfo?.id) {
-            tenantInfo.id = require('crypto').randomUUID();
-            await this.copySecrets(key, tenantInfo.id);
+        if (tenantInfo && !tenantInfo.id) {
+            tenantInfo.id = require('crypto').randomUUID().replaceAll('-','');
+            await this.copySecrets(tenantInfo.name, tenantInfo.id);
             await this.removeTenant(key);
             this.setTenant(tenantInfo);
         }
         return tenantInfo;
+    }
+
+    public async getTenantByTenantName(tenantName: string): Promise<TenantInfo | undefined> {
+        let tenants = await this.getTenants();
+        tenants = tenants.filter(t => t.tenantName === tenantName);
+        if (tenants.length === 0) {
+            return undefined;
+        } else if (tenants.length === 1) {
+            return tenants[0];
+        }
+        throw new Error("More than 1 tenant found for " + tenantName);
     }
 
     public setTenant(value: TenantInfo) {

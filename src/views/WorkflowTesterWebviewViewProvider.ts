@@ -66,12 +66,13 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
             switch (command) {
                 case 'getWorkflows':
                     {
-                        this.showWorkflow(data.tenant);
+                        this.showWorkflow(data.tenantId);
                         break;
                     }
                 case 'getWorkflowTriggers':
                     {
-                        const client = new IdentityNowClient(data.tenant);
+                        const tenantInfo = await this._tenantService.getTenant(data.tenantId);
+                        const client = new IdentityNowClient(data.tenantId, tenantInfo?.tenantName ?? "");
                         const workflowTriggers = await client.getWorflowTriggers();
 
                         if (this._view) {
@@ -87,7 +88,8 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
                     }
                 case 'testWorkflow':
                     {
-                        const client = new IdentityNowClient(data.tenant);
+                        const tenantInfo = await this._tenantService.getTenant(data.tenantId);
+                        const client = new IdentityNowClient(data.tenantId, tenantInfo?.tenantName ?? "");
                         await vscode.window.withProgress({
                             location: vscode.ProgressLocation.Notification,
                             title: `Testing workflow ${data.workflowName}...`,
@@ -121,11 +123,12 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
         });
     }
 
-    public async showWorkflow(tenantName: string, workflowId?: string) {
+    public async showWorkflow(tenantId: string, workflowId?: string) {
 
         if (this._view) {
             this._view.show?.(true);
-            const client = new IdentityNowClient(tenantName);
+            const tenantInfo = await this._tenantService.getTenant(tenantId);
+            const client = new IdentityNowClient(tenantId, tenantInfo?.tenantName ?? "");
 
             const workflows = await client.getWorflows();
             // subset of info from workflows
@@ -137,7 +140,7 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
             }));
 
             const payload: any = {
-                tenant: tenantName,
+                tenantId: tenantId,
                 workflows: workflowModels
             };
             if (workflowId) {

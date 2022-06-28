@@ -2,7 +2,6 @@ import * as vscode from "vscode";
 import { TenantService } from "../services/TenantService";
 import * as fs from 'fs';
 import { TenantInfo } from "../models/TenantInfo";
-import { compareByName } from "../utils";
 import { TenantInfoQuickPickItem } from "../models/TenantInfoQuickPickItem";
 
 export async function chooseTenant(tenantService: TenantService, title: string): Promise<TenantInfo | undefined> {

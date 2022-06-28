@@ -11,7 +11,10 @@ import { ConnectorRule, ValidationResult } from '../models/connectorRule';
 
 export class IdentityNowClient {
 
-    constructor(private readonly tenantName: string) { };
+    constructor(
+        private readonly tenantId: string,
+        private readonly tenantName: string
+        ) { };
 
     public async getSources(): Promise<any> {
         console.log('> getSources');
@@ -212,7 +215,7 @@ export class IdentityNowClient {
     }
 
     private async prepareHeaders(): Promise<any> {
-        const session = await authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [this.tenantName]);
+        const session = await authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [this.tenantId]);
         return {
             // eslint-disable-next-line @typescript-eslint/naming-convention
             "Authorization": `Bearer ${session?.accessToken}`,

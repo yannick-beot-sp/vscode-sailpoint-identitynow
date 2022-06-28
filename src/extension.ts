@@ -4,7 +4,6 @@ import * as vscode from 'vscode';
 import * as commands from './commands/constants';
 import { AddTenantCommand } from './commands/addTenant';
 import { NewTransformCommand } from './commands/newTransform';
-import { onFileSaved } from './commands/onFileSave';
 import { OpenResourceCommand } from './commands/openResource';
 import { IdentityNowResourceProvider } from './files/IdentityNowResourceProvider';
 import { SailPointIdentityNowAuthenticationProvider } from './services/AuthenticationProvider';
@@ -22,7 +21,8 @@ import { WorkflowTesterWebviewViewProvider } from './views/WorkflowTesterWebview
 import { TestWorkflowCommand } from './commands/testWorkflow';
 import { TransformEvaluator } from './services/TransformEvaluator';
 import { ConnectorRuleCommand } from './commands/connectorRuleCommand';
-import { exportScriptEditor, exportScriptView } from './commands/exportScriptFromRule';
+import { ExportScriptFromRuleCommand } from './commands/exportScriptFromRuleCommand';
+import { FileHandler } from './files/FileHandler';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -112,7 +112,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.workspace.registerFileSystemProvider(
 			URL_PREFIX,
-			new IdentityNowResourceProvider()
+			new IdentityNowResourceProvider(tenantService)
 		));
 
 	const newTransformCommand = new NewTransformCommand();
@@ -147,13 +147,17 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.VALIDATE_CONNECTOR_RULE,
 			newConnectorRuleCommand.validateScript, newConnectorRuleCommand));
 
+	const exportScriptFromRuleCommand = new ExportScriptFromRuleCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_CONNECTOR_RULE_SCRIPT_EDITOR,
-			exportScriptEditor));
+			exportScriptFromRuleCommand.exportScriptEditor, exportScriptFromRuleCommand));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_CONNECTOR_RULE_SCRIPT_VIEW,
-			exportScriptView));
-	vscode.workspace.onDidSaveTextDocument(onFileSaved);
+			exportScriptFromRuleCommand.exportScriptView, exportScriptFromRuleCommand));
+
+
+	const fileHandler = new FileHandler(tenantService);
+	vscode.workspace.onDidSaveTextDocument(fileHandler.onFileSaved, fileHandler);
 }
 
 // this method is called when your extension is deactivated

@@ -43,7 +43,7 @@ export class ConnectorRuleCommand {
         if (!tenantInfo) {
             return;
         }
-        const client = new IdentityNowClient(tenantInfo.tenantName);
+        const client = new IdentityNowClient(tenantInfo.id, tenantInfo.tenantName);
         let newUri: vscode.Uri;
         if (answer === UPDATE_RULE) {
 
@@ -76,7 +76,7 @@ export class ConnectorRuleCommand {
         let document = await vscode.workspace.openTextDocument(newUri);
         document = await vscode.languages.setTextDocumentLanguage(document, 'json');
         vscode.window.showTextDocument(document, { preview: false, preserveFocus: true });
-        const rulesNode = new RulesTreeItem(tenantInfo.tenantName);
+        const rulesNode = new RulesTreeItem(tenantInfo.id, tenantInfo.tenantName);
         vscode.commands.executeCommand(commands.REFRESH, rulesNode);
 
     }
@@ -97,13 +97,13 @@ export class ConnectorRuleCommand {
         if (!tenantInfo) {
             return;
         }
-        const client = new IdentityNowClient(tenantInfo.tenantName);
+        const client = new IdentityNowClient(tenantInfo.id, tenantInfo.tenantName);
         const res = await client.validateConnectorRule(selection);
 
         if (res.state === "OK") {
             await vscode.window.showInformationMessage('The script is valid');
         } else {
-            let  message = "Could not validate script. ";
+            let message = "Could not validate script. ";
             message += res.details?.map(detail => `${detail.line}:${detail.column}: ${detail.messsage}`).join('\n') ?? "";
             await vscode.window.showErrorMessage(message);
         }

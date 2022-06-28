@@ -1,12 +1,8 @@
 import * as vscode from 'vscode';
-import * as commands from './constants';
-import { WorkflowsTreeItem, WorkflowTreeItem } from '../models/IdentityNowTreeItem';
+import { WorkflowTreeItem } from '../models/IdentityNowTreeItem';
 import { IdentityNowClient } from '../services/IdentityNowClient';
-import { getPathByUri, getWorkflowExecutionDetailUri } from '../utils/UriUtils';
+import { getWorkflowExecutionDetailUri } from '../utils/UriUtils';
 import { WorkflowExecution } from '../models/workflow';
-
-
-
 
 export async function viewWorkflowExecutionHistory(node: WorkflowTreeItem): Promise<void> {
 
@@ -16,7 +12,7 @@ export async function viewWorkflowExecutionHistory(node: WorkflowTreeItem): Prom
         console.log("WARNING: viewWorkflowExecutionHistory: invalid item", node);
         throw new Error("viewWorkflowExecutionHistory: invalid item");
     }
-    const client = new IdentityNowClient(node.tenantName);
+    const client = new IdentityNowClient(node.tenantId, node.tenantName);
 
     let history = await vscode.window.withProgress<WorkflowExecution[]>({
         location: vscode.ProgressLocation.Notification,

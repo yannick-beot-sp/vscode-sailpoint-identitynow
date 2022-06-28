@@ -26,10 +26,10 @@
     setVSCodeMessageListener();
 
     // on load, check if there is only one value/tenant. Load workflows if tenant already selected
-    const tenant = tenantDropDown.value;
+    const tenantId = tenantDropDown.value;
     if (tenant) {
-        vscode.postMessage({ command: 'getWorkflows', tenant: tenant });
-        vscode.postMessage({ command: 'getWorkflowTriggers', tenant: tenant });
+        vscode.postMessage({ command: 'getWorkflows', tenantId: tenantId });
+        vscode.postMessage({ command: 'getWorkflowTriggers', tenantId: tenantId });
     }
 
     /**
@@ -72,7 +72,7 @@
     function onButtonSubmit(event) {
         vscode.postMessage({
             command: 'testWorkflow',
-            tenant: tenantDropDown.value,
+            tenantId: tenantIdDropDown.value,
             workflowId: workflowDropDown.value,
             workflowName: workflowDropDown.selectedOptions[0].text,
             payload: payloadTextarea.value
@@ -86,8 +86,8 @@
     function onTenantDropDownChange(event) {
         var tenant = event.target.value;
         if (tenant) {
-            vscode.postMessage({ command: 'getWorkflows', tenant: tenant });
-            vscode.postMessage({ command: 'getWorkflowTriggers', tenant: tenant });
+            vscode.postMessage({ command: 'getWorkflows', tenantId: tenantId });
+            vscode.postMessage({ command: 'getWorkflowTriggers', tenantId: tenantId });
         } else {
             workflowDropDown.disabled = true;
         }
@@ -125,12 +125,12 @@
         if (tenantDropDown.value !== payload.tenant) {
             console.log('setWorkflowDropDownValues: updating tenant dropdown');
             tenantDropDown.options.forEach(opt => {
-                if (opt.value === payload.tenant) { opt.selected = true; }
+                if (opt.value === payload.tenantId) { opt.selected = true; }
             });
             // need to refresh triggers if not the same tenant, just in case
-            vscode.postMessage({ command: 'getWorkflowTriggers', tenant: payload.tenant });
+            vscode.postMessage({ command: 'getWorkflowTriggers', tenantId: payload.tenantId });
         } else if (triggers.length < 1) {
-            vscode.postMessage({ command: 'getWorkflowTriggers', tenant: payload.tenant });
+            vscode.postMessage({ command: 'getWorkflowTriggers', tenantId: payload.tenantId });
         }
 
         for (var o of document.querySelectorAll(`#${WORKFLOW_DROPDOWN_ID} > option`)) {
