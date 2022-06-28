@@ -149,7 +149,8 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
                 token = await this.createAccessToken(tenantId, credentials.clientId, credentials.clientSecret);
             }
             console.log("< getSessionByTenant for", tenantId);
-            return new SailPointIdentityNowPatSession(tenantId,
+            const tenantInfo = await this.tenantService.getTenant(tenantId);
+            return new SailPointIdentityNowPatSession(tenantInfo?.name ?? "",
                 credentials.clientId,
                 token.accessToken,
                 this.getSessionId(tenantId)

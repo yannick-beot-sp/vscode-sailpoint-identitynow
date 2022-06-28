@@ -37,9 +37,7 @@ export class TenantService {
 
         // As not all tenantInfo will have an id, changing the id/key in the storages
         if (tenantInfo && !tenantInfo.id) {
-            tenantInfo.id = require('crypto').randomUUID().replaceAll('-','');
-            await this.copySecrets(tenantInfo.name, tenantInfo.id);
-            await this.removeTenant(key);
+            tenantInfo.id = tenantInfo.tenantName;
             this.setTenant(tenantInfo);
         }
         return tenantInfo;
@@ -172,16 +170,4 @@ export class TenantService {
             await this.secretStorage.delete(key);
         }
     }
-
-    private async copySecrets(from: string, to: string) {
-        const token = await this.getTenantAccessToken(from);
-        if (token !== undefined) {
-            await this.setTenantAccessToken(to, token);
-        }
-        const cred = await this.getTenantCredentials(from);
-        if (cred !== undefined) {
-            await this.setTenantCredentials(to, cred);
-        }
-    }
-
 }
