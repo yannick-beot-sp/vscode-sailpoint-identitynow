@@ -151,7 +151,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
             }
             console.log("< getSessionByTenant for", tenantId);
             
-            return new SailPointIdentityNowPatSession(tenantInfo?.name ?? "",
+            return new SailPointIdentityNowPatSession(tenantInfo?.tenantName ?? "",
                 credentials.clientId,
                 token.accessToken,
                 this.getSessionId(tenantId)
@@ -198,7 +198,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
             });
         
         return new SailPointIdentityNowPatSession(
-            tenantInfo?.name ?? "",
+            tenantInfo?.tenantName ?? "",
             clientId,
             token.accessToken,
             this.getSessionId(tenantId));

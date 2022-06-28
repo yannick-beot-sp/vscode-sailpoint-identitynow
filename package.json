@@ -33,6 +33,7 @@
 		"onView:vscode-sailpoint-identitynow.view",
 		"onCommand:vscode-sailpoint-identitynow.add-tenant",
 		"onCommand:vscode-sailpoint-identitynow.remove-tenant",
+		"onCommand:vscode-sailpoint-identitynow.rename-tenant",
 		"onCommand:vscode-sailpoint-identitynow.export-config.view",
 		"onCommand:vscode-sailpoint-identitynow.export-config.palette",
 		"onCommand:vscode-sailpoint-identitynow.refresh",
@@ -99,6 +100,10 @@
 			{
 				"command": "vscode-sailpoint-identitynow.remove-tenant",
 				"title": "Remove tenant"
+			},
+			{
+				"command": "vscode-sailpoint-identitynow.rename-tenant",
+				"title": "Rename tenant"
 			},
 			{
 				"command": "vscode-sailpoint-identitynow.export-config.view",
@@ -274,6 +279,10 @@
 			"view/item/context": [
 				{
 					"command": "vscode-sailpoint-identitynow.remove-tenant",
+					"when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
+				},
+				{
+					"command": "vscode-sailpoint-identitynow.rename-tenant",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
 				},
 				{

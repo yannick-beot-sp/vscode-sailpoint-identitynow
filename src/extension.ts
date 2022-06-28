@@ -23,6 +23,7 @@ import { TransformEvaluator } from './services/TransformEvaluator';
 import { ConnectorRuleCommand } from './commands/connectorRuleCommand';
 import { ExportScriptFromRuleCommand } from './commands/exportScriptFromRuleCommand';
 import { FileHandler } from './files/FileHandler';
+import { RenameTenantCommand } from './commands/renameTenant';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -53,6 +54,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.ADD_TENANT, addTenantCommand.execute,
 			addTenantCommand));
+	const renameTenantCommand = new RenameTenantCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.RENAME_TENANT, renameTenantCommand.execute,
+			renameTenantCommand));
 
 	const identityNowDataProvider = new IdentityNowDataProvider(context, tenantService);
 	vscode.window.registerTreeDataProvider(commands.TREE_VIEW, identityNowDataProvider);
