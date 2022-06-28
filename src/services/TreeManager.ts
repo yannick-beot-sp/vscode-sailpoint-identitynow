@@ -42,10 +42,9 @@ export class TreeManager {
         } catch(err) {
             console.error("Session for ", tenantName, "does not exist:", err);
         }
-        this.authProvider.removePat(tenantName);
-        this.tenantService.removeTenant(tenantName);
-        await vscode.commands.executeCommand(commands.REFRESH);
-        await vscode.window.showInformationMessage(`Successfully deleted tenant ${tenantName}`);
+        await this.tenantService.removeTenant(tenantName);
+        vscode.commands.executeCommand(commands.REFRESH);
+        vscode.window.showInformationMessage(`Successfully deleted tenant ${tenantName}`);
     }
 
     public async aggregateSource(item: SourceTreeItem, disableOptimization = false): Promise<void> {

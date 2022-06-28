@@ -8,9 +8,6 @@ import path = require('path');
 import { TenantService } from '../services/TenantService';
 import { chooseTenant, confirmFileOverwrite } from '../utils/vsCodeHelpers';
 
-
-
-
 const objectTypeItems = [
     {
         "objectType": "SOURCE",
@@ -68,12 +65,12 @@ export class ExportConfigPalette {
 
     async execute() {
         console.log("> exportConfigPalette.execute");
-        const tenantName = await chooseTenant(this.tenantService, 'From which tenant do you want to export the config?');
-        console.log("exportConfigPalette: tenant = ", tenantName);
-        if (!tenantName) {
+        const tenantInfo = await chooseTenant(this.tenantService, 'From which tenant do you want to export the config?');
+        console.log("exportConfigPalette: tenant = ", tenantInfo);
+        if (!tenantInfo) {
             return;
         }
-        exportConfig(tenantName as string);
+        exportConfig(tenantInfo.tenantName);
     }
 }
 

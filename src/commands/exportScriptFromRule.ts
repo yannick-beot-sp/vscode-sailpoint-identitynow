@@ -1,28 +1,11 @@
 import * as vscode from 'vscode';
-import { RuleTreeItem, TenantTreeItem } from '../models/IdentityNowTreeItem';
+import { RuleTreeItem } from '../models/IdentityNowTreeItem';
 import { IdentityNowClient } from '../services/IdentityNowClient';
-import { ObjectTypeItem } from '../models/ConfigQuickPickItem';
-import { delay, toDateSuffix } from '../utils';
+import { toDateSuffix } from '../utils';
 import * as fs from 'fs';
 import path = require('path');
-import { TenantService } from '../services/TenantService';
-import { chooseTenant, confirmFileOverwrite } from '../utils/vsCodeHelpers';
+import { confirmFileOverwrite } from '../utils/vsCodeHelpers';
 import { getIdByUri, getNameByUri } from '../utils/UriUtils';
-
-
-
-
-
-const exportTypeItems = [
-    {
-        "label": "Single file",
-        "description": "Download a single JSON file containing all exported objects"
-    },
-    {
-        "label": "Multiple files",
-        "description": "Save objects as separate JSON file on the filesystem"
-    }
-];
 
 export async function exportScriptView(node?: RuleTreeItem): Promise<void> {
 
@@ -69,7 +52,7 @@ function buildProposedFilePath(tenantName: string, ruleName: string): string {
 
 
 async function chooseFileForExport(proposedFile: string): Promise<string | undefined> {
-
+    console.log("> chooseFileForExport: " + proposedFile);
     let exportFile: string | undefined = undefined;
 
     exportFile = await vscode.window.showInputBox({
@@ -88,8 +71,7 @@ async function chooseFileForExport(proposedFile: string): Promise<string | undef
 }
 
 async function exportScript(tenantName: string, ruleName: string, ruleId: string): Promise<void> {
-
-    console.log(`exportScript: tenantName=${tenantName}, ruleName=${ruleName}, ruleId=${ruleId}`);
+    console.log(`> exportScript: tenantName=${tenantName}, ruleName=${ruleName}, ruleId=${ruleId}`);
     let exportFile: string | undefined = buildProposedFilePath(tenantName, ruleName);
     exportFile = await chooseFileForExport(exportFile);
     if (!exportFile) {
@@ -122,6 +104,4 @@ async function exportScript(tenantName: string, ruleName: string, ruleId: string
         await vscode.window.showTextDocument(document, { preview: true });
         vscode.window.showInformationMessage(`Successfully exported script from rule ${ruleName}`);
     });
-
-
 }

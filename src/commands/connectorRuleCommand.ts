@@ -38,12 +38,12 @@ export class ConnectorRuleCommand {
         if (!answer) {
             return;
         }
-        const tenantName = await chooseTenant(this.tenantService, 'Choose a tenant to update the rule');
-        console.log("upload: tenant = ", tenantName);
-        if (!tenantName) {
+        const tenantInfo = await chooseTenant(this.tenantService, 'Choose a tenant to update the rule');
+        console.log("upload: tenant = ", tenantInfo);
+        if (!tenantInfo) {
             return;
         }
-        const client = new IdentityNowClient(tenantName);
+        const client = new IdentityNowClient(tenantInfo.tenantName);
         let newUri: vscode.Uri;
         if (answer === UPDATE_RULE) {
 
@@ -55,7 +55,7 @@ export class ConnectorRuleCommand {
             rule.sourceCode.script = selection;
             const path = '/beta/connector-rules/' + rule.id;
             client.updateResource(path, JSON.stringify(rule));
-            newUri = getResourceUri(tenantName, 'connector-rules', rule.id, rule.name, true);
+            newUri = getResourceUri(tenantInfo.tenantName, 'connector-rules', rule.id, rule.name, true);
         } else {
             // NEW_RULE
             let ruleName = await this.askRuleName() || "";
@@ -70,13 +70,13 @@ export class ConnectorRuleCommand {
             rule.sourceCode.script = selection;
             rule.name = ruleName;
             const data = await client.createResource('/beta/connector-rules', JSON.stringify(rule));
-            newUri = getResourceUri(tenantName, 'connector-rules', data.id, data.name, true);
+            newUri = getResourceUri(tenantInfo.tenantName, 'connector-rules', data.id, data.name, true);
         }
         // Open document and then show document to force JSON
         let document = await vscode.workspace.openTextDocument(newUri);
         document = await vscode.languages.setTextDocumentLanguage(document, 'json');
         vscode.window.showTextDocument(document, { preview: false, preserveFocus: true });
-        const rulesNode = new RulesTreeItem(tenantName);
+        const rulesNode = new RulesTreeItem(tenantInfo.tenantName);
         vscode.commands.executeCommand(commands.REFRESH, rulesNode);
 
     }
@@ -92,12 +92,12 @@ export class ConnectorRuleCommand {
         if (!selection) {
             return;
         }
-        const tenantName = await chooseTenant(this.tenantService, 'Choose a tenant to validate the script');
-        console.log("validateScript: tenant = ", tenantName);
-        if (!tenantName) {
+        const tenantInfo = await chooseTenant(this.tenantService, 'Choose a tenant to validate the script');
+        console.log("validateScript: tenant = ", tenantInfo);
+        if (!tenantInfo) {
             return;
         }
-        const client = new IdentityNowClient(tenantName);
+        const client = new IdentityNowClient(tenantInfo.tenantName);
         const res = await client.validateConnectorRule(selection);
 
         if (res.state === "OK") {

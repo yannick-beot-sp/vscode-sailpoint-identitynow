@@ -21,13 +21,12 @@ export class IdentityNowDataProvider implements TreeDataProvider<BaseTreeItem> {
     async getChildren(item?: BaseTreeItem): Promise<BaseTreeItem[]> {
         console.log("> getChildren", item);
         if (item === undefined) {
-            const results: BaseTreeItem[] = [];
-            const tenants = this.tenantService.getTenants().sort();
-            if (tenants !== undefined && tenants instanceof Array) {
-                for (let tenantName of tenants) {
-                    results.push(new TenantTreeItem(tenantName, this.context));
-                }
-            }
+            const tenants = await this.tenantService.getTenants();
+            const results = tenants.map(tenant => new TenantTreeItem(
+                tenant.name,
+                tenant.id,
+                tenant.tenantName)
+            );
             console.log("< getChildren", results);
             return results;
         } else if (item.collapsibleState === TreeItemCollapsibleState.None) {

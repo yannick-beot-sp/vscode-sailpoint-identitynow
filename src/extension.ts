@@ -32,13 +32,13 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "vscode-sailpoint-identitynow" is now active!');
 
-	const tenantService = new TenantService(context.globalState);
+	const tenantService = new TenantService(context.globalState, context.secrets);
 
 	// Register our authentication provider. NOTE: this will register the provider globally which means that
 	// any other extension can use this provider via the `getSession` API.
 	// NOTE: when implementing an auth provider, don't forget to register an activation event for that provider
 	// in your package.json file: "onAuthenticationRequest:AzureDevOpsPAT"
-	const authProvider = new SailPointIdentityNowAuthenticationProvider(context.secrets, tenantService);
+	const authProvider = new SailPointIdentityNowAuthenticationProvider(tenantService);
 
 	context.subscriptions.push(vscode.authentication.registerAuthenticationProvider(
 		SailPointIdentityNowAuthenticationProvider.id,

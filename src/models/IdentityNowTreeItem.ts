@@ -26,10 +26,11 @@ export abstract class BaseTreeItem extends TreeItem {
  */
 export class TenantTreeItem extends BaseTreeItem {
     constructor(
-        public readonly tenantName: string,
-        context: ExtensionContext
+        tenantLabel: string,
+        public readonly tenantId: string,
+        public readonly tenantName: string
     ) {
-        super(tenantName, TreeItemCollapsibleState.Collapsed);
+        super(tenantLabel, TreeItemCollapsibleState.Collapsed);
 
     }
     iconPath = new ThemeIcon('organization');

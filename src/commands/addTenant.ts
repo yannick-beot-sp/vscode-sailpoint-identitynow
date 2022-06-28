@@ -28,6 +28,22 @@ export class AddTenantCommand {
         return result;
     }
 
+    async askDisplayName(tenantName: string): Promise<string | undefined> {
+        const result = await vscode.window.showInputBox({
+            value: tenantName,
+            ignoreFocusOut: true,
+            placeHolder: 'company',
+            prompt: "Enter a display name for this tenant",
+            title: 'IdentityNow',
+            validateInput: text => {
+                if (isEmpty(text)) {
+                    return "Display name must not be empty";
+                }
+            }
+        });
+        return result;
+    }
+
 
     async execute(context: vscode.ExtensionContext): Promise<void> {
 
@@ -35,12 +51,22 @@ export class AddTenantCommand {
         if (isEmpty(tenantName)) {
             return;
         }
+
+        let displayName = await this.askDisplayName(tenantName) || "";
+        if (isEmpty(displayName)) {
+            return;
+        }
+
         tenantName = tenantName.toLowerCase();
 
         const session = await vscode.authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [tenantName], { createIfNone: true });
         if (!isEmpty(session.accessToken)) {
             vscode.window.showInformationMessage(`Tenant ${tenantName} added!`);
-            this.tenantService.setTenant({ name: tenantName, apiUrl: '' });
+            this.tenantService.setTenant({
+                id: require('crypto').randomUUID(),
+                name: displayName,
+                tenantName: tenantName
+            });
             vscode.commands.executeCommand(commands.REFRESH);
         }
     }
