@@ -6,6 +6,12 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [0.0.11] - 2022/06/29
+- Can rename tenant display name (cf. [#12](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/12))
+
+## [0.0.10] - 2022/06/27
+- Release for documentation fix
+
 ## [0.0.9] - 2022/06/27
 
 ### Added
@@ -22,7 +28,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Fixed
 
-- #6 update regexp for transform names
+- [#6](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/6) update regexp for transform names
 
 ## [0.0.7] - 2022/04/28
 ### Added

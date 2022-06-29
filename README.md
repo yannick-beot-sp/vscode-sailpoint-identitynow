@@ -123,6 +123,10 @@ None
 
 ## Release Notes
 
+### 0.0.11
+
+- Can rename tenant display name (cf. [#12](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/12))
+
 ### 0.0.9
 
 - Support for connector rules: creation, deletion, update, export, import
@@ -133,7 +137,7 @@ None
 Transforms for ever!
 
 - New transforms (E.164 Phone, Random Alphanumeric Random Numeric,  Replace All, Rule, UUID Generator), cf. [#8](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/8)
-- #6 update regexp for transform names
+- [#6](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/6) update regexp for transform names
 
 ### 0.0.7
 
