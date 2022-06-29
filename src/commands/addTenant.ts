@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as commands from './constants';
 import { SailPointIdentityNowAuthenticationProvider } from '../services/AuthenticationProvider';
 import { TenantService } from '../services/TenantService';
-import { isEmpty } from '../utils';
+import { isEmpty, normalizeTenant } from '../utils';
 import { askDisplayName } from '../utils/vsCodeHelpers';
 
 
@@ -36,6 +36,13 @@ export class AddTenantCommand {
         if (isEmpty(tenantName)) {
             return;
         }
+        const normalizedTenantName = normalizeTenant(tenantName);
+        const tenantInfo = await this.tenantService.getTenantByTenantName(normalizedTenantName);
+        if (tenantInfo!==undefined) {
+            console.error("Tenant "+tenantName+ " already exists");
+            vscode.window.showErrorMessage("Tenant "+tenantName+ " already exists");
+            return;
+        }
 
         let displayName = await askDisplayName(tenantName) || "";
         displayName = displayName.trim();
@@ -43,12 +50,11 @@ export class AddTenantCommand {
             return;
         }
 
-        tenantName = tenantName.toLowerCase();
         const tenantId = require('crypto').randomUUID().replaceAll('-', '');
         this.tenantService.setTenant({
             id: tenantId,
             name: displayName,
-            tenantName: tenantName
+            tenantName: normalizedTenantName
         });
         let session: vscode.AuthenticationSession;
         try {

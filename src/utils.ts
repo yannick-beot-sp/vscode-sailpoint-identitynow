@@ -33,16 +33,30 @@ export function toTimestamp(strDate: string): number {
 export function toDateSuffix(): string {
     var date = new Date();
     let str = date.toISOString(); //"2011-12-19T15:28:46.493Z"
-    str= str.replaceAll(':','-');
-    str= str.replaceAll(/\..*/g,'');
+    str = str.replaceAll(':', '-');
+    str = str.replaceAll(/\..*/g, '');
     return str;
 }
 
-export function convertToText(data:any):string {
+export function convertToText(data: any): string {
     if (data) {
         return JSON.stringify(data, null, 4);
     }
     return '';
 }
 
-export const compareByName = (a:any, b:any) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1;
+/**
+ * Function used to compare 2 objects by the property 'name'. Useful for sorting most IDN objects
+ */
+export const compareByName = (a: any, b: any) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1;
+
+/**
+ * Use to get the full tenant name. The idea is to prevent the creation of the same tenant if already present
+ */
+export function normalizeTenant(tenantName: string) {
+    tenantName = tenantName.toLowerCase();
+    if (tenantName.indexOf(".") === -1) {
+        tenantName += ".identitynow.com";
+    }
+    return tenantName;
+}
