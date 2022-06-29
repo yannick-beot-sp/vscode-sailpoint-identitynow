@@ -28,7 +28,7 @@ async function updateWorkflowStatus(node: WorkflowTreeItem, enable: boolean): Pr
         console.log("WARNING: updateWorkflowStatus: invalid item", node);
         throw new Error("updateWorkflowStatus: invalid item");
     }
-    const client = new IdentityNowClient(node.tenantName);
+    const client = new IdentityNowClient(node.tenantId,node.tenantName);
     
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
@@ -36,8 +36,7 @@ async function updateWorkflowStatus(node: WorkflowTreeItem, enable: boolean): Pr
         cancellable: false
     }, async (task, token) => {
         await client.updateWorkflowStatus(getPathByUri(node.uri) || "", enable);
-        const workflowsNode = new WorkflowsTreeItem(node.uri.authority);
-        await vscode.commands.executeCommand(commands.REFRESH, workflowsNode);
+        await vscode.commands.executeCommand(commands.REFRESH, node);
     });
     console.log("< updateWorkflowStatus");
 }

@@ -1,24 +1,38 @@
 import * as vscode from "vscode";
 import { TenantService } from "../services/TenantService";
 import * as fs from 'fs';
+import { TenantInfo } from "../models/TenantInfo";
+import { TenantInfoQuickPickItem } from "../models/TenantInfoQuickPickItem";
+import { isEmpty } from "../utils";
 
-export async function chooseTenant(tenantService: TenantService, title: string): Promise<string | undefined> {
+export async function chooseTenant(tenantService: TenantService, title: string): Promise<TenantInfo | undefined> {
 	console.log("> chooseTenant");
-	const tenants = tenantService.getTenants().sort();
-	let tenantName: string | undefined = '';
+	const tenants = await tenantService.getTenants();
+	let tenantInfo: TenantInfo | undefined;
 	if (tenants.length < 1) {
-		return;
+		// Do nothting. tenantInfo = undefined
 	} else if (tenants.length === 1) {
-		tenantName = tenants[0];
+		tenantInfo = tenants[0];
 	} else {
-		tenantName = await vscode.window.showQuickPick(tenants, { placeHolder: title });
-		if (tenantName === undefined) {
-			console.log("chooseTenant: no tenant");
-			return undefined;
+		// Compute properties for QuickPickItem
+		const tenantQuickPickItems = tenants
+			.map(obj => ({ ...obj, label: obj?.name, detail: obj?.tenantName }));
+		const tenantQuickPickItem = await vscode.window.showQuickPick(tenantQuickPickItems as TenantInfoQuickPickItem[], {
+			ignoreFocusOut: false,
+			title: title,
+			canPickMany: false
+		});
+		if (tenantQuickPickItem !== undefined) {
+			// Remove uncessary QuickPickItem properties
+			// @ts-ignore
+			delete tenantQuickPickItem.label;
+			// @ts-ignore
+			delete tenantQuickPickItem.detail;
+			tenantInfo = tenantQuickPickItem;
 		}
 	}
-	console.log("<chooseTenant: tenant = ", tenantName);
-	return tenantName;
+	console.log("<chooseTenant: tenant = ", tenantInfo);
+	return tenantInfo;
 }
 
 export function getSelectionContent(editor: vscode.TextEditor): string | undefined {
@@ -61,4 +75,21 @@ export async function confirmFileOverwrite(exportFile: string): Promise<boolean>
 	}
 	console.log("< confirmFileOverwrite: overwrite file");
 	return true;
+}
+
+
+export async function askDisplayName(tenantName: string): Promise<string | undefined> {
+	const result = await vscode.window.showInputBox({
+		value: tenantName,
+		ignoreFocusOut: true,
+		placeHolder: 'company',
+		prompt: "Enter a display name for this tenant",
+		title: 'IdentityNow',
+		validateInput: text => {
+			if (isEmpty(text) || isEmpty(text.trim()) ) {
+				return "Display name must not be empty";
+			}
+		}
+	});
+	return result;
 }

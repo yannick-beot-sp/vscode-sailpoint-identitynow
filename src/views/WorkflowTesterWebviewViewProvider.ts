@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import * as commands from '../commands/constants';
-import { Workflow } from '../models/workflow';
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { TenantService } from '../services/TenantService';
 import { delay } from '../utils';
@@ -37,7 +36,7 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
                     */
     }
 
-    public resolveWebviewView(
+    public async resolveWebviewView(
         webviewView: vscode.WebviewView,
         context: vscode.WebviewViewResolveContext,
         token: vscode.CancellationToken,
@@ -53,7 +52,7 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
             ]
         };
 
-        webviewView.webview.html = this.getHtmlForWebview(webviewView.webview);
+        webviewView.webview.html = await this.getHtmlForWebview(webviewView.webview);
 
         // Sets up an event listener to listen for messages passed from the webview view context
         // and executes code based on the message that is recieved
@@ -67,12 +66,13 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
             switch (command) {
                 case 'getWorkflows':
                     {
-                        this.showWorkflow(data.tenant);
+                        this.showWorkflow(data.tenantId);
                         break;
                     }
                 case 'getWorkflowTriggers':
                     {
-                        const client = new IdentityNowClient(data.tenant);
+                        const tenantInfo = await this._tenantService.getTenant(data.tenantId);
+                        const client = new IdentityNowClient(data.tenantId, tenantInfo?.tenantName ?? "");
                         const workflowTriggers = await client.getWorflowTriggers();
 
                         if (this._view) {
@@ -88,7 +88,8 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
                     }
                 case 'testWorkflow':
                     {
-                        const client = new IdentityNowClient(data.tenant);
+                        const tenantInfo = await this._tenantService.getTenant(data.tenantId);
+                        const client = new IdentityNowClient(data.tenantId, tenantInfo?.tenantName ?? "");
                         await vscode.window.withProgress({
                             location: vscode.ProgressLocation.Notification,
                             title: `Testing workflow ${data.workflowName}...`,
@@ -122,11 +123,12 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
         });
     }
 
-    public async showWorkflow(tenantName: string, workflowId?: string) {
+    public async showWorkflow(tenantId: string, workflowId?: string) {
 
         if (this._view) {
             this._view.show?.(true);
-            const client = new IdentityNowClient(tenantName);
+            const tenantInfo = await this._tenantService.getTenant(tenantId);
+            const client = new IdentityNowClient(tenantId, tenantInfo?.tenantName ?? "");
 
             const workflows = await client.getWorflows();
             // subset of info from workflows
@@ -138,7 +140,7 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
             }));
 
             const payload: any = {
-                tenant: tenantName,
+                tenantId: tenantId,
                 workflows: workflowModels
             };
             if (workflowId) {
@@ -152,7 +154,7 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
         }
     }
 
-    private getHtmlForWebview(webview: vscode.Webview) {
+    private async getHtmlForWebview(webview: vscode.Webview) {
         // Get the local path to main script run in the webview, then convert it to a uri we can use in the webview.
         const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'views', 'workflow', 'main.js'));
         const toolkitUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri,
@@ -165,7 +167,7 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
         const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'views', 'workflow', 'main.css'));
 
 
-        const tenantNames = this._tenantService.getTenants();
+        const tenantNames = await this._tenantService.getTenants();
 
         let tenantOptions = '';
         if (tenantNames.length !== 1) {
@@ -173,7 +175,7 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
             tenantOptions = '<vscode-option value=""></vscode-option>';
         } else {
             for (const tenantName of tenantNames) {
-                tenantOptions += `<vscode-option value="${tenantName}">${tenantName}</vscode-option>`;
+                tenantOptions += `<vscode-option value="${tenantName.id}">${tenantName.name}</vscode-option>`;
             }
         }
         return `<!DOCTYPE html>

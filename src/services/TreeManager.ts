@@ -14,7 +14,7 @@ export class TreeManager {
         private readonly dataProvider: IdentityNowDataProvider,
         private readonly tenantService: TenantService,
         private readonly authProvider: SailPointIdentityNowAuthenticationProvider,
-        private readonly transformEvaluator : TransformEvaluator,
+        private readonly transformEvaluator: TransformEvaluator,
     ) { }
 
     public async removeTenant(item: TenantTreeItem): Promise<void> {
@@ -35,17 +35,16 @@ export class TreeManager {
             return;
         }
         try {
-            const session = await vscode.authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [tenantName], { createIfNone: false });
+            const session = await vscode.authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [item.tenantId], { createIfNone: false });
             if (session !== undefined) {
                 this.authProvider.removeSession(session.id);
             }
-        } catch(err) {
+        } catch (err) {
             console.error("Session for ", tenantName, "does not exist:", err);
         }
-        this.authProvider.removePat(tenantName);
-        this.tenantService.removeTenant(tenantName);
-        await vscode.commands.executeCommand(commands.REFRESH);
-        await vscode.window.showInformationMessage(`Successfully deleted tenant ${tenantName}`);
+        await this.tenantService.removeTenant(item.tenantId);
+        vscode.commands.executeCommand(commands.REFRESH);
+        vscode.window.showInformationMessage(`Successfully deleted tenant ${tenantName}`);
     }
 
     public async aggregateSource(item: SourceTreeItem, disableOptimization = false): Promise<void> {
@@ -55,7 +54,7 @@ export class TreeManager {
             console.log("WARNING: aggregateSource: invalid item", item);
             throw new Error("aggregateSource: invalid item");
         }
-        const client = new IdentityNowClient(item.tenantName);
+        const client = new IdentityNowClient(item.tenantId, item.tenantName);
         vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Aggregation of ${item.label}`,
@@ -103,7 +102,7 @@ export class TreeManager {
             return;
         }
 
-        const client = new IdentityNowClient(item.tenantName);
+        const client = new IdentityNowClient(item.tenantId, item.tenantName);
         vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Reset of ${item.label}`,

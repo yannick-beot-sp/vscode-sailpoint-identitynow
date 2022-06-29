@@ -3,11 +3,15 @@ import * as vscode from 'vscode';
 import { Disposable, Event, FileChangeEvent, FileStat, FileSystemProvider, FileType, Uri } from "vscode";
 import { NEW_ID } from '../constants';
 import { IdentityNowClient } from '../services/IdentityNowClient';
+import { TenantService } from '../services/TenantService';
 import { convertToText, str2Uint8Array, toTimestamp, uint8Array2Str } from '../utils';
-import { getIdByUri, getNameByUri, getPathByUri } from '../utils/UriUtils';
+import { getIdByUri, getPathByUri } from '../utils/UriUtils';
 
 export class IdentityNowResourceProvider implements FileSystemProvider {
     private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
+
+    constructor(private readonly tenantService: TenantService) { }
+
     onDidChangeFile: Event<FileChangeEvent[]> = this._emitter.event;
 
     watch(uri: Uri, options: { recursive: boolean; excludes: string[]; }): Disposable {
@@ -52,8 +56,8 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
             console.log('New file');
             return '';
         }
-
-        const client = new IdentityNowClient(tenantName);
+        const tenantInfo = await this.tenantService.getTenantByTenantName(tenantName);
+        const client = new IdentityNowClient(tenantInfo?.id ?? "", tenantName);
 
         const data = await client.getResource(resourcePath);
         if (!data) {
@@ -72,7 +76,8 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
         if (!resourcePath) {
             throw Error("Invalid uri:" + uri);
         }
-        const client = new IdentityNowClient(tenantName);
+        const tenantInfo = await this.tenantService.getTenantByTenantName(tenantName);
+        const client = new IdentityNowClient(tenantInfo?.id ?? "", tenantName);
         let data = uint8Array2Str(content);
 
         const id = path.posix.basename(resourcePath);

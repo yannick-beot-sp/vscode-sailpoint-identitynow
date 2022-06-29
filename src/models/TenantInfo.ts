@@ -1,6 +1,7 @@
 export interface TenantInfo {
+    id: string;
     name: string;
-    apiUrl: string;
+    tenantName: string;
 }
 
 export interface TenantCredentials {

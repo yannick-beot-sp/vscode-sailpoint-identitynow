@@ -4,29 +4,28 @@ import { OpenResourceCommand } from "../commands/openResource";
 import { ATTRIBUTES } from '../models/TransformAttributes';
 import { COUNTRYCODES } from '../models/CountryCodes';
 import { IdentityNowClient } from './IdentityNowClient';
-import { VALID_DATE_FORMATS, VALID_OPERATORS } from '../constants';
-import { ConsoleReporter } from '@vscode/test-electron';
-import { Z_ASCII } from 'zlib';
+import { VALID_OPERATORS } from '../constants';
 
 export class TransformEvaluator {
     private input: any;
-    private tenantName: any;
+    private tenantName = "";
+    private tenantId = "";
     private identityNameOrId: any;
 
-    constructor() { 
+    constructor() {
         this.input = undefined;
-        this.tenantName = undefined;
+        // this.tenantName = undefined;
         this.identityNameOrId = undefined;
     }
 
-    async evaluate(item?:any): Promise<any> {
+    async evaluate(item?: any): Promise<any> {
         console.log('Evaluating transform...');
         console.log("################### item=", item);
 
         if (item.tenantName !== undefined) {
             this.tenantName = item.tenantName;
-
-            let openResourceCommand:OpenResourceCommand = new OpenResourceCommand();
+            this.tenantId = item.tenantId;
+            let openResourceCommand: OpenResourceCommand = new OpenResourceCommand();
             await openResourceCommand.execute(item);
         } else {
             if (item.authority !== undefined) {
@@ -34,14 +33,14 @@ export class TransformEvaluator {
                 console.log(this.tenantName);
             }
         }
-        
+
         console.log('TenantName = ' + this.tenantName);
 
         const editor = vscode.window.activeTextEditor;
 
         if (editor) {
-			const document = editor.document;
-			const text = document.getText();
+            const document = editor.document;
+            const text = document.getText();
             const transform = JSON.parse(text);
 
             let transformName = await this.getTransformName(transform);
@@ -74,7 +73,7 @@ export class TransformEvaluator {
                             missingAttributes.push(requiredAttributes[i]);
                         }
                     }
-                    
+
                     if (missingAttributes.length > 0) {
                         message = "Missing required attribute(s) [" + missingAttributes + "]";
                         console.error(message);
@@ -87,7 +86,7 @@ export class TransformEvaluator {
             if (transformType === 'rule') {
                 transformType += ':' + attributes.operation;
             }
-            
+
             let requiresInput: boolean = await this.requiresInput(transformType);
 
             if (requiresInput) {
@@ -105,7 +104,7 @@ export class TransformEvaluator {
                             this.input = attributes.input;
                         }
                     } else {
-                        this.input = await this.askInput(transformType) ;
+                        this.input = await this.askInput(transformType);
 
                         if (isEmpty(this.input)) {
                             return;
@@ -128,14 +127,15 @@ export class TransformEvaluator {
             }
 
             let result: any = await this.evaluateTransformOfType(transformType, attributes);
-        
+
             if (result !== undefined) {
-                vscode.window.showInformationMessage("Validation of transform successful. Result = " + (typeof result === 'string'? ("'" + result + "'") : result));
+                vscode.window.showInformationMessage("Validation of transform successful. Result = " + (typeof result === 'string' ? ("'" + result + "'") : result));
             }
         }
 
         this.input = undefined;
-        this.tenantName = undefined;
+        this.tenantName = "";
+        this.tenantId = "";
         this.identityNameOrId = undefined;
     }
 
@@ -169,7 +169,7 @@ export class TransformEvaluator {
                 if ((transform.attributes !== undefined) && (transform.attributes.operation !== undefined)) {
                     transformType += ":" + transform.attributes.operation;
                 }
-            } 
+            }
 
             let isValidTransformType: boolean = await this.isValidTransformType(transformType);
 
@@ -199,24 +199,24 @@ export class TransformEvaluator {
 
     async requiresInput(transformType: string): Promise<boolean> {
         console.log("> requiresInput", transformType);
-        let result:boolean = true;
+        let result: boolean = true;
 
         if ((ATTRIBUTES[transformType].required.indexOf('input') === -1) && ((ATTRIBUTES[transformType].optional.indexOf('input') === -1))) {
             result = false;
         }
-        
+
         console.log("< Requires input", result);
         return result;
     }
 
-    async askInput(transformType:string): Promise<string | undefined> {
+    async askInput(transformType: string): Promise<string | undefined> {
         let placeHolder = "Input text";
-        let prompt:string = "Enter the text you want to use as transform's input";
+        let prompt: string = "Enter the text you want to use as transform's input";
 
         if ((transformType === 'accountAttribute') || (transformType === 'identityAttribute') || (transformType === 'rule:getReferenceIdentityAttribute')) {
             placeHolder = "Identity's username";
             prompt = "Enter the username of the identity you want to evaluate";
-        } 
+        }
 
         const input = await vscode.window.showInputBox({
             value: '',
@@ -241,7 +241,7 @@ export class TransformEvaluator {
         return requiredAttributes;
     }
 
-    async evaluateTransformOfType(transformType: string, attributes:any): Promise<any | undefined> {
+    async evaluateTransformOfType(transformType: string, attributes: any): Promise<any | undefined> {
         console.log("> evaluateTransformOfType", transformType, attributes);
         let result: any = undefined;
 
@@ -373,7 +373,7 @@ export class TransformEvaluator {
                         missingAttributes.push(requiredAttributes[i]);
                     }
                 }
-                
+
                 if (missingAttributes.length > 0) {
                     message = "Missing required attribute(s) [" + missingAttributes + "]";
                     console.error(message);
@@ -400,7 +400,7 @@ export class TransformEvaluator {
                         this.input = attributes.input;
                     }
                 } else {
-                    this.input = await this.askInput(transformType) ;
+                    this.input = await this.askInput(transformType);
 
                     if (isEmpty(this.input)) {
                         return;
@@ -425,17 +425,17 @@ export class TransformEvaluator {
         return this.evaluateTransformOfType(transformType, attributes);
     }
 
-    async accountAttribute(attributes:any) {
+    async accountAttribute(attributes: any) {
         console.log("Entering method accountAttribute");
         let result = undefined;
 
-        let sourceName:string = attributes.sourceName;
+        let sourceName: string = attributes.sourceName;
         console.log(">>> Required attribute 'sourceName': '" + sourceName + "'");
 
-        let attributeName:string = attributes.attributeName;
+        let attributeName: string = attributes.attributeName;
         console.log(">>> Required attribute 'attributeName': '" + attributeName + "'");
 
-        const client = new IdentityNowClient(this.tenantName);
+        const client = new IdentityNowClient(this.tenantId, this.tenantName);
 
         let sourceId: any = await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
@@ -462,7 +462,7 @@ export class TransformEvaluator {
             console.log('No username specified. Nothing to do');
             return;
         }
-        
+
         console.log("Evaluating for identity='" + this.identityNameOrId + "'");
 
         let identity = await vscode.window.withProgress({
@@ -470,8 +470,8 @@ export class TransformEvaluator {
             title: `Getting identity '${this.identityNameOrId}'...`,
             cancellable: false
         }, async (task, token) => {
-            return await client.getIdentity(this.identityNameOrId);      
-        }); 
+            return await client.getIdentity(this.identityNameOrId);
+        });
 
         if (identity === undefined) {
             let message = `Identity '${this.identityNameOrId}' couldn't be found`;
@@ -512,7 +512,7 @@ export class TransformEvaluator {
             return;
         }
 
-        let attributeValue:any = undefined;
+        let attributeValue: any = undefined;
 
         if (account.attributes !== undefined) {
             attributeValue = account.attributes[attributeName];
@@ -526,16 +526,16 @@ export class TransformEvaluator {
         }
 
         result = attributeValue;
-        
+
         console.log("Exiting accountAttribute. result=" + result);
         return result;
     }
 
     async base64Decode() {
         console.log("Entering method base64Decode");
-        
+
         let result = Buffer.from(this.input, 'base64').toString();
-        
+
         console.log("Exiting base64Decode. result=" + result);
         return result;
     }
@@ -549,7 +549,7 @@ export class TransformEvaluator {
         return result;
     }
 
-    async concat(attributes:any) {
+    async concat(attributes: any) {
         console.log("Entering method concat");
         let result = '';
 
@@ -576,16 +576,16 @@ export class TransformEvaluator {
         for (let i = 0; i < evaluatedValues.length; i++) {
             result += evaluatedValues[i];
         }
-        
+
         console.log("Exiting concat. result=" + result);
         return result;
     }
 
-    async conditional(attributes:any) {
+    async conditional(attributes: any) {
         console.log("Entering method conditional");
-        let result:any;
+        let result: any;
 
-        let expression:string = attributes.expression;
+        let expression: string = attributes.expression;
         console.log(">>> Required attribute 'expression': '" + expression + "'");
         let expressionItems: string[];
         let message: string;
@@ -606,8 +606,8 @@ export class TransformEvaluator {
             return;
         }
 
-        let leftHandExpression:string = expressionItems[0].replaceAll("\"", "");
-        let leftHandExpressionValue:string;
+        let leftHandExpression: string = expressionItems[0].replaceAll("\"", "");
+        let leftHandExpressionValue: string;
 
         if (leftHandExpression.startsWith('$')) {
             if (leftHandExpression.includes(' ')) {
@@ -639,8 +639,8 @@ export class TransformEvaluator {
 
         console.log("Left hand expression value '" + leftHandExpressionValue + "'");
 
-        let rightHandExpression:string = expressionItems[1].replaceAll("\"", "");
-        let rightHandExpressionValue:string;
+        let rightHandExpression: string = expressionItems[1].replaceAll("\"", "");
+        let rightHandExpressionValue: string;
 
         if (rightHandExpression.startsWith('$')) {
             if (rightHandExpression.includes(' ')) {
@@ -672,8 +672,8 @@ export class TransformEvaluator {
 
         console.log("Right hand expression value '" + rightHandExpressionValue + "'");
 
-        let positiveCondition:string = attributes.positiveCondition;
-        let positiveConditionValue:string;
+        let positiveCondition: string = attributes.positiveCondition;
+        let positiveConditionValue: string;
 
         if (positiveCondition.startsWith('$')) {
             if (positiveCondition.includes(' ')) {
@@ -705,9 +705,9 @@ export class TransformEvaluator {
 
         console.log(">>> Required attribute 'positiveCondition': '" + positiveConditionValue + "'");
 
-        let negativeCondition:string = attributes.negativeCondition;
-        let negativeConditionValue:string;
-        
+        let negativeCondition: string = attributes.negativeCondition;
+        let negativeConditionValue: string;
+
         if (negativeCondition.startsWith('$')) {
             if (negativeCondition.includes(' ')) {
                 message = `Invalid variable '${negativeCondition}'`;
@@ -748,7 +748,7 @@ export class TransformEvaluator {
         return result;
     }
 
-    async dateCompare(attributes:any) {
+    async dateCompare(attributes: any) {
         console.log("Entering method dateCompare");
         let result = undefined;
 
@@ -801,19 +801,19 @@ export class TransformEvaluator {
 
         switch (operator) {
             case 'lt':
-                console.log(new Date(firstDate) + ' < ' +  new Date(secondDate));
+                console.log(new Date(firstDate) + ' < ' + new Date(secondDate));
                 operationResult = new Date(firstDate) < new Date(secondDate);
                 break;
             case 'lte':
-                console.log(new Date(firstDate) + ' <= ' +  new Date(secondDate));
+                console.log(new Date(firstDate) + ' <= ' + new Date(secondDate));
                 operationResult = new Date(firstDate) <= new Date(secondDate);
                 break;
             case 'gt':
-                console.log(new Date(firstDate) + ' > ' +  new Date(secondDate));
+                console.log(new Date(firstDate) + ' > ' + new Date(secondDate));
                 operationResult = new Date(firstDate) > new Date(secondDate);
                 break;
             case 'gte':
-                console.log(new Date(firstDate) + ' >= ' +  new Date(secondDate));
+                console.log(new Date(firstDate) + ' >= ' + new Date(secondDate));
                 operationResult = new Date(firstDate) >= new Date(secondDate);
                 break;
             default:
@@ -831,12 +831,12 @@ export class TransformEvaluator {
         return result;
     }
 
-    async dateFormat(attributes:any) {
+    async dateFormat(attributes: any) {
         console.log("Entering method dateFormat");
         let result = undefined;
 
         let inputFormat = 'ISO8601';
-        
+
         if (attributes.inputFormat !== undefined) {
             inputFormat = attributes.inputFormat;
         }
@@ -857,19 +857,19 @@ export class TransformEvaluator {
             }
         }
 
-/*
-        if (!VALID_DATE_FORMATS.includes(inputFormat)) {
-            let message = `Invalid input date format '${inputFormat}'`;
-            console.error(message);
-            vscode.window.showErrorMessage(message);
-            return;
-        }
-        */
+        /*
+                if (!VALID_DATE_FORMATS.includes(inputFormat)) {
+                    let message = `Invalid input date format '${inputFormat}'`;
+                    console.error(message);
+                    vscode.window.showErrorMessage(message);
+                    return;
+                }
+                */
 
         console.log(`>>> Optional attribute 'inputFormat': '${inputFormat}'`);
 
         let outputFormat = 'ISO8601';
-        
+
         if (attributes.outputFormat !== undefined) {
             outputFormat = attributes.outputFormat;
         }
@@ -896,7 +896,7 @@ export class TransformEvaluator {
         return result;
     }
 
-    async e164phone(attributes:any) {
+    async e164phone(attributes: any) {
         console.log("Entering method e164phone");
         let result = undefined;
         let defaultRegion;
@@ -920,7 +920,7 @@ export class TransformEvaluator {
                 vscode.window.showErrorMessage(message);
                 console.log("Exiting e164phone. result=" + result);
                 return;
-            } 
+            }
         } else {
             defaultRegion = 'US';
         }
@@ -933,12 +933,12 @@ export class TransformEvaluator {
         console.log("Exiting e164phone. result=" + result);
         return result;
     }
-    
-    async firstValid(attributes:any) {
+
+    async firstValid(attributes: any) {
         console.log("Entering method firstValid");
         let result = undefined;
 
-        let currentValues:string = attributes.values;
+        let currentValues: string = attributes.values;
         let values: string[] = [];
 
         for (let value of currentValues) {
@@ -952,7 +952,7 @@ export class TransformEvaluator {
 
         console.log(">>> Required attribute 'values': '" + values + "'");
 
-        let ignoreErrors:string = 'false';
+        let ignoreErrors: string = 'false';
 
         if (attributes.ignoreErrors !== undefined) {
             ignoreErrors = attributes.ignoreErrors;
@@ -960,7 +960,7 @@ export class TransformEvaluator {
         }
 
         console.error("Pending to implement ignoreErrors");
-        
+
         for (let value of values) {
             if ((value !== 'undefined') && (value !== null)) {
                 result = value;
@@ -972,10 +972,10 @@ export class TransformEvaluator {
         return result;
     }
 
-    async generateRandomString(attributes:any) {
+    async generateRandomString(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method generateRandomString");
-        let result:any = undefined;
+        let result: any = undefined;
 
         let includeNumbers = attributes.includeNumbers;
 
@@ -1006,7 +1006,7 @@ export class TransformEvaluator {
         console.log(">>> Required attribute 'length': '" + length + "'");
 
         let lengthNumber = parseInt(length);
-        
+
         if (isNaN(lengthNumber)) {
             let message = `Attribute 'length' must be a number`;
             console.error(message);
@@ -1024,7 +1024,7 @@ export class TransformEvaluator {
         }
 
         let availableChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        
+
         if (includeNumbers === 'true') {
             availableChars += '0123456789';
         }
@@ -1032,26 +1032,26 @@ export class TransformEvaluator {
         if (includeSpecialChars === 'true') {
             availableChars += '!@#$%&*()+<>?';
         }
-        
+
         console.log('availableChars=' + availableChars);
 
-        result = Array(lengthNumber).join().split(',').map(function() { return availableChars.charAt(Math.floor(Math.random() * availableChars.length)); }).join('');
+        result = Array(lengthNumber).join().split(',').map(function () { return availableChars.charAt(Math.floor(Math.random() * availableChars.length)); }).join('');
 
         console.log("Exiting generateRandomString. result=" + result);
         return result;
     }
 
-    async getEndOfString(attributes:any) {
+    async getEndOfString(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method getEndOfString");
-        let result:any = undefined;
+        let result: any = undefined;
 
         let numChars = attributes.numChars;
 
         console.log(">>> Required attribute 'numChars': '" + numChars + "'");
 
         let numCharsNumber = parseInt(numChars);
-        
+
         if (isNaN(numCharsNumber)) {
             let message = `Attribute 'numChars' must be a number`;
             console.error(message);
@@ -1065,15 +1065,15 @@ export class TransformEvaluator {
         } else {
             result = this.input.substring(this.input.length - numCharsNumber);
         }
-        
+
         console.log("Exiting getEndOfString. result=" + result);
         return result;
     }
 
-    async getReferenceIdentityAttribute(attributes:any) {
+    async getReferenceIdentityAttribute(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method getReferenceIdentityAttribute");
-        let result:any = undefined;
+        let result: any = undefined;
 
         let uid = attributes.uid;
         console.log(">>> Required attribute 'uid': '" + uid + "'");
@@ -1081,27 +1081,27 @@ export class TransformEvaluator {
         let attributeName = attributes.attributeName;
         console.log(">>> Required attribute 'attributeName': '" + attributeName + "'");
 
-        const client = new IdentityNowClient(this.tenantName);
+        const client = new IdentityNowClient(this.tenantId, this.tenantName);
 
         if (uid === 'manager') {
             this.input = await this.askInput("rule:getReferenceIdentityAttribute");
-            
+
             let identity = await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
                 title: `Getting identity '${this.input}'...`,
                 cancellable: false
             }, async (task, token) => {
                 let identity = await client.getIdentity(this.input);
-                return identity;      
-            }); 
-    
+                return identity;
+            });
+
             if (identity === undefined) {
                 let message = `Identity '${this.input}' couldn't be found`;
                 console.error(message);
                 vscode.window.showErrorMessage(message);
                 return;
             }
-    
+
             if (identity.manager === undefined) {
                 let message = `Missing or invalid value for identity '${this.input}' attribute 'manager'`;
                 vscode.window.showErrorMessage(message);
@@ -1116,16 +1116,16 @@ export class TransformEvaluator {
                     cancellable: false
                 }, async (task, token) => {
                     let manager = await client.getIdentity(identity.manager.name);
-                    return manager;      
-                }); 
-        
+                    return manager;
+                });
+
                 if (manager === undefined) {
                     let message = `Identity '${identity.manager.name}' couldn't be found`;
                     console.error(message);
                     vscode.window.showErrorMessage(message);
                     return;
                 }
-        
+
                 if (manager[attributeName] === undefined) {
                     let message = `Missing or invalid value for identity '${attributeName}' attribute 'manager'`;
                     vscode.window.showErrorMessage(message);
@@ -1141,16 +1141,16 @@ export class TransformEvaluator {
                 cancellable: false
             }, async (task, token) => {
                 let identity = await client.getIdentity(uid);
-                return identity;      
-            }); 
-    
+                return identity;
+            });
+
             if (identity === undefined) {
                 let message = `Identity '${uid}' couldn't be found`;
                 console.error(message);
                 vscode.window.showErrorMessage(message);
                 return;
             }
-    
+
             if (identity[attributeName] === undefined) {
                 let message = `Missing or invalid value for identity '${uid}' attribute '${attributeName}'`;
                 vscode.window.showErrorMessage(message);
@@ -1164,14 +1164,14 @@ export class TransformEvaluator {
         return result;
     }
 
-    async identityAttribute(attributes:any) {
+    async identityAttribute(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method identityAttribute");
         let result = undefined;
 
-        let name:string = attributes.name;
+        let name: string = attributes.name;
         console.log(">>> Required attribute 'attributes.name': '" + name + "'");
-        
+
         if (this.identityNameOrId === undefined) {
             this.identityNameOrId = await this.askInput('identityAttribute');
         }
@@ -1181,7 +1181,7 @@ export class TransformEvaluator {
             return;
         }
 
-        const client = new IdentityNowClient(this.tenantName);
+        const client = new IdentityNowClient(this.tenantId, this.tenantName);
 
         let identity = await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
@@ -1189,8 +1189,8 @@ export class TransformEvaluator {
             cancellable: false
         }, async (task, token) => {
             let identity = await client.getIdentity(this.identityNameOrId);
-            return identity;      
-        }); 
+            return identity;
+        });
 
         if (identity === undefined) {
             let message = `Identity '${this.identityNameOrId}' couldn't be found`;
@@ -1203,15 +1203,15 @@ export class TransformEvaluator {
             let message = `Missing or invalid value for identity '${this.identityNameOrId}' attribute '${name}'`;
             vscode.window.showErrorMessage(message);
             return;
-        } 
-    
+        }
+
         result = identity.attributes[name];
-        
+
         console.log("Exiting identityAttribute. result=" + result);
         return result;
     }
 
-    async indexOf(attributes:any) {
+    async indexOf(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method indexOf");
         let result = 0;
@@ -1221,21 +1221,21 @@ export class TransformEvaluator {
         if (typeof substring === 'object') {
             substring = await this.evaluateChildTransform(substring);
         }
-        
+
         console.log(">>> Required attribute 'substring': '" + substring + "'");
-        
+
         result = this.input.indexOf(substring);
 
         console.log("Exiting indexOf. result=" + result);
         return result;
     }
 
-    async iso3166(attributes:any) {
+    async iso3166(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method iso3166");
         let result = 0;
 
-        let format:string = "alpha2";
+        let format: string = "alpha2";
 
         if (attributes.format !== 'undefined') {
             format = attributes.format;
@@ -1251,12 +1251,12 @@ export class TransformEvaluator {
 
         let message = "Transform 'iso3166' not yet implemented";
         vscode.window.showWarningMessage(message);
-        return; 
+        return;
 
         console.log("Exiting iso3166. result=" + result);
         return result;
     }
-    async lastIndexOf(attributes:any) {
+    async lastIndexOf(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method lastIndexOf");
         let result = 0;
@@ -1268,23 +1268,23 @@ export class TransformEvaluator {
         if (typeof substring === 'object') {
             result = await this.evaluateChildTransform(substring);
         }
-        
+
         result = this.input.lastIndexOf(substring);
 
         console.log("Exiting lastIndexOf. result=" + result);
         return result;
     }
 
-    async leftPad(attributes:any) {
+    async leftPad(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method leftPad");
-        let result:string;
+        let result: string;
 
         let length: number = attributes.length;
 
         console.log(">>> Required attribute 'length': '" + length + "'");
 
-        let padding:string = ' ';
+        let padding: string = ' ';
 
         if (attributes.padding !== 'undefined') {
             padding = attributes.padding;
@@ -1292,15 +1292,15 @@ export class TransformEvaluator {
         }
 
         result = this.input.padStart(length, padding);
-        
+
         console.log("Exiting leftPad. result=" + result);
         return result;
     }
 
-    async lookup(attributes:any) {
+    async lookup(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method lookup");
-        let result:any = undefined;
+        let result: any = undefined;
 
         let table = attributes.table;
 
@@ -1310,7 +1310,7 @@ export class TransformEvaluator {
 
         if (result === undefined) {
             if (table["default"]) {
-                result = table["default"]; 
+                result = table["default"];
             } else {
                 result = null;
             }
@@ -1320,13 +1320,13 @@ export class TransformEvaluator {
         return result;
     }
 
-    async normalizeNames(attributes:any) {
+    async normalizeNames(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method normalizeNames");
-        let result:string = 'undefined';
+        let result: string = 'undefined';
 
-        let searchPattern = new RegExp('(\\w+)(-|\\s|\')?', 'g');            
-        let items:string[] = this.input.split(searchPattern);
+        let searchPattern = new RegExp('(\\w+)(-|\\s|\')?', 'g');
+        let items: string[] = this.input.split(searchPattern);
 
         let camelCaseWord;
         let ignoreNext = false;
@@ -1370,10 +1370,10 @@ export class TransformEvaluator {
             }
         }
 
-        let toponymcOrGenerational:string[] = ['VON', 'DEL', 'OF', 'DE', 'LA', 'Y'];
+        let toponymcOrGenerational: string[] = ['VON', 'DEL', 'OF', 'DE', 'LA', 'Y'];
 
         for (let item of toponymcOrGenerational) {
-            searchPattern = new RegExp(`\\b(?=\\w)${item}\\b(?<=\\w)`, 'gi'); 
+            searchPattern = new RegExp(`\\b(?=\\w)${item}\\b(?<=\\w)`, 'gi');
 
             if (result.match(searchPattern)) {
                 result = result.replace(searchPattern, item.toLowerCase());
@@ -1389,30 +1389,30 @@ export class TransformEvaluator {
         console.log("Exiting normalizeNames. result=" + result);
         return result;
     }
-    
-    async lower(attributes:any) {
+
+    async lower(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method lower");
-        let result:string = this.input.toLowerCase();
+        let result: string = this.input.toLowerCase();
 
         console.log("Exiting lower. result=" + result);
         return result;
     }
 
-    async randomAlphaNumeric(attributes:any) {
+    async randomAlphaNumeric(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method randomAlphaNumeric");
         let result;
 
-        let length:any = attributes.length;
+        let length: any = attributes.length;
 
         if (length === undefined) {
             length = 32;
         } else {
             console.log(">>> Option attribute 'length': '" + length + "'");
         }
-        
-        if (typeof length  === 'string') {
+
+        if (typeof length === 'string') {
             let message = `Attribute 'length' must be a number`;
             console.error(message);
             vscode.window.showErrorMessage(message);
@@ -1437,27 +1437,27 @@ export class TransformEvaluator {
         }
 
         let availableChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        
-        result = Array(length).join().split(',').map(function() { return availableChars.charAt(Math.floor(Math.random() * availableChars.length)); }).join('');
+
+        result = Array(length).join().split(',').map(function () { return availableChars.charAt(Math.floor(Math.random() * availableChars.length)); }).join('');
 
         console.log("Exiting randomAlphaNumeric. result=" + result);
         return result;
     }
-    
-    async randomNumeric(attributes:any) {
+
+    async randomNumeric(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method randomNumeric");
         let result;
 
-        let length:any = attributes.length;
+        let length: any = attributes.length;
 
         if (length === undefined) {
             length = 32;
         } else {
             console.log(">>> Option attribute 'length': '" + length + "'");
         }
-        
-        if (typeof length  === 'string') {
+
+        if (typeof length === 'string') {
             let message = `Attribute 'length' must be a number`;
             console.error(message);
             vscode.window.showErrorMessage(message);
@@ -1482,14 +1482,14 @@ export class TransformEvaluator {
         }
 
         let availableChars = '0123456789';
-        
-        result = Array(length).join().split(',').map(function() { return availableChars.charAt(Math.floor(Math.random() * availableChars.length)); }).join('');
+
+        result = Array(length).join().split(',').map(function () { return availableChars.charAt(Math.floor(Math.random() * availableChars.length)); }).join('');
 
         console.log("Exiting randomNumeric. result=" + result);
         return result;
     }
 
-    async reference(attributes:any) {
+    async reference(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method reference");
         let result = undefined;
@@ -1497,7 +1497,7 @@ export class TransformEvaluator {
         let id = attributes.id;
         console.log(">>> Required attribute 'id': '" + id + "'");
 
-        const client = new IdentityNowClient(this.tenantName);
+        const client = new IdentityNowClient(this.tenantId, this.tenantName);
 
         let transform: any = await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
@@ -1521,10 +1521,10 @@ export class TransformEvaluator {
         return result;
     }
 
-    async replaceAll(attributes:any) {
+    async replaceAll(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method replaceAll");
-        let result:string = 'undefined';
+        let result: string = 'undefined';
 
         let table = attributes.table;
 
@@ -1545,15 +1545,15 @@ export class TransformEvaluator {
         return result;
     }
 
-    async replace(attributes:any) {
+    async replace(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method replace");
-        let result:string;
+        let result: string;
 
-        let regex:string = attributes.regex;
+        let regex: string = attributes.regex;
         console.log(">>> Required attribute 'regex': '" + regex + "'");
 
-        let replacement:string = attributes.replacement;
+        let replacement: string = attributes.replacement;
         console.log(">>> Required attribute 'replacement': '" + replacement + "'");
 
         let searchPattern = new RegExp(regex, 'g');
@@ -1563,16 +1563,16 @@ export class TransformEvaluator {
         return result;
     }
 
-    async rightPad(attributes:any) {
+    async rightPad(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method rightPad");
-        let result:string;
+        let result: string;
 
         let length: number = attributes.length;
 
         console.log(">>> Required attribute 'length': '" + length + "'");
 
-        let padding:string = ' ';
+        let padding: string = ' ';
 
         if (attributes.padding !== 'undefined') {
             padding = attributes.padding;
@@ -1580,15 +1580,15 @@ export class TransformEvaluator {
         }
 
         result = this.input.padEnd(length, padding);
-        
+
         console.log("Exiting rightPad. result=" + result);
         return result;
     }
 
-    async rule(attributes:any) {
+    async rule(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method rule");
-        let result:any = undefined;
+        let result: any = undefined;
 
         let name = attributes.name;
 
@@ -1614,31 +1614,31 @@ export class TransformEvaluator {
                     vscode.window.showErrorMessage(message);
             }
         }
-        
+
         console.log("Exiting rule. result=" + result);
         return result;
     }
 
-    async split(attributes:any) {
+    async split(attributes: any) {
         console.log("Entering method split");
-        let result:any = undefined;
+        let result: any = undefined;
 
-        let delimiter:string = attributes.delimiter;
+        let delimiter: string = attributes.delimiter;
         console.log(">>> Required attribute 'delimiter': '" + delimiter + "'");
 
-        let index:number = attributes.index;
+        let index: number = attributes.index;
         console.log(">>> Required attribute 'index': '" + index + "'");
 
-        let throws:boolean = false;
+        let throws: boolean = false;
 
         if (attributes.throws !== undefined) {
             throws = attributes.throws;
 
             console.log(">>> Optional attribute 'throws': " + throws);
         }
-         
+
         let components = this.input.split(delimiter);
-        
+
         if (index < components.length) {
             result = components[index];
         } else {
@@ -1653,11 +1653,11 @@ export class TransformEvaluator {
         return result;
     }
 
-    async static(attributes:any) {
+    async static(attributes: any) {
         console.log("Entering method static");
         let result = undefined;
 
-        let value:string = attributes.value;
+        let value: string = attributes.value;
         console.log(">>> Required attribute 'value': '" + value + "'");
 
         if (value.startsWith("$")) {
@@ -1672,12 +1672,12 @@ export class TransformEvaluator {
         } else {
             result = value;
         }
-        
+
         console.log("Exiting static. result=" + result);
         return result;
     }
 
-    async substring(attributes:any) {
+    async substring(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method substring");
         let result: string = '';
@@ -1686,7 +1686,7 @@ export class TransformEvaluator {
         if (typeof begin === 'object') {
             console.log("Getting complex value 'begin'");
             begin = await this.evaluateChildTransform(begin);
-        } 
+        }
 
         if (begin !== undefined) {
             console.log(">>> Required attribute 'begin': " + begin);
@@ -1702,7 +1702,7 @@ export class TransformEvaluator {
                     console.log(">>> Ignoring optional attribute 'beginOffset': " + beginOffset + " because 'begin' is -1");
                 }
             }
-        
+
             let end = undefined;
 
             if (attributes.end) {
@@ -1745,33 +1745,33 @@ export class TransformEvaluator {
 
             console.log("Exiting substring. result=" + result);
             return result;
-        }   
+        }
     }
 
-    async trim(attributes:any) {
+    async trim(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method trim");
-        let result:string = this.input.trim();
+        let result: string = this.input.trim();
 
         console.log("Exiting trim. result=" + result);
         return result;
     }
 
-    async upper(attributes:any) {
+    async upper(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method upper");
-        let result:string = this.input.toUpperCase();
+        let result: string = this.input.toUpperCase();
 
         console.log("Exiting upper. result=" + result);
         return result;
     }
 
-    async uuid(attributes:any) {
+    async uuid(attributes: any) {
         console.log("------------------------------------------------------------------------------------------");
         console.log("Entering method uuid");
-        let result:string = 'undefined';
+        let result: string = 'undefined';
 
-        result = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        result = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
             var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });

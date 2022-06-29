@@ -4,7 +4,6 @@ import * as vscode from 'vscode';
 import * as commands from './commands/constants';
 import { AddTenantCommand } from './commands/addTenant';
 import { NewTransformCommand } from './commands/newTransform';
-import { onFileSaved } from './commands/onFileSave';
 import { OpenResourceCommand } from './commands/openResource';
 import { IdentityNowResourceProvider } from './files/IdentityNowResourceProvider';
 import { SailPointIdentityNowAuthenticationProvider } from './services/AuthenticationProvider';
@@ -22,7 +21,9 @@ import { WorkflowTesterWebviewViewProvider } from './views/WorkflowTesterWebview
 import { TestWorkflowCommand } from './commands/testWorkflow';
 import { TransformEvaluator } from './services/TransformEvaluator';
 import { ConnectorRuleCommand } from './commands/connectorRuleCommand';
-import { exportScriptEditor, exportScriptView } from './commands/exportScriptFromRule';
+import { ExportScriptFromRuleCommand } from './commands/exportScriptFromRuleCommand';
+import { FileHandler } from './files/FileHandler';
+import { RenameTenantCommand } from './commands/renameTenant';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -32,13 +33,13 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "vscode-sailpoint-identitynow" is now active!');
 
-	const tenantService = new TenantService(context.globalState);
+	const tenantService = new TenantService(context.globalState, context.secrets);
 
 	// Register our authentication provider. NOTE: this will register the provider globally which means that
 	// any other extension can use this provider via the `getSession` API.
 	// NOTE: when implementing an auth provider, don't forget to register an activation event for that provider
 	// in your package.json file: "onAuthenticationRequest:AzureDevOpsPAT"
-	const authProvider = new SailPointIdentityNowAuthenticationProvider(context.secrets, tenantService);
+	const authProvider = new SailPointIdentityNowAuthenticationProvider(tenantService);
 
 	context.subscriptions.push(vscode.authentication.registerAuthenticationProvider(
 		SailPointIdentityNowAuthenticationProvider.id,
@@ -53,6 +54,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.ADD_TENANT, addTenantCommand.execute,
 			addTenantCommand));
+	const renameTenantCommand = new RenameTenantCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.RENAME_TENANT, renameTenantCommand.execute,
+			renameTenantCommand));
 
 	const identityNowDataProvider = new IdentityNowDataProvider(context, tenantService);
 	vscode.window.registerTreeDataProvider(commands.TREE_VIEW, identityNowDataProvider);
@@ -112,7 +117,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.workspace.registerFileSystemProvider(
 			URL_PREFIX,
-			new IdentityNowResourceProvider()
+			new IdentityNowResourceProvider(tenantService)
 		));
 
 	const newTransformCommand = new NewTransformCommand();
@@ -147,13 +152,17 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.VALIDATE_CONNECTOR_RULE,
 			newConnectorRuleCommand.validateScript, newConnectorRuleCommand));
 
+	const exportScriptFromRuleCommand = new ExportScriptFromRuleCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_CONNECTOR_RULE_SCRIPT_EDITOR,
-			exportScriptEditor));
+			exportScriptFromRuleCommand.exportScriptEditor, exportScriptFromRuleCommand));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_CONNECTOR_RULE_SCRIPT_VIEW,
-			exportScriptView));
-	vscode.workspace.onDidSaveTextDocument(onFileSaved);
+			exportScriptFromRuleCommand.exportScriptView, exportScriptFromRuleCommand));
+
+
+	const fileHandler = new FileHandler(tenantService);
+	vscode.workspace.onDidSaveTextDocument(fileHandler.onFileSaved, fileHandler);
 }
 
 // this method is called when your extension is deactivated

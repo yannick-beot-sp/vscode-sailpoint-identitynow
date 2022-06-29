@@ -8,9 +8,6 @@ import path = require('path');
 import { TenantService } from '../services/TenantService';
 import { chooseTenant, confirmFileOverwrite } from '../utils/vsCodeHelpers';
 
-
-
-
 const objectTypeItems = [
     {
         "objectType": "SOURCE",
@@ -58,7 +55,7 @@ export async function exportConfigView(node?: TenantTreeItem): Promise<void> {
         throw new Error("exportConfig: invalid item");
     }
 
-    exportConfig(node.tenantName);
+    exportConfig(node.tenantId, node.tenantName);
 }
 
 export class ExportConfigPalette {
@@ -68,16 +65,16 @@ export class ExportConfigPalette {
 
     async execute() {
         console.log("> exportConfigPalette.execute");
-        const tenantName = await chooseTenant(this.tenantService, 'From which tenant do you want to export the config?');
-        console.log("exportConfigPalette: tenant = ", tenantName);
-        if (!tenantName) {
+        const tenantInfo = await chooseTenant(this.tenantService, 'From which tenant do you want to export the config?');
+        console.log("exportConfigPalette: tenant = ", tenantInfo);
+        if (!tenantInfo) {
             return;
         }
-        exportConfig(tenantName as string);
+        exportConfig(tenantInfo.id, tenantInfo.tenantName);
     }
 }
 
-async function exportConfig(tenantName: string): Promise<void> {
+async function exportConfig(tenantId: string, tenantName: string): Promise<void> {
 
     const exportTypeItem = await vscode.window.showQuickPick<vscode.QuickPickItem>(exportTypeItems, {
         ignoreFocusOut: false,
@@ -151,7 +148,7 @@ async function exportConfig(tenantName: string): Promise<void> {
         return;
     }
 
-    const client = new IdentityNowClient(tenantName);
+    const client = new IdentityNowClient(tenantId, tenantName);
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: `Exporting configuration from ${tenantName}...`,
