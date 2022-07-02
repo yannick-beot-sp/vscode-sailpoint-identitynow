@@ -6,6 +6,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+- Possibility to add a tenant with an access token
+
 ## [0.0.11] - 2022/06/29
 - Can rename tenant display name (cf. [#12](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/12))
 
