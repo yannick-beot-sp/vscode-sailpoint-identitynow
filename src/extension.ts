@@ -24,6 +24,7 @@ import { ConnectorRuleCommand } from './commands/connectorRuleCommand';
 import { ExportScriptFromRuleCommand } from './commands/exportScriptFromRuleCommand';
 import { FileHandler } from './files/FileHandler';
 import { RenameTenantCommand } from './commands/renameTenant';
+import { IdentityNowUriHandler } from './uriHandler';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -163,6 +164,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const fileHandler = new FileHandler(tenantService);
 	vscode.workspace.onDidSaveTextDocument(fileHandler.onFileSaved, fileHandler);
+
+	const uriHandler = new IdentityNowUriHandler(tenantService);
+	context.subscriptions.push(
+		vscode.window.registerUriHandler(uriHandler));
+
 }
 
 // this method is called when your extension is deactivated

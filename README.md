@@ -30,6 +30,10 @@ Alternatively, you can click on the `+` in the SailPoint view.
 
 ![Add tenant](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/add-tenant.gif)
 
+It is also possible to add a tenant by using the following URIs:
+`vscode://yannick-beot-sp.vscode-sailpoint-identitynow/addtenant?tenantName=company&accessToken=eyJh...&authenticationMethod=AccessToken` or 
+`vscode://yannick-beot-sp.vscode-sailpoint-identitynow/addtenant?tenantName=company&clientId=806c451e057b442ba67b5d459716e97a&clientSecret=***&authenticationMethod=PersonalAccessToken`.
+
 ## Export config of a tenant
 
 In the SailPoint view, right-click on a tenant to export config.
