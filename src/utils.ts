@@ -60,3 +60,8 @@ export function normalizeTenant(tenantName: string) {
     }
     return tenantName;
 }
+
+// cf. https://stackoverflow.com/questions/38552003/how-to-decode-jwt-token-in-javascript-without-using-a-library
+export function parseJwt(token: string): any {
+    return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+}

@@ -6,6 +6,9 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+- Possibility to add a tenant with an access token
+- The extension have an URI handler (cf.[#17](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/17)). If a URL with the following format is called in the system, a tenant is added or updated: vscode://yannick-beot-sp.vscode-sailpoint-identitynow/addtenant?tenantName=XXX&accessToken=eyJh...&authenticationMethod=AccessToken
+
 ## [0.0.11] - 2022/06/29
 - Can rename tenant display name (cf. [#12](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/12))
 

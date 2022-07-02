@@ -28,7 +28,13 @@ Open the **Command Palette** with `Ctrl+Shift+P` (Windows or Linux) or `Cmd+Shif
 
 Alternatively, you can click on the `+` in the SailPoint view.
 
+You can add a tenant by using a Personal Access Token (PAT) or by using a short-lived access token (like one you can get from https://yourtenant.identitynow.com/ui/session.
+
 ![Add tenant](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/add-tenant.gif)
+
+It is also possible to add a tenant by using the following URIs:
+`vscode://yannick-beot-sp.vscode-sailpoint-identitynow/addtenant?tenantName=company&accessToken=eyJh...&authenticationMethod=AccessToken` or 
+`vscode://yannick-beot-sp.vscode-sailpoint-identitynow/addtenant?tenantName=company&clientId=806c451e057b442ba67b5d459716e97a&clientSecret=***&authenticationMethod=PersonalAccessToken`.
 
 ## Export config of a tenant
 

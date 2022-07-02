@@ -2,7 +2,7 @@
 	"name": "vscode-sailpoint-identitynow",
 	"displayName": "SailPoint IdentityNow",
 	"description": "Customize SailPoint IdentityNow",
-	"version": "0.0.11",
+	"version": "0.0.12",
 	"publisher": "yannick-beot-sp",
 	"icon": "resources/idn.png",
 	"bugs": {
@@ -57,7 +57,8 @@
 		"onCommand:vscode-sailpoint-identitynow.connector-rule.validate",
 		"onCommand:vscode-sailpoint-identitynow.connector-rule.export-script.editor",
 		"onCommand:vscode-sailpoint-identitynow.connector-rule.export-script.view",
-		"onFileSystem:idn"
+		"onFileSystem:idn",
+		"onUri"
 	],
 	"license": "MIT",
 	"main": "./out/extension.js",

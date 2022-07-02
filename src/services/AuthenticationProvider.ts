@@ -10,8 +10,8 @@ import {
     EventEmitter,
     window,
 } from 'vscode';
-import { TenantToken } from '../models/TenantInfo';
-import { isEmpty } from '../utils';
+import { AuthenticationMethod, TenantCredentials, TenantToken } from '../models/TenantInfo';
+import { isEmpty, parseJwt } from '../utils';
 import { EndpointUtils } from '../utils/EndpointUtils';
 import { TenantService } from './TenantService';
 
@@ -139,26 +139,50 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
 
     private async getSessionByTenant(tenantId: string): Promise<SailPointIdentityNowPatSession | null> {
         console.log("> getSessionByTenant", tenantId);
-        const credentials = await this.tenantService.getTenantCredentials(tenantId);
-        if (credentials !== undefined) {
-            const tenantInfo = await this.tenantService.getTenant(tenantId);
-            // Check if an access token already exists
-            let token = await this.tenantService.getTenantAccessToken(tenantId);
-            // If no access token or expired => create one
-            if (token === undefined || token.expired()) {
-                console.log("INFO: accessToken is expired. Updating Access Token");
-                token = await this.createAccessToken(tenantInfo?.tenantName ?? "", credentials.clientId, credentials.clientSecret);
+        // Check if an access token already exists
+        let token = await this.tenantService.getTenantAccessToken(tenantId);
+        const tenantInfo = await this.tenantService.getTenant(tenantId);
+        if (token === undefined || token.expired()) {
+            console.log("INFO: accessToken is expired. Updating Access Token");
+            if (tenantInfo?.authenticationMethod === AuthenticationMethod.accessToken) {
+                const accessToken = await this.askAccessToken() || "";
+                if (isEmpty(accessToken)) {
+                    throw new Error('Access Token is required');
+                }
+                const jwt = parseJwt(accessToken);
+                const token = new TenantToken(accessToken, new Date(jwt.exp * 1000), { clientId: jwt.client_id } as TenantCredentials);
+                this.tenantService.setTenantAccessToken(tenantId, token);
+                return new SailPointIdentityNowPatSession(
+                    tenantInfo?.tenantName ?? "",
+                    jwt.client_id,
+                    accessToken,
+                    this.getSessionId(tenantId));
+            } else {
+                // If no access token or expired => create one
+                const credentials = await this.tenantService.getTenantCredentials(tenantId);
+                if (credentials !== undefined) {
+
+                    token = await this.createAccessToken(tenantInfo?.tenantName ?? "", credentials.clientId, credentials.clientSecret);
+                    console.log("< getSessionByTenant for", tenantId);
+
+                    return new SailPointIdentityNowPatSession(tenantInfo?.tenantName ?? "",
+                        credentials.clientId,
+                        token.accessToken,
+                        this.getSessionId(tenantId)
+                    );
+                } else {
+                    console.log("WARNING: no credentials for tenant", tenantId);
+                }
             }
-            console.log("< getSessionByTenant for", tenantId);
-            
-            return new SailPointIdentityNowPatSession(tenantInfo?.tenantName ?? "",
-                credentials.clientId,
-                token.accessToken,
-                this.getSessionId(tenantId)
-            );
         } else {
-            console.log("WARNING: no credentials for tenant", tenantId);
+            console.log("< getSessionByTenant existing token");
+            return new SailPointIdentityNowPatSession(
+                tenantInfo?.tenantName ?? "",
+                token.client.clientId,
+                token.accessToken,
+                this.getSessionId(tenantId));
         }
+
         console.log("< getSessionByTenant null");
         return null;
     }
@@ -171,38 +195,55 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
      */
     async createSession(_scopes: string[]): Promise<AuthenticationSession> {
         console.log("> createSession", _scopes);
-        if (_scopes.length !== 1) {
+        if (_scopes.length !== 1 || isEmpty(_scopes[0])) {
             throw new Error('Scope is required');
         }
-        const tenantId = _scopes[0];
-
         this.ensureInitialized();
-
-        // Prompt for the PAT.
-        const clientId = await this.askPATClientId() || "";
-        if (isEmpty(clientId)) {
-            throw new Error('Client ID is required');
-        }
-
-        const clientSecret = await this.askPATClientSecret() || "";
-        if (isEmpty(clientSecret)) {
-            throw new Error('Client Secret is required');
-        }
+        const tenantId = _scopes[0];
         const tenantInfo = await this.tenantService.getTenant(tenantId);
 
-        const token = await this.createAccessToken(tenantInfo?.tenantName ?? "", clientId, clientSecret);
-        this.tenantService.setTenantCredentials(tenantId,
-            {
-                clientId: clientId,
-                clientSecret: clientSecret
-            });
-        
-        return new SailPointIdentityNowPatSession(
-            tenantInfo?.tenantName ?? "",
-            clientId,
-            token.accessToken,
-            this.getSessionId(tenantId));
+        if (tenantInfo?.authenticationMethod === AuthenticationMethod.accessToken) {
+            // Access Token
+            const accessToken = await this.askAccessToken() || "";
+            if (isEmpty(accessToken)) {
+                throw new Error('Access Token is required');
+            }
+            const jwt = parseJwt(accessToken);
+            const token = new TenantToken(accessToken, new Date(jwt.exp * 1000), {} as TenantCredentials);
+            this.tenantService.setTenantAccessToken(tenantId, token);
+            return new SailPointIdentityNowPatSession(
+                tenantInfo?.tenantName ?? "",
+                jwt.client_id,
+                accessToken,
+                this.getSessionId(tenantId));
+
+        } else {
+            // Prompt for the PAT.
+            const clientId = await this.askPATClientId() || "";
+            if (isEmpty(clientId)) {
+                throw new Error('Client ID is required');
+            }
+
+            const clientSecret = await this.askPATClientSecret() || "";
+            if (isEmpty(clientSecret)) {
+                throw new Error('Client Secret is required');
+            }
+
+            const token = await this.createAccessToken(tenantInfo?.tenantName ?? "", clientId, clientSecret);
+            this.tenantService.setTenantCredentials(tenantId,
+                {
+                    clientId: clientId,
+                    clientSecret: clientSecret
+                });
+
+            return new SailPointIdentityNowPatSession(
+                tenantInfo?.tenantName ?? "",
+                clientId,
+                token.accessToken,
+                this.getSessionId(tenantId));
+        }
     }
+
     /**
      * Create an access Token and update secret storage
      * @param tenantName 
@@ -287,4 +328,24 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
         });
         return result;
     }
+
+    private async askAccessToken(): Promise<string | undefined> {
+        const result = await window.showInputBox({
+            value: '',
+            password: true,
+            ignoreFocusOut: true,
+            placeHolder: '***',
+            prompt: 'Enter an Access Token.',
+            title: 'IdentityNow',
+            validateInput: text => {
+                const regex = new RegExp('^([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_+/=-]+)$');
+                if (regex.test(text)) {
+                    return null;
+                }
+                return "Invalid access token";
+            }
+        });
+        return result;
+    }
 }
+
