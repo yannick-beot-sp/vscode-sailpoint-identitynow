@@ -1,7 +1,13 @@
+export enum AuthenticationMethod {
+    personalAccessToken,
+    accessToken
+}
+
 export interface TenantInfo {
     id: string;
     name: string;
     tenantName: string;
+    authenticationMethod: AuthenticationMethod;
 }
 
 export interface TenantCredentials {

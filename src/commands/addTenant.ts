@@ -4,6 +4,7 @@ import { SailPointIdentityNowAuthenticationProvider } from '../services/Authenti
 import { TenantService } from '../services/TenantService';
 import { isEmpty, normalizeTenant } from '../utils';
 import { askDisplayName } from '../utils/vsCodeHelpers';
+import { AuthenticationMethod } from '../models/TenantInfo';
 
 
 export class AddTenantCommand {
@@ -28,6 +29,23 @@ export class AddTenantCommand {
         });
         return result;
     }
+    async askAuthenticationMethod(): Promise<AuthenticationMethod | undefined> {
+
+        const authMethodStr = await vscode.window.showQuickPick(
+            ["Personal Access Token", "Access Token"], {
+            ignoreFocusOut: true,
+            placeHolder: "Authentication method",
+            title: "IdentityNow",
+            canPickMany: false
+        });
+        if (authMethodStr === undefined) {
+            return undefined;
+        } else if (authMethodStr === "Personal Access Token") {
+
+            return AuthenticationMethod.personalAccessToken;
+        }
+        return AuthenticationMethod.accessToken;
+    }
 
 
     async execute(context: vscode.ExtensionContext): Promise<void> {
@@ -38,9 +56,9 @@ export class AddTenantCommand {
         }
         const normalizedTenantName = normalizeTenant(tenantName);
         const tenantInfo = await this.tenantService.getTenantByTenantName(normalizedTenantName);
-        if (tenantInfo!==undefined) {
-            console.error("Tenant "+tenantName+ " already exists");
-            vscode.window.showErrorMessage("Tenant "+tenantName+ " already exists");
+        if (tenantInfo !== undefined) {
+            console.error("Tenant " + tenantName + " already exists");
+            vscode.window.showErrorMessage("Tenant " + tenantName + " already exists");
             return;
         }
 
@@ -50,11 +68,17 @@ export class AddTenantCommand {
             return;
         }
 
+        const authMethod = await this.askAuthenticationMethod();
+        if (authMethod === undefined) {
+            return;
+        }
+
         const tenantId = require('crypto').randomUUID().replaceAll('-', '');
         this.tenantService.setTenant({
             id: tenantId,
             name: displayName,
-            tenantName: normalizedTenantName
+            tenantName: normalizedTenantName,
+            authenticationMethod: authMethod
         });
         let session: vscode.AuthenticationSession;
         try {
