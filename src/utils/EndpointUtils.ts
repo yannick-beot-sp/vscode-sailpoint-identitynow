@@ -4,7 +4,11 @@ export class EndpointUtils {
         let baseApiUrl = `https://${tenantName}.api.identitynow.com`;
 
         if (tenantName.indexOf('.') > 0) {
-            baseApiUrl = tenantName.replace(/([a-z0-9][a-z0-9-]+)\.(.*)/, "https://$1.api.$2");
+            if (tenantName.includes('.identitysoon.com')) {
+                baseApiUrl = tenantName.replace(/([a-z0-9][a-z0-9-]+)\.(.*)/, "https://$1.api.cloud.sailpoint.com");
+            } else {
+                baseApiUrl = tenantName.replace(/([a-z0-9][a-z0-9-]+)\.(.*)/, "https://$1.api.$2");
+            }
         }
         return baseApiUrl;
     }
