@@ -5,6 +5,7 @@ import { ATTRIBUTES } from '../models/TransformAttributes';
 import { COUNTRYCODES } from '../models/CountryCodes';
 import { IdentityNowClient } from './IdentityNowClient';
 import { VALID_OPERATORS } from '../constants';
+import { TenantService } from './TenantService';
 
 export class TransformEvaluator {
     private input: any;
@@ -12,7 +13,9 @@ export class TransformEvaluator {
     private tenantId = "";
     private identityNameOrId: any;
 
-    constructor() {
+    constructor(
+        private readonly tenantService: TenantService
+    ) {
         this.input = undefined;
         // this.tenantName = undefined;
         this.identityNameOrId = undefined;
@@ -22,20 +25,21 @@ export class TransformEvaluator {
         console.log('Evaluating transform...');
         console.log("################### item=", item);
 
-        if (item.tenantName !== undefined) {
+        if (item !== undefined && item.tenantName) {
             this.tenantName = item.tenantName;
             this.tenantId = item.tenantId;
             let openResourceCommand: OpenResourceCommand = new OpenResourceCommand();
             await openResourceCommand.execute(item);
         } else {
-            if (item.authority !== undefined) {
-                this.tenantName = item.authority;
-                console.log(this.tenantName);
+            const editor = vscode.window.activeTextEditor;
+            this.tenantName = editor?.document.uri.authority ?? "";
+            if (this.tenantName) {
+                const tenantInfo = await this.tenantService.getTenantByTenantName(this.tenantName);
+                this.tenantId = tenantInfo?.id ?? "";
             }
         }
 
         console.log('TenantName = ' + this.tenantName);
-
         const editor = vscode.window.activeTextEditor;
 
         if (editor) {

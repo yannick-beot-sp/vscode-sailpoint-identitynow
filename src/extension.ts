@@ -65,7 +65,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	vscode.commands.registerCommand(commands.REFRESH, identityNowDataProvider.refresh, identityNowDataProvider);
 
-	const transformEvaluator = new TransformEvaluator();
+	const transformEvaluator = new TransformEvaluator(tenantService);
 	const treeManager = new TreeManager(identityNowDataProvider, tenantService, authProvider, transformEvaluator);
 
 	context.subscriptions.push(
