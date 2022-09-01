@@ -129,6 +129,9 @@ None
 
 ## Release Notes
 
+### 0.0.13
+- Regression on transform evaluation (cf. [#20](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/20))
+
 ### 0.0.12
 
 - Possibility to add a tenant with an access token (cf. [#18](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/18))
