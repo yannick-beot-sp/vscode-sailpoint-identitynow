@@ -14,25 +14,38 @@ export class IdentityNowClient {
     constructor(
         private readonly tenantId: string,
         private readonly tenantName: string
-        ) { };
+    ) { };
 
     public async getSources(): Promise<any> {
         console.log('> getSources');
-        const endpoint = EndpointUtils.getV3Url(this.tenantName) + '/sources?sorters=name';
-        // process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; 
-        console.log('endpoint = ' + endpoint);
-        const headers = await this.prepareHeaders();
-        const req = await fetch(endpoint, {
-            headers: headers
-        });
+        const limit = 250;
+        let result: any[] = [];
+        let offset = 0;
+        let total = 0;
+        let firstQuery = true;
+        let endpoint = EndpointUtils.getV3Url(this.tenantName) + `/sources?count=true&limit=${limit}`;
+        do {
+            console.log('endpoint = ' + endpoint);
+            const headers = await this.prepareHeaders();
+            const req = await fetch(endpoint, {
+                headers: headers
+            });
 
-        if (!req.ok) {
+            if (!req.ok) {
+                throw new Error(req.statusText);
+            }
+            result = result.concat(await req.json());
+            if (firstQuery) {
+                total = Number(req.headers.get("X-Total-Count"));
+                firstQuery = false;
+            }
+            offset += limit;
+            endpoint = withQuery(endpoint, { count: false, offset: offset });
+        } while (offset < total);
 
-            throw new Error(req.statusText);
-        }
-        const res = await req.json();
-
-        return res;
+        // issue with sorting on server-side
+        // to be fixed
+        return result.sort(compareByName);
     }
 
     /**
@@ -570,7 +583,7 @@ export class IdentityNowClient {
         return rules;
     }
 
-    public async getConnectorRuleById(id: string): Promise<ConnectorRule| undefined> {
+    public async getConnectorRuleById(id: string): Promise<ConnectorRule | undefined> {
         const rule = await this.getResource('/beta/connector-rules/' + id);
         return rule;
     }

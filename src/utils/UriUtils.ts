@@ -2,13 +2,17 @@ import { Uri } from "vscode";
 import * as path from 'path';
 import { URL_PREFIX } from "../constants";
 
-export function withQuery(url: string, params: any): string {
-    let query = Object.keys(params)
+export function withQuery(baseUrl: string, params: any): string {
+
+    const url = new URL(baseUrl);
+    const urlParams: URLSearchParams = new URLSearchParams(url.search);
+
+    Object.keys(params)
         .filter(k => params[k] !== undefined)
-        .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
-        .join('&');
-    url += (url.indexOf('?') === -1 ? '?' : '&') + query;
-    return url;
+        .forEach(k => urlParams.set(k, params[k]));
+        
+    url.search = urlParams.toString();
+    return url.toString();
 }
 
 /**
