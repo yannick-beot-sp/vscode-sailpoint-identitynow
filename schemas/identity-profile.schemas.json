@@ -1,0 +1,138 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://developer.sailpoint.com/schemas/identity-profile.json",
+  "title": "Identity Profile",
+  "description": "Schema of a Identity Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "ID of the object to which this reference applies",
+      "example": "2c91808568c529c60168cca6f90c1313"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable display name of the object to which this reference applies",
+      "example": "William Wilson"
+    },
+
+    "description": {
+      "type": "string",
+      "description": "The description of the Identity Profile.",
+      "example": "My custom flat file profile"
+    },
+    "owner": {
+      "$ref": "#/components/schemas/IdentityProfile/allOf/0",
+      "description": "The owner of the Identity Profile."
+    },
+    "priority": {
+      "type": "integer",
+      "format": "int64",
+      "description": "The priority for an Identity Profile.",
+      "example": 10
+    },
+    "authoritativeSource": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["SOURCE"],
+          "description": "Type of the object to which this reference applies",
+          "example": "SOURCE"
+        },
+        "id": {
+          "type": "string",
+          "description": "ID of the object to which this reference applies",
+          "example": "2c9180835d191a86015d28455b4b232a"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable display name of the object to which this reference applies",
+          "example": "HR Active Directory"
+        }
+      }
+    },
+    "identityRefreshRequired": {
+      "type": "boolean",
+      "description": "True if a identity refresh is needed. Typically triggered when a change on the source has been made.",
+      "example": true
+    },
+    "identityCount": {
+      "type": "integer",
+      "description": "The number of identities that belong to the Identity Profile.",
+      "format": "int32",
+      "example": 8
+    },
+    "identityAttributeConfig": {
+      "type": "object",
+      "description": "Defines all the identity attribute mapping configurations. This defines how to generate or collect data for each identity attributes in identity refresh process.",
+      "properties": {
+        "enabled": {
+          "description": "The backend will only promote values if the profile/mapping is enabled.",
+          "type": "boolean",
+          "example": true
+        },
+        "attributeTransforms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "description": "Defines a transformation definition for an identity attribute.",
+            "properties": {
+              "identityAttributeName": {
+                "type": "string",
+                "description": "Name of the identity attribute.",
+                "example": "email"
+              },
+              "transformDefinition": {
+                "description": "The seaspray transformation definition.",
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "description": "The type of the transform definition.",
+                    "example": "accountAttribute"
+                  },
+                  "attributes": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "object"
+                    },
+                    "description": "Arbitrary key-value pairs to store any metadata for the object",
+                    "example": {
+                      "attributeName": "e-mail",
+                      "sourceName": "MySource",
+                      "sourceId": "2c9180877a826e68017a8c0b03da1a53"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "identityExceptionReportReference": {
+      "type": "object",
+      "properties": {
+        "taskResultId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The id of the task result.",
+          "example": "2c918086795cd09201795d5f7d7533df"
+        },
+        "reportName": {
+          "type": "string",
+          "example": "My annual report",
+          "description": "The name of the report."
+        }
+      }
+    },
+    "hasTimeBasedAttr": {
+      "description": "Indicates the value of requiresPeriodicRefresh attribute for the Identity Profile.",
+      "type": "boolean",
+      "example": true
+    }
+  },
+  "required": ["name"]
+}

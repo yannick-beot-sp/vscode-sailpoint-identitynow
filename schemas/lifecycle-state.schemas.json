@@ -1,0 +1,126 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://developer.sailpoint.com/schemas/lifecycle-state.json",
+  "title": "lifecycle State",
+  "description": "Schema of a lifecycle state",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "description": "System-generated unique ID of the Object",
+      "type": "string",
+      "example": "id12345",
+      "readOnly": true
+    },
+    "name": {
+      "description": "Name of the Object",
+      "type": "string",
+      "example": "aName"
+    },
+    "created": {
+      "description": "Creation date of the Object",
+      "type": "string",
+      "example": "2015-05-28T14:07:17.000Z",
+      "format": "date-time",
+      "readOnly": true
+    },
+    "modified": {
+      "description": "Last modification date of the Object",
+      "type": "string",
+      "example": "2015-05-28T14:07:17.000Z",
+      "format": "date-time",
+      "readOnly": true
+    },
+    "enabled": {
+      "type": "boolean",
+      "example": true,
+      "description": "Whether the lifecycle state is enabled or disabled."
+    },
+    "technicalName": {
+      "type": "string",
+      "example": "Technical Name",
+      "description": "The technical name for lifecycle state. This is for internal use."
+    },
+    "description": {
+      "type": "string",
+      "example": "Lifecycle description",
+      "description": "Lifecycle state description."
+    },
+    "identityCount": {
+      "type": "integer",
+      "format": "int32",
+      "example": 42,
+      "readOnly": true,
+      "description": "Number of identities that have the lifecycle state."
+    },
+    "emailNotificationOption": {
+      "type": "object",
+      "description": "This is used for representing email configuration for a lifecycle state",
+      "properties": {
+        "notifyManagers": {
+          "type": "boolean",
+          "example": true,
+          "description": "If true, then the manager is notified of the lifecycle state change."
+        },
+        "notifyAllAdmins": {
+          "type": "boolean",
+          "example": true,
+          "description": "If true, then all the admins are notified of the lifecycle state change."
+        },
+        "notifySpecificUsers": {
+          "type": "boolean",
+          "example": true,
+          "description": "If true, then the users specified in \"emailAddressList\" below are notified of lifecycle state change."
+        },
+        "emailAddressList": {
+          "type": "array",
+          "example": ["test@test.com", "test2@test.com"],
+          "items": {
+            "type": "string"
+          },
+          "description": "List of user email addresses. If \"notifySpecificUsers\" option is true, then these users are notified of lifecycle state change."
+        }
+      }
+    },
+    "accountActions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "description": "Object for specifying Actions to be performed on a specified list of sources' account.",
+        "properties": {
+          "action": {
+            "example": "ENABLE",
+            "type": "string",
+            "description": "Describes if action will be enabled or disabled",
+            "enum": ["ENABLE", "DISABLE"]
+          },
+          "sourceIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true,
+            "example": [
+              "2c918084660f45d6016617daa9210584",
+              "2c918084660f45d6016617daa9210500"
+            ],
+            "description": "List of unique source IDs. The sources must have the ENABLE feature or flat file source. See \"/sources\" endpoint for source features."
+          }
+        }
+      }
+    },
+    "accessProfileIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "example": [
+        "2c918084660f45d6016617daa9210584",
+        "2c918084660f45d6016617daa9210500"
+      ],
+      "description": "List of unique access-profile IDs that are associated with the lifecycle state."
+    }
+  },
+  "required": ["name", "technicalName"]
+}
