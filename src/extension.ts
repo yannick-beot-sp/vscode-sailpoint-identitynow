@@ -25,6 +25,7 @@ import { ExportScriptFromRuleCommand } from './commands/exportScriptFromRuleComm
 import { FileHandler } from './files/FileHandler';
 import { RenameTenantCommand } from './commands/renameTenant';
 import { IdentityNowUriHandler } from './uriHandler';
+import { SortIdentityProfileCommand } from './commands/sortIdentityProfile';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -161,6 +162,13 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.EXPORT_CONNECTOR_RULE_SCRIPT_VIEW,
 			exportScriptFromRuleCommand.exportScriptView, exportScriptFromRuleCommand));
 
+	const sortIdentityProfileCommand = new SortIdentityProfileCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.SORT_IDENTITY_PROFILES_BY_NAME,
+			sortIdentityProfileCommand.sortByName, sortIdentityProfileCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.SORT_IDENTITY_PROFILES_BY_PRIORITY,
+			sortIdentityProfileCommand.sortByPriority, sortIdentityProfileCommand));
 
 	const fileHandler = new FileHandler(tenantService);
 	vscode.workspace.onDidSaveTextDocument(fileHandler.onFileSaved, fileHandler);

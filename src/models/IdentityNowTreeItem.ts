@@ -3,7 +3,7 @@ import { getIdByUri, getPathByUri, getResourceUri } from '../utils/UriUtils';
 import * as commands from '../commands/constants';
 import path = require('path');
 import { IdentityNowClient } from '../services/IdentityNowClient';
-import { compareByName } from '../utils';
+import { compareByName, compareByPriority } from '../utils';
 
 /**
  * Base class to expose getChildren and updateIcon methods
@@ -42,6 +42,7 @@ export class TenantTreeItem extends BaseTreeItem {
         results.push(new TransformsTreeItem(this.tenantId, this.tenantName));
         results.push(new WorkflowsTreeItem(this.tenantId, this.tenantName));
         results.push(new RulesTreeItem(this.tenantId, this.tenantName));
+        results.push(new IdentityProfilesTreeItem(this.tenantId, this.tenantName));
         return new Promise(resolve => resolve(results));
     }
 }
@@ -90,6 +91,43 @@ export class SourcesTreeItem extends FolderTreeItem {
             }
         }
         return results;
+    }
+}
+/**
+ * Containers for Identity Profiles
+ */
+export class IdentityProfilesTreeItem extends FolderTreeItem {
+    constructor(
+        public readonly tenantId: string,
+        public readonly tenantName: string
+    ) {
+        super('Identity Profiles', 'identity-profiles');
+    }
+
+    private criteria = IdentityProfileSorting.name;
+
+    public async sortBy(criteria: IdentityProfileSorting) {
+        this.criteria = criteria;
+
+    }
+
+    async getChildren(): Promise<BaseTreeItem[]> {
+        const results: BaseTreeItem[] = [];
+        const client = new IdentityNowClient(this.tenantId, this.tenantName);
+        let identityProfiles = await client.getIdentityProfiles();
+        if (this.criteria === IdentityProfileSorting.name) {
+            identityProfiles = identityProfiles.sort(compareByName);
+        } else {
+            identityProfiles = identityProfiles.sort(compareByPriority);
+        }
+        const identityProfileItems = identityProfiles.map(w =>
+            new IdentityProfileTreeItem(
+                this.tenantId,
+                this.tenantName,
+                `${w.name} (${w.authoritativeSource.name.replace(/ \[source.*\]/, "")})`,
+                w.id));
+        return identityProfileItems;
+
     }
 }
 
@@ -155,10 +193,7 @@ export class SourceTreeItem extends IdentityNowResourceTreeItem {
             dark: context.asAbsolutePath('resources/dark/source.svg')
         };
     }
-
-
 }
-
 
 /**
  * Containers for transforms
@@ -209,9 +244,6 @@ export class TransformTreeItem extends IdentityNowResourceTreeItem {
     }
 }
 
-/**
- * Containers for schemas
- */
 export class SchemasTreeItem extends FolderTreeItem {
     constructor(
         public readonly tenantId: string,
@@ -391,8 +423,6 @@ export class RulesTreeItem extends FolderTreeItem {
 }
 
 export class RuleTreeItem extends IdentityNowResourceTreeItem {
-    contextValue = 'connector-rule';
-
     constructor(
         tenantId: string,
         tenantName: string,
@@ -402,7 +432,55 @@ export class RuleTreeItem extends IdentityNowResourceTreeItem {
         super(tenantId, tenantName, label, 'connector-rules', id, TreeItemCollapsibleState.None, undefined, undefined, true);
     }
 
+    contextValue = 'connector-rule';
     iconPath = new ThemeIcon('file-code');
 }
 
+export class IdentityProfileTreeItem extends IdentityNowResourceTreeItem {
+    constructor(
+        tenantId: string,
+        tenantName: string,
+        label: string,
+        id: string,
+    ) {
+        super(tenantId, tenantName, label, 'identity-profiles', id, TreeItemCollapsibleState.Collapsed);
+    }
 
+    contextValue = 'identity-profile';
+
+    iconPath = new ThemeIcon('person-add');
+
+    async getChildren(): Promise<BaseTreeItem[]> {
+        const results: BaseTreeItem[] = [];
+        const client = new IdentityNowClient(this.tenantId, this.tenantName);
+        const lifecycleStates = await client.getLifecycleStates(this.id);
+
+        const lifecycleStateItems = lifecycleStates.map(w =>
+            new LifecycleStateTreeItem(this.tenantId, this.tenantName, w.name, this.id, w.id));
+        return lifecycleStateItems;
+    }
+
+
+}
+
+export enum IdentityProfileSorting {
+    name,
+    priority,
+}
+
+export class LifecycleStateTreeItem extends IdentityNowResourceTreeItem {
+
+    constructor(
+        tenantId: string,
+        tenantName: string,
+        label: string,
+        id: string,
+        subId: string
+    ) {
+        super(tenantId, tenantName, label, 'identity-profiles', id, TreeItemCollapsibleState.None, 'lifecycle-states', subId);
+    }
+
+    iconPath = new ThemeIcon('activate-breakpoints');
+
+    contextValue = 'lifecycle-state';
+}

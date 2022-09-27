@@ -51,6 +51,12 @@ export function convertToText(data: any): string {
 export const compareByName = (a: any, b: any) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1;
 
 /**
+ * Function used to compare 2 objects by the property 'priority'. Useful for sorting identity profiles
+ */
+ export const compareByPriority = (a: any, b: any) => (a.priority > b.priority) ? 1 : -1;
+
+
+/**
  * Use to get the full tenant name. The idea is to prevent the creation of the same tenant if already present
  */
 export function normalizeTenant(tenantName: string) {

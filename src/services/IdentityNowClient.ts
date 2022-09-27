@@ -6,6 +6,7 @@ import 'isomorphic-fetch';
 const FormData = require('form-data');
 import { withQuery } from "../utils/UriUtils";
 import { Workflow, WorkflowExecution } from "../models/workflow";
+import { IdentityProfile, LifeCycleState } from "../models/identityProfile";
 import { compareByName, convertToText } from '../utils';
 import { ConnectorRule, ValidationResult } from '../models/connectorRule';
 
@@ -631,6 +632,23 @@ export class IdentityNowClient {
         return jsonBody;
     }
 
+    public async getIdentityProfiles(): Promise<IdentityProfile[]> {
+        const identityProfiles = await this.getResource('/v3/identity-profiles?sorters=name');
+        if (identityProfiles === undefined || !Array.isArray(identityProfiles)) {
+            return [];
+        }
+        // identityProfiles.sort(compareByName);
+        return identityProfiles;
+    }
+
+    public async getLifecycleStates( identityProfileId:string): Promise<LifeCycleState[]> {
+        const lifecycleStates = await this.getResource(`/v3/identity-profiles/${identityProfileId}/lifecycle-states`);
+        if (lifecycleStates === undefined || !Array.isArray(lifecycleStates)) {
+            return [];
+        }
+        // identityProfiles.sort(compareByName);
+        return lifecycleStates;
+    }
 
 }
 

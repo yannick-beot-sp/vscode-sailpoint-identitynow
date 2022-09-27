@@ -31,6 +31,9 @@ export class FileHandler {
         if (olduri.path.match('transforms')) {
             node = new TransformsTreeItem(tenantInfo?.id ?? "", tenantName);
             resourceType = 'transforms';
+        } else if (olduri.path.match('lifecycle-states')) {
+            node = new TransformsTreeItem(tenantInfo?.id ?? "", tenantName);
+            resourceType = 'lifecycle-states';
         } else {
             node = new RulesTreeItem(tenantInfo?.id ?? "", tenantName);
             resourceType = 'connector-rules';

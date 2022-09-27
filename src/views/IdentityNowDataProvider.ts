@@ -11,9 +11,13 @@ export class IdentityNowDataProvider implements TreeDataProvider<BaseTreeItem> {
         private readonly tenantService: TenantService) {
     }
 
-    refresh(): void {
+    refresh(node?: BaseTreeItem): void {
         console.log('> IdentityNowDataProvider.refresh');
-        this._onDidChangeTreeData.fire();
+        if (node) {
+            this._onDidChangeTreeData.fire(node);
+        } else {
+            this._onDidChangeTreeData.fire();
+        }
     }
 
     async getChildren(item?: BaseTreeItem): Promise<BaseTreeItem[]> {

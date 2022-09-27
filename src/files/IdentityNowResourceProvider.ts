@@ -6,6 +6,8 @@ import { IdentityNowClient } from '../services/IdentityNowClient';
 import { TenantService } from '../services/TenantService';
 import { convertToText, str2Uint8Array, toTimestamp, uint8Array2Str } from '../utils';
 import { getIdByUri, getPathByUri } from '../utils/UriUtils';
+import { compare } from 'fast-json-patch';
+
 
 export class IdentityNowResourceProvider implements FileSystemProvider {
     private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
@@ -105,9 +107,30 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
                 data = JSON.stringify(transform);
             }
 
-            const updatedData = await client.updateResource(resourcePath, data);
-            if (!updatedData) {
-                throw vscode.FileSystemError.FileNotFound(uri);
+            if (resourcePath.match("identity-profiles")) {
+                // match identity profiles & lifecycle states
+                const oldData = await client.getResource(resourcePath);
+                const newData = JSON.parse(data);
+                if (!oldData) {
+                    throw vscode.FileSystemError.FileNotFound(uri);
+                }
+                let jsonpatch = compare(oldData, newData);
+                jsonpatch = jsonpatch.filter(p => p.path !== "/modified");
+                let patchResourcePath;
+                // Patch support for identity profiles only in beta for now
+                if (!resourcePath.match("lifecycle-states")) {
+                    patchResourcePath = resourcePath.replace("v3", "beta");
+                } else {
+                    patchResourcePath = resourcePath;
+                }
+                await client.patchResource(patchResourcePath, JSON.stringify(jsonpatch));
+
+
+            } else {
+                const updatedData = await client.updateResource(resourcePath, data);
+                if (!updatedData) {
+                    throw vscode.FileSystemError.FileNotFound(uri);
+                }
             }
             this._emitter.fire([({ type: vscode.FileChangeType.Changed, uri })]);
         }
