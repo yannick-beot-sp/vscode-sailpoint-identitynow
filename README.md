@@ -13,6 +13,7 @@ The SailPoint IdentityNow extension makes it easy to:
 - View, create, edit, delete schemas of a source
 - View, edit, enable, disable, and test workflows and view execution history
 - View, create, edit, delete connector rules and export/import the script of a rule
+- View, edit, delete identity profiles and lifecycle states
 
 ## Installation
 

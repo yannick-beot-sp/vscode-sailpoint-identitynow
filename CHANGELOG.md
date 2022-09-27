@@ -6,6 +6,9 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+- Add support for Identity Profiles
+- Pagination for sources (cf. [#25](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/25))
+
 ## [0.0.13] - 2022/09/01
 - Regression on transform evaluation (cf. [#20](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/20))
 
