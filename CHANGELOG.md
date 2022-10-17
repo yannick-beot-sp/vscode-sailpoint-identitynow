@@ -6,6 +6,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+- Add 2 commands for sources: reset accounts and reset entitlements
 - Add support for Identity Profiles
 - Pagination for sources (cf. [#25](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/25))
 

@@ -130,6 +130,11 @@ None
 
 ## Release Notes
 
+### 0.0.14
+- Add 2 commands for sources: reset accounts and reset entitlements
+- Add support for Identity Profiles
+- Pagination for sources (cf. [#25](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/25))
+
 ### 0.0.13
 - Regression on transform evaluation (cf. [#20](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/20))
 

@@ -42,6 +42,8 @@
     "onCommand:vscode-sailpoint-identitynow.aggregate-source",
     "onCommand:vscode-sailpoint-identitynow.aggregate-source-disable-optimization",
     "onCommand:vscode-sailpoint-identitynow.reset-source",
+    "onCommand:vscode-sailpoint-identitynow.reset-source-accounts",
+    "onCommand:vscode-sailpoint-identitynow.reset-source-entitlements",
     "onCommand:vscode-sailpoint-identitynow.new-transform",
     "onCommand:vscode-sailpoint-identitynow.new-provisioning-policy",
     "onCommand:vscode-sailpoint-identitynow.new-schema",
@@ -143,6 +145,14 @@
       {
         "command": "vscode-sailpoint-identitynow.reset-source",
         "title": "Reset source"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.reset-source-accounts",
+        "title": "Reset accounts"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.reset-source-entitlements",
+        "title": "Reset entitlements"
       },
       {
         "command": "vscode-sailpoint-identitynow.new-transform",
@@ -251,6 +261,14 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.reset-source-accounts",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.reset-source-entitlements",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.new-transform",
           "when": "never"
         },
@@ -331,6 +349,14 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.reset-source",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.reset-source-accounts",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.reset-source-entitlements",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
         },
         {

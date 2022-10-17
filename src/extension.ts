@@ -85,6 +85,12 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.RESET_SOURCE,
 			(tenantTreeItem) => treeManager.resetSource(tenantTreeItem)));
 	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.RESET_SOURCE_ACCOUNTS,
+			(tenantTreeItem) => treeManager.resetSource(tenantTreeItem, "entitlements")));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.RESET_SOURCE_ENTITLEMENTS,
+			(tenantTreeItem) => treeManager.resetSource(tenantTreeItem, "accounts")));
+	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM,
 			(tenantTreeItem) => treeManager.evaluateTransform(tenantTreeItem)));
 

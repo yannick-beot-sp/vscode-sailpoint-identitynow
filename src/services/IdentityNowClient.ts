@@ -269,9 +269,12 @@ export class IdentityNowClient {
         return res;
     }
 
-    public async resetSource(sourceID: Number): Promise<any> {
+    public async resetSource(sourceID: Number, skip: string | null = null): Promise<any> {
         console.log('> IdentityNowClient.resetSource', sourceID);
-        const endpoint = EndpointUtils.getCCUrl(this.tenantName) + '/source/reset/' + sourceID;
+        let endpoint = EndpointUtils.getCCUrl(this.tenantName) + '/source/reset/' + sourceID;
+        if (!!skip) {
+            endpoint += "?skip="+skip;
+        }
         const headers = await this.prepareHeaders();
         headers['Content-Type'] = 'application/x-www-form-urlencoded';
 
@@ -641,7 +644,7 @@ export class IdentityNowClient {
         return identityProfiles;
     }
 
-    public async getLifecycleStates( identityProfileId:string): Promise<LifeCycleState[]> {
+    public async getLifecycleStates(identityProfileId: string): Promise<LifeCycleState[]> {
         const lifecycleStates = await this.getResource(`/v3/identity-profiles/${identityProfileId}/lifecycle-states`);
         if (lifecycleStates === undefined || !Array.isArray(lifecycleStates)) {
             return [];

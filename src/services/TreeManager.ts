@@ -84,16 +84,19 @@ export class TreeManager {
     }
 
 
-    public async resetSource(item: SourceTreeItem): Promise<void> {
+    public async resetSource(item: SourceTreeItem, skip: string | null = null): Promise<void> {
         console.log("> resetSource", item);
         // assessing that item is a SourceTreeItem
         if (item === undefined || !(item instanceof SourceTreeItem)) {
             console.log("WARNING: resetSource: invalid item", item);
             throw new Error("aggregateSource: invalid item");
         }
-
+        let skipping = "";
+        if (!!skip) {
+            skipping = ` skipping ${skip}`;
+        }
         const response = await vscode.window.showWarningMessage(
-            `Are you sure you want to reset ${item.label}?`,
+            `Are you sure you want to reset ${item.label}${skipping}?`,
             { modal: true },
             ...["Yes", "No"]
         );
@@ -105,12 +108,12 @@ export class TreeManager {
         const client = new IdentityNowClient(item.tenantId, item.tenantName);
         vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
-            title: `Reset of ${item.label}`,
+            title: `Reset of ${item.label}${skipping}`,
             cancellable: false
         }, async (progress, token) => {
             let job = null;
             try {
-                job = await client.resetSource(item.ccId);
+                job = await client.resetSource(item.ccId, skip);
             } catch (err) {
                 vscode.window.showErrorMessage('' + err);
                 return;
@@ -126,7 +129,7 @@ export class TreeManager {
             } while (task !== null && task.status === "PENDING");
             if (task !== null) {
                 if (task.status === "SUCCESS") {
-                    vscode.window.showInformationMessage(`Source ${task.object.displayName} successfully reset`);
+                    vscode.window.showInformationMessage(`Source ${task.object.displayName} successfully reset${skipping}`);
                 } else if (task.status === "WARNING") {
                     vscode.window.showWarningMessage(
                         `Warning during reset of ${task.object.displayName}: ${task.details?.messages?.Warn}`);
