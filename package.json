@@ -1,480 +1,504 @@
 {
-	"name": "vscode-sailpoint-identitynow",
-	"displayName": "SailPoint IdentityNow",
-	"description": "Customize SailPoint IdentityNow",
-	"version": "0.0.13",
-	"publisher": "yannick-beot-sp",
-	"icon": "resources/idn.png",
-	"bugs": {
-		"url": "https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow.git"
-	},
-	"homepage": "https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/",
-	"engines": {
-		"vscode": "^1.63.0"
-	},
-	"extensionKind": [
-		"ui",
-		"workspace"
-	],
-	"categories": [
-		"Snippets",
-		"Other"
-	],
-	"keywords": [
-		"SailPoint",
-		"IdentityNow"
-	],
-	"preview": true,
-	"activationEvents": [
-		"onView:vscode-sailpoint-identitynow.view",
-		"onCommand:vscode-sailpoint-identitynow.add-tenant",
-		"onCommand:vscode-sailpoint-identitynow.remove-tenant",
-		"onCommand:vscode-sailpoint-identitynow.rename-tenant",
-		"onCommand:vscode-sailpoint-identitynow.export-config.view",
-		"onCommand:vscode-sailpoint-identitynow.export-config.palette",
-		"onCommand:vscode-sailpoint-identitynow.refresh",
-		"onCommand:vscode-sailpoint-identitynow.open-resource",
-		"onCommand:vscode-sailpoint-identitynow.remove-resource",
-		"onCommand:vscode-sailpoint-identitynow.aggregate-source",
-		"onCommand:vscode-sailpoint-identitynow.aggregate-source-disable-optimization",
-		"onCommand:vscode-sailpoint-identitynow.reset-source",
-		"onCommand:vscode-sailpoint-identitynow.new-transform",
-		"onCommand:vscode-sailpoint-identitynow.new-provisioning-policy",
-		"onCommand:vscode-sailpoint-identitynow.new-schema",
-		"onCommand:vscode-sailpoint-identitynow.workflow.enable",
-		"onCommand:vscode-sailpoint-identitynow.workflow.disable",
-		"onCommand:vscode-sailpoint-identitynow.workflow.view-execution-history",
-		"onCommand:vscode-sailpoint-identitynow.workflow.test",
-		"onView:vscode-sailpoint-identitynow.workflow.test-view",
-		"onCommand:vscode-sailpoint-identitynow.transform.evaluate",
-		"onCommand:vscode-sailpoint-identitynow.transform.evaluate.editor",
-		"onCommand:vscode-sailpoint-identitynow.new-connector-rule",
-		"onCommand:vscode-sailpoint-identitynow.connector-rule.upload",
-		"onCommand:vscode-sailpoint-identitynow.connector-rule.validate",
-		"onCommand:vscode-sailpoint-identitynow.connector-rule.export-script.editor",
-		"onCommand:vscode-sailpoint-identitynow.connector-rule.export-script.view",
-		"onCommand:vscode-sailpoint-identitynow.identity-profiles.sort.name",
-		"onCommand:vscode-sailpoint-identitynow.identity-profiles.sort.priority",
-		"onFileSystem:idn",
-		"onUri"
-	],
-	"license": "MIT",
-	"main": "./out/extension.js",
-	"contributes": {
-		"viewsContainers": {
-			"activitybar": [
-				{
-					"id": "sailpoint",
-					"title": "SailPoint IdentityNow",
-					"icon": "resources/idn.svg"
-				}
-			]
-		},
-		"views": {
-			"sailpoint": [
-				{
-					"id": "vscode-sailpoint-identitynow.view",
-					"name": "IdentityNow Tenants",
-					"icon": "resources/idn.svg"
-				},
-				{
-					"id": "vscode-sailpoint-identitynow.workflow.test-view",
-					"type": "webview",
-					"name": "Workflow tester"
-				}
-			]
-		},
-		"viewsWelcome": [
-			{
-				"view": "vscode-sailpoint-identitynow.view",
-				"contents": "No tenant.\n[Add Tenant](command:vscode-sailpoint-identitynow.add-tenant)"
-			}
-		],
-		"commands": [
-			{
-				"command": "vscode-sailpoint-identitynow.add-tenant",
-				"title": "IdentityNow: Add tenant...",
-				"icon": "$(add)"
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.remove-tenant",
-				"title": "Remove tenant"
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.rename-tenant",
-				"title": "Rename tenant"
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.export-config.view",
-				"title": "Export config...",
-				"icon": "$(export)"
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.export-config.palette",
-				"title": "IdentityNow: Export config...",
-				"icon": "$(export)"
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.refresh",
-				"title": "IdentityNow: Refresh",
-				"icon": "$(refresh)"
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.open-resource",
-				"title": "Open"
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.remove-resource",
-				"title": "Delete",
-				"icon": "$(trash)"
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.aggregate-source",
-				"title": "Aggregate source"
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.aggregate-source-disable-optimization",
-				"title": "Aggregate source without optimization"
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.reset-source",
-				"title": "Reset source"
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.new-transform",
-				"title": "New transform",
-				"icon": "$(add)"
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.new-provisioning-policy",
-				"title": "New provisioning policy",
-				"icon": "$(add)"
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.new-schema",
-				"title": "New Schema",
-				"icon": "$(add)"
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.workflow.enable",
-				"title": "Enable",
-				"icon": "$(debug-start)"
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.workflow.test",
-				"title": "Test workflow...",
-				"icon": "$(test-view-icon)"
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.workflow.disable",
-				"title": "Disable",
-				"icon": "$(debug-stop)"
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.workflow.view-execution-history",
-				"title": "View execution history..."
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.transform.evaluate",
-				"title": "Evaluate"
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.transform.evaluate.editor",
-				"title": "Evaluate this transform..."
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.new-connector-rule",
-				"title": "New connector rule",
-				"icon": "$(add)"
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.connector-rule.upload",
-				"title": "IdentityNow: Upload this code to a rule..."
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.connector-rule.validate",
-				"title": "IdentityNow: Validate this code..."
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.connector-rule.export-script.editor",
-				"title": "IdentityNow: Export the script from this rule..."
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.connector-rule.export-script.view",
-				"title": "Export the script..."
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.identity-profiles.sort.name",
-				"title": "Sort by name",
-				"icon": {
-					"light": "resources/light/sort-alphabetically.svg",
-					"dark": "resources/dark/sort-alphabetically.svg"
-				}
-			},
-			{
-				"command": "vscode-sailpoint-identitynow.identity-profiles.sort.priority",
-				"title": "Sort by priority",
-				"icon": {
-					"light": "resources/light/sort-number.svg",
-					"dark": "resources/dark/sort-number.svg"
-				}
-			}
-		],
-		"menus": {
-			"commandPalette": [
-				{
-					"command": "vscode-sailpoint-identitynow.export-config.view",
-					"when": "never"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.aggregate-source",
-					"when": "never"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.open-resource",
-					"when": "never"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.remove-resource",
-					"when": "never"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.aggregate-source-disable-optimization",
-					"when": "never"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.reset-source",
-					"when": "never"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.new-transform",
-					"when": "never"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.new-provisioning-policy",
-					"when": "never"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.new-schema",
-					"when": "never"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.workflow.enable",
-					"when": "never"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.workflow.disable",
-					"when": "never"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.workflow.test",
-					"when": "never"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.workflow.view-execution-history",
-					"when": "never"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.transform.evaluate",
-					"when": "never"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.identity-profiles.sort.name",
-					"when": "never"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.identity-profiles.sort.priority",
-					"when": "never"
-				}
-			],
-			"view/title": [
-				{
-					"command": "vscode-sailpoint-identitynow.add-tenant",
-					"when": "view == vscode-sailpoint-identitynow.view",
-					"group": "navigation"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.refresh",
-					"when": "view == vscode-sailpoint-identitynow.view",
-					"group": "navigation"
-				}
-			],
-			"view/item/context": [
-				{
-					"command": "vscode-sailpoint-identitynow.remove-tenant",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.rename-tenant",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.export-config.view",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.refresh",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == sources",
-					"group": "inline"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.aggregate-source",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.aggregate-source-disable-optimization",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.reset-source",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.open-resource",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.new-transform",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == transforms",
-					"group": "inline@1"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.refresh",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == transforms",
-					"group": "inline@2"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.open-resource",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == transform"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.remove-resource",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == transform"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.new-provisioning-policy",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == provisioning-policies",
-					"group": "inline@1"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.refresh",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == provisioning-policies",
-					"group": "inline@2"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.remove-resource",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == provisioning-policy"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.new-schema",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == schemas",
-					"group": "inline@1"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.refresh",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == schemas",
-					"group": "inline@2"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.remove-resource",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == schema"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.refresh",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == workflows",
-					"group": "inline"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.open-resource",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /workflow$/i"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.remove-resource",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /workflow$/i"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.workflow.enable",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == disabledWorkflow"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.workflow.disable",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == enabledWorkflow"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.workflow.view-execution-history",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /workflow$/i"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.workflow.test",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /XXX$/i"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.transform.evaluate",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == transform"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.new-connector-rule",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rules",
-					"group": "inline@1"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.refresh",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rules",
-					"group": "inline@2"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.open-resource",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rule"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.remove-resource",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rule"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.connector-rule.export-script.view",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rule"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.refresh",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-profiles",
-					"group": "inline@3"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.identity-profiles.sort.name",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-profiles",
-					"group": "inline@2"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.identity-profiles.sort.priority",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-profiles",
-					"group": "inline@1"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.refresh",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-profile",
-					"group": "inline@1"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.open-resource",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-profile"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.remove-resource",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-profile"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.open-resource",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == lifecycle-state"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.remove-resource",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == lifecycle-state"
-				},
-				{
+  "name": "vscode-sailpoint-identitynow",
+  "displayName": "SailPoint IdentityNow",
+  "description": "Customize SailPoint IdentityNow",
+  "version": "0.0.13",
+  "publisher": "yannick-beot-sp",
+  "icon": "resources/idn.png",
+  "bugs": {
+    "url": "https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow.git"
+  },
+  "homepage": "https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/",
+  "engines": {
+    "vscode": "^1.63.0"
+  },
+  "extensionKind": [
+    "ui",
+    "workspace"
+  ],
+  "categories": [
+    "Snippets",
+    "Other"
+  ],
+  "keywords": [
+    "SailPoint",
+    "IdentityNow"
+  ],
+  "preview": true,
+  "activationEvents": [
+    "onView:vscode-sailpoint-identitynow.view",
+    "onCommand:vscode-sailpoint-identitynow.add-tenant",
+    "onCommand:vscode-sailpoint-identitynow.remove-tenant",
+    "onCommand:vscode-sailpoint-identitynow.rename-tenant",
+    "onCommand:vscode-sailpoint-identitynow.export-config.view",
+    "onCommand:vscode-sailpoint-identitynow.export-config.palette",
+    "onCommand:vscode-sailpoint-identitynow.refresh",
+    "onCommand:vscode-sailpoint-identitynow.open-resource",
+    "onCommand:vscode-sailpoint-identitynow.remove-resource",
+    "onCommand:vscode-sailpoint-identitynow.aggregate-source",
+    "onCommand:vscode-sailpoint-identitynow.aggregate-source-disable-optimization",
+    "onCommand:vscode-sailpoint-identitynow.reset-source",
+    "onCommand:vscode-sailpoint-identitynow.new-transform",
+    "onCommand:vscode-sailpoint-identitynow.new-provisioning-policy",
+    "onCommand:vscode-sailpoint-identitynow.new-schema",
+    "onCommand:vscode-sailpoint-identitynow.workflow.enable",
+    "onCommand:vscode-sailpoint-identitynow.workflow.disable",
+    "onCommand:vscode-sailpoint-identitynow.workflow.view-execution-history",
+    "onCommand:vscode-sailpoint-identitynow.workflow.test",
+    "onView:vscode-sailpoint-identitynow.workflow.test-view",
+    "onCommand:vscode-sailpoint-identitynow.transform.evaluate",
+    "onCommand:vscode-sailpoint-identitynow.transform.evaluate.editor",
+    "onCommand:vscode-sailpoint-identitynow.new-connector-rule",
+    "onCommand:vscode-sailpoint-identitynow.connector-rule.upload",
+    "onCommand:vscode-sailpoint-identitynow.connector-rule.validate",
+    "onCommand:vscode-sailpoint-identitynow.connector-rule.export-script.editor",
+    "onCommand:vscode-sailpoint-identitynow.connector-rule.export-script.view",
+    "onCommand:vscode-sailpoint-identitynow.identity-profiles.sort.name",
+    "onCommand:vscode-sailpoint-identitynow.identity-profiles.sort.priority",
+    "onFileSystem:idn",
+    "onUri"
+  ],
+  "license": "MIT",
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "sailpoint",
+          "title": "SailPoint IdentityNow",
+          "icon": "resources/idn.svg"
+        }
+      ]
+    },
+    "views": {
+      "sailpoint": [
+        {
+          "id": "vscode-sailpoint-identitynow.view",
+          "name": "IdentityNow Tenants",
+          "icon": "resources/idn.svg"
+        },
+        {
+          "id": "vscode-sailpoint-identitynow.workflow.test-view",
+          "type": "webview",
+          "name": "Workflow tester"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "vscode-sailpoint-identitynow.view",
+        "contents": "No tenant.\n[Add Tenant](command:vscode-sailpoint-identitynow.add-tenant)"
+      }
+    ],
+    "commands": [
+      {
+        "command": "vscode-sailpoint-identitynow.add-tenant",
+        "title": "IdentityNow: Add tenant...",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.remove-tenant",
+        "title": "Remove tenant"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.rename-tenant",
+        "title": "Rename tenant"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.export-config.view",
+        "title": "Export config...",
+        "icon": "$(export)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.export-config.palette",
+        "title": "IdentityNow: Export config...",
+        "icon": "$(export)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.refresh",
+        "title": "IdentityNow: Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.open-resource",
+        "title": "Open"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.remove-resource",
+        "title": "Delete",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.aggregate-source",
+        "title": "Aggregate source"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.aggregate-source-disable-optimization",
+        "title": "Aggregate source without optimization"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.reset-source",
+        "title": "Reset source"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.reset-source-accounts",
+        "title": "Reset accounts"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.reset-source-entitlements",
+        "title": "Reset entitlements"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.new-transform",
+        "title": "New transform",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.new-provisioning-policy",
+        "title": "New provisioning policy",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.new-schema",
+        "title": "New Schema",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.workflow.enable",
+        "title": "Enable",
+        "icon": "$(debug-start)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.workflow.test",
+        "title": "Test workflow...",
+        "icon": "$(test-view-icon)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.workflow.disable",
+        "title": "Disable",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.workflow.view-execution-history",
+        "title": "View execution history..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.transform.evaluate",
+        "title": "Evaluate"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.transform.evaluate.editor",
+        "title": "Evaluate this transform..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.new-connector-rule",
+        "title": "New connector rule",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.connector-rule.upload",
+        "title": "IdentityNow: Upload this code to a rule..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.connector-rule.validate",
+        "title": "IdentityNow: Validate this code..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.connector-rule.export-script.editor",
+        "title": "IdentityNow: Export the script from this rule..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.connector-rule.export-script.view",
+        "title": "Export the script..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.identity-profiles.sort.name",
+        "title": "Sort by name",
+        "icon": {
+          "light": "resources/light/sort-alphabetically.svg",
+          "dark": "resources/dark/sort-alphabetically.svg"
+        }
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.identity-profiles.sort.priority",
+        "title": "Sort by priority",
+        "icon": {
+          "light": "resources/light/sort-number.svg",
+          "dark": "resources/dark/sort-number.svg"
+        }
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "vscode-sailpoint-identitynow.export-config.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.aggregate-source",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.open-resource",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.remove-resource",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.aggregate-source-disable-optimization",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.reset-source",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.reset-source-accounts",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.reset-source-entitlements",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-transform",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-provisioning-policy",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-schema",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.workflow.enable",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.workflow.disable",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.workflow.test",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.workflow.view-execution-history",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.transform.evaluate",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identity-profiles.sort.name",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identity-profiles.sort.priority",
+          "when": "never"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "vscode-sailpoint-identitynow.add-tenant",
+          "when": "view == vscode-sailpoint-identitynow.view",
+          "group": "navigation"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.refresh",
+          "when": "view == vscode-sailpoint-identitynow.view",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "vscode-sailpoint-identitynow.remove-tenant",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.rename-tenant",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.export-config.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.refresh",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == sources",
+          "group": "inline"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.aggregate-source",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.aggregate-source-disable-optimization",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.reset-source",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.reset-source-accounts",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.reset-source-entitlements",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.open-resource",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-transform",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == transforms",
+          "group": "inline@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.refresh",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == transforms",
+          "group": "inline@2"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.open-resource",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == transform"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.remove-resource",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == transform"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-provisioning-policy",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == provisioning-policies",
+          "group": "inline@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.refresh",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == provisioning-policies",
+          "group": "inline@2"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.remove-resource",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == provisioning-policy"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-schema",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == schemas",
+          "group": "inline@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.refresh",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == schemas",
+          "group": "inline@2"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.remove-resource",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == schema"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.refresh",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == workflows",
+          "group": "inline"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.open-resource",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /workflow$/i"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.remove-resource",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /workflow$/i"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.workflow.enable",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == disabledWorkflow"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.workflow.disable",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == enabledWorkflow"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.workflow.view-execution-history",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /workflow$/i"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.workflow.test",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /XXX$/i"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.transform.evaluate",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == transform"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-connector-rule",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rules",
+          "group": "inline@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.refresh",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rules",
+          "group": "inline@2"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.open-resource",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rule"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.remove-resource",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rule"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.connector-rule.export-script.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rule"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.refresh",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-profiles",
+          "group": "inline@3"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identity-profiles.sort.name",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-profiles",
+          "group": "inline@2"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identity-profiles.sort.priority",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-profiles",
+          "group": "inline@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.refresh",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-profile",
+          "group": "inline@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.open-resource",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-profile"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.remove-resource",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-profile"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.open-resource",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == lifecycle-state"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.remove-resource",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == lifecycle-state"
+        },
+        {
 					"command": "vscode-sailpoint-identitynow.remove-resource",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == service-desk-integration"
 				},
@@ -482,84 +506,84 @@
 					"command": "vscode-sailpoint-identitynow.open-resource",
 					"when": "view == vscode-sailpoint-identitynow.view && viewItem == service-desk-integration"
 				}
-			],
-			"editor/context": [
-				{
-					"command": "vscode-sailpoint-identitynow.transform.evaluate.editor",
-					"when": "resourcePath =~ /transforms/"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.connector-rule.upload"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.connector-rule.validate"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.connector-rule.export-script.editor",
-					"when": "resourcePath =~ /idn://.*/connector-rules/.*/"
-				}
-			]
-		},
-		"snippets": [
-			{
-				"language": "json",
-				"path": "./snippets/transforms.json"
-			}
-		],
-		"jsonValidation": [
-			{
-				"fileMatch": "idn://**/schemas/**/*",
-				"url": "./schemas/schema.schemas.json"
-			},
-			{
-				"fileMatch": "idn://**/provisioning-policies/**/*",
-				"url": "./schemas/provisioning-policy.schemas.json"
-			},
-			{
-				"fileMatch": "idn://**/identity-profiles/*/*",
-				"url": "./schemas/identity-profile.schemas.json"
-			},
-			{
-				"fileMatch": "idn://**/lifecycle-states/**/*",
-				"url": "./schemas/lifecycle-state.schemas.json"
-			}
-		]
-	},
-	"scripts": {
-		"vscode:prepublish": "npm run esbuild-base -- --minify",
-		"esbuild-base": "rimraf out && esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
-		"esbuild": "npm run esbuild-base -- --sourcemap",
-		"esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
-		"test-compile": "tsc -p ./",
-		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
-		"pretest": "npm run compile && npm run lint",
-		"lint": "eslint src --ext ts",
-		"test": "node ./out/test/runTest.js",
-		"clean": "rimraf out"
-	},
-	"devDependencies": {
-		"@types/glob": "^7.2.0",
-		"@types/isomorphic-fetch": "^0.0.35",
-		"@types/isomorphic-form-data": "^2.0.0",
-		"@types/mocha": "^9.0.0",
-		"@types/node": "14.x",
-		"@types/vscode": "^1.63.0",
-		"@typescript-eslint/eslint-plugin": "^5.9.1",
-		"@typescript-eslint/parser": "^5.9.1",
-		"@vscode/test-electron": "^2.0.3",
-		"esbuild": "^0.14.18",
-		"eslint": "^8.6.0",
-		"glob": "^7.2.0",
-		"mocha": "^9.1.3",
-		"rimraf": "^3.0.2",
-		"typescript": "^4.5.4"
-	},
-	"dependencies": {
-		"@vscode/webview-ui-toolkit": "^1.0.0",
-		"client-oauth2": "^4.3.3",
-		"fast-json-patch": "^3.1.1",
-		"isomorphic-fetch": "^3.0.0",
-		"isomorphic-form-data": "^2.0.0"
-	}
+      ],
+      "editor/context": [
+        {
+          "command": "vscode-sailpoint-identitynow.transform.evaluate.editor",
+          "when": "resourcePath =~ /transforms/"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.connector-rule.upload"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.connector-rule.validate"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.connector-rule.export-script.editor",
+          "when": "resourcePath =~ /idn://.*/connector-rules/.*/"
+        }
+      ]
+    },
+    "snippets": [
+      {
+        "language": "json",
+        "path": "./snippets/transforms.json"
+      }
+    ],
+    "jsonValidation": [
+      {
+        "fileMatch": "idn://**/schemas/**/*",
+        "url": "./schemas/schema.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/provisioning-policies/**/*",
+        "url": "./schemas/provisioning-policy.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/identity-profiles/*/*",
+        "url": "./schemas/identity-profile.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/lifecycle-states/**/*",
+        "url": "./schemas/lifecycle-state.schemas.json"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run esbuild-base -- --minify",
+    "esbuild-base": "rimraf out && esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+    "esbuild": "npm run esbuild-base -- --sourcemap",
+    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+    "test-compile": "tsc -p ./",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "clean": "rimraf out"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.2.0",
+    "@types/isomorphic-fetch": "^0.0.35",
+    "@types/isomorphic-form-data": "^2.0.0",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "14.x",
+    "@types/vscode": "^1.63.0",
+    "@typescript-eslint/eslint-plugin": "^5.9.1",
+    "@typescript-eslint/parser": "^5.9.1",
+    "@vscode/test-electron": "^2.0.3",
+    "esbuild": "^0.14.18",
+    "eslint": "^8.6.0",
+    "glob": "^7.2.0",
+    "mocha": "^9.1.3",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.5.4"
+  },
+  "dependencies": {
+    "@vscode/webview-ui-toolkit": "^1.0.0",
+    "client-oauth2": "^4.3.3",
+    "fast-json-patch": "^3.1.1",
+    "isomorphic-fetch": "^3.0.0",
+    "isomorphic-form-data": "^2.0.0"
+  }
 }

@@ -276,12 +276,14 @@ export class IdentityNowClient {
 		return res;
 	}
 
-	public async resetSource(sourceID: Number): Promise<any> {
-		console.log("> IdentityNowClient.resetSource", sourceID);
-		const endpoint =
-			EndpointUtils.getCCUrl(this.tenantName) + "/source/reset/" + sourceID;
-		const headers = await this.prepareHeaders();
-		headers["Content-Type"] = "application/x-www-form-urlencoded";
+    public async resetSource(sourceID: Number, skip: string | null = null): Promise<any> {
+        console.log('> IdentityNowClient.resetSource', sourceID);
+        let endpoint = EndpointUtils.getCCUrl(this.tenantName) + '/source/reset/' + sourceID;
+        if (!!skip) {
+            endpoint += "?skip="+skip;
+        }
+        const headers = await this.prepareHeaders();
+        headers['Content-Type'] = 'application/x-www-form-urlencoded';
 
 		const req = await fetch(endpoint, {
 			method: "POST",
