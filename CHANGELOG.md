@@ -6,6 +6,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+- Add supports for Service Desk Integrations (@fernando-delosrios-sp)
+
 ## [0.0.14] - 2022-10-18
 
 - Add 2 commands for sources: reset accounts and reset entitlements
@@ -55,7 +57,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 - Add step to creation of transform to have a non-empty file
 - If only 1 tenant, automatically selected in the workflow tester
 - Added refresh buttons in the view
-- Add the capacity to evaluate transforms [#7](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/7)
+- Add the capacity to evaluate transforms [#7](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/7) thanks to @cristian-grau-sp
 
 ## [0.0.6] - 2022-04-27
 
