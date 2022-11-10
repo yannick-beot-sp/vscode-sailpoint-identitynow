@@ -2,7 +2,7 @@
   "name": "vscode-sailpoint-identitynow",
   "displayName": "SailPoint IdentityNow",
   "description": "Customize SailPoint IdentityNow",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "publisher": "yannick-beot-sp",
   "icon": "resources/idn.png",
   "bugs": {
@@ -499,13 +499,18 @@
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == lifecycle-state"
         },
         {
-					"command": "vscode-sailpoint-identitynow.remove-resource",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == service-desk-integration"
-				},
-				{
-					"command": "vscode-sailpoint-identitynow.open-resource",
-					"when": "view == vscode-sailpoint-identitynow.view && viewItem == service-desk-integration"
-				}
+          "command": "vscode-sailpoint-identitynow.refresh",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == service-desk-integrations",
+          "group": "inline@2"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.remove-resource",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == service-desk-integration"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.open-resource",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == service-desk-integration"
+        }
       ],
       "editor/context": [
         {
