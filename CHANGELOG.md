@@ -6,28 +6,49 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [0.0.15] - 2022-11-10
+
+### Added
+
 - Add supports for Service Desk Integrations (@fernando-delosrios-sp)
+
+### Fixed
+
+- Fix supports of UTF-8 values in transform (cf. [#33](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/33))
 
 ## [0.0.14] - 2022-10-18
 
+### Added
+
 - Add 2 commands for sources: reset accounts and reset entitlements
 - Add support for Identity Profiles
+
+### Fixed
+
 - Pagination for sources (cf. [#25](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/25))
 
 ## [0.0.13] - 2022-09-01
 
+### Fixed
+
 - Regression on transform evaluation (cf. [#20](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/20))
 
 ## [0.0.12] - 2022-07-03
+
+### Added
 
 - Possibility to add a tenant with an access token (cf. [#18](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/18))
 - The extension have an URI handler (cf. [#17](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/17)). If a URL with the following format is called in the system, a tenant is added or updated: vscode://yannick-beot-sp.vscode-sailpoint-identitynow/addtenant?tenantName=XXX&accessToken=eyJh...&authenticationMethod=AccessToken
 
 ## [0.0.11] - 2022-06-29
 
+### Added
+
 - Can rename tenant display name (cf. [#12](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/12))
 
 ## [0.0.10] - 2022-06-27
+
+### Fixed
 
 - Release for documentation fix
 

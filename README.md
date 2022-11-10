@@ -134,6 +134,7 @@ None
 ### 0.0.15
 
 - Add supports for Service Desk Integrations (@fernando-delosrios-sp)
+- Fix supports of UTF-8 values in transform (cf. [#33](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/33))
 
 ### 0.0.14
 
