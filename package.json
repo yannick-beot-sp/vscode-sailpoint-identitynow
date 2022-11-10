@@ -42,8 +42,6 @@
     "onCommand:vscode-sailpoint-identitynow.aggregate-source",
     "onCommand:vscode-sailpoint-identitynow.aggregate-source-disable-optimization",
     "onCommand:vscode-sailpoint-identitynow.reset-source",
-    "onCommand:vscode-sailpoint-identitynow.reset-source-accounts",
-    "onCommand:vscode-sailpoint-identitynow.reset-source-entitlements",
     "onCommand:vscode-sailpoint-identitynow.new-transform",
     "onCommand:vscode-sailpoint-identitynow.new-provisioning-policy",
     "onCommand:vscode-sailpoint-identitynow.new-schema",
@@ -499,6 +497,19 @@
         {
           "command": "vscode-sailpoint-identitynow.remove-resource",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == lifecycle-state"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.refresh",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == service-desk-integrations",
+          "group": "inline@2"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.remove-resource",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == service-desk-integration"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.open-resource",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == service-desk-integration"
         }
       ],
       "editor/context": [
