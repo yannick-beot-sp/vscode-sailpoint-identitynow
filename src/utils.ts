@@ -8,16 +8,12 @@ export function delay(ms: number) {
 
 
 export function uint8Array2Str(arr: Uint8Array): string {
-    let bufferAsString = String.fromCharCode(...arr);
+    let bufferAsString = new TextDecoder("utf-8").decode(arr);
     return bufferAsString;
 }
 
 export function str2Uint8Array(str: string): Uint8Array {
-    var buf = new ArrayBuffer(str.length);
-    var bufView = new Uint8Array(buf);
-    for (var i = 0, strLen = str.length; i < strLen; i++) {
-        bufView[i] = str.charCodeAt(i);
-    }
+    const bufView = new TextEncoder().encode(str);
     return bufView;
 }
 
