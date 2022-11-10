@@ -13,6 +13,7 @@ The SailPoint IdentityNow extension makes it easy to:
 - View, create, edit, delete schemas of a source
 - View, edit, enable, disable, and test workflows and view execution history
 - View, create, edit, delete connector rules and export/import the script of a rule
+- View, edit, delete service desk integrations
 - View, edit, delete identity profiles and lifecycle states
 
 ## Installation
@@ -130,6 +131,10 @@ None
 
 ## Release Notes
 
+### 0.0.15
+
+- Add supports for Service Desk Integrations (@fernando-delosrios-sp)
+
 ### 0.0.14
 
 - Add 2 commands for sources: reset accounts and reset entitlements
@@ -169,7 +174,7 @@ Added:
 - Add step to creation of transform to have a non-empty file
 - If only 1 tenant, automatically selected in the workflow tester
 - Added refresh buttons in the view
-- Add the capacity to evaluate transforms
+- Add the capacity to evaluate transforms [#7](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/7) thanks to @cristian-grau-sp
 
 ### 0.0.6
 
