@@ -6,6 +6,11 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix error when exporting to file (cf. [#35](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/35))
+
+
 ## [0.0.15] - 2022-11-10
 
 ### Added

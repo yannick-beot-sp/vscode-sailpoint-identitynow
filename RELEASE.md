@@ -7,6 +7,7 @@ This document presents the release process, just to not forget.
 - [ ] Update `README.md`
 - [ ] Update `CHANGELOG.md`
 - [ ] Update version in `package.json`
+- [ ] Update Discuss page: https://developer.sailpoint.com/discuss/t/identitynow-extensions-for-visual-studio-code/5983/2
 
 == Publish in the marketplace and GitHub Release
 
