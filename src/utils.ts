@@ -29,8 +29,7 @@ export function toTimestamp(strDate: string): number {
 export function toDateSuffix(): string {
     var date = new Date();
     let str = date.toISOString(); //"2011-12-19T15:28:46.493Z"
-    str = str.replaceAll(':', '-');
-    str = str.replaceAll(/\..*/g, '');
+    str = str.replaceAll(':', '-').replace(/\..*$/, '');
     return str;
 }
 
