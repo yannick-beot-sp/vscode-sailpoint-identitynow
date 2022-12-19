@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { TenantTreeItem } from '../models/IdentityNowTreeItem';
+import { FolderTreeItem, IdentityNowResourceTreeItem, IdentityProfileTreeItem, RuleTreeItem, SourceTreeItem, TenantTreeItem, TransformTreeItem } from '../models/IdentityNowTreeItem';
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { ObjectTypeItem } from '../models/ConfigQuickPickItem';
 import { delay, toDateSuffix } from '../utils';
@@ -47,17 +47,122 @@ const exportTypeItems = [
     }
 ];
 
-export async function exportConfigView(node?: TenantTreeItem): Promise<void> {
+/**
+ * Entrypoint for full export configuration from the tree view. Tenant is known.
+ * @param node 
+ */
+export async function fullExportConfigFromTreeView(node?: TenantTreeItem): Promise<void> {
 
     // assessing that item is a IdentityNowResourceTreeItem
     if (node === undefined || !(node instanceof TenantTreeItem)) {
-        console.log("WARNING: exportConfig: invalid item", node);
-        throw new Error("exportConfig: invalid item");
+        console.log("WARNING: fullExportConfigFromTreeView: invalid item", node);
+        throw new Error("fullExportConfigFromTreeView: invalid item");
     }
 
-    exportConfig(node.tenantId, node.tenantName);
+    fullExportConfig(node.tenantId, node.tenantName);
 }
 
+
+/**
+ * Entrypoint for full export configuration from the command palette. Tenant is unknown.
+ */
+export class ExportNodeConfig {
+    constructor(
+        private readonly tenantService: TenantService
+    ) { }
+
+
+    getObjectType(node: IdentityNowResourceTreeItem): string {
+        switch (node.constructor.name) {
+            case SourceTreeItem.name:
+                return "SOURCE";
+            case TransformTreeItem.name:
+                return "TRANSFORM";
+            case IdentityProfileTreeItem.name:
+                return "IDENTITY_PROFILE";
+            case RuleTreeItem.name:
+                return "RULE";
+            default:
+                throw new Error("Invalid node type:" + node.label);
+
+        }
+    }
+
+    getProposedFilename(tenantName: string, objectType: string, label: string): string {
+        let exportFile = '';
+        if (vscode.workspace.workspaceFolders !== undefined && vscode.workspace.workspaceFolders.length > 0) {
+            const workspaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath.replace(/\\/g, "/");
+            const exportFolder = path.join(workspaceFolder, 'exportedObjects');
+            const dateSuffix = toDateSuffix();
+            const filename = `identitynowconfig-${tenantName}-${objectType}-${label}-${dateSuffix}.json`;
+            exportFile = path.join(exportFolder, filename);
+        }
+        console.log("< ExportNodeConfig.getProposedFilename: " + exportFile);
+        return exportFile;
+    }
+
+    async execute(node?: IdentityNowResourceTreeItem) {
+
+        console.log("> ExportNodeConfig.execute");
+        // assessing that item is a IdentityNowResourceTreeItem
+        if (node === undefined || !(node instanceof IdentityNowResourceTreeItem)) {
+            console.log("WARNING: ExportNodeConfig: invalid item", node);
+            throw new Error("ExportNodeConfig: invalid item");
+        }
+
+
+        const tenantName = node.uri?.authority || "";
+        console.log("ExportNodeConfig: tenantName = ", tenantName);
+        const tenantInfo = await this.tenantService.getTenantByTenantName(tenantName);
+        console.log("ExportNodeConfig: tenant = ", tenantInfo);
+        const tenantId = tenantInfo?.id || "";
+
+        const objectType = this.getObjectType(node);
+        var label = '';
+        if (typeof node.label === "string") {
+            label = node.label;
+        } else {
+            label = node.label?.label || "";
+        }
+
+        let exportFile: string | undefined = this.getProposedFilename(tenantName, objectType, label);
+        exportFile = await vscode.window.showInputBox({
+            ignoreFocusOut: true,
+            value: exportFile,
+            prompt: `Enter the file to save ${label} to`
+        });
+
+        if (exportFile === undefined) {
+            console.log("< exportConfig: no file");
+            return;
+        }
+        const overwrite = await confirmFileOverwrite(exportFile);
+        if (!overwrite) {
+            return;
+        }
+
+        const objectTypes = [objectType];
+        const options: any = {};
+        options[objectType] = {
+            "includedIds": [
+                node.id
+            ]
+        };
+        await exportConfig(tenantId,
+            tenantName,
+            exportFile,
+            true,
+            objectTypes,
+            options
+        );
+    }
+}
+
+
+
+/**
+ * Entrypoint for full export configuration from the command palette. Tenant is unknown.
+ */
 export class ExportConfigPalette {
     constructor(
         private readonly tenantService: TenantService
@@ -70,11 +175,11 @@ export class ExportConfigPalette {
         if (!tenantInfo) {
             return;
         }
-        exportConfig(tenantInfo.id, tenantInfo.tenantName);
+        fullExportConfig(tenantInfo.id, tenantInfo.tenantName);
     }
 }
 
-async function exportConfig(tenantId: string, tenantName: string): Promise<void> {
+async function fullExportConfig(tenantId: string, tenantName: string): Promise<void> {
 
     const exportTypeItem = await vscode.window.showQuickPick<vscode.QuickPickItem>(exportTypeItems, {
         ignoreFocusOut: false,
@@ -148,6 +253,32 @@ async function exportConfig(tenantId: string, tenantName: string): Promise<void>
         return;
     }
 
+    const objectTypeArray = objectTypeItemsToExport.map(i => i.objectType);
+
+    await exportConfig(tenantId,
+        tenantName,
+        (exportSingle ? exportFile : exportFolder) || "",
+        exportSingle,
+        objectTypeArray
+    );
+
+}
+
+/**
+ * 
+ * @param tenantId Id of tenant
+ * @param tenantName name of the tenant (for display purpose)
+ * @param target either the target file path or folder for the export
+ * @param exportSingle true if exported to a single file
+ * @param objectTypes types of object
+ * @param options options to include or exclude objects
+ */
+async function exportConfig(tenantId: string,
+    tenantName: string,
+    target: string,
+    exportSingle: boolean,
+    objectTypes: string[],
+    options = {}) {
     const client = new IdentityNowClient(tenantId, tenantName);
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
@@ -155,15 +286,14 @@ async function exportConfig(tenantId: string, tenantName: string): Promise<void>
         cancellable: false
     }, async (task, token) => {
 
-        const objectTypeArray = objectTypeItemsToExport.map(i => i.objectType);
-        const jobId = await client.startExportJob(objectTypeArray);
-        let jobStatus = await client.getExportJobStatus(jobId);
-        console.log({ jobStatus });
-        while (jobStatus.status === "NOT_STARTED" || jobStatus.status === "IN_PROGRESS") {
+        const jobId = await client.startExportJob(objectTypes, options);
+
+        let jobStatus: any;
+        do {
             await delay(1000);
             jobStatus = await client.getExportJobStatus(jobId);
             console.log({ jobStatus });
-        }
+        } while (jobStatus.status === "NOT_STARTED" || jobStatus.status === "IN_PROGRESS");
 
         if (jobStatus.status !== "COMPLETE") {
             throw new Error("Could not export config: " + jobStatus.message);
@@ -171,11 +301,11 @@ async function exportConfig(tenantId: string, tenantName: string): Promise<void>
 
         const data = await client.getExportJobResult(jobId);
         if (exportSingle) {
-            console.log('Writing to ', exportFile);
-            fs.writeFileSync(exportFile as string, JSON.stringify(data, null, 2), { encoding: "utf8" });
+            console.log('Writing to ', target);
+            fs.writeFileSync(target, JSON.stringify(data, null, 2), { encoding: "utf8" });
         } else {
             for (let obj of data.objects) {
-                const targetFolder = path.join(exportFolder as string, obj.self.type);
+                const targetFolder = path.join(target, obj.self.type);
                 const targetFilename = obj.self.name + ".json";
                 const targetFilepath = path.join(targetFolder, targetFilename);
                 if (!fs.existsSync(targetFolder)) {

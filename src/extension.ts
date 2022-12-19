@@ -31,8 +31,6 @@ import { SortIdentityProfileCommand } from './commands/sortIdentityProfile';
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "vscode-sailpoint-identitynow" is now active!');
 
 	const tenantService = new TenantService(context.globalState, context.secrets);
@@ -115,12 +113,17 @@ export function activate(context: vscode.ExtensionContext) {
 			viewWorkflowExecutionHistory));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_CONFIG_VIEW,
-			exportConfig.exportConfigView));
+			exportConfig.fullExportConfigFromTreeView));
 
 	const exportConfigPaletteCommand = new exportConfig.ExportConfigPalette(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_CONFIG_PALETTE,
 			exportConfigPaletteCommand.execute, exportConfigPaletteCommand));
+
+	const exportNodeConfig = new exportConfig.ExportNodeConfig(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_NODE_CONFIG_VIEW,
+			exportNodeConfig.execute, exportNodeConfig));
 
 	context.subscriptions.push(
 		vscode.workspace.registerFileSystemProvider(

@@ -6,6 +6,7 @@ export const RENAME_TENANT = 'vscode-sailpoint-identitynow.rename-tenant';
 export const REMOVE_TENANT = 'vscode-sailpoint-identitynow.remove-tenant';
 export const EXPORT_CONFIG_VIEW = 'vscode-sailpoint-identitynow.export-config.view';
 export const EXPORT_CONFIG_PALETTE = 'vscode-sailpoint-identitynow.export-config.palette';
+export const EXPORT_NODE_CONFIG_VIEW = 'vscode-sailpoint-identitynow.export-node-config.view';
 export const AGGREGATE = 'vscode-sailpoint-identitynow.aggregate-source';
 export const AGGREGATE_DISABLE_OPTIMIZATION = 'vscode-sailpoint-identitynow.aggregate-source-disable-optimization';
 export const RESET_SOURCE = 'vscode-sailpoint-identitynow.reset-source';

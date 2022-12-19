@@ -36,6 +36,7 @@
     "onCommand:vscode-sailpoint-identitynow.rename-tenant",
     "onCommand:vscode-sailpoint-identitynow.export-config.view",
     "onCommand:vscode-sailpoint-identitynow.export-config.palette",
+    "onCommand:vscode-sailpoint-identitynow.export-node-config.view",
     "onCommand:vscode-sailpoint-identitynow.refresh",
     "onCommand:vscode-sailpoint-identitynow.open-resource",
     "onCommand:vscode-sailpoint-identitynow.remove-resource",
@@ -116,6 +117,11 @@
       {
         "command": "vscode-sailpoint-identitynow.export-config.palette",
         "title": "IdentityNow: Export config...",
+        "icon": "$(export)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.export-node-config.view",
+        "title": "Export sp-config...",
         "icon": "$(export)"
       },
       {
@@ -239,6 +245,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.export-node-config.view",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.aggregate-source",
           "when": "never"
         },
@@ -331,6 +341,10 @@
         {
           "command": "vscode-sailpoint-identitynow.export-config.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.export-node-config.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^source|identity-profile|connector-rule|transform$/i"
         },
         {
           "command": "vscode-sailpoint-identitynow.refresh",
