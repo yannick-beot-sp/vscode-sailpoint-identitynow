@@ -6,7 +6,7 @@
 The SailPoint IdentityNow extension makes it easy to:
 
 - Connect to several tenants
-- Export config of a tenant
+- Import and export config of a tenant
 - View, edit, aggregate or reset sources
 - View, create, edit, delete, and test transforms
 - View, create, edit, delete provisioning policies of a source
@@ -40,10 +40,24 @@ It is also possible to add a tenant by using the following URIs:
 
 ## Export config of a tenant
 
-In the SailPoint view, right-click on a tenant to export config.
-Or, from the **Command Palette**, find the command "IdentityNow: Export config...".
+
+
+In the **SailPoint view**, right-click on a tenant to import or export config.
+
+![Import/export config](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/import-export-treeview.png)
+
+You can also export a single source, rule, identity profile or transform by right-clicking it and choosing "Export sp-config..."
+![Import/export config](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/export-node.png)
+
+Or, from the **Command Palette**, find the command "IdentityNow: Import config..." or "IdentityNow: Export config...".
+
+![Import/export config](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/import-export-palette.png)
 
 ![Export config](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/export-config.gif)
+
+Finally, you can right-click a JSON file in the explorer to import it.
+
+![Import/export config](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/import-file.png)
 
 ## Rule management
 
@@ -130,6 +144,12 @@ At this moment, there is no configuration settings for this extension.
 None
 
 ## Release Notes
+
+### 0.0.16
+
+- Capability to export a single source, rule, transform or identity profile from the tree view
+- Capability to import a sp-config
+- Fix error when exporting to file (cf. [#35](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/35))
 
 ### 0.0.15
 

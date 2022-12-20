@@ -7,34 +7,8 @@ import * as fs from 'fs';
 import path = require('path');
 import { TenantService } from '../services/TenantService';
 import { chooseTenant, confirmFileOverwrite } from '../utils/vsCodeHelpers';
+import { OBJECT_TYPE_ITEMS } from '../models/ObjectTypeQuickPickItem';
 
-const objectTypeItems = [
-    {
-        "objectType": "SOURCE",
-        "label": "Sources",
-        picked: true
-    },
-    {
-        "objectType": "TRIGGER_SUBSCRIPTION",
-        "label": "Trigger subscriptions",
-        picked: true
-    },
-    {
-        "objectType": "IDENTITY_PROFILE",
-        "label": "Identity profiles",
-        picked: true
-    },
-    {
-        "objectType": "TRANSFORM",
-        "label": "Transforms",
-        picked: true
-    },
-    {
-        "objectType": "RULE",
-        "label": "Rules",
-        picked: true
-    }
-];
 
 const exportTypeItems = [
     {
@@ -240,7 +214,7 @@ async function fullExportConfig(tenantId: string, tenantName: string): Promise<v
         }
     }
 
-    const sortedObjectTypeItems = objectTypeItems.sort(((a, b) => (a.label > b.label) ? 1 : -1));
+    const sortedObjectTypeItems = OBJECT_TYPE_ITEMS.sort(((a, b) => (a.label > b.label) ? 1 : -1));
 
     const objectTypeItemsToExport = await vscode.window.showQuickPick<ObjectTypeItem>(sortedObjectTypeItems, {
         ignoreFocusOut: false,

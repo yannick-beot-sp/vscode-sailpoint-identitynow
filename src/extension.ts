@@ -26,6 +26,7 @@ import { FileHandler } from './files/FileHandler';
 import { RenameTenantCommand } from './commands/renameTenant';
 import { IdentityNowUriHandler } from './uriHandler';
 import { SortIdentityProfileCommand } from './commands/sortIdentityProfile';
+import { MenuImporter, PaletteImporter, TreeViewImporter } from './commands/importConfig';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -124,6 +125,22 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_NODE_CONFIG_VIEW,
 			exportNodeConfig.execute, exportNodeConfig));
+
+
+	const paletteImporterCommand = new PaletteImporter(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_CONFIG_PALETTE,
+			paletteImporterCommand.execute, paletteImporterCommand));
+
+	const menuImporterCommand = new MenuImporter(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_CONFIG_MENU,
+			menuImporterCommand.execute, menuImporterCommand));
+
+	const treeviewImporterCommand = new TreeViewImporter(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_CONFIG_VIEW,
+			treeviewImporterCommand.execute, treeviewImporterCommand));
 
 	context.subscriptions.push(
 		vscode.workspace.registerFileSystemProvider(

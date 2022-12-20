@@ -6,6 +6,11 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+### Added
+
+- Capability to export a single source, rule, transform or identity profile from the tree view
+- Capability to import a sp-config
+
 ### Fixed
 
 - Fix error when exporting to file (cf. [#35](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/35))

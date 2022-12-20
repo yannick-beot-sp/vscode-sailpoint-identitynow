@@ -37,6 +37,9 @@
     "onCommand:vscode-sailpoint-identitynow.export-config.view",
     "onCommand:vscode-sailpoint-identitynow.export-config.palette",
     "onCommand:vscode-sailpoint-identitynow.export-node-config.view",
+    "onCommand:vscode-sailpoint-identitynow.import-config.view",
+    "onCommand:vscode-sailpoint-identitynow.import-config.palette",
+    "onCommand:vscode-sailpoint-identitynow.import-config.menu",
     "onCommand:vscode-sailpoint-identitynow.refresh",
     "onCommand:vscode-sailpoint-identitynow.open-resource",
     "onCommand:vscode-sailpoint-identitynow.remove-resource",
@@ -123,6 +126,21 @@
         "command": "vscode-sailpoint-identitynow.export-node-config.view",
         "title": "Export sp-config...",
         "icon": "$(export)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.import-config.view",
+        "title": "Import config...",
+        "icon": "$(export)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.import-config.palette",
+        "title": "IdentityNow: Import config...",
+        "icon": "$(import)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.import-config.menu",
+        "title": "IdentityNow: Import config...",
+        "icon": "$(import)"
       },
       {
         "command": "vscode-sailpoint-identitynow.refresh",
@@ -249,6 +267,14 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.import-config.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.import-config.menu",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.aggregate-source",
           "when": "never"
         },
@@ -344,7 +370,11 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.export-node-config.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^source|identity-profile|connector-rule|transform$/i"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^(source|identity-profile|connector-rule|transform)$/i"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.import-config.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
         },
         {
           "command": "vscode-sailpoint-identitynow.refresh",
@@ -540,8 +570,17 @@
         {
           "command": "vscode-sailpoint-identitynow.connector-rule.export-script.editor",
           "when": "resourcePath =~ /idn://.*/connector-rules/.*/"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.import-config.palette",
+          "when": "resourcePath =~ /\\.json/"
         }
-      ]
+      ],
+      "explorer/context": [{
+        "when": "resourceLangId == json",
+        "command": "vscode-sailpoint-identitynow.import-config.menu",
+        "group": "idn"
+    }]
     },
     "snippets": [
       {

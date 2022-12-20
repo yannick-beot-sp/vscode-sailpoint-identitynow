@@ -51,6 +51,15 @@ export function getSelectionContent(editor: vscode.TextEditor): string | undefin
 }
 
 
+/**
+ * Return the content of the current opened file
+ * @param editor 
+ * @returns content of the current opened file
+ */
+export function getFullContent(editor: vscode.TextEditor): string {
+	return editor.document.getText(getFullDocumentRange(editor));
+}
+
 export function getFullDocumentRange(editor: vscode.TextEditor): vscode.Selection {
 	if (editor.document.lineCount > 0) {
 		let lineCount = editor.document.lineCount;

@@ -10,12 +10,15 @@ import { IdentityProfile, LifeCycleState } from "../models/identityProfile";
 import { compareByName, convertToText } from "../utils";
 import { ConnectorRule, ValidationResult } from "../models/connectorRule";
 import { ServiceDesk } from "../models/ServiceDesk";
+import { ExportOptions } from "../models/ExportOptions";
+import { Readable } from "stream";
+import { ImportJobResults, JobStatus } from "../models/JobStatus";
 
 export class IdentityNowClient {
 	constructor(
 		private readonly tenantId: string,
 		private readonly tenantName: string
-	) {}
+	) { }
 
 	public async getSources(): Promise<any> {
 		console.log("> getSources");
@@ -276,14 +279,14 @@ export class IdentityNowClient {
 		return res;
 	}
 
-    public async resetSource(sourceID: Number, skip: string | null = null): Promise<any> {
-        console.log('> IdentityNowClient.resetSource', sourceID);
-        let endpoint = EndpointUtils.getCCUrl(this.tenantName) + '/source/reset/' + sourceID;
-        if (!!skip) {
-            endpoint += "?skip="+skip;
-        }
-        const headers = await this.prepareHeaders();
-        headers['Content-Type'] = 'application/x-www-form-urlencoded';
+	public async resetSource(sourceID: Number, skip: string | null = null): Promise<any> {
+		console.log('> IdentityNowClient.resetSource', sourceID);
+		let endpoint = EndpointUtils.getCCUrl(this.tenantName) + '/source/reset/' + sourceID;
+		if (!!skip) {
+			endpoint += "?skip=" + skip;
+		}
+		const headers = await this.prepareHeaders();
+		headers['Content-Type'] = 'application/x-www-form-urlencoded';
 
 		const req = await fetch(endpoint, {
 			method: "POST",
@@ -339,15 +342,15 @@ export class IdentityNowClient {
 
 	public async getSourceId(sourceName: string): Promise<string> {
 		/*
-            sourceName - A reference to the source to search for accounts.
+			sourceName - A reference to the source to search for accounts.
 
-            This is a reference by a source's display name attribute (e.g. Active Directory). If the display name is updated, this reference will also need to be updated.
+			This is a reference by a source's display name attribute (e.g. Active Directory). If the display name is updated, this reference will also need to be updated.
 
-            As an alternative an applicationId or applicationName can be provided instead.
+			As an alternative an applicationId or applicationName can be provided instead.
 
-            applicationId - This is a reference by a source's external GUID/ID attribute (e.g. "ff8081815a8b3925015a8b6adac901ff")
-            applicationName - This is a reference by a source's immutable name attribute (e.g. "Active Directory [source]")
-        */
+			applicationId - This is a reference by a source's external GUID/ID attribute (e.g. "ff8081815a8b3925015a8b6adac901ff")
+			applicationName - This is a reference by a source's immutable name attribute (e.g. "Active Directory [source]")
+		*/
 		console.log("> getSourceId", sourceName);
 		let endpoint =
 			EndpointUtils.getV3Url(this.tenantName) +
@@ -520,6 +523,8 @@ export class IdentityNowClient {
 		return jobId;
 	}
 
+
+
 	/**
 	 * cf. https://developer.sailpoint.com/apis/beta/#operation/spConfigExportJobStatus
 	 * @param jobId
@@ -527,8 +532,7 @@ export class IdentityNowClient {
 	 */
 	public async getExportJobStatus(jobId: String): Promise<any> {
 		console.log("> getExportJobStatus", jobId);
-		const path = "/beta/sp-config/export/" + jobId;
-		console.log("path = " + path);
+		const path = `/beta/sp-config/export/${jobId}`;
 		return this.getResource(path);
 	}
 
@@ -539,10 +543,78 @@ export class IdentityNowClient {
 	 */
 	public async getExportJobResult(jobId: String): Promise<any> {
 		console.log("> getExportJobResult", jobId);
-		const path = "/beta/sp-config/export/" + jobId + "/download";
-		console.log("path = " + path);
+		const path = `/beta/sp-config/export/${jobId}/download`;
 		return this.getResource(path);
 	}
+
+	/**
+	 *
+	 * cf. https://developer.sailpoint.com/idn/api/beta/sp-config-import
+	 * @returns jobId
+	 */
+	public async startImportJob(
+		data: string,
+		options: ExportOptions = {}
+	): Promise<string> {
+		console.log("> startImportJob", options);
+		const endpoint = EndpointUtils.getBetaUrl(this.tenantName) + "/sp-config/import";
+		// const endpoint = "https://webhook.site/584bc6da-1d4c-4062-980b-38e19ebea9ee";
+		console.log("startImportJob: endpoint = " + endpoint);
+
+		let headers = await this.prepareHeaders();
+
+		let formData = new FormData();
+		formData.append("data", data, "import.json");
+		if (Object.keys(options).length !== 0 || options.constructor !== Object) {
+			formData.append("options", JSON.stringify(options));
+		}
+
+		console.log("startImportJob: requesting", formData);
+
+		const formHeaders = formData.getHeaders();
+		headers = {
+			...formHeaders,
+			...headers,
+		};
+
+		const req = await fetch(endpoint, {
+			method: "POST",
+			headers: headers,
+			body: formData,
+		});
+
+		if (!req.ok) {
+			throw new Error(req.statusText);
+		}
+		const res: any = await req.json();
+		const jobId = res.jobId;
+		console.log("< startImportJob. jobId =", jobId);
+		return jobId;
+	}
+
+
+	/**
+	 * cf. https://developer.sailpoint.com/idn/api/beta/sp-config-import-job-status
+	 * @param jobId
+	 * @returns
+	 */
+	public async getImportJobStatus(jobId: String): Promise<JobStatus> {
+		console.log("> getImportJobStatus", jobId);
+		const path = `/beta/sp-config/import/${jobId}`;
+		return this.getResource(path);
+	}
+
+	/**
+	 * cf. https://developer.sailpoint.com/idn/api/beta/sp-config-import-download
+	 * @param jobId
+	 * @returns
+	 */
+	public async getImportJobResult(jobId: String): Promise<ImportJobResults> {
+		console.log("> getImportJobResult", jobId);
+		const path = `/beta/sp-config/import/${jobId}/download`;
+		return this.getResource(path);
+	}
+
 
 	/**
 	 * cf. https://developer.sailpoint.com/apis/beta/#operation/patchWorkflow
