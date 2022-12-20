@@ -65,7 +65,7 @@ class BaseImporter {
                     throw new Error("Could not import config: " + jobStatus.message);
                 }
 
-                const importJobresult = await client.getImportJobResult(jobId);
+                const importJobresult:any = await client.getImportJobResult(jobId);
                 for (const key in importJobresult.results) {
                     if (message.length > 0) {
                         message += ", ";

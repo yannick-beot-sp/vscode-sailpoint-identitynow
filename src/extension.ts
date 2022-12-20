@@ -27,6 +27,7 @@ import { RenameTenantCommand } from './commands/renameTenant';
 import { IdentityNowUriHandler } from './uriHandler';
 import { SortIdentityProfileCommand } from './commands/sortIdentityProfile';
 import { MenuImporter, PaletteImporter, TreeViewImporter } from './commands/importConfig';
+import { refreshIdentityProfile } from './commands/refreshIdentityProfile';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -187,6 +188,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_CONNECTOR_RULE_SCRIPT_VIEW,
 			exportScriptFromRuleCommand.exportScriptView, exportScriptFromRuleCommand));
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.REFRESH_IDENTITY_PROFILE,
+			refreshIdentityProfile));
 
 	const sortIdentityProfileCommand = new SortIdentityProfileCommand();
 	context.subscriptions.push(

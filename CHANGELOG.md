@@ -10,6 +10,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 - Capability to export a single source, rule, transform or identity profile from the tree view
 - Capability to import a sp-config
+- Can refresh identities under an identity profile (cf. [#30](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/30))
 
 ### Fixed
 

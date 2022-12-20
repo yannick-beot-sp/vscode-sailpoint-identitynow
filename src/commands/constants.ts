@@ -31,6 +31,7 @@ export const EXPORT_CONNECTOR_RULE_SCRIPT_EDITOR = 'vscode-sailpoint-identitynow
 export const EXPORT_CONNECTOR_RULE_SCRIPT_VIEW = 'vscode-sailpoint-identitynow.connector-rule.export-script.view';
 export const SORT_IDENTITY_PROFILES_BY_NAME = 'vscode-sailpoint-identitynow.identity-profiles.sort.name';
 export const SORT_IDENTITY_PROFILES_BY_PRIORITY = 'vscode-sailpoint-identitynow.identity-profiles.sort.priority';
+export const REFRESH_IDENTITY_PROFILE = 'vscode-sailpoint-identitynow.identity-profile.refresh';
 
 export const TREE_VIEW = 'vscode-sailpoint-identitynow.view';
 export const WORKFLOW_TESTER_VIEW = 'vscode-sailpoint-identitynow.workflow.test-view';

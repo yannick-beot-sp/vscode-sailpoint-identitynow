@@ -15,6 +15,7 @@ import { Readable } from "stream";
 import { ImportJobResults, JobStatus } from "../models/JobStatus";
 
 export class IdentityNowClient {
+
 	constructor(
 		private readonly tenantId: string,
 		private readonly tenantName: string
@@ -496,8 +497,7 @@ export class IdentityNowClient {
 		objectOptions = {}
 	): Promise<string> {
 		console.log("> startExportJob", objectTypes);
-		let endpoint = EndpointUtils.getBetaUrl(this.tenantName);
-		endpoint += "/sp-config/export";
+		const endpoint = EndpointUtils.getBetaUrl(this.tenantName) + "/sp-config/export";
 		console.log("endpoint = " + endpoint);
 
 		const headers = await this.prepareHeaders();
@@ -795,6 +795,21 @@ export class IdentityNowClient {
 		}
 		// identityProfiles.sort(compareByName);
 		return serviceDesks;
+	}
+
+	public async refreshIdentityProfile(identityProfileId: string):Promise<void> {
+		console.log("> refreshIdentityProfile", identityProfileId);
+		const endpoint = EndpointUtils.getBetaUrl(this.tenantName) + `/identity-profiles/${identityProfileId}/refresh-identities`;
+		console.log("endpoint = " + endpoint);
+		const headers = await this.prepareHeaders();
+		const resp = await fetch(endpoint, {
+			method: "POST",
+			headers: headers
+		});
+
+		if (!resp.ok) {
+			throw new Error(resp.statusText);
+		}
 	}
 }
 

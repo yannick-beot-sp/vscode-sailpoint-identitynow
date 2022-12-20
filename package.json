@@ -63,6 +63,7 @@
     "onCommand:vscode-sailpoint-identitynow.connector-rule.export-script.view",
     "onCommand:vscode-sailpoint-identitynow.identity-profiles.sort.name",
     "onCommand:vscode-sailpoint-identitynow.identity-profiles.sort.priority",
+    "onCommand:vscode-sailpoint-identitynow.identity-profile.refresh",
     "onFileSystem:idn",
     "onUri"
   ],
@@ -240,6 +241,10 @@
         "title": "Export the script..."
       },
       {
+        "command": "vscode-sailpoint-identitynow.identity-profile.refresh",
+        "title": "Refresh all identities"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.identity-profiles.sort.name",
         "title": "Sort by name",
         "icon": {
@@ -332,6 +337,10 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.transform.evaluate",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identity-profile.refresh",
           "when": "never"
         },
         {
@@ -507,6 +516,10 @@
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rule"
         },
         {
+          "command": "vscode-sailpoint-identitynow.identity-profile.refresh",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-profile"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.refresh",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-profiles",
           "group": "inline@3"
@@ -519,11 +532,6 @@
         {
           "command": "vscode-sailpoint-identitynow.identity-profiles.sort.priority",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-profiles",
-          "group": "inline@1"
-        },
-        {
-          "command": "vscode-sailpoint-identitynow.refresh",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-profile",
           "group": "inline@1"
         },
         {
