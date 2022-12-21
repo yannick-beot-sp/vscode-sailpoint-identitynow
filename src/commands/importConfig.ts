@@ -7,7 +7,7 @@ import * as fs from 'fs';
 // import path = require('path');
 import { TenantService } from '../services/TenantService';
 import { chooseTenant, getFullContent } from '../utils/vsCodeHelpers';
-import { ExportOptions, ObjectOptions } from '../models/ExportOptions';
+import { ExportOptions } from '../models/ExportOptions';
 import { ObjectPickItem } from '../models/ObjectPickItem';
 import { OBJECT_TYPE_ITEMS } from '../models/ObjectTypeQuickPickItem';
 import { ImportedObject } from '../models/JobStatus';
@@ -22,14 +22,19 @@ const PICK_AND_CHOOSE: vscode.QuickPickItem = {
 };
 
 
-
-class Importer {
+/**
+ * Base class for all importer
+ */
+class BaseImporter {
     tenantName: string | undefined;
     tenantId: string | undefined;
     filePath: string | undefined;
     data = "";
     importOptions: ExportOptions = {};
 
+    /**
+     * Create the import job and follow-up the result
+     */
     async importConfig(): Promise<void> {
         if (!this.tenantId || !this.tenantName) {
             throw new Error("Invalid tenant info");
@@ -48,8 +53,6 @@ class Importer {
             cancellable: false
         }, async (task, token) => {
             try {
-
-
                 const jobId = await client.startImportJob(data, importOptions);
                 let jobStatus: any;
                 do {
@@ -62,7 +65,7 @@ class Importer {
                     throw new Error("Could not import config: " + jobStatus.message);
                 }
 
-                const importJobresult = await client.getImportJobResult(jobId);
+                const importJobresult:any = await client.getImportJobResult(jobId);
                 for (const key in importJobresult.results) {
                     if (message.length > 0) {
                         message += ", ";
@@ -70,22 +73,21 @@ class Importer {
                     message += importJobresult.results[key].importedObjects
                         .map((x: ImportedObject) => `${x.name} (${key})`)
                         .join(", ");
-
                 }
             } catch (error: any) {
                 vscode.window.showErrorMessage(`Could not import data: ${error.message}`);
                 throw error;
-
             }
-
-        }).then(() => {
-            vscode.window.showInformationMessage(
+        }).then(async () => {
+            await vscode.window.showInformationMessage(
                 `Successfully imported configuration to ${this.tenantName}: ${message}`)
         });
     }
 
-
-
+    /**
+     * Asks the user if he/she wants to import everything or not
+     * @returns ALL or PICK_AND_CHOOSE
+     */
     async askImportAll(): Promise<boolean | undefined> {
         const result = await vscode.window.showQuickPick(
             [ALL, PICK_AND_CHOOSE],
@@ -101,7 +103,11 @@ class Importer {
         }
     };
 
-
+    /**
+     * Asks the user to choose from a list of ObjectPickItem
+     * @param items List of ObjectPickItem 
+     * @returns List of ids
+     */
     async askChosenItems(items: Array<ObjectPickItem>): Promise<Array<string> | undefined> {
         const result = await vscode.window.showQuickPick(
             items,
@@ -117,7 +123,11 @@ class Importer {
         }
     };
 
-
+    /**
+     * Maps object types to QuickPickItems with a human-readable label and asks to choose
+     * @param objectTypes List of object types to choose from
+     * @returns 
+     */
     async askSelectObjectTypes(objectTypes: Set<string>): Promise<Array<string> | undefined> {
         const sortedObjectTypeItems = OBJECT_TYPE_ITEMS
             .filter(x => objectTypes.has(x.objectType))
@@ -190,7 +200,7 @@ class Importer {
  * Entry point to import file from the command palette. Tenant is unknown. File is known.
  * @param node 
  */
-export class PaletteImporter extends Importer {
+export class PaletteImporter extends BaseImporter {
     constructor(
         private readonly tenantService: TenantService
     ) { super(); }
@@ -228,7 +238,7 @@ export class PaletteImporter extends Importer {
  * Entry point to import file from the explorer. Tenant is unknown. File is known.
  * @param node 
  */
-export class MenuImporter extends Importer {
+export class MenuImporter extends BaseImporter {
     constructor(
         private readonly tenantService: TenantService
     ) { super(); }
@@ -257,7 +267,7 @@ export class MenuImporter extends Importer {
  * Entry point to import file from the tree view. Tenant is already known
  * @param node 
  */
-export class TreeViewImporter extends Importer {
+export class TreeViewImporter extends BaseImporter {
     constructor(
         private readonly tenantService: TenantService
     ) { super(); }
