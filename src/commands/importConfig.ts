@@ -285,7 +285,7 @@ export class TreeViewImporter extends BaseImporter {
             console.log("WARNING: TreeViewImporter.execute: invalid item", node);
             throw new Error("TreeViewImporter.execute: invalid item");
         }
-        this.tenantId = node.id;
+        this.tenantId = node.tenantId;
         this.tenantName = node.tenantName;
 
 

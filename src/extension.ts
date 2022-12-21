@@ -108,25 +108,22 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.DISABLE_WORKFLOW,
 			disableWorkflow));
-
-
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.VIEW_WORKFLOW_EXECUTION_HISTORY,
 			viewWorkflowExecutionHistory));
+
+	const exportConfigViewCommand = new exportConfig.ExportConfigTreeView();
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_CONFIG_VIEW,
-			exportConfig.fullExportConfigFromTreeView));
-
+			exportConfigViewCommand.execute, exportConfigViewCommand));
 	const exportConfigPaletteCommand = new exportConfig.ExportConfigPalette(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_CONFIG_PALETTE,
 			exportConfigPaletteCommand.execute, exportConfigPaletteCommand));
-
 	const exportNodeConfig = new exportConfig.ExportNodeConfig(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_NODE_CONFIG_VIEW,
 			exportNodeConfig.execute, exportNodeConfig));
-
 
 	const paletteImporterCommand = new PaletteImporter(tenantService);
 	context.subscriptions.push(

@@ -158,7 +158,8 @@ export class IdentityNowResourceTreeItem extends BaseTreeItem {
 		public readonly tenantName: string,
 		label: string,
 		resourceType: string,
-		public readonly id: string,
+		//public readonly
+		id: string,
 		collapsible: TreeItemCollapsibleState,
 		public readonly subResourceType: string = "",
 		public readonly subId: string = "",
@@ -166,6 +167,7 @@ export class IdentityNowResourceTreeItem extends BaseTreeItem {
 	) {
 		// By default, a IdentityNowResourceTreeItem will be a leaf, meaning that there will not be any childs
 		super(label, collapsible);
+		this.id = id;
 		this.uri = getResourceUri(tenantName, resourceType, id, label, beta);
 		if (subResourceType && subId) {
 			this.uri = this.uri.with({

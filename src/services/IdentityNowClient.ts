@@ -10,7 +10,7 @@ import { IdentityProfile, LifeCycleState } from "../models/identityProfile";
 import { compareByName, convertToText } from "../utils";
 import { ConnectorRule, ValidationResult } from "../models/connectorRule";
 import { ServiceDesk } from "../models/ServiceDesk";
-import { ExportOptions } from "../models/ExportOptions";
+import { ExportOptions, ObjectOptions } from "../models/ExportOptions";
 import { Readable } from "stream";
 import { ImportJobResults, JobStatus } from "../models/JobStatus";
 
@@ -489,30 +489,36 @@ export class IdentityNowClient {
 
 	/**
 	 *
-	 * cf. https://developer.sailpoint.com/apis/beta/#operation/spConfigExport
+	 * cf. https://developer.sailpoint.com/idn/api/beta/sp-config-export
 	 * @returns jobId
 	 */
 	public async startExportJob(
 		objectTypes: string[],
-		objectOptions = {}
+		objectOptions: ObjectOptions = {}
 	): Promise<string> {
-		console.log("> startExportJob", objectTypes);
+		console.log("> startExportJob", objectTypes, objectOptions);
 		const endpoint = EndpointUtils.getBetaUrl(this.tenantName) + "/sp-config/export";
 		console.log("endpoint = " + endpoint);
 
 		const headers = await this.prepareHeaders();
 
 		const payload = {
-			description: `Export Job vscode ${new Date().toISOString()}`,
-			includeTypes: objectTypes,
-			objectOptions: objectOptions,
+			"description": `Export Job vscode ${new Date().toISOString()}`,
+			"includeTypes": objectTypes,
+			"objectOptions": objectOptions,
 		};
 
 		console.log("startExportJob: requesting", payload);
+		const payloadStr = JSON.stringify(
+			payload,
+			["description", "includeTypes", "objectOptions",
+				"SOURCE", "RULE", "IDENTITY_PROFILE", "TRIGGER_SUBSCRIPTION", "TRANSFORM",
+				"includedIds", "includedNames"]);
+		console.log("startExportJob: payloadStr=" + payloadStr);
 		const req = await fetch(endpoint, {
 			method: "POST",
 			headers: headers,
-			body: JSON.stringify(payload),
+			body: payloadStr,
 		});
 		if (!req.ok) {
 			throw new Error(req.statusText);
@@ -522,8 +528,6 @@ export class IdentityNowClient {
 		console.log("< startExportJob. jobId =", jobId);
 		return jobId;
 	}
-
-
 
 	/**
 	 * cf. https://developer.sailpoint.com/apis/beta/#operation/spConfigExportJobStatus
@@ -797,7 +801,7 @@ export class IdentityNowClient {
 		return serviceDesks;
 	}
 
-	public async refreshIdentityProfile(identityProfileId: string):Promise<void> {
+	public async refreshIdentityProfile(identityProfileId: string): Promise<void> {
 		console.log("> refreshIdentityProfile", identityProfileId);
 		const endpoint = EndpointUtils.getBetaUrl(this.tenantName) + `/identity-profiles/${identityProfileId}/refresh-identities`;
 		console.log("endpoint = " + endpoint);
