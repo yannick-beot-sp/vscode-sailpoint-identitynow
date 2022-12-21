@@ -38,15 +38,14 @@ It is also possible to add a tenant by using the following URIs:
 `vscode://yannick-beot-sp.vscode-sailpoint-identitynow/addtenant?tenantName=company&accessToken=eyJh...&authenticationMethod=AccessToken` or 
 `vscode://yannick-beot-sp.vscode-sailpoint-identitynow/addtenant?tenantName=company&clientId=806c451e057b442ba67b5d459716e97a&clientSecret=***&authenticationMethod=PersonalAccessToken`.
 
-## Export config of a tenant
-
-
+## Import and export the config of a tenant
 
 In the **SailPoint view**, right-click on a tenant to import or export config.
 
 ![Import/export config](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/import-export-treeview.png)
 
-You can also export a single source, rule, identity profile or transform by right-clicking it and choosing "Export sp-config..."
+You can also export a single source, rule, identity profile or transform by right-clicking it and choosing "Export sp-config...".
+
 ![Import/export config](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/export-node.png)
 
 Or, from the **Command Palette**, find the command "IdentityNow: Import config..." or "IdentityNow: Export config...".
