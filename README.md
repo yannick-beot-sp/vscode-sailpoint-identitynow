@@ -146,8 +146,12 @@ None
 
 ### 0.0.16
 
+Almost Christmas!
+
 - Capability to export a single source, rule, transform or identity profile from the tree view
+- Capability to refine export from the command palette or from a tenant in the tree view
 - Capability to import a sp-config
+- Can refresh identities under an identity profile (cf. [#30](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/30))
 - Fix error when exporting to file (cf. [#35](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/35))
 
 ### 0.0.15
