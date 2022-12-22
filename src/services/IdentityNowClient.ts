@@ -30,7 +30,7 @@ export class IdentityNowClient {
 		let firstQuery = true;
 		let endpoint =
 			EndpointUtils.getV3Url(this.tenantName) +
-			`/sources?count=true&limit=${limit}`;
+			`/sources?count=true&limit=${limit}&sorters=name`;
 		do {
 			console.log("endpoint = " + endpoint);
 			const headers = await this.prepareHeaders();
@@ -50,9 +50,7 @@ export class IdentityNowClient {
 			endpoint = withQuery(endpoint, { count: false, offset: offset });
 		} while (offset < total);
 
-		// issue with sorting on server-side
-		// to be fixed
-		return result.sort(compareByName);
+		return result;
 	}
 
 	/**
