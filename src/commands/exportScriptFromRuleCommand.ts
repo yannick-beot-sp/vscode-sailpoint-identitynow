@@ -20,7 +20,7 @@ export class ExportScriptFromRuleCommand {
             throw new Error("exportScriptView: invalid item");
         }
 
-        await this.exportScript(node.tenantId, node.tenantName, node.label as string, node.id);
+        await this.exportScript(node.tenantId, node.tenantName, node.label as string, node.id as string);
     }
 
     public async exportScriptEditor(): Promise<void> {

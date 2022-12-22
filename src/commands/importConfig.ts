@@ -32,6 +32,12 @@ class BaseImporter {
     data = "";
     importOptions: ExportOptions = {};
 
+
+    init(): void {
+        this.data = "";
+        this.importOptions = {};
+    }
+
     /**
      * Create the import job and follow-up the result
      */
@@ -65,7 +71,7 @@ class BaseImporter {
                     throw new Error("Could not import config: " + jobStatus.message);
                 }
 
-                const importJobresult:any = await client.getImportJobResult(jobId);
+                const importJobresult: any = await client.getImportJobResult(jobId);
                 for (const key in importJobresult.results) {
                     if (message.length > 0) {
                         message += ", ";
@@ -151,6 +157,9 @@ class BaseImporter {
     async selectAndImport(): Promise<void> {
         const spConfig = JSON.parse(this.data);
 
+        //
+        // Do we import everything?
+        // 
         const importAll = await this.askImportAll();
         if (importAll === undefined) { return; }
 
@@ -159,8 +168,14 @@ class BaseImporter {
             return;
         }
 
+        //
+        // Get the list of (unique) object types present in the data
+        //
         const objectTypes = new Set<string>();
         spConfig.objects.forEach((x: any) => objectTypes.add(x.self.type));
+        //
+        // Ask the user to choose which object types
+        // 
         const requestedObjectTypes = await this.askSelectObjectTypes(objectTypes);
         if (requestedObjectTypes === undefined) { return; }
 
@@ -170,6 +185,9 @@ class BaseImporter {
             objectOptions: {}
         };
 
+        //
+        // Building the list of Ids for each object type
+        // 
         for (const requestedObjectType of requestedObjectTypes) {
             const pickItems = spConfig.objects.filter((x: any) => x.self.type === requestedObjectType)
                 .map((x: any) => ({
@@ -212,6 +230,7 @@ export class PaletteImporter extends BaseImporter {
      */
     async execute(): Promise<void> {
         console.log("> PaletteImporter.execute");
+        this.init();
         const tenantInfo = await chooseTenant(this.tenantService, 'To which tenant do you want to import the config?');
         console.log("PaletteImporter.execute: tenant = ", tenantInfo);
         if (!tenantInfo) {
@@ -248,8 +267,9 @@ export class MenuImporter extends BaseImporter {
      * 2. get content of the current selected file in the editor
      * 3. Start the import steps
      */
-    async execute(fileUri: vscode.Uri): Promise<void> {
+    async execute(fileUri: vscode.Uri, selectedFiles: vscode.Uri[]): Promise<void> {
         console.log("> MenuImporter.execute");
+        this.init();
         const tenantInfo = await chooseTenant(this.tenantService, 'To which tenant do you want to import the config?');
         console.log("MenuImporter.execute: tenant = ", tenantInfo);
         if (!tenantInfo) {
@@ -279,6 +299,7 @@ export class TreeViewImporter extends BaseImporter {
    */
     async execute(node?: TenantTreeItem): Promise<void> {
         console.log("> TreeViewImporter.execute");
+        this.init();
 
         // assessing that item is a IdentityNowResourceTreeItem
         if (node === undefined || !(node instanceof TenantTreeItem)) {

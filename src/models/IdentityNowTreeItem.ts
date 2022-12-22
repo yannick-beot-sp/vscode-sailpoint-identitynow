@@ -537,7 +537,7 @@ export class IdentityProfileTreeItem extends IdentityNowResourceTreeItem {
 	async getChildren(): Promise<BaseTreeItem[]> {
 		const results: BaseTreeItem[] = [];
 		const client = new IdentityNowClient(this.tenantId, this.tenantName);
-		const lifecycleStates = await client.getLifecycleStates(this.id);
+		const lifecycleStates = await client.getLifecycleStates(this.id as string);
 
 		const lifecycleStateItems = lifecycleStates.map(
 			(w) =>
@@ -545,7 +545,7 @@ export class IdentityProfileTreeItem extends IdentityNowResourceTreeItem {
 					this.tenantId,
 					this.tenantName,
 					w.name,
-					this.id,
+					this.id as string,
 					w.id
 				)
 		);

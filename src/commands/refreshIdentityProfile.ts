@@ -21,7 +21,7 @@ export async function refreshIdentityProfile(node?: IdentityProfileTreeItem): Pr
         title: `Refreshing ${node.label}...`,
         cancellable: false
     }, async (task, token) => {
-        await client.refreshIdentityProfile(node.id);
+        await client.refreshIdentityProfile(node.id as string);
     }).then(async () =>
         await vscode.window.showInformationMessage(`Successfully refreshed ${node.label}`));
 
