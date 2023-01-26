@@ -6,6 +6,11 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+### Fixed
+
+- Update length limit for connector rule names and provisioning policy name
+
+
 ## [0.0.16] - 2022-12-22
 
 ### Added

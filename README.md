@@ -144,6 +144,10 @@ None
 
 ## Release Notes
 
+### 0.0.17
+
+- Update length limit for connector rule names and provisioning policy name
+
 ### 0.0.16
 
 Almost Christmas!

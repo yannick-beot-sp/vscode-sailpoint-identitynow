@@ -15,10 +15,6 @@ async function askProvisioningPolicyName(): Promise<string | undefined> {
         title: 'IdentityNow',
         validateInput: text =>
         {
-            if (text && text.length > 50) {
-                return "Provisioning Policy name cannot exceed 50 characters.";
-            }
-
             if (text === '') {
                 return "You must provide a Provisioning Policy name.";
             }

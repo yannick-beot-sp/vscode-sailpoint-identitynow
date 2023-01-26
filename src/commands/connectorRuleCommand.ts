@@ -200,8 +200,8 @@ export class ConnectorRuleCommand {
             prompt: "Enter the Connector Rule name",
             title: 'IdentityNow',
             validateInput: text => {
-                if (text && text.length > 50) {
-                    return "Connector Rule name cannot exceed 50 characters.";
+                if (text && text.length > 128) {
+                    return "Connector Rule name cannot exceed 128 characters.";
                 }
 
                 if (text === '') {
