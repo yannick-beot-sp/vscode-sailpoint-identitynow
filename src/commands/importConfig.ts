@@ -86,7 +86,7 @@ class BaseImporter {
             }
         }).then(async () => {
             await vscode.window.showInformationMessage(
-                `Successfully imported configuration to ${this.tenantName}: ${message}`)
+                `Successfully imported configuration to ${this.tenantName}: ${message}`);
         });
     }
 

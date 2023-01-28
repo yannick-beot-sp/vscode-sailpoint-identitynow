@@ -35,8 +35,8 @@ abstract class BaseExporter {
     target: string | null | undefined;
     client!: IdentityNowClient;
 
-    constructor() {}
-    
+    constructor() { }
+
     protected init(): void {
         this.options = {};
         this.objectTypes = [];
@@ -50,7 +50,7 @@ abstract class BaseExporter {
         if (!this.tenantId || !this.tenantName) {
             throw new Error("Invalid tenant info");
         }
-        this.client = new IdentityNowClient(this.tenantId, this.tenantName)
+        this.client = new IdentityNowClient(this.tenantId, this.tenantName);
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Exporting configuration from ${this.tenantName}...`,
@@ -458,7 +458,7 @@ export class ExportConfigPalette extends WizardBaseExporter {
         if (!tenantInfo) {
             return;
         }
-        
+
         this.tenantId = tenantInfo?.id || "";
         this.tenantName = tenantInfo?.tenantName || "";
 
@@ -480,7 +480,7 @@ export class ExportConfigTreeView extends WizardBaseExporter {
             console.log("WARNING: fullExportConfigFromTreeView: invalid item", node);
             throw new Error("fullExportConfigFromTreeView: invalid item");
         }
-        this.tenantId = node.tenantId
+        this.tenantId = node.tenantId;
         this.tenantName = node.tenantName;
 
         await this.chooseAndExport();
