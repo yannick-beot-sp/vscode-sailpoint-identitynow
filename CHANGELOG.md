@@ -8,6 +8,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Fixed
 
+## [0.0.17] - 2023-01-29
+
 - Update length limit for connector rule names and provisioning policy name
 - Update regexp for tenant name
 - Fix TLS error when trying to get an access token
