@@ -11,7 +11,6 @@ import { compareByName, convertToText } from "../utils";
 import { ConnectorRule, ValidationResult } from "../models/connectorRule";
 import { ServiceDesk } from "../models/ServiceDesk";
 import { ExportOptions, ObjectOptions } from "../models/ExportOptions";
-import { Readable } from "stream";
 import { ImportJobResults, JobStatus } from "../models/JobStatus";
 
 export class IdentityNowClient {

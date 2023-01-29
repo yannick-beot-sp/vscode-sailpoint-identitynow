@@ -1,4 +1,5 @@
 import ClientOAuth2 = require('client-oauth2');
+import { utils } from 'mocha';
 import {
     authentication,
     AuthenticationProvider,
@@ -14,6 +15,7 @@ import { AuthenticationMethod, TenantCredentials, TenantToken } from '../models/
 import { isEmpty, parseJwt } from '../utils';
 import { EndpointUtils } from '../utils/EndpointUtils';
 import { TenantService } from './TenantService';
+import { request } from '../utils/Request';
 
 class SailPointIdentityNowPatSession implements AuthenticationSession {
     readonly account: AuthenticationSessionAccountInformation;
@@ -251,12 +253,12 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
      * @param clientSecret 
      */
     async createAccessToken(tenantName: string, clientId: string, clientSecret: string): Promise<TenantToken> {
+        console.log('> createAccessToken', tenantName, clientId);
         const idnAuth = new ClientOAuth2({
             clientId: clientId,
             clientSecret: clientSecret,
             accessTokenUri: EndpointUtils.getAccessTokenUrl(tenantName)
-        });
-        console.log('> createAccessToken', tenantName, clientId);
+        }, request);
 
         const oauth2token = await idnAuth.credentials.getToken();
         console.log('Successfully logged in to IdentityNow');
