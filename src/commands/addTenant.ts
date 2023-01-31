@@ -19,8 +19,8 @@ export class AddTenantCommand {
             prompt: "Enter the tenant name",
             title: 'IdentityNow',
             validateInput: text => {
-                // https://regexr.com/771h7
-                const regex = new RegExp('^([a-z0-9][a-z0-9\-]+[a-z0-9]\.)*([a-z0-9][a-z0-9\-]+[a-z0-9])$', 'i');
+                // https://regexr.com/7798n
+                const regex = new RegExp('^([a-z0-9][a-z0-9\-]*[a-z0-9]\.)*([a-z0-9][a-z0-9\-]*[a-z0-9])$', 'i');
                 if (regex.test(text)) {
                     return null;
                 }
