@@ -8,23 +8,72 @@
   "properties": {
     "id": {
       "type": "string",
-      "description": "ID of the object to which this reference applies",
-      "example": "2c91808568c529c60168cca6f90c1313"
+      "description": "System-generated unique ID of the Object",
+      "example": "2c91808568c529c60168cca6f90c1313",
+      "readOnly": true
     },
     "name": {
       "type": "string",
       "description": "Human-readable display name of the object to which this reference applies",
-      "example": "William Wilson"
+      "example": "aName"
     },
-
-    "description": {
+    "created": {
       "type": "string",
+      "description": "Creation date of the Object",
+      "example": "2015-05-28T14:07:17Z",
+      "format": "date-time",
+      "readOnly": true
+    },
+    "modified": {
+      "type": "string",
+      "description": "Last modification date of the Object",
+      "example": "2015-05-28T14:07:17Z",
+      "format": "date-time",
+      "readOnly": true
+    },
+    "description": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
       "description": "The description of the Identity Profile.",
       "example": "My custom flat file profile"
     },
     "owner": {
-      "$ref": "#/components/schemas/IdentityProfile/allOf/0",
-      "description": "The owner of the Identity Profile."
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "description": "The owner of the Identity Profile.",
+          "nullable": true,
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "IDENTITY"
+              ],
+              "description": "Type of the object to which this reference applies",
+              "example": "IDENTITY"
+            },
+            "id": {
+              "type": "string",
+              "description": "ID of the object to which this reference applies",
+              "example": "2c9180835d191a86015d28455b4b232a"
+            },
+            "name": {
+              "type": "string",
+              "description": "Human-readable display name of the object to which this reference applies",
+              "example": "William Wilson"
+            }
+          }
+        }
+      ]
     },
     "priority": {
       "type": "integer",
@@ -37,7 +86,9 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["SOURCE"],
+          "enum": [
+            "SOURCE"
+          ],
           "description": "Type of the object to which this reference applies",
           "example": "SOURCE"
         },
@@ -96,7 +147,14 @@
                   "attributes": {
                     "type": "object",
                     "additionalProperties": {
-                      "type": "object"
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "object"
+                        }
+                      ]
                     },
                     "description": "Arbitrary key-value pairs to store any metadata for the object",
                     "example": {
@@ -113,20 +171,27 @@
       }
     },
     "identityExceptionReportReference": {
-      "type": "object",
-      "properties": {
-        "taskResultId": {
-          "type": "string",
-          "format": "uuid",
-          "description": "The id of the task result.",
-          "example": "2c918086795cd09201795d5f7d7533df"
+      "anyOf": [
+        {
+          "type": "null"
         },
-        "reportName": {
-          "type": "string",
-          "example": "My annual report",
-          "description": "The name of the report."
+        {
+          "type": "object",
+          "properties": {
+            "taskResultId": {
+              "type": "string",
+              "format": "uuid",
+              "description": "The id of the task result.",
+              "example": "2c918086795cd09201795d5f7d7533df"
+            },
+            "reportName": {
+              "type": "string",
+              "example": "My annual report",
+              "description": "The name of the report."
+            }
+          }
         }
-      }
+      ]
     },
     "hasTimeBasedAttr": {
       "description": "Indicates the value of requiresPeriodicRefresh attribute for the Identity Profile.",
@@ -134,5 +199,8 @@
       "example": true
     }
   },
-  "required": ["name"]
+  "required": [
+    "name",
+    "authoritativeSource"
+  ]
 }
