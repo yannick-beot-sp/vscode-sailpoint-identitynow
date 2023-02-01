@@ -10,14 +10,21 @@
       "type": "string"
     },
     "description": {
-      "type": [
-        "string",
-        "null"
-      ]
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "the description of the provisioning policy",
+      "example": "this provisioning policy creates access based on an identity going inactive"
     },
     "usageType": {
       "type": "string",
-      "nullable": false,
+      "example": "CREATE",
+      "description": "The type of ProvisioningPolicy usage.",
       "enum": [
         "CREATE",
         "UPDATE",
@@ -48,10 +55,32 @@
             "example": "userName"
           },
           "transform": {
-            "type": "object"
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The transform to apply to the field",
+            "example": {
+              "type": "rule",
+              "attributes": {
+                "name": "Create Unique LDAP Attribute"
+              }
+            },
+            "default": {}
           },
           "attributes": {
-            "type": "object"
+            "type": "object",
+            "description": "Attributes required for the transform",
+            "example": {
+              "template": "${firstname}.${lastname}${uniqueCounter}",
+              "cloudMaxUniqueChecks": "50",
+              "cloudMaxSize": "20",
+              "cloudRequired": "true"
+            }
           },
           "isRequired": {
             "type": "boolean",

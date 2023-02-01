@@ -74,7 +74,10 @@
         },
         "emailAddressList": {
           "type": "array",
-          "example": ["test@test.com", "test2@test.com"],
+          "example": [
+            "test@test.com",
+            "test2@test.com"
+          ],
           "items": {
             "type": "string"
           },
@@ -92,7 +95,10 @@
             "example": "ENABLE",
             "type": "string",
             "description": "Describes if action will be enabled or disabled",
-            "enum": ["ENABLE", "DISABLE"]
+            "enum": [
+              "ENABLE",
+              "DISABLE"
+            ]
           },
           "sourceIds": {
             "type": "array",
@@ -122,5 +128,8 @@
       "description": "List of unique access-profile IDs that are associated with the lifecycle state."
     }
   },
-  "required": ["name", "technicalName"]
+  "required": [
+    "name",
+    "technicalName"
+  ]
 }
