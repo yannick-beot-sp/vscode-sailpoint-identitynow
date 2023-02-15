@@ -6,9 +6,18 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [0.0.18] - 2023-02-15
+
 ### Fixed
 
+- Export was not creating folders recursively
+- Update schema for identity profiles, life cycle states, and provisioning policies
+- Update regexp for tenant name for short names
+
+
 ## [0.0.17] - 2023-01-29
+
+### Fixed
 
 - Update length limit for connector rule names and provisioning policy name
 - Update regexp for tenant name

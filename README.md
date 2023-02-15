@@ -144,6 +144,12 @@ None
 
 ## Release Notes
 
+### 0.0.18
+
+- Export was not creating folders recursively
+- Update schema for identity profiles, life cycle states, and provisioning policies
+- Update regexp for tenant name for short names
+
 ### 0.0.17
 
 - Update length limit for connector rule names and provisioning policy name
