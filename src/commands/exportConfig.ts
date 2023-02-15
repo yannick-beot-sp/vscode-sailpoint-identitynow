@@ -88,7 +88,7 @@ abstract class BaseExporter {
             console.log('Writing to ', this.target);
             const parentDir = path.dirname(this.target);
             if (!fs.existsSync(parentDir)) {
-                fs.mkdirSync(parentDir);
+                fs.mkdirSync(parentDir, {recursive: true});
             }
             fs.writeFileSync(this.target, JSON.stringify(data, null, 2), { encoding: "utf8" });
         } else {
