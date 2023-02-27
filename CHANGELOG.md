@@ -6,6 +6,10 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+### Added 
+
+- Aggregation of entitlements
+
 ## [0.0.18] - 2023-02-15
 
 ### Fixed

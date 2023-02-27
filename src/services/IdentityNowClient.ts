@@ -241,16 +241,43 @@ export class IdentityNowClient {
 		};
 	}
 
-	public async startAggregation(
+	public async startEntitlementAggregation(
+		sourceID: Number,
+		types: string[] | null = null
+	): Promise<any> {
+		console.log("> IdentityNowClient.startEntitlementAggregation");
+		let endpoint =
+			EndpointUtils.getCCUrl(this.tenantName) +
+			"/source/loadEntitlements/" +
+			sourceID;
+
+		if (types !== null && types.length > 0) {
+			const objectTypes = types.join(",");
+			endpoint = withQuery(endpoint, { objectType: objectTypes });
+		}
+		console.log("endpoint = " + endpoint);
+		const headers = await this.prepareHeaders();
+		const req = await fetch(endpoint, {
+			method: "POST",
+			headers: headers,
+		});
+		if (!req.ok) {
+			console.error("Could not start aggregation:" + req.statusText);
+			throw new Error("Could not start aggregation:" + req.statusText);
+		}
+		const res = await req.json();
+		return res;
+	}
+
+	public async startAccountAggregation(
 		sourceID: Number,
 		disableOptimization = false
 	): Promise<any> {
-		console.log("> IdentityNowClient.startAggregation");
+		console.log("> IdentityNowClient.startAccountAggregation");
 		const endpoint =
 			EndpointUtils.getCCUrl(this.tenantName) +
 			"/source/loadAccounts/" +
 			sourceID;
-		// const endpoint = 'https://webhook.site/9bd2674b-2c53-4cd0-8b04-bfd2571b8678';
 		console.log("endpoint = " + endpoint);
 		let headers = await this.prepareHeaders();
 
@@ -271,6 +298,7 @@ export class IdentityNowClient {
 			body: formData,
 		});
 		if (!req.ok) {
+			console.error("Could not start aggregation:" + req.statusText);
 			throw new Error("Could not start aggregation:" + req.statusText);
 		}
 		const res = await req.json();
@@ -641,7 +669,8 @@ export class IdentityNowClient {
 	}
 
 	/**
-	 * cf. https://developer.sailpoint.com/apis/beta/#operation/listWorkflowExecutions
+	 * cf. https://developer.sailpoint.com/idn/api/beta/list-workflow-executions
+	 * There is a limit of 250 items by default
 	 * @param workflowId
 	 * @returns
 	 */
@@ -654,7 +683,7 @@ export class IdentityNowClient {
 		return await this.getResource(path);
 	}
 	/**
-	 * cf. https://developer.sailpoint.com/apis/beta/#operation/getWorkflowExecution
+	 * cf. https://developer.sailpoint.com/idn/api/beta/get-workflow-execution
 	 * @param workflowExecutionId
 	 * @returns
 	 */

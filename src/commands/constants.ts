@@ -12,6 +12,7 @@ export const IMPORT_CONFIG_PALETTE = 'vscode-sailpoint-identitynow.import-config
 export const IMPORT_CONFIG_MENU = 'vscode-sailpoint-identitynow.import-config.menu';
 export const AGGREGATE = 'vscode-sailpoint-identitynow.aggregate-source';
 export const AGGREGATE_DISABLE_OPTIMIZATION = 'vscode-sailpoint-identitynow.aggregate-source-disable-optimization';
+export const AGGREGATE_ENTITLEMENTS = 'vscode-sailpoint-identitynow.aggregate-entitlements';
 export const RESET_SOURCE = 'vscode-sailpoint-identitynow.reset-source';
 export const RESET_SOURCE_ACCOUNTS = 'vscode-sailpoint-identitynow.reset-source-accounts';
 export const RESET_SOURCE_ENTITLEMENTS = 'vscode-sailpoint-identitynow.reset-source-entitlements';

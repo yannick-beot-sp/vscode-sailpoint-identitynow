@@ -82,6 +82,9 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.AGGREGATE_DISABLE_OPTIMIZATION,
 			(tenantTreeItem) => treeManager.aggregateSource(tenantTreeItem, true)));
 	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.AGGREGATE_ENTITLEMENTS,
+			(tenantTreeItem) => treeManager.aggregateSource(tenantTreeItem, false, "entitlements")));
+	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.RESET_SOURCE,
 			(tenantTreeItem) => treeManager.resetSource(tenantTreeItem)));
 	context.subscriptions.push(

@@ -132,6 +132,10 @@
         "title": "Aggregate source without optimization"
       },
       {
+        "command": "vscode-sailpoint-identitynow.aggregate-entitlements",
+        "title": "Aggregate entitlements"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.reset-source",
         "title": "Reset source"
       },
@@ -262,6 +266,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.aggregate-entitlements",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.reset-source",
           "when": "never"
         },
@@ -361,7 +369,7 @@
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
         },
         {
-          "command": "vscode-sailpoint-identitynow.aggregate-source-disable-optimization",
+          "command": "vscode-sailpoint-identitynow.aggregate-entitlements",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
         },
         {
