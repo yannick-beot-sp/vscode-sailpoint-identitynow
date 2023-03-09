@@ -148,6 +148,10 @@
         "title": "Reset entitlements"
       },
       {
+        "command": "vscode-sailpoint-identitynow.source.export.accounts.view",
+        "title": "Export accounts"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.new-transform",
         "title": "New transform",
         "icon": "$(add)"
@@ -282,6 +286,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.source.export.accounts.view",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.new-transform",
           "when": "never"
         },
@@ -382,6 +390,10 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.reset-source-entitlements",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.source.export.accounts.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
         },
         {
@@ -558,11 +570,13 @@
           "when": "resourcePath =~ /\\.json/"
         }
       ],
-      "explorer/context": [{
-        "when": "resourceLangId == json",
-        "command": "vscode-sailpoint-identitynow.import-config.menu",
-        "group": "idn"
-    }]
+      "explorer/context": [
+        {
+          "when": "resourceLangId == json",
+          "command": "vscode-sailpoint-identitynow.import-config.menu",
+          "group": "idn"
+        }
+      ]
     },
     "snippets": [
       {
@@ -604,26 +618,29 @@
   },
   "devDependencies": {
     "@types/glob": "^8.0.0",
-    "@types/mocha": "^10.0.1",
-    "@types/node": "16.x",
     "@types/isomorphic-fetch": "^0.0.36",
     "@types/isomorphic-form-data": "^2.0.1",
+    "@types/lodash": "^4.14.191",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
     "@types/vscode": "^1.74.0",
     "@typescript-eslint/eslint-plugin": "^5.47.0",
     "@typescript-eslint/parser": "^5.47.0",
     "@vscode/test-electron": "^2.2.1",
     "esbuild": "^0.16.9",
+    "eslint": "^8.30.0",
     "glob": "^8.0.3",
     "mocha": "^10.2.0",
-    "typescript": "^4.9.4",
-    "eslint": "^8.30.0",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "typescript": "^4.9.4"
   },
   "dependencies": {
+    "@json2csv/node": "^6.1.2",
     "@vscode/webview-ui-toolkit": "^1.0.0",
     "client-oauth2": "^4.3.3",
     "fast-json-patch": "^3.1.1",
     "isomorphic-fetch": "^3.0.0",
-    "isomorphic-form-data": "^2.0.0"
+    "isomorphic-form-data": "^2.0.0",
+    "lodash": "^4.17.21"
   }
 }

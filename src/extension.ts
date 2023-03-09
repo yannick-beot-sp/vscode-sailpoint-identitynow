@@ -28,6 +28,7 @@ import { IdentityNowUriHandler } from './uriHandler';
 import { SortIdentityProfileCommand } from './commands/sortIdentityProfile';
 import { MenuImporter, PaletteImporter, TreeViewImporter } from './commands/importConfig';
 import { refreshIdentityProfile } from './commands/refreshIdentityProfile';
+import { AccountExporter } from './commands/exportAccounts';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -96,6 +97,11 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM,
 			(tenantTreeItem) => treeManager.evaluateTransform(tenantTreeItem)));
+
+	const accountExporterCommand = new AccountExporter();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_ACCOUNTS_VIEW,
+			accountExporterCommand.execute, accountExporterCommand));
 
 	const openResourceCommand = new OpenResourceCommand();
 	context.subscriptions.push(

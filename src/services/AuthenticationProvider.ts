@@ -1,5 +1,4 @@
 import ClientOAuth2 = require('client-oauth2');
-import { utils } from 'mocha';
 import {
     authentication,
     AuthenticationProvider,

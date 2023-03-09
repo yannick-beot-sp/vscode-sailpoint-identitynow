@@ -4,6 +4,7 @@ import { IdentityNowClient } from '../services/IdentityNowClient';
 import { ObjectTypeItem } from '../models/ConfigQuickPickItem';
 import { delay, toDateSuffix } from '../utils';
 import * as fs from 'fs';
+import * as os from 'os';
 import path = require('path');
 import { TenantService } from '../services/TenantService';
 import { chooseTenant, confirmFileOverwrite } from '../utils/vsCodeHelpers';
@@ -44,7 +45,7 @@ abstract class BaseExporter {
     }
 
     /**
-     * Will display a porgress for the export
+     * Will display a progress bar for the export
      */
     public async exportConfigWithProgression(): Promise<void> {
         if (!this.tenantId || !this.tenantName) {
@@ -88,7 +89,7 @@ abstract class BaseExporter {
             console.log('Writing to ', this.target);
             const parentDir = path.dirname(this.target);
             if (!fs.existsSync(parentDir)) {
-                fs.mkdirSync(parentDir, {recursive: true});
+                fs.mkdirSync(parentDir, { recursive: true });
             }
             fs.writeFileSync(this.target, JSON.stringify(data, null, 2), { encoding: "utf8" });
         } else {
@@ -159,11 +160,14 @@ abstract class BaseExporter {
     protected getProposedFolder(objectType: string | undefined = undefined): string {
         let proposedFolder = '';
         if (vscode.workspace.workspaceFolders !== undefined && vscode.workspace.workspaceFolders.length > 0) {
-            const workspaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath.replace(/\\/g, "/");
-            proposedFolder = path.join(workspaceFolder, 'exportedObjects');
-            if (objectType) {
-                proposedFolder = path.join(proposedFolder, objectType);
-            }
+            proposedFolder = vscode.workspace.workspaceFolders[0].uri.fsPath.replace(/\\/g, "/");
+        } else {
+            proposedFolder = os.homedir();
+        }
+
+        proposedFolder = path.join(proposedFolder, 'exportedObjects');
+        if (objectType) {
+            proposedFolder = path.join(proposedFolder, objectType);
         }
         console.log("< getProposedFolder: " + proposedFolder);
         return proposedFolder;
