@@ -5,6 +5,7 @@ import { titleCase } from '../utils/titleCase';
 
 const SECTION_CONF = "vscode-sailpoint-identitynow";
 const ACCOUNT_REPORT_FILENAME_CONF = "report.accounts.filename";
+const ENTITLEMENT_REPORT_FILENAME_CONF = "report.entitlements.filename";
 
 
 interface ContextValues {
@@ -110,6 +111,21 @@ export class PathProposer {
         sourceName: string,
     ): string {
         let path = this.getConfigKey(ACCOUNT_REPORT_FILENAME_CONF);
+        path = this.replaceVariables(path, {
+            t: tenantName,
+            T: tenantDisplayName,
+            S: sourceName
+        });
+        return path as string;
+    }
+
+
+    public static getEntitlementReportFilename(
+        tenantName: string,
+        tenantDisplayName: string,
+        sourceName: string,
+    ): string {
+        let path = this.getConfigKey(ENTITLEMENT_REPORT_FILENAME_CONF);
         path = this.replaceVariables(path, {
             t: tenantName,
             T: tenantDisplayName,

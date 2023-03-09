@@ -152,6 +152,10 @@
         "title": "Export accounts..."
       },
       {
+        "command": "vscode-sailpoint-identitynow.source.export.entitlements.view",
+        "title": "Export entitlements..."
+      },
+      {
         "command": "vscode-sailpoint-identitynow.new-transform",
         "title": "New transform",
         "icon": "$(add)"
@@ -290,6 +294,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.source.export.entitlements.view",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.new-transform",
           "when": "never"
         },
@@ -394,6 +402,10 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.source.export.accounts.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.source.export.entitlements.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
         },
         {
@@ -607,7 +619,11 @@
       "properties": {
         "vscode-sailpoint-identitynow.report.accounts.filename":{
           "type":"string",
-          "default": "%x/reports/%T-%S-%y%M%d-%h%m%s.csv"
+          "default": "%x/reports/%T-%S-Accounts-%y%M%d-%h%m%s.csv"
+        },
+        "vscode-sailpoint-identitynow.report.entitlements.filename":{
+          "type":"string",
+          "default": "%x/reports/%T-%S-Entitlements-%y%M%d-%h%m%s.csv"
         }
       }
     }

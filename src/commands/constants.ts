@@ -15,6 +15,7 @@ export const AGGREGATE_DISABLE_OPTIMIZATION = 'vscode-sailpoint-identitynow.aggr
 export const AGGREGATE_ENTITLEMENTS = 'vscode-sailpoint-identitynow.aggregate-entitlements';
 export const UPLOAD_FILE = 'vscode-sailpoint-identitynow.source.upload-file';
 export const EXPORT_ACCOUNTS_VIEW = 'vscode-sailpoint-identitynow.source.export.accounts.view';
+export const EXPORT_ENTITLEMENTS_VIEW = 'vscode-sailpoint-identitynow.source.export.entitlements.view';
 export const RESET_SOURCE = 'vscode-sailpoint-identitynow.reset-source';
 export const RESET_SOURCE_ACCOUNTS = 'vscode-sailpoint-identitynow.reset-source-accounts';
 export const RESET_SOURCE_ENTITLEMENTS = 'vscode-sailpoint-identitynow.reset-source-entitlements';

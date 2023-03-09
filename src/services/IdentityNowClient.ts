@@ -13,6 +13,7 @@ import { ServiceDesk } from "../models/ServiceDesk";
 import { ExportOptions, ObjectOptions } from "../models/ExportOptions";
 import { ImportJobResults, JobStatus } from "../models/JobStatus";
 import { Account, AccountsQueryParams, DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
+import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS, Entitlement, EntitlementsQueryParams } from "../models/Entitlements";
 
 
 const CONTENT_TYPE_HEADER = "Content-Type";
@@ -916,6 +917,47 @@ export class IdentityNowClient {
 	public async getAccountsBySource(sourceId: string, offset = 0, limit = 250): Promise<Account[]> {
 		const filters = `sourceId eq "${sourceId}"`;
 		const resp = await this.getAccounts({
+			filters,
+			limit,
+			offset
+		});
+		return await resp.json();
+	}
+
+	public async getEntitlements(
+		query: EntitlementsQueryParams = DEFAULT_ENTITLEMENTS_QUERY_PARAMS
+	): Promise<Response> {
+		console.log("> getEntitlements", query);
+		const queryValues = {
+			...DEFAULT_ENTITLEMENTS_QUERY_PARAMS,
+			...query
+		};
+		let endpoint = `${EndpointUtils.getBetaUrl(this.tenantName)}/entitlements`;
+		endpoint = withQuery(endpoint, queryValues);
+		console.log("endpoint = " + endpoint);
+		const headers = await this.prepareHeaders();
+		const resp = await fetch(endpoint, {
+			headers: headers
+		});
+
+		this.ensureOK(resp);
+		return resp;
+	}
+
+	public async getEntitlementCountBySource(sourceId: string): Promise<number> {
+		const filters = `source.id eq "${sourceId}"`;
+		const resp = await this.getEntitlements({
+			filters,
+			count: true,
+			limit: 0,
+			offset: 0
+		});
+		return Number(resp.headers.get(TOTAL_COUNT_HEADER));
+	}
+
+	public async getEntitlementsBySource(sourceId: string, offset = 0, limit = 250): Promise<Entitlement[]> {
+		const filters = `source.id eq "${sourceId}"`;
+		const resp = await this.getEntitlements({
 			filters,
 			limit,
 			offset

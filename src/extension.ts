@@ -29,6 +29,7 @@ import { SortIdentityProfileCommand } from './commands/sortIdentityProfile';
 import { MenuImporter, PaletteImporter, TreeViewImporter } from './commands/importConfig';
 import { refreshIdentityProfile } from './commands/refreshIdentityProfile';
 import { AccountExporter } from './commands/exportAccounts';
+import { EntitlementExporter } from './commands/exportEntitlements';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -102,6 +103,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_ACCOUNTS_VIEW,
 			accountExporterCommand.execute, accountExporterCommand));
+	const entitlementExporterCommand = new EntitlementExporter();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_ENTITLEMENTS_VIEW,
+			entitlementExporterCommand.execute, entitlementExporterCommand));
 
 	const openResourceCommand = new OpenResourceCommand();
 	context.subscriptions.push(
