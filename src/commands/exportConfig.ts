@@ -7,10 +7,11 @@ import * as fs from 'fs';
 import * as os from 'os';
 import path = require('path');
 import { TenantService } from '../services/TenantService';
-import { chooseTenant, confirmFileOverwrite } from '../utils/vsCodeHelpers';
+import { askFile, askFolder, chooseTenant, confirmFileOverwrite } from '../utils/vsCodeHelpers';
 import { OBJECT_TYPE_ITEMS } from '../models/ObjectTypeQuickPickItem';
 import { ObjectPickItem } from '../models/ObjectPickItem';
 import { isBlank } from '../utils/stringUtils';
+import { ensureFolderExists } from '../utils/fileutils';
 
 const SINGLE_EXPORT_TYPE = {
     "label": "Single file",
@@ -87,75 +88,21 @@ abstract class BaseExporter {
         const data = await this.client.getExportJobResult(jobId);
         if (this.exportSingle) {
             console.log('Writing to ', this.target);
-            const parentDir = path.dirname(this.target);
-            if (!fs.existsSync(parentDir)) {
-                fs.mkdirSync(parentDir, { recursive: true });
-            }
+            ensureFolderExists(this.target);
             fs.writeFileSync(this.target, JSON.stringify(data, null, 2), { encoding: "utf8" });
         } else {
             for (let obj of data.objects) {
                 const targetFolder = path.join(this.target, obj.self.type);
                 const targetFilename = obj.self.name + ".json";
                 const targetFilepath = path.join(targetFolder, targetFilename);
-                if (!fs.existsSync(targetFolder)) {
-                    fs.mkdirSync(targetFolder);
-                }
+                ensureFolderExists(targetFilepath);
                 console.log('Writing to ', targetFilepath);
                 fs.writeFileSync(targetFilepath, JSON.stringify(obj.object, null, 2), { encoding: "utf8" });
             }
         }
     }
 
-    protected async askFile(prompt: string, proposedFile: string): Promise<string | undefined> {
-        const target = await vscode.window.showInputBox({
-            ignoreFocusOut: true,
-            value: proposedFile,
-            prompt: prompt
-        });
 
-        if (target === undefined || isBlank(target)) {
-            console.log("< askFile: no file");
-            return;
-        }
-        const overwrite = await confirmFileOverwrite(target);
-        if (!overwrite) {
-            return;
-        }
-        return target;
-    }
-
-    /**
-     * Will prompt the user to get a folder path. 
-     * If the folder does not exist, it will create it.
-     * If the folder already exist, it will get confirmation to overwrite it.
-     * @param prompt Prompt to display
-     * @param exportFolder Proposition of folder
-     * @returns undefined to escape or the folder path as string
-     */
-    protected async askFolder(prompt: string, exportFolder: string): Promise<string | undefined> {
-        const target = await vscode.window.showInputBox({
-            ignoreFocusOut: true,
-            value: exportFolder,
-            prompt: prompt
-        });
-        if (target === undefined || isBlank(target)) {
-            console.log("< askFolder: no folder");
-            return;
-        }
-        if (!fs.existsSync(target)) {
-            fs.mkdirSync(target, { recursive: true });
-        }
-        else {
-            const answer = await vscode.window.showQuickPick(
-                ["No", "Yes"],
-                { placeHolder: 'The folder already exists, do you want to overwrite files?' });
-            if (answer === undefined || answer === "No") {
-                console.log("< exportConfig: do not overwrite");
-                return;
-            }
-        }
-        return target;
-    }
 
     protected getProposedFolder(objectType: string | undefined = undefined): string {
         let proposedFolder = '';
@@ -265,11 +212,11 @@ abstract class WizardBaseExporter extends BaseExporter {
         let exportFile: string | undefined = this.getProposedFilename(this.tenantName);
 
         if (this.exportSingle) {
-            this.target = await this.askFile(
+            this.target = await askFile(
                 "Enter the file to save the exported objects to",
                 path.join(exportFolder, exportFile));
         } else {
-            this.target = await this.askFolder(
+            this.target = await askFolder(
                 "Enter folder to save the exported objects",
                 exportFolder);
         }
@@ -429,7 +376,7 @@ export class ExportNodeConfig extends BaseExporter {
             this.getProposedFilename(this.tenantName, label)
         );
 
-        this.target = await this.askFile(
+        this.target = await askFile(
             `Enter the file to save ${label} to`,
             exportFile);
         if (this.target === undefined) {

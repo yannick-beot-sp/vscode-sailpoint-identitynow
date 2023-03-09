@@ -7,12 +7,16 @@ import { withQuery } from '../utils/UriUtils';
 import { CSVWriter } from '../services/CSVWriter';
 import { Schema } from '../models/Schema';
 import { off } from 'process';
+import { PathProposer } from '../services/PathProposer';
+import { askFile } from '../utils/vsCodeHelpers';
+import { ensureFolderExists } from '../utils/fileutils';
 
 /**
  * Base class for all importer
  */
 abstract class BaseAccountExporter {
     tenantName: string | undefined;
+    tenantDisplayName: string | undefined;
     tenantId: string | undefined;
     filePath: string | undefined;
     client!: IdentityNowClient;
@@ -92,8 +96,24 @@ export class AccountExporter extends BaseAccountExporter {
 
         this.tenantId = node.tenantId;
         this.tenantName = node.tenantName;
+        this.tenantDisplayName = node.tenantDisplayName;
         this.sourceId = node.id as string;
-        this.filePath = 'c:/tmp/test1.csv';
+
+        const proposedPath = PathProposer.getAccountReportFilename(
+            this.tenantName,
+            this.tenantDisplayName,
+            node.label as string
+        );
+        this.filePath = await askFile(
+            "Enter the file to save the account report to",
+            proposedPath
+        );
+        if (this.filePath === undefined) {
+            return;
+        }
+
+        ensureFolderExists(this.filePath);
+        
         await this.exportFileWithProgression();
     }
 

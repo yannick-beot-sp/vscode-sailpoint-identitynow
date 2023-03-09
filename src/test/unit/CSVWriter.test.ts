@@ -1,4 +1,4 @@
-import * as assert from 'assert';
+/* eslint-disable @typescript-eslint/naming-convention */
 import * as os from 'os';
 import { it, describe } from 'mocha';
 import path = require('node:path');
@@ -89,7 +89,6 @@ const data = [
 const hearders = ["id","first_name","last_name","email"];
 
 suite('CSVWriter Test Suite', () => {
-    // vscode.window.showInformationMessage('Start all tests.');
     describe('CSVWriter without transform', () => {
         const outputPath =   path.join(os.tmpdir(), './dummy-array.csv');
         console.log("Writing to", outputPath);

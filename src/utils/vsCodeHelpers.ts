@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import { TenantInfo } from "../models/TenantInfo";
 import { TenantInfoQuickPickItem } from "../models/TenantInfoQuickPickItem";
 import { isEmpty } from "../utils";
+import { isBlank } from "./stringUtils";
 
 export async function chooseTenant(tenantService: TenantService, title: string): Promise<TenantInfo | undefined> {
 	console.log("> chooseTenant");
@@ -86,7 +87,6 @@ export async function confirmFileOverwrite(exportFile: string): Promise<boolean>
 	return true;
 }
 
-
 export async function askDisplayName(tenantName: string): Promise<string | undefined> {
 	const result = await vscode.window.showInputBox({
 		value: tenantName,
@@ -95,10 +95,62 @@ export async function askDisplayName(tenantName: string): Promise<string | undef
 		prompt: "Enter a display name for this tenant",
 		title: 'IdentityNow',
 		validateInput: text => {
-			if (isEmpty(text) || isEmpty(text.trim()) ) {
+			if (isEmpty(text) || isEmpty(text.trim())) {
 				return "Display name must not be empty";
 			}
 		}
 	});
 	return result;
+}
+
+export async function askFile(prompt: string, proposedFile: string): Promise<string | undefined> {
+	const target = await vscode.window.showInputBox({
+		ignoreFocusOut: true,
+		value: proposedFile,
+		prompt: prompt
+	});
+
+	if (target === undefined || isBlank(target)) {
+		console.log("< askFile: no file");
+		return;
+	}
+	const overwrite = await confirmFileOverwrite(target);
+	if (!overwrite) {
+		console.log("< askFile: fo not overwrite");
+		return;
+	}
+	return target;
+}
+
+/**
+ * Will prompt the user to get a folder path. 
+ * If the folder does not exist, it will create it.
+ * If the folder already exist, it will get confirmation to overwrite it.
+ * @param prompt Prompt to display
+ * @param exportFolder Proposition of folder
+ * @returns undefined to escape or the folder path as string
+ */
+export async function askFolder(prompt: string, exportFolder: string): Promise<string | undefined> {
+	const target = await vscode.window.showInputBox({
+		ignoreFocusOut: true,
+		value: exportFolder,
+		prompt: prompt
+	});
+	if (target === undefined || isBlank(target)) {
+		console.log("< askFolder: no folder");
+		return;
+	}
+	if (!fs.existsSync(target)) {
+		fs.mkdirSync(target, { recursive: true });
+	}
+	else {
+		const answer = await vscode.window.showQuickPick(
+			["No", "Yes"],
+			{ placeHolder: 'The folder already exists, do you want to overwrite files?' });
+		if (answer === undefined || answer === "No") {
+			console.log("< askFolder: do not overwrite");
+			return;
+		}
+	}
+	return target;
 }

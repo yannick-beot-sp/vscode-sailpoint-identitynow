@@ -26,16 +26,24 @@ export interface AttributeBag {
 
 export interface PaginatedQueryParams {
     filters?: string,
-    limit: Number,
-    offset: Number,
-    count: boolean,
+    limit?: number,
+    offset?: number,
+    count?: boolean,
     sorters?: string
 
 }
 
 export interface AccountsQueryParams extends PaginatedQueryParams {
-    detailLevel: "FULL" | "SLIM"
+    detailLevel?: "FULL" | "SLIM"
 }
+
+export const DEFAULT_ACCOUNTS_QUERY_PARAMS: AccountsQueryParams = {
+    count: false,
+    limit: 250,
+    offset: 0,
+    detailLevel: "SLIM",
+    sorters: "name"
+};
 
 /**
  * As returned by 401 error

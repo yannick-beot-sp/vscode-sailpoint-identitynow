@@ -16,9 +16,13 @@ import { compareByName, compareByPriority } from "../utils";
  * Base class to expose getChildren and updateIcon methods
  */
 export abstract class BaseTreeItem extends TreeItem {
+
 	constructor(
 		label: string | TreeItemLabel,
-		collapsibleState?: TreeItemCollapsibleState
+		public readonly tenantId: string,
+		public readonly tenantName: string,
+		public readonly tenantDisplayName: string,
+		collapsibleState: TreeItemCollapsibleState = TreeItemCollapsibleState.None,
 	) {
 		super(label, collapsibleState);
 	}
@@ -36,10 +40,15 @@ export abstract class BaseTreeItem extends TreeItem {
 export class TenantTreeItem extends BaseTreeItem {
 	constructor(
 		tenantLabel: string,
-		public readonly tenantId: string,
-		public readonly tenantName: string
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
 	) {
-		super(tenantLabel, TreeItemCollapsibleState.Collapsed);
+		super(tenantLabel,
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			TreeItemCollapsibleState.Collapsed);
 		this.tooltip = tenantName;
 	}
 	iconPath = new ThemeIcon("organization");
@@ -47,12 +56,12 @@ export class TenantTreeItem extends BaseTreeItem {
 
 	getChildren(): Promise<BaseTreeItem[]> {
 		const results: BaseTreeItem[] = [];
-		results.push(new SourcesTreeItem(this.tenantId, this.tenantName));
-		results.push(new TransformsTreeItem(this.tenantId, this.tenantName));
-		results.push(new WorkflowsTreeItem(this.tenantId, this.tenantName));
-		results.push(new RulesTreeItem(this.tenantId, this.tenantName));
-		results.push(new ServiceDesksTreeItem(this.tenantId, this.tenantName));
-		results.push(new IdentityProfilesTreeItem(this.tenantId, this.tenantName));
+		results.push(new SourcesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new TransformsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new WorkflowsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new RulesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new ServiceDesksTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new IdentityProfilesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		return new Promise((resolve) => resolve(results));
 	}
 }
@@ -64,9 +73,16 @@ export abstract class FolderTreeItem extends BaseTreeItem {
 	constructor(
 		label: string,
 		public readonly contextValue: string,
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
 		public readonly parentUri?: Uri
 	) {
-		super(label, TreeItemCollapsibleState.Collapsed);
+		super(label,
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			TreeItemCollapsibleState.Collapsed);
 	}
 
 	updateIcon(): void {
@@ -83,10 +99,11 @@ export abstract class FolderTreeItem extends BaseTreeItem {
  */
 export class SourcesTreeItem extends FolderTreeItem {
 	constructor(
-		public readonly tenantId: string,
-		public readonly tenantName: string
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
 	) {
-		super("Sources", "sources");
+		super("Sources", "sources", tenantId, tenantName, tenantDisplayName);
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
@@ -99,6 +116,7 @@ export class SourcesTreeItem extends FolderTreeItem {
 					new SourceTreeItem(
 						this.tenantId,
 						this.tenantName,
+						this.tenantDisplayName,
 						source.name,
 						source.id,
 						source.connectorAttributes.cloudExternalId
@@ -114,10 +132,11 @@ export class SourcesTreeItem extends FolderTreeItem {
  */
 export class IdentityProfilesTreeItem extends FolderTreeItem {
 	constructor(
-		public readonly tenantId: string,
-		public readonly tenantName: string
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
 	) {
-		super("Identity Profiles", "identity-profiles");
+		super("Identity Profiles", "identity-profiles", tenantId, tenantName, tenantDisplayName);
 	}
 
 	private criteria = IdentityProfileSorting.name;
@@ -140,6 +159,7 @@ export class IdentityProfilesTreeItem extends FolderTreeItem {
 				new IdentityProfileTreeItem(
 					this.tenantId,
 					this.tenantName,
+					this.tenantDisplayName,
 					`${w.name} (${w.authoritativeSource.name.replace(
 						/ \[source.*\]/,
 						""
@@ -154,19 +174,20 @@ export class IdentityProfilesTreeItem extends FolderTreeItem {
 export class IdentityNowResourceTreeItem extends BaseTreeItem {
 	public readonly uri: Uri;
 	constructor(
-		public readonly tenantId: string,
-		public readonly tenantName: string,
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
 		label: string,
 		resourceType: string,
 		//public readonly
 		id: string,
-		collapsible: TreeItemCollapsibleState,
+		collapsible: TreeItemCollapsibleState = TreeItemCollapsibleState.None,
 		public readonly subResourceType: string = "",
 		public readonly subId: string = "",
 		public readonly beta = false
 	) {
 		// By default, a IdentityNowResourceTreeItem will be a leaf, meaning that there will not be any childs
-		super(label, collapsible);
+		super(label, tenantId, tenantName, tenantDisplayName, collapsible);
 		this.id = id;
 		this.uri = getResourceUri(tenantName, resourceType, id, label, beta);
 		if (subResourceType && subId) {
@@ -197,6 +218,7 @@ export class SourceTreeItem extends IdentityNowResourceTreeItem {
 	constructor(
 		tenantId: string,
 		tenantName: string,
+		tenantDisplayName: string,
 		label: string,
 		id: string,
 		public readonly ccId: Number
@@ -204,6 +226,7 @@ export class SourceTreeItem extends IdentityNowResourceTreeItem {
 		super(
 			tenantId,
 			tenantName,
+			tenantDisplayName,
 			label,
 			"sources",
 			id,
@@ -215,9 +238,9 @@ export class SourceTreeItem extends IdentityNowResourceTreeItem {
 
 	getChildren(): Promise<BaseTreeItem[]> {
 		const results: BaseTreeItem[] = [];
-		results.push(new SchemasTreeItem(this.tenantId, this.tenantName, this.uri));
+		results.push(new SchemasTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, this.uri));
 		results.push(
-			new ProvisioningPoliciesTreeItem(this.tenantId, this.tenantName, this.uri)
+			new ProvisioningPoliciesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, this.uri)
 		);
 		return new Promise((resolve) => resolve(results));
 	}
@@ -235,10 +258,11 @@ export class SourceTreeItem extends IdentityNowResourceTreeItem {
  */
 export class TransformsTreeItem extends FolderTreeItem {
 	constructor(
-		public readonly tenantId: string,
-		public readonly tenantName: string
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
 	) {
-		super("Transforms", "transforms");
+		super("Transforms", "transforms", tenantId, tenantName, tenantDisplayName);
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
@@ -253,6 +277,7 @@ export class TransformsTreeItem extends FolderTreeItem {
 					new TransformTreeItem(
 						this.tenantId,
 						this.tenantName,
+						this.tenantDisplayName,
 						element.name,
 						element.id
 					)
@@ -266,14 +291,19 @@ export class TransformsTreeItem extends FolderTreeItem {
 export class TransformTreeItem extends IdentityNowResourceTreeItem {
 	contextValue = "transform";
 
-	constructor(tenantId: string, tenantName: string, label: string, id: string) {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string) {
 		super(
 			tenantId,
 			tenantName,
+			tenantDisplayName,
 			label,
 			"transforms",
-			id,
-			TreeItemCollapsibleState.None
+			id
 		);
 	}
 
@@ -287,11 +317,12 @@ export class TransformTreeItem extends IdentityNowResourceTreeItem {
 
 export class SchemasTreeItem extends FolderTreeItem {
 	constructor(
-		public readonly tenantId: string,
-		public readonly tenantName: string,
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
 		parentUri: Uri
 	) {
-		super("Schemas", "schemas", parentUri);
+		super("Schemas", "schemas", tenantId, tenantName, tenantDisplayName, parentUri);
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
@@ -308,6 +339,7 @@ export class SchemasTreeItem extends FolderTreeItem {
 						new SchemaTreeItem(
 							this.tenantId,
 							this.tenantName,
+							this.tenantDisplayName,
 							element.name,
 							getIdByUri(this.parentUri) || "",
 							element.id
@@ -322,6 +354,7 @@ export class SchemaTreeItem extends IdentityNowResourceTreeItem {
 	constructor(
 		tenantId: string,
 		tenantName: string,
+		tenantDisplayName: string,
 		label: string,
 		id: string,
 		subId: string
@@ -329,6 +362,7 @@ export class SchemaTreeItem extends IdentityNowResourceTreeItem {
 		super(
 			tenantId,
 			tenantName,
+			tenantDisplayName,
 			label,
 			"sources",
 			id,
@@ -348,11 +382,12 @@ export class SchemaTreeItem extends IdentityNowResourceTreeItem {
  */
 export class ProvisioningPoliciesTreeItem extends FolderTreeItem {
 	constructor(
-		public readonly tenantId: string,
-		public readonly tenantName: string,
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
 		parentUri: Uri
 	) {
-		super("Provisioning Policies", "provisioning-policies", parentUri);
+		super("Provisioning Policies", "provisioning-policies", tenantId, tenantName, tenantDisplayName, parentUri);
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
@@ -374,6 +409,7 @@ export class ProvisioningPoliciesTreeItem extends FolderTreeItem {
 						new ProvisioningPolicyTreeItem(
 							this.tenantId,
 							this.tenantName,
+							this.tenantDisplayName,
 							provisioningPolicy.name,
 							getIdByUri(this.parentUri) || "",
 							provisioningPolicy.usageType
@@ -390,6 +426,7 @@ export class ProvisioningPolicyTreeItem extends IdentityNowResourceTreeItem {
 	constructor(
 		tenantId: string,
 		tenantName: string,
+		tenantDisplayName: string,
 		label: string,
 		id: string,
 		subId: string
@@ -398,10 +435,10 @@ export class ProvisioningPolicyTreeItem extends IdentityNowResourceTreeItem {
 		super(
 			tenantId,
 			tenantName,
+			tenantDisplayName,
 			label,
 			"sources",
-			id + "/provisioning-policies/" + subId,
-			TreeItemCollapsibleState.None
+			id + "/provisioning-policies/" + subId
 		);
 	}
 
@@ -418,10 +455,11 @@ export class ProvisioningPolicyTreeItem extends IdentityNowResourceTreeItem {
  */
 export class WorkflowsTreeItem extends FolderTreeItem {
 	constructor(
-		public readonly tenantId: string,
-		public readonly tenantName: string
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
 	) {
-		super("Workflows", "workflows");
+		super("Workflows", "workflows", tenantId, tenantName, tenantDisplayName);
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
@@ -432,6 +470,7 @@ export class WorkflowsTreeItem extends FolderTreeItem {
 				new WorkflowTreeItem(
 					this.tenantId,
 					this.tenantName,
+					this.tenantDisplayName,
 					w.name,
 					w.id,
 					w.enabled
@@ -445,6 +484,7 @@ export class WorkflowTreeItem extends IdentityNowResourceTreeItem {
 	constructor(
 		tenantId: string,
 		tenantName: string,
+		tenantDisplayName: string,
 		label: string,
 		id: string,
 		public enabled: boolean
@@ -452,6 +492,7 @@ export class WorkflowTreeItem extends IdentityNowResourceTreeItem {
 		super(
 			tenantId,
 			tenantName,
+			tenantDisplayName,
 			label,
 			"workflows",
 			id,
@@ -483,27 +524,34 @@ export class WorkflowTreeItem extends IdentityNowResourceTreeItem {
  */
 export class RulesTreeItem extends FolderTreeItem {
 	constructor(
-		public readonly tenantId: string,
-		public readonly tenantName: string
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
 	) {
-		super("Rules", "connector-rules");
+		super("Rules", "connector-rules", tenantId, tenantName, tenantDisplayName);
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
 		const client = new IdentityNowClient(this.tenantId, this.tenantName);
 		const rules = await client.getConnectorRules();
 		const ruleTreeItems = rules.map(
-			(r) => new RuleTreeItem(this.tenantId, this.tenantName, r.name, r.id)
+			(r) => new RuleTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, r.name, r.id)
 		);
 		return ruleTreeItems;
 	}
 }
 
 export class RuleTreeItem extends IdentityNowResourceTreeItem {
-	constructor(tenantId: string, tenantName: string, label: string, id: string) {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string) {
 		super(
 			tenantId,
 			tenantName,
+			tenantDisplayName,
 			label,
 			"connector-rules",
 			id,
@@ -519,10 +567,17 @@ export class RuleTreeItem extends IdentityNowResourceTreeItem {
 }
 
 export class IdentityProfileTreeItem extends IdentityNowResourceTreeItem {
-	constructor(tenantId: string, tenantName: string, label: string, id: string) {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string
+	) {
 		super(
 			tenantId,
 			tenantName,
+			tenantDisplayName,
 			label,
 			"identity-profiles",
 			id,
@@ -544,6 +599,7 @@ export class IdentityProfileTreeItem extends IdentityNowResourceTreeItem {
 				new LifecycleStateTreeItem(
 					this.tenantId,
 					this.tenantName,
+					this.tenantDisplayName,
 					w.name,
 					this.id as string,
 					w.id
@@ -562,6 +618,7 @@ export class LifecycleStateTreeItem extends IdentityNowResourceTreeItem {
 	constructor(
 		tenantId: string,
 		tenantName: string,
+		tenantDisplayName: string,
 		label: string,
 		id: string,
 		subId: string
@@ -569,6 +626,7 @@ export class LifecycleStateTreeItem extends IdentityNowResourceTreeItem {
 		super(
 			tenantId,
 			tenantName,
+			tenantDisplayName,
 			label,
 			"identity-profiles",
 			id,
@@ -588,10 +646,11 @@ export class LifecycleStateTreeItem extends IdentityNowResourceTreeItem {
  */
 export class ServiceDesksTreeItem extends FolderTreeItem {
 	constructor(
-		public readonly tenantId: string,
-		public readonly tenantName: string
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
 	) {
-		super("Service Desk", "service-desk-integrations");
+		super("Service Desk", "service-desk-integrations", tenantId, tenantName, tenantDisplayName);
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
@@ -600,7 +659,7 @@ export class ServiceDesksTreeItem extends FolderTreeItem {
 		const serviceDesks = await client.getServiceDesks();
 		const serviceDeskItems = serviceDesks.map(
 			(w) =>
-				new ServiceDeskTreeItem(this.tenantId, this.tenantName, w.name, w.id)
+				new ServiceDeskTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, w.name, w.id)
 		);
 		return serviceDeskItems;
 	}
@@ -609,14 +668,18 @@ export class ServiceDesksTreeItem extends FolderTreeItem {
 export class ServiceDeskTreeItem extends IdentityNowResourceTreeItem {
 	contextValue = "service-desk-integration";
 
-	constructor(tenantId: string, tenantName: string, label: string, id: string) {
+	constructor(tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string) {
 		super(
 			tenantId,
 			tenantName,
+			tenantDisplayName,
 			label,
 			"service-desk-integrations",
-			id,
-			TreeItemCollapsibleState.None
+			id
 		);
 	}
 

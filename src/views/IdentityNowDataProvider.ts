@@ -27,7 +27,8 @@ export class IdentityNowDataProvider implements TreeDataProvider<BaseTreeItem> {
             const results = tenants.map(tenant => new TenantTreeItem(
                 tenant.name,
                 tenant.id,
-                tenant.tenantName)
+                tenant.tenantName,
+                tenant.name)
             );
             console.log("< getChildren", results);
             return results;

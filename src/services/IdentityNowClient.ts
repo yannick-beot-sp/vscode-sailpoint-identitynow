@@ -12,7 +12,7 @@ import { ConnectorRule, ValidationResult } from "../models/connectorRule";
 import { ServiceDesk } from "../models/ServiceDesk";
 import { ExportOptions, ObjectOptions } from "../models/ExportOptions";
 import { ImportJobResults, JobStatus } from "../models/JobStatus";
-import { Account, AccountsQueryParams } from "../models/Account";
+import { Account, AccountsQueryParams, DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 
 
 const CONTENT_TYPE_HEADER = "Content-Type";
@@ -884,16 +884,14 @@ export class IdentityNowClient {
 	}
 
 
-	public async getAccounts(query: AccountsQueryParams = {
-		filters: undefined,
-		count: false,
-		limit: 250,
-		offset: 0,
-		detailLevel: "SLIM"
-	}): Promise<Response> {
+	public async getAccounts(query: AccountsQueryParams = DEFAULT_ACCOUNTS_QUERY_PARAMS): Promise<Response> {
 		console.log("> getAccounts", query);
+		const queryValues = {
+			...DEFAULT_ACCOUNTS_QUERY_PARAMS,
+			...query
+		};
 		let endpoint = `${EndpointUtils.getBetaUrl(this.tenantName)}/accounts`;
-		endpoint = withQuery(endpoint, query);
+		endpoint = withQuery(endpoint, queryValues);
 		console.log("endpoint = " + endpoint);
 		const headers = await this.prepareHeaders();
 		const resp = await fetch(endpoint, {
@@ -910,8 +908,7 @@ export class IdentityNowClient {
 			filters,
 			count: true,
 			limit: 0,
-			offset: 0,
-			detailLevel: "SLIM"
+			offset: 0
 		});
 		return Number(resp.headers.get(TOTAL_COUNT_HEADER));
 	}
@@ -920,11 +917,8 @@ export class IdentityNowClient {
 		const filters = `sourceId eq "${sourceId}"`;
 		const resp = await this.getAccounts({
 			filters,
-			count: false,
 			limit,
-			offset,
-			detailLevel: "SLIM",
-			sorters: "name"
+			offset
 		});
 		return await resp.json();
 	}

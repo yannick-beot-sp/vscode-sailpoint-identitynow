@@ -149,7 +149,7 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.source.export.accounts.view",
-        "title": "Export accounts"
+        "title": "Export accounts..."
       },
       {
         "command": "vscode-sailpoint-identitynow.new-transform",
@@ -601,7 +601,16 @@
         "fileMatch": "idn://**/lifecycle-states/**/*",
         "url": "./schemas/lifecycle-state.schemas.json"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "IdentityNow",
+      "properties": {
+        "vscode-sailpoint-identitynow.report.accounts.filename":{
+          "type":"string",
+          "default": "%x/reports/%T-%S-%y%M%d-%h%m%s.csv"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run esbuild-base -- --minify",
@@ -614,6 +623,7 @@
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
+    "test:unit": "npm run compile && mocha -u tdd ./out/test/unit/*.test.js",
     "clean": "rimraf out"
   },
   "devDependencies": {

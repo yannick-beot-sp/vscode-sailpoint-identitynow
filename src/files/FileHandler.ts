@@ -29,13 +29,13 @@ export class FileHandler {
         let isBeta = false;
         const tenantInfo = await this.tenantService.getTenantByTenantName(tenantName);
         if (olduri.path.match('transforms')) {
-            node = new TransformsTreeItem(tenantInfo?.id ?? "", tenantName);
+            node = new TransformsTreeItem(tenantInfo?.id ?? "", tenantName, tenantInfo?.name ?? "");
             resourceType = 'transforms';
         } else if (olduri.path.match('lifecycle-states')) {
-            node = new TransformsTreeItem(tenantInfo?.id ?? "", tenantName);
+            node = new TransformsTreeItem(tenantInfo?.id ?? "", tenantName, tenantInfo?.name ?? "");
             resourceType = 'lifecycle-states';
         } else {
-            node = new RulesTreeItem(tenantInfo?.id ?? "", tenantName);
+            node = new RulesTreeItem(tenantInfo?.id ?? "", tenantName, tenantInfo?.name ?? "");
             resourceType = 'connector-rules';
             isBeta = true;
         }
