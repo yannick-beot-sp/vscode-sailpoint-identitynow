@@ -137,19 +137,26 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.reset-source",
-        "title": "Reset source"
+        "title": "Reset source",
+        "group": "reset@2"
       },
       {
         "command": "vscode-sailpoint-identitynow.reset-source-accounts",
-        "title": "Reset accounts"
+        "title": "Reset accounts",
+        "group": "reset@2"
       },
       {
         "command": "vscode-sailpoint-identitynow.reset-source-entitlements",
-        "title": "Reset entitlements"
+        "title": "Reset entitlements",
+        "group": "reset@2"
       },
       {
         "command": "vscode-sailpoint-identitynow.source.export.accounts.view",
         "title": "Export accounts..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.source.export.uncorrelated-accounts.view",
+        "title": "Export uncorrelated accounts..."
       },
       {
         "command": "vscode-sailpoint-identitynow.source.export.entitlements.view",
@@ -294,6 +301,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.source.export.uncorrelated-accounts.view",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.source.export.entitlements.view",
           "when": "never"
         },
@@ -382,31 +393,48 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.aggregate-source",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "group": "aggregate"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.aggregate-source-disable-optimization",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "group": "aggregate"
         },
         {
           "command": "vscode-sailpoint-identitynow.aggregate-entitlements",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "group": "aggregate"
         },
         {
           "command": "vscode-sailpoint-identitynow.reset-source",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "group": "reset"
         },
         {
           "command": "vscode-sailpoint-identitynow.reset-source-accounts",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "group": "reset"
         },
         {
           "command": "vscode-sailpoint-identitynow.reset-source-entitlements",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "group": "reset"
         },
         {
           "command": "vscode-sailpoint-identitynow.source.export.accounts.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "group": "report"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.source.export.uncorrelated-accounts.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "group": "report"
         },
         {
           "command": "vscode-sailpoint-identitynow.source.export.entitlements.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "group": "report"
         },
         {
           "command": "vscode-sailpoint-identitynow.open-resource",
@@ -617,12 +645,16 @@
     "configuration": {
       "title": "IdentityNow",
       "properties": {
-        "vscode-sailpoint-identitynow.report.accounts.filename":{
-          "type":"string",
+        "vscode-sailpoint-identitynow.report.accounts.filename": {
+          "type": "string",
           "default": "%x/reports/%T-%S-Accounts-%y%M%d-%h%m%s.csv"
         },
-        "vscode-sailpoint-identitynow.report.entitlements.filename":{
-          "type":"string",
+        "vscode-sailpoint-identitynow.report.uncorrelatedAccounts.filename": {
+          "type": "string",
+          "default": "%x/reports/%T-%S-Uncorrelated-Accounts-%y%M%d-%h%m%s.csv"
+        },
+        "vscode-sailpoint-identitynow.report.entitlements.filename": {
+          "type": "string",
           "default": "%x/reports/%T-%S-Entitlements-%y%M%d-%h%m%s.csv"
         }
       }

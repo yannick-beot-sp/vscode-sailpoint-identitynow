@@ -903,8 +903,11 @@ export class IdentityNowClient {
 		return resp;
 	}
 
-	public async getAccountCountBySource(sourceId: string): Promise<Number> {
-		const filters = `sourceId eq "${sourceId}"`;
+	public async getAccountCountBySource(sourceId: string, exportUncorrelatedAccountOnly = false): Promise<Number> {
+		let filters = `sourceId eq "${sourceId}"`;
+		if (exportUncorrelatedAccountOnly) {
+			filters += " and uncorrelated eq true";
+		}
 		const resp = await this.getAccounts({
 			filters,
 			count: true,
@@ -914,8 +917,11 @@ export class IdentityNowClient {
 		return Number(resp.headers.get(TOTAL_COUNT_HEADER));
 	}
 
-	public async getAccountsBySource(sourceId: string, offset = 0, limit = 250): Promise<Account[]> {
-		const filters = `sourceId eq "${sourceId}"`;
+	public async getAccountsBySource(sourceId: string, exportUncorrelatedAccountOnly = false, offset = 0, limit = 250): Promise<Account[]> {
+		let filters = `sourceId eq "${sourceId}"`;
+		if (exportUncorrelatedAccountOnly) {
+			filters += " and uncorrelated eq true";
+		}
 		const resp = await this.getAccounts({
 			filters,
 			limit,

@@ -5,6 +5,7 @@ import { titleCase } from '../utils/titleCase';
 
 const SECTION_CONF = "vscode-sailpoint-identitynow";
 const ACCOUNT_REPORT_FILENAME_CONF = "report.accounts.filename";
+const UNCORRELATED_ACCOUNT_REPORT_FILENAME_CONF = "report.uncorrelatedAccounts.filename";
 const ENTITLEMENT_REPORT_FILENAME_CONF = "report.entitlements.filename";
 
 
@@ -105,18 +106,44 @@ export class PathProposer {
         return path;
     }
 
+
+    private static getSourceBasedReportFilename(
+        key: string,
+        tenantName: string,
+        tenantDisplayName: string,
+        sourceName: string,
+    ): string {
+        let path = this.getConfigKey(key);
+        path = this.replaceVariables(path, {
+            t: tenantName,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            T: tenantDisplayName,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            S: sourceName
+        });
+        return path as string;
+    }
+
     public static getAccountReportFilename(
         tenantName: string,
         tenantDisplayName: string,
         sourceName: string,
     ): string {
-        let path = this.getConfigKey(ACCOUNT_REPORT_FILENAME_CONF);
-        path = this.replaceVariables(path, {
-            t: tenantName,
-            T: tenantDisplayName,
-            S: sourceName
-        });
-        return path as string;
+        return this.getSourceBasedReportFilename(ACCOUNT_REPORT_FILENAME_CONF,
+            tenantName,
+            tenantDisplayName,
+            sourceName);
+    }
+
+    public static getUncorrelatedAccountReportFilename(
+        tenantName: string,
+        tenantDisplayName: string,
+        sourceName: string,
+    ): string {
+        return this.getSourceBasedReportFilename(UNCORRELATED_ACCOUNT_REPORT_FILENAME_CONF,
+            tenantName,
+            tenantDisplayName,
+            sourceName);
     }
 
 
@@ -125,13 +152,10 @@ export class PathProposer {
         tenantDisplayName: string,
         sourceName: string,
     ): string {
-        let path = this.getConfigKey(ENTITLEMENT_REPORT_FILENAME_CONF);
-        path = this.replaceVariables(path, {
-            t: tenantName,
-            T: tenantDisplayName,
-            S: sourceName
-        });
-        return path as string;
+        return this.getSourceBasedReportFilename(ENTITLEMENT_REPORT_FILENAME_CONF,
+            tenantName,
+            tenantDisplayName,
+            sourceName);
     }
 
 

@@ -55,7 +55,11 @@ export class CSVWriter {
         await this.pipeline(this.parser, data);
     }
 
-    public end() {
+    public async end() {
+        if (!this.initialized) {
+            // ensure headers are written
+            await this.intialize();
+        }
         this.output.end();
     }
 }
