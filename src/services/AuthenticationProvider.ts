@@ -153,6 +153,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
                 const jwt = parseJwt(accessToken);
                 const token = new TenantToken(accessToken, new Date(jwt.exp * 1000), { clientId: jwt.client_id } as TenantCredentials);
                 this.tenantService.setTenantAccessToken(tenantId, token);
+
                 return new SailPointIdentityNowPatSession(
                     tenantInfo?.tenantName ?? "",
                     jwt.client_id,
@@ -164,8 +165,9 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
                 if (credentials !== undefined) {
 
                     token = await this.createAccessToken(tenantInfo?.tenantName ?? "", credentials.clientId, credentials.clientSecret);
+                    this.tenantService.setTenantAccessToken(tenantId, token);
+                    
                     console.log("< getSessionByTenant for", tenantId);
-
                     return new SailPointIdentityNowPatSession(tenantInfo?.tenantName ?? "",
                         credentials.clientId,
                         token.accessToken,
