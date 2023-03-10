@@ -1,13 +1,10 @@
 import * as assert from 'assert';
 import { it, describe } from 'mocha';
 
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
-import * as vscode from 'vscode';
 import { EndpointUtils } from '../../utils/EndpointUtils';
 // import * as myExtension from '../../extension';
 
-suite('Extension Test Suite', () => {
+suite('EndpointUtils Test Suite', () => {
 	// vscode.window.showInformationMessage('Start all tests.');
 	describe('EndpointUtils.getBaseUrl()', () => {
 		const tests = [

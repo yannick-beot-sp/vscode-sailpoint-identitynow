@@ -47,7 +47,7 @@ export class TreeManager {
         vscode.window.showInformationMessage(`Successfully deleted tenant ${tenantName}`);
     }
 
-    public async aggregateSource(item: SourceTreeItem, disableOptimization = false): Promise<void> {
+    public async aggregateSource(item: SourceTreeItem, disableOptimization = false, type = "accounts"): Promise<void> {
         console.log("> aggregateSource", item, disableOptimization);
         // assessing that item is a SourceTreeItem
         if (item === undefined || !(item instanceof SourceTreeItem)) {
@@ -57,15 +57,23 @@ export class TreeManager {
         const client = new IdentityNowClient(item.tenantId, item.tenantName);
         vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
-            title: `Aggregation of ${item.label}`,
+            title: `Aggregation of ${type} from ${item.label}`,
             cancellable: false
         }, async (progress, token) => {
-            const job = await client.startAggregation(item.ccId, disableOptimization);
+            let job: any;
+            let jobType: AggregationJob;
+            if ("accounts"=== type) {
+                job = await client.startAccountAggregation(item.ccId, disableOptimization);
+                jobType = AggregationJob.CLOUD_ACCOUNT_AGGREGATION;
+            } else {
+                job = await client.startEntitlementAggregation(item.ccId);
+                jobType = AggregationJob.ENTITLEMENT_AGGREGATION;
+            }
             console.log("job =", job);
             let task: any | null = null;
             do {
                 await delay(5000);
-                task = await client.getAggregationJob(item.ccId, job.task.id);
+                task = await client.getAggregationJob(item.ccId, job.task.id, jobType);
                 console.log("task =", task);
 
             } while (task !== null && task.status === "PENDING");

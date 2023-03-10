@@ -6,15 +6,16 @@ import { compareByName, isEmpty } from "../utils";
 
 const SECRET_PAT_PREFIX = "IDENTITYNOW_SECRET_PAT_";
 const SECRET_AT_PREFIX = "IDENTITYNOW_SECRET_AT_";
+const TENANT_PREFIX = "IDENTITYNOW_TENANT_";
+const ALL_TENANTS_KEY = "IDENTITYNOW_TENANTS";
 
 export class TenantService {
-    private static TENANT_PREFIX = "IDENTITYNOW_TENANT_";
-    private static ALL_TENANTS_KEY = "IDENTITYNOW_TENANTS";
+
 
     constructor(private storage: Memento, private readonly secretStorage: SecretStorage,) { }
 
     public async getTenants(): Promise<TenantInfo[]> {
-        let tenants = this.storage.get<string[]>(TenantService.ALL_TENANTS_KEY);
+        let tenants = this.storage.get<string[]>(ALL_TENANTS_KEY);
         if (tenants === undefined) {
             return [];
         }
@@ -29,7 +30,7 @@ export class TenantService {
 
 
     public async getTenant(key: string): Promise<TenantInfo | undefined> {
-        const tenantInfo = this.storage.get<TenantInfo>(TenantService.TENANT_PREFIX + key);
+        const tenantInfo = this.storage.get<TenantInfo>(TENANT_PREFIX + key);
         // As not all tenantInfo will have name and a tenantName, changing the tenantInfo
         if (tenantInfo && !tenantInfo?.tenantName) {
             tenantInfo.tenantName = tenantInfo.name;
@@ -55,20 +56,20 @@ export class TenantService {
     }
 
     public setTenant(value: TenantInfo) {
-        let tenants = this.storage.get<string[]>(TenantService.ALL_TENANTS_KEY);
+        let tenants = this.storage.get<string[]>(ALL_TENANTS_KEY);
         if (tenants === undefined) {
             tenants = [];
         }
         if (tenants.indexOf(value.id) === -1) {
             tenants.push(value.id);
-            this.storage.update(TenantService.ALL_TENANTS_KEY, tenants);
+            this.storage.update(ALL_TENANTS_KEY, tenants);
         }
 
-        this.storage.update(TenantService.TENANT_PREFIX + value.id, value);
+        this.storage.update(TENANT_PREFIX + value.id, value);
     }
 
     public async removeTenant(tenantId: string) {
-        let tenants = this.storage.get<string[]>(TenantService.ALL_TENANTS_KEY);
+        let tenants = this.storage.get<string[]>(ALL_TENANTS_KEY);
         if (tenants === undefined) {
             tenants = [];
         }
@@ -76,9 +77,9 @@ export class TenantService {
 
         if (index > -1) {
             tenants.splice(index, 1);
-            this.storage.update(TenantService.ALL_TENANTS_KEY, tenants);
+            this.storage.update(ALL_TENANTS_KEY, tenants);
         }
-        const tenantKey = TenantService.TENANT_PREFIX + tenantId;
+        const tenantKey = TENANT_PREFIX + tenantId;
         if (this.storage.get(tenantKey) !== undefined) {
             this.storage.update(tenantKey, null);
         }

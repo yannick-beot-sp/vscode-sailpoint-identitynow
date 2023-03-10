@@ -28,6 +28,8 @@ import { IdentityNowUriHandler } from './uriHandler';
 import { SortIdentityProfileCommand } from './commands/sortIdentityProfile';
 import { MenuImporter, PaletteImporter, TreeViewImporter } from './commands/importConfig';
 import { refreshIdentityProfile } from './commands/refreshIdentityProfile';
+import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './commands/exportAccounts';
+import { EntitlementExporterCommand } from './commands/exportEntitlements';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -82,6 +84,9 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.AGGREGATE_DISABLE_OPTIMIZATION,
 			(tenantTreeItem) => treeManager.aggregateSource(tenantTreeItem, true)));
 	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.AGGREGATE_ENTITLEMENTS,
+			(tenantTreeItem) => treeManager.aggregateSource(tenantTreeItem, false, "entitlements")));
+	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.RESET_SOURCE,
 			(tenantTreeItem) => treeManager.resetSource(tenantTreeItem)));
 	context.subscriptions.push(
@@ -93,6 +98,19 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM,
 			(tenantTreeItem) => treeManager.evaluateTransform(tenantTreeItem)));
+
+	const accountExporterCommand = new AccountExporterCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_ACCOUNTS_VIEW,
+			accountExporterCommand.execute, accountExporterCommand));
+	const uncorrelatedAccountExporterCommand = new UncorrelatedAccountExporterCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_UNCORRELATED_ACCOUNTS_VIEW,
+			uncorrelatedAccountExporterCommand.execute, uncorrelatedAccountExporterCommand));
+	const entitlementExporterCommand = new EntitlementExporterCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_ENTITLEMENTS_VIEW,
+			entitlementExporterCommand.execute, entitlementExporterCommand));
 
 	const openResourceCommand = new OpenResourceCommand();
 	context.subscriptions.push(

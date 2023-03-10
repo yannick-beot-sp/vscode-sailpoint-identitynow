@@ -132,16 +132,35 @@
         "title": "Aggregate source without optimization"
       },
       {
+        "command": "vscode-sailpoint-identitynow.aggregate-entitlements",
+        "title": "Aggregate entitlements"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.reset-source",
-        "title": "Reset source"
+        "title": "Reset source",
+        "group": "reset@2"
       },
       {
         "command": "vscode-sailpoint-identitynow.reset-source-accounts",
-        "title": "Reset accounts"
+        "title": "Reset accounts",
+        "group": "reset@2"
       },
       {
         "command": "vscode-sailpoint-identitynow.reset-source-entitlements",
-        "title": "Reset entitlements"
+        "title": "Reset entitlements",
+        "group": "reset@2"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.source.export.accounts.view",
+        "title": "Export accounts..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.source.export.uncorrelated-accounts.view",
+        "title": "Export uncorrelated accounts..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.source.export.entitlements.view",
+        "title": "Export entitlements..."
       },
       {
         "command": "vscode-sailpoint-identitynow.new-transform",
@@ -262,6 +281,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.aggregate-entitlements",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.reset-source",
           "when": "never"
         },
@@ -271,6 +294,18 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.reset-source-entitlements",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.source.export.accounts.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.source.export.uncorrelated-accounts.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.source.export.entitlements.view",
           "when": "never"
         },
         {
@@ -358,23 +393,48 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.aggregate-source",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "group": "aggregate"
         },
         {
           "command": "vscode-sailpoint-identitynow.aggregate-source-disable-optimization",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "group": "aggregate"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.aggregate-entitlements",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "group": "aggregate"
         },
         {
           "command": "vscode-sailpoint-identitynow.reset-source",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "group": "reset"
         },
         {
           "command": "vscode-sailpoint-identitynow.reset-source-accounts",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "group": "reset"
         },
         {
           "command": "vscode-sailpoint-identitynow.reset-source-entitlements",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "group": "reset"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.source.export.accounts.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "group": "report"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.source.export.uncorrelated-accounts.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "group": "report"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.source.export.entitlements.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "group": "report"
         },
         {
           "command": "vscode-sailpoint-identitynow.open-resource",
@@ -550,11 +610,13 @@
           "when": "resourcePath =~ /\\.json/"
         }
       ],
-      "explorer/context": [{
-        "when": "resourceLangId == json",
-        "command": "vscode-sailpoint-identitynow.import-config.menu",
-        "group": "idn"
-    }]
+      "explorer/context": [
+        {
+          "when": "resourceLangId == json",
+          "command": "vscode-sailpoint-identitynow.import-config.menu",
+          "group": "idn"
+        }
+      ]
     },
     "snippets": [
       {
@@ -579,7 +641,24 @@
         "fileMatch": "idn://**/lifecycle-states/**/*",
         "url": "./schemas/lifecycle-state.schemas.json"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "IdentityNow",
+      "properties": {
+        "vscode-sailpoint-identitynow.report.accounts.filename": {
+          "type": "string",
+          "default": "%x/reports/%T-%S-Accounts-%y%M%d-%h%m%s.csv"
+        },
+        "vscode-sailpoint-identitynow.report.uncorrelatedAccounts.filename": {
+          "type": "string",
+          "default": "%x/reports/%T-%S-Uncorrelated-Accounts-%y%M%d-%h%m%s.csv"
+        },
+        "vscode-sailpoint-identitynow.report.entitlements.filename": {
+          "type": "string",
+          "default": "%x/reports/%T-%S-Entitlements-%y%M%d-%h%m%s.csv"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run esbuild-base -- --minify",
@@ -592,30 +671,34 @@
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
+    "test:unit": "npm run compile && mocha -u tdd ./out/test/unit/*.test.js",
     "clean": "rimraf out"
   },
   "devDependencies": {
     "@types/glob": "^8.0.0",
-    "@types/mocha": "^10.0.1",
-    "@types/node": "16.x",
     "@types/isomorphic-fetch": "^0.0.36",
     "@types/isomorphic-form-data": "^2.0.1",
+    "@types/lodash": "^4.14.191",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
     "@types/vscode": "^1.74.0",
     "@typescript-eslint/eslint-plugin": "^5.47.0",
     "@typescript-eslint/parser": "^5.47.0",
     "@vscode/test-electron": "^2.2.1",
     "esbuild": "^0.16.9",
+    "eslint": "^8.30.0",
     "glob": "^8.0.3",
     "mocha": "^10.2.0",
-    "typescript": "^4.9.4",
-    "eslint": "^8.30.0",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "typescript": "^4.9.4"
   },
   "dependencies": {
+    "@json2csv/node": "^6.1.2",
     "@vscode/webview-ui-toolkit": "^1.0.0",
     "client-oauth2": "^4.3.3",
     "fast-json-patch": "^3.1.1",
     "isomorphic-fetch": "^3.0.0",
-    "isomorphic-form-data": "^2.0.0"
+    "isomorphic-form-data": "^2.0.0",
+    "lodash": "^4.17.21"
   }
 }

@@ -7,6 +7,7 @@ import path = require('path');
 import { confirmFileOverwrite } from '../utils/vsCodeHelpers';
 import { getIdByUri, getNameByUri } from '../utils/UriUtils';
 import { TenantService } from '../services/TenantService';
+import { ensureFolderExists } from '../utils/fileutils';
 
 
 export class ExportScriptFromRuleCommand {
@@ -83,10 +84,7 @@ export class ExportScriptFromRuleCommand {
             return;
         }
 
-        const exportFolder = path.dirname(exportFile);
-        if (!fs.existsSync(exportFolder)) {
-            fs.mkdirSync(exportFolder, { recursive: true });
-        }
+        ensureFolderExists(exportFile);
 
         const client = new IdentityNowClient(tenantId, tenantName);
         await vscode.window.withProgress({

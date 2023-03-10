@@ -7,11 +7,18 @@ const FormData = require("form-data");
 import { withQuery } from "../utils/UriUtils";
 import { Workflow, WorkflowExecution } from "../models/workflow";
 import { IdentityProfile, LifeCycleState } from "../models/identityProfile";
-import { compareByName, convertToText } from "../utils";
+import { compareByName, convertToText, isEmpty } from "../utils";
 import { ConnectorRule, ValidationResult } from "../models/connectorRule";
 import { ServiceDesk } from "../models/ServiceDesk";
 import { ExportOptions, ObjectOptions } from "../models/ExportOptions";
 import { ImportJobResults, JobStatus } from "../models/JobStatus";
+import { Account, AccountsQueryParams, DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
+import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS, Entitlement, EntitlementsQueryParams } from "../models/Entitlements";
+
+
+const CONTENT_TYPE_HEADER = "Content-Type";
+const TOTAL_COUNT_HEADER = "X-Total-Count";
+const CONTENT_TYPE_JSON = "application/json";
 
 export class IdentityNowClient {
 
@@ -42,7 +49,7 @@ export class IdentityNowClient {
 			}
 			result = result.concat(await req.json());
 			if (firstQuery) {
-				total = Number(req.headers.get("X-Total-Count"));
+				total = Number(req.headers.get(TOTAL_COUNT_HEADER));
 				firstQuery = false;
 			}
 			offset += limit;
@@ -204,8 +211,7 @@ export class IdentityNowClient {
 		console.log("> patchResource", path);
 		const endpoint = EndpointUtils.getBaseUrl(this.tenantName) + path;
 		console.log("endpoint = " + endpoint);
-		const headers = await this.prepareHeaders();
-		headers["Content-Type"] = "application/json-patch+json";
+		const headers = await this.prepareHeaders("application/json-patch+json");
 		const req = await fetch(endpoint, {
 			method: "PATCH",
 			headers: headers,
@@ -228,7 +234,13 @@ export class IdentityNowClient {
 		return res;
 	}
 
-	private async prepareHeaders(): Promise<any> {
+	private async prepareHeaders(contentType = CONTENT_TYPE_JSON): Promise<any> {
+		const headers = await this.prepareAuthenticationHeader();
+		headers[CONTENT_TYPE_HEADER] = contentType;
+		return headers;
+	}
+
+	private async prepareAuthenticationHeader(): Promise<any> {
 		const session = await authentication.getSession(
 			SailPointIdentityNowAuthenticationProvider.id,
 			[this.tenantId]
@@ -236,21 +248,47 @@ export class IdentityNowClient {
 		return {
 			// eslint-disable-next-line @typescript-eslint/naming-convention
 			Authorization: `Bearer ${session?.accessToken}`,
-			// eslint-disable-next-line @typescript-eslint/naming-convention
-			"Content-Type": "application/json",
+
 		};
 	}
 
-	public async startAggregation(
+	public async startEntitlementAggregation(
+		sourceID: Number,
+		types: string[] | null = null
+	): Promise<any> {
+		console.log("> IdentityNowClient.startEntitlementAggregation");
+		let endpoint =
+			EndpointUtils.getCCUrl(this.tenantName) +
+			"/source/loadEntitlements/" +
+			sourceID;
+
+		if (types !== null && types.length > 0) {
+			const objectTypes = types.join(",");
+			endpoint = withQuery(endpoint, { objectType: objectTypes });
+		}
+		console.log("endpoint = " + endpoint);
+		const headers = await this.prepareHeaders();
+		const req = await fetch(endpoint, {
+			method: "POST",
+			headers: headers,
+		});
+		if (!req.ok) {
+			console.error("Could not start aggregation:" + req.statusText);
+			throw new Error("Could not start aggregation:" + req.statusText);
+		}
+		const res = await req.json();
+		return res;
+	}
+
+	public async startAccountAggregation(
 		sourceID: Number,
 		disableOptimization = false
 	): Promise<any> {
-		console.log("> IdentityNowClient.startAggregation");
+		console.log("> IdentityNowClient.startAccountAggregation");
 		const endpoint =
 			EndpointUtils.getCCUrl(this.tenantName) +
 			"/source/loadAccounts/" +
 			sourceID;
-		// const endpoint = 'https://webhook.site/9bd2674b-2c53-4cd0-8b04-bfd2571b8678';
 		console.log("endpoint = " + endpoint);
 		let headers = await this.prepareHeaders();
 
@@ -271,6 +309,7 @@ export class IdentityNowClient {
 			body: formData,
 		});
 		if (!req.ok) {
+			console.error("Could not start aggregation:" + req.statusText);
 			throw new Error("Could not start aggregation:" + req.statusText);
 		}
 		const res = await req.json();
@@ -283,8 +322,7 @@ export class IdentityNowClient {
 		if (!!skip) {
 			endpoint += "?skip=" + skip;
 		}
-		const headers = await this.prepareHeaders();
-		headers['Content-Type'] = 'application/x-www-form-urlencoded';
+		const headers = await this.prepareHeaders('application/x-www-form-urlencoded');
 
 		const req = await fetch(endpoint, {
 			method: "POST",
@@ -641,7 +679,8 @@ export class IdentityNowClient {
 	}
 
 	/**
-	 * cf. https://developer.sailpoint.com/apis/beta/#operation/listWorkflowExecutions
+	 * cf. https://developer.sailpoint.com/idn/api/beta/list-workflow-executions
+	 * There is a limit of 250 items by default
 	 * @param workflowId
 	 * @returns
 	 */
@@ -654,7 +693,7 @@ export class IdentityNowClient {
 		return await this.getResource(path);
 	}
 	/**
-	 * cf. https://developer.sailpoint.com/apis/beta/#operation/getWorkflowExecution
+	 * cf. https://developer.sailpoint.com/idn/api/beta/get-workflow-execution
 	 * @param workflowExecutionId
 	 * @returns
 	 */
@@ -812,6 +851,126 @@ export class IdentityNowClient {
 			throw new Error(resp.statusText);
 		}
 	}
+
+	private async ensureOK(resp: Response, customMessage = ""): Promise<void> {
+		const caller = (new Error()).stack?.split("\n")[2].trim().split(" ")[1];
+		let message = `${isEmpty(customMessage) ? caller : customMessage}: `;
+		if (resp.ok) {
+			return;
+		}
+		if (resp.headers.has(CONTENT_TYPE_HEADER)
+			&& resp.headers.get(CONTENT_TYPE_HEADER)?.startsWith(CONTENT_TYPE_JSON)) {
+			const error = await resp.json();
+			message += this.getErrorMessage(error);
+		} else {
+			message += resp.statusText;
+		}
+		console.error(caller, message);
+		throw new Error(message);
+
+	}
+
+	private getErrorMessage(json: any): string {
+		if ('error' in json) {
+			return json.error;
+		}
+
+		if ('message' in json) {
+			return json.message;
+		}
+		if ('messages' in json) {
+			return json.messages[0].text;
+		}
+		return JSON.stringify(json);
+	}
+
+
+	public async getAccounts(query: AccountsQueryParams = DEFAULT_ACCOUNTS_QUERY_PARAMS): Promise<Response> {
+		console.log("> getAccounts", query);
+		const queryValues = {
+			...DEFAULT_ACCOUNTS_QUERY_PARAMS,
+			...query
+		};
+		let endpoint = `${EndpointUtils.getBetaUrl(this.tenantName)}/accounts`;
+		endpoint = withQuery(endpoint, queryValues);
+		console.log("endpoint = " + endpoint);
+		const headers = await this.prepareHeaders();
+		const resp = await fetch(endpoint, {
+			headers: headers
+		});
+
+		this.ensureOK(resp);
+		return resp;
+	}
+
+	public async getAccountCountBySource(sourceId: string, exportUncorrelatedAccountOnly = false): Promise<Number> {
+		let filters = `sourceId eq "${sourceId}"`;
+		if (exportUncorrelatedAccountOnly) {
+			filters += " and uncorrelated eq true";
+		}
+		const resp = await this.getAccounts({
+			filters,
+			count: true,
+			limit: 0,
+			offset: 0
+		});
+		return Number(resp.headers.get(TOTAL_COUNT_HEADER));
+	}
+
+	public async getAccountsBySource(sourceId: string, exportUncorrelatedAccountOnly = false, offset = 0, limit = 250): Promise<Account[]> {
+		let filters = `sourceId eq "${sourceId}"`;
+		if (exportUncorrelatedAccountOnly) {
+			filters += " and uncorrelated eq true";
+		}
+		const resp = await this.getAccounts({
+			filters,
+			limit,
+			offset
+		});
+		return await resp.json();
+	}
+
+	public async getEntitlements(
+		query: EntitlementsQueryParams = DEFAULT_ENTITLEMENTS_QUERY_PARAMS
+	): Promise<Response> {
+		console.log("> getEntitlements", query);
+		const queryValues = {
+			...DEFAULT_ENTITLEMENTS_QUERY_PARAMS,
+			...query
+		};
+		let endpoint = `${EndpointUtils.getBetaUrl(this.tenantName)}/entitlements`;
+		endpoint = withQuery(endpoint, queryValues);
+		console.log("endpoint = " + endpoint);
+		const headers = await this.prepareHeaders();
+		const resp = await fetch(endpoint, {
+			headers: headers
+		});
+
+		this.ensureOK(resp);
+		return resp;
+	}
+
+	public async getEntitlementCountBySource(sourceId: string): Promise<number> {
+		const filters = `source.id eq "${sourceId}"`;
+		const resp = await this.getEntitlements({
+			filters,
+			count: true,
+			limit: 0,
+			offset: 0
+		});
+		return Number(resp.headers.get(TOTAL_COUNT_HEADER));
+	}
+
+	public async getEntitlementsBySource(sourceId: string, offset = 0, limit = 250): Promise<Entitlement[]> {
+		const filters = `source.id eq "${sourceId}"`;
+		const resp = await this.getEntitlements({
+			filters,
+			limit,
+			offset
+		});
+		return await resp.json();
+	}
+
 }
 
 export enum AggregationJob {

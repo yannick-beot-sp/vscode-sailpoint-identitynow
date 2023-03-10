@@ -6,6 +6,14 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+### Added 
+
+- New command: Aggregation of entitlements
+- New command: Export of accounts
+- New command: Export of uncorrelated accounts
+- New command: Export of entitlements
+- Settings for export path
+
 ## [0.0.18] - 2023-02-15
 
 ### Fixed
