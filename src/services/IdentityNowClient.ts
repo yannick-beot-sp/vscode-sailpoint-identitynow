@@ -253,7 +253,7 @@ export class IdentityNowClient {
 	}
 
 	public async startEntitlementAggregation(
-		sourceID: Number,
+		sourceID: number,
 		types: string[] | null = null
 	): Promise<any> {
 		console.log("> IdentityNowClient.startEntitlementAggregation");
@@ -281,7 +281,7 @@ export class IdentityNowClient {
 	}
 
 	public async startAccountAggregation(
-		sourceID: Number,
+		sourceID: number,
 		disableOptimization = false
 	): Promise<any> {
 		console.log("> IdentityNowClient.startAccountAggregation");
@@ -316,7 +316,7 @@ export class IdentityNowClient {
 		return res;
 	}
 
-	public async resetSource(sourceID: Number, skip: string | null = null): Promise<any> {
+	public async resetSource(sourceID: number, skip: string | null = null): Promise<any> {
 		console.log('> IdentityNowClient.resetSource', sourceID);
 		let endpoint = EndpointUtils.getCCUrl(this.tenantName) + '/source/reset/' + sourceID;
 		if (!!skip) {
@@ -341,7 +341,7 @@ export class IdentityNowClient {
 	}
 
 	public async getAggregationJob(
-		sourceID: Number,
+		sourceID: number,
 		taskId: string,
 		jobType = AggregationJob.CLOUD_ACCOUNT_AGGREGATION
 	): Promise<any> {
@@ -903,7 +903,7 @@ export class IdentityNowClient {
 		return resp;
 	}
 
-	public async getAccountCountBySource(sourceId: string, exportUncorrelatedAccountOnly = false): Promise<Number> {
+	public async getAccountCountBySource(sourceId: string, exportUncorrelatedAccountOnly = false): Promise<number> {
 		let filters = `sourceId eq "${sourceId}"`;
 		if (exportUncorrelatedAccountOnly) {
 			filters += " and uncorrelated eq true";
