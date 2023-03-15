@@ -1,5 +1,3 @@
-'use strict';
-
 import { Memento, SecretStorage } from "vscode";
 import { TenantCredentials, TenantInfo, TenantToken } from "../models/TenantInfo";
 import { compareByName, isEmpty } from "../utils";

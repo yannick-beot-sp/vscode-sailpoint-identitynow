@@ -86,13 +86,14 @@ const data = [
         "ip_address": "36.125.71.172"
     }
 ];
-const hearders = ["id","first_name","last_name","email"];
+
+const headers = ["id","first_name","last_name","email"];
 
 suite('CSVWriter Test Suite', () => {
     describe('CSVWriter without transform', () => {
         const outputPath =   path.join(os.tmpdir(), './dummy-array.csv');
         console.log("Writing to", outputPath);
-        const csvWriter = new CSVWriter(outputPath,hearders,hearders);
+        const csvWriter = new CSVWriter(outputPath,headers,headers);
         it("should not fail",async () => {
             await csvWriter.write(data);
             csvWriter.end();

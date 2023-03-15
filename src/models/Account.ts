@@ -45,6 +45,22 @@ export const DEFAULT_ACCOUNTS_QUERY_PARAMS: AccountsQueryParams = {
     sorters: "name"
 };
 
+
+export interface PublicIdentitiesQueryParams extends PaginatedQueryParams {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    "add-core-filters"?: boolean
+}
+
+export const DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS: PublicIdentitiesQueryParams = {
+    count: false,
+    limit: 250,
+    offset: 0,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    "add-core-filters": false,
+    sorters: "name"
+};
+
+
 /**
  * As returned by 401 error
  */

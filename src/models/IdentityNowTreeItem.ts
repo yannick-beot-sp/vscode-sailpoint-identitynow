@@ -221,7 +221,7 @@ export class SourceTreeItem extends IdentityNowResourceTreeItem {
 		tenantDisplayName: string,
 		label: string,
 		id: string,
-		public readonly ccId: Number
+		public readonly ccId: number
 	) {
 		super(
 			tenantId,

@@ -12,8 +12,8 @@ import { ConnectorRule, ValidationResult } from "../models/connectorRule";
 import { ServiceDesk } from "../models/ServiceDesk";
 import { ExportOptions, ObjectOptions } from "../models/ExportOptions";
 import { ImportJobResults, JobStatus } from "../models/JobStatus";
-import { Account, AccountsQueryParams, DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
-import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS, Entitlement, EntitlementsQueryParams } from "../models/Entitlements";
+import { Account, AccountsQueryParams, DEFAULT_ACCOUNTS_QUERY_PARAMS, DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS, PublicIdentitiesQueryParams } from "../models/Account";
+import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS, Entitlement, EntitlementsQueryParams, PublicIdentity } from "../models/Entitlements";
 
 
 const CONTENT_TYPE_HEADER = "Content-Type";
@@ -929,6 +929,21 @@ export class IdentityNowClient {
 		});
 		return await resp.json();
 	}
+	public async getAccountBySource(sourceId: string, nativeIdentity: string): Promise<Account> {
+		let filters = `sourceId eq "${sourceId}" and nativeIdentity eq "${nativeIdentity}"`;
+		const resp = await this.getAccounts({
+			filters,
+			limit: 1,
+			offset: 0,
+			count: true
+		});
+
+		const nbAccount = Number(resp.headers.get(TOTAL_COUNT_HEADER));
+		if (nbAccount !== 1) {
+			throw new Error("Could Not Find Account");
+		}
+		return (await resp.json())[0];
+	}
 
 	public async getEntitlements(
 		query: EntitlementsQueryParams = DEFAULT_ENTITLEMENTS_QUERY_PARAMS
@@ -969,6 +984,41 @@ export class IdentityNowClient {
 			offset
 		});
 		return await resp.json();
+	}
+
+	public async getPublicIdentities(
+		query: PublicIdentitiesQueryParams = DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS
+	): Promise<Response> {
+		console.log("> getPublicIdentities", query);
+		const queryValues = {
+			...DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS,
+			...query
+		};
+		let endpoint = `${EndpointUtils.getV3Url(this.tenantName)}/public-identities`;
+		endpoint = withQuery(endpoint, queryValues);
+		console.log("endpoint = " + endpoint);
+		const headers = await this.prepareHeaders();
+		const resp = await fetch(endpoint, {
+			headers: headers
+		});
+
+		this.ensureOK(resp);
+		return resp;
+	}
+
+	public async getPublicIdentitiesByAlias(alias: string): Promise<PublicIdentity> {
+		const filters = `alias eq "${alias}"`;
+		const resp = await this.getPublicIdentities({
+			filters,
+			limit: 1,
+			offset: 0,
+			count: true
+		});
+		const nbIdentity = Number(resp.headers.get(TOTAL_COUNT_HEADER));
+		if (nbIdentity !== 1) {
+			throw new Error("Could Not Find Identity");
+		}
+		return (await resp.json())[0];
 	}
 
 }
