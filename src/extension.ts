@@ -30,6 +30,7 @@ import { MenuImporter, PaletteImporter, TreeViewImporter } from './commands/impo
 import { refreshIdentityProfile } from './commands/refreshIdentityProfile';
 import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './commands/exportAccounts';
 import { EntitlementExporterCommand } from './commands/exportEntitlements';
+import { AccountImportNodeCommand } from './commands/importAccount';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -95,9 +96,16 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.RESET_SOURCE_ENTITLEMENTS,
 			(tenantTreeItem) => treeManager.resetSource(tenantTreeItem, "accounts")));
+
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM,
 			(tenantTreeItem) => treeManager.evaluateTransform(tenantTreeItem)));
+
+	const accountImportNodeCommand = new AccountImportNodeCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_ACCOUNTS_VIEW,
+			accountImportNodeCommand.execute, accountImportNodeCommand));
+
 
 	const accountExporterCommand = new AccountExporterCommand();
 	context.subscriptions.push(

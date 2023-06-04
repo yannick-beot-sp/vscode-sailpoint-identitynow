@@ -151,6 +151,10 @@
         "group": "reset@2"
       },
       {
+        "command": "vscode-sailpoint-identitynow.source.import.accounts.view",
+        "title": "Import Accounts..."
+      },
+      {
         "command": "vscode-sailpoint-identitynow.source.export.accounts.view",
         "title": "Export accounts..."
       },
@@ -297,6 +301,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.source.import.accounts.view",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.source.export.accounts.view",
           "when": "never"
         },
@@ -420,6 +428,11 @@
           "command": "vscode-sailpoint-identitynow.reset-source-entitlements",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
           "group": "reset"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.source.import.accounts.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "group": "import"
         },
         {
           "command": "vscode-sailpoint-identitynow.source.export.accounts.view",
@@ -603,7 +616,7 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.connector-rule.export-script.editor",
-          "when": "resourcePath =~ /idn://.*/connector-rules/.*/"
+          "when": "resourceScheme == idn && resourcePath =~ /.*\\/connector-rules\\/.*/"
         },
         {
           "command": "vscode-sailpoint-identitynow.import-config.palette",

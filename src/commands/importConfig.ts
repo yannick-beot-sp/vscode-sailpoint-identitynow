@@ -231,6 +231,14 @@ export class PaletteImporter extends BaseImporter {
     async execute(): Promise<void> {
         console.log("> PaletteImporter.execute");
         this.init();
+        
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            console.error('No editor');
+            throw new Error("No editor");
+
+        }
+        
         const tenantInfo = await chooseTenant(this.tenantService, 'To which tenant do you want to import the config?');
         console.log("PaletteImporter.execute: tenant = ", tenantInfo);
         if (!tenantInfo) {
@@ -239,12 +247,6 @@ export class PaletteImporter extends BaseImporter {
         this.tenantId = tenantInfo.id;
         this.tenantName = tenantInfo.tenantName;
 
-        const editor = vscode.window.activeTextEditor;
-        if (!editor) {
-            console.error('No editor');
-            throw new Error("No editor");
-
-        }
 
         this.data = getFullContent(editor);
 

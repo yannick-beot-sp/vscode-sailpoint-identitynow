@@ -7,10 +7,9 @@ import * as fs from 'fs';
 import * as os from 'os';
 import path = require('path');
 import { TenantService } from '../services/TenantService';
-import { askFile, askFolder, chooseTenant, confirmFileOverwrite } from '../utils/vsCodeHelpers';
+import { askFile, askFolder, chooseTenant } from '../utils/vsCodeHelpers';
 import { OBJECT_TYPE_ITEMS } from '../models/ObjectTypeQuickPickItem';
 import { ObjectPickItem } from '../models/ObjectPickItem';
-import { isBlank } from '../utils/stringUtils';
 import { ensureFolderExists } from '../utils/fileutils';
 
 const SINGLE_EXPORT_TYPE = {
@@ -345,22 +344,20 @@ export class ExportNodeConfig extends BaseExporter {
         }
     }
 
-    async execute(node?: IdentityNowResourceTreeItem) {
+    async execute(node?: IdentityNowResourceTreeItem): Promise<void> {
 
         console.log("> ExportNodeConfig.execute");
         this.init();
         // assessing that item is a IdentityNowResourceTreeItem
         if (node === undefined || !(node instanceof IdentityNowResourceTreeItem)) {
-            console.log("WARNING: ExportNodeConfig: invalid item", node);
+            console.error("ExportNodeConfig: invalid item", node);
             throw new Error("ExportNodeConfig: invalid item");
         }
 
 
-        this.tenantName = node.uri?.authority || "";
+        this.tenantName = node.tenantName;
         console.log("ExportNodeConfig: tenantName = ", this.tenantName);
-        const tenantInfo = await this.tenantService.getTenantByTenantName(this.tenantName);
-        console.log("ExportNodeConfig: tenant = ", tenantInfo);
-        this.tenantId = tenantInfo?.id || "";
+        this.tenantId = node.tenantId;
 
         const objectType = this.getObjectType(node);
         this.objectTypes = [objectType];

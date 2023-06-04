@@ -10,7 +10,6 @@ import { Account } from '../models/Account';
 
 export class AccountExporterCommand {
 
-
     /**
      * Entry point 
      * @param node 

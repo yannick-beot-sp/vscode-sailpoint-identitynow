@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import * as vscode from "vscode";
 import { authentication } from "vscode";
 import { EndpointUtils } from "../utils/EndpointUtils";
@@ -34,9 +35,7 @@ export class IdentityNowClient {
 		let offset = 0;
 		let total = 0;
 		let firstQuery = true;
-		let endpoint =
-			EndpointUtils.getV3Url(this.tenantName) +
-			`/sources?count=true&limit=${limit}&sorters=name`;
+		let endpoint = `${EndpointUtils.getV3Url(this.tenantName)}/sources?count=true&limit=${limit}&sorters=name`;
 		do {
 			console.log("endpoint = " + endpoint);
 			const headers = await this.prepareHeaders();
@@ -57,6 +56,24 @@ export class IdentityNowClient {
 		} while (offset < total);
 
 		return result;
+	}
+
+	public async getSourceById(sourceId: string): Promise<any> {
+		console.log("> getSourceById", sourceId);
+
+		let endpoint = `${EndpointUtils.getV3Url(this.tenantName)}/sources/${sourceId}`;
+		console.log("endpoint = " + endpoint);
+		const headers = await this.prepareHeaders();
+		const resp = await fetch(endpoint, {
+			headers: headers,
+		});
+
+		if (!resp.ok) {
+			throw new Error(resp.statusText);
+		}
+
+
+		return await resp.json();
 	}
 
 	/**
@@ -1019,6 +1036,42 @@ export class IdentityNowClient {
 			throw new Error("Could Not Find Identity");
 		}
 		return (await resp.json())[0];
+	}
+
+
+	public async startImportAccount(
+		sourceCCId: number,
+		deleteThreshold: number,
+		filePath: string
+	): Promise<any> {
+		console.log("> IdentityNowClient.startImportAccount");
+		const endpoint = `${EndpointUtils.getCCUrl(this.tenantName)}/source/loadAccounts/${sourceCCId}`;
+
+		;
+		console.log("endpoint = " + endpoint);
+		let headers = await this.prepareHeaders();
+
+		var formData = new FormData();
+		formData.append("update-delete-threshold-combobox-inputEl", `${deleteThreshold}%`);
+		formData.append('file', fs.createReadStream(filePath));
+
+		const formHeaders = formData.getHeaders();
+		headers = {
+			...formHeaders,
+			...headers,
+		};
+
+		const resp = await fetch(endpoint, {
+			method: "POST",
+			headers: headers,
+			body: formData,
+		});
+		if (!resp.ok) {
+			console.error("Could not import accounts:" + resp.statusText);
+			throw new Error("Could not import accounts:" + resp.statusText);
+		}
+		const res = await resp.json();
+		return res;
 	}
 
 }
