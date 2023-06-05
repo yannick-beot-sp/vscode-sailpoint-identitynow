@@ -974,7 +974,7 @@ export class IdentityNowClient {
 		const resp = await this.getEntitlements({
 			filters,
 			count: true,
-			limit: 0,
+			limit: 1,
 			offset: 0
 		});
 		return Number(resp.headers.get(TOTAL_COUNT_HEADER));
