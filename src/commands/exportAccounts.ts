@@ -167,10 +167,10 @@ class UncorrelatedAccountExporter extends BaseCSVExporter<Account> {
 
         console.log("> UncorrelatedAccountExporter.exportFile");
         const headers: string[] = [
-            "account","displayName","userName","type"
+            "account", "displayName", "userName", "type"
         ];
         const paths: string[] = [
-            "nativeIdentity","name","userName","type"
+            "nativeIdentity", "name", "userName", "type"
         ];
         const unwindablePaths: string[] = [];
 
@@ -186,13 +186,17 @@ class UncorrelatedAccountExporter extends BaseCSVExporter<Account> {
             }
             const schema = schemas.find(x => x.name === 'account') as Schema;
             schema.attributes.forEach(x => {
-                headers.push(x.name);
+                // to prevent to have duplicates in the header for "displayName", or "type", etc.
+                if (headers.includes(x.name)) {
+                    headers.push('attributes.' + x.name);
+                } else {
+                    headers.push(x.name);
+                }
                 const path = 'attributes.' + x.name;
                 paths.push(path);
-                //if (x.isMulti) { unwindablePaths.push(path); }
             });
         } else {
-         
+
         }
         if (token.isCancellationRequested) {
             return;

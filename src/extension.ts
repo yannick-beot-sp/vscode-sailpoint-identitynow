@@ -31,6 +31,7 @@ import { refreshIdentityProfile } from './commands/refreshIdentityProfile';
 import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './commands/exportAccounts';
 import { EntitlementExporterCommand } from './commands/exportEntitlements';
 import { AccountImportNodeCommand } from './commands/importAccount';
+import { UncorrelatedAccountImportNodeCommand } from './commands/importUncorrelatedAccount';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -105,6 +106,11 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_ACCOUNTS_VIEW,
 			accountImportNodeCommand.execute, accountImportNodeCommand));
+
+	const uncorrelatedAccountImportNodeCommand = new UncorrelatedAccountImportNodeCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_UNCORRELATED_ACCOUNTS_VIEW,
+			uncorrelatedAccountImportNodeCommand.execute, uncorrelatedAccountImportNodeCommand));
 
 
 	const accountExporterCommand = new AccountExporterCommand();

@@ -16,6 +16,7 @@ export const AGGREGATE_ENTITLEMENTS = 'vscode-sailpoint-identitynow.aggregate-en
 export const UPLOAD_FILE = 'vscode-sailpoint-identitynow.source.upload-file';
 export const IMPORT_ACCOUNTS_VIEW = 'vscode-sailpoint-identitynow.source.import.accounts.view';
 export const EXPORT_ACCOUNTS_VIEW = 'vscode-sailpoint-identitynow.source.export.accounts.view';
+export const IMPORT_UNCORRELATED_ACCOUNTS_VIEW = 'vscode-sailpoint-identitynow.source.import.uncorrelated-accounts.view';
 export const EXPORT_UNCORRELATED_ACCOUNTS_VIEW = 'vscode-sailpoint-identitynow.source.export.uncorrelated-accounts.view';
 export const EXPORT_ENTITLEMENTS_VIEW = 'vscode-sailpoint-identitynow.source.export.entitlements.view';
 export const RESET_SOURCE = 'vscode-sailpoint-identitynow.reset-source';

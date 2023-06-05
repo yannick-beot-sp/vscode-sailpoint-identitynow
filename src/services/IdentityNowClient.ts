@@ -230,26 +230,20 @@ export class IdentityNowClient {
 		const endpoint = EndpointUtils.getBaseUrl(this.tenantName) + path;
 		console.log("endpoint = " + endpoint);
 		const headers = await this.prepareHeaders("application/json-patch+json");
-		const req = await fetch(endpoint, {
+		const response = await fetch(endpoint, {
 			method: "PATCH",
 			headers: headers,
 			body: data,
 		});
 
-		if (!req.ok) {
-			if (req.status === 404) {
-				return null;
-			}
-			if (req.status === 400) {
-				const details: any = await req.json();
-				const detail = details?.messages[0]?.text || req.statusText;
-				throw new Error(detail);
-			}
-			throw new Error(req.statusText);
+		await this.ensureOK(response);
+		const text = await response.text();
+		if (response.headers.has(CONTENT_TYPE_HEADER)
+			&& response.headers.get(CONTENT_TYPE_HEADER)?.startsWith(CONTENT_TYPE_JSON)
+			&& text) {
+			return JSON.parse(text);
 		}
-		const res = await req.json();
-
-		return res;
+		return text;
 	}
 
 	private async prepareHeaders(contentType = CONTENT_TYPE_JSON): Promise<any> {
@@ -511,7 +505,7 @@ export class IdentityNowClient {
 			headers: headers,
 		});
 
-		this.ensureOK(resp);
+		await this.ensureOK(resp);
 		const json = await resp.json();
 		if (Array.isArray(json)) {
 			if (json.length === 1) {
@@ -858,11 +852,20 @@ export class IdentityNowClient {
 		if (resp.ok) {
 			return;
 		}
+		const text = await resp.text();
+		console.log(text);
 		if (resp.headers.has(CONTENT_TYPE_HEADER)
-			&& resp.headers.get(CONTENT_TYPE_HEADER)?.startsWith(CONTENT_TYPE_JSON)) {
-			const error = await resp.json();
-			console.log(error);
-			message += this.getErrorMessage(error);
+			&& resp.headers.get(CONTENT_TYPE_HEADER)?.startsWith(CONTENT_TYPE_JSON)
+			&& text) {
+			try {
+				const error = JSON.parse(text);
+				console.log(error);
+				message += this.getErrorMessage(error);
+			} catch (e) {
+				message += text;
+			}
+		} else if (text) {
+			message += text;
 		} else {
 			message += resp.statusText;
 		}
@@ -900,7 +903,7 @@ export class IdentityNowClient {
 			headers: headers
 		});
 
-		this.ensureOK(resp);
+		await this.ensureOK(resp);
 		return resp;
 	}
 
@@ -962,7 +965,7 @@ export class IdentityNowClient {
 			headers: headers
 		});
 
-		this.ensureOK(resp);
+		await this.ensureOK(resp);
 		return resp;
 	}
 
@@ -1003,7 +1006,7 @@ export class IdentityNowClient {
 			headers: headers
 		});
 
-		this.ensureOK(resp);
+		await this.ensureOK(resp);
 		return resp;
 	}
 
@@ -1020,21 +1023,6 @@ export class IdentityNowClient {
 			throw new Error("Could Not Find Identity");
 		}
 		return (await resp.json())[0];
-	}
-
-	public async getImportUncorrelatedAccountTask(taskId: string): Promise<any> {
-		console.log('> getImportUncorrelatedAccountTask');
-		const endpoint = `${EndpointUtils.getCCUrl(this.tenantName)}/cc/api/taskResult/get/${taskId}`;
-		console.log("endpoint = " + endpoint);
-		const headers = await this.prepareHeaders();
-
-		const resp = await fetch(endpoint, {
-			headers: headers
-		});
-
-		this.ensureOK(resp);
-		return resp.json();
-
 	}
 
 	public async startImportAccount(
@@ -1064,40 +1052,35 @@ export class IdentityNowClient {
 			headers: headers,
 			body: formData,
 		});
-		this.ensureOK(resp, "Could not import accounts");
-		const res = await resp.json();
-		return res;
-	}
-	public async startImportUncorrelatedAccount(
-		sourceCCId: number,
-		input: Readable
-	): Promise<any> {
-		console.log("> IdentityNowClient.startImportAccount");
-		const endpoint = `${EndpointUtils.getCCUrl(this.tenantName)}/source/loadUncorrelatedAccounts/${sourceCCId}`;
-		// const endpoint = "https://webhook.site/f5a8084e-a2ca-4cc8-8bfb-4d1905985e6f";
-		console.log("endpoint = " + endpoint);
-
-		let headers = await this.prepareHeaders();
-
-		var formData = new FormData();
-		formData.append('file', input);
-
-		const formHeaders = formData.getHeaders();
-		headers = {
-			...formHeaders,
-			...headers,
-		};
-
-		const resp = await fetch(endpoint, {
-			method: "POST",
-			headers: headers,
-			body: formData,
-		});
-		this.ensureOK(resp, "Could not import uncorrelated accounts");
+		await this.ensureOK(resp, "Could not import accounts");
 		const res = await resp.json();
 		return res;
 	}
 
+
+	/**
+	 * cf. https://developer.sailpoint.com/idn/api/v3/update-account
+	 * @param accountId
+	 * @param identityId The unique ID of the identity this account is correlated to
+	 * @returns
+	 */
+	public async updateAccount(
+		accountId: string,
+		identityId: string
+	): Promise<void> {
+		console.log("> patchAccount", accountId, identityId);
+		const path = `/v3/accounts/${accountId}`;
+		const payload = [
+			{
+				op: "replace",
+				path: "/identityId",
+				value: identityId,
+			},
+		];
+
+		await this.patchResource(path, JSON.stringify(payload));
+		console.log("< patchAccount");
+	}
 }
 
 export enum AggregationJob {
