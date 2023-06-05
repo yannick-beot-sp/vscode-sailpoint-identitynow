@@ -15,6 +15,7 @@ import { ExportOptions, ObjectOptions } from "../models/ExportOptions";
 import { ImportJobResults, JobStatus } from "../models/JobStatus";
 import { Account, AccountsQueryParams, DEFAULT_ACCOUNTS_QUERY_PARAMS, DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS, PublicIdentitiesQueryParams } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS, Entitlement, EntitlementsQueryParams, PublicIdentity } from "../models/Entitlements";
+import { Readable } from 'stream';
 
 
 const CONTENT_TYPE_HEADER = "Content-Type";
@@ -501,42 +502,24 @@ export class IdentityNowClient {
 		sourceId: string
 	): Promise<any> {
 		console.log("> getAccount", nativeIdentity, sourceId);
-		let endpoint =
-			EndpointUtils.getV3Url(this.tenantName) +
-			'/accounts?filters=sourceId eq "' +
-			sourceId +
-			'" and nativeIdentity eq "' +
-			nativeIdentity +
-			'"';
+		const endpoint = `${EndpointUtils.getV3Url(this.tenantName)}/accounts?filters=sourceId eq "${sourceId}" and nativeIdentity eq "${nativeIdentity}"`;
 		console.log("endpoint = " + endpoint);
 
 		const headers = await this.prepareHeaders();
 
-		let account = await fetch(endpoint, {
+		const resp = await fetch(endpoint, {
 			headers: headers,
-		})
-			.then(async function (response) {
-				if (response.status === 200) {
-					let json: any = await response.json();
+		});
 
-					if (json !== undefined) {
-						if (json.length > 0) {
-							return json[0];
-						}
-					}
-				} else {
-					console.error(response.statusText);
-					vscode.window.showErrorMessage(
-						`${endpoint} --> ${response.statusText}`
-					);
-					return;
-				}
-			})
-			.catch(function (error) {
-				console.log(error);
-			});
-
-		return account;
+		this.ensureOK(resp);
+		const json = await resp.json();
+		if (Array.isArray(json)) {
+			if (json.length === 1) {
+				return json[0];
+			}
+			throw new Error(`Invalid number of results for account: ${json.length}`);
+		}
+		throw new Error("Invalid JSON");
 	}
 
 	/**
@@ -878,6 +861,7 @@ export class IdentityNowClient {
 		if (resp.headers.has(CONTENT_TYPE_HEADER)
 			&& resp.headers.get(CONTENT_TYPE_HEADER)?.startsWith(CONTENT_TYPE_JSON)) {
 			const error = await resp.json();
+			console.log(error);
 			message += this.getErrorMessage(error);
 		} else {
 			message += resp.statusText;
@@ -1038,6 +1022,20 @@ export class IdentityNowClient {
 		return (await resp.json())[0];
 	}
 
+	public async getImportUncorrelatedAccountTask(taskId: string): Promise<any> {
+		console.log('> getImportUncorrelatedAccountTask');
+		const endpoint = `${EndpointUtils.getCCUrl(this.tenantName)}/cc/api/taskResult/get/${taskId}`;
+		console.log("endpoint = " + endpoint);
+		const headers = await this.prepareHeaders();
+
+		const resp = await fetch(endpoint, {
+			headers: headers
+		});
+
+		this.ensureOK(resp);
+		return resp.json();
+
+	}
 
 	public async startImportAccount(
 		sourceCCId: number,
@@ -1066,10 +1064,36 @@ export class IdentityNowClient {
 			headers: headers,
 			body: formData,
 		});
-		if (!resp.ok) {
-			console.error("Could not import accounts:" + resp.statusText);
-			throw new Error("Could not import accounts:" + resp.statusText);
-		}
+		this.ensureOK(resp, "Could not import accounts");
+		const res = await resp.json();
+		return res;
+	}
+	public async startImportUncorrelatedAccount(
+		sourceCCId: number,
+		input: Readable
+	): Promise<any> {
+		console.log("> IdentityNowClient.startImportAccount");
+		const endpoint = `${EndpointUtils.getCCUrl(this.tenantName)}/source/loadUncorrelatedAccounts/${sourceCCId}`;
+		// const endpoint = "https://webhook.site/f5a8084e-a2ca-4cc8-8bfb-4d1905985e6f";
+		console.log("endpoint = " + endpoint);
+
+		let headers = await this.prepareHeaders();
+
+		var formData = new FormData();
+		formData.append('file', input);
+
+		const formHeaders = formData.getHeaders();
+		headers = {
+			...formHeaders,
+			...headers,
+		};
+
+		const resp = await fetch(endpoint, {
+			method: "POST",
+			headers: headers,
+			body: formData,
+		});
+		this.ensureOK(resp, "Could not import uncorrelated accounts");
 		const res = await resp.json();
 		return res;
 	}
