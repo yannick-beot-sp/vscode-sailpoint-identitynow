@@ -1,5 +1,6 @@
 import path = require('path');
 import * as fs from 'fs';
+import * as readline from 'readline';
 import * as os from 'os';
 import { mkdtemp, rm } from 'node:fs/promises';
 
@@ -17,6 +18,27 @@ export async function ensureFolderExists(filepath: string) {
     }
 
     console.log('< ensureFolderExists');
+}
+
+
+
+/**
+ * cf. https://stackoverflow.com/a/60193465
+ * @param pathToFile 
+ * @returns 
+ */
+export async function getFirstLine(pathToFile: string): Promise<string> {
+    const readable = fs.createReadStream(pathToFile);
+    const reader = readline.createInterface({ input: readable });
+    const line = await new Promise<string>((resolve, reject) => {
+        reader.on('line', (line) => {
+            reader.close();
+            resolve(line);
+        });
+        reader.on('error', (err: any) => reject(err));
+    });
+    readable.close();
+    return line;
 }
 
 /**

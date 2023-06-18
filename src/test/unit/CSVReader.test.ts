@@ -53,7 +53,6 @@ suite('CSVReader Test Suite', () => {
             let counter = new Counter();
 
             let f = function (data: UncorrelatedAccount) {
-                // console.log({data});
                 counter.inc();
             };
             await csvReader.processLine(f);
@@ -73,6 +72,17 @@ suite('CSVReader Test Suite', () => {
             const count = await csvReader.getLines();
             console.log("count=" + count);
             assert.equal(count, 3);
+        });
+    });
+
+    describe('CSVReader should read header', () => {
+        const csvReader = new CSVReader(inputPath);
+        it("should not fail", async () => {
+            const headers = await csvReader.getHeaders();
+            console.log("headers=" + headers);
+            assert.notEqual(headers, null);
+            assert.equal(headers.length, 4);
+
         });
     });
 

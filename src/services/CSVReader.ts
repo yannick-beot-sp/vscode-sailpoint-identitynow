@@ -5,6 +5,7 @@ import { parse } from 'csv-parse';
 // Note, the `stream/promises` module is only available
 // starting with Node.js version 16
 import { finished } from 'stream/promises';
+import { getFirstLine } from '../utils/fileutils';
 
 
 export class CSVReader {
@@ -19,6 +20,8 @@ export class CSVReader {
         const parser = fs
             .createReadStream(this.filepath)
             .pipe(parse({
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                skip_empty_lines: true,
                 columns: true,
                 comment: '#'
             }));
@@ -37,18 +40,11 @@ export class CSVReader {
         }
     }
 
-    // public async getHeaders(): Promise<string[]> {
-    //     this.checkExists();
-    //     return new Promise((resolve, reject) => {
-    //         const input = fs.createReadStream(this.filepath);
-    //         input.pipe(csvParser())
-    //             .on('headers', (headers) => {
-    //                 input.destroy();
-    //                 resolve(headers);
-    //             })
-    //             .on('error', (err: any) => reject(err));
-    //     });
-    // }
+    public async getHeaders(): Promise<string[]> {
+        this.checkExists();
+        const headers = await getFirstLine(this.filepath);
+        return headers?.split(',') ?? [""];
+    }
 
     /**
      * 

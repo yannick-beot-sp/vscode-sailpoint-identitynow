@@ -29,7 +29,7 @@ import { SortIdentityProfileCommand } from './commands/sortIdentityProfile';
 import { MenuImporter, PaletteImporter, TreeViewImporter } from './commands/importConfig';
 import { refreshIdentityProfile } from './commands/refreshIdentityProfile';
 import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './commands/exportAccounts';
-import { EntitlementExporterCommand } from './commands/exportEntitlements';
+import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from './commands/exportEntitlementDetails';
 import { AccountImportNodeCommand } from './commands/importAccount';
 import { UncorrelatedAccountImportNodeCommand } from './commands/importUncorrelatedAccount';
 
@@ -121,10 +121,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_UNCORRELATED_ACCOUNTS_VIEW,
 			uncorrelatedAccountExporterCommand.execute, uncorrelatedAccountExporterCommand));
-	const entitlementExporterCommand = new EntitlementExporterCommand();
+	const entitlementDetailsExporterCommand = new EntitlementDetailsExporterCommand();
 	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.EXPORT_ENTITLEMENTS_VIEW,
-			entitlementExporterCommand.execute, entitlementExporterCommand));
+		vscode.commands.registerCommand(commands.EXPORT_ENTITLEMENT_DETAILS_VIEW,
+			entitlementDetailsExporterCommand.execute, entitlementDetailsExporterCommand));
 
 	const openResourceCommand = new OpenResourceCommand();
 	context.subscriptions.push(
