@@ -29,7 +29,10 @@ import { SortIdentityProfileCommand } from './commands/sortIdentityProfile';
 import { MenuImporter, PaletteImporter, TreeViewImporter } from './commands/importConfig';
 import { refreshIdentityProfile } from './commands/refreshIdentityProfile';
 import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './commands/exportAccounts';
-import { EntitlementExporterCommand } from './commands/exportEntitlements';
+import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from './commands/exportEntitlementDetails';
+import { AccountImportNodeCommand } from './commands/importAccount';
+import { UncorrelatedAccountImportNodeCommand } from './commands/importUncorrelatedAccount';
+import { EntitlementDetailsImportNodeCommand } from './commands/importEntitlementDetails';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -95,9 +98,24 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.RESET_SOURCE_ENTITLEMENTS,
 			(tenantTreeItem) => treeManager.resetSource(tenantTreeItem, "accounts")));
+
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM,
 			(tenantTreeItem) => treeManager.evaluateTransform(tenantTreeItem)));
+
+	const accountImportNodeCommand = new AccountImportNodeCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_ACCOUNTS_VIEW,
+			accountImportNodeCommand.execute, accountImportNodeCommand));
+
+	const uncorrelatedAccountImportNodeCommand = new UncorrelatedAccountImportNodeCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_UNCORRELATED_ACCOUNTS_VIEW,
+			uncorrelatedAccountImportNodeCommand.execute, uncorrelatedAccountImportNodeCommand));
+	const entitlementDetailsImportNodeCommand = new EntitlementDetailsImportNodeCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_ENTITLEMENT_DETAILS_VIEW,
+			entitlementDetailsImportNodeCommand.execute, entitlementDetailsImportNodeCommand));
 
 	const accountExporterCommand = new AccountExporterCommand();
 	context.subscriptions.push(
@@ -107,10 +125,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_UNCORRELATED_ACCOUNTS_VIEW,
 			uncorrelatedAccountExporterCommand.execute, uncorrelatedAccountExporterCommand));
-	const entitlementExporterCommand = new EntitlementExporterCommand();
+	const entitlementDetailsExporterCommand = new EntitlementDetailsExporterCommand();
 	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.EXPORT_ENTITLEMENTS_VIEW,
-			entitlementExporterCommand.execute, entitlementExporterCommand));
+		vscode.commands.registerCommand(commands.EXPORT_ENTITLEMENT_DETAILS_VIEW,
+			entitlementDetailsExporterCommand.execute, entitlementDetailsExporterCommand));
 
 	const openResourceCommand = new OpenResourceCommand();
 	context.subscriptions.push(

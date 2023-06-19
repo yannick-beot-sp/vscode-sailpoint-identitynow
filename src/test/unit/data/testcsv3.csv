@@ -1,0 +1,2 @@
+"attributeName","attributeValue","displayName","description","privileged","schema","owner","requestable"
+"memberOf","CN=AccountsPayable,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com","AccountsPayable","Allows access to AP menu in accounting applications","true","group",,

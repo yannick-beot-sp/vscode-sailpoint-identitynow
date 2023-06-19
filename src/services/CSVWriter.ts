@@ -16,14 +16,19 @@ export class CSVWriter {
 
     constructor(private outputPath: string, private headers: string[], private paths: string[], private unwindablePaths: string[] = []) {
         // Construct options for AsyncParser
-        const opts: any = { fields: this.paths, transforms: [], header: false };
+        const opts: any = {
+            fields: this.paths,
+            transforms: [],
+            header: false,
+            defaultValue: ''
+        };
         if (Array.isArray(unwindablePaths) && unwindablePaths.length > 0) {
             opts.transforms = [customUnwind({ paths: unwindablePaths })];
         }
         this.parser = new AsyncParser(opts);
     }
 
-    private async intialize(): Promise<void> {
+    private async initialize(): Promise<void> {
         this.initialized = true;
         const opts = { fields: this.headers, transforms: {}, header: true };
         // TODO
@@ -49,7 +54,7 @@ export class CSVWriter {
 
     public async write(data: any[]): Promise<void> {
         if (!this.initialized) {
-            await this.intialize();
+            await this.initialize();
         }
         this.output.write(EOL);
         await this.pipeline(this.parser, data);
@@ -58,7 +63,7 @@ export class CSVWriter {
     public async end() {
         if (!this.initialized) {
             // ensure headers are written
-            await this.intialize();
+            await this.initialize();
         }
         this.output.end();
     }

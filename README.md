@@ -15,6 +15,7 @@ The SailPoint IdentityNow extension makes it easy to:
 - View, create, edit, delete connector rules and export/import the script of a rule
 - View, edit, delete service desk integrations
 - View, edit, delete identity profiles and lifecycle states, and refreshes all the identities under a profile
+- Import/Export Accounts (import for delimited files only), uncorrelated accounts, entitlement details
 
 ## Installation
 
@@ -30,7 +31,7 @@ Open the **Command Palette** with `Ctrl+Shift+P` (Windows or Linux) or `Cmd+Shif
 
 Alternatively, you can click on the `+` in the SailPoint view.
 
-You can add a tenant by using a Personal Access Token (PAT) or by using a short-lived access token (like one you can get from https://yourtenant.identitynow.com/ui/session.
+You can add a tenant by using a Personal Access Token (PAT) or by using a short-lived access token (like one you can get from https://yourtenant.identitynow.com/ui/session).
 
 ![Add tenant](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/add-tenant.gif)
 
@@ -136,7 +137,31 @@ This extension includes the following snippets for schemas:
 
 ## Extension Settings
 
-At this moment, there is no configuration settings for this extension.
+The extension supports the following settings:
+
+* `vscode-sailpoint-identitynow.report.accounts.filename`: Define the pattern for the folder to export accounts.
+  * Default value: `%x/reports/%T-%S-Accounts-%y%M%d-%h%m%s.csv`
+* `vscode-sailpoint-identitynow.report.uncorrelatedAccounts.filename`: Define the pattern for the folder to export uncorrelated accounts.
+  * Default value: `%x/reports/%T-%S-Uncorrelated-Accounts-%y%M%d-%h%m%s.csv`
+* `vscode-sailpoint-identitynow.report.entitlements.filename`: Define the pattern for the folder to export entitlement details.
+  * Default value: `%x/reports/%T-%S-Entitlements-%y%M%d-%h%m%s.csv`
+
+The pattern defined above use the following tokens:
+    * `%u`: User Home Dir
+    * `%w`: Workspace folder
+    * `%x`: Either workspace folder if defined, or home dir
+    * `%d`: Day
+    * `%M`: Month
+    * `%y`: Year
+    * `%h`: Hour
+    * `%m`: Minute
+    * `%s`: Second
+    * `%t`: Tenant name
+    * `%T`: Tenant display name
+    * `%o`: Object type
+    * `%S`: Source name
+
+
 
 ## Known Issues
 

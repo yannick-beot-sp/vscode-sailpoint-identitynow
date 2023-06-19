@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import * as vscode from "vscode";
 import { authentication } from "vscode";
 import { EndpointUtils } from "../utils/EndpointUtils";
@@ -11,9 +12,10 @@ import { compareByName, convertToText, isEmpty } from "../utils";
 import { ConnectorRule, ValidationResult } from "../models/connectorRule";
 import { ServiceDesk } from "../models/ServiceDesk";
 import { ExportOptions, ObjectOptions } from "../models/ExportOptions";
-import { ImportJobResults, JobStatus } from "../models/JobStatus";
-import { Account, AccountsQueryParams, DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
-import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS, Entitlement, EntitlementsQueryParams } from "../models/Entitlements";
+import { ImportEntitlementsResult, ImportJobResults, JobStatus } from "../models/JobStatus";
+import { Account, AccountsQueryParams, DEFAULT_ACCOUNTS_QUERY_PARAMS, DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS, PublicIdentitiesQueryParams } from "../models/Account";
+import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS, Entitlement, EntitlementsQueryParams, PublicIdentity } from "../models/Entitlements";
+import { Readable } from 'stream';
 
 
 const CONTENT_TYPE_HEADER = "Content-Type";
@@ -34,9 +36,7 @@ export class IdentityNowClient {
 		let offset = 0;
 		let total = 0;
 		let firstQuery = true;
-		let endpoint =
-			EndpointUtils.getV3Url(this.tenantName) +
-			`/sources?count=true&limit=${limit}&sorters=name`;
+		let endpoint = `${EndpointUtils.getV3Url(this.tenantName)}/sources?count=true&limit=${limit}&sorters=name`;
 		do {
 			console.log("endpoint = " + endpoint);
 			const headers = await this.prepareHeaders();
@@ -57,6 +57,24 @@ export class IdentityNowClient {
 		} while (offset < total);
 
 		return result;
+	}
+
+	public async getSourceById(sourceId: string): Promise<any> {
+		console.log("> getSourceById", sourceId);
+
+		let endpoint = `${EndpointUtils.getV3Url(this.tenantName)}/sources/${sourceId}`;
+		console.log("endpoint = " + endpoint);
+		const headers = await this.prepareHeaders();
+		const resp = await fetch(endpoint, {
+			headers: headers,
+		});
+
+		if (!resp.ok) {
+			throw new Error(resp.statusText);
+		}
+
+
+		return await resp.json();
 	}
 
 	/**
@@ -212,26 +230,20 @@ export class IdentityNowClient {
 		const endpoint = EndpointUtils.getBaseUrl(this.tenantName) + path;
 		console.log("endpoint = " + endpoint);
 		const headers = await this.prepareHeaders("application/json-patch+json");
-		const req = await fetch(endpoint, {
+		const response = await fetch(endpoint, {
 			method: "PATCH",
 			headers: headers,
 			body: data,
 		});
 
-		if (!req.ok) {
-			if (req.status === 404) {
-				return null;
-			}
-			if (req.status === 400) {
-				const details: any = await req.json();
-				const detail = details?.messages[0]?.text || req.statusText;
-				throw new Error(detail);
-			}
-			throw new Error(req.statusText);
+		await this.ensureOK(response);
+		const text = await response.text();
+		if (response.headers.has(CONTENT_TYPE_HEADER)
+			&& response.headers.get(CONTENT_TYPE_HEADER)?.startsWith(CONTENT_TYPE_JSON)
+			&& text) {
+			return JSON.parse(text);
 		}
-		const res = await req.json();
-
-		return res;
+		return text;
 	}
 
 	private async prepareHeaders(contentType = CONTENT_TYPE_JSON): Promise<any> {
@@ -253,7 +265,7 @@ export class IdentityNowClient {
 	}
 
 	public async startEntitlementAggregation(
-		sourceID: Number,
+		sourceID: number,
 		types: string[] | null = null
 	): Promise<any> {
 		console.log("> IdentityNowClient.startEntitlementAggregation");
@@ -281,7 +293,7 @@ export class IdentityNowClient {
 	}
 
 	public async startAccountAggregation(
-		sourceID: Number,
+		sourceID: number,
 		disableOptimization = false
 	): Promise<any> {
 		console.log("> IdentityNowClient.startAccountAggregation");
@@ -316,7 +328,7 @@ export class IdentityNowClient {
 		return res;
 	}
 
-	public async resetSource(sourceID: Number, skip: string | null = null): Promise<any> {
+	public async resetSource(sourceID: number, skip: string | null = null): Promise<any> {
 		console.log('> IdentityNowClient.resetSource', sourceID);
 		let endpoint = EndpointUtils.getCCUrl(this.tenantName) + '/source/reset/' + sourceID;
 		if (!!skip) {
@@ -341,7 +353,7 @@ export class IdentityNowClient {
 	}
 
 	public async getAggregationJob(
-		sourceID: Number,
+		sourceID: number,
 		taskId: string,
 		jobType = AggregationJob.CLOUD_ACCOUNT_AGGREGATION
 	): Promise<any> {
@@ -388,13 +400,7 @@ export class IdentityNowClient {
 			applicationName - This is a reference by a source's immutable name attribute (e.g. "Active Directory [source]")
 		*/
 		console.log("> getSourceId", sourceName);
-		let endpoint =
-			EndpointUtils.getV3Url(this.tenantName) +
-			'/sources?filters=name eq "' +
-			sourceName +
-			'" or id eq "' +
-			sourceName +
-			'"';
+		let endpoint = `${EndpointUtils.getV3Url(this.tenantName)}/sources?filters=name eq "${sourceName}" or id eq "${sourceName}"`;
 		console.log("endpoint = " + endpoint);
 
 		const headers = await this.prepareHeaders();
@@ -484,42 +490,24 @@ export class IdentityNowClient {
 		sourceId: string
 	): Promise<any> {
 		console.log("> getAccount", nativeIdentity, sourceId);
-		let endpoint =
-			EndpointUtils.getV3Url(this.tenantName) +
-			'/accounts?filters=sourceId eq "' +
-			sourceId +
-			'" and nativeIdentity eq "' +
-			nativeIdentity +
-			'"';
+		const endpoint = `${EndpointUtils.getV3Url(this.tenantName)}/accounts?filters=sourceId eq "${sourceId}" and nativeIdentity eq "${nativeIdentity}"`;
 		console.log("endpoint = " + endpoint);
 
 		const headers = await this.prepareHeaders();
 
-		let account = await fetch(endpoint, {
+		const resp = await fetch(endpoint, {
 			headers: headers,
-		})
-			.then(async function (response) {
-				if (response.status === 200) {
-					let json: any = await response.json();
+		});
 
-					if (json !== undefined) {
-						if (json.length > 0) {
-							return json[0];
-						}
-					}
-				} else {
-					console.error(response.statusText);
-					vscode.window.showErrorMessage(
-						`${endpoint} --> ${response.statusText}`
-					);
-					return;
-				}
-			})
-			.catch(function (error) {
-				console.log(error);
-			});
-
-		return account;
+		await this.ensureOK(resp);
+		const json = await resp.json();
+		if (Array.isArray(json)) {
+			if (json.length === 1) {
+				return json[0];
+			}
+			throw new Error(`Invalid number of results for account: ${json.length}`);
+		}
+		throw new Error("Invalid JSON");
 	}
 
 	/**
@@ -597,7 +585,6 @@ export class IdentityNowClient {
 	): Promise<string> {
 		console.log("> startImportJob", options);
 		const endpoint = EndpointUtils.getBetaUrl(this.tenantName) + "/sp-config/import";
-		// const endpoint = "https://webhook.site/584bc6da-1d4c-4062-980b-38e19ebea9ee";
 		console.log("startImportJob: endpoint = " + endpoint);
 
 		let headers = await this.prepareHeaders();
@@ -858,10 +845,20 @@ export class IdentityNowClient {
 		if (resp.ok) {
 			return;
 		}
+		const text = await resp.text();
+		console.log(text);
 		if (resp.headers.has(CONTENT_TYPE_HEADER)
-			&& resp.headers.get(CONTENT_TYPE_HEADER)?.startsWith(CONTENT_TYPE_JSON)) {
-			const error = await resp.json();
-			message += this.getErrorMessage(error);
+			&& resp.headers.get(CONTENT_TYPE_HEADER)?.startsWith(CONTENT_TYPE_JSON)
+			&& text) {
+			try {
+				const error = JSON.parse(text);
+				console.log(error);
+				message += this.getErrorMessage(error);
+			} catch (e) {
+				message += text;
+			}
+		} else if (text) {
+			message += text;
 		} else {
 			message += resp.statusText;
 		}
@@ -899,11 +896,11 @@ export class IdentityNowClient {
 			headers: headers
 		});
 
-		this.ensureOK(resp);
+		await this.ensureOK(resp);
 		return resp;
 	}
 
-	public async getAccountCountBySource(sourceId: string, exportUncorrelatedAccountOnly = false): Promise<Number> {
+	public async getAccountCountBySource(sourceId: string, exportUncorrelatedAccountOnly = false): Promise<number> {
 		let filters = `sourceId eq "${sourceId}"`;
 		if (exportUncorrelatedAccountOnly) {
 			filters += " and uncorrelated eq true";
@@ -929,6 +926,21 @@ export class IdentityNowClient {
 		});
 		return await resp.json();
 	}
+	public async getAccountBySource(sourceId: string, nativeIdentity: string): Promise<Account> {
+		let filters = `sourceId eq "${sourceId}" and nativeIdentity eq "${nativeIdentity}"`;
+		const resp = await this.getAccounts({
+			filters,
+			limit: 1,
+			offset: 0,
+			count: true
+		});
+
+		const nbAccount = Number(resp.headers.get(TOTAL_COUNT_HEADER));
+		if (nbAccount !== 1) {
+			throw new Error("Could Not Find Account");
+		}
+		return (await resp.json())[0];
+	}
 
 	public async getEntitlements(
 		query: EntitlementsQueryParams = DEFAULT_ENTITLEMENTS_QUERY_PARAMS
@@ -946,7 +958,7 @@ export class IdentityNowClient {
 			headers: headers
 		});
 
-		this.ensureOK(resp);
+		await this.ensureOK(resp);
 		return resp;
 	}
 
@@ -955,7 +967,7 @@ export class IdentityNowClient {
 		const resp = await this.getEntitlements({
 			filters,
 			count: true,
-			limit: 0,
+			limit: 1,
 			offset: 0
 		});
 		return Number(resp.headers.get(TOTAL_COUNT_HEADER));
@@ -971,6 +983,141 @@ export class IdentityNowClient {
 		return await resp.json();
 	}
 
+	public async getPublicIdentities(
+		query: PublicIdentitiesQueryParams = DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS
+	): Promise<Response> {
+		console.log("> getPublicIdentities", query);
+		const queryValues = {
+			...DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS,
+			...query
+		};
+		let endpoint = `${EndpointUtils.getV3Url(this.tenantName)}/public-identities`;
+		endpoint = withQuery(endpoint, queryValues);
+		console.log("endpoint = " + endpoint);
+		const headers = await this.prepareHeaders();
+		const resp = await fetch(endpoint, {
+			headers: headers
+		});
+
+		await this.ensureOK(resp);
+		return resp;
+	}
+
+	public async getPublicIdentitiesByAlias(alias: string): Promise<PublicIdentity> {
+		const filters = `alias eq "${alias}"`;
+		const resp = await this.getPublicIdentities({
+			filters,
+			limit: 1,
+			offset: 0,
+			count: true
+		});
+		const nbIdentity = Number(resp.headers.get(TOTAL_COUNT_HEADER));
+		if (nbIdentity !== 1) {
+			throw new Error("Could Not Find Identity");
+		}
+		return (await resp.json())[0];
+	}
+
+	public async startImportAccount(
+		sourceCCId: number,
+		deleteThreshold: number,
+		filePath: string
+	): Promise<any> {
+		console.log("> IdentityNowClient.startImportAccount");
+		const endpoint = `${EndpointUtils.getCCUrl(this.tenantName)}/source/loadAccounts/${sourceCCId}`;
+
+		;
+		console.log("endpoint = " + endpoint);
+		let headers = await this.prepareHeaders();
+
+		var formData = new FormData();
+		formData.append("update-delete-threshold-combobox-inputEl", `${deleteThreshold}%`);
+		formData.append('file', fs.createReadStream(filePath));
+
+		const formHeaders = formData.getHeaders();
+		headers = {
+			...formHeaders,
+			...headers,
+		};
+
+		const resp = await fetch(endpoint, {
+			method: "POST",
+			headers: headers,
+			body: formData,
+		});
+		await this.ensureOK(resp, "Could not import accounts");
+		const res = await resp.json();
+		return res;
+	}
+
+
+	/**
+	 * cf. https://developer.sailpoint.com/idn/api/v3/update-account
+	 * @param accountId
+	 * @param identityId The unique ID of the identity this account is correlated to
+	 * @returns
+	 */
+	public async updateAccount(
+		accountId: string,
+		identityId: string
+	): Promise<void> {
+		console.log("> patchAccount", accountId, identityId);
+		const path = `/v3/accounts/${accountId}`;
+		const payload = [
+			{
+				op: "replace",
+				path: "/identityId",
+				value: identityId,
+			},
+		];
+
+		await this.patchResource(path, JSON.stringify(payload));
+		console.log("< patchAccount");
+	}
+
+	public async importEntitlements(
+		sourceId: string,
+		filePath: string
+	): Promise<ImportEntitlementsResult> {
+		console.log("> IdentityNowClient.importEntitlements");
+		const endpoint = `${EndpointUtils.getBetaUrl(this.tenantName)}/entitlements/sources/${sourceId}/entitlements/import`;
+		console.log("endpoint = " + endpoint);
+		let headers = await this.prepareHeaders();
+
+		var formData = new FormData();
+		formData.append("slpt-source-entitlements-panel-search-entitlements-inputEl", 'Search Entitlements');
+		formData.append('csvFile', fs.createReadStream(filePath));
+
+		const formHeaders = formData.getHeaders();
+		headers = {
+			...formHeaders,
+			...headers,
+		};
+
+		const resp = await fetch(endpoint, {
+			method: "POST",
+			headers: headers,
+			body: formData,
+		});
+		await this.ensureOK(resp, "Could not import accounts");
+		const res = await resp.json();
+		return res;
+	}
+
+	/**
+	 * cf. https://developer.sailpoint.com/idn/api/beta/patch-entitlement
+	 * @param entitlementId
+	 * @param payload
+	 * @returns
+	 */
+		public async updateEntitlement(
+			entitlementId: string,
+			payload: Array<any>
+		): Promise<any> {
+			console.log("> updateEntitlement", entitlementId, payload);
+			const path = `/beta/entitlements/${entitlementId}`;	
+			return await this.patchResource(path, JSON.stringify(payload));
+		}
 }
 
 export enum AggregationJob {
