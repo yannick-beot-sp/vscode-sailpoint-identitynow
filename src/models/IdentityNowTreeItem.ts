@@ -119,7 +119,8 @@ export class SourcesTreeItem extends FolderTreeItem {
 						this.tenantDisplayName,
 						source.name,
 						source.id,
-						source.connectorAttributes.cloudExternalId
+						source.connectorAttributes.cloudExternalId,
+						source.type
 					)
 				);
 			}
@@ -221,7 +222,8 @@ export class SourceTreeItem extends IdentityNowResourceTreeItem {
 		tenantDisplayName: string,
 		label: string,
 		id: string,
-		public readonly ccId: number
+		public readonly ccId: number,
+		public readonly type: string
 	) {
 		super(
 			tenantId,
@@ -232,9 +234,11 @@ export class SourceTreeItem extends IdentityNowResourceTreeItem {
 			id,
 			TreeItemCollapsibleState.Collapsed
 		);
+
+		this.contextValue = type.replace(" ", "") + "source";
 	}
 
-	contextValue = "source";
+
 
 	getChildren(): Promise<BaseTreeItem[]> {
 		const results: BaseTreeItem[] = [];

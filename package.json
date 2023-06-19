@@ -404,7 +404,7 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.export-node-config.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^(source|identity-profile|connector-rule|transform)$/i"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^(.*source|identity-profile|connector-rule|transform)$/i"
         },
         {
           "command": "vscode-sailpoint-identitynow.import-config.view",
@@ -417,67 +417,67 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.aggregate-source",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/",
           "group": "aggregate@0"
         },
         {
           "command": "vscode-sailpoint-identitynow.aggregate-source-disable-optimization",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/",
           "group": "aggregate@1"
         },
         {
           "command": "vscode-sailpoint-identitynow.aggregate-entitlements",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/",
           "group": "aggregate@2"
         },
         {
           "command": "vscode-sailpoint-identitynow.reset-source",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/",
           "group": "reset"
         },
         {
           "command": "vscode-sailpoint-identitynow.reset-source-accounts",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/",
           "group": "reset"
         },
         {
           "command": "vscode-sailpoint-identitynow.reset-source-entitlements",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/",
           "group": "reset"
         },
         {
           "command": "vscode-sailpoint-identitynow.source.import.accounts.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == DelimitedFilesource",
           "group": "import@0"
         },
         {
           "command": "vscode-sailpoint-identitynow.source.import.uncorrelated-accounts.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/",
           "group": "import@1"
         },
         {
           "command": "vscode-sailpoint-identitynow.source.import.entitlement-details.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/",
           "group": "import@2"
         },
         {
           "command": "vscode-sailpoint-identitynow.source.export.accounts.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
-          "group": "report"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/",
+          "group": "report@0"
         },
         {
           "command": "vscode-sailpoint-identitynow.source.export.uncorrelated-accounts.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
-          "group": "report"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/",
+          "group": "report@1"
         },
         {
           "command": "vscode-sailpoint-identitynow.source.export.entitlement-details.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
-          "group": "report"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/",
+          "group": "report@2"
         },
         {
           "command": "vscode-sailpoint-identitynow.open-resource",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/"
         },
         {
           "command": "vscode-sailpoint-identitynow.new-transform",
