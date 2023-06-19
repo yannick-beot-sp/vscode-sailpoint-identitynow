@@ -9,10 +9,13 @@ This changelog is following the recommended format by [keepachangelog](https://k
 ### Added 
 
 - New command: Aggregation of entitlements
+- Settings for export path
 - New command: Export of accounts
 - New command: Export of uncorrelated accounts
-- New command: Export of entitlements
-- Settings for export path
+- New command: Export of entitlement details
+- New command: Import of accounts
+- New command: Import of uncorrelated accounts
+- New command: Import of entitlement details
 
 ## [0.0.18] - 2023-02-15
 
