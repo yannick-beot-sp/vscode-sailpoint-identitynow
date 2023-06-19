@@ -32,6 +32,7 @@ import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './co
 import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from './commands/exportEntitlementDetails';
 import { AccountImportNodeCommand } from './commands/importAccount';
 import { UncorrelatedAccountImportNodeCommand } from './commands/importUncorrelatedAccount';
+import { EntitlementDetailsImportNodeCommand } from './commands/importEntitlementDetails';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -111,7 +112,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_UNCORRELATED_ACCOUNTS_VIEW,
 			uncorrelatedAccountImportNodeCommand.execute, uncorrelatedAccountImportNodeCommand));
-
+	const entitlementDetailsImportNodeCommand = new EntitlementDetailsImportNodeCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_ENTITLEMENT_DETAILS_VIEW,
+			entitlementDetailsImportNodeCommand.execute, entitlementDetailsImportNodeCommand));
 
 	const accountExporterCommand = new AccountExporterCommand();
 	context.subscriptions.push(

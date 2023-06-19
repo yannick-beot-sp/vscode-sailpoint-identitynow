@@ -10,6 +10,7 @@ const dataFolder = path.join(path.dirname(__filename).replace(path.sep + "out" +
 suite('CSVReader Test Suite', () => {
     const inputPath = path.join(dataFolder, 'testcsv1.csv');
     const inputPath2 = path.join(dataFolder, 'testcsv2.csv');
+    const inputPath3 = path.join(dataFolder, 'testcsv3.csv');
     console.log("Reading to", inputPath);
     
     describe('CSVReader should read data', () => {
@@ -76,12 +77,21 @@ suite('CSVReader Test Suite', () => {
     });
 
     describe('CSVReader should read header', () => {
-        const csvReader = new CSVReader(inputPath);
         it("should not fail", async () => {
+            const csvReader = new CSVReader(inputPath);
+            const headers = await csvReader.getHeaders();
+            // console.log("headers=" + headers);
+            assert.notEqual(headers, null);
+            assert.equal(headers.length, 4);
+
+        });
+        it("should work with quotes", async () => {
+            const csvReader = new CSVReader(inputPath3);
             const headers = await csvReader.getHeaders();
             console.log("headers=" + headers);
             assert.notEqual(headers, null);
-            assert.equal(headers.length, 4);
+            assert.equal(headers.length, 8);
+            assert.ok(headers[0].indexOf('"') === -1);
 
         });
     });

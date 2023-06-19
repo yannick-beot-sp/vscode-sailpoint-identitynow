@@ -40,3 +40,9 @@ export interface ImportedObject {
     id: string
     type: string
 }
+
+export interface ImportEntitlementsResult {
+    total: number
+    updated: number
+    saved: number
+}

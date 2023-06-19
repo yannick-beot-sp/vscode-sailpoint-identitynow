@@ -68,10 +68,10 @@ class EntitlementExporter extends BaseCSVExporter<Entitlement> {
     protected async exportFile(task: any, token: vscode.CancellationToken): Promise<void> {
         console.log("> BaseEntitlementExporter.exportFile");
         const headers = [
-            "attributeName", "attributeValue", "displayName", "description", "privileged", "schema", "owner"
+            "attributeName", "attributeValue", "displayName", "description", "schema", "privileged", "requestable", "owner"
         ];
         const paths = [
-            "attribute", "value", "name", "description", "privileged", "sourceSchemaObjectType", "owner.name"
+            "attribute", "value", "name", "description", "sourceSchemaObjectType", "privileged", "requestable", "owner.name"
         ];
         const unwindablePaths: string[] = [];
 

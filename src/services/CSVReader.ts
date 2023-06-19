@@ -2,6 +2,9 @@ import * as fs from 'fs';
 import * as readline from 'readline';
 import { UncorrelatedAccount } from '../models/UncorrelatedAccount';
 import { parse } from 'csv-parse';
+import { parse as parseSync } from 'csv-parse/sync';
+
+
 // Note, the `stream/promises` module is only available
 // starting with Node.js version 16
 import { finished } from 'stream/promises';
@@ -43,7 +46,9 @@ export class CSVReader {
     public async getHeaders(): Promise<string[]> {
         this.checkExists();
         const headers = await getFirstLine(this.filepath);
-        return headers?.split(',') ?? [""];
+
+        const records = parseSync(headers, {columns:false});
+        return records[0];
     }
 
     /**

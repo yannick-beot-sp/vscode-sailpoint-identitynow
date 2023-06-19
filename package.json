@@ -159,6 +159,10 @@
         "title": "Import uncorrelated accounts..."
       },
       {
+        "command": "vscode-sailpoint-identitynow.source.import.entitlement-details.view",
+        "title": "Import entitlement details..."
+      },
+      {
         "command": "vscode-sailpoint-identitynow.source.export.accounts.view",
         "title": "Export accounts..."
       },
@@ -313,6 +317,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.source.import.entitlement-details.view",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.source.export.accounts.view",
           "when": "never"
         },
@@ -440,12 +448,17 @@
         {
           "command": "vscode-sailpoint-identitynow.source.import.accounts.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
-          "group": "import"
+          "group": "import@0"
         },
         {
           "command": "vscode-sailpoint-identitynow.source.import.uncorrelated-accounts.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
-          "group": "import"
+          "group": "import@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.source.import.entitlement-details.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source",
+          "group": "import@2"
         },
         {
           "command": "vscode-sailpoint-identitynow.source.export.accounts.view",

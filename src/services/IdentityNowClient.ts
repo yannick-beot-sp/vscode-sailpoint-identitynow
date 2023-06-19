@@ -12,7 +12,7 @@ import { compareByName, convertToText, isEmpty } from "../utils";
 import { ConnectorRule, ValidationResult } from "../models/connectorRule";
 import { ServiceDesk } from "../models/ServiceDesk";
 import { ExportOptions, ObjectOptions } from "../models/ExportOptions";
-import { ImportJobResults, JobStatus } from "../models/JobStatus";
+import { ImportEntitlementsResult, ImportJobResults, JobStatus } from "../models/JobStatus";
 import { Account, AccountsQueryParams, DEFAULT_ACCOUNTS_QUERY_PARAMS, DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS, PublicIdentitiesQueryParams } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS, Entitlement, EntitlementsQueryParams, PublicIdentity } from "../models/Entitlements";
 import { Readable } from 'stream';
@@ -400,13 +400,7 @@ export class IdentityNowClient {
 			applicationName - This is a reference by a source's immutable name attribute (e.g. "Active Directory [source]")
 		*/
 		console.log("> getSourceId", sourceName);
-		let endpoint =
-			EndpointUtils.getV3Url(this.tenantName) +
-			'/sources?filters=name eq "' +
-			sourceName +
-			'" or id eq "' +
-			sourceName +
-			'"';
+		let endpoint = `${EndpointUtils.getV3Url(this.tenantName)}/sources?filters=name eq "${sourceName}" or id eq "${sourceName}"`;
 		console.log("endpoint = " + endpoint);
 
 		const headers = await this.prepareHeaders();
@@ -591,7 +585,6 @@ export class IdentityNowClient {
 	): Promise<string> {
 		console.log("> startImportJob", options);
 		const endpoint = EndpointUtils.getBetaUrl(this.tenantName) + "/sp-config/import";
-		// const endpoint = "https://webhook.site/584bc6da-1d4c-4062-980b-38e19ebea9ee";
 		console.log("startImportJob: endpoint = " + endpoint);
 
 		let headers = await this.prepareHeaders();
@@ -1081,6 +1074,50 @@ export class IdentityNowClient {
 		await this.patchResource(path, JSON.stringify(payload));
 		console.log("< patchAccount");
 	}
+
+	public async importEntitlements(
+		sourceId: string,
+		filePath: string
+	): Promise<ImportEntitlementsResult> {
+		console.log("> IdentityNowClient.importEntitlements");
+		const endpoint = `${EndpointUtils.getBetaUrl(this.tenantName)}/entitlements/sources/${sourceId}/entitlements/import`;
+		console.log("endpoint = " + endpoint);
+		let headers = await this.prepareHeaders();
+
+		var formData = new FormData();
+		formData.append("slpt-source-entitlements-panel-search-entitlements-inputEl", 'Search Entitlements');
+		formData.append('csvFile', fs.createReadStream(filePath));
+
+		const formHeaders = formData.getHeaders();
+		headers = {
+			...formHeaders,
+			...headers,
+		};
+
+		const resp = await fetch(endpoint, {
+			method: "POST",
+			headers: headers,
+			body: formData,
+		});
+		await this.ensureOK(resp, "Could not import accounts");
+		const res = await resp.json();
+		return res;
+	}
+
+	/**
+	 * cf. https://developer.sailpoint.com/idn/api/beta/patch-entitlement
+	 * @param entitlementId
+	 * @param payload
+	 * @returns
+	 */
+		public async updateEntitlement(
+			entitlementId: string,
+			payload: Array<any>
+		): Promise<any> {
+			console.log("> updateEntitlement", entitlementId, payload);
+			const path = `/beta/entitlements/${entitlementId}`;	
+			return await this.patchResource(path, JSON.stringify(payload));
+		}
 }
 
 export enum AggregationJob {
