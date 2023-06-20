@@ -695,6 +695,22 @@
         "vscode-sailpoint-identitynow.report.entitlements.filename": {
           "type": "string",
           "default": "%x/reports/%T-%S-Entitlements-%y%M%d-%h%m%s.csv"
+        },
+        "vscode-sailpoint-identitynow.sP-Config.singleResource.filename": {
+          "type": "string",
+          "default": "%x/exportedObjects/identitynowconfig-%t-%S-%y%M%d-%h%m%s.json"
+        },
+        "vscode-sailpoint-identitynow.sP-Config.singleFile.filename": {
+          "type": "string",
+          "default": "%x/exportedObjects/identitynowconfig-%t-%y%M%d-%h%m%s.json"
+        },
+        "vscode-sailpoint-identitynow.sP-Config.multipleFiles.folder": {
+          "type": "string",
+          "default": "%x/exportedObjects"
+        },
+        "vscode-sailpoint-identitynow.sP-Config.multipleFiles.filename": {
+          "type": "string",
+          "default": "%o/%S.json"
         }
       }
     }

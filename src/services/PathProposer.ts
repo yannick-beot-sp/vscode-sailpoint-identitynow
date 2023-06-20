@@ -8,6 +8,11 @@ const ACCOUNT_REPORT_FILENAME_CONF = "report.accounts.filename";
 const UNCORRELATED_ACCOUNT_REPORT_FILENAME_CONF = "report.uncorrelatedAccounts.filename";
 const ENTITLEMENT_REPORT_FILENAME_CONF = "report.entitlements.filename";
 
+const SPCONFIG_SINGLE_RESOURCE_CONF = "sP-Config.singleResource.filename";
+const SPCONFIG_SINGLE_FILE_CONF = "sP-Config.singleFile.filename";
+const SPCONFIG_MULTIPLE_FILES_FOLDER_CONF = "sP-Config.multipleFiles.folder";
+const SPCONFIG_MULTIPLE_FILES_FILENAME_CONF = "sP-Config.multipleFiles.filename";
+
 
 interface ContextValues {
     /**
@@ -106,7 +111,6 @@ export class PathProposer {
         return path;
     }
 
-
     private static getSourceBasedReportFilename(
         key: string,
         tenantName: string,
@@ -120,6 +124,39 @@ export class PathProposer {
             T: tenantDisplayName,
             // eslint-disable-next-line @typescript-eslint/naming-convention
             S: sourceName
+        });
+        return path as string;
+    }
+
+    private static getObjectBasedReportFilename(
+        key: string,
+        tenantName: string,
+        tenantDisplayName: string,
+        objectType: string,
+        objectName: string,
+    ): string {
+        let path = this.getConfigKey(key);
+        path = this.replaceVariables(path, {
+            t: tenantName,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            T: tenantDisplayName,
+            o: objectType,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            S: objectName
+        });
+        return path as string;
+    }
+
+    private static getTenantBasedReportFilename(
+        key: string,
+        tenantName: string,
+        tenantDisplayName: string,
+    ): string {
+        let path = this.getConfigKey(key);
+        path = this.replaceVariables(path, {
+            t: tenantName,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            T: tenantDisplayName,
         });
         return path as string;
     }
@@ -146,7 +183,6 @@ export class PathProposer {
             sourceName);
     }
 
-
     public static getEntitlementReportFilename(
         tenantName: string,
         tenantDisplayName: string,
@@ -158,5 +194,48 @@ export class PathProposer {
             sourceName);
     }
 
+    public static getSPConfigSingleResourceFilename(
+        tenantName: string,
+        tenantDisplayName: string,
+        objectType: string,
+        objectName: string,
+    ): string {
+        return this.getObjectBasedReportFilename(SPCONFIG_SINGLE_RESOURCE_CONF,
+            tenantName,
+            tenantDisplayName,
+            objectType,
+            objectName);
+    }
 
+    public static getSPConfigSingleFileFilename(
+        tenantName: string,
+        tenantDisplayName: string,
+    ): string {
+        return this.getTenantBasedReportFilename(SPCONFIG_SINGLE_FILE_CONF,
+            tenantName,
+            tenantDisplayName);
+    }
+
+    public static getSPConfigMultipeFileFolder(
+        tenantName: string,
+        tenantDisplayName: string
+    ): string {
+
+        return this.getTenantBasedReportFilename(SPCONFIG_MULTIPLE_FILES_FOLDER_CONF,
+            tenantName,
+            tenantDisplayName);
+    }
+
+    public static getSPConfigMultipeFileFilename(
+        tenantName: string,
+        tenantDisplayName: string,
+        objectType: string,
+        objectName: string,
+    ): string {
+        return this.getObjectBasedReportFilename(SPCONFIG_MULTIPLE_FILES_FILENAME_CONF,
+            tenantName,
+            tenantDisplayName,
+            objectType,
+            objectName);
+    }
 }

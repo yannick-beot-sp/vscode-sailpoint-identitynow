@@ -145,6 +145,14 @@ The extension supports the following settings:
   * Default value: `%x/reports/%T-%S-Uncorrelated-Accounts-%y%M%d-%h%m%s.csv`
 * `vscode-sailpoint-identitynow.report.entitlements.filename`: Define the pattern for the folder to export entitlement details.
   * Default value: `%x/reports/%T-%S-Entitlements-%y%M%d-%h%m%s.csv`
+* `vscode-sailpoint-identitynow.sP-Config.singleResource.filename`: Define the pattern for the SP-Config file of a single resource (Source, Identity Profile, Connector Rule, or Transform).
+  * Default value: `%x/exportedObjects/identitynowconfig-%t-%S-%y%M%d-%h%m%s.json`
+* `vscode-sailpoint-identitynow.sP-Config.singleFile.filename`: Define the pattern for the SP-Config file as a single file for multiple resources
+  * Default value: `%x/exportedObjects/identitynowconfig-%t-%y%M%d-%h%m%s.json`
+* `vscode-sailpoint-identitynow.sP-Config.multipleFiles.folder`: Define the pattern for the SP-Config folder as multiple files for multiple resources. This folder is proposed.
+  * Default value: `%x/exportedObjects`
+* `vscode-sailpoint-identitynow.sP-Config.multipleFiles.filename`: Define the pattern for the SP-Config filename as multiple files for multiple resources. It will be concatenated to the export folder. These filenames are not confirmed.
+  * Default value: `%o/%S.json`
 
 The pattern defined above use the following tokens:
     * `%u`: User Home Dir
@@ -159,9 +167,7 @@ The pattern defined above use the following tokens:
     * `%t`: Tenant name
     * `%T`: Tenant display name
     * `%o`: Object type
-    * `%S`: Source name
-
-
+    * `%S`: Source name for source-based report or object name
 
 ## Known Issues
 

@@ -532,11 +532,10 @@ export class IdentityNowClient {
 		};
 
 		console.log("startExportJob: requesting", payload);
-		const payloadStr = JSON.stringify(
-			payload,
-			["description", "includeTypes", "objectOptions",
-				"SOURCE", "RULE", "IDENTITY_PROFILE", "TRIGGER_SUBSCRIPTION", "TRANSFORM",
-				"includedIds", "includedNames"]);
+		const payloadStr = JSON.stringify(payload);
+			// ["description", "includeTypes", "objectOptions",
+			// 	"SOURCE", "RULE", "IDENTITY_PROFILE", "TRIGGER_SUBSCRIPTION", "TRANSFORM",
+			// 	"includedIds", "includedNames"]);
 		console.log("startExportJob: payloadStr=" + payloadStr);
 		const req = await fetch(endpoint, {
 			method: "POST",

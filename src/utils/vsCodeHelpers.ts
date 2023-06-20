@@ -154,3 +154,15 @@ export async function askFolder(prompt: string, exportFolder: string): Promise<s
 	}
 	return target;
 }
+
+
+/**
+ * Open in preview a file/uri
+ */
+export async function openPreview(uri: vscode.Uri, language="json") {
+
+	let document = await vscode.workspace.openTextDocument(uri);
+	document = await vscode.languages.setTextDocumentLanguage(document, language);
+	vscode.window.showTextDocument(document, { preview: false, preserveFocus: true });
+
+}
