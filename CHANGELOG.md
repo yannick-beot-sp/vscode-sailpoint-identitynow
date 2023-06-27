@@ -1,4 +1,4 @@
-# Change Log
+00# Change Log
 
 All notable changes to the "vscode-sailpoint-identitynow" extension will be documented in this file.
 
@@ -16,6 +16,10 @@ This changelog is following the recommended format by [keepachangelog](https://k
 - New command: Import of accounts
 - New command: Import of uncorrelated accounts
 - New command: Import of entitlement details
+
+### Fixed
+
+- List transforms by name while exporting SP-Config
 
 ## [0.0.18] - 2023-02-15
 

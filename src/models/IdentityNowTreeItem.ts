@@ -270,23 +270,19 @@ export class TransformsTreeItem extends FolderTreeItem {
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
-		const results: BaseTreeItem[] = [];
+		let results: BaseTreeItem[] = [];
 		const client = new IdentityNowClient(this.tenantId, this.tenantName);
 		const transforms = await client.getTransforms();
 		if (transforms !== undefined && transforms instanceof Array) {
-			transforms.sort(compareByName);
-			for (let index = 0; index < transforms.length; index++) {
-				const element = transforms[index];
-				results.push(
-					new TransformTreeItem(
-						this.tenantId,
-						this.tenantName,
-						this.tenantDisplayName,
-						element.name,
-						element.id
-					)
-				);
-			}
+			results = transforms.map((element) =>
+				new TransformTreeItem(
+					this.tenantId,
+					this.tenantName,
+					this.tenantDisplayName,
+					element.name,
+					element.id
+				)
+			);
 		}
 		return results;
 	}
@@ -338,16 +334,15 @@ export class SchemasTreeItem extends FolderTreeItem {
 		if (schemas !== undefined && schemas instanceof Array) {
 			results = schemas
 				.sort(compareByName)
-				.map(
-					(element) =>
-						new SchemaTreeItem(
-							this.tenantId,
-							this.tenantName,
-							this.tenantDisplayName,
-							element.name,
-							getIdByUri(this.parentUri) || "",
-							element.id
-						)
+				.map((element) =>
+					new SchemaTreeItem(
+						this.tenantId,
+						this.tenantName,
+						this.tenantDisplayName,
+						element.name,
+						getIdByUri(this.parentUri) || "",
+						element.id
+					)
 				);
 		}
 		return results;

@@ -104,23 +104,16 @@ export class IdentityNowClient {
 
 	/**
 	 * NOTE: "List transforms" endpoint does not support sorters yet
+	 * It will return sorted by name list by name
 	 * @returns return all transforms
 	 */
 	public async getTransforms(): Promise<any> {
 		console.log("> getTransforms");
-		const endpoint = EndpointUtils.getV3Url(this.tenantName) + "/transforms";
-		console.log("endpoint = " + endpoint);
-		const headers = await this.prepareHeaders();
-		const req = await fetch(endpoint, {
-			headers: headers,
-		});
-
-		if (!req.ok) {
-			throw new Error(req.statusText);
+		const transforms = await this.getResource("/v3/transforms");
+		if (transforms !== undefined && transforms instanceof Array) {
+			transforms.sort(compareByName);
 		}
-		const res = await req.json();
-
-		return res;
+		return transforms;
 	}
 
 	public async getTransformByName(name: string): Promise<any> {
