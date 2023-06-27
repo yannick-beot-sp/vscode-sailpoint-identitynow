@@ -30,9 +30,9 @@ const MULTIPLE_EXPORT_TYPE =
 const EXPORT_TYPES = [SINGLE_EXPORT_TYPE, MULTIPLE_EXPORT_TYPE];
 
 /**
- * Base Class used by exporter with full wizard 
+ * Base Class used by exporter command with full wizard 
  */
-export abstract class WizardBaseExporter {
+export abstract class WizardBasedExporterCommand {
 
     /**
      * Asks the user if he/she wants to import everything or not

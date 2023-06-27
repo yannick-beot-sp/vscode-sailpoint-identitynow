@@ -31,9 +31,9 @@ import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from 
 import { AccountImportNodeCommand } from './commands/importAccount';
 import { UncorrelatedAccountImportNodeCommand } from './commands/importUncorrelatedAccount';
 import { EntitlementDetailsImportNodeCommand } from './commands/importEntitlementDetails';
-import { ExportConfigTreeView } from './commands/spconfig-export/ExportConfigTreeView';
-import { ExportConfigPalette } from './commands/spconfig-export/ExportConfigPalette';
-import { ExportNodeConfig } from './commands/spconfig-export/ExportNodeConfig';
+import { ExportConfigTreeViewCommand } from './commands/spconfig-export/ExportConfigTreeViewCommand';
+import { ExportConfigPaletteCommand } from './commands/spconfig-export/ExportConfigPaletteCommand';
+import { ExportConfigNodeTreeViewCommand } from './commands/spconfig-export/ExportConfigNodeTreeViewCommand';
 import { ImportConfigExplorerCommand } from './commands/spconfig-import/ImportConfigExplorerCommand';
 import { ImportConfigPaletteCommand } from './commands/spconfig-import/ImportConfigPaletteCommand';
 import { ImportConfigTreeViewCommand } from './commands/spconfig-import/ImportConfigTreeViewCommand';
@@ -152,15 +152,15 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.VIEW_WORKFLOW_EXECUTION_HISTORY,
 			viewWorkflowExecutionHistory));
 
-	const exportConfigViewCommand = new ExportConfigTreeView();
+	const exportConfigViewCommand = new ExportConfigTreeViewCommand();
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_CONFIG_VIEW,
 			exportConfigViewCommand.execute, exportConfigViewCommand));
-	const exportConfigPaletteCommand = new ExportConfigPalette(tenantService);
+	const exportConfigPaletteCommand = new ExportConfigPaletteCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_CONFIG_PALETTE,
 			exportConfigPaletteCommand.execute, exportConfigPaletteCommand));
-	const exportNodeConfig = new ExportNodeConfig();
+	const exportNodeConfig = new ExportConfigNodeTreeViewCommand();
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_NODE_CONFIG_VIEW,
 			exportNodeConfig.execute, exportNodeConfig));

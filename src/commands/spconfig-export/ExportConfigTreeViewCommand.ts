@@ -1,10 +1,10 @@
 import { TenantTreeItem } from "../../models/IdentityNowTreeItem";
-import { WizardBaseExporter } from "./WizardBaseExporter";
+import { WizardBasedExporterCommand } from "./WizardBasedExporterCommand";
 
 /**
  * Entrypoint for full export configuration from the tree view. Tenant is known.
  */
-export class ExportConfigTreeView extends WizardBaseExporter {
+export class ExportConfigTreeViewCommand extends WizardBasedExporterCommand {
     constructor() { super(); }
 
     async execute(node?: TenantTreeItem) {

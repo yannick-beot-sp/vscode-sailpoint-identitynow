@@ -8,7 +8,7 @@ import { Uri } from 'vscode';
 /**
  * Entrypoint to export a Node (Source, Rule, Identity Profile or transform). Tenant is known.
  */
-export class ExportNodeConfig {
+export class ExportConfigNodeTreeViewCommand {
     constructor() {}
 
 

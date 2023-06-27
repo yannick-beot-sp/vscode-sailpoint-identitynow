@@ -15,9 +15,9 @@ const PICK_AND_CHOOSE: vscode.QuickPickItem = {
 };
 
 /**
- * Base class for all importer
+ * Base class for all importer command
  */
-export class WizardBasedImporterCommand {
+export abstract class WizardBasedImporterCommand {
 
     /**
      * Asks the user if he/she wants to import everything or not
