@@ -9,13 +9,17 @@ This changelog is following the recommended format by [keepachangelog](https://k
 ### Added 
 
 - New command: Aggregation of entitlements
-- Settings for export path
+- Settings for export path, including SP Config
 - New command: Export of accounts
 - New command: Export of uncorrelated accounts
 - New command: Export of entitlement details
 - New command: Import of accounts
 - New command: Import of uncorrelated accounts
 - New command: Import of entitlement details
+
+### Changed 
+
+- Better error management of SPConfig Import and message info
 
 ### Fixed
 

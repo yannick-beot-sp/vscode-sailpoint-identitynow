@@ -31,10 +31,17 @@ export interface Results {
 export interface ImportJobResult {
     infos: any[]
     warnings: any[]
-    errors: any[]
+    errors: ImportedError[]
     importedObjects: ImportedObject[]
 }
-
+export interface ImportedError {
+    key: string
+    text: string
+    detail: ImportedErrorDetail
+}
+export interface ImportedErrorDetail {
+    exceptionMessage: string
+}
 export interface ImportedObject {
     name: string
     id: string
