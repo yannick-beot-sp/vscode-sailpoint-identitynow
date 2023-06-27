@@ -4,6 +4,7 @@ import { IdentityNowClient } from '../services/IdentityNowClient';
 import { CSVReader } from '../services/CSVReader';
 import { UncorrelatedAccount } from '../models/UncorrelatedAccount';
 import { isEmpty } from 'lodash';
+import { chooseFile } from '../utils/vsCodeHelpers';
 
 interface UncorrelatedAccountImportResult {
     correlated: number
@@ -137,19 +138,8 @@ export class UncorrelatedAccountImportNodeCommand {
             throw new Error("UncorrelatedAccountImportNodeCommand: invalid item");
         }
 
-        const fileUri = await vscode.window.showOpenDialog({
-            canSelectFolders: false,
-            canSelectFiles: true,
-            canSelectMany: false,
-            filters: {
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                'CSV files': ['csv'],
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                'All files': ['*']
-            }
-        });
-
-        if (fileUri === undefined || fileUri.length === 0) { return; }
+        const fileUri = await chooseFile('CSV files', 'csv');
+        if (fileUri === undefined ) { return; }
 
         const accountImporter = new UncorrelatedAccountImporter(
             node.tenantId,
@@ -158,7 +148,7 @@ export class UncorrelatedAccountImportNodeCommand {
             node.label as string,
             node.id as string,
             node.ccId,
-            fileUri[0]
+            fileUri
         );
         await accountImporter.importFileWithProgression();
     }

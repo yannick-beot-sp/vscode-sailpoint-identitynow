@@ -2,8 +2,8 @@ import * as vscode from 'vscode';
 import { SourceTreeItem } from "../models/IdentityNowTreeItem";
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { CSVReader } from '../services/CSVReader';
-import { isEmpty, result } from 'lodash';
 import { isNotEmpty } from '../utils/stringUtils';
+import { chooseFile } from '../utils/vsCodeHelpers';
 
 // List of mandatory headers to update the description of entitlements
 const mandatoryHeadersDescription = ["attributeName", "attributeValue", "displayName", "description", "schema"];
@@ -164,15 +164,7 @@ class EntitlementDetailsImporter {
                     "value": ("TRUE" === data.requestable.toUpperCase())
                 });
             }
-/*
-            if (isNotEmpty(data.privileged)) {
-                payload.push({
-                    "op": "replace",
-                    "path": "/privileged",
-                    "value": ("TRUE" === data.privileged.toUpperCase())
-                });
-            }
-*/
+
             if (isNotEmpty(data.owner)) {
                 if (/^[a-f0-9]{32}$/.test(data.owner)) {
                     // is id
@@ -232,20 +224,8 @@ export class EntitlementDetailsImportNodeCommand {
             throw new Error("EntitlementDetailsImportNodeCommand: invalid item");
         }
 
-        const fileUri = await vscode.window.showOpenDialog({
-            title: 'Entitlement Details Import',
-            canSelectFolders: false,
-            canSelectFiles: true,
-            canSelectMany: false,
-            filters: {
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                'CSV files': ['csv'],
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                'All files': ['*']
-            }
-        });
-
-        if (fileUri === undefined || fileUri.length === 0) { return; }
+        const fileUri = await chooseFile('CSV files', 'csv');
+        if (fileUri === undefined ) { return; }
 
         const entitlementImporter = new EntitlementDetailsImporter(
             node.tenantId,
@@ -254,7 +234,7 @@ export class EntitlementDetailsImportNodeCommand {
             node.label as string,
             node.id as string,
             node.ccId,
-            fileUri[0]
+            fileUri
         );
         await entitlementImporter.importFileWithProgression();
     }

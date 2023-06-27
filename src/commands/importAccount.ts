@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { SourceTreeItem } from "../models/IdentityNowTreeItem";
 import { AggregationJob, IdentityNowClient } from '../services/IdentityNowClient';
 import { delay } from '../utils';
+import { chooseFile } from '../utils/vsCodeHelpers';
 
 class AccountImporter {
     readonly client: IdentityNowClient;
@@ -76,19 +77,8 @@ export class AccountImportNodeCommand {
             throw new Error("AccountImportNodeCommand: invalid item");
         }
 
-        const fileUri = await vscode.window.showOpenDialog({
-            canSelectFolders: false,
-            canSelectFiles: true,
-            canSelectMany: false,
-            filters: {
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                'CSV files': ['csv'],
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                'All files': ['*']
-            }
-        });
-
-        if (fileUri === undefined || fileUri.length === 0) { return; }
+        const fileUri = await chooseFile('CSV files', 'csv');
+        if (fileUri === undefined ) { return; }
 
         const accountImporter = new AccountImporter(
             node.tenantId,
@@ -97,7 +87,7 @@ export class AccountImportNodeCommand {
             node.label as string,
             node.id as string,
             node.ccId,
-            fileUri[0]
+            fileUri
         );
         await accountImporter.importFileWithProgression();
     }

@@ -38,7 +38,7 @@ export class SPConfigExporter {
         }, async (task, token) => await this.exportConfig(task, token))
             .then(async () =>
                 vscode.window.showInformationMessage(
-                    `Successfully exported configuration from ${this.tenantName}`
+                    `Successfully exported configuration from ${this.tenantDisplayName}`
                 ));
     }
 

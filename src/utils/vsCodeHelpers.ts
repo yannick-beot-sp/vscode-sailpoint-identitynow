@@ -159,10 +159,29 @@ export async function askFolder(prompt: string, exportFolder: string): Promise<s
 /**
  * Open in preview a file/uri
  */
-export async function openPreview(uri: vscode.Uri, language="json") {
+export async function openPreview(uri: vscode.Uri, language = "json") {
 
 	let document = await vscode.workspace.openTextDocument(uri);
 	document = await vscode.languages.setTextDocumentLanguage(document, language);
 	vscode.window.showTextDocument(document, { preview: false, preserveFocus: true });
 
+}
+
+/**
+ * Open File Dialog to choose a file
+ * @param fileType the name of files (e.g. 'JSON files') 
+ * @param extension the extension (e.g. 'json') 
+ */
+export async function chooseFile(fileType: string, extension: string): Promise<undefined | vscode.Uri> {
+	const fileUri = await vscode.window.showOpenDialog({
+		canSelectMany: false,
+		openLabel: 'Open',
+		filters: {
+			[fileType]: [extension],
+			// eslint-disable-next-line @typescript-eslint/naming-convention
+			'All files': ['*']
+		}
+	});
+
+	return fileUri === undefined || fileUri.length === 0 ? undefined : fileUri[0];
 }

@@ -25,7 +25,6 @@ import { FileHandler } from './files/FileHandler';
 import { RenameTenantCommand } from './commands/renameTenant';
 import { IdentityNowUriHandler } from './uriHandler';
 import { SortIdentityProfileCommand } from './commands/sortIdentityProfile';
-import { MenuImporter, PaletteImporter, TreeViewImporter } from './commands/importConfig';
 import { refreshIdentityProfile } from './commands/refreshIdentityProfile';
 import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './commands/exportAccounts';
 import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from './commands/exportEntitlementDetails';
@@ -35,6 +34,9 @@ import { EntitlementDetailsImportNodeCommand } from './commands/importEntitlemen
 import { ExportConfigTreeView } from './commands/spconfig-export/ExportConfigTreeView';
 import { ExportConfigPalette } from './commands/spconfig-export/ExportConfigPalette';
 import { ExportNodeConfig } from './commands/spconfig-export/ExportNodeConfig';
+import { ImportConfigExplorerCommand } from './commands/spconfig-import/ImportConfigExplorerCommand';
+import { ImportConfigPaletteCommand } from './commands/spconfig-import/ImportConfigPaletteCommand';
+import { ImportConfigTreeViewCommand } from './commands/spconfig-import/ImportConfigTreeViewCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -163,17 +165,17 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.EXPORT_NODE_CONFIG_VIEW,
 			exportNodeConfig.execute, exportNodeConfig));
 
-	const paletteImporterCommand = new PaletteImporter(tenantService);
+	const paletteImporterCommand = new ImportConfigPaletteCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_CONFIG_PALETTE,
 			paletteImporterCommand.execute, paletteImporterCommand));
 
-	const menuImporterCommand = new MenuImporter(tenantService);
+	const menuImporterCommand = new ImportConfigExplorerCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_CONFIG_MENU,
 			menuImporterCommand.execute, menuImporterCommand));
 
-	const treeviewImporterCommand = new TreeViewImporter(tenantService);
+	const treeviewImporterCommand = new ImportConfigTreeViewCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_CONFIG_VIEW,
 			treeviewImporterCommand.execute, treeviewImporterCommand));
