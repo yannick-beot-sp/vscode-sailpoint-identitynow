@@ -3,8 +3,11 @@ import { TenantService } from "../services/TenantService";
 import * as fs from 'fs';
 import { TenantInfo } from "../models/TenantInfo";
 import { TenantInfoQuickPickItem } from "../models/TenantInfoQuickPickItem";
-import { isEmpty } from "../utils";
+import { compareByName, isEmpty } from "../utils";
 import { isBlank } from "./stringUtils";
+import { ObjectPickItem } from "../models/ObjectPickItem";
+import { ObjectTypeItem } from "../models/ConfigQuickPickItem";
+import { OBJECT_TYPE_ITEMS } from "../models/ObjectTypeQuickPickItem";
 
 export async function chooseTenant(tenantService: TenantService, title: string): Promise<TenantInfo | undefined> {
 	console.log("> chooseTenant");
@@ -184,4 +187,61 @@ export async function chooseFile(fileType: string, extension: string): Promise<u
 	});
 
 	return fileUri === undefined || fileUri.length === 0 ? undefined : fileUri[0];
+}
+
+
+/**
+ * Asks the user to choose from a list of ObjectPickItem
+ * @param items List of ObjectPickItem 
+ * @returns List of ids
+ */
+export async function askChosenItems(title: string, placeHolder: string, items: Array<any>): Promise<Array<string> | undefined> {
+	const pickItems: ObjectPickItem[] = items
+		.sort(compareByName)
+		.map((x: any) => ({
+			label: x.name,
+			description: x.description,
+			id: x.id,
+			picked: true
+		}));
+
+	const result = await vscode.window.showQuickPick(
+		pickItems,
+		{
+			ignoreFocusOut: true,
+			placeHolder: placeHolder,
+			title: title,
+			canPickMany: true
+		});
+
+	if (result && result.length > 0) {
+		return result.map(x => x.id);
+	}
+	return undefined;
+};
+
+
+/**
+ * Maps object types to QuickPickItems with a human-readable label and asks to choose
+ * @param objectTypes List of object types to choose from
+ * @returns 
+ */
+export async function askSelectObjectTypes(title: string, objectTypeItems: Array<ObjectTypeItem> = OBJECT_TYPE_ITEMS): Promise<Array<ObjectTypeItem> | undefined> {
+	const sortedObjectTypeItems = objectTypeItems
+		.sort(((a, b) => (a.label > b.label) ? 1 : -1));
+
+	const selectedObjectTypeItems = await vscode.window.showQuickPick<ObjectTypeItem>(sortedObjectTypeItems, {
+		ignoreFocusOut: false,
+		title: title,
+		canPickMany: true
+	});
+
+	if (selectedObjectTypeItems !== undefined
+		&& Array.isArray(selectedObjectTypeItems)
+		&& selectedObjectTypeItems.length > 0) {
+
+		return selectedObjectTypeItems;
+	}
+	console.log("< askSelectObjectTypes: no objectType");
+	return undefined;
 }

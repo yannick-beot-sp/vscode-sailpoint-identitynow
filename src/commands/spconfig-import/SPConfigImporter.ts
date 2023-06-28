@@ -48,14 +48,11 @@ export class SPConfigImporter {
                 await delay(1000);
                 jobStatus = await this.client.getImportJobStatus(jobId);
                 console.log({ jobStatus });
-            } while (jobStatus.status === "NOT_STARTED" || jobStatus.status === "IN_PROGRESS");
-
-            // if (jobStatus.status !== "COMPLETE") {
-            //     throw new Error(jobStatus.message);
-            // }
+            } while (!jobStatus.hasOwnProperty("completed"));
 
             const importJobresult = await this.client.getImportJobResult(jobId);
-            return importJobresult;
+            const result = { ...importJobresult, ...jobStatus };
+            return result;
 
         },).then(async (importJobresult) => {
             const errors = [] as string[];
@@ -68,13 +65,17 @@ export class SPConfigImporter {
             }
 
             if (errors.length > 0) {
+                // Errors are detailed
                 let message = "Could not import config: ";
                 message += errors.join(". ");
                 message += ". ";
-                message += this.formatImportedObjects(importJobresult);              
+                message += this.formatImportedObjects(importJobresult);
                 vscode.window.showErrorMessage(message);
-
+            } else if (importJobresult.status === "FAILED") {
+                // If error but not details in the job result, takes the initial message
+                vscode.window.showErrorMessage(importJobresult.message);
             } else {
+                // It is a success
                 const message = this.formatImportedObjects(importJobresult);
                 // At this moment it is not possible to have a multi-line notification
                 await vscode.window.showInformationMessage(

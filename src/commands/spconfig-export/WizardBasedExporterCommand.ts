@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { ObjectPickItem } from '../../models/ObjectPickItem';
 import { OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
 import { ObjectTypeItem } from '../../models/ConfigQuickPickItem';
-import { askFile, askFolder, openPreview } from '../../utils/vsCodeHelpers';
+import { askChosenItems, askFile, askFolder, openPreview } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
 import { IdentityNowClient } from '../../services/IdentityNowClient';
 import { SPConfigExporter } from './SPConfigExporter';
@@ -20,7 +20,7 @@ const PICK_AND_CHOOSE: vscode.QuickPickItem = {
 
 const SINGLE_EXPORT_TYPE = {
     "label": "Single file",
-    "description": "Download a single JSON file containing all exported objects"
+    "description": "Download a single JSON file containing all exported objects (SP-Config)"
 };
 const MULTIPLE_EXPORT_TYPE =
 {
@@ -53,25 +53,7 @@ export abstract class WizardBasedExporterCommand {
         }
     };
 
-    /**
-     * Asks the user to choose from a list of ObjectPickItem
-     * @param items List of ObjectPickItem 
-     * @returns List of ids
-     */
-    async askChosenItems(itemType: string, items: Array<ObjectPickItem>): Promise<Array<string> | undefined> {
-        const result = await vscode.window.showQuickPick(
-            items,
-            {
-                ignoreFocusOut: true,
-                placeHolder: "What do you want to export?",
-                title: itemType,
-                canPickMany: true
-            });
 
-        if (result) {
-            return result.map(x => x.id);
-        }
-    };
 
     /**
      * Prompt the users for options and start the export
@@ -138,7 +120,7 @@ export abstract class WizardBasedExporterCommand {
             console.log("< chooseAndExport: no objectType");
             return;
         }
-        const objectTypes = objectTypeItemsToExport.map(i => i.objectType);
+        const objectTypes = [] as string[];
         const options: any = {};
 
         //
@@ -183,15 +165,11 @@ export abstract class WizardBasedExporterCommand {
                 if (items === undefined || !Array.isArray(items) || items.length === 0) {
                     continue;
                 }
-                const pickItems: ObjectPickItem[] = items.map((x: any) => ({
-                    label: x.name,
-                    description: x.description,
-                    id: x.id,
-                    picked: true
-                }));
-                const includeIds = await this.askChosenItems(objectTypeItem.label, pickItems);
-                if (includeIds === undefined) { return; }
-                if (pickItems.length !== includeIds.length) {
+
+                const includeIds = await askChosenItems(objectTypeItem.label, "What do you want to export?", items);
+                if (includeIds === undefined) { continue; }
+                objectTypes.push(objectTypeItem.objectType);
+                if (items.length !== includeIds.length) {
                     // XXX What is the expected behavior of the SP Config import if includedIds is empty?
                     options[objectTypeItem.objectType] = {
                         includedIds: includeIds

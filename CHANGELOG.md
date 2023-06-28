@@ -6,6 +6,10 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+### Changed
+
+- Better error management for SPConfig import and object type displayed for import
+
 ## [0.0.19] - 2023-06-28
 
 ### Added 
