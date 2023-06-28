@@ -175,6 +175,19 @@ None
 
 ## Release Notes
 
+### 0.0.19
+
+- New command: Aggregation of entitlements
+- Settings for export path, including SP Config
+- New command: Export of accounts
+- New command: Export of uncorrelated accounts
+- New command: Export of entitlement details
+- New command: Import of accounts
+- New command: Import of uncorrelated accounts
+- New command: Import of entitlement details
+- Better error management of SPConfig Import and message info
+- List transforms by name while exporting SP-Config
+
 ### 0.0.18
 
 - Export was not creating folders recursively

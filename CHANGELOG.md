@@ -6,6 +6,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [0.0.19] - 2023-06-28
+
 ### Added 
 
 - New command: Aggregation of entitlements
