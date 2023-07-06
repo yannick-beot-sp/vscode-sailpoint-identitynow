@@ -40,6 +40,7 @@ import { ImportConfigTreeViewCommand } from './commands/spconfig-import/ImportCo
 import { AccessProfileExporterCommand } from './commands/ExportAccessProfiles';
 import { RoleExporterCommand } from './commands/ExportRoles';
 import { AccessProfileImporterCommand } from './commands/ImportAccessProfiles';
+import { RoleImporterCommand } from './commands/ImportRoles';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -265,6 +266,12 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_ROLE_VIEW,
 			roleExporterCommand.execute, roleExporterCommand));
+
+	// Role Importer
+	const roleImporterCommand = new RoleImporterCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_ROLE_VIEW,
+			roleImporterCommand.execute, roleImporterCommand));
 
 }
 

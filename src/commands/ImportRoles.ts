@@ -3,35 +3,34 @@ import { IdentityNowClient } from "../services/IdentityNowClient";
 import { isEmpty } from 'lodash';
 import { GenericCSVReader } from '../services/GenericCSVReader';
 import { chooseFile } from '../utils/vsCodeHelpers';
-import { AccessProfilesTreeItem } from '../models/IdentityNowTreeItem';
+import { RolesTreeItem } from '../models/IdentityNowTreeItem';
 
-interface AccessProfileImportResult {
+interface RolesImportResult {
     success: number
     error: number
 }
 
-interface AccessProfileCSVRecord {
+interface RoleCSVRecord {
     name: string
     description: string 
     enabled: boolean
     requestable: boolean
-    source: string
     owner: string
 }
 
-export class AccessProfileImporterCommand {
+export class RoleImporterCommand {
 
-    async execute(node?: AccessProfilesTreeItem): Promise<void> {
-        console.log("> AccessProfileImporterCommand.execute");
+    async execute(node?: RolesTreeItem): Promise<void> {
+        console.log("> RoleImporterCommand.execute");
         if (node === undefined) {
-            console.error("AccessProfileImporterCommand: invalid item", node);
-            throw new Error("AccessProfileImporterCommand: invalid item");
+            console.error("RoleImporterCommand: invalid item", node);
+            throw new Error("RoleImporterCommand: invalid item");
         }
 
         const fileUri = await chooseFile('CSV files', 'csv');
         if (fileUri === undefined ) { return; }
 
-        const accessProfileImporter = new AccessProfileImporter(
+        const roleImporter = new RoleImporter(
             node.tenantId,
             node.tenantName,
             node.tenantDisplayName,
@@ -40,17 +39,17 @@ export class AccessProfileImporterCommand {
             0,
             fileUri
         );
-        await accessProfileImporter.importFileWithProgression();
+        await roleImporter.importFileWithProgression();
     }
 }
 
-export class AccessProfileImporter {
+export class RoleImporter {
     readonly client: IdentityNowClient;
     constructor(
         private tenantId: string,
         private tenantName: string,
         private tenantDisplayName: string,
-        private sourceName: string,
+        private roleName: string,
         private sourceId: string,
         private sourceCCId: number,
         private fileUri: vscode.Uri
@@ -61,7 +60,7 @@ export class AccessProfileImporter {
     async importFileWithProgression(): Promise<void> {
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
-            title: `Importing access profiles to ${this.sourceName}...`,
+            title: `Importing roles to ${this.roleName}...`,
             cancellable: false
         }, async (task, token) =>
             await this.importFile(task, token)
@@ -69,22 +68,19 @@ export class AccessProfileImporter {
     }
 
     protected async importFile(task: any, token: vscode.CancellationToken): Promise<void> {
-        console.log("> AccessProfileImporter.importFile");
+        console.log("> RoleImporter.importFile");
         const csvReader = new GenericCSVReader(this.fileUri.fsPath);
 
         const nbLines = await csvReader.getLines();
         const incr = 100 / nbLines;
         task.report({ increment: 0 });
 
-        const result: AccessProfileImportResult = {
+        const result: RolesImportResult = {
             success: 0,
             error: 0
         };
 
-        // Get the Sources to use for lookup of Id
-        const sources = await this.client.getSources();
-
-        await csvReader.processLine(async (data: AccessProfileCSVRecord) => {
+        await csvReader.processLine(async (data: RoleCSVRecord) => {
             if (token.isCancellationRequested) {
                 // skip
                 return;
@@ -104,22 +100,9 @@ export class AccessProfileImporter {
                 data.requestable = false;
             }
 
-            if (isEmpty(data.source)) {
-                result.error++;
-                // console.log('Missing source in file');
-                return;
-            }
-
             if (isEmpty(data.owner)) {
                 result.error++;
                 // console.log('Missing owner in file');
-                return;
-            }
-
-            // Enrich source Id
-            const sourceId = this.lookupSourceId(sources, data.source);
-            if (isEmpty(sourceId)) {
-                result.error++;
                 return;
             }
 
@@ -131,7 +114,7 @@ export class AccessProfileImporter {
                 return;
             }
 
-            const accessProfilePayload = {
+            const rolePayload = {
                 "name": data.name,
                 "description": "", // need to add description at some point
                 "enabled": data.enabled,
@@ -140,19 +123,13 @@ export class AccessProfileImporter {
                     "type": "IDENTITY",
                     "name": data.owner
                 },
-                "source": {
-                    "id": sourceId,
-                    "type": "SOURCE",
-                    "name": data.source
-                },
-                "entitlements": [],
                 // "requestable": data.requestable
             };
 
-            // console.log(JSON.stringify(accessProfilePayload));
+            console.log(JSON.stringify(rolePayload));
 
             try {
-                await this.client.createResource('/v3/access-profiles', JSON.stringify(accessProfilePayload));
+                await this.client.createResource('/v3/roles', JSON.stringify(rolePayload));
                 result.success++;
             } catch (error) {
                 result.error++;
