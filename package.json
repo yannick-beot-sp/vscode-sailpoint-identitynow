@@ -627,6 +627,16 @@
         {
           "command": "vscode-sailpoint-identitynow.open-resource",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == service-desk-integration"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.refresh",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles",
+          "group": "inline"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.refresh",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles",
+          "group": "inline"
         }
       ],
       "editor/context": [
