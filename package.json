@@ -671,12 +671,20 @@
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles"
         },
         {
+          "command": "vscode-sailpoint-identitynow.remove-resource",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profile"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.csv.export.roles.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles"
         },
         {
           "command": "vscode-sailpoint-identitynow.csv.import.roles.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.remove-resource",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == role"
         }
       ],
       "editor/context": [
