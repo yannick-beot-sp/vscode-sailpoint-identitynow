@@ -45,6 +45,8 @@ export const WORKFLOW_TESTER_VIEW = 'vscode-sailpoint-identitynow.workflow.test-
 
 // Access Profile Import / Export
 export const EXPORT_ACCESS_PROFILE_VIEW = 'vscode-sailpoint-identitynow.csv.export.access-profiles.view';
+export const IMPORT_ACCESS_PROFILE_VIEW = 'vscode-sailpoint-identitynow.csv.import.access-profiles.view';
 
 // Role Import / Export
 export const EXPORT_ROLE_VIEW = 'vscode-sailpoint-identitynow.csv.export.roles.view';
+export const IMPORT_ROLE_VIEW = 'vscode-sailpoint-identitynow.csv.import.roles.view';

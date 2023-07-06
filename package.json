@@ -264,6 +264,14 @@
       {
         "command": "vscode-sailpoint-identitynow.csv.export.roles.view",
         "title": "Export all Roles as CSV..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.csv.import.access-profiles.view",
+        "title": "Import Access Profiles CSV..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.csv.import.roles.view",
+        "title": "Import Roles CSV..."
       }
     ],
     "menus": {
@@ -659,7 +667,15 @@
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles"
         },
         {
+          "command": "vscode-sailpoint-identitynow.csv.import.access-profiles.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.csv.export.roles.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.csv.import.roles.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles"
         }
       ],
