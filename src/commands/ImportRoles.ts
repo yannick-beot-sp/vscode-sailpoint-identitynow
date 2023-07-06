@@ -147,17 +147,4 @@ export class RoleImporter {
             vscode.window.showInformationMessage(message);
         }
     }
-
-    protected lookupSourceId(sources: any, sourceName: string) {
-        if (sources !== undefined && sources instanceof Array) {
-			for (let source of sources) {
-                console.log(`${source.name} === ${sourceName}`)
-                if (source.name.trim() === sourceName.trim()) {
-                    console.log('Found the right one!')
-                    return source.id;
-                }
-            }
-        }
-        throw new Error('AccessProfileImporter: Unable to retrieve sources');
-    }
 }

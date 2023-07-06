@@ -174,9 +174,9 @@ export class AccessProfileImporter {
     protected lookupSourceId(sources: any, sourceName: string) {
         if (sources !== undefined && sources instanceof Array) {
 			for (let source of sources) {
-                console.log(`${source.name} === ${sourceName}`)
+                // console.log(`${source.name} === ${sourceName}`)
                 if (source.name.trim() === sourceName.trim()) {
-                    console.log('Found the right one!')
+                    // console.log('Found the right one!')
                     return source.id;
                 }
             }
