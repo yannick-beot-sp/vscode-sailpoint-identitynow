@@ -13,6 +13,8 @@ const SPCONFIG_SINGLE_FILE_CONF = "sP-Config.singleFile.filename";
 const SPCONFIG_MULTIPLE_FILES_FOLDER_CONF = "sP-Config.multipleFiles.folder";
 const SPCONFIG_MULTIPLE_FILES_FILENAME_CONF = "sP-Config.multipleFiles.filename";
 
+const GENERIC_CSV_REPORT_VIEW = "report.csv.filename";
+
 
 interface ContextValues {
     /**
@@ -53,6 +55,9 @@ interface ContextValues {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     S?: string
 
+    /** Type name */
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    J?: string
 }
 
 
@@ -237,5 +242,34 @@ export class PathProposer {
             tenantDisplayName,
             objectType,
             objectName);
+    }
+
+    private static getGenericCSVFilenameWithKey(
+        key: string,
+        tenantName: string,
+        tenantDisplayName: string,
+        type: string
+    ): string {
+        let path = this.getConfigKey(key);
+        path = this.replaceVariables(path, {
+            t: tenantName,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            T: tenantDisplayName,
+            J: type
+        });
+        return path as string;
+    }
+
+    public static getGenericCSVFilename(
+        tenantName: string,
+        tenantDisplayName: string,
+        type: string
+    ): string {
+        return this.getGenericCSVFilenameWithKey(
+            GENERIC_CSV_REPORT_VIEW,
+            tenantName,
+            tenantDisplayName,
+            type
+        );
     }
 }

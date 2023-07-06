@@ -256,6 +256,14 @@
           "light": "resources/light/sort-number.svg",
           "dark": "resources/dark/sort-number.svg"
         }
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.csv.export.access-profiles.view",
+        "title": "Export all Access Profiles as CSV..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.csv.export.roles.view",
+        "title": "Export all Roles as CSV..."
       }
     ],
     "menus": {
@@ -374,6 +382,14 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.identity-profiles.sort.priority",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.csv.export.access-profiles.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.csv.export.roles.view",
           "when": "never"
         }
       ],
@@ -637,6 +653,14 @@
           "command": "vscode-sailpoint-identitynow.refresh",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles",
           "group": "inline"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.csv.export.access-profiles.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.csv.export.roles.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles"
         }
       ],
       "editor/context": [
@@ -721,6 +745,10 @@
         "vscode-sailpoint-identitynow.sP-Config.multipleFiles.filename": {
           "type": "string",
           "default": "%o/%S.json"
+        },
+        "vscode-sailpoint-identitynow.report.csv.filename": {
+          "type": "string",
+          "default": "%x/reports/%T-%J-%y%M%d-%h%m%s.csv"
         }
       }
     }

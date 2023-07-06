@@ -42,3 +42,9 @@ export const SORT_IDENTITY_PROFILES_BY_PRIORITY = 'vscode-sailpoint-identitynow.
 export const REFRESH_IDENTITY_PROFILE = 'vscode-sailpoint-identitynow.identity-profile.refresh';
 export const TREE_VIEW = 'vscode-sailpoint-identitynow.view';
 export const WORKFLOW_TESTER_VIEW = 'vscode-sailpoint-identitynow.workflow.test-view';
+
+// Access Profile Import / Export
+export const EXPORT_ACCESS_PROFILE_VIEW = 'vscode-sailpoint-identitynow.csv.export.access-profiles.view';
+
+// Role Import / Export
+export const EXPORT_ROLE_VIEW = 'vscode-sailpoint-identitynow.csv.export.roles.view';
