@@ -1158,6 +1158,54 @@ export class IdentityNowClient {
 		const rule = await this.getResource("/v3/access-profiles/" + id);
 		return rule;
 	}
+
+	/**
+	 * List Access Profiles
+	 * @returns list of access profiles
+	 * Added by richastral 06/07/2023
+	 */
+	public async getRoles(): Promise<any> {
+		console.log("> getRoles");
+		const limit = 250;
+		let result: any[] = [];
+		let offset = 0;
+		let total = 0;
+		let firstQuery = true;
+		let endpoint = `${EndpointUtils.getV3Url(this.tenantName)}/roles?count=true&limit=${limit}&sorters=name`;
+		do {
+			console.log("endpoint = " + endpoint);
+			const headers = await this.prepareHeaders();
+			const req = await fetch(endpoint, {
+				headers: headers,
+			});
+
+			if (!req.ok) {
+				throw new Error(req.statusText);
+			}
+			result = result.concat(await req.json());
+			if (firstQuery) {
+				total = Number(req.headers.get(TOTAL_COUNT_HEADER));
+				firstQuery = false;
+			}
+			offset += limit;
+			endpoint = withQuery(endpoint, { count: false, offset: offset });
+		} while (offset < total);
+
+		return result;
+	}
+
+	/**
+	 * Get Access Profile by Id
+	 * @param id id of access profile
+	 * @returns Access Profile
+	 * Added by richastral 06/07/2023
+	 */
+	public async getRoleById(
+		id: string
+	): Promise<ConnectorRule | undefined> {
+		const rule = await this.getResource("/v3/roles/" + id);
+		return rule;
+	}
 }
 
 export enum AggregationJob {
