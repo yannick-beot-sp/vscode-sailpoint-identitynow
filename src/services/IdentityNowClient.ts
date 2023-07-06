@@ -1110,6 +1110,54 @@ export class IdentityNowClient {
 			const path = `/beta/entitlements/${entitlementId}`;	
 			return await this.patchResource(path, JSON.stringify(payload));
 		}
+
+	/**
+	 * List Access Profiles
+	 * @returns list of access profiles
+	 * Added by richastral 06/07/2023
+	 */
+	public async getAccessProfiles(): Promise<any> {
+		console.log("> getAccessProfiles");
+		const limit = 250;
+		let result: any[] = [];
+		let offset = 0;
+		let total = 0;
+		let firstQuery = true;
+		let endpoint = `${EndpointUtils.getV3Url(this.tenantName)}/access-profiles?count=true&limit=${limit}&sorters=name`;
+		do {
+			console.log("endpoint = " + endpoint);
+			const headers = await this.prepareHeaders();
+			const req = await fetch(endpoint, {
+				headers: headers,
+			});
+
+			if (!req.ok) {
+				throw new Error(req.statusText);
+			}
+			result = result.concat(await req.json());
+			if (firstQuery) {
+				total = Number(req.headers.get(TOTAL_COUNT_HEADER));
+				firstQuery = false;
+			}
+			offset += limit;
+			endpoint = withQuery(endpoint, { count: false, offset: offset });
+		} while (offset < total);
+
+		return result;
+	}
+
+	/**
+	 * Get Access Profile by Id
+	 * @param id id of access profile
+	 * @returns Access Profile
+	 * Added by richastral 06/07/2023
+	 */
+	public async getAccessProfileById(
+		id: string
+	): Promise<ConnectorRule | undefined> {
+		const rule = await this.getResource("/v3/access-profiles/" + id);
+		return rule;
+	}
 }
 
 export enum AggregationJob {

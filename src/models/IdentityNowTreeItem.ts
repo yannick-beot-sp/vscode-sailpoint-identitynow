@@ -62,6 +62,12 @@ export class TenantTreeItem extends BaseTreeItem {
 		results.push(new RulesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new ServiceDesksTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new IdentityProfilesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+
+		/**
+		 * Added by richastral 06/07/2023
+		 */
+		results.push(new AccessProfilesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+
 		return new Promise((resolve) => resolve(results));
 	}
 }
@@ -683,4 +689,65 @@ export class ServiceDeskTreeItem extends IdentityNowResourceTreeItem {
 	}
 
 	iconPath = new ThemeIcon("gear");
+}
+
+/**
+ * Represents the access profiles drop down in tree node
+ */
+export class AccessProfilesTreeItem extends FolderTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {
+		super("Access Profiles", "access-profiles", tenantId, tenantName, tenantDisplayName);
+	}
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		const results: BaseTreeItem[] = [];
+		const client = new IdentityNowClient(this.tenantId, this.tenantName);
+		const sources = await client.getAccessProfiles();
+		if (sources !== undefined && sources instanceof Array) {
+			for (let source of sources) {
+				results.push(
+					new AccessProfileTreeItem(
+						this.tenantId,
+						this.tenantName,
+						this.tenantDisplayName,
+						source.name,
+						source.id
+					)
+				);
+			}
+		}
+		return results;
+	}
+}
+
+/**
+ * Represents the single access profile.
+ */
+export class AccessProfileTreeItem extends IdentityNowResourceTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string) {
+		super(
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			"access-profiles",
+			id,
+			TreeItemCollapsibleState.None,
+			undefined,
+			undefined,
+			true
+		);
+	}
+
+	contextValue = "access-profile";
+	iconPath = new ThemeIcon("file-code");
 }
