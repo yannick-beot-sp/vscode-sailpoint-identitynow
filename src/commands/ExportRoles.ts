@@ -63,10 +63,10 @@ class RoleExporter extends BaseCSVExporter<Role> {
     protected async exportFile(task: any, token: vscode.CancellationToken): Promise<void> {
         console.log("> RoleExporter.exportFile");
         const headers = [
-            "name", /*"description",*/ "enabled", "requestable"
+            "name", /*"description",*/ "enabled", "requestable", "owner"
         ];
         const paths = [
-            "name", /*"description",*/ "enabled", "requestable"
+            "name", /*"description",*/ "enabled", "requestable", "owner.name"
         ];
         const unwindablePaths: string[] = [];
 
