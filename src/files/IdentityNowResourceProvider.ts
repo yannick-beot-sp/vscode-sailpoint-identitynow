@@ -156,6 +156,12 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 					patchResourcePath,
 					JSON.stringify(jsonpatch)
 				);
+			} else if (resourcePath.match("access-profiles")) {
+				// Currently not supported
+				throw vscode.FileSystemError.Unavailable('Modification of Access Profiles is not yet available!');
+			} else if (resourcePath.match("roles")) {
+				// Currently not supported
+				throw vscode.FileSystemError.Unavailable('Modification of Roles is not yet available!');
 			} else {
 				const updatedData = await client.updateResource(resourcePath, data);
 				if (!updatedData) {
