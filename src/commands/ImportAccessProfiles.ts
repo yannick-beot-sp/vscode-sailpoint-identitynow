@@ -4,6 +4,7 @@ import { isEmpty } from 'lodash';
 import { GenericCSVReader } from '../services/GenericCSVReader';
 import { chooseFile } from '../utils/vsCodeHelpers';
 import { AccessProfilesTreeItem } from '../models/IdentityNowTreeItem';
+import { Entitlement } from '../models/Entitlements';
 
 interface AccessProfileImportResult {
     success: number
@@ -17,6 +18,7 @@ interface AccessProfileCSVRecord {
     requestable: boolean
     source: string
     owner: string
+    entitlements: string
 }
 
 export class AccessProfileImporterCommand {
@@ -92,7 +94,7 @@ export class AccessProfileImporter {
             task.report({ increment: incr, message: data.name });
             if (isEmpty(data.name)) {
                 result.error++;
-                // console.log('Missing name in file');
+                console.log('Missing name in file');
                 return;
             }
 
@@ -106,13 +108,13 @@ export class AccessProfileImporter {
 
             if (isEmpty(data.source)) {
                 result.error++;
-                // console.log('Missing source in file');
+                console.log('Missing source in file');
                 return;
             }
 
             if (isEmpty(data.owner)) {
                 result.error++;
-                // console.log('Missing owner in file');
+                console.log('Missing owner in file');
                 return;
             }
 
@@ -120,6 +122,7 @@ export class AccessProfileImporter {
             const sourceId = this.lookupSourceId(sources, data.source);
             if (isEmpty(sourceId)) {
                 result.error++;
+                console.log('Cannot find source');
                 return;
             }
 
@@ -128,8 +131,40 @@ export class AccessProfileImporter {
             const ownerId = owner.id;
             if (isEmpty(ownerId)) {
                 result.error++;
+                console.log('Cannot find owner');
                 return;
             }
+
+            let outputEntititlements: any = [];
+
+            if (!isEmpty(data.entitlements)) {
+                // Get entitlements for source
+                const sourceEntitlements = await this.client.getEntitlementsBySource(sourceId);
+                const entitlementsArray = data.entitlements.split(';');
+
+                if (entitlementsArray.length > 0) {
+                    for (let entInd = 0; entInd < entitlementsArray.length; entInd++) {
+                        const ent = entitlementsArray[entInd];
+                        let entitlementId = '';
+
+                        for (let index = 0; index < sourceEntitlements.length; index++) {
+                            const sent = sourceEntitlements[index];
+                            if (sent.name.trim() === ent.trim()) {
+                                entitlementId = sent.id;
+                            }
+                        }
+
+                        if (entitlementId.length > 0) {
+                            outputEntititlements.push({
+                                "id": entitlementId,
+                                "type": "ENTITLEMENT"
+                            });
+                        }
+                    }
+                }
+            }
+
+            console.log("--------------------------------------------");
 
             const accessProfilePayload = {
                 "name": data.name,
@@ -145,11 +180,11 @@ export class AccessProfileImporter {
                     "type": "SOURCE",
                     "name": data.source
                 },
-                "entitlements": [],
+                "entitlements": outputEntititlements,
                 // "requestable": data.requestable
             };
 
-            // console.log(JSON.stringify(accessProfilePayload));
+            console.log(JSON.stringify(accessProfilePayload));
 
             try {
                 await this.client.createResource('/v3/access-profiles', JSON.stringify(accessProfilePayload));

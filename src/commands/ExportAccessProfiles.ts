@@ -6,6 +6,8 @@ import { AccessProfilesTreeItem } from '../models/IdentityNowTreeItem';
 import { askFile } from '../utils/vsCodeHelpers';
 import { PathProposer } from '../services/PathProposer';
 
+import { flatten } from '@json2csv/transforms';
+
 export class AccessProfileExporterCommand {
     /**
      * Entry point 
@@ -63,14 +65,18 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
     protected async exportFile(task: any, token: vscode.CancellationToken): Promise<void> {
         console.log("> AccessProfileExporter.exportFile");
         const headers = [
-            "name", /*"description",*/ "enabled", "requestable", "source", "owner"
+            "name", /*"description",*/ "enabled", "requestable", "source", "owner", "entitlements"
         ];
         const paths = [
-            "name", /*"description",*/ "enabled", "requestable", "source.name", "owner.name"
+            "name", /*"description",*/ "enabled", "requestable", "source.name", "owner.name", "entitlements"
         ];
         const unwindablePaths: string[] = [];
 
+        const customTransform: any[] | undefined = [
+            flatten({ separator: ';', objects: false, arrays: true })
+        ];
+
         const iterator = new AccessProfilePaginator(this.client);
-        await this.writeData(headers, paths, unwindablePaths, iterator, task, token);
+        await this.writeData(headers, paths, unwindablePaths, iterator, task, token, customTransform);
     }
 }

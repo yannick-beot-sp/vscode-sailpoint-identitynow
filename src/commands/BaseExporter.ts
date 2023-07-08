@@ -54,13 +54,16 @@ export abstract class BaseCSVExporter<T> {
         paths: string[],
         unwindablePaths: string[],
         iterator: AsyncIterable<T[]>,
-        task: any, token: vscode.CancellationToken) {
+        task: any, 
+        token: vscode.CancellationToken,
+        transforms: any[] = []) {
         ensureFolderExists(this.filePath);
         const csvWriter = new CSVWriter(
             this.filePath,
             headers,
             paths,
-            unwindablePaths);
+            unwindablePaths,
+            transforms);
 
         for await (const data of iterator) {
             await csvWriter.write(data);
