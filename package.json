@@ -280,16 +280,48 @@
         "title": "Export all Access Profiles as CSV..."
       },
       {
+        "command": "vscode-sailpoint-identitynow.csv.export.access-profiles-icon.view",
+        "title": "Export all Access Profiles as CSV...",
+        "icon": {
+          "light": "resources/light/export.svg",
+          "dark": "resources/dark/export.svg"
+        }
+      },
+      {
         "command": "vscode-sailpoint-identitynow.csv.export.roles.view",
         "title": "Export all Roles as CSV..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.csv.export.roles-icon.view",
+        "title": "Export all Roles as CSV...",
+        "icon": {
+          "light": "resources/light/export.svg",
+          "dark": "resources/dark/export.svg"
+        }
       },
       {
         "command": "vscode-sailpoint-identitynow.csv.import.access-profiles.view",
         "title": "Import Access Profiles CSV..."
       },
       {
+        "command": "vscode-sailpoint-identitynow.csv.import.access-profiles-icon.view",
+        "title": "Import Access Profiles CSV...",
+        "icon": {
+          "light": "resources/light/import.svg",
+          "dark": "resources/dark/import.svg"
+        }
+      },
+      {
         "command": "vscode-sailpoint-identitynow.csv.import.roles.view",
         "title": "Import Roles CSV..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.csv.import.roles-icon.view",
+        "title": "Import Roles CSV...",
+        "icon": {
+          "light": "resources/light/import.svg",
+          "dark": "resources/dark/import.svg"
+        }
       }
     ],
     "menus": {
@@ -703,8 +735,18 @@
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles"
         },
         {
+          "command": "vscode-sailpoint-identitynow.csv.export.access-profiles-icon.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles",
+          "group": "inline@3"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.csv.import.access-profiles.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.csv.import.access-profiles-icon.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles",
+          "group": "inline@2"
         },
         {
           "command": "vscode-sailpoint-identitynow.remove-resource",
@@ -715,8 +757,18 @@
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles"
         },
         {
+          "command": "vscode-sailpoint-identitynow.csv.export.roles-icon.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles",
+          "group": "inline@3"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.csv.import.roles.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.csv.import.roles-icon.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles",
+          "group": "inline@2"
         },
         {
           "command": "vscode-sailpoint-identitynow.remove-resource",

@@ -256,11 +256,17 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_ACCESS_PROFILE_VIEW,
 			accessProfileExporterCommand.execute, accessProfileExporterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_ACCESS_PROFILE_ICON_VIEW,
+			accessProfileExporterCommand.execute, accessProfileExporterCommand));
 	
 	// Access Profile Importer
 	const accessProfileImporterCommand = new AccessProfileImporterCommand();
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_ACCESS_PROFILE_VIEW,
+			accessProfileImporterCommand.execute, accessProfileImporterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_ACCESS_PROFILE_ICON_VIEW,
 			accessProfileImporterCommand.execute, accessProfileImporterCommand));
 
 	// Role Exporter
@@ -268,11 +274,17 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_ROLE_VIEW,
 			roleExporterCommand.execute, roleExporterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_ROLE_ICON_VIEW,
+			roleExporterCommand.execute, roleExporterCommand));
 
 	// Role Importer
 	const roleImporterCommand = new RoleImporterCommand();
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_ROLE_VIEW,
+			roleImporterCommand.execute, roleImporterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_ROLE_ICON_VIEW,
 			roleImporterCommand.execute, roleImporterCommand));
 
 	const newRoleCommand = new NewRoleCommand(tenantService);

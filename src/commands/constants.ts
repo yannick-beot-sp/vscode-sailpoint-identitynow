@@ -45,11 +45,15 @@ export const WORKFLOW_TESTER_VIEW = 'vscode-sailpoint-identitynow.workflow.test-
 
 // Access Profile Import / Export
 export const EXPORT_ACCESS_PROFILE_VIEW = 'vscode-sailpoint-identitynow.csv.export.access-profiles.view';
+export const EXPORT_ACCESS_PROFILE_ICON_VIEW = 'vscode-sailpoint-identitynow.csv.export.access-profiles-icon.view';
 export const IMPORT_ACCESS_PROFILE_VIEW = 'vscode-sailpoint-identitynow.csv.import.access-profiles.view';
+export const IMPORT_ACCESS_PROFILE_ICON_VIEW = 'vscode-sailpoint-identitynow.csv.import.access-profiles-icon.view';
 
 // Role Import / Export
 export const EXPORT_ROLE_VIEW = 'vscode-sailpoint-identitynow.csv.export.roles.view';
+export const EXPORT_ROLE_ICON_VIEW = 'vscode-sailpoint-identitynow.csv.export.roles-icon.view';
 export const IMPORT_ROLE_VIEW = 'vscode-sailpoint-identitynow.csv.import.roles.view';
+export const IMPORT_ROLE_ICON_VIEW = 'vscode-sailpoint-identitynow.csv.import.roles-icon.view';
 
 // New Access Profile
 export const NEW_ACCESS_PROFILE = 'vscode-sailpoint-identitynow.new-access-profile';
