@@ -1,0 +1,23 @@
+{
+    "name": "<<<NAME>>>",
+    "description": null,
+    "enabled": false,
+    "owner": {
+        "type": "IDENTITY",
+        "id": "<<<OWNER_ID>>>",
+        "name": "<<<OWNER_NAME>>>"
+    },
+    "source": {},
+    "entitlements": [],
+    "requestable": true,
+    "accessRequestConfig": {
+        "commentsRequired": false,
+        "denialCommentsRequired": false,
+        "approvalSchemes": []
+    },
+    "revocationRequestConfig": {
+        "approvalSchemes": []
+    },
+    "segments": [],
+    "provisioningCriteria": null
+}

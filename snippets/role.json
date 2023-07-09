@@ -1,0 +1,22 @@
+{
+    "name": "<<NAME>>",
+    "description": "<<DESCRIPTION>>",
+    "owner": {
+        "type": "IDENTITY",
+        "id": "<<OWNER_ID>>",
+        "name": "<<OWNER_NAME>>"
+    },
+    "accessProfiles": [],
+    "membership": null,
+    "legacyMembershipInfo": null,
+    "enabled": false,
+    "accessRequestConfig": {
+        "commentsRequired": false,
+        "denialCommentsRequired": false,
+        "approvalSchemes": []
+    },
+    "revocationRequestConfig": {
+        "approvalSchemes": []
+    },
+    "segments": []
+}

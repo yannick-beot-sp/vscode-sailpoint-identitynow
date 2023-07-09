@@ -6,7 +6,7 @@ import { AccessRevokeRequestConfig, CommonInfoType } from "./CommonModels";
  */
 
 export interface AccessProfile {
-    id: string
+    id?: string
     name: string
     description: any
     created: string
@@ -14,7 +14,7 @@ export interface AccessProfile {
     enabled: boolean
     owner: CommonInfoType
     source: CommonInfoType
-    entitlements: CommonInfoType
+    entitlements: CommonInfoType[]
     requestable: boolean
     accessRequestConfig: AccessRevokeRequestConfig
     revocationRequestConfig: AccessRevokeRequestConfig

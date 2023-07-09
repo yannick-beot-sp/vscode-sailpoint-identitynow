@@ -258,6 +258,24 @@
         }
       },
       {
+        "command": "vscode-sailpoint-identitynow.new-access-profile",
+        "title": "New Access Profile"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.new-access-profile-icon",
+        "title": "New Access Profile",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.new-role",
+        "title": "New Role"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.new-role-icon",
+        "title": "New Role",
+        "icon": "$(add)"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.csv.export.access-profiles.view",
         "title": "Export all Access Profiles as CSV..."
       },
@@ -651,6 +669,24 @@
         {
           "command": "vscode-sailpoint-identitynow.open-resource",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == service-desk-integration"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-access-profile",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-access-profile-icon",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles",
+          "group": "inline"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-role",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-role-icon",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles",
+          "group": "inline@1"
         },
         {
           "command": "vscode-sailpoint-identitynow.refresh",

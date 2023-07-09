@@ -6,7 +6,7 @@ import { AccessRevokeRequestConfig, CommonInfoType } from "./CommonModels";
  */
 
 export interface Role {
-    id: string
+    id?: string
     name: string
     created: string
     modified: string

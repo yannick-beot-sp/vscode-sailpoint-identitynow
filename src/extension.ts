@@ -41,6 +41,8 @@ import { AccessProfileExporterCommand } from './commands/ExportAccessProfiles';
 import { RoleExporterCommand } from './commands/ExportRoles';
 import { AccessProfileImporterCommand } from './commands/ImportAccessProfiles';
 import { RoleImporterCommand } from './commands/ImportRoles';
+import { NewAccessProfileCommand } from './commands/NewAccessProfileCommand';
+import { NewRoleCommand } from './commands/NewRoleCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -272,6 +274,14 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_ROLE_VIEW,
 			roleImporterCommand.execute, roleImporterCommand));
+
+	const newRoleCommand = new NewRoleCommand(tenantService);
+		context.subscriptions.push(
+			vscode.commands.registerCommand(commands.NEW_ROLE,
+				newRoleCommand.newRole, newRoleCommand));
+		context.subscriptions.push(
+			vscode.commands.registerCommand(commands.NEW_ROLE_ICON,
+				newRoleCommand.newRole, newRoleCommand));
 
 }
 

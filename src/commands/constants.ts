@@ -50,3 +50,11 @@ export const IMPORT_ACCESS_PROFILE_VIEW = 'vscode-sailpoint-identitynow.csv.impo
 // Role Import / Export
 export const EXPORT_ROLE_VIEW = 'vscode-sailpoint-identitynow.csv.export.roles.view';
 export const IMPORT_ROLE_VIEW = 'vscode-sailpoint-identitynow.csv.import.roles.view';
+
+// New Access Profile
+export const NEW_ACCESS_PROFILE = 'vscode-sailpoint-identitynow.new-access-profile';
+export const NEW_ACCESS_PROFILE_ICON = 'vscode-sailpoint-identitynow.new-access-profile-icon';
+
+// New Role
+export const NEW_ROLE = 'vscode-sailpoint-identitynow.new-role';
+export const NEW_ROLE_ICON = 'vscode-sailpoint-identitynow.new-role-icon';

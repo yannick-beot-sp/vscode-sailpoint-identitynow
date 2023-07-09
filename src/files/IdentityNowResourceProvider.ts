@@ -115,7 +115,9 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 			} else if (
 				resourcePath.match("schemas") ||
 				resourcePath.match("provisioning-policies") ||
-				resourcePath.match("connector-rules")
+				resourcePath.match("connector-rules") ||
+				resourcePath.match("access-profiles") ||
+				resourcePath.match("roles")
 			) {
 				const createdData = await client.createResource(
 					path.posix.dirname(resourcePath),
