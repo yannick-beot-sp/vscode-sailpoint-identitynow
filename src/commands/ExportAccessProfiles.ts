@@ -73,7 +73,15 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
         const unwindablePaths: string[] = [];
 
         const customTransform: any[] | undefined = [
-            flatten({ separator: ';', objects: false, arrays: true })
+            function(item:any) {
+                let entitlements = '';
+                for (let index = 0; index < item.entitlements.length; index++){
+                    const ent = item.entitlements[index];
+                    entitlements += ent.name + ';';
+                }
+                item.entitlements = entitlements.substring(0, entitlements.length-1);
+                return item;
+            }
         ];
 
         const iterator = new AccessProfilePaginator(this.client);
