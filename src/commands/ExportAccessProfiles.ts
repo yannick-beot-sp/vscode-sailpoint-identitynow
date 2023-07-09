@@ -64,10 +64,32 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
     protected async exportFile(task: any, token: vscode.CancellationToken): Promise<void> {
         console.log("> AccessProfileExporter.exportFile");
         const headers = [
-            "name", "description", "enabled", "source", "owner", "commentsRequired", "denialCommentsRequired", "approvalSchemes", "entitlements"
+            "name", 
+            "description", 
+            "enabled", 
+            "source", 
+            "owner", 
+            "commentsRequired", 
+            "denialCommentsRequired", 
+            "approvalSchemes", 
+            "revokeCommentsRequired", 
+            "revokeDenialCommentsRequired", 
+            "revokeApprovalSchemes", 
+            "entitlements"
         ];
         const paths = [
-            "name", "descriptionXX", "enabled", "source.name", "owner.name", "accessRequestConfig.denialCommentsRequired", "accessRequestConfig.denialCommentsRequired", "approvalSchemes", "entitlements"
+            "name", 
+            "descriptionXX", 
+            "enabled", 
+            "source.name", 
+            "owner.name", 
+            "accessRequestConfig.commentsRequired", 
+            "accessRequestConfig.denialCommentsRequired", 
+            "approvalSchemes",
+            "revocationRequestConfig.commentsRequired", 
+            "revocationRequestConfig.denialCommentsRequired", 
+            "revokeApprovalSchemes", 
+            "entitlements"
         ];
         const unwindablePaths: string[] = [];
 
@@ -76,7 +98,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
         const customTransform: any[] | undefined = [
             function(item:any) {
                 let entitlements = '';
-                let approvalSchemes = '';
+                
                 for (let index = 0; index < item.entitlements.length; index++){
                     const ent = item.entitlements[index];
                     entitlements += ent.name + ';';
@@ -84,6 +106,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
                 item.entitlements = entitlements.substring(0, entitlements.length-1);
 
                 if (item.accessRequestConfig) {
+                    let approvalSchemes = '';
                     for (let index = 0; index < item.accessRequestConfig.approvalSchemes.length; index++){
                         const scheme = item.accessRequestConfig.approvalSchemes[index];
                         
@@ -105,6 +128,47 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
                         }
                     }
                     item.approvalSchemes = approvalSchemes.substring(0, approvalSchemes.length-1);
+
+                    if (isEmpty(item.accessRequestConfig.commentsRequired)) {
+                        item.accessRequestConfig.commentsRequired = false;
+                    }
+
+                    if (isEmpty(item.accessRequestConfig.denialCommentsRequired)) {
+                        item.accessRequestConfig.denialCommentsRequired = false;
+                    }
+                }
+
+                if (item.revocationRequestConfig) {
+                    let approvalSchemes = '';
+                    for (let index = 0; index < item.revocationRequestConfig.approvalSchemes.length; index++){
+                        const scheme = item.revocationRequestConfig.approvalSchemes[index];
+                        
+                        if (scheme.approverType === 'GOVERNANCE_GROUP') {
+                            let governanceGroupName = '';
+                            if (governanceGroups !== undefined && governanceGroups instanceof Array) {
+                                for (let group of governanceGroups) {
+                                    if (group.id.trim() === scheme.approverId.trim()) {
+                                        governanceGroupName =  group.name;
+                                    }
+                                }
+                            }
+                            
+                            if (!isEmpty(governanceGroupName)) {
+                                approvalSchemes += governanceGroupName  + ';';
+                            }
+                        } else {
+                            approvalSchemes += scheme.approverType  + ';';
+                        }
+                    }
+                    item.revokeApprovalSchemes = approvalSchemes.substring(0, approvalSchemes.length-1);
+
+                    if (isEmpty(item.revocationRequestConfig.commentsRequired)) {
+                        item.revocationRequestConfig.commentsRequired = false;
+                    }
+
+                    if (isEmpty(item.revocationRequestConfig.denialCommentsRequired)) {
+                        item.revocationRequestConfig.denialCommentsRequired = false;
+                    }
                 }
                 return item;
             }

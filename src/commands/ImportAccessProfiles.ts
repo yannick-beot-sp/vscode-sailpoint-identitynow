@@ -4,7 +4,6 @@ import { isEmpty } from 'lodash';
 import { GenericCSVReader } from '../services/GenericCSVReader';
 import { chooseFile } from '../utils/vsCodeHelpers';
 import { AccessProfilesTreeItem } from '../models/IdentityNowTreeItem';
-import { Entitlement } from '../models/Entitlements';
 
 interface AccessProfileImportResult {
     success: number

@@ -723,12 +723,12 @@
         {
           "command": "vscode-sailpoint-identitynow.refresh",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles",
-          "group": "inline"
+          "group": "inline@3"
         },
         {
           "command": "vscode-sailpoint-identitynow.refresh",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles",
-          "group": "inline"
+          "group": "inline@3"
         },
         {
           "command": "vscode-sailpoint-identitynow.csv.export.access-profiles.view",
