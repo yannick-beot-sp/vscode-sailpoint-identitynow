@@ -207,7 +207,7 @@ export class AccessProfileImporter {
 
             const accessProfilePayload = {
                 "name": data.name,
-                "description": "", // need to add description at some point
+                "description": data.description, // need to add description at some point
                 "enabled": data.enabled,
                 "owner": {
                     "id": ownerId,
