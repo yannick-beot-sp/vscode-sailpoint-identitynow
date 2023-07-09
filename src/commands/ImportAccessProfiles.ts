@@ -19,6 +19,9 @@ interface AccessProfileCSVRecord {
     source: string
     owner: string
     entitlements: string
+    commentsRequired: boolean
+    denialCommentsRequired: boolean
+    approvalSchemes: string
 }
 
 export class AccessProfileImporterCommand {
@@ -87,6 +90,7 @@ export class AccessProfileImporter {
         const sources = await this.client.getSources();
 
         await csvReader.processLine(async (data: AccessProfileCSVRecord) => {
+            
             if (token.isCancellationRequested) {
                 // skip
                 return;
@@ -118,6 +122,14 @@ export class AccessProfileImporter {
                 return;
             }
 
+            if (isEmpty(data.commentsRequired)) {
+                data.commentsRequired = false;
+            }
+
+            if (isEmpty(data.denialCommentsRequired)) {
+                data.denialCommentsRequired = false;
+            }
+
             // Enrich source Id
             const sourceId = this.lookupSourceId(sources, data.source);
             if (isEmpty(sourceId)) {
@@ -128,12 +140,12 @@ export class AccessProfileImporter {
 
             // Enrich Owner Id
             const owner = await this.client.getIdentity(data.owner);
-            const ownerId = owner.id;
-            if (isEmpty(ownerId)) {
+            if (isEmpty(owner)) {
                 result.error++;
                 console.log('Cannot find owner');
                 return;
             }
+            const ownerId = owner.id;
 
             let outputEntititlements: any = [];
 
@@ -164,7 +176,34 @@ export class AccessProfileImporter {
                 }
             }
 
-            console.log("--------------------------------------------");
+            let approverJson:any[] = [];
+
+            const governanceGroups = await this.client.getGovernanceGroups();
+
+            if (!isEmpty(data.approvalSchemes)) {
+                const approversList = data.approvalSchemes.split(';');
+                for (let index=0; index < approversList.length; index++) {
+                    const approver = approversList[index];
+                    console.log("Approver: " + approver);
+                    let approverObj: any = {
+                        "approverType": approver
+                    };
+
+                    if (!(approver === 'APP_OWNER' || approver === 'OWNER' || approver === 'SOURCE_OWNER' || approver === 'MANAGER')) {
+                        approverObj.approverType = 'GOVERNANCE_GROUP';
+
+                        const governanceGroupId = this.lookupGovernanceGroupId(governanceGroups, approver);
+                        if (isEmpty(governanceGroupId)) {
+                            result.error++;
+                            console.log('Cannot find governance group');
+                            return;
+                        }
+                        approverObj.approverId = governanceGroupId;
+                    }
+
+                    approverJson.push(approverObj);
+                }
+            }
 
             const accessProfilePayload = {
                 "name": data.name,
@@ -180,11 +219,16 @@ export class AccessProfileImporter {
                     "type": "SOURCE",
                     "name": data.source
                 },
+                "accessRequestConfig": {
+                    "commentsRequired": data.commentsRequired,
+                    "denialCommentsRequired": data.denialCommentsRequired,
+                    "approvalSchemes": approverJson
+                },
                 "entitlements": outputEntititlements,
                 // "requestable": data.requestable
             };
 
-            console.log(JSON.stringify(accessProfilePayload));
+            approverJson = [];
 
             try {
                 await this.client.createResource('/v3/access-profiles', JSON.stringify(accessProfilePayload));
@@ -209,13 +253,25 @@ export class AccessProfileImporter {
     protected lookupSourceId(sources: any, sourceName: string) {
         if (sources !== undefined && sources instanceof Array) {
 			for (let source of sources) {
-                // console.log(`${source.name} === ${sourceName}`)
+                console.log(sourceName);
                 if (source.name.trim() === sourceName.trim()) {
-                    // console.log('Found the right one!')
                     return source.id;
                 }
             }
         }
         throw new Error('AccessProfileImporter: Unable to retrieve sources');
+    }
+
+    protected lookupGovernanceGroupId(governanceGroups: any, governanceGroup: string) {
+        if (governanceGroups !== undefined && governanceGroups instanceof Array) {
+			for (let group of governanceGroups) {
+                console.log(`${group.name} === ${governanceGroup}`);
+                if (group.name.trim() === governanceGroup.trim()) {
+                    console.log('Found Governance Group!');
+                    return group.id;
+                }
+            }
+        }
+        throw new Error('AccessProfileImporter: Unable to retrieve governance group');
     }
 }

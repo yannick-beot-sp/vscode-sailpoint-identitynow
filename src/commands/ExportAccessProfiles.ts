@@ -65,10 +65,10 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
     protected async exportFile(task: any, token: vscode.CancellationToken): Promise<void> {
         console.log("> AccessProfileExporter.exportFile");
         const headers = [
-            "name", /*"description",*/ "enabled", "requestable", "source", "owner", "entitlements"
+            "name", /*"description",*/ "enabled", "source", "owner", "commentsRequired", "denialCommentsRequired", "approvalSchemes", "entitlements"
         ];
         const paths = [
-            "name", /*"description",*/ "enabled", "requestable", "source.name", "owner.name", "entitlements"
+            "name", /*"description",*/ "enabled", "source.name", "owner.name", "accessRequestConfig.denialCommentsRequired", "accessRequestConfig.denialCommentsRequired", "approvalSchemes.approverType", "entitlements"
         ];
         const unwindablePaths: string[] = [];
 
