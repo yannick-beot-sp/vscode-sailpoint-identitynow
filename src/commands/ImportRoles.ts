@@ -16,6 +16,10 @@ interface RoleCSVRecord {
     enabled: boolean
     requestable: boolean
     owner: string
+    commentsRequired: boolean
+    denialCommentsRequired: boolean
+    approvalSchemes: string
+    accessProfiles: string
 }
 
 export class RoleImporterCommand {
@@ -100,9 +104,16 @@ export class RoleImporter {
                 data.requestable = false;
             }
 
+            if (isEmpty(data.commentsRequired)) {
+                data.commentsRequired = false;
+            }
+
+            if (isEmpty(data.denialCommentsRequired)) {
+                data.denialCommentsRequired = false;
+            }
+
             if (isEmpty(data.owner)) {
                 result.error++;
-                // console.log('Missing owner in file');
                 return;
             }
 
@@ -114,19 +125,79 @@ export class RoleImporter {
                 return;
             }
 
+            let outputAccessProfiles: any = [];
+
+            if (!isEmpty(data.accessProfiles)) {
+                const accessProfiles = await this.client.getAccessProfiles();
+                const accessProfilesArray = data.accessProfiles.split(';');
+
+                if (accessProfilesArray.length > 0) {
+                    for (let appInd = 0; appInd < accessProfilesArray.length; appInd++) {
+                        const app = accessProfilesArray[appInd];
+                        let accessProfileId = '';
+
+                        for (let index = 0; index < accessProfiles.length; index++) {
+                            const sapp = accessProfiles[index];
+                            if (sapp.name.trim() === app.trim()) {
+                                accessProfileId = sapp.id;
+                            }
+                        }
+
+                        if (accessProfileId.length > 0) {
+                            outputAccessProfiles.push({
+                                "id": accessProfileId,
+                                "type": "ACCESS_PROFILE"
+                            });
+                        }
+                    }
+                }
+            }
+
+            let approverJson:any[] = [];
+
+            const governanceGroups = await this.client.getGovernanceGroups();
+
+            if (!isEmpty(data.approvalSchemes)) {
+                const approversList = data.approvalSchemes.split(';');
+                for (let index=0; index < approversList.length; index++) {
+                    const approver = approversList[index];
+                    console.log("Approver: " + approver);
+                    let approverObj: any = {
+                        "approverType": approver
+                    };
+
+                    if (!(approver === 'APP_OWNER' || approver === 'OWNER' || approver === 'SOURCE_OWNER' || approver === 'MANAGER')) {
+                        approverObj.approverType = 'GOVERNANCE_GROUP';
+
+                        const governanceGroupId = this.lookupGovernanceGroupId(governanceGroups, approver);
+                        if (isEmpty(governanceGroupId)) {
+                            result.error++;
+                            console.log('Cannot find governance group');
+                            return;
+                        }
+                        approverObj.approverId = governanceGroupId;
+                    }
+
+                    approverJson.push(approverObj);
+                }
+            }
+
             const rolePayload = {
                 "name": data.name,
-                "description": "", // need to add description at some point
+                "description": data.description,
                 "enabled": data.enabled,
                 "owner": {
                     "id": ownerId,
                     "type": "IDENTITY",
                     "name": data.owner
                 },
-                // "requestable": data.requestable
+                "accessRequestConfig": {
+                    "commentsRequired": data.commentsRequired,
+                    "denialCommentsRequired": data.denialCommentsRequired,
+                    "approvalSchemes": approverJson
+                },
+                "accessProfiles": outputAccessProfiles
             };
-
-            console.log(JSON.stringify(rolePayload));
 
             try {
                 await this.client.createResource('/v3/roles', JSON.stringify(rolePayload));
@@ -146,5 +217,17 @@ export class RoleImporter {
         } else {
             vscode.window.showInformationMessage(message);
         }
+    }
+
+    protected lookupGovernanceGroupId(governanceGroups: any, governanceGroup: string) {
+        if (governanceGroups !== undefined && governanceGroups instanceof Array) {
+			for (let group of governanceGroups) {
+                console.log(`${group.name} === ${governanceGroup}`);
+                if (group.name.trim() === governanceGroup.trim()) {
+                    return group.id;
+                }
+            }
+        }
+        return null;
     }
 }

@@ -5,6 +5,7 @@ import { askFile } from '../utils/vsCodeHelpers';
 import { PathProposer } from '../services/PathProposer';
 import { Role } from '../models/Role';
 import RolePaginator from './paginator/RolePaginator';
+import { isEmpty } from 'lodash';
 
 export class RoleExporterCommand {
     /**
@@ -63,14 +64,52 @@ class RoleExporter extends BaseCSVExporter<Role> {
     protected async exportFile(task: any, token: vscode.CancellationToken): Promise<void> {
         console.log("> RoleExporter.exportFile");
         const headers = [
-            "name", /*"description",*/ "enabled", "requestable", "owner"
+            "name", "description", "enabled", "owner", "commentsRequired", "denialCommentsRequired", "approvalSchemes", "accessProfiles"
         ];
         const paths = [
-            "name", /*"description",*/ "enabled", "requestable", "owner.name"
+            "name", "descriptionXXX", "enabled", "owner.name", "accessRequestConfig.denialCommentsRequired", "accessRequestConfig.denialCommentsRequired", "approvalSchemes", "accessProfiles"
         ];
         const unwindablePaths: string[] = [];
 
+        const governanceGroups = await this.client.getGovernanceGroups();
+
+        const customTransform: any[] | undefined = [
+            function(item:any) {
+                let accessProfiles = '';
+                let approvalSchemes = '';
+                for (let index = 0; index < item.accessProfiles.length; index++){
+                    const app = item.accessProfiles[index];
+                    accessProfiles += app.name + ';';
+                }
+                item.accessProfiles = accessProfiles.substring(0, accessProfiles.length-1);
+                if (item.accessRequestConfig) {
+                    for (let index = 0; index < item.accessRequestConfig.approvalSchemes.length; index++){
+                        const scheme = item.accessRequestConfig.approvalSchemes[index];
+                        
+                        if (scheme.approverType === 'GOVERNANCE_GROUP') {
+                            let governanceGroupName = '';
+                            if (governanceGroups !== undefined && governanceGroups instanceof Array) {
+                                for (let group of governanceGroups) {
+                                    if (group.id.trim() === scheme.approverId.trim()) {
+                                        governanceGroupName =  group.name;
+                                    }
+                                }
+                            }
+                            
+                            if (!isEmpty(governanceGroupName)) {
+                                approvalSchemes += governanceGroupName  + ';';
+                            }
+                        } else {
+                            approvalSchemes += scheme.approverType  + ';';
+                        }
+                    }
+                    item.approvalSchemes = approvalSchemes.substring(0, approvalSchemes.length-1);
+                }
+                return item;
+            }
+        ];
+
         const iterator = new RolePaginator(this.client);
-        await this.writeData(headers, paths, unwindablePaths, iterator, task, token);
+        await this.writeData(headers, paths, unwindablePaths, iterator, task, token, customTransform);
     }
 }

@@ -224,8 +224,7 @@ export class AccessProfileImporter {
                     "denialCommentsRequired": data.denialCommentsRequired,
                     "approvalSchemes": approverJson
                 },
-                "entitlements": outputEntititlements,
-                // "requestable": data.requestable
+                "entitlements": outputEntititlements
             };
 
             approverJson = [];
@@ -259,7 +258,7 @@ export class AccessProfileImporter {
                 }
             }
         }
-        throw new Error('AccessProfileImporter: Unable to retrieve sources');
+        return null;
     }
 
     protected lookupGovernanceGroupId(governanceGroups: any, governanceGroup: string) {
@@ -272,6 +271,6 @@ export class AccessProfileImporter {
                 }
             }
         }
-        throw new Error('AccessProfileImporter: Unable to retrieve governance group');
+        return null;
     }
 }

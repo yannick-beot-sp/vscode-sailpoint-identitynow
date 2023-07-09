@@ -5,8 +5,7 @@ import AccessProfilePaginator from './paginator/AccessProfilePaginator';
 import { AccessProfilesTreeItem } from '../models/IdentityNowTreeItem';
 import { askFile } from '../utils/vsCodeHelpers';
 import { PathProposer } from '../services/PathProposer';
-
-import { flatten } from '@json2csv/transforms';
+import { isEmpty } from 'lodash';
 
 export class AccessProfileExporterCommand {
     /**
@@ -68,18 +67,45 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
             "name", "description", "enabled", "source", "owner", "commentsRequired", "denialCommentsRequired", "approvalSchemes", "entitlements"
         ];
         const paths = [
-            "name", "descriptionXX", "enabled", "source.name", "owner.name", "accessRequestConfig.denialCommentsRequired", "accessRequestConfig.denialCommentsRequired", "approvalSchemes.approverType", "entitlements"
+            "name", "descriptionXX", "enabled", "source.name", "owner.name", "accessRequestConfig.denialCommentsRequired", "accessRequestConfig.denialCommentsRequired", "approvalSchemes", "entitlements"
         ];
         const unwindablePaths: string[] = [];
+
+        const governanceGroups = await this.client.getGovernanceGroups();
 
         const customTransform: any[] | undefined = [
             function(item:any) {
                 let entitlements = '';
+                let approvalSchemes = '';
                 for (let index = 0; index < item.entitlements.length; index++){
                     const ent = item.entitlements[index];
                     entitlements += ent.name + ';';
                 }
                 item.entitlements = entitlements.substring(0, entitlements.length-1);
+
+                if (item.accessRequestConfig) {
+                    for (let index = 0; index < item.accessRequestConfig.approvalSchemes.length; index++){
+                        const scheme = item.accessRequestConfig.approvalSchemes[index];
+                        
+                        if (scheme.approverType === 'GOVERNANCE_GROUP') {
+                            let governanceGroupName = '';
+                            if (governanceGroups !== undefined && governanceGroups instanceof Array) {
+                                for (let group of governanceGroups) {
+                                    if (group.id.trim() === scheme.approverId.trim()) {
+                                        governanceGroupName =  group.name;
+                                    }
+                                }
+                            }
+                            
+                            if (!isEmpty(governanceGroupName)) {
+                                approvalSchemes += governanceGroupName  + ';';
+                            }
+                        } else {
+                            approvalSchemes += scheme.approverType  + ';';
+                        }
+                    }
+                    item.approvalSchemes = approvalSchemes.substring(0, approvalSchemes.length-1);
+                }
                 return item;
             }
         ];
