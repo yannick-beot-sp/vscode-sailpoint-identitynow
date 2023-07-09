@@ -37,12 +37,12 @@ import { ExportConfigNodeTreeViewCommand } from './commands/spconfig-export/Expo
 import { ImportConfigExplorerCommand } from './commands/spconfig-import/ImportConfigExplorerCommand';
 import { ImportConfigPaletteCommand } from './commands/spconfig-import/ImportConfigPaletteCommand';
 import { ImportConfigTreeViewCommand } from './commands/spconfig-import/ImportConfigTreeViewCommand';
-import { AccessProfileExporterCommand } from './commands/ExportAccessProfiles';
-import { RoleExporterCommand } from './commands/ExportRoles';
-import { AccessProfileImporterCommand } from './commands/ImportAccessProfiles';
-import { RoleImporterCommand } from './commands/ImportRoles';
-import { NewAccessProfileCommand } from './commands/NewAccessProfileCommand';
-import { NewRoleCommand } from './commands/NewRoleCommand';
+import { AccessProfileExporterCommand } from './commands/access-profile/ExportAccessProfiles';
+import { RoleExporterCommand } from './commands/roles/ExportRoles';
+import { AccessProfileImporterCommand } from './commands/access-profile/ImportAccessProfiles';
+import { RoleImporterCommand } from './commands/roles/ImportRoles';
+import { NewAccessProfileCommand } from './commands/access-profile/NewAccessProfileCommand';
+import { NewRoleCommand } from './commands/roles/NewRoleCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -294,6 +294,14 @@ export function activate(context: vscode.ExtensionContext) {
 		context.subscriptions.push(
 			vscode.commands.registerCommand(commands.NEW_ROLE_ICON,
 				newRoleCommand.newRole, newRoleCommand));
+
+	const newAccessProfileCommand = new NewAccessProfileCommand(tenantService);
+		context.subscriptions.push(
+			vscode.commands.registerCommand(commands.NEW_ACCESS_PROFILE,
+				newAccessProfileCommand.newAccessProfile, newAccessProfileCommand));
+		context.subscriptions.push(
+			vscode.commands.registerCommand(commands.NEW_ACCESS_PROFILE_ICON,
+				newAccessProfileCommand.newAccessProfile, newAccessProfileCommand));
 
 }
 

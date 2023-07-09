@@ -1,30 +1,30 @@
 import * as vscode from 'vscode';
-import { BaseCSVExporter } from "./BaseExporter";
-import { AccessProfile } from '../models/AccessProfile';
-import AccessProfilePaginator from './paginator/AccessProfilePaginator';
-import { AccessProfilesTreeItem } from '../models/IdentityNowTreeItem';
-import { askFile } from '../utils/vsCodeHelpers';
-import { PathProposer } from '../services/PathProposer';
+import { BaseCSVExporter } from "../BaseExporter";
+import { RolesTreeItem } from '../../models/IdentityNowTreeItem';
+import { askFile } from '../../utils/vsCodeHelpers';
+import { PathProposer } from '../../services/PathProposer';
+import { Role } from '../../models/Role';
+import RolePaginator from './RolePaginator';
 import { isEmpty } from 'lodash';
 
-export class AccessProfileExporterCommand {
+export class RoleExporterCommand {
     /**
      * Entry point 
      * @param node 
      * @returns 
      */
-    async execute(node?: AccessProfilesTreeItem) {
+    async execute(node?: RolesTreeItem) {
         console.log("> AccessProfileExporterCommand.execute");
 
         if (node === undefined) {
-            console.error("WARNING: AccessProfileExporterCommand: invalid item", node);
-            throw new Error("AccessProfileExporterCommand: invalid item");
+            console.error("WARNING: RoleExporterCommand: invalid item", node);
+            throw new Error("RoleExporterCommand: invalid item");
         }
 
         const proposedPath = PathProposer.getGenericCSVFilename(
             node.tenantName,
             node.tenantDisplayName,
-            "AccessProfile"
+            "Roles"
         );
 
         const filePath = await askFile(
@@ -36,7 +36,7 @@ export class AccessProfileExporterCommand {
             return;
         }
 
-        const exporter = new AccessProfileExporter(
+        const exporter = new RoleExporter(
             node.tenantId,
             node.tenantName,
             node.tenantDisplayName,
@@ -46,14 +46,14 @@ export class AccessProfileExporterCommand {
     }
 }
 
-class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
+class RoleExporter extends BaseCSVExporter<Role> {
     constructor(
         tenantId: string,
         tenantName: string,
         tenantDisplayName: string,
         path: string
     ) {
-        super("access profiles",
+        super("roles",
             tenantId,
             tenantName,
             tenantDisplayName,
@@ -62,34 +62,32 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
     }
 
     protected async exportFile(task: any, token: vscode.CancellationToken): Promise<void> {
-        console.log("> AccessProfileExporter.exportFile");
+        console.log("> RoleExporter.exportFile");
         const headers = [
-            "name", 
-            "description", 
-            "enabled", 
-            "source", 
-            "owner", 
-            "commentsRequired", 
-            "denialCommentsRequired", 
-            "approvalSchemes", 
+            "name",
+            "description",
+            "enabled",
+            "owner",
+            "commentsRequired",
+            "denialCommentsRequired",
+            "approvalSchemes",
             "revokeCommentsRequired", 
             "revokeDenialCommentsRequired", 
             "revokeApprovalSchemes", 
-            "entitlements"
+            "accessProfiles"
         ];
         const paths = [
-            "name", 
-            "descriptionXX", 
-            "enabled", 
-            "source.name", 
-            "owner.name", 
-            "accessRequestConfig.commentsRequired", 
-            "accessRequestConfig.denialCommentsRequired", 
+            "name",
+            "descriptionXXX",
+            "enabled",
+            "owner.name",
+            "accessRequestConfig.denialCommentsRequired",
+            "accessRequestConfig.denialCommentsRequired",
             "approvalSchemes",
-            "revocationRequestConfig.commentsRequired", 
             "revocationRequestConfig.denialCommentsRequired", 
-            "revokeApprovalSchemes", 
-            "entitlements"
+            "revocationRequestConfig.denialCommentsRequired", 
+            "revokeApprovalSchemes",
+            "accessProfiles"
         ];
         const unwindablePaths: string[] = [];
 
@@ -97,14 +95,13 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
 
         const customTransform: any[] | undefined = [
             function(item:any) {
-                let entitlements = '';
+                let accessProfiles = '';
                 
-                for (let index = 0; index < item.entitlements.length; index++){
-                    const ent = item.entitlements[index];
-                    entitlements += ent.name + ';';
+                for (let index = 0; index < item.accessProfiles.length; index++){
+                    const app = item.accessProfiles[index];
+                    accessProfiles += app.name + ';';
                 }
-                item.entitlements = entitlements.substring(0, entitlements.length-1);
-
+                item.accessProfiles = accessProfiles.substring(0, accessProfiles.length-1);
                 if (item.accessRequestConfig) {
                     let approvalSchemes = '';
                     for (let index = 0; index < item.accessRequestConfig.approvalSchemes.length; index++){
@@ -174,7 +171,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
             }
         ];
 
-        const iterator = new AccessProfilePaginator(this.client);
+        const iterator = new RolePaginator(this.client);
         await this.writeData(headers, paths, unwindablePaths, iterator, task, token, customTransform);
     }
 }

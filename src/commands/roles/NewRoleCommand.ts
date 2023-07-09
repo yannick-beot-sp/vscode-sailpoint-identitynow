@@ -1,13 +1,13 @@
 import * as vscode from 'vscode';
-import { TenantService } from "../services/TenantService";
-import { RolesTreeItem } from '../models/IdentityNowTreeItem';
-import { compareByName, isEmpty } from '../utils';
-import { NEW_ID } from '../constants';
-import { IdentityNowClient } from '../services/IdentityNowClient';
-import { getResourceUri } from '../utils/UriUtils';
-import { Role } from '../models/Role';
+import { TenantService } from "../../services/TenantService";
+import { RolesTreeItem } from '../../models/IdentityNowTreeItem';
+import { compareByName, isEmpty } from '../../utils';
+import { NEW_ID } from '../../constants';
+import { IdentityNowClient } from '../../services/IdentityNowClient';
+import { getResourceUri } from '../../utils/UriUtils';
+import { Role } from '../../models/Role';
 
-const role: Role = require('../../snippets/role.json');
+const role: Role = require('../../../snippets/role.json');
 
 /**
  * Command used to open a source or a role

@@ -1,13 +1,13 @@
 import * as vscode from 'vscode';
-import { TenantService } from "../services/TenantService";
-import { AccessProfilesTreeItem } from '../models/IdentityNowTreeItem';
-import { compareByName, isEmpty } from '../utils';
-import { NEW_ID } from '../constants';
-import { AccessProfile } from '../models/AccessProfile';
-import { IdentityNowClient } from '../services/IdentityNowClient';
-import { getResourceUri } from '../utils/UriUtils';
+import { TenantService } from "../../services/TenantService";
+import { AccessProfilesTreeItem } from '../../models/IdentityNowTreeItem';
+import { compareByName, isEmpty } from '../../utils';
+import { NEW_ID } from '../../constants';
+import { AccessProfile } from '../../models/AccessProfile';
+import { IdentityNowClient } from '../../services/IdentityNowClient';
+import { getResourceUri } from '../../utils/UriUtils';
 
-const accessProfile: AccessProfile = require('../../snippets/access-profile.json');
+const accessProfile: AccessProfile = require('../../../snippets/access-profile.json');
 
 /**
  * Command used to open a source or a access profile

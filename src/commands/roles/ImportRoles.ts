@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
-import { IdentityNowClient } from "../services/IdentityNowClient";
+import { IdentityNowClient } from "../../services/IdentityNowClient";
 import { isEmpty } from 'lodash';
-import { GenericCSVReader } from '../services/GenericCSVReader';
-import { chooseFile } from '../utils/vsCodeHelpers';
-import { RolesTreeItem } from '../models/IdentityNowTreeItem';
+import { GenericCSVReader } from '../../services/GenericCSVReader';
+import { chooseFile } from '../../utils/vsCodeHelpers';
+import { RolesTreeItem } from '../../models/IdentityNowTreeItem';
 
 interface RolesImportResult {
     success: number

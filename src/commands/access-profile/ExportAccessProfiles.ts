@@ -1,30 +1,30 @@
 import * as vscode from 'vscode';
-import { BaseCSVExporter } from "./BaseExporter";
-import { RolesTreeItem } from '../models/IdentityNowTreeItem';
-import { askFile } from '../utils/vsCodeHelpers';
-import { PathProposer } from '../services/PathProposer';
-import { Role } from '../models/Role';
-import RolePaginator from './paginator/RolePaginator';
+import { BaseCSVExporter } from "../BaseExporter";
+import { AccessProfile } from '../../models/AccessProfile';
+import AccessProfilePaginator from './AccessProfilePaginator';
+import { AccessProfilesTreeItem } from '../../models/IdentityNowTreeItem';
+import { askFile } from '../../utils/vsCodeHelpers';
+import { PathProposer } from '../../services/PathProposer';
 import { isEmpty } from 'lodash';
 
-export class RoleExporterCommand {
+export class AccessProfileExporterCommand {
     /**
      * Entry point 
      * @param node 
      * @returns 
      */
-    async execute(node?: RolesTreeItem) {
+    async execute(node?: AccessProfilesTreeItem) {
         console.log("> AccessProfileExporterCommand.execute");
 
         if (node === undefined) {
-            console.error("WARNING: RoleExporterCommand: invalid item", node);
-            throw new Error("RoleExporterCommand: invalid item");
+            console.error("WARNING: AccessProfileExporterCommand: invalid item", node);
+            throw new Error("AccessProfileExporterCommand: invalid item");
         }
 
         const proposedPath = PathProposer.getGenericCSVFilename(
             node.tenantName,
             node.tenantDisplayName,
-            "Roles"
+            "AccessProfile"
         );
 
         const filePath = await askFile(
@@ -36,7 +36,7 @@ export class RoleExporterCommand {
             return;
         }
 
-        const exporter = new RoleExporter(
+        const exporter = new AccessProfileExporter(
             node.tenantId,
             node.tenantName,
             node.tenantDisplayName,
@@ -46,14 +46,14 @@ export class RoleExporterCommand {
     }
 }
 
-class RoleExporter extends BaseCSVExporter<Role> {
+class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
     constructor(
         tenantId: string,
         tenantName: string,
         tenantDisplayName: string,
         path: string
     ) {
-        super("roles",
+        super("access profiles",
             tenantId,
             tenantName,
             tenantDisplayName,
@@ -62,32 +62,34 @@ class RoleExporter extends BaseCSVExporter<Role> {
     }
 
     protected async exportFile(task: any, token: vscode.CancellationToken): Promise<void> {
-        console.log("> RoleExporter.exportFile");
+        console.log("> AccessProfileExporter.exportFile");
         const headers = [
-            "name",
-            "description",
-            "enabled",
-            "owner",
-            "commentsRequired",
-            "denialCommentsRequired",
-            "approvalSchemes",
+            "name", 
+            "description", 
+            "enabled", 
+            "source", 
+            "owner", 
+            "commentsRequired", 
+            "denialCommentsRequired", 
+            "approvalSchemes", 
             "revokeCommentsRequired", 
             "revokeDenialCommentsRequired", 
             "revokeApprovalSchemes", 
-            "accessProfiles"
+            "entitlements"
         ];
         const paths = [
-            "name",
-            "descriptionXXX",
-            "enabled",
-            "owner.name",
-            "accessRequestConfig.denialCommentsRequired",
-            "accessRequestConfig.denialCommentsRequired",
+            "name", 
+            "descriptionXX", 
+            "enabled", 
+            "source.name", 
+            "owner.name", 
+            "accessRequestConfig.commentsRequired", 
+            "accessRequestConfig.denialCommentsRequired", 
             "approvalSchemes",
+            "revocationRequestConfig.commentsRequired", 
             "revocationRequestConfig.denialCommentsRequired", 
-            "revocationRequestConfig.denialCommentsRequired", 
-            "revokeApprovalSchemes",
-            "accessProfiles"
+            "revokeApprovalSchemes", 
+            "entitlements"
         ];
         const unwindablePaths: string[] = [];
 
@@ -95,13 +97,14 @@ class RoleExporter extends BaseCSVExporter<Role> {
 
         const customTransform: any[] | undefined = [
             function(item:any) {
-                let accessProfiles = '';
+                let entitlements = '';
                 
-                for (let index = 0; index < item.accessProfiles.length; index++){
-                    const app = item.accessProfiles[index];
-                    accessProfiles += app.name + ';';
+                for (let index = 0; index < item.entitlements.length; index++){
+                    const ent = item.entitlements[index];
+                    entitlements += ent.name + ';';
                 }
-                item.accessProfiles = accessProfiles.substring(0, accessProfiles.length-1);
+                item.entitlements = entitlements.substring(0, entitlements.length-1);
+
                 if (item.accessRequestConfig) {
                     let approvalSchemes = '';
                     for (let index = 0; index < item.accessRequestConfig.approvalSchemes.length; index++){
@@ -171,7 +174,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
             }
         ];
 
-        const iterator = new RolePaginator(this.client);
+        const iterator = new AccessProfilePaginator(this.client);
         await this.writeData(headers, paths, unwindablePaths, iterator, task, token, customTransform);
     }
 }
