@@ -19,6 +19,9 @@ interface RoleCSVRecord {
     commentsRequired: boolean
     denialCommentsRequired: boolean
     approvalSchemes: string
+    revokeCommentsRequired: string
+    revokeDenialCommentsRequired: string
+    revokeApprovalSchemes: string
     accessProfiles: string
 }
 
@@ -112,6 +115,14 @@ export class RoleImporter {
                 data.denialCommentsRequired = false;
             }
 
+            if (isEmpty(data.revokeCommentsRequired)) {
+                data.commentsRequired = false;
+            }
+
+            if (isEmpty(data.revokeDenialCommentsRequired)) {
+                data.denialCommentsRequired = false;
+            }
+
             if (isEmpty(data.owner)) {
                 result.error++;
                 return;
@@ -153,7 +164,7 @@ export class RoleImporter {
                 }
             }
 
-            let approverJson:any[] = [];
+            let approverJson: any[] = [];
 
             const governanceGroups = await this.client.getGovernanceGroups();
 
@@ -182,6 +193,33 @@ export class RoleImporter {
                 }
             }
 
+            let revokeApproverJson: any[] = [];
+
+            if (!isEmpty(data.revokeApprovalSchemes)) {
+                const approversList = data.revokeApprovalSchemes.split(';');
+                for (let index=0; index < approversList.length; index++) {
+                    const approver = approversList[index];
+                    console.log("Approver: " + approver);
+                    let approverObj: any = {
+                        "approverType": approver
+                    };
+
+                    if (!(approver === 'APP_OWNER' || approver === 'OWNER' || approver === 'SOURCE_OWNER' || approver === 'MANAGER')) {
+                        approverObj.approverType = 'GOVERNANCE_GROUP';
+
+                        const governanceGroupId = this.lookupGovernanceGroupId(governanceGroups, approver);
+                        if (isEmpty(governanceGroupId)) {
+                            result.error++;
+                            console.log('Cannot find governance group');
+                            return;
+                        }
+                        approverObj.approverId = governanceGroupId;
+                    }
+
+                    revokeApproverJson.push(approverObj);
+                }
+            }
+
             const rolePayload = {
                 "name": data.name,
                 "description": data.description,
@@ -195,6 +233,11 @@ export class RoleImporter {
                     "commentsRequired": data.commentsRequired,
                     "denialCommentsRequired": data.denialCommentsRequired,
                     "approvalSchemes": approverJson
+                },
+                "revocationRequestConfig": {
+                    "commentsRequired": data.revokeCommentsRequired,
+                    "denialCommentsRequired": data.revokeDenialCommentsRequired,
+                    "approvalSchemes": revokeApproverJson
                 },
                 "accessProfiles": outputAccessProfiles
             };

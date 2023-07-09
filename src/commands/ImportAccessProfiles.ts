@@ -20,6 +20,9 @@ interface AccessProfileCSVRecord {
     entitlements: string
     commentsRequired: boolean
     denialCommentsRequired: boolean
+    revokeCommentsRequired: string
+    revokeDenialCommentsRequired: string
+    revokeApprovalSchemes: string
     approvalSchemes: string
 }
 
@@ -129,6 +132,14 @@ export class AccessProfileImporter {
                 data.denialCommentsRequired = false;
             }
 
+            if (isEmpty(data.revokeCommentsRequired)) {
+                data.commentsRequired = false;
+            }
+
+            if (isEmpty(data.revokeDenialCommentsRequired)) {
+                data.denialCommentsRequired = false;
+            }
+
             // Enrich source Id
             const sourceId = this.lookupSourceId(sources, data.source);
             if (isEmpty(sourceId)) {
@@ -204,6 +215,33 @@ export class AccessProfileImporter {
                 }
             }
 
+            let revokeApproverJson: any[] = [];
+
+            if (!isEmpty(data.revokeApprovalSchemes)) {
+                const approversList = data.revokeApprovalSchemes.split(';');
+                for (let index=0; index < approversList.length; index++) {
+                    const approver = approversList[index];
+                    console.log("Approver: " + approver);
+                    let approverObj: any = {
+                        "approverType": approver
+                    };
+
+                    if (!(approver === 'APP_OWNER' || approver === 'OWNER' || approver === 'SOURCE_OWNER' || approver === 'MANAGER')) {
+                        approverObj.approverType = 'GOVERNANCE_GROUP';
+
+                        const governanceGroupId = this.lookupGovernanceGroupId(governanceGroups, approver);
+                        if (isEmpty(governanceGroupId)) {
+                            result.error++;
+                            console.log('Cannot find governance group');
+                            return;
+                        }
+                        approverObj.approverId = governanceGroupId;
+                    }
+
+                    revokeApproverJson.push(approverObj);
+                }
+            }
+
             const accessProfilePayload = {
                 "name": data.name,
                 "description": data.description, // need to add description at some point
@@ -222,6 +260,11 @@ export class AccessProfileImporter {
                     "commentsRequired": data.commentsRequired,
                     "denialCommentsRequired": data.denialCommentsRequired,
                     "approvalSchemes": approverJson
+                },
+                "revocationRequestConfig": {
+                    "commentsRequired": data.revokeCommentsRequired,
+                    "denialCommentsRequired": data.revokeDenialCommentsRequired,
+                    "approvalSchemes": revokeApproverJson
                 },
                 "entitlements": outputEntititlements
             };
