@@ -78,7 +78,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
         ];
         const paths = [
             "name",
-            "descriptionXXX",
+            "description",
             "enabled",
             "owner.name",
             "accessRequestConfig.denialCommentsRequired",
@@ -166,6 +166,11 @@ class RoleExporter extends BaseCSVExporter<Role> {
                     if (isEmpty(item.revocationRequestConfig.denialCommentsRequired)) {
                         item.revocationRequestConfig.denialCommentsRequired = false;
                     }
+                }
+
+                // Escape carriage returns in description.
+                if (item.description) {
+                    item.description = item.description.replaceAll('\r\n', '\\r\\n').replaceAll('\r', '\\r').replaceAll('\n', '\\n');
                 }
                 return item;
             }

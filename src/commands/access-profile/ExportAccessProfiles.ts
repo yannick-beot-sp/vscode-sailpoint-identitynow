@@ -79,7 +79,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
         ];
         const paths = [
             "name", 
-            "descriptionXX", 
+            "description", 
             "enabled", 
             "source.name", 
             "owner.name", 
@@ -169,6 +169,11 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
                     if (isEmpty(item.revocationRequestConfig.denialCommentsRequired)) {
                         item.revocationRequestConfig.denialCommentsRequired = false;
                     }
+                }
+
+                // Escape carriage returns in description.
+                if (item.description) {
+                    item.description = item.description.replaceAll('\r\n', '\\r\\n').replaceAll('\r', '\\r').replaceAll('\n', '\\n');
                 }
                 return item;
             }

@@ -242,6 +242,9 @@ export class AccessProfileImporter {
                 }
             }
 
+            // Fix for carriage returns in the description field.
+            data.description = data.description.replaceAll('\\r\\n', '\r\n').replaceAll('\\r', '\r').replaceAll('\\n', '\n');
+
             const accessProfilePayload = {
                 "name": data.name,
                 "description": data.description, // need to add description at some point

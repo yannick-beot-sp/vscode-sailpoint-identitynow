@@ -220,6 +220,9 @@ export class RoleImporter {
                 }
             }
 
+            // Fix for carriage returns in the description field.
+            data.description = data.description.replaceAll('\\r\\n', '\r\n').replaceAll('\\r', '\r').replaceAll('\\n', '\n');
+
             const rolePayload = {
                 "name": data.name,
                 "description": data.description,
