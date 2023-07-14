@@ -72,9 +72,9 @@ export class NewAccessProfileCommand {
             await vscode.window.showTextDocument(document, { preview: true });
 
             const edit = new vscode.WorkspaceEdit();
-            newAccessProfile.name = name;
+            newAccessProfile.name = name.trim();
             newAccessProfile.owner.id = owner.id;
-            newAccessProfile.owner.name = owner.name;
+            newAccessProfile.owner.name = owner.name.trim();
             newAccessProfile.owner.type = 'IDENTITY';
 
             newAccessProfile.source = {

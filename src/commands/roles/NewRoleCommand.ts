@@ -68,9 +68,9 @@ export class NewRoleCommand {
             await vscode.window.showTextDocument(document, { preview: true });
 
             const edit = new vscode.WorkspaceEdit();
-            newRole.name = name;
+            newRole.name = name.trim();
             newRole.owner.id = owner.id;
-            newRole.owner.name = owner.name;
+            newRole.owner.name = owner.name.trim();
             newRole.owner.type = 'IDENTITY';
 
             newRole.accessProfiles.push({

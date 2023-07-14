@@ -246,7 +246,7 @@ export class AccessProfileImporter {
             data.description = data.description.replaceAll('\\r\\n', '\r\n').replaceAll('\\r', '\r').replaceAll('\\n', '\n');
 
             const accessProfilePayload = {
-                "name": data.name,
+                "name": data.name.trim(),
                 "description": data.description, // need to add description at some point
                 "enabled": data.enabled,
                 "owner": {

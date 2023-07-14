@@ -224,7 +224,7 @@ export class RoleImporter {
             data.description = data.description.replaceAll('\\r\\n', '\r\n').replaceAll('\\r', '\r').replaceAll('\\n', '\n');
 
             const rolePayload = {
-                "name": data.name,
+                "name": data.name.trim(),
                 "description": data.description,
                 "enabled": data.enabled,
                 "owner": {
