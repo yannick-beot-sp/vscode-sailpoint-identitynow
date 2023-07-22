@@ -1270,6 +1270,55 @@ export class IdentityNowClient {
 
 		return result;
 	}
+
+	public async getAllEntitlementsBySource(sourceId: string): Promise<any> {
+		console.log("> getAllEntitlementsBySource");
+		const limit = 250;
+		let result: any[] = [];
+		let offset = 0;
+		let total = 0;
+		let firstQuery = true;
+
+		const filters = `source.id eq "${sourceId}"`;
+
+		const queryValues = {
+			filters,
+			count: true,
+			limit: limit,
+			offset: offset,
+			sorters: 'name'
+		};
+
+		// let endpoint = `${EndpointUtils.getBetaUrl(this.tenantName)}/entitlements?count=true&limit=${limit}&sorters=name`;
+		let endpoint = `${EndpointUtils.getBetaUrl(this.tenantName)}/entitlements`;
+		endpoint = withQuery(endpoint, queryValues);
+		do {
+			console.log("endpoint = " + endpoint);
+			const headers = await this.prepareHeaders();
+			const req = await fetch(endpoint, {
+				headers: headers,
+			});
+
+			if (!req.ok) {
+				throw new Error(req.statusText);
+			}
+			result = result.concat(await req.json());
+			if (firstQuery) {
+				total = Number(req.headers.get(TOTAL_COUNT_HEADER));
+				firstQuery = false;
+			}
+			offset += limit;
+			endpoint = withQuery(endpoint, {
+				filters,
+				count: true,
+				limit: limit,
+				offset: offset,
+				sorters: 'name'
+			});
+		} while (offset < total);
+
+		return result;
+	}
 }
 
 export enum AggregationJob {

@@ -4,6 +4,7 @@ import { isEmpty } from 'lodash';
 import { GenericCSVReader } from '../../services/GenericCSVReader';
 import { chooseFile } from '../../utils/vsCodeHelpers';
 import { RolesTreeItem } from '../../models/IdentityNowTreeItem';
+import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
 
 interface RolesImportResult {
     success: number
@@ -52,6 +53,9 @@ export class RoleImporterCommand {
 
 export class RoleImporter {
     readonly client: IdentityNowClient;
+
+    logWriter: CSVLogWriter | undefined;
+
     constructor(
         private tenantId: string,
         private tenantName: string,
@@ -78,9 +82,19 @@ export class RoleImporter {
         console.log("> RoleImporter.importFile");
         const csvReader = new GenericCSVReader(this.fileUri.fsPath);
 
+        try{
+            this.logWriter = new CSVLogWriter(this.fileUri.fsPath);
+        } catch (_exc: any) {
+            console.log(_exc);
+            vscode.window.showErrorMessage(_exc);
+            return;
+        }
+
         const nbLines = await csvReader.getLines();
         const incr = 100 / nbLines;
         task.report({ increment: 0 });
+
+        let processedLines = 0;
 
         const result: RolesImportResult = {
             success: 0,
@@ -88,6 +102,9 @@ export class RoleImporter {
         };
 
         await csvReader.processLine(async (data: RoleCSVRecord) => {
+
+            processedLines++;
+
             if (token.isCancellationRequested) {
                 // skip
                 return;
@@ -95,9 +112,13 @@ export class RoleImporter {
             task.report({ increment: incr, message: data.name });
             if (isEmpty(data.name)) {
                 result.error++;
-                // console.log('Missing name in file');
+                const nameMessage = `Missing attribute 'name' in record`;
+                await this.writeLog(processedLines, 'role', CSVLogWriterLogType.ERROR, nameMessage);
+                vscode.window.showErrorMessage(nameMessage);
                 return;
             }
+
+            const apName = data.name;
 
             if (isEmpty(data.enabled)) {
                 data.enabled = false;
@@ -125,16 +146,25 @@ export class RoleImporter {
 
             if (isEmpty(data.owner)) {
                 result.error++;
+                const owMessage = `Missing 'owner' in CSV`;
+                await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, owMessage);
+                vscode.window.showErrorMessage(owMessage);
                 return;
             }
 
             // Enrich Owner Id
             const owner = await this.client.getIdentity(data.owner);
-            const ownerId = owner.id;
-            if (isEmpty(ownerId)) {
+            
+            if (isEmpty(owner)) {
+                console.log('TESTTEST');
                 result.error++;
+                const owMessage = `Unable to find owner with name '${data.owner}' in IDN`;
+                await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, owMessage);
+                vscode.window.showErrorMessage(owMessage);
                 return;
             }
+
+            const ownerId = owner.id;
 
             let outputAccessProfiles: any = [];
 
@@ -160,6 +190,11 @@ export class RoleImporter {
                                 "type": "ACCESS_PROFILE"
                             });
                         }
+                        else {
+                            const etMessage = `Unable to find role with name '${app.trim()}' in IDN, Role will be still created.`;
+                            await this.writeLog(processedLines, apName, CSVLogWriterLogType.WARNING, etMessage);
+                            vscode.window.showWarningMessage(etMessage);
+                        }
                     }
                 }
             }
@@ -183,7 +218,9 @@ export class RoleImporter {
                         const governanceGroupId = this.lookupGovernanceGroupId(governanceGroups, approver);
                         if (isEmpty(governanceGroupId)) {
                             result.error++;
-                            console.log('Cannot find governance group');
+                            const ggMessage = `Cannot find governance group with name '${approver}' in IDN, AP will be still created.`;
+                            await this.writeLog(processedLines, apName, CSVLogWriterLogType.WARNING, ggMessage);
+                            vscode.window.showWarningMessage(ggMessage);
                             return;
                         }
                         approverObj.approverId = governanceGroupId;
@@ -210,7 +247,9 @@ export class RoleImporter {
                         const governanceGroupId = this.lookupGovernanceGroupId(governanceGroups, approver);
                         if (isEmpty(governanceGroupId)) {
                             result.error++;
-                            console.log('Cannot find governance group');
+                            const ggMessage = `Cannot find governance group with name '${approver}' in IDN, AP will be still created.`;
+                            await this.writeLog(processedLines, apName, CSVLogWriterLogType.WARNING, ggMessage);
+                            vscode.window.showWarningMessage(ggMessage);
                             return;
                         }
                         approverObj.approverId = governanceGroupId;
@@ -247,10 +286,11 @@ export class RoleImporter {
 
             try {
                 await this.client.createResource('/v3/roles', JSON.stringify(rolePayload));
+                await this.writeLog(processedLines, apName, CSVLogWriterLogType.SUCCESS, `Successfully imported role '${data.name}'`);
                 result.success++;
-            } catch (error) {
+            } catch (error: any) {
                 result.error++;
-                console.error(error);
+                await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, `Cannot create role: '${error.message}' in IDN`);
             }
         });
 
@@ -262,6 +302,12 @@ export class RoleImporter {
             vscode.window.showWarningMessage(message);
         } else {
             vscode.window.showInformationMessage(message);
+        }
+
+        try {
+            this.logWriter?.end();
+        } catch (_exc) {
+            // do nothing hopefully
         }
     }
 
@@ -275,5 +321,17 @@ export class RoleImporter {
             }
         }
         return null;
+    }
+
+    private async writeLog(csvLine: number | string |  null, objectName: string, type: CSVLogWriterLogType, message: string) {
+        let logMessage = '';
+        if (this.logWriter) {
+            if (!csvLine) {
+                csvLine = '0';
+            }
+            const lnStr = '' + csvLine; // Convert to string 'old skool casting ;-)' ;-)
+            logMessage =  `[CSV${lnStr.padStart(8, '0')}][${objectName}] ${message}`;
+            await this.logWriter.writeLine(type, logMessage);
+        }
     }
 }
