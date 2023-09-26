@@ -174,6 +174,11 @@ The pattern defined above use the following tokens:
 None
 
 ## Release Notes
+### 0.0.20
+- Remove dependency to client-oauth2, isomorphic-fetch,isomorphic-form-data
+- Relies on axios and sailpoint-api-client wherever it is possible
+- Better error management for SPConfig import and object type displayed for import
+- Workflow icon not properly updated after enabling or disabling the workflow
 
 ### 0.0.19
 
