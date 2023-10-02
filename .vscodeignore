@@ -3,6 +3,8 @@
 .github/**
 src/**
 .gitignore
+*.zip
+*.vsx
 .yarnrc
 vsc-extension-quickstart.md
 IDEAS.md
