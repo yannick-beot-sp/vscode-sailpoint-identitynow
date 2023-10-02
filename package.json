@@ -2,7 +2,7 @@
   "name": "vscode-sailpoint-identitynow",
   "displayName": "SailPoint IdentityNow",
   "description": "Customize SailPoint IdentityNow",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "publisher": "yannick-beot-sp",
   "icon": "resources/idn.png",
   "bugs": {
@@ -731,11 +731,9 @@
   },
   "devDependencies": {
     "@types/glob": "^8.0.0",
-    "@types/isomorphic-fetch": "^0.0.36",
-    "@types/isomorphic-form-data": "^2.0.1",
     "@types/lodash": "^4.14.191",
     "@types/mocha": "^10.0.1",
-    "@types/node": "16.x",
+    "@types/node": "^18.15.0",
     "@types/vscode": "^1.74.0",
     "@typescript-eslint/eslint-plugin": "^5.47.0",
     "@typescript-eslint/parser": "^5.47.0",
@@ -750,11 +748,10 @@
   "dependencies": {
     "@json2csv/node": "^6.1.2",
     "@vscode/webview-ui-toolkit": "^1.0.0",
-    "client-oauth2": "^4.3.3",
+    "axios": "^1.5.0",
     "csv-parse": "^5.4.0",
     "fast-json-patch": "^3.1.1",
-    "isomorphic-fetch": "^3.0.0",
-    "isomorphic-form-data": "^2.0.0",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "sailpoint-api-client": "^1.2.2"
   }
 }

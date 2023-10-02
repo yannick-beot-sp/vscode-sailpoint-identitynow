@@ -3,6 +3,7 @@ import { ExportOptions } from '../../models/ExportOptions';
 import { OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
 import { SPConfigImporter } from './SPConfigImporter';
 import { askChosenItems, askSelectObjectTypes } from '../../utils/vsCodeHelpers';
+import { ImportOptionsBeta, ImportOptionsBetaIncludeTypesEnum } from 'sailpoint-api-client';
 
 const ALL: vscode.QuickPickItem = {
     label: "Import everything",
@@ -42,7 +43,7 @@ export abstract class WizardBasedImporterCommand {
         tenantName: string,
         tenantDisplayName: string,
         data: string,
-        importOptions: ExportOptions = {}): Promise<void> {
+        importOptions: ImportOptionsBeta = {}): Promise<void> {
 
         const importer = new SPConfigImporter(tenantId, tenantName, tenantDisplayName, importOptions, data);
         await importer.importConfig();
@@ -86,7 +87,7 @@ export abstract class WizardBasedImporterCommand {
         const requestedObjectTypes = await askSelectObjectTypes("Object type to import", availableObjectTypeItems);
         if (requestedObjectTypes === undefined) { return; }
 
-        const options: ExportOptions = {
+        const options: ImportOptionsBeta = {
             includeTypes: [],
             excludeTypes: [],
             objectOptions: {}
@@ -106,7 +107,7 @@ export abstract class WizardBasedImporterCommand {
             const includeIds = await askChosenItems(requestedObjectType.label, "What do you want to import?", pickItems);
 
             if (includeIds === undefined) { continue; }
-            options.includeTypes?.push(requestedObjectType.objectType);
+            options.includeTypes?.push(ImportOptionsBetaIncludeTypesEnum[requestedObjectType.objectType]);
             if (pickItems.length !== includeIds.length) {
                 // XXX What is the expected behavior of the SP Config import if includedIds is empty?
                 Object.defineProperty(options.objectOptions,

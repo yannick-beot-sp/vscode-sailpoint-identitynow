@@ -6,6 +6,7 @@ import { IdentityNowClient } from '../../services/IdentityNowClient';
 import { delay } from '../../utils';
 import { ensureFolderExists } from '../../utils/fileutils';
 import { PathProposer } from '../../services/PathProposer';
+import { ExportPayloadBetaIncludeTypesEnum, ObjectExportImportOptionsBeta } from 'sailpoint-api-client';
 
 /**
  * Class use to export SP-Config
@@ -17,28 +18,33 @@ export class SPConfigExporter {
         private readonly tenantName: string,
         private readonly tenantDisplayName: string,
         private target: string,
-        private readonly options:any,
-        private objectTypes: string[] = [],
+        private readonly options: {
+            [key: string]: ObjectExportImportOptionsBeta;
+        },
+        private objectTypes: ExportPayloadBetaIncludeTypesEnum[] = [],
         private readonly exportSingle = true
-        ) { 
-            this.client = new IdentityNowClient(this.tenantId, this.tenantName);
-        }
+    ) {
+        this.client = new IdentityNowClient(this.tenantId, this.tenantName);
+    }
 
     /**
      * Will display a progress bar for the export
      */
     public async exportConfigWithProgression(): Promise<void> {
 
-        
-        await vscode.window.withProgress({
+
+        const success = await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Exporting configuration from ${this.tenantName}...`,
             cancellable: false
-        }, async (task, token) => await this.exportConfig(task, token))
-            .then(async () =>
-                vscode.window.showInformationMessage(
-                    `Successfully exported configuration from ${this.tenantDisplayName}`
-                ));
+        }, async (task, token) => {
+            await this.exportConfig(task, token);
+            return true;
+        });
+        if (success) {
+            vscode.window.showInformationMessage(
+                `Successfully exported configuration from ${this.tenantDisplayName}`);
+        }
     }
 
     private async exportConfig(task: any, token: vscode.CancellationToken): Promise<void> {

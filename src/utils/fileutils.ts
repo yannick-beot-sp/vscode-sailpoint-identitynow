@@ -4,6 +4,7 @@ import * as readline from 'readline';
 import * as os from 'os';
 import { mkdtemp, rm } from 'node:fs/promises';
 
+
 /**
  * Ensure that the folder supposed to hold the filename exists and if not, creates it
  * @param filepath absolute path, including the filename
@@ -19,8 +20,6 @@ export async function ensureFolderExists(filepath: string) {
 
     console.log('< ensureFolderExists');
 }
-
-
 
 /**
  * cf. https://stackoverflow.com/a/60193465

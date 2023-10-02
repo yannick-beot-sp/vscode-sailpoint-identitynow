@@ -505,7 +505,7 @@ export class TransformEvaluator {
             title: `Getting account for nativeIdentity '${nativeIdentity}'...`,
             cancellable: false
         }, async (task, token) => {
-            let account = await client.getAccount(nativeIdentity, sourceId);
+            let account = await client.getAccountBySource(sourceId, nativeIdentity);
             return account;
         });
 

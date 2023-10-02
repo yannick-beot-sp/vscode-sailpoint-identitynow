@@ -76,7 +76,7 @@ class UncorrelatedAccountImporter {
             let account = undefined;
             try {
                 // Getting account
-                account = await this.client.getAccount(data.account, this.sourceId);
+                account = await this.client.getAccountBySource(this.sourceId, data.account);
             } catch (error) {
                 console.error(error);
             }

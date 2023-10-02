@@ -63,7 +63,11 @@ export class TreeManager {
             let job: any;
             let jobType: AggregationJob;
             if ("accounts"=== type) {
-                job = await client.startAccountAggregation(item.ccId, disableOptimization);
+
+                job = await client.startAccountAggregation(item.ccId, disableOptimization)
+                    .catch(error=>{
+                        console.error(error);
+                    });
                 jobType = AggregationJob.CLOUD_ACCOUNT_AGGREGATION;
             } else {
                 job = await client.startEntitlementAggregation(item.ccId);
@@ -76,8 +80,8 @@ export class TreeManager {
                 task = await client.getAggregationJob(item.ccId, job.task.id, jobType);
                 console.log("task =", task);
 
-            } while (task !== null && task.status === "PENDING");
-            if (task !== null) {
+            } while (task !== undefined && task.status === "PENDING");
+            if (task !== undefined) {
                 if (task.status === "SUCCESS") {
                     vscode.window.showInformationMessage(`Source ${task.object.displayName} successfully aggregated`);
                 } else if (task.status === "WARNING") {
@@ -134,8 +138,8 @@ export class TreeManager {
                 task = await client.getAggregationJob(item.ccId, job.id, AggregationJob.SOURCE_RESET);
                 console.log("task =", task);
 
-            } while (task !== null && task.status === "PENDING");
-            if (task !== null) {
+            } while (task !== undefined && task.status === "PENDING");
+            if (task !== undefined) {
                 if (task.status === "SUCCESS") {
                     vscode.window.showInformationMessage(`Source ${task.object.displayName} successfully reset${skipping}`);
                 } else if (task.status === "WARNING") {

@@ -3,8 +3,8 @@ import { SourceTreeItem } from '../models/IdentityNowTreeItem';
 import { PathProposer } from '../services/PathProposer';
 import { askFile } from '../utils/vsCodeHelpers';
 import { BaseCSVExporter } from './BaseExporter';
-import { Entitlement } from '../models/Entitlements';
 import EntitlementPaginator from './EntitlementPaginator';
+import { Entitlement } from 'sailpoint-api-client';
 
 
 export class EntitlementExporterCommand {

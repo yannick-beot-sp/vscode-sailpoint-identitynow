@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
 
 import { ObjectPickItem } from '../../models/ObjectPickItem';
-import { OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
-import { ObjectTypeItem } from '../../models/ConfigQuickPickItem';
+import { OBJECT_TYPE_ITEMS, ObjectTypeQuickPickItem } from '../../models/ObjectTypeQuickPickItem';
 import { askChosenItems, askFile, askFolder, openPreview } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
 import { IdentityNowClient } from '../../services/IdentityNowClient';
 import { SPConfigExporter } from './SPConfigExporter';
+import { ExportPayloadBetaIncludeTypesEnum, ObjectExportImportOptionsBeta } from 'sailpoint-api-client';
 
 const ALL: vscode.QuickPickItem = {
     label: "Export everything",
@@ -94,7 +94,7 @@ export abstract class WizardBasedExporterCommand {
                 exportFile);
 
         } else {
-            let exportFolder = PathProposer.getSPConfigMultipeFileFolder(
+            const exportFolder = PathProposer.getSPConfigMultipeFileFolder(
                 tenantName,
                 tenantDisplayName);
             target = await askFolder(
@@ -110,7 +110,7 @@ export abstract class WizardBasedExporterCommand {
         //
         const sortedObjectTypeItems = OBJECT_TYPE_ITEMS.sort(((a, b) => (a.label > b.label) ? 1 : -1));
 
-        const objectTypeItemsToExport = await vscode.window.showQuickPick<ObjectTypeItem>(sortedObjectTypeItems, {
+        const objectTypeItemsToExport = await vscode.window.showQuickPick<ObjectTypeQuickPickItem>(sortedObjectTypeItems, {
             ignoreFocusOut: false,
             title: "Object type to export",
             canPickMany: true
@@ -120,8 +120,8 @@ export abstract class WizardBasedExporterCommand {
             console.log("< chooseAndExport: no objectType");
             return;
         }
-        const objectTypes = [] as string[];
-        const options: any = {};
+        const objectTypes: ExportPayloadBetaIncludeTypesEnum[] = objectTypeItemsToExport.map(x=>x.objectType);
+        const options: { [key: string]: ObjectExportImportOptionsBeta } = {};
 
         //
         // Do we export all objects or just a subset?
@@ -141,19 +141,19 @@ export abstract class WizardBasedExporterCommand {
             for (const objectTypeItem of objectTypeItemsToExport) {
                 let items: any[] = [];
                 switch (objectTypeItem.objectType) {
-                    case "SOURCE":
+                    case ExportPayloadBetaIncludeTypesEnum.Source:
                         items = await client.getSources();
                         break;
-                    case "IDENTITY_PROFILE":
+                    case ExportPayloadBetaIncludeTypesEnum.IdentityProfile:
                         items = await client.getIdentityProfiles();
                         break;
-                    case "TRANSFORM":
+                    case ExportPayloadBetaIncludeTypesEnum.Transform:
                         items = await client.getTransforms();
                         break;
-                    case "RULE":
+                    case ExportPayloadBetaIncludeTypesEnum.Rule:
                         items = await client.getConnectorRules();
                         break;
-                    case "TRIGGER_SUBSCRIPTION":
+                    case ExportPayloadBetaIncludeTypesEnum.TriggerSubscription:
                         options["TRIGGER_SUBSCRIPTION"] = {
                             includedIds: [],
                             includedNames: []
@@ -168,7 +168,7 @@ export abstract class WizardBasedExporterCommand {
 
                 const includeIds = await askChosenItems(objectTypeItem.label, "What do you want to export?", items);
                 if (includeIds === undefined) { continue; }
-                objectTypes.push(objectTypeItem.objectType);
+                // objectTypes.push(objectTypeItem.objectType);
                 if (items.length !== includeIds.length) {
                     // XXX What is the expected behavior of the SP Config import if includedIds is empty?
                     options[objectTypeItem.objectType] = {

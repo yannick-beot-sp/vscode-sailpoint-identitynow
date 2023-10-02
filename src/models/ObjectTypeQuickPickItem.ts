@@ -1,33 +1,34 @@
+import { ExportPayloadBetaIncludeTypesEnum } from "sailpoint-api-client";
 import { QuickPickItem } from "vscode";
 
 export interface ObjectTypeQuickPickItem extends QuickPickItem {
-    objectType: string
+    objectType: ExportPayloadBetaIncludeTypesEnum
 }
 
 export const OBJECT_TYPE_ITEMS: ObjectTypeQuickPickItem[] = [
     {
-        "objectType": "SOURCE",
-        "label": "Sources",
+        objectType: ExportPayloadBetaIncludeTypesEnum.Source,
+        label: "Sources",
         picked: true
     },
     {
-        "objectType": "TRIGGER_SUBSCRIPTION",
-        "label": "Trigger subscriptions",
+        objectType: ExportPayloadBetaIncludeTypesEnum.TriggerSubscription,
+        label: "Trigger subscriptions",
         picked: true
     },
     {
-        "objectType": "IDENTITY_PROFILE",
-        "label": "Identity profiles",
+        objectType: ExportPayloadBetaIncludeTypesEnum.IdentityProfile,
+        label: "Identity profiles",
         picked: true
     },
     {
-        "objectType": "TRANSFORM",
-        "label": "Transforms",
+        objectType: ExportPayloadBetaIncludeTypesEnum.Transform,
+        label: "Transforms",
         picked: true
     },
     {
-        "objectType": "RULE",
-        "label": "Rules",
+        objectType: ExportPayloadBetaIncludeTypesEnum.Rule,
+        label: "Rules",
         picked: true
     }
 ];

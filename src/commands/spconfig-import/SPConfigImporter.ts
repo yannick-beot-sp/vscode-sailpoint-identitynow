@@ -2,8 +2,9 @@ import * as vscode from 'vscode';
 import { ExportOptions } from '../../models/ExportOptions';
 import { IdentityNowClient } from '../../services/IdentityNowClient';
 import { delay } from '../../utils';
-import { ImportJobResults, ImportedError } from '../../models/JobStatus';
 import { OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
+import { ImportOptionsBeta } from 'sailpoint-api-client';
+import { ImportJobResults } from '../../models/JobStatus';
 
 const ALL: vscode.QuickPickItem = {
     label: "Import everything",
@@ -25,7 +26,7 @@ export class SPConfigImporter {
         private readonly tenantId: string,
         private readonly tenantName: string,
         private readonly tenantDisplayName: string,
-        private readonly importOptions: ExportOptions = {},
+        private readonly importOptions: ImportOptionsBeta = {},
         private data: string
 
     ) {
@@ -55,11 +56,12 @@ export class SPConfigImporter {
             return result;
 
         },).then(async (importJobresult) => {
+            console.log("importJobresult=",importJobresult);
             const errors = [] as string[];
             let objectType: keyof typeof importJobresult.results;
             for (objectType in importJobresult.results) {
                 importJobresult.results[objectType]?.errors
-                    .forEach((element: ImportedError) => {
+                    .forEach((element) => {
                         errors.push(element.detail.exceptionMessage);
                     });
             }
