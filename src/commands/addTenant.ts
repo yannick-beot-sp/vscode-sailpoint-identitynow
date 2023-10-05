@@ -5,6 +5,7 @@ import { TenantService } from '../services/TenantService';
 import { isEmpty, normalizeTenant } from '../utils';
 import { askDisplayName } from '../utils/vsCodeHelpers';
 import { AuthenticationMethod } from '../models/TenantInfo';
+import { randomUUID } from 'crypto';
 
 
 export class AddTenantCommand {
@@ -73,7 +74,7 @@ export class AddTenantCommand {
             return;
         }
 
-        const tenantId = require('crypto').randomUUID().replaceAll('-', '');
+        const tenantId = randomUUID().replaceAll('-', '');
         this.tenantService.setTenant({
             id: tenantId,
             name: displayName,

@@ -1,6 +1,6 @@
 import { Uri } from "vscode";
-import * as path from 'path';
 import { URL_PREFIX } from "../constants";
+import { posix } from "path";
 
 export function withQuery(baseUrl: string, params: any): string {
 
@@ -76,7 +76,7 @@ export function getResourceTypeByUri(uri: Uri): string | null {
 
 export function getNameByUri(uri: Uri): string | null {
     const respath = uri.path || "";
-    return path.posix.basename(respath);
+    return posix.basename(respath);
 }
 
 /**

@@ -4,7 +4,8 @@ import { AddTenantQueryString } from './models/AddTenantQueryString';
 import { AuthenticationMethod, TenantCredentials, TenantToken } from './models/TenantInfo';
 import { TenantService } from './services/TenantService';
 import { isEmpty, normalizeTenant, parseJwt } from './utils';
-var querystring = require('querystring');
+import { randomUUID } from 'crypto';
+const querystring = require('querystring');
 
 export class IdentityNowUriHandler implements vscode.UriHandler {
 
@@ -55,7 +56,7 @@ export class IdentityNowUriHandler implements vscode.UriHandler {
             // Tenant found update the access token
             tenantId = tenantInfo.id;
         } else {
-            tenantId = require('crypto').randomUUID().replaceAll('-', '');
+            tenantId = randomUUID().replaceAll('-', '');
             //Create the tenant
             this.tenantService.setTenant({
                 id: tenantId,
