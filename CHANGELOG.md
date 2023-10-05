@@ -6,9 +6,17 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [0.0.20] - 2023-10-05
+
 ### Changed
 
 - Better error management for SPConfig import and object type displayed for import
+- Remove dependency to client-oauth2, isomorphic-fetch, isomorphic-form-data
+- Relies on axios and sailpoint-api-client wherever it is possible
+
+### Fixed
+
+- Issue with fetch (cf. [#50](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/50))
 - Workflow icon not properly updated after enabling or disabling the workflow
 
 ## [0.0.19] - 2023-06-28
