@@ -6,6 +6,10 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [0.0.21] - 2023-10-05
+### Fixed
+- Revert bundle (cf. [#51](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/51))
+
 ## [0.0.20] - 2023-10-05
 
 ### Changed

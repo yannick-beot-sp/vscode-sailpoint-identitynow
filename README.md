@@ -174,6 +174,11 @@ The pattern defined above use the following tokens:
 None
 
 ## Release Notes
+
+### 0.0.21
+
+- Revert bundle (cf. [#51](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/51))
+
 ### 0.0.20
 
 - Issue with fetch (cf. [#50](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/50))
