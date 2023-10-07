@@ -54,7 +54,7 @@ export function getWorkflowExecutionDetailUri(tenantName: string, executionId: s
 
 export function getIdByUri(uri?: Uri): string | null {
     const path = uri?.path || "";
-    const found = path.match(/^\/.+\/(.*?)\/.*?/);
+    const found = path.match(/^\/.+\/(.*?)\/.*?$/);
     // Found including the whole match and the group
     // cf. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/match
     if (found && found.length === 2) {

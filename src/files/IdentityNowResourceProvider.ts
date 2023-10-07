@@ -24,7 +24,7 @@ import { compare } from "fast-json-patch";
 export class IdentityNowResourceProvider implements FileSystemProvider {
 	private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
 
-	constructor(private readonly tenantService: TenantService) {}
+	constructor(private readonly tenantService: TenantService) { }
 
 	onDidChangeFile: Event<FileChangeEvent[]> = this._emitter.event;
 
@@ -33,15 +33,18 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 		options: { recursive: boolean; excludes: string[] }
 	): Disposable {
 		// ignore, fires for all changes...
-		return new vscode.Disposable(() => {});
+		return new vscode.Disposable(() => { });
 	}
 
 	async stat(uri: Uri): Promise<FileStat> {
 		console.log("> IdentityNowResourceProvider.stat", uri);
 		// Not optimized here but do not
 		const data = await this.lookupResource(uri);
+		const id = getIdByUri(uri);
+		// const isFile = this.isUUID(id);
+		const isFile = id !== "provisioning-policies" && id !== "schemas";
 		return {
-			type: FileType.File,
+			type: (isFile ? FileType.File : FileType.Directory),
 			ctime: toTimestamp(data.created),
 			mtime: toTimestamp(data.modified),
 			size: convertToText(data).length,
@@ -71,7 +74,7 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 			throw Error("Invalid uri:" + uri);
 		}
 		const id = getIdByUri(uri);
-		if (id === NEW_ID) {
+		if (id === NEW_ID || id === "provisioning-policies" || id === "schemas") {
 			console.log("New file");
 			return "";
 		}
