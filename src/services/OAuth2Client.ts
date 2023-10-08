@@ -1,4 +1,5 @@
 import axios from "axios";
+import { onErrorResponse, onRequest, onResponse } from "./AxiosHandlers";
 
 export class AccessToken {
     // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -60,7 +61,16 @@ export class OAuth2Client {
 
 
         try {
-            const { data, status } = await axios.post<AccessToken>(this.tokenUrl, params);
+            const instance =  axios.create();
+            instance.interceptors.request.use(
+                onRequest);
+            instance.interceptors.response.use(
+                onResponse,
+                onErrorResponse
+            );
+
+
+            const { data, status } = await instance.post<AccessToken>(this.tokenUrl, params);
             if (status === 200) {
                 const token = Object.assign(new AccessToken(), data);
                 return token;

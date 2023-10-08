@@ -12,7 +12,7 @@ import axios, { AxiosInstance } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
 import { basename } from 'path';
 import { createReadStream } from 'fs';
-import { onErrorResponse } from "./AxiosHandlers";
+import { onErrorResponse, onRequest, onResponse } from "./AxiosHandlers";
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const FormData = require('form-data');
 
@@ -90,8 +90,10 @@ export class IdentityNowClient {
 			}
 			
 		});
+		instance.interceptors.request.use(
+			onRequest);
 		instance.interceptors.response.use(
-			response => response,
+			onResponse,
 			onErrorResponse
 		);
 		return instance;

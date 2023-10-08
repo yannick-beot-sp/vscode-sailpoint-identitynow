@@ -81,9 +81,11 @@ export class AddTenantCommand {
             tenantName: normalizedTenantName,
             authenticationMethod: authMethod
         });
-        let session: vscode.AuthenticationSession;
         try {
-            session = await vscode.authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [tenantId], { createIfNone: true });
+            const session: vscode.AuthenticationSession = await vscode.authentication.getSession(
+                SailPointIdentityNowAuthenticationProvider.id,
+                [tenantId],
+                { createIfNone: true });
             if (session !== undefined && !isEmpty(session.accessToken)) {
                 await vscode.commands.executeCommand(commands.REFRESH);
                 await vscode.window.showInformationMessage(`Tenant ${displayName} added!`);
