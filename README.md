@@ -175,6 +175,10 @@ None
 
 ## Release Notes
 
+### Unreleased
+
+- Issue when importing SP-Config: when selecting items, the list of object Ids was not properly sent
+
 ### 0.0.22
 
 - Provide the ability to create provisioning policy for something else than the CREATE policy (cf. [#29](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/29))

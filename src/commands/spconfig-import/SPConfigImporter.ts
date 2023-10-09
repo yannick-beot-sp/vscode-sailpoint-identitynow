@@ -1,9 +1,8 @@
 import * as vscode from 'vscode';
-import { ExportOptions } from '../../models/ExportOptions';
 import { IdentityNowClient } from '../../services/IdentityNowClient';
 import { delay } from '../../utils';
 import { OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
-import { ImportOptionsBeta } from 'sailpoint-api-client';
+import { ImportOptionsBeta, SpConfigJobBetaStatusEnum } from 'sailpoint-api-client';
 import { ImportJobResults } from '../../models/JobStatus';
 
 const ALL: vscode.QuickPickItem = {
@@ -37,26 +36,25 @@ export class SPConfigImporter {
      * Create the import job and follow-up the result
      */
     public async importConfig(): Promise<void> {
-        const importOptions = this.importOptions;
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Importing configuration to ${this.tenantDisplayName}...`,
             cancellable: false
         }, async (task, token) => {
-            const jobId = await this.client.startImportJob(this.data, importOptions);
+            const jobId = await this.client.startImportJob(this.data, this.importOptions);
             let jobStatus: any;
             do {
                 await delay(1000);
                 jobStatus = await this.client.getImportJobStatus(jobId);
                 console.log({ jobStatus });
-            } while (!jobStatus.hasOwnProperty("completed"));
+            } while (jobStatus.status === SpConfigJobBetaStatusEnum.NotStarted || jobStatus.status === SpConfigJobBetaStatusEnum.InProgress);
 
             const importJobresult = await this.client.getImportJobResult(jobId);
             const result = { ...importJobresult, ...jobStatus };
             return result;
 
         },).then(async (importJobresult) => {
-            console.log("importJobresult=",importJobresult);
+            console.log("importJobresult=", importJobresult);
             const errors = [] as string[];
             let objectType: keyof typeof importJobresult.results;
             for (objectType in importJobresult.results) {

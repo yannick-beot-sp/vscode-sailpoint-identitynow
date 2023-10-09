@@ -509,7 +509,7 @@ export class IdentityNowClient {
 		if (Object.keys(options).length !== 0 || options.constructor !== Object) {
 			formData.append("options", JSON.stringify(options));
 		}
-		console.log("startImportJob: requesting", formData);
+		console.log("startImportJob: requesting");
 
 		const response = await httpClient.post(
 			endpoint, 

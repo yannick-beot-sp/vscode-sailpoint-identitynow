@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import { ExportOptions } from '../../models/ExportOptions';
 import { OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
 import { SPConfigImporter } from './SPConfigImporter';
 import { askChosenItems, askSelectObjectTypes } from '../../utils/vsCodeHelpers';
@@ -107,17 +106,14 @@ export abstract class WizardBasedImporterCommand {
             const includeIds = await askChosenItems(requestedObjectType.label, "What do you want to import?", pickItems);
 
             if (includeIds === undefined) { continue; }
-            options.includeTypes?.push(ImportOptionsBetaIncludeTypesEnum[requestedObjectType.objectType]);
+            const includeType: ImportOptionsBetaIncludeTypesEnum = <ImportOptionsBetaIncludeTypesEnum>requestedObjectType.objectType;
+            options.includeTypes?.push(includeType);
+
             if (pickItems.length !== includeIds.length) {
-                // XXX What is the expected behavior of the SP Config import if includedIds is empty?
-                Object.defineProperty(options.objectOptions,
-                    requestedObjectType.objectType, {
-                    value:
-                    {
-                        includedIds: includeIds,
-                        includedNames: []
-                    }
-                });
+                options.objectOptions[requestedObjectType.objectType] = {
+                    includedIds: includeIds,
+                    includedNames: []
+                };
             }
         }
         if (options.includeTypes?.length === 0) {

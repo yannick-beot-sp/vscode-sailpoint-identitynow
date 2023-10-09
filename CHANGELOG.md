@@ -6,6 +6,10 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+### Fixed
+
+- Issue when importing SP-Config: when selecting items, the list of object Ids was not properly sent
+
 ## [0.0.22] - 2023-10-08
 
 ### Added 
