@@ -6,6 +6,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [0.0.23] - 2023-10-11
+
 ### Fixed
 
 - Issue when importing SP-Config: when selecting items, the list of object Ids was not properly sent
@@ -22,6 +24,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 - Issue when creating a provisioning policy (cf. [#52](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/52))
 
 ## [0.0.21] - 2023-10-05
+
 ### Fixed
 - Revert bundle (cf. [#51](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/51))
 

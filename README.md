@@ -175,7 +175,7 @@ None
 
 ## Release Notes
 
-### Unreleased
+### 0.0.23
 
 - Issue when importing SP-Config: when selecting items, the list of object Ids was not properly sent
 - Issue when refreshing identities of an identity profile  (cf. [#53](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/53))
