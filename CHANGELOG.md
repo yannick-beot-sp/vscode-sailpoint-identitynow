@@ -9,6 +9,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 ### Fixed
 
 - Issue when importing SP-Config: when selecting items, the list of object Ids was not properly sent
+- Issue when refreshing identities of an identity profile  (cf. [#53](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/53))
 
 ## [0.0.22] - 2023-10-08
 

@@ -38,7 +38,7 @@ export const onRequest = (request: InternalAxiosRequestConfig): InternalAxiosReq
     const method = request.method?.toUpperCase();
     const url = request.url;
     const body = typeof request.data === 'object' ? JSON.stringify(request.data) : request.data;
-    console.debug(`REQUEST: ${method} ${url} ${body}`);
+    console.log(`REQUEST: ${method} ${url} ${body}`);
     return request;
 };
 
@@ -46,6 +46,6 @@ export const onResponse = (response: AxiosResponse): AxiosResponse => {
 
     const status = response.status;
     const body = typeof response.data === 'object' ? JSON.stringify(response.data) : response.data;
-    console.debug(`RESPONSE: ${status} ${body}`);
+    console.log(`RESPONSE: ${status} ${body}`);
     return response;
 };
