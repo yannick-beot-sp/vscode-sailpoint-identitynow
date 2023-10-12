@@ -8,7 +8,7 @@ export const onErrorResponse = (error: AxiosError | Error): Promise<AxiosError> 
         const { statusText, status, data } = error.response as AxiosResponse ?? {};
 
         console.error(
-            `[IdentityNowClient] ${method?.toUpperCase()} ${url} | Error ${status} ${message}`, error
+            `[IdentityNowClient] ${method?.toUpperCase()} ${url} | Error ${status} ${message} | ${data}`, error
         );
 
         if ('error' in data) {
@@ -20,6 +20,8 @@ export const onErrorResponse = (error: AxiosError | Error): Promise<AxiosError> 
             errorMessage = data.message;
         } else if ('messages' in data) {
             errorMessage = data.messages[0].text;
+        } else if ('formatted_msg' in data) {
+            errorMessage = data.formatted_msg;
         } else {
             errorMessage = message;
         }
