@@ -5,6 +5,7 @@ import { TenantService } from '../services/TenantService';
 import { isEmpty, normalizeTenant } from '../utils';
 import { askDisplayName } from '../utils/vsCodeHelpers';
 import { AuthenticationMethod } from '../models/TenantInfo';
+import { randomUUID } from 'crypto';
 
 
 export class AddTenantCommand {
@@ -73,16 +74,18 @@ export class AddTenantCommand {
             return;
         }
 
-        const tenantId = require('crypto').randomUUID().replaceAll('-', '');
+        const tenantId = randomUUID().replaceAll('-', '');
         this.tenantService.setTenant({
             id: tenantId,
             name: displayName,
             tenantName: normalizedTenantName,
             authenticationMethod: authMethod
         });
-        let session: vscode.AuthenticationSession;
         try {
-            session = await vscode.authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [tenantId], { createIfNone: true });
+            const session: vscode.AuthenticationSession = await vscode.authentication.getSession(
+                SailPointIdentityNowAuthenticationProvider.id,
+                [tenantId],
+                { createIfNone: true });
             if (session !== undefined && !isEmpty(session.accessToken)) {
                 await vscode.commands.executeCommand(commands.REFRESH);
                 await vscode.window.showInformationMessage(`Tenant ${displayName} added!`);

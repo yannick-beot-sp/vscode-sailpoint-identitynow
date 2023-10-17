@@ -3,11 +3,11 @@ import { RuleTreeItem } from '../models/IdentityNowTreeItem';
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { toDateSuffix } from '../utils';
 import * as fs from 'fs';
-import path = require('path');
 import { confirmFileOverwrite } from '../utils/vsCodeHelpers';
 import { getIdByUri, getNameByUri } from '../utils/UriUtils';
 import { TenantService } from '../services/TenantService';
 import { ensureFolderExists } from '../utils/fileutils';
+import { join } from 'path';
 
 
 export class ExportScriptFromRuleCommand {
@@ -49,8 +49,8 @@ export class ExportScriptFromRuleCommand {
 
         if (vscode.workspace.workspaceFolders !== undefined) {
             const workspaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath.replace(/\\/g, "/");
-            const exportFolder = path.join(workspaceFolder, 'exportedObjects', 'rule-scripts');
-            exportFile = path.join(exportFolder, 'script-' + tenantName + '-' + ruleName + '-' + toDateSuffix() + '.bsh');
+            const exportFolder = join(workspaceFolder, 'exportedObjects', 'rule-scripts');
+            exportFile = join(exportFolder, 'script-' + tenantName + '-' + ruleName + '-' + toDateSuffix() + '.bsh');
         }
 
         return exportFile;

@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
-import { ExportOptions } from '../../models/ExportOptions';
 import { IdentityNowClient } from '../../services/IdentityNowClient';
 import { delay } from '../../utils';
-import { ImportJobResults, ImportedError } from '../../models/JobStatus';
 import { OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
+import { ImportOptionsBeta, SpConfigJobBetaStatusEnum } from 'sailpoint-api-client';
+import { ImportJobResults } from '../../models/JobStatus';
 
 const ALL: vscode.QuickPickItem = {
     label: "Import everything",
@@ -25,7 +25,7 @@ export class SPConfigImporter {
         private readonly tenantId: string,
         private readonly tenantName: string,
         private readonly tenantDisplayName: string,
-        private readonly importOptions: ExportOptions = {},
+        private readonly importOptions: ImportOptionsBeta = {},
         private data: string
 
     ) {
@@ -36,45 +36,46 @@ export class SPConfigImporter {
      * Create the import job and follow-up the result
      */
     public async importConfig(): Promise<void> {
-        const importOptions = this.importOptions;
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Importing configuration to ${this.tenantDisplayName}...`,
             cancellable: false
         }, async (task, token) => {
-            const jobId = await this.client.startImportJob(this.data, importOptions);
+            const jobId = await this.client.startImportJob(this.data, this.importOptions);
             let jobStatus: any;
             do {
                 await delay(1000);
                 jobStatus = await this.client.getImportJobStatus(jobId);
                 console.log({ jobStatus });
-            } while (jobStatus.status === "NOT_STARTED" || jobStatus.status === "IN_PROGRESS");
-
-            // if (jobStatus.status !== "COMPLETE") {
-            //     throw new Error(jobStatus.message);
-            // }
+            } while (jobStatus.status === SpConfigJobBetaStatusEnum.NotStarted || jobStatus.status === SpConfigJobBetaStatusEnum.InProgress);
 
             const importJobresult = await this.client.getImportJobResult(jobId);
-            return importJobresult;
+            const result = { ...importJobresult, ...jobStatus };
+            return result;
 
         },).then(async (importJobresult) => {
+            console.log("importJobresult=", importJobresult);
             const errors = [] as string[];
             let objectType: keyof typeof importJobresult.results;
             for (objectType in importJobresult.results) {
                 importJobresult.results[objectType]?.errors
-                    .forEach((element: ImportedError) => {
+                    .forEach((element) => {
                         errors.push(element.detail.exceptionMessage);
                     });
             }
 
             if (errors.length > 0) {
+                // Errors are detailed
                 let message = "Could not import config: ";
                 message += errors.join(". ");
                 message += ". ";
-                message += this.formatImportedObjects(importJobresult);              
+                message += this.formatImportedObjects(importJobresult);
                 vscode.window.showErrorMessage(message);
-
+            } else if (importJobresult.status === "FAILED") {
+                // If error but not details in the job result, takes the initial message
+                vscode.window.showErrorMessage(importJobresult.message);
             } else {
+                // It is a success
                 const message = this.formatImportedObjects(importJobresult);
                 // At this moment it is not possible to have a multi-line notification
                 await vscode.window.showInformationMessage(

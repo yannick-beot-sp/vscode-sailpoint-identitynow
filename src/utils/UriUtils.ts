@@ -1,6 +1,6 @@
 import { Uri } from "vscode";
-import * as path from 'path';
 import { URL_PREFIX } from "../constants";
+import { posix } from "path";
 
 export function withQuery(baseUrl: string, params: any): string {
 
@@ -54,7 +54,7 @@ export function getWorkflowExecutionDetailUri(tenantName: string, executionId: s
 
 export function getIdByUri(uri?: Uri): string | null {
     const path = uri?.path || "";
-    const found = path.match(/^\/.+\/(.*?)\/.*?/);
+    const found = path.match(/^\/.+\/(.*?)\/.*?$/);
     // Found including the whole match and the group
     // cf. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/match
     if (found && found.length === 2) {
@@ -76,7 +76,7 @@ export function getResourceTypeByUri(uri: Uri): string | null {
 
 export function getNameByUri(uri: Uri): string | null {
     const respath = uri.path || "";
-    return path.posix.basename(respath);
+    return posix.basename(respath);
 }
 
 /**

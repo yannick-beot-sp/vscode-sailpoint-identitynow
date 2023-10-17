@@ -114,23 +114,19 @@ export class SourcesTreeItem extends FolderTreeItem {
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
-		const results: BaseTreeItem[] = [];
+		let results: BaseTreeItem[] = [];
 		const client = new IdentityNowClient(this.tenantId, this.tenantName);
 		const sources = await client.getSources();
 		if (sources !== undefined && sources instanceof Array) {
-			for (let source of sources) {
-				results.push(
-					new SourceTreeItem(
-						this.tenantId,
-						this.tenantName,
-						this.tenantDisplayName,
-						source.name,
-						source.id,
-						source.connectorAttributes.cloudExternalId,
-						source.type
-					)
-				);
-			}
+			results = sources.map(source => new SourceTreeItem(
+				this.tenantId,
+				this.tenantName,
+				this.tenantDisplayName,
+				source.name,
+				source.id,
+				source.connectorAttributes["cloudExternalId"],
+				source.type
+			));
 		}
 		return results;
 	}
@@ -660,12 +656,14 @@ export class ServiceDesksTreeItem extends FolderTreeItem {
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
-		const results: BaseTreeItem[] = [];
 		const client = new IdentityNowClient(this.tenantId, this.tenantName);
 		const serviceDesks = await client.getServiceDesks();
-		const serviceDeskItems = serviceDesks.map(
-			(w) =>
-				new ServiceDeskTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, w.name, w.id)
+		const serviceDeskItems = serviceDesks.map((w) =>
+			new ServiceDeskTreeItem(this.tenantId,
+				this.tenantName,
+				this.tenantDisplayName,
+				w.name,
+				w.id)
 		);
 		return serviceDeskItems;
 	}
@@ -705,22 +703,15 @@ export class AccessProfilesTreeItem extends FolderTreeItem {
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
-		const results: BaseTreeItem[] = [];
 		const client = new IdentityNowClient(this.tenantId, this.tenantName);
-		const sources = await client.getAccessProfiles();
-		if (sources !== undefined && sources instanceof Array) {
-			for (let source of sources) {
-				results.push(
-					new AccessProfileTreeItem(
-						this.tenantId,
-						this.tenantName,
-						this.tenantDisplayName,
-						source.name,
-						source.id
-					)
-				);
-			}
-		}
+		const response = await client.getAccessProfiles();
+		const results: BaseTreeItem[] = response.data.map(accessProfile=>new AccessProfileTreeItem(
+			this.tenantId,
+			this.tenantName,
+			this.tenantDisplayName,
+			accessProfile.name,
+			accessProfile.id
+		));
 		return results;
 	}
 }
@@ -767,22 +758,15 @@ export class RolesTreeItem extends FolderTreeItem {
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
-		const results: BaseTreeItem[] = [];
 		const client = new IdentityNowClient(this.tenantId, this.tenantName);
-		const roles = await client.getRoles();
-		if (roles !== undefined && roles instanceof Array) {
-			for (let role of roles) {
-				results.push(
-					new RoleTreeItem(
-						this.tenantId,
-						this.tenantName,
-						this.tenantDisplayName,
-						role.name,
-						role.id
-					)
-				);
-			}
-		}
+		const response = await client.getRoles();
+		const results: BaseTreeItem[] = response.data.map(role=>new RoleTreeItem(
+			this.tenantId,
+			this.tenantName,
+			this.tenantDisplayName,
+			role.name,
+			role.id
+		));
 		return results;
 	}
 }

@@ -37,8 +37,9 @@ class AccountImporter {
         console.log("> AccountImporter.importFile");
         const source = await this.client.getSourceById(this.sourceId);
 
-        let job = await this.client.startImportAccount(
+        let job = await this.client.startAccountAggregation(
             this.sourceCCId,
+            false,
             source.connectorAttributes.deleteThresholdPercentage,
             this.fileUri.fsPath
         );
@@ -50,8 +51,8 @@ class AccountImporter {
             job = await this.client.getAggregationJob(this.sourceCCId, job.task.id, AggregationJob.CLOUD_ACCOUNT_AGGREGATION);
             console.log("job =", job);
 
-        } while (job !== null && job.status === "PENDING");
-        if (job !== null) {
+        } while (job !== undefined && job.status === "PENDING");
+        if (job !== undefined) {
             if (job.status === "SUCCESS") {
                 vscode.window.showInformationMessage(`Source ${job.object.displayName} successfully aggregated`);
             } else if (job.status === "WARNING") {

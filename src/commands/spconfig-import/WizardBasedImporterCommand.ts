@@ -1,9 +1,8 @@
 import * as vscode from 'vscode';
-import { ExportOptions } from '../../models/ExportOptions';
-import { ObjectTypeItem } from '../../models/ConfigQuickPickItem';
-import { ObjectPickItem } from '../../models/ObjectPickItem';
 import { OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
 import { SPConfigImporter } from './SPConfigImporter';
+import { askChosenItems, askSelectObjectTypes } from '../../utils/vsCodeHelpers';
+import { ImportOptionsBeta, ImportOptionsBetaIncludeTypesEnum } from 'sailpoint-api-client';
 
 const ALL: vscode.QuickPickItem = {
     label: "Import everything",
@@ -38,60 +37,15 @@ export abstract class WizardBasedImporterCommand {
         }
     };
 
-    /**
-     * Asks the user to choose from a list of ObjectPickItem
-     * @param items List of ObjectPickItem 
-     * @returns List of ids
-     */
-    private async askChosenItems(items: Array<ObjectPickItem>): Promise<Array<string> | undefined> {
-        const result = await vscode.window.showQuickPick(
-            items,
-            {
-                ignoreFocusOut: true,
-                placeHolder: "What do you want to import?",
-                title: "IdentityNow",
-                canPickMany: true
-            });
-
-        if (result) {
-            return result.map(x => x.id);
-        }
-    };
-
-    /**
-     * Maps object types to QuickPickItems with a human-readable label and asks to choose
-     * @param objectTypes List of object types to choose from
-     * @returns 
-     */
-    private async askSelectObjectTypes(objectTypes: Set<string>): Promise<Array<string> | undefined> {
-        const sortedObjectTypeItems = OBJECT_TYPE_ITEMS
-            .filter(x => objectTypes.has(x.objectType))
-            .sort(((a, b) => (a.label > b.label) ? 1 : -1));
-
-        const objectTypeItemsToImport = await vscode.window.showQuickPick<ObjectTypeItem>(sortedObjectTypeItems, {
-            ignoreFocusOut: false,
-            title: "Object type to import",
-            canPickMany: true
-        });
-
-        if (objectTypeItemsToImport !== undefined
-            && Array.isArray(objectTypeItemsToImport)
-            && objectTypeItemsToImport.length > 0) {
-
-            return objectTypeItemsToImport.map(x => x.objectType);
-        }
-        console.log("< askSelectObjectTypes: no objectType");
-    }
-
     private async startImportConfig(
         tenantId: string,
         tenantName: string,
         tenantDisplayName: string,
-        data: string, 
-        importOptions: ExportOptions = {}): Promise<void> {
+        data: string,
+        importOptions: ImportOptionsBeta = {}): Promise<void> {
 
-            const importer = new SPConfigImporter(tenantId, tenantName, tenantDisplayName, importOptions, data);
-            await importer.importConfig();
+        const importer = new SPConfigImporter(tenantId, tenantName, tenantDisplayName, importOptions, data);
+        await importer.importConfig();
     }
 
     async selectAndImport(
@@ -109,8 +63,8 @@ export abstract class WizardBasedImporterCommand {
 
         if (importAll) {
             await this.startImportConfig(
-                tenantId, 
-                tenantName, 
+                tenantId,
+                tenantName,
                 tenantDisplayName,
                 data
             );
@@ -122,14 +76,18 @@ export abstract class WizardBasedImporterCommand {
         //
         const objectTypes = new Set<string>();
         spConfig.objects.forEach((x: any) => objectTypes.add(x.self.type));
+
         //
         // Ask the user to choose which object types
         // 
-        const requestedObjectTypes = await this.askSelectObjectTypes(objectTypes);
+        // List of ObjectTypeItems based on object types present in the SP Config
+        const availableObjectTypeItems = OBJECT_TYPE_ITEMS
+            .filter(x => objectTypes.has(x.objectType));
+        const requestedObjectTypes = await askSelectObjectTypes("Object type to import", availableObjectTypeItems);
         if (requestedObjectTypes === undefined) { return; }
 
-        const options: ExportOptions = {
-            includeTypes: requestedObjectTypes,
+        const options: ImportOptionsBeta = {
+            includeTypes: [],
             excludeTypes: [],
             objectOptions: {}
         };
@@ -138,33 +96,36 @@ export abstract class WizardBasedImporterCommand {
         // Building the list of Ids for each object type
         // 
         for (const requestedObjectType of requestedObjectTypes) {
-            const pickItems = spConfig.objects.filter((x: any) => x.self.type === requestedObjectType)
+            const pickItems = spConfig.objects
+                .filter((x: any) => x.self.type === requestedObjectType.objectType)
                 .map((x: any) => ({
-                    label: x.self.name,
+                    name: x.self.name,
                     id: x.self.id,
                     picked: true
                 }));
-            const includeIds = await this.askChosenItems(pickItems);
-            if (includeIds === undefined) { return; }
+            const includeIds = await askChosenItems(requestedObjectType.label, "What do you want to import?", pickItems);
+
+            if (includeIds === undefined) { continue; }
+            const includeType: ImportOptionsBetaIncludeTypesEnum = <ImportOptionsBetaIncludeTypesEnum>requestedObjectType.objectType;
+            options.includeTypes?.push(includeType);
+
             if (pickItems.length !== includeIds.length) {
-                // XXX What is the expected behavior of the SP Config import if includedIds is empty?
-                Object.defineProperty(options.objectOptions,
-                    requestedObjectType, {
-                    value:
-                    {
-                        includedIds: includeIds,
-                        includedNames: []
-                    }
-                });
+                options.objectOptions[requestedObjectType.objectType] = {
+                    includedIds: includeIds,
+                    includedNames: []
+                };
             }
         }
-
-        await this.startImportConfig(
-            tenantId, 
-            tenantName, 
-            tenantDisplayName,
-            data,
-            options
-        );
+        if (options.includeTypes?.length === 0) {
+            vscode.window.showInformationMessage("Nothing to import");
+        } else {
+            await this.startImportConfig(
+                tenantId,
+                tenantName,
+                tenantDisplayName,
+                data,
+                options
+            );
+        }
     }
 }

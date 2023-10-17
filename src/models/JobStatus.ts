@@ -10,7 +10,6 @@ export interface JobStatus {
     completed: string | null
 }
 
-
 export interface ImportJobResults {
     results: Results
 }

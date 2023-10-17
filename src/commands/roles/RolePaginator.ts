@@ -1,5 +1,4 @@
-import { AccessProfile } from "../../models/AccessProfile";
-import { Role } from "../../models/Role";
+import { Role } from "sailpoint-api-client";
 import { IdentityNowClient } from "../../services/IdentityNowClient";
 
 /**
@@ -14,7 +13,7 @@ export default class RolePaginator implements AsyncIterable<Role[]> {
     ) { }
 
     async *[Symbol.asyncIterator](): AsyncIterableIterator<Role[]> {
-        const data = await this.client.getRoles();
-        yield data;
+        const response = await this.client.getRoles();
+        yield response.data;
     }
 }

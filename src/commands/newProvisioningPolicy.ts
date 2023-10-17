@@ -1,10 +1,39 @@
 import path = require('path');
 import * as vscode from 'vscode';
 import { NEW_ID } from '../constants';
-import { ProvisioningPoliciesTreeItem, TransformsTreeItem } from "../models/IdentityNowTreeItem";
+import { ProvisioningPoliciesTreeItem } from "../models/IdentityNowTreeItem";
 import { isEmpty, str2Uint8Array } from '../utils';
-import { getPathByUri, getResourceUri } from '../utils/UriUtils';
+import { getPathByUri } from '../utils/UriUtils';
+import { UsageTypeBeta } from 'sailpoint-api-client';
+import { convertPascalCase2SpaceBased } from '../utils/stringUtils';
+import { ProvisioningPolicyTypeQuickPickItem } from '../models/ProvisioningPolicyTypeQuickPickItem';
 
+
+
+function prepareUsageTypePickItems(): Array<ProvisioningPolicyTypeQuickPickItem> {
+    const FIRST = UsageTypeBeta.Create;
+    return Object.keys(UsageTypeBeta).map(key => ({
+        label: convertPascalCase2SpaceBased(key),
+        description: (UsageTypeBeta[key] === FIRST ? "(default)" : ""),
+        value: UsageTypeBeta[key]
+    }))
+        .sort(((a, b) => (a.label > b.label) ? 1 : -1))
+        // To move "Create" at the top. cf. https://stackoverflow.com/a/23921775
+        .sort((a, b) => a.value === FIRST ? -1 : b.value === FIRST ? 1 : 0);
+}
+
+
+async function askProvisioningPolicyType(): Promise<string | undefined> {
+
+    const typePickList = prepareUsageTypePickItems();
+    const result = await vscode.window.showQuickPick(typePickList, {
+        ignoreFocusOut: true,
+        title: "Type of provisioning policy",
+        canPickMany: false
+    });
+
+    return result?.value;
+}
 
 async function askProvisioningPolicyName(): Promise<string | undefined> {
     const result = await vscode.window.showInputBox({
@@ -13,8 +42,7 @@ async function askProvisioningPolicyName(): Promise<string | undefined> {
         placeHolder: 'Provisioning Policy name',
         prompt: "Enter the provisioning policy name",
         title: 'IdentityNow',
-        validateInput: text =>
-        {
+        validateInput: text => {
             if (text === '') {
                 return "You must provide a Provisioning Policy name.";
             }
@@ -26,7 +54,7 @@ async function askProvisioningPolicyName(): Promise<string | undefined> {
                 return null;
             }
             return "Invalid Provisioning Policy name";
-        } 
+        }
     });
     return result;
 }
@@ -46,7 +74,14 @@ export async function newProvisioningPolicy(treeItem: ProvisioningPoliciesTreeIt
     if (isEmpty(tenantName)) {
         return;
     }
-    let provisioningPolicyName = await askProvisioningPolicyName() || "";
+
+    const usageType = await askProvisioningPolicyType();
+    if (usageType === undefined) {
+        return;
+    }
+
+
+    const provisioningPolicyName = await askProvisioningPolicyName() || "";
     if (isEmpty(provisioningPolicyName)) {
         return;
     }
@@ -62,14 +97,14 @@ export async function newProvisioningPolicy(treeItem: ProvisioningPoliciesTreeIt
                 getPathByUri(treeItem.parentUri) || "",
                 'provisioning-policies',
                 NEW_ID,
-                'CREATE'
+                usageType
             )
         });
         if (!newUri) { return; }
         const data = {
             "name": provisioningPolicyName,
             "description": null,
-            "usageType": "CREATE",
+            "usageType": usageType,
             "fields": []
         };
         await vscode.workspace.fs.writeFile(
@@ -80,7 +115,7 @@ export async function newProvisioningPolicy(treeItem: ProvisioningPoliciesTreeIt
             path: path.posix.join(
                 getPathByUri(treeItem.parentUri) || "",
                 'provisioning-policies',
-                'CREATE',
+                usageType,
                 provisioningPolicyName
             )
         });

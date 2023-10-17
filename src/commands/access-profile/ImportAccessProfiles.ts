@@ -373,7 +373,7 @@ export class AccessProfileImporter {
                 cancellable: false
             }, async (task, token) =>
                 {
-                    const entitlements = await this.client.getAllEntitlementsBySource(sourceId);
+                    const entitlements = await this.client.getEntitlementsBySource(sourceId);
                     this.storedEntitlements[sourceId] = entitlements;
                     const count = this.storedEntitlements[sourceId].length;
                     vscode.window.showInformationMessage(`Found '${count}' entitlements for source '${sourceName}...`);

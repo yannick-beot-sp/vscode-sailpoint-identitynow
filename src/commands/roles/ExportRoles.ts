@@ -3,9 +3,9 @@ import { BaseCSVExporter } from "../BaseExporter";
 import { RolesTreeItem } from '../../models/IdentityNowTreeItem';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
-import { Role } from '../../models/Role';
 import RolePaginator from './RolePaginator';
 import { isEmpty } from 'lodash';
+import { Role } from 'sailpoint-api-client';
 
 export class RoleExporterCommand {
     /**
@@ -112,6 +112,8 @@ class RoleExporter extends BaseCSVExporter<Role> {
                             if (governanceGroups !== undefined && governanceGroups instanceof Array) {
                                 for (let group of governanceGroups) {
                                     if (group.id.trim() === scheme.approverId.trim()) {
+                                        // cf. https://github.com/sailpoint-oss/typescript-sdk/issues/15
+                                        // @ts-ignore                                        
                                         governanceGroupName =  group.name;
                                     }
                                 }
@@ -145,6 +147,8 @@ class RoleExporter extends BaseCSVExporter<Role> {
                             if (governanceGroups !== undefined && governanceGroups instanceof Array) {
                                 for (let group of governanceGroups) {
                                     if (group.id.trim() === scheme.approverId.trim()) {
+                                        // cf. https://github.com/sailpoint-oss/typescript-sdk/issues/15
+                                        // @ts-ignore                                        
                                         governanceGroupName =  group.name;
                                     }
                                 }

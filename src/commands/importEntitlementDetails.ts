@@ -148,7 +148,7 @@ class EntitlementDetailsImporter {
                 filters: `source.id eq "${this.sourceId}" and attribute eq "${data.attributeName}" and value eq "${data.attributeValue}" and type eq "${data.schema}"`
             });
 
-            const entitlements = await response.json();
+            const entitlements = response.data;
             if (!Array.isArray(entitlements) || entitlements.length !== 1) {
                 this.result.entitlementNotFound++;
                 return;
@@ -164,7 +164,13 @@ class EntitlementDetailsImporter {
                     "value": ("TRUE" === data.requestable.toUpperCase())
                 });
             }
-
+            if (isNotEmpty(data.privileged)) {
+                payload.push({
+                    "op": "replace",
+                    "path": "/privileged",
+                    "value": ("TRUE" === data.privileged.toUpperCase())
+                });
+            }
             if (isNotEmpty(data.owner)) {
                 if (/^[a-f0-9]{32}$/.test(data.owner)) {
                     // is id

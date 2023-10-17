@@ -32,9 +32,4 @@ export class EndpointUtils {
         const baseApiUrl = this.getBaseUrl(tenantName);
         return baseApiUrl + '/cc/api';
     }
-
-    public static getV2Url(tenantName: string): string {
-        const baseApiUrl = this.getBaseUrl(tenantName);
-        return baseApiUrl + '/v2';
-    }
 }

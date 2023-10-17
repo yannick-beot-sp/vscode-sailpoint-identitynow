@@ -1,3 +1,4 @@
+import { ExportPayloadBetaIncludeTypesEnum } from 'sailpoint-api-client';
 import { IdentityNowResourceTreeItem, IdentityProfileTreeItem, RuleTreeItem, SourceTreeItem, TransformTreeItem } from '../../models/IdentityNowTreeItem';
 import { PathProposer } from '../../services/PathProposer';
 import { askFile, openPreview } from '../../utils/vsCodeHelpers';
@@ -12,16 +13,16 @@ export class ExportConfigNodeTreeViewCommand {
     constructor() {}
 
 
-    private getObjectType(node: IdentityNowResourceTreeItem): string {
+    private getObjectType(node: IdentityNowResourceTreeItem): ExportPayloadBetaIncludeTypesEnum {
         switch (node.constructor.name) {
             case SourceTreeItem.name:
-                return "SOURCE";
+                return ExportPayloadBetaIncludeTypesEnum.Source;
             case TransformTreeItem.name:
-                return "TRANSFORM";
+                return ExportPayloadBetaIncludeTypesEnum.Transform;
             case IdentityProfileTreeItem.name:
-                return "IDENTITY_PROFILE";
+                return ExportPayloadBetaIncludeTypesEnum.IdentityProfile;
             case RuleTreeItem.name:
-                return "RULE";
+                return ExportPayloadBetaIncludeTypesEnum.Rule;
             default:
                 throw new Error("Invalid node type:" + node.label);
 

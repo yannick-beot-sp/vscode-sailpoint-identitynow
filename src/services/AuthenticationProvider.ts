@@ -1,4 +1,3 @@
-import ClientOAuth2 = require('client-oauth2');
 import {
     authentication,
     AuthenticationProvider,
@@ -14,7 +13,7 @@ import { AuthenticationMethod, TenantCredentials, TenantToken } from '../models/
 import { isEmpty, parseJwt } from '../utils';
 import { EndpointUtils } from '../utils/EndpointUtils';
 import { TenantService } from './TenantService';
-import { request } from '../utils/Request';
+import { OAuth2Client } from './OAuth2Client';
 
 class SailPointIdentityNowPatSession implements AuthenticationSession {
     readonly account: AuthenticationSessionAccountInformation;
@@ -255,18 +254,18 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
      */
     async createAccessToken(tenantName: string, clientId: string, clientSecret: string): Promise<TenantToken> {
         console.log('> createAccessToken', tenantName, clientId);
-        const idnAuth = new ClientOAuth2({
-            clientId: clientId,
-            clientSecret: clientSecret,
-            accessTokenUri: EndpointUtils.getAccessTokenUrl(tenantName)
-        }, request);
+        const idnAuth = new OAuth2Client(
+            clientId,
+            clientSecret,
+            EndpointUtils.getAccessTokenUrl(tenantName)
+        );
 
-        const oauth2token = await idnAuth.credentials.getToken();
+        const oauth2token = await idnAuth.getAccessToken();
         console.log('Successfully logged in to IdentityNow');
         // To prevent issue with JSON.stringify and circular conversion
         const token = new TenantToken(
             oauth2token.accessToken,
-            oauth2token.expiresIn(Number(oauth2token.data.expires_in)),
+            oauth2token.expiresIn,
             {
                 clientId: clientId,
                 clientSecret: clientSecret

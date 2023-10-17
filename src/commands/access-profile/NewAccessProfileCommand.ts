@@ -3,9 +3,9 @@ import { TenantService } from "../../services/TenantService";
 import { AccessProfilesTreeItem } from '../../models/IdentityNowTreeItem';
 import { compareByName, isEmpty } from '../../utils';
 import { NEW_ID } from '../../constants';
-import { AccessProfile } from '../../models/AccessProfile';
 import { IdentityNowClient } from '../../services/IdentityNowClient';
 import { getResourceUri } from '../../utils/UriUtils';
+import { AccessProfile } from 'sailpoint-api-client';
 
 const accessProfile: AccessProfile = require('../../../snippets/access-profile.json');
 
@@ -36,14 +36,15 @@ export class NewAccessProfileCommand {
 
         // Get Sources and Identities
         const sources = await client.getSources();
-        const identities = await client.getIdentities();
+        // XXX Not satisfying
+        const identities = await client.getPublicIdentities();
 
         let name = await this.askName() || "";
         if (isEmpty(name)) {
             return;
         }
 
-        const owner = await this.askOwner(identities);
+        const owner = await this.askOwner(identities.data);
         if (!owner) {
             return;
         }
@@ -113,7 +114,7 @@ export class NewAccessProfileCommand {
 
                 // '+' removed from allowed character as known issue during search/filter of access profile 
                 // If search/filter is failing, the access profile is not properly closed and reopened
-                const regex = new RegExp('^[a-z0-9 _:;,={}@()#-|^%$!?.*]{1,50}$', 'i');
+                const regex = new RegExp('^[a-z0-9 _:;,={}@()#-|^%$!?.*]{1,128}$', 'i');
                 if (regex.test(text)) {
                     return null;
                 }

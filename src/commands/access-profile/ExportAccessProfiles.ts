@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
 import { BaseCSVExporter } from "../BaseExporter";
-import { AccessProfile } from '../../models/AccessProfile';
-import AccessProfilePaginator from './AccessProfilePaginator';
 import { AccessProfilesTreeItem } from '../../models/IdentityNowTreeItem';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
 import { isEmpty } from 'lodash';
+import { AccessProfile, AccessProfilesApiListAccessProfilesRequest } from 'sailpoint-api-client';
+import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator';
 
 export class AccessProfileExporterCommand {
     /**
@@ -115,6 +115,8 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
                             if (governanceGroups !== undefined && governanceGroups instanceof Array) {
                                 for (let group of governanceGroups) {
                                     if (group.id.trim() === scheme.approverId.trim()) {
+                                        // cf. https://github.com/sailpoint-oss/typescript-sdk/issues/15
+                                        // @ts-ignore
                                         governanceGroupName =  group.name;
                                     }
                                 }
@@ -148,6 +150,8 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
                             if (governanceGroups !== undefined && governanceGroups instanceof Array) {
                                 for (let group of governanceGroups) {
                                     if (group.id.trim() === scheme.approverId.trim()) {
+                                        // cf. https://github.com/sailpoint-oss/typescript-sdk/issues/15
+                                        // @ts-ignore
                                         governanceGroupName =  group.name;
                                     }
                                 }
@@ -179,7 +183,9 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
             }
         ];
 
-        const iterator = new AccessProfilePaginator(this.client);
+        const iterator = new GenericAsyncIterableIterator<AccessProfile,AccessProfilesApiListAccessProfilesRequest>(
+            this.client,
+            this.client.getAccessProfiles);
         await this.writeData(headers, paths, unwindablePaths, iterator, task, token, customTransform);
     }
 }

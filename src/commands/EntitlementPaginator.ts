@@ -1,5 +1,4 @@
-import { Account } from "../models/Account";
-import { Entitlement } from "../models/Entitlements";
+import { Entitlement } from "sailpoint-api-client";
 import { IdentityNowClient } from "../services/IdentityNowClient";
 
 

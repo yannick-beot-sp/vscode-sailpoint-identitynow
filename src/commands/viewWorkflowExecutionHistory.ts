@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { WorkflowTreeItem } from '../models/IdentityNowTreeItem';
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { getWorkflowExecutionDetailUri } from '../utils/UriUtils';
-import { WorkflowExecution } from '../models/workflow';
+import { WorkflowExecutionBeta } from 'sailpoint-api-client';
 
 export async function viewWorkflowExecutionHistory(node: WorkflowTreeItem): Promise<void> {
 
@@ -14,12 +14,12 @@ export async function viewWorkflowExecutionHistory(node: WorkflowTreeItem): Prom
     }
     const client = new IdentityNowClient(node.tenantId, node.tenantName);
 
-    let history = await vscode.window.withProgress<WorkflowExecution[]>({
+    let history = await vscode.window.withProgress<WorkflowExecutionBeta[]>({
         location: vscode.ProgressLocation.Notification,
         title: 'Listing workflow executions...',
         cancellable: false
     }, async (task, token) => {
-        return await client.getWorkflowExecutionHistory(node.id as string) as WorkflowExecution[];
+        return await client.getWorkflowExecutionHistory(node.id as string);
     });
 
     if (history === undefined || !Array.isArray(history) || history.length < 1) {
@@ -28,7 +28,7 @@ export async function viewWorkflowExecutionHistory(node: WorkflowTreeItem): Prom
     }
 
     // Sorting descendant to get latest execution first
-    history.sort((a, b) => (a.startTime < b.startTime) ? 1 : -1);
+    history.sort((a, b) => (a < b.startTime) ? 1 : -1);
 
     // At this moment, the execution history is kept 2 days. No need to display more
     const oldest = new Date();

@@ -5,7 +5,7 @@ import { compareByName, isEmpty } from '../../utils';
 import { NEW_ID } from '../../constants';
 import { IdentityNowClient } from '../../services/IdentityNowClient';
 import { getResourceUri } from '../../utils/UriUtils';
-import { Role } from '../../models/Role';
+import { Role } from 'sailpoint-api-client';
 
 const role: Role = require('../../../snippets/role.json');
 
@@ -36,19 +36,20 @@ export class NewRoleCommand {
 
         // Get Sources and Identities
         const accessProfiles = await client.getAccessProfiles();
-        const identities = await client.getIdentities();
+        const identities = await client.getPublicIdentities();
 
         let name = await this.askName() || "";
         if (isEmpty(name)) {
             return;
         }
-
-        const owner = await this.askOwner(identities);
+        // XXX Changer ce point en ajoutant une étape de wizard
+        const owner = await this.askOwner(identities.data);
         if (!owner) {
             return;
         }
 
-        const accessProfile = await this.askAccessProfiles(accessProfiles);
+        // XXX Changer ce point
+        const accessProfile = await this.askAccessProfiles(accessProfiles.data);
         if (!accessProfile) {
             return;
         }
@@ -103,7 +104,7 @@ export class NewRoleCommand {
 
                 // '+' removed from allowed character as known issue during search/filter of role
                 // If search/filter is failing, the role is not properly closed and reopened
-                const regex = new RegExp('^[a-z0-9 _:;,={}@()#-|^%$!?.*]{1,50}$', 'i');
+                const regex = new RegExp('^[a-z0-9 _:;,={}@()#-|^%$!?.*]{1,128}$', 'i');
                 if (regex.test(text)) {
                     return null;
                 }

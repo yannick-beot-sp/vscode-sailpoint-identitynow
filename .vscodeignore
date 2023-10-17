@@ -2,8 +2,12 @@
 .vscode-test/**
 .github/**
 src/**
+node_modules/**
 .gitignore
+*.zip
+*.vsix
 .yarnrc
+webpack.config.js
 vsc-extension-quickstart.md
 IDEAS.md
 RELEASE.md

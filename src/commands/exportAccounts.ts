@@ -5,8 +5,7 @@ import { PathProposer } from '../services/PathProposer';
 import { askFile } from '../utils/vsCodeHelpers';
 import { BaseCSVExporter } from './BaseExporter';
 import AccountPaginator from './AccountPaginator';
-import { Account } from '../models/Account';
-
+import { Account } from 'sailpoint-api-client';
 
 export class AccountExporterCommand {
 

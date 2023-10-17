@@ -6,6 +6,45 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+### Changed
+
+- Add better error message when resetting a source fails (cf. [#54](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/54))
+
+## [0.0.23] - 2023-10-11
+
+### Fixed
+
+- Issue when importing SP-Config: when selecting items, the list of object Ids was not properly sent
+- Issue when refreshing identities of an identity profile  (cf. [#53](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/53))
+
+## [0.0.22] - 2023-10-08
+
+### Added 
+
+- Provide the ability to create provisioning policy for something else than the CREATE policy (cf. [#29](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/29))
+
+### Fixed
+
+- Issue when creating a provisioning policy (cf. [#52](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/52))
+
+## [0.0.21] - 2023-10-05
+
+### Fixed
+- Revert bundle (cf. [#51](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/51))
+
+## [0.0.20] - 2023-10-05
+
+### Changed
+
+- Better error management for SPConfig import and object type displayed for import
+- Remove dependency to client-oauth2, isomorphic-fetch, isomorphic-form-data
+- Relies on axios and sailpoint-api-client wherever it is possible
+
+### Fixed
+
+- Issue with fetch (cf. [#50](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/50))
+- Workflow icon not properly updated after enabling or disabling the workflow
+
 ## [0.0.19] - 2023-06-28
 
 ### Added 

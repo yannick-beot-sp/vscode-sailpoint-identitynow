@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import { NEW_ID } from '../constants';
-import { ConnectorRule } from '../models/connectorRule';
 import { RulesTreeItem } from "../models/IdentityNowTreeItem";
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { TenantService } from '../services/TenantService';
@@ -8,7 +7,8 @@ import { compareByName, isEmpty } from '../utils';
 import { getResourceUri } from '../utils/UriUtils';
 import { chooseTenant, getSelectionContent } from '../utils/vsCodeHelpers';
 import * as commands from './constants';
-const rules: ConnectorRule[] = require('../../snippets/connector-rules.json');
+import { ConnectorRuleResponseBeta } from 'sailpoint-api-client';
+const rules: ConnectorRuleResponseBeta[] = require('../../snippets/connector-rules.json');
 
 /**
  * Internal constants
@@ -151,7 +151,7 @@ export class ConnectorRuleCommand {
         });
     }
 
-    private async chooseExistingRule(client: IdentityNowClient): Promise<ConnectorRule | undefined> {
+    private async chooseExistingRule(client: IdentityNowClient): Promise<ConnectorRuleResponseBeta | undefined> {
         const rules = await client.getConnectorRules();
         return await this.showPickRule(rules, 'Connector rule');
     }
@@ -167,7 +167,7 @@ export class ConnectorRuleCommand {
 
     }
 
-    private async showPickRule(listRules: ConnectorRule[], title: string): Promise<ConnectorRule | undefined> {
+    private async showPickRule(listRules: ConnectorRuleResponseBeta[], title: string): Promise<ConnectorRuleResponseBeta | undefined> {
 
         // QuickPickItem use label instead of name
         // Relying on "detail" instead of "description" as "detail" provides a longer view
@@ -210,7 +210,7 @@ export class ConnectorRuleCommand {
 
                 // '+' removed from allowed character as known issue during search/filter of transform 
                 // If search/filter is failing, the transform is not properly closed and reopened
-                const regex = new RegExp('^[a-z0-9 _:;,={}@()#-|^%$!?.*]{1,50}$', 'i');
+                const regex = new RegExp('^[a-z0-9 _:;,={}@()#-|^%$!?.*]{1,128}$', 'i');
                 if (regex.test(text)) {
                     return null;
                 }
@@ -220,7 +220,7 @@ export class ConnectorRuleCommand {
         return result?.trim();
     }
 
-    private async askRuleType(): Promise<ConnectorRule | undefined> {
+    private async askRuleType(): Promise<ConnectorRuleResponseBeta | undefined> {
         return await this.showPickRule(rules, 'Connector rule type');
     }
 }
