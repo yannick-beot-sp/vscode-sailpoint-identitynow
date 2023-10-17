@@ -1,0 +1,500 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://developer.sailpoint.com/schemas/role.json",
+    "title": "Access Profile",
+    "description": "Schema of a Access Profile",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "type": "string",
+            "description": "The ID of the Access Profile",
+            "example": "2c91808a7190d06e01719938fcd20792",
+            "readOnly": true
+        },
+        "name": {
+            "type": "string",
+            "description": "Name of the Access Profile",
+            "example": "Employee-database-read-write"
+        },
+        "description": {
+            "anyOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "description": "Information about the Access Profile",
+            "example": "Collection of entitlements to read/write the employee database"
+        },
+        "created": {
+            "type": "string",
+            "description": "Date the Access Profile was created",
+            "format": "date-time",
+            "example": "2021-03-01T22:32:58.104Z",
+            "readOnly": true
+        },
+        "modified": {
+            "type": "string",
+            "description": "Date the Access Profile was last modified.",
+            "format": "date-time",
+            "example": "2021-03-02T20:22:28.104Z",
+            "readOnly": true
+        },
+        "enabled": {
+            "type": "boolean",
+            "description": "Whether the Access Profile is enabled. If the Access Profile is enabled then you must include at least one Entitlement.",
+            "example": true
+        },
+        "owner": {
+            "description": "Owner of the Access Profile",
+            "type": "object",
+            "nullable": false,
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "IDENTITY"
+                    ],
+                    "description": "Owner type. This field must be either left null or set to 'IDENTITY' on input, otherwise a 400 Bad Request error will result.",
+                    "example": "IDENTITY"
+                },
+                "id": {
+                    "type": "string",
+                    "description": "Identity id",
+                    "example": "2c9180a46faadee4016fb4e018c20639"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Human-readable display name of the owner. It may be left null or omitted in a POST or PATCH. If set, it must match the current value of the owner's display name, otherwise a 400 Bad Request error will result.",
+                    "example": "support"
+                }
+            }
+        },
+        "source": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "The ID of the Source with with which the Access Profile is associated",
+                    "example": "2c91809773dee3610173fdb0b6061ef4"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "SOURCE"
+                    ],
+                    "description": "The type of the Source, will always be SOURCE",
+                    "example": "SOURCE"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The display name of the associated Source",
+                    "example": "ODS-AD-SOURCE"
+                }
+            }
+        },
+        "entitlements": {
+            "type": "array",
+            "description": "A list of entitlements associated with the Access Profile. If enabled is false this is allowed to be empty otherwise it needs to contain at least one Entitlement.",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "The ID of the Entitlement",
+                        "example": "2c91809773dee32014e13e122092014e"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "ENTITLEMENT"
+                        ],
+                        "description": "The type of the Entitlement, will always be ENTITLEMENT",
+                        "example": "ENTITLEMENT"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "The display name of the Entitlement",
+                        "example": "CN=entitlement.490efde5,OU=OrgCo,OU=ServiceDept,DC=HQAD,DC=local"
+                    }
+                }
+            }
+        },
+        "requestable": {
+            "type": "boolean",
+            "description": "Whether the Access Profile is requestable via access request. Currently, making an Access Profile non-requestable is only supported  for customers enabled with the new Request Center. Otherwise, attempting to create an Access Profile with a value  **false** in this field results in a 400 error.",
+            "example": true
+        },
+        "accessRequestConfig": {
+            "anyOf": [
+                {
+                    "type": "object"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "description": "Access request configuration for this object",
+            "properties": {
+                "commentsRequired": {
+                    "type": "boolean",
+                    "description": "Whether the requester of the containing object must provide comments justifying the request",
+                    "example": true
+                },
+                "denialCommentsRequired": {
+                    "type": "boolean",
+                    "description": "Whether an approver must provide comments when denying the request",
+                    "example": true
+                },
+                "approvalSchemes": {
+                    "type": "array",
+                    "description": "List describing the steps in approving the request",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "approverType": {
+                                "type": "string",
+                                "enum": [
+                                    "APP_OWNER",
+                                    "OWNER",
+                                    "SOURCE_OWNER",
+                                    "MANAGER",
+                                    "GOVERNANCE_GROUP"
+                                ],
+                                "description": "Describes the individual or group that is responsible for an approval step. Values are as follows.\n**APP_OWNER**: The owner of the Application\n\n**OWNER**: Owner of the associated Access Profile or Role\n\n**SOURCE_OWNER**: Owner of the Source associated with an Access Profile\n\n**MANAGER**: Manager of the Identity making the request\n\n**GOVERNANCE_GROUP**: A Governance Group, the ID of which is specified by the **approverId** field",
+                                "example": "GOVERNANCE_GROUP"
+                            },
+                            "approverId": {
+                                "anyOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "description": "Id of the specific approver, used only when approverType is GOVERNANCE_GROUP",
+                                "example": "46c79819-a69f-49a2-becb-12c971ae66c6"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "revocationRequestConfig": {
+            "anyOf": [
+                {
+                    "type": "object"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "description": "Revocation request configuration for this object.",
+            "properties": {
+                "commentsRequired": {
+                    "anyOf": [
+                        {
+                            "type": "boolean"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Whether the requester of the containing object must provide comments justifying the request",
+                    "example": false,
+                    "default": false
+                },
+                "denialCommentsRequired": {
+                    "anyOf": [
+                        {
+                            "type": "boolean"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Whether an approver must provide comments when denying the request",
+                    "example": false,
+                    "default": false
+                },
+                "approvalSchemes": {
+                    "type": "array",
+                    "description": "List describing the steps in approving the revocation request",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "approverType": {
+                                "type": "string",
+                                "enum": [
+                                    "APP_OWNER",
+                                    "OWNER",
+                                    "SOURCE_OWNER",
+                                    "MANAGER",
+                                    "GOVERNANCE_GROUP"
+                                ],
+                                "description": "Describes the individual or group that is responsible for an approval step. Values are as follows.\n**APP_OWNER**: The owner of the Application\n\n**OWNER**: Owner of the associated Access Profile or Role\n\n**SOURCE_OWNER**: Owner of the Source associated with an Access Profile\n\n**MANAGER**: Manager of the Identity making the request\n\n**GOVERNANCE_GROUP**: A Governance Group, the ID of which is specified by the **approverId** field",
+                                "example": "GOVERNANCE_GROUP"
+                            },
+                            "approverId": {
+                                "anyOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "description": "Id of the specific approver, used only when approverType is GOVERNANCE_GROUP",
+                                "example": "46c79819-a69f-49a2-becb-12c971ae66c6"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "segments": {
+            "anyOf": [
+                {
+                    "type": "array"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "items": {
+                "type": "string"
+            },
+            "description": "List of IDs of segments, if any, to which this Access Profile is assigned.",
+            "example": [
+                "f7b1b8a3-5fed-4fd4-ad29-82014e137e19",
+                "29cb6c06-1da8-43ea-8be4-b3125f248f2a"
+            ]
+        },
+        "provisioningCriteria": {
+            "anyOf": [
+                {
+                    "type": "object"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "description": "When an Identity has multiple Accounts on the Source with which an Access Profile is associated, this expression is evaluated against those Accounts to choose one to provision with the Access Profile.",
+            "example": {
+                "operation": "OR",
+                "children": [
+                    {
+                        "operation": "AND",
+                        "children": [
+                            {
+                                "attribute": "dn",
+                                "operation": "CONTAINS",
+                                "value": "useast"
+                            },
+                            {
+                                "attribute": "manager",
+                                "operation": "CONTAINS",
+                                "value": "Scott.Clark"
+                            }
+                        ]
+                    },
+                    {
+                        "operation": "AND",
+                        "children": [
+                            {
+                                "attribute": "dn",
+                                "operation": "EQUALS",
+                                "value": "Gibson"
+                            },
+                            {
+                                "attribute": "telephoneNumber",
+                                "operation": "CONTAINS",
+                                "value": "512"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "properties": {
+                "operation": {
+                    "type": "string",
+                    "enum": [
+                        "EQUALS",
+                        "NOT_EQUALS",
+                        "CONTAINS",
+                        "HAS",
+                        "AND",
+                        "OR"
+                    ],
+                    "description": "Supported operations on ProvisioningCriteria",
+                    "example": "EQUALS"
+                },
+                "attribute": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Name of the Account attribute to be tested. If **operation** is one of EQUALS, NOT_EQUALS, CONTAINS, or HAS, this field is required. Otherwise, specifying it is an error.",
+                    "example": "email"
+                },
+                "value": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "String value to test the Account attribute w/r/t the specified operation. If the operation is one of EQUALS, NOT_EQUALS, or CONTAINS, this field is required. Otherwise, specifying it is an error. If the Attribute is not String-typed, it will be converted to the appropriate type.",
+                    "example": "carlee.cert1c9f9b6fd@mailinator.com"
+                },
+                "children": {
+                    "anyOf": [
+                        {
+                            "type": "array"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "items": {
+                        "type": "object",
+                        "description": "Defines matching criteria for an Account to be provisioned with a specific Access Profile",
+                        "properties": {
+                            "operation": {
+                                "type": "string",
+                                "enum": [
+                                    "EQUALS",
+                                    "NOT_EQUALS",
+                                    "CONTAINS",
+                                    "HAS",
+                                    "AND",
+                                    "OR"
+                                ],
+                                "description": "Supported operations on ProvisioningCriteria",
+                                "example": "EQUALS"
+                            },
+                            "attribute": {
+                                "type": "string",
+                                "description": "Name of the Account attribute to be tested. If **operation** is one of EQUALS, NOT_EQUALS, CONTAINS, or HAS, this field is required. Otherwise, specifying it is an error.",
+                                "example": "email",
+                                "nullable": true
+                            },
+                            "value": {
+                                "anyOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "description": "String value to test the Account attribute w/r/t the specified operation. If the operation is one of EQUALS, NOT_EQUALS, or CONTAINS, this field is required. Otherwise, specifying it is an error. If the Attribute is not String-typed, it will be converted to the appropriate type.",
+                                "example": "carlee.cert1c9f9b6fd@mailinator.com"
+                            },
+                            "children": {
+                                "anyOf": [
+                                    {
+                                        "type": "array"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "items": {
+                                    "type": "object",
+                                    "description": "Defines matching criteria for an Account to be provisioned with a specific Access Profile",
+                                    "properties": {
+                                        "operation": {
+                                            "type": "string",
+                                            "enum": [
+                                                "EQUALS",
+                                                "NOT_EQUALS",
+                                                "CONTAINS",
+                                                "HAS",
+                                                "AND",
+                                                "OR"
+                                            ],
+                                            "description": "Supported operations on ProvisioningCriteria",
+                                            "example": "EQUALS"
+                                        },
+                                        "attribute": {
+                                            "type": "string",
+                                            "description": "Name of the Account attribute to be tested. If **operation** is one of EQUALS, NOT_EQUALS, CONTAINS, or HAS, this field is required. Otherwise, specifying it is an error.",
+                                            "example": "email",
+                                            "nullable": true
+                                        },
+                                        "value": {
+                                            "type": "string",
+                                            "description": "String value to test the Account attribute w/r/t the specified operation. If the operation is one of EQUALS, NOT_EQUALS, or CONTAINS, this field is required. Otherwise, specifying it is an error. If the Attribute is not String-typed, it will be converted to the appropriate type.",
+                                            "example": "carlee.cert1c9f9b6fd@mailinator.com"
+                                        }
+                                    }
+                                },
+                                "description": "Array of child criteria. Required if the operation is AND or OR, otherwise it must be left null. A maximum of three levels of criteria are supported, including leaf nodes.",
+                                "example": null
+                            }
+                        }
+                    },
+                    "description": "Array of child criteria. Required if the operation is AND or OR, otherwise it must be left null. A maximum of three levels of criteria are supported, including leaf nodes.",
+                    "example": null
+                }
+            }
+        }
+    },
+    "definitions": {
+        "reference": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "description": "Refers to a specific Identity attribute, Account attibute, or Entitlement used in Role membership criteria",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "IDENTITY",
+                        "ACCOUNT",
+                        "ENTITLEMENT"
+                    ],
+                    "description": "Indicates whether the associated criteria represents an expression on identity attributes, account attributes, or entitlements, respectively.",
+                    "example": "ACCOUNT"
+                },
+                "property": {
+                    "type": "string",
+                    "description": "The name of the attribute or entitlement to which the associated criteria applies.",
+                    "example": "attribute.email"
+                },
+                "sourceId": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "ID of the Source from which an account attribute or entitlement is drawn. Required if type is ACCOUNT or ENTITLEMENT",
+                    "example": "2c9180867427f3a301745aec18211519"
+                }
+            },
+            "required": [
+                "type",
+                "property"
+            ]
+        }
+    },
+    "required": [
+        "name",
+        "owner"
+    ]
+}

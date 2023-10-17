@@ -825,6 +825,14 @@
       {
         "fileMatch": "idn://**/lifecycle-states/**/*",
         "url": "./schemas/lifecycle-state.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/roles/**/*",
+        "url": "./schemas/role.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/access-profiles/**/*",
+        "url": "./schemas/access-profile.schemas.json"
       }
     ],
     "configuration": {

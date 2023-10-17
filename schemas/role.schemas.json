@@ -1,0 +1,667 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://developer.sailpoint.com/schemas/role.json",
+    "title": "Role",
+    "description": "Schema of a role",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "type": "string",
+            "description": "The id of the Role. This field must be left null when creating an Role, otherwise a 400 Bad Request error will result.",
+            "example": "2c918086749d78830174a1a40e121518"
+        },
+        "name": {
+            "type": "string",
+            "description": "The human-readable display name of the Role",
+            "maxLength": 128,
+            "example": "Role 2567"
+        },
+        "created": {
+            "type": "string",
+            "description": "Date the Role was created",
+            "format": "date-time",
+            "example": "2021-03-01T22:32:58.104Z",
+            "readOnly": true
+        },
+        "modified": {
+            "type": "string",
+            "description": "Date the Role was last modified.",
+            "format": "date-time",
+            "example": "2021-03-02T20:22:28.104Z",
+            "readOnly": true
+        },
+        "description": {
+            "anyOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "description": "A human-readable description of the Role",
+            "example": "Urna amet cursus pellentesque nisl orci maximus lorem nisl euismod fusce morbi placerat adipiscing maecenas nisi tristique et metus et lacus sed morbi nunc nisl maximus magna arcu varius sollicitudin elementum enim maecenas nisi id ipsum tempus fusce diam ipsum tortor."
+        },
+        "owner": {
+            "type": "object",
+            "nullable": false,
+            "description": "The owner of this object.",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "IDENTITY"
+                    ],
+                    "description": "Owner type. This field must be either left null or set to 'IDENTITY' on input, otherwise a 400 Bad Request error will result.",
+                    "example": "IDENTITY"
+                },
+                "id": {
+                    "type": "string",
+                    "description": "Identity id",
+                    "example": "2c9180a46faadee4016fb4e018c20639"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Human-readable display name of the owner. It may be left null or omitted in a POST or PATCH. If set, it must match the current value of the owner's display name, otherwise a 400 Bad Request error will result.",
+                    "example": "support"
+                }
+            }
+        },
+        "accessProfiles": {
+            "anyOf": [
+                {
+                    "type": "array"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "ID of the Access Profile",
+                        "example": "ff808081751e6e129f1518161919ecca"
+                    },
+                    "type": {
+                        "type": "string",
+                        "description": "Type of requested object. This field must be either left null or set to 'ACCESS_PROFILE' when creating an Access Profile, otherwise a 400 Bad Request error will result.",
+                        "enum": [
+                            "ACCESS_PROFILE"
+                        ],
+                        "example": "ACCESS_PROFILE"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Human-readable display name of the Access Profile. This field is ignored on input.",
+                        "example": "Access Profile 2567"
+                    }
+                }
+            }
+        },
+        "membership": {
+            "anyOf": [
+                {
+                    "type": "object"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "description": "When present, specifies that the Role is to be granted to Identities which either satisfy specific criteria or which are members of a given list of Identities.",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "STANDARD",
+                        "IDENTITY_LIST"
+                    ],
+                    "description": "This enum characterizes the type of a Role's membership selector. Only the following two are fully supported:\n\nSTANDARD: Indicates that Role membership is defined in terms of a criteria expression\n\nIDENTITY_LIST: Indicates that Role membership is conferred on the specific identities listed",
+                    "example": "IDENTITY_LIST"
+                },
+                "criteria": {
+                    "anyOf": [
+                        {
+                            "type": "object"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Defines STANDARD type Role membership",
+                    "properties": {
+                        "operation": {
+                            "type": "string",
+                            "enum": [
+                                "EQUALS",
+                                "NOT_EQUALS",
+                                "CONTAINS",
+                                "STARTS_WITH",
+                                "ENDS_WITH",
+                                "AND",
+                                "OR"
+                            ],
+                            "description": "An operation",
+                            "example": "EQUALS"
+                        },
+                        "key": {
+                            "anyOf": [
+                                {
+                                    "type": "object"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "description": "Refers to a specific Identity attribute, Account attibute, or Entitlement used in Role membership criteria",
+                            "properties": {
+                                "type": {
+                                    "type": "string",
+                                    "enum": [
+                                        "IDENTITY",
+                                        "ACCOUNT",
+                                        "ENTITLEMENT"
+                                    ],
+                                    "description": "Indicates whether the associated criteria represents an expression on identity attributes, account attributes, or entitlements, respectively.",
+                                    "example": "ACCOUNT"
+                                },
+                                "property": {
+                                    "type": "string",
+                                    "description": "The name of the attribute or entitlement to which the associated criteria applies.",
+                                    "example": "attribute.email"
+                                },
+                                "sourceId": {
+                                    "anyOf": [
+                                        {
+                                            "type": "string"
+                                        },
+                                        {
+                                            "type": "null"
+                                        }
+                                    ],
+                                    "description": "ID of the Source from which an account attribute or entitlement is drawn. Required if type is ACCOUNT or ENTITLEMENT",
+                                    "example": "2c9180867427f3a301745aec18211519"
+                                }
+                            },
+                            "required": [
+                                "type",
+                                "property"
+                            ]
+                        },
+                        "stringValue": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "description": "String value to test the Identity attribute, Account attribute, or Entitlement specified in the key w/r/t the specified operation. If this criteria is a leaf node, that is, if the operation is one of EQUALS, NOT_EQUALS, CONTAINS, STARTS_WITH, or ENDS_WITH, this field is required. Otherwise, specifying it is an error.",
+                            "example": "carlee.cert1c9f9b6fd@mailinator.com"
+                        },
+                        "children": {
+                            "anyOf": [
+                                {
+                                    "type": "array"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "items": {
+                                "anyOf": [
+                                    {
+                                        "type": "object"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "description": "Defines STANDARD type Role membership",
+                                "properties": {
+                                    "operation": {
+                                        "type": "string",
+                                        "enum": [
+                                            "EQUALS",
+                                            "NOT_EQUALS",
+                                            "CONTAINS",
+                                            "STARTS_WITH",
+                                            "ENDS_WITH",
+                                            "AND",
+                                            "OR"
+                                        ],
+                                        "description": "An operation",
+                                        "example": "EQUALS"
+                                    },
+                                    "key": {
+                                        "anyOf": [
+                                            {
+                                                "type": "object"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "description": "Refers to a specific Identity attribute, Account attibute, or Entitlement used in Role membership criteria",
+                                        "properties": {
+                                            "type": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "IDENTITY",
+                                                    "ACCOUNT",
+                                                    "ENTITLEMENT"
+                                                ],
+                                                "description": "Indicates whether the associated criteria represents an expression on identity attributes, account attributes, or entitlements, respectively.",
+                                                "example": "ACCOUNT"
+                                            },
+                                            "property": {
+                                                "type": "string",
+                                                "description": "The name of the attribute or entitlement to which the associated criteria applies.",
+                                                "example": "attribute.email"
+                                            },
+                                            "sourceId": {
+                                                "anyOf": [
+                                                    {
+                                                        "type": "string"
+                                                    },
+                                                    {
+                                                        "type": "null"
+                                                    }
+                                                ],
+                                                "description": "ID of the Source from which an account attribute or entitlement is drawn. Required if type is ACCOUNT or ENTITLEMENT",
+                                                "example": "2c9180867427f3a301745aec18211519"
+                                            }
+                                        },
+                                        "required": [
+                                            "type",
+                                            "property"
+                                        ]
+                                    },
+                                    "stringValue": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "description": "String value to test the Identity attribute, Account attribute, or Entitlement specified in the key w/r/t the specified operation. If this criteria is a leaf node, that is, if the operation is one of EQUALS, NOT_EQUALS, CONTAINS, STARTS_WITH, or ENDS_WITH, this field is required. Otherwise, specifying it is an error.",
+                                        "example": "carlee.cert1c9f9b6fd@mailinator.com"
+                                    },
+                                    "children": {
+                                        "anyOf": [
+                                            {
+                                                "type": "array"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "items": {
+                                            "type": "object",
+                                            "description": "Defines STANDARD type Role membership",
+                                            "properties": {
+                                                "operation": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "EQUALS",
+                                                        "NOT_EQUALS",
+                                                        "CONTAINS",
+                                                        "STARTS_WITH",
+                                                        "ENDS_WITH",
+                                                        "AND",
+                                                        "OR"
+                                                    ],
+                                                    "description": "An operation",
+                                                    "example": "EQUALS"
+                                                },
+                                                "key": {
+                                                    "$ref": "#/definitions/reference",
+                                                    "description": "Refers to a specific Identity attribute, Account attibute, or Entitlement used in Role membership criteria"
+                                                },
+                                                "stringValue": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "String value to test the Identity attribute, Account attribute, or Entitlement specified in the key w/r/t the specified operation. If this criteria is a leaf node, that is, if the operation is one of EQUALS, NOT_EQUALS, CONTAINS, STARTS_WITH, or ENDS_WITH, this field is required. Otherwise, specifying it is an error.",
+                                                    "example": "carlee.cert1c9f9b6fd@mailinator.com"
+                                                }
+                                            }
+                                        },
+                                        "description": "Array of child criteria. Required if the operation is AND or OR, otherwise it must be left null. A maximum of three levels of criteria are supported, including leaf nodes. Additionally, AND nodes can only be children or OR nodes and vice-versa."
+                                    }
+                                }
+                            },
+                            "description": "Array of child criteria. Required if the operation is AND or OR, otherwise it must be left null. A maximum of three levels of criteria are supported, including leaf nodes. Additionally, AND nodes can only be children or OR nodes and vice-versa."
+                        }
+                    }
+                },
+                "identities": {
+                    "anyOf": [
+                        {
+                            "type": "array"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "items": {
+                        "type": "object",
+                        "description": "A reference to an Identity in an IDENTITY_LIST role membership criteria.",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "example": "IDENTITY",
+                                "enum": [
+                                    "ACCOUNT_CORRELATION_CONFIG",
+                                    "ACCESS_PROFILE",
+                                    "ACCESS_REQUEST_APPROVAL",
+                                    "ACCOUNT",
+                                    "APPLICATION",
+                                    "CAMPAIGN",
+                                    "CAMPAIGN_FILTER",
+                                    "CERTIFICATION",
+                                    "CLUSTER",
+                                    "CONNECTOR_SCHEMA",
+                                    "ENTITLEMENT",
+                                    "GOVERNANCE_GROUP",
+                                    "IDENTITY",
+                                    "IDENTITY_PROFILE",
+                                    "IDENTITY_REQUEST",
+                                    "LIFECYCLE_STATE",
+                                    "PASSWORD_POLICY",
+                                    "ROLE",
+                                    "RULE",
+                                    "SOD_POLICY",
+                                    "SOURCE",
+                                    "TAG",
+                                    "TAG_CATEGORY",
+                                    "TASK_RESULT",
+                                    "REPORT_RESULT",
+                                    "SOD_VIOLATION",
+                                    "ACCOUNT_ACTIVITY",
+                                    "WORKGROUP"
+                                ],
+                                "description": "An enumeration of the types of DTOs supported within the IdentityNow infrastructure."
+                            },
+                            "id": {
+                                "type": "string",
+                                "description": "Identity id",
+                                "example": "2c9180a46faadee4016fb4e018c20639"
+                            },
+                            "name": {
+                                "anyOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "description": "Human-readable display name of the Identity.",
+                                "example": "Thomas Edison"
+                            },
+                            "aliasName": {
+                                "anyOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "description": "User name of the Identity",
+                                "example": "t.edison"
+                            }
+                        }
+                    },
+                    "description": "Defines role membership as being exclusive to the specified Identities, when type is IDENTITY_LIST."
+                }
+            }
+        },
+        "legacyMembershipInfo": {
+            "anyOf": [
+                {
+                    "type": "object"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "description": "This field is not directly modifiable and is generally expected to be *null*. In very rare instances, some Roles may have been created using membership selection criteria that are no longer fully supported. While these Roles will still work, they should be migrated to STANDARD or IDENTITY_LIST selection criteria. This field exists for informational purposes as an aid to such migration.",
+            "example": {
+                "type": "IDENTITY_LIST"
+            },
+            "additionalProperties": true
+        },
+        "enabled": {
+            "type": "boolean",
+            "description": "Whether the Role is enabled or not.",
+            "example": true,
+            "default": false
+        },
+        "requestable": {
+            "type": "boolean",
+            "description": "Whether the Role can be the target of access requests.",
+            "example": true,
+            "default": false
+        },
+        "accessRequestConfig": {
+            "anyOf": [
+                {
+                    "type": "object"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "description": "Access request configuration for this object",
+            "properties": {
+                "commentsRequired": {
+                    "anyOf": [
+                        {
+                            "type": "boolean"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Whether the requester of the containing object must provide comments justifying the request",
+                    "example": true,
+                    "default": false
+                },
+                "denialCommentsRequired": {
+                    "anyOf": [
+                        {
+                            "type": "boolean"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Whether an approver must provide comments when denying the request",
+                    "example": true,
+                    "default": false
+                },
+                "approvalSchemes": {
+                    "type": "array",
+                    "description": "List describing the steps in approving the request",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "approverType": {
+                                "type": "string",
+                                "enum": [
+                                    "OWNER",
+                                    "MANAGER",
+                                    "GOVERNANCE_GROUP"
+                                ],
+                                "description": "Describes the individual or group that is responsible for an approval step. Values are as follows.\n\n**OWNER**: Owner of the associated Role\n\n**MANAGER**: Manager of the Identity making the request\n\n**GOVERNANCE_GROUP**: A Governance Group, the ID of which is specified by the **approverId** field",
+                                "example": "GOVERNANCE_GROUP"
+                            },
+                            "approverId": {
+                                "anyOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "description": "Id of the specific approver, used only when approverType is GOVERNANCE_GROUP",
+                                "example": "46c79819-a69f-49a2-becb-12c971ae66c6"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "revocationRequestConfig": {
+            "default": null,
+            "description": "Revocation request configuration for this object.",
+            "anyOf": [
+                {
+                    "type": "object"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "properties": {
+                "commentsRequired": {
+                    "anyOf": [
+                        {
+                            "type": "boolean"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Whether the requester of the containing object must provide comments justifying the request",
+                    "example": false,
+                    "default": false
+                },
+                "denialCommentsRequired": {
+                    "anyOf": [
+                        {
+                            "type": "boolean"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Whether an approver must provide comments when denying the request",
+                    "example": false,
+                    "default": false
+                },
+                "approvalSchemes": {
+                    "type": "array",
+                    "description": "List describing the steps in approving the revocation request",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "approverType": {
+                                "type": "string",
+                                "enum": [
+                                    "APP_OWNER",
+                                    "OWNER",
+                                    "SOURCE_OWNER",
+                                    "MANAGER",
+                                    "GOVERNANCE_GROUP"
+                                ],
+                                "description": "Describes the individual or group that is responsible for an approval step. Values are as follows.\n**APP_OWNER**: The owner of the Application\n\n**OWNER**: Owner of the associated Access Profile or Role\n\n**SOURCE_OWNER**: Owner of the Source associated with an Access Profile\n\n**MANAGER**: Manager of the Identity making the request\n\n**GOVERNANCE_GROUP**: A Governance Group, the ID of which is specified by the **approverId** field",
+                                "example": "GOVERNANCE_GROUP"
+                            },
+                            "approverId": {
+                                "anyOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "type": "string",
+                                "description": "Id of the specific approver, used only when approverType is GOVERNANCE_GROUP",
+                                "example": "46c79819-a69f-49a2-becb-12c971ae66c6"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "segments": {
+            "anyOf": [
+                {
+                    "type": "array"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "items": {
+                "type": "string"
+            },
+            "description": "List of IDs of segments, if any, to which this Role is assigned.",
+            "example": [
+                "f7b1b8a3-5fed-4fd4-ad29-82014e137e19",
+                "29cb6c06-1da8-43ea-8be4-b3125f248f2a"
+            ]
+        }
+    },
+    "definitions": {
+        "reference": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "description": "Refers to a specific Identity attribute, Account attibute, or Entitlement used in Role membership criteria",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "IDENTITY",
+                        "ACCOUNT",
+                        "ENTITLEMENT"
+                    ],
+                    "description": "Indicates whether the associated criteria represents an expression on identity attributes, account attributes, or entitlements, respectively.",
+                    "example": "ACCOUNT"
+                },
+                "property": {
+                    "type": "string",
+                    "description": "The name of the attribute or entitlement to which the associated criteria applies.",
+                    "example": "attribute.email"
+                },
+                "sourceId": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "ID of the Source from which an account attribute or entitlement is drawn. Required if type is ACCOUNT or ENTITLEMENT",
+                    "example": "2c9180867427f3a301745aec18211519"
+                }
+            },
+            "required": [
+                "type",
+                "property"
+            ]
+        }
+    },
+    "required": [
+        "name",
+        "owner"
+    ]
+}
