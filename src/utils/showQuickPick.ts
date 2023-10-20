@@ -8,20 +8,32 @@ import { Wizard } from '../wizard/wizard';
 import { GoBackError, UserCancelledError } from '../errors';
 
 // Picks are shown in given order, except higher priority items and recently used are moved to the top, and items are grouped if requiested
-export async function showQuickPick<TPick extends QuickPickItem, T>(wizard: Wizard<T>, picks: TPick[] | Promise<TPick[]>, options: QuickPickOptions): Promise<TPick | TPick[]> {
+export async function showQuickPick<TPick extends QuickPickItem, T>(
+    wizard: Wizard<T>,
+    picks: TPick[] | Promise<TPick[]>,
+    options: QuickPickOptions): Promise<TPick | TPick[]> {
+
+
     const disposables: Disposable[] = [];
     try {
         const quickPick: QuickPick<TPick> = createQuickPick(wizard, options);
         disposables.push(quickPick);
-                    // Show progress bar while loading quick picks
-                    quickPick.busy = true;
-                    quickPick.enabled = false;
-                    quickPick.placeholder = options.placeHolder;
-                    quickPick.items = await createQuickPickItems(picks, wizard);
-                    quickPick.selectedItems = quickPick.items.filter(x=>x.picked);
-                    quickPick.show();
-                    quickPick.busy = false;
-                    quickPick.enabled = true;
+        // Show progress bar while loading quick picks
+        quickPick.busy = true;
+        quickPick.enabled = false;
+        quickPick.placeholder = "Loading...";
+        quickPick.show();
+
+        picks = await picks;
+        quickPick.items = await createQuickPickItems(picks, wizard);
+        if (options.canPickMany){
+            quickPick.selectedItems = quickPick.items.filter(x => x.picked);
+        } else {
+            quickPick.activeItems = quickPick.items.filter(x => x.picked);
+        }
+        quickPick.placeholder = options.placeHolder;
+        quickPick.busy = false;
+        quickPick.enabled = true;
 
         // eslint-disable-next-line @typescript-eslint/no-misused-promises, no-async-promise-executor
         const result = await new Promise<TPick | TPick[]>(async (resolve, reject): Promise<void> => {
@@ -92,8 +104,7 @@ function createQuickPick<TPick extends QuickPickItem, T>(wizard: Wizard<T>, opti
     return quickPick;
 }
 
-async function createQuickPickItems<TPick extends QuickPickItem, T>(picks: TPick[] | Promise<TPick[]>, wizard: Wizard<T>) {
-    picks = await picks;
+async function createQuickPickItems<TPick extends QuickPickItem, T>(picks: TPick[], wizard: Wizard<T>) {
     let values = wizard.getCachedInputBoxValue();
     if (values !== undefined) {
         if (typeof values === 'string') {
@@ -107,7 +118,7 @@ async function createQuickPickItems<TPick extends QuickPickItem, T>(picks: TPick
                 return x;
             });
         } else if (Array.isArray(values)) {
-            const labels = values.map(x=>x.label);
+            const labels = values.map(x => x.label);
             picks = picks.map(x => {
                 x.picked = labels.includes(x.label);
                 return x;

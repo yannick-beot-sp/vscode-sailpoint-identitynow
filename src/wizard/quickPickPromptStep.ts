@@ -14,12 +14,20 @@ export interface QuickPickPromptStepOptions<WizardContext, T extends QuickPickIt
      * Function that will be used to get values from picked item(s)
      */
     project?(value: T): any;
+
+    /**
+     * Strings are passed in the items. So expect to store in the context a string. 
+     * Otherwise, store the QuickPickItem
+     * It is possible to override this behavior by defining a custom _project
+     */
+    storeString?: boolean;
 }
 
 export class QuickPickPromptStep<WizardContext, T extends QuickPickItem> extends WizardPromptStep<WizardContext> {
     private readonly _options: QuickPickOptions;
     private readonly _name: string;
     private readonly _displayName!: string;
+    private readonly _storeString!: boolean;
     private readonly _items: string[] | T[] | ((context: WizardContext) => string[] | T[] | Promise<string[] | T[]>);
     private _project?(value: T): any;
 
@@ -43,22 +51,26 @@ export class QuickPickPromptStep<WizardContext, T extends QuickPickItem> extends
         }
         this._items = quickPickPromptStepOptions.items;
         this._project = quickPickPromptStepOptions.project;
+        this._storeString = quickPickPromptStepOptions.storeString ?? false;
+        if (this._storeString && !this._project) {
+            this._project = (x: T) => { return x.label; };
+        }
     }
 
     public async prompt(wizard: Wizard<WizardContext>, wizardContext: WizardContext): Promise<void> {
-        const items = await this.getPicks(wizardContext);
-        let value: T | T[] | string | string[] = await showQuickPick(wizard, items, this._options);
+        // special case as "await" will be done in showQuickPick
+        const items = this.getPicks(wizardContext);
+        let value: T | T[] | string | string[] = await showQuickPick(
+            wizard,
+            items,
+            this._options
+        );
+
         if (this._project) {
             if (this._options.canPickMany) {
                 value = (value as T[]).map(this._project);
             } else {
                 value = this._project(value as T);
-            }
-        } else {
-            if (this._options.canPickMany) {
-                value = (value as T[]).map(x => x.label);
-            } else {
-                value = (value as T).label;
             }
         }
         wizardContext[this._name] = value;

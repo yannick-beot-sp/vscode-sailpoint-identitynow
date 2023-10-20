@@ -6,7 +6,7 @@ import { withQuery } from "../utils/UriUtils";
 import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, Transform, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, Entitlement, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, ImportSpConfigRequestBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, Transform, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, Entitlement, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, ImportSpConfigRequestBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -27,6 +27,9 @@ export const TOTAL_COUNT_HEADER = "x-total-count";
 const CONTENT_TYPE_JSON = "application/json";
 const CONTENT_TYPE_FORM_URLENCODED = "application/x-www-form-urlencoded";
 const CONTENT_TYPE_FORM_JSON_PATCH = "application/json-patch+json";
+
+
+const DEFAULT_PAGINATION = 250;
 
 export class IdentityNowClient {
 
@@ -404,6 +407,58 @@ export class IdentityNowClient {
 		}
 	}
 
+	public async searchAccessProfiles(query: string, limit?: number, fields?: string[], includeNested = false): Promise<AccessProfileDocument[]> {
+		console.log("> searchIdentity", query);
+
+		let search: Search = {
+			indices: [
+				"accessprofiles"
+			],
+			query: {
+				query: query
+			},
+			sort: ["-name"],
+			includeNested: includeNested,
+			queryResultFilter:{
+				includes: fields
+			}
+		};
+
+		return await this.search(search, limit) as IdentityDocument[];
+	}
+	public async searchIdentities(query: string, limit?: number, fields?: string[], includeNested = false): Promise<IdentityDocument[]> {
+		console.log("> searchIdentity", query);
+
+		let search: Search = {
+			indices: [
+				"identities"
+			],
+			query: {
+				query: query
+			},
+			sort: ["-name"],
+			includeNested: includeNested,
+			queryResultFilter:{
+				includes: fields
+			}
+		};
+
+		return await this.search(search, limit) as IdentityDocument[];
+	}
+
+	public async search(query: Search, limit?: number): Promise<SearchDocument[]> {
+		console.log("> search", query);
+
+		const increment = limit ? Math.min(DEFAULT_PAGINATION, limit) : DEFAULT_PAGINATION;
+
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SearchApi(apiConfig);
+		const resp = await Paginator.paginateSearchApi(api, query, increment, limit);
+		return resp.data;
+	}
+
+
+
 	/////////////////////////////
 	//#endregion Search
 	/////////////////////////////
@@ -765,7 +820,7 @@ export class IdentityNowClient {
 		return Number(resp.headers[TOTAL_COUNT_HEADER]);
 	}
 
-	public async getAccountsBySource(sourceId: string, exportUncorrelatedAccountOnly = false, offset = 0, limit = 250): Promise<Account[]> {
+	public async getAccountsBySource(sourceId: string, exportUncorrelatedAccountOnly = false, offset = 0, limit = DEFAULT_PAGINATION): Promise<Account[]> {
 		let filters = `sourceId eq "${sourceId}"`;
 		if (exportUncorrelatedAccountOnly) {
 			filters += " and uncorrelated eq true";
@@ -854,7 +909,7 @@ export class IdentityNowClient {
 		return Number(resp.headers[TOTAL_COUNT_HEADER]);
 	}
 
-	public async getEntitlementsBySource(sourceId: string, offset = 0, limit = 250): Promise<Entitlement[]> {
+	public async getEntitlementsBySource(sourceId: string, offset = 0, limit = DEFAULT_PAGINATION): Promise<Entitlement[]> {
 		const filters = `source.id eq "${sourceId}"`;
 		const resp = await this.getEntitlements({
 			filters,
@@ -868,7 +923,7 @@ export class IdentityNowClient {
 	 * cf. https://developer.sailpoint.com/idn/api/beta/patch-entitlement
 	 * @param id
 	 * @param payload
- 	*/
+	  */
 	public async updateEntitlement(
 		id: string,
 		payload: Array<JsonPatchOperationBeta>
@@ -1017,7 +1072,7 @@ export class IdentityNowClient {
 		console.log("> createRole", role);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new RolesApi(apiConfig);
-		const response = await api.createRole({role});
+		const response = await api.createRole({ role });
 		return response.data;
 	}
 

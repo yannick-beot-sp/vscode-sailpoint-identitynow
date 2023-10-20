@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import { TenantService } from "../../services/TenantService";
 import { RolesTreeItem } from '../../models/IdentityNowTreeItem';
-import { compareByName } from '../../utils';
 import { isEmpty } from '../../utils/stringUtils';
 import { NEW_ID } from '../../constants';
 import { IdentityNowClient } from '../../services/IdentityNowClient';
@@ -10,6 +9,8 @@ import { Role } from 'sailpoint-api-client';
 import { runWizard } from '../../wizard/wizard';
 import { InputPromptStep } from '../../wizard/inputPromptStep';
 import { QuickPickPromptStep } from '../../wizard/quickPickPromptStep';
+import { Validator } from '../../validator/validator';
+import { WizardContext } from '../../wizard/wizardContext';
 
 const role: Role = require('../../../snippets/role.json');
 
@@ -36,51 +37,102 @@ export class NewRoleCommand {
 
         const client = new IdentityNowClient(tenant.tenantId, tenant.tenantName);
 
-        let name = await this.askName() || "";
-        if (isEmpty(name)) {
-            return;
-        }
-        vscode.window.showInformationMessage('Retrieving reference data, this may a few moments...');
-        // Get Sources and Identities
-        const accessProfiles = await client.getAccessProfiles();
-        const identities = await client.getPublicIdentities();
 
+        const roleNameValidator = new Validator({
+            required: true,
+            maxLength: 128,
+            regexp: '^[A-Za-z0-9 _:;,={}@()#-|^%$!?.*]+$'
+        });
+        const requiredValidator = new Validator({
+            required: true
+        });
 
-        // XXX Changer ce point en ajoutant une étape de wizard
-        const owner = await this.askOwner(identities.data);
-        if (!owner) {
-            return;
-        }
+        const values = await runWizard({
+            title: "Creation of a role",
+            hideStepCount: false,
+            promptSteps: [
+                new InputPromptStep({
+                    name: "role",
+                    options: {
+                        validateInput: (s: string) => { return roleNameValidator.validate(s); }
+                    }
+                }),
+                new InputPromptStep({
+                    name: "ownerQuery",
+                    displayName: "owner",
+                    options: {
+                        validateInput: (s: string) => { return requiredValidator.validate(s); }
+                    }
+                }),
+                new QuickPickPromptStep({
+                    name: "owner",
+                    displayName: "role owner",
+                    items: async (context: WizardContext): Promise<vscode.QuickPickItem[]> => {
+                        const results = (await client.searchIdentities(context["ownerQuery"], 100, ["id", "name", "displayName", "email"]))
+                            .map(x => {
+                                const email = x.email ? `(${x.email})` : undefined;
+                                const description = x.displayName ? [x.displayName, email].join(' ') : x.email;
 
-        // XXX Changer ce point
-        const accessProfile = await this.askAccessProfiles(accessProfiles.data);
-        if (!accessProfile) {
-            return;
-        }
+                                return {
+                                    ...x,
+                                    label: x.name,
+                                    description
+                                };
+                            });
 
+                        return results;
+                    }
+                }),
+                new InputPromptStep({
+                    name: "accessProfileQuery",
+                    displayName: "access profile",
+                    options: {
+                        validateInput: (s: string) => { return requiredValidator.validate(s); }
+                    }
+                }),
+                new QuickPickPromptStep({
+                    name: "accessProfile",
+                    displayName: "access profile",
+                    items: async (context: WizardContext): Promise<vscode.QuickPickItem[]> => {
+                        const results = (await client.searchAccessProfiles(context["accessProfileQuery"], 100, ["id", "name", "description"]))
+                            .map(x => ({
+                                id: x.id,
+                                label: x.name,
+                                name: x.name,
+                                detail: x.description
+                            }));
 
-        let newRole = role;
+                        return results;
+                    }
+                }),
+            ]
+        });
+        console.log({ values });
+        if (values === undefined) { return; }
+
+        // Deep copy of "role"
+        const newRole = JSON.parse(JSON.stringify(role));
 
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: 'Creating File...',
             cancellable: false
         }, async (task, token) => {
-
+            const name = values["role"].trim();
             const newUri = getResourceUri(tenantName, 'roles', NEW_ID, name);
             let document = await vscode.workspace.openTextDocument(newUri);
             document = await vscode.languages.setTextDocumentLanguage(document, 'json');
             await vscode.window.showTextDocument(document, { preview: true });
 
             const edit = new vscode.WorkspaceEdit();
-            newRole.name = name.trim();
-            newRole.owner.id = owner.id;
-            newRole.owner.name = owner.name.trim();
+            newRole.name = name;
+            newRole.owner.id = values["owner"].id;
+            newRole.owner.name = values["owner"].name.trim();
             newRole.owner.type = 'IDENTITY';
 
             newRole.accessProfiles.push({
-                id: accessProfile.id,
-                name: accessProfile.name,
+                id: values["accessProfile"].id,
+                name: values["accessProfile"].name,
                 type: 'ACCESS_PROFILE'
             });
 
@@ -90,81 +142,4 @@ export class NewRoleCommand {
         });
     }
 
-    private async askName(): Promise<string | undefined> {
-        const result = await vscode.window.showInputBox({
-            value: '',
-            ignoreFocusOut: true,
-            placeHolder: 'Role name',
-            prompt: "Enter the Role name",
-            title: 'IdentityNow',
-            validateInput: text => {
-                if (text && text.length > 128) {
-                    return "Role name cannot exceed 128 characters.";
-                }
-
-                if (text === '') {
-                    return "You must provide a Role name.";
-                }
-
-                // '+' removed from allowed character as known issue during search/filter of role
-                // If search/filter is failing, the role is not properly closed and reopened
-                const regex = new RegExp('^[a-z0-9 _:;,={}@()#-|^%$!?.*]{1,128}$', 'i');
-                if (regex.test(text)) {
-                    return null;
-                }
-                return "Invalid Role name";
-            }
-        });
-        return result?.trim();
-    }
-
-    private async showPickAccessProfile(accessProfiles: any[], title: string): Promise<any | undefined> {
-        const accessProfilesPickList = accessProfiles
-            .sort(compareByName)
-            .map((obj: { name: any; description: any; }) => ({ ...obj, label: obj.name, detail: obj.description }));
-
-        accessProfilesPickList.forEach((obj: { description: any; }) => delete obj.description);
-
-        const accessProfile = await vscode.window.showQuickPick(accessProfilesPickList, {
-            ignoreFocusOut: false,
-            title: title,
-            canPickMany: false
-        });
-        if (accessProfile?.label) {
-            accessProfile.description = accessProfile.detail;
-            // @ts-ignore
-            delete accessProfile.label;
-            delete accessProfile.detail;
-        }
-        return accessProfile;
-    }
-
-    private async askAccessProfiles(accessProfiles: any[]): Promise<any | undefined> {
-        return await this.showPickAccessProfile(accessProfiles, 'Select Access Profile');
-    }
-
-    private async showPickOwner(identities: any[], title: string): Promise<any | undefined> {
-        const identityPickList = identities
-            .sort(compareByName)
-            .map((obj: { name: any; description: any; }) => ({ ...obj, label: obj.name, detail: obj.name }));
-
-        identityPickList.forEach((obj: { description: any; }) => delete obj.description);
-
-        const identity = await vscode.window.showQuickPick(identityPickList, {
-            ignoreFocusOut: false,
-            title: title,
-            canPickMany: false
-        });
-        if (identity?.label) {
-            identity.description = identity.detail;
-            // @ts-ignore
-            delete identity.label;
-            delete identity.detail;
-        }
-        return identity;
-    }
-
-    private async askOwner(identities: any[]): Promise<any | undefined> {
-        return await this.showPickOwner(identities, 'Select Owner');
-    }
 }
