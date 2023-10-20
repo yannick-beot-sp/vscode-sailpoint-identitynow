@@ -1,3 +1,7 @@
+export function isEmpty(strValue: string | null | undefined): boolean {
+    return (!strValue || strValue.trim() === "" || (strValue.trim()).length === 0);
+}
+
 export function isNotEmpty(val: any) {
     return typeof val === 'string' && !!val;
 }

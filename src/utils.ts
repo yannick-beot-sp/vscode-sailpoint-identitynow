@@ -1,7 +1,3 @@
-export function isEmpty(strValue: string | null | undefined): boolean {
-    return (!strValue || strValue.trim() === "" || (strValue.trim()).length === 0);
-}
-
 export function delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }

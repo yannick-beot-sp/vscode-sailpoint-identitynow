@@ -1,11 +1,12 @@
 import * as vscode from 'vscode';
 import { TenantService } from "../../services/TenantService";
 import { AccessProfilesTreeItem } from '../../models/IdentityNowTreeItem';
-import { compareByName, isEmpty } from '../../utils';
+import { compareByName } from '../../utils';
 import { NEW_ID } from '../../constants';
 import { IdentityNowClient } from '../../services/IdentityNowClient';
 import { getResourceUri } from '../../utils/UriUtils';
 import { AccessProfile } from 'sailpoint-api-client';
+import { isEmpty } from '../../utils/stringUtils';
 
 const accessProfile: AccessProfile = require('../../../snippets/access-profile.json');
 

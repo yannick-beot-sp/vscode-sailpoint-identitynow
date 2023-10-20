@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { isEmpty } from '../utils';
+import { isEmpty } from '../utils/stringUtils';
 import { OpenResourceCommand } from "../commands/openResource";
 import { ATTRIBUTES } from '../models/TransformAttributes';
 import { COUNTRYCODES } from '../models/CountryCodes';

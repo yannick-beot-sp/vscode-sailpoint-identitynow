@@ -1,7 +1,7 @@
 import { Memento, SecretStorage } from "vscode";
 import { TenantCredentials, TenantInfo, TenantToken } from "../models/TenantInfo";
-import { compareByName, isEmpty } from "../utils";
-
+import { compareByName } from "../utils";
+import { isEmpty } from '../utils/stringUtils';
 const SECRET_PAT_PREFIX = "IDENTITYNOW_SECRET_PAT_";
 const SECRET_AT_PREFIX = "IDENTITYNOW_SECRET_AT_";
 const TENANT_PREFIX = "IDENTITYNOW_TENANT_";

@@ -1,4 +1,4 @@
-import { isEmpty } from '../utils';
+import { isEmpty } from '../utils/stringUtils';
 import * as vscode from 'vscode';
 import * as os from 'os';
 import { titleCase } from '../utils/titleCase';

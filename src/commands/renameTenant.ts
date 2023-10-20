@@ -1,8 +1,7 @@
 import * as vscode from 'vscode';
 import * as commands from './constants';
-import { SailPointIdentityNowAuthenticationProvider } from '../services/AuthenticationProvider';
 import { TenantService } from '../services/TenantService';
-import { isEmpty } from '../utils';
+import { isEmpty } from '../utils/stringUtils';
 import { TenantTreeItem } from '../models/IdentityNowTreeItem';
 import { askDisplayName } from '../utils/vsCodeHelpers';
 

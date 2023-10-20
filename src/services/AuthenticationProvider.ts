@@ -10,7 +10,8 @@ import {
     window,
 } from 'vscode';
 import { AuthenticationMethod, TenantCredentials, TenantToken } from '../models/TenantInfo';
-import { isEmpty, parseJwt } from '../utils';
+import { parseJwt } from '../utils';
+import { isEmpty } from '../utils/stringUtils';
 import { EndpointUtils } from '../utils/EndpointUtils';
 import { TenantService } from './TenantService';
 import { OAuth2Client } from './OAuth2Client';

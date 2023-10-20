@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { NEW_ID } from '../constants';
 import { TransformsTreeItem } from "../models/IdentityNowTreeItem";
 import { TransformQuickPickItem } from '../models/TransformQuickPickItem';
-import { isEmpty } from '../utils';
+import { isEmpty } from '../utils/stringUtils';
 import { getResourceUri } from '../utils/UriUtils';
 const transforms = require('../../snippets/transforms.json');
 

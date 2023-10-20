@@ -3,8 +3,8 @@ import { TenantService } from "../services/TenantService";
 import * as fs from 'fs';
 import { TenantInfo } from "../models/TenantInfo";
 import { TenantInfoQuickPickItem } from "../models/TenantInfoQuickPickItem";
-import { compareByName, isEmpty } from "../utils";
-import { isBlank } from "./stringUtils";
+import { compareByName } from "../utils";
+import { isBlank, isEmpty } from "./stringUtils";
 import { ObjectPickItem } from "../models/ObjectPickItem";
 import { OBJECT_TYPE_ITEMS, ObjectTypeQuickPickItem } from "../models/ObjectTypeQuickPickItem";
 

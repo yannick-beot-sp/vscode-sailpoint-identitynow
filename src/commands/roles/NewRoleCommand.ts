@@ -1,11 +1,15 @@
 import * as vscode from 'vscode';
 import { TenantService } from "../../services/TenantService";
 import { RolesTreeItem } from '../../models/IdentityNowTreeItem';
-import { compareByName, isEmpty } from '../../utils';
+import { compareByName } from '../../utils';
+import { isEmpty } from '../../utils/stringUtils';
 import { NEW_ID } from '../../constants';
 import { IdentityNowClient } from '../../services/IdentityNowClient';
 import { getResourceUri } from '../../utils/UriUtils';
 import { Role } from 'sailpoint-api-client';
+import { runWizard } from '../../wizard/wizard';
+import { InputPromptStep } from '../../wizard/inputPromptStep';
+import { QuickPickPromptStep } from '../../wizard/quickPickPromptStep';
 
 const role: Role = require('../../../snippets/role.json');
 
@@ -32,16 +36,16 @@ export class NewRoleCommand {
 
         const client = new IdentityNowClient(tenant.tenantId, tenant.tenantName);
 
-        vscode.window.showInformationMessage('Retrieving reference data, this may a few moments...');
-
-        // Get Sources and Identities
-        const accessProfiles = await client.getAccessProfiles();
-        const identities = await client.getPublicIdentities();
-
         let name = await this.askName() || "";
         if (isEmpty(name)) {
             return;
         }
+        vscode.window.showInformationMessage('Retrieving reference data, this may a few moments...');
+        // Get Sources and Identities
+        const accessProfiles = await client.getAccessProfiles();
+        const identities = await client.getPublicIdentities();
+
+
         // XXX Changer ce point en ajoutant une étape de wizard
         const owner = await this.askOwner(identities.data);
         if (!owner) {
@@ -119,7 +123,7 @@ export class NewRoleCommand {
             .sort(compareByName)
             .map((obj: { name: any; description: any; }) => ({ ...obj, label: obj.name, detail: obj.description }));
 
-            accessProfilesPickList.forEach((obj: { description: any; }) => delete obj.description);
+        accessProfilesPickList.forEach((obj: { description: any; }) => delete obj.description);
 
         const accessProfile = await vscode.window.showQuickPick(accessProfilesPickList, {
             ignoreFocusOut: false,
@@ -144,7 +148,7 @@ export class NewRoleCommand {
             .sort(compareByName)
             .map((obj: { name: any; description: any; }) => ({ ...obj, label: obj.name, detail: obj.name }));
 
-            identityPickList.forEach((obj: { description: any; }) => delete obj.description);
+        identityPickList.forEach((obj: { description: any; }) => delete obj.description);
 
         const identity = await vscode.window.showQuickPick(identityPickList, {
             ignoreFocusOut: false,

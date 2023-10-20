@@ -2,10 +2,11 @@ import * as vscode from 'vscode';
 import * as commands from './constants';
 import { SailPointIdentityNowAuthenticationProvider } from '../services/AuthenticationProvider';
 import { TenantService } from '../services/TenantService';
-import { isEmpty, normalizeTenant } from '../utils';
+import { normalizeTenant } from '../utils';
 import { askDisplayName } from '../utils/vsCodeHelpers';
 import { AuthenticationMethod } from '../models/TenantInfo';
 import { randomUUID } from 'crypto';
+import { isEmpty } from '../utils/stringUtils';
 
 
 export class AddTenantCommand {
