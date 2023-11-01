@@ -1,5 +1,6 @@
 {
     "name": "<<NAME>>",
+    "enabled": true,
     "description": "<<DESCRIPTION>>",
     "owner": {
         "type": "IDENTITY",
@@ -9,7 +10,6 @@
     "accessProfiles": [],
     "membership": null,
     "legacyMembershipInfo": null,
-    "enabled": false,
     "accessRequestConfig": {
         "commentsRequired": false,
         "denialCommentsRequired": false,

@@ -1,7 +1,7 @@
 {
     "name": "<<<NAME>>>",
-    "description": null,
-    "enabled": false,
+    "description": "<<DESCRIPTION>>",
+    "enabled": true,
     "owner": {
         "type": "IDENTITY",
         "id": "<<<OWNER_ID>>>",

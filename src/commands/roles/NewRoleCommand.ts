@@ -14,6 +14,7 @@ import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
 import { requiredValidator } from '../../validator/requiredValidator';
 import { InputOwnerStep } from '../../wizard/inputOwnerStep';
 import { QuickPickOwnerStep } from '../../wizard/quickPickOwnerStep';
+import { createNewFile } from '../../utils/vsCodeHelpers';
 
 const role: Role = require('../../../snippets/role.json');
 
@@ -26,7 +27,7 @@ const roleNameValidator = new Validator({
 
 
 /**
- * Command used to open a source or a role
+ * Command used to create a role
  */
 export class NewRoleCommand {
 
@@ -63,7 +64,7 @@ export class NewRoleCommand {
                 new InputOwnerStep(),
                 new QuickPickOwnerStep(
                     "role owner",
-                    () => {return client}
+                    () => { return client; }
                 ),
                 new InputPromptStep({
                     name: "accessProfileQuery",
@@ -107,26 +108,20 @@ export class NewRoleCommand {
             const name = values["role"].trim();
             const tenantName = values["tenant"].tenantName;
             const newUri = getResourceUri(tenantName, 'roles', NEW_ID, name);
-            let document = await vscode.workspace.openTextDocument(newUri);
-            document = await vscode.languages.setTextDocumentLanguage(document, 'json');
-            await vscode.window.showTextDocument(document, { preview: true });
 
-            const edit = new vscode.WorkspaceEdit();
             newRole.name = name;
-            newRole.owner.id = values["owner"].id;
-            newRole.owner.name = values["owner"].name.trim();
-            newRole.owner.type = 'IDENTITY';
-
+            newRole.owner = {
+                id: values["owner"].id,
+                name: values["owner"].name,
+                type: "IDENTITY"
+            };
             newRole.accessProfiles.push(...values["accessProfiles"].map(x => ({
                 id: x.id,
                 name: x.name,
                 type: 'ACCESS_PROFILE'
             })));
 
-            const strContent = JSON.stringify(newRole, null, 4);
-            edit.insert(newUri, new vscode.Position(0, 0), strContent);
-            let success = await vscode.workspace.applyEdit(edit);
+            await createNewFile(newUri, newRole);
         });
     }
-
 }

@@ -6,7 +6,7 @@ import { withQuery } from "../utils/UriUtils";
 import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, Transform, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, Entitlement, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, ImportSpConfigRequestBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, Transform, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, Entitlement, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, ImportSpConfigRequestBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -417,7 +417,7 @@ export class IdentityNowClient {
 			query: {
 				query: query
 			},
-			sort: ["-name"],
+			sort: ["name"],
 			includeNested: includeNested,
 			queryResultFilter: {
 				includes: fields
@@ -426,7 +426,28 @@ export class IdentityNowClient {
 
 		return await this.search(search, limit) as IdentityDocument[];
 	}
-	public async searchIdentities(query: string, limit?: number, fields?: string[], includeNested = false): Promise<IdentityDocument[]> {
+
+	public async searchEntitlements(query: string, limit?: number, fields?: string[], includeNested = false): Promise<EntitlementDocument[]> {
+		console.log("> searchIdentity", query);
+
+		const search: Search = {
+			indices: [
+				"entitlements"
+			],
+			query: {
+				query: query
+			},
+			sort: ["name"],
+			includeNested: includeNested,
+			queryResultFilter: {
+				includes: fields
+			}
+		};
+
+		return await this.search(search, limit) as EntitlementDocument[];
+	}
+
+	public async searchIdentities(query: string, limit?: number, fields?: string[]): Promise<IdentityDocument[]> {
 		console.log("> searchIdentity", query);
 
 		const search: Search = {
@@ -436,8 +457,8 @@ export class IdentityNowClient {
 			query: {
 				query: query
 			},
-			sort: ["-name"],
-			includeNested: includeNested,
+			sort: ["name"],
+			includeNested: false,
 			queryResultFilter: {
 				includes: fields
 			}
@@ -883,6 +904,21 @@ export class IdentityNowClient {
 	//#region Entitlements
 	/////////////////////////
 
+	public async getAllEntitlements(query: string): Promise<EntitlementBeta[]> {
+		console.log("> getAllEntitlements");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new EntitlementsBetaApi(apiConfig);
+		const result = await Paginator.paginate(api,
+			api.listEntitlements,
+			{ filters: query, sorters: "name" });
+		return result.data;
+	}
+
+	/**
+	 * This function is used to support "manual" pagination and only returns a maximum of 250 records
+	 * @param query parameters for query
+	 * @returns list of entitlements
+	 */
 	public async getEntitlements(
 		query: EntitlementsBetaApiListEntitlementsRequest = DEFAULT_ENTITLEMENTS_QUERY_PARAMS
 		// @ts-ignore 
@@ -899,6 +935,7 @@ export class IdentityNowClient {
 	}
 
 	public async getEntitlementCountBySource(sourceId: string): Promise<number> {
+		console.log("> getEntitlementCountBySource", sourceId);
 		const filters = `source.id eq "${sourceId}"`;
 		const resp = await this.getEntitlements({
 			filters,
@@ -909,7 +946,13 @@ export class IdentityNowClient {
 		return Number(resp.headers[TOTAL_COUNT_HEADER]);
 	}
 
-	public async getEntitlementsBySource(sourceId: string, offset = 0, limit = DEFAULT_PAGINATION): Promise<Entitlement[]> {
+	/**
+	 * This function is used to support "manual" pagination and only returns a maximum of 250 records
+	 * @param sourceId Id of the source
+	 * @returns list of entitlements
+	*/
+	public async getEntitlementsBySource(sourceId: string, offset = 0, limit = DEFAULT_PAGINATION): Promise<EntitlementBeta[]> {
+		console.log("> getEntitlementsBySource", sourceId, offset, limit);
 		const filters = `source.id eq "${sourceId}"`;
 		const resp = await this.getEntitlements({
 			filters,
@@ -918,6 +961,12 @@ export class IdentityNowClient {
 		});
 		return await resp.data;
 	}
+	public async getAllEntitlementsBySource(sourceId: string): Promise<EntitlementBeta[]> {
+		console.log("> getAllEntitlementsBySource", sourceId);
+		const filters = `source.id eq "${sourceId}"`;
+		const resp = await this.getAllEntitlements(filters);
+		return resp;
+	}
 
 	/**
 	 * cf. https://developer.sailpoint.com/idn/api/beta/patch-entitlement
@@ -925,36 +974,36 @@ export class IdentityNowClient {
 	 * @param payload
 	  */
 	public async updateEntitlement(
-		id: string,
-		payload: Array<JsonPatchOperationBeta>
-	): Promise<void> {
-		console.log("> updateEntitlement", id, payload);
-		const apiConfig = await this.getApiConfiguration();
-		const api = new EntitlementsBetaApi(apiConfig);
-		const response = await api.patchEntitlement({
-			id,
-			jsonPatchOperationBeta: payload
-		});
-		console.log("< updateEntitlement");
-	}
+			id: string,
+			payload: Array<JsonPatchOperationBeta>
+		): Promise < void> {
+			console.log("> updateEntitlement", id, payload);
+			const apiConfig = await this.getApiConfiguration();
+			const api = new EntitlementsBetaApi(apiConfig);
+			const response = await api.patchEntitlement({
+				id,
+				jsonPatchOperationBeta: payload
+			});
+			console.log("< updateEntitlement");
+		}
 
 	public async importEntitlements(
-		sourceId: string,
-		filePath: string
-	): Promise<ImportEntitlementsResult> {
-		console.log("> IdentityNowClient.importEntitlements");
-		const endpoint = `beta/entitlements/sources/${sourceId}/entitlements/import`;
-		console.log("endpoint = " + endpoint);
-		const httpClient = await this.getAxios(CONTENT_TYPE_FORM_URLENCODED);
+			sourceId: string,
+			filePath: string
+		): Promise < ImportEntitlementsResult > {
+			console.log("> IdentityNowClient.importEntitlements");
+			const endpoint = `beta/entitlements/sources/${sourceId}/entitlements/import`;
+			console.log("endpoint = " + endpoint);
+			const httpClient = await this.getAxios(CONTENT_TYPE_FORM_URLENCODED);
 
-		var formData = new FormData();
-		formData.append("slpt-source-entitlements-panel-search-entitlements-inputEl", 'Search Entitlements');
-		formData.append('csvFile', createReadStream(filePath));
+			var formData = new FormData();
+			formData.append("slpt-source-entitlements-panel-search-entitlements-inputEl", 'Search Entitlements');
+			formData.append('csvFile', createReadStream(filePath));
 
-		const response = await httpClient.post(endpoint, formData);
+			const response = await httpClient.post(endpoint, formData);
 
-		return response.data;
-	}
+			return response.data;
+		}
 
 	/////////////////////////
 	//#endregion Entitlements
@@ -965,32 +1014,32 @@ export class IdentityNowClient {
 	//////////////////////////////
 
 	public async getPublicIdentities(
-		query: PublicIdentitiesApiGetPublicIdentitiesRequest = DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS
-	): Promise<AxiosResponse<PublicIdentity[], any>> {
-		console.log("> getPublicIdentities", query);
-		const queryValues: PublicIdentitiesApiGetPublicIdentitiesRequest = {
-			...DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS,
-			...query
-		};
+			query: PublicIdentitiesApiGetPublicIdentitiesRequest = DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS
+		): Promise < AxiosResponse < PublicIdentity[], any >> {
+			console.log("> getPublicIdentities", query);
+			const queryValues: PublicIdentitiesApiGetPublicIdentitiesRequest = {
+				...DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS,
+				...query
+			};
 
-		const apiConfig = await this.getApiConfiguration();
-		const api = new PublicIdentitiesApi(apiConfig);
-		const response = await api.getPublicIdentities(queryValues);
-		return response;
-	}
-
-	public async getPublicIdentitiesByAlias(alias: string): Promise<PublicIdentity> {
-		const filters = `alias eq "${alias}"`;
-		const resp = await this.getPublicIdentities({
-			filters,
-			limit: 1,
-			offset: 0,
-			count: true
-		});
-		const nbIdentity = Number(resp.headers[TOTAL_COUNT_HEADER]);
-		if (nbIdentity !== 1) {
-			throw new Error("Could Not Find Identity");
+			const apiConfig = await this.getApiConfiguration();
+			const api = new PublicIdentitiesApi(apiConfig);
+			const response = await api.getPublicIdentities(queryValues);
+			return response;
 		}
+
+	public async getPublicIdentitiesByAlias(alias: string): Promise < PublicIdentity > {
+			const filters = `alias eq "${alias}"`;
+			const resp = await this.getPublicIdentities({
+				filters,
+				limit: 1,
+				offset: 0,
+				count: true
+			});
+			const nbIdentity = Number(resp.headers[TOTAL_COUNT_HEADER]);
+			if(nbIdentity !== 1) {
+				throw new Error("Could Not Find Identity");
+	}
 		return resp.data[0];
 	}
 	//////////////////////////////
@@ -998,16 +1047,16 @@ export class IdentityNowClient {
 	//////////////////////////////
 
 	//////////////////////////////
-	//#region Roles
+	//#region Governance Groups
 	//////////////////////////////
 
-	public async getGovernanceGroups(): Promise<WorkgroupDtoBeta[]> {
-		console.log("> getGovernanceGroups");
-		const apiConfig = await this.getApiConfiguration();
-		const api = new GovernanceGroupsBetaApi(apiConfig);
-		const result = await Paginator.paginate(api, api.listWorkgroups, { sorters: "name" });
-		return result.data;
-	}
+	public async getGovernanceGroups(): Promise < WorkgroupDtoBeta[] > {
+	console.log("> getGovernanceGroups");
+	const apiConfig = await this.getApiConfiguration();
+	const api = new GovernanceGroupsBetaApi(apiConfig);
+	const result = await Paginator.paginate(api, api.listWorkgroups, { sorters: "name" });
+	return result.data;
+}
 
 	//////////////////////////////
 	//#endregion Governance Groups
@@ -1018,33 +1067,33 @@ export class IdentityNowClient {
 	//////////////////////////////
 
 	public async getAccessProfiles(
-		query: AccessProfilesApiListAccessProfilesRequest = DEFAULT_ACCESSPROFILES_QUERY_PARAMS
-	): Promise<AxiosResponse<AccessProfile[], any>> {
-		console.log("> getAccessProfiles", query);
-		const queryValues: AccessProfilesApiListAccessProfilesRequest = {
-			...DEFAULT_ACCESSPROFILES_QUERY_PARAMS,
-			...query
-		};
-		const apiConfig = await this.getApiConfiguration();
-		const api = new AccessProfilesApi(apiConfig);
-		const response = await api.listAccessProfiles(queryValues);
-		return response;
-	}
+	query: AccessProfilesApiListAccessProfilesRequest = DEFAULT_ACCESSPROFILES_QUERY_PARAMS
+): Promise < AxiosResponse < AccessProfile[], any >> {
+	console.log("> getAccessProfiles", query);
+	const queryValues: AccessProfilesApiListAccessProfilesRequest = {
+		...DEFAULT_ACCESSPROFILES_QUERY_PARAMS,
+		...query
+	};
+	const apiConfig = await this.getApiConfiguration();
+	const api = new AccessProfilesApi(apiConfig);
+	const response = await api.listAccessProfiles(queryValues);
+	return response;
+}
 
-	public async getAccessProfileByName(name: string): Promise<AccessProfile> {
-		console.log("> getAccessProfileByName", name);
-		let filters = `name eq "${name}"`;
-		const response = await this.getAccessProfiles({
-			filters
-		});
+	public async getAccessProfileByName(name: string): Promise < AccessProfile > {
+	console.log("> getAccessProfileByName", name);
+	let filters = `name eq "${name}"`;
+	const response = await this.getAccessProfiles({
+		filters
+	});
 
-		const result = response.data;
+	const result = response.data;
 
-		if (!result || !(result instanceof Array) || result.length !== 1) {
-			console.log("getAccessProfileByName returns ", result);
-			throw new Error(`Could not find Access Profile "${name}"`);
-		}
-		return result[0];
+	if(!result || !(result instanceof Array) || result.length !== 1) {
+	console.log("getAccessProfileByName returns ", result);
+	throw new Error(`Could not find Access Profile "${name}"`);
+}
+return result[0];
 	}
 
 	//////////////////////////////
@@ -1055,43 +1104,43 @@ export class IdentityNowClient {
 	//#region Roles
 	//////////////////////////////
 
-	public async getRoleByName(name: string): Promise<Role> {
-		console.log("> getRoleByName", name);
-		const result = await this.getRoles({
-			filters: `name eq "${name}"`,
-			limit: 1
-		});
-		const roles = result.data;
+	public async getRoleByName(name: string): Promise < Role > {
+	console.log("> getRoleByName", name);
+	const result = await this.getRoles({
+		filters: `name eq "${name}"`,
+		limit: 1
+	});
+	const roles = result.data;
 
-		if (!roles || !(roles instanceof Array) || roles.length !== 1) {
-			console.log("getRoleByName returns ", roles);
-			throw new Error(`Could not find role "${name} "`);
-		}
-		// returning only one role
-		return roles[0];
+	if(!roles || !(roles instanceof Array) || roles.length !== 1) {
+	console.log("getRoleByName returns ", roles);
+	throw new Error(`Could not find role "${name} "`);
+}
+// returning only one role
+return roles[0];
 	}
 
 	public async getRoles(
-		query: RolesApiListRolesRequest = DEFAULT_ROLES_QUERY_PARAMS
-	): Promise<AxiosResponse<Role[], any>> {
-		console.log("> getRoles", query);
-		const queryValues: RolesApiListRolesRequest = {
-			...DEFAULT_ROLES_QUERY_PARAMS,
-			...query
-		};
-		const apiConfig = await this.getApiConfiguration();
-		const api = new RolesApi(apiConfig);
-		const response = await api.listRoles(queryValues);
-		return response;
-	}
+	query: RolesApiListRolesRequest = DEFAULT_ROLES_QUERY_PARAMS
+): Promise < AxiosResponse < Role[], any >> {
+	console.log("> getRoles", query);
+	const queryValues: RolesApiListRolesRequest = {
+		...DEFAULT_ROLES_QUERY_PARAMS,
+		...query
+	};
+	const apiConfig = await this.getApiConfiguration();
+	const api = new RolesApi(apiConfig);
+	const response = await api.listRoles(queryValues);
+	return response;
+}
 
-	public async createRole(role: Role): Promise<Role> {
-		console.log("> createRole", role);
-		const apiConfig = await this.getApiConfiguration();
-		const api = new RolesApi(apiConfig);
-		const response = await api.createRole({ role });
-		return response.data;
-	}
+	public async createRole(role: Role): Promise < Role > {
+	console.log("> createRole", role);
+	const apiConfig = await this.getApiConfiguration();
+	const api = new RolesApi(apiConfig);
+	const response = await api.createRole({ role });
+	return response.data;
+}
 
 	//////////////////////////////
 	//#endregion Roles
