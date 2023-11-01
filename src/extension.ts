@@ -44,6 +44,7 @@ import { RoleImporterCommand } from './commands/roles/ImportRoles';
 import { NewAccessProfileCommand } from './commands/access-profile/NewAccessProfileCommand';
 import { NewRoleCommand } from './commands/roles/NewRoleCommand';
 import { LoadMoreNode } from './models/IdentityNowTreeItem';
+import { FilterCommand } from './commands/filterCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -153,8 +154,15 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.LOAD_MORE,
-			async (n: LoadMoreNode)=>{await n.loadMore()}));
+			async (n: LoadMoreNode) => { await n.loadMore(); }));
 
+	const filterCommand = new FilterCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.FILTER_VIEW,
+			filterCommand.execute));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.UPDATE_FILTER_VIEW,
+			filterCommand.execute));
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.ENABLE_WORKFLOW,

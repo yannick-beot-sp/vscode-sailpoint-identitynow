@@ -4,6 +4,8 @@ import { getIdByUri, getPathByUri, getResourceUri } from "../utils/UriUtils";
 import * as commands from "../commands/constants";
 import { IdentityNowClient, TOTAL_COUNT_HEADER } from "../services/IdentityNowClient";
 import { compareByName, compareByPriority } from "../utils";
+import { AxiosResponse } from "axios";
+import { AccessProfileDocument, RoleDocument } from "sailpoint-api-client";
 
 /**
  * Base class to expose getChildren and updateIcon methods
@@ -59,10 +61,6 @@ export class TenantTreeItem extends BaseTreeItem {
 		results.push(new RulesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new ServiceDesksTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new IdentityProfilesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
-
-		/**
-		 * Added by richastral 06/07/2023
-		 */
 		results.push(new AccessProfilesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new RolesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 
@@ -687,24 +685,38 @@ export class ServiceDeskTreeItem extends IdentityNowResourceTreeItem {
 	iconPath = new vscode.ThemeIcon("gear");
 }
 
+export interface PageableNode {
+	currentOffset: number
+	limit?: number;
+	readonly hasMore: boolean;
+	filters?: string | undefined
+	children: BaseTreeItem[]
+	loadMore(): Promise<void>;
+
+}
+
 /**
- * Represents the access profiles drop down in tree node
+ * Contains the roles in tree view
  */
-export class AccessProfilesTreeItem extends FolderTreeItem implements PageableNode {
+export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implements PageableNode {
 	currentOffset = 0;
 	limit?: number;
 	filters?: string = "*";
 	children: BaseTreeItem[] = [];
 	client: IdentityNowClient;
 
-	private _total = 0;
+	protected _total = 0;
 
 	constructor(
+		label: string,
+		contextValue: string,
 		tenantId: string,
 		tenantName: string,
 		tenantDisplayName: string,
+		private readonly notFoundMessage: string,
+		private readonly mapper: (x: any) => BaseTreeItem
 	) {
-		super("Access Profiles", "access-profiles", tenantId, tenantName, tenantDisplayName);
+		super(label, contextValue, tenantId, tenantName, tenantDisplayName);
 		this.limit = 250;
 		this.client = new IdentityNowClient(this.tenantId, this.tenantName);
 	}
@@ -714,9 +726,10 @@ export class AccessProfilesTreeItem extends FolderTreeItem implements PageableNo
 		this.children = [];
 	}
 
+	protected abstract loadNext(): Promise<AxiosResponse<T[]>>;
+
 	async loadMore(): Promise<void> {
 		await vscode.window.withProgress({
-			title: "Loading access profiles...",
 			location: {
 				viewId: commands.TREE_VIEW
 			}
@@ -726,30 +739,18 @@ export class AccessProfilesTreeItem extends FolderTreeItem implements PageableNo
 				this.children.pop();
 			}
 
-			const response = await this.client.paginatedSearchAccessProfiles(
-				this.filters,
-				this.limit,
-				this.currentOffset,
-				(this._total === 0)
-			);
+			const response = await this.loadNext();
 
 			if (this._total === 0) {
 				this._total = Number(response.headers[TOTAL_COUNT_HEADER]);
 			}
 
 			if (this._total === 0) {
-				// still 0?
-				this.children = [new MessageNode('No access profile found')];
+				this.children = [new MessageNode(this.notFoundMessage)];
 				return;
 			}
 
-			const results: BaseTreeItem[] = response.data.map(x => new AccessProfileTreeItem(
-				this.tenantId,
-				this.tenantName,
-				this.tenantDisplayName,
-				x.name,
-				x.id
-			));
+			const results: BaseTreeItem[] = response.data.map(this.mapper);
 			this.children.push(...results);
 
 			if (this.hasMore) {
@@ -773,6 +774,37 @@ export class AccessProfilesTreeItem extends FolderTreeItem implements PageableNo
 			await this.loadMore();
 		}
 		return this.children;
+	}
+}
+
+/**
+ * Contains the access profiles in tree view
+ */
+
+export class AccessProfilesTreeItem extends PageableFolderTreeItem<AccessProfileDocument> {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {
+		super("Access Profiles", "access-profiles", tenantId, tenantName, tenantDisplayName, 'No access profile found',
+			(role => new RoleTreeItem(
+				tenantId,
+				tenantName,
+				tenantDisplayName,
+				role.name,
+				role.id
+			))
+		);
+	}
+	protected async  loadNext(): Promise<AxiosResponse<AccessProfileDocument[]>> {
+		const response = await this.client.paginatedSearchAccessProfiles(
+			this.filters,
+			this.limit,
+			this.currentOffset,
+			(this._total === 0)
+		);
+		return response;
 	}
 }
 
@@ -805,103 +837,64 @@ export class AccessProfileTreeItem extends IdentityNowResourceTreeItem {
 }
 
 
-interface PageableNode {
-	currentOffset: number
-	limit?: number;
-	readonly hasMore: boolean;
-	filters?: string | undefined
-	children: BaseTreeItem[]
-	loadMore(): Promise<void>;
-
-}
 
 /**
- * Represents the roles drop down in tree node
- * Added by richastral 06/07/2023
+ * Contains the roles in tree view
  */
-export class RolesTreeItem extends FolderTreeItem implements PageableNode {
-	currentOffset = 0;
-	limit?: number;
-	filters?: string = "*";
-	children: BaseTreeItem[] = [];
-	client: IdentityNowClient;
-
-	private _total = 0;
-
+export class RolesTreeItem extends PageableFolderTreeItem<RoleDocument> {
 	constructor(
 		tenantId: string,
 		tenantName: string,
 		tenantDisplayName: string,
 	) {
-		super("Roles", "roles", tenantId, tenantName, tenantDisplayName);
-		this.limit = 250;
-		this.client = new IdentityNowClient(this.tenantId, this.tenantName);
-	}
-
-	reset(): void {
-		this.currentOffset = 0;
-		this.children = [];
-	}
-
-	async loadMore(): Promise<void> {
-		await vscode.window.withProgress({
-			title: "Loading roles...",
-			location: {
-				viewId: commands.TREE_VIEW
-			}
-		}, async () => {
-			if (this.children.length > 0) {
-				// remove "Load More" or Message node 
-				this.children.pop();
-			}
-
-			const response = await this.client.paginatedSearchRoles(
-				this.filters,
-				this.limit,
-				this.currentOffset,
-				(this._total === 0)
-			);
-
-			if (this._total === 0) {
-				this._total = Number(response.headers[TOTAL_COUNT_HEADER]);
-			}
-
-			if (this._total === 0) {
-				this.children = [new MessageNode('No role found')];
-				return;
-			}
-
-			const results: BaseTreeItem[] = response.data.map(role => new RoleTreeItem(
-				this.tenantId,
-				this.tenantName,
-				this.tenantDisplayName,
+		super("Roles", "roles", tenantId, tenantName, tenantDisplayName, 'No role found',
+			(role => new RoleTreeItem(
+				tenantId,
+				tenantName,
+				tenantDisplayName,
 				role.name,
 				role.id
-			));
-			this.children.push(...results);
+			))
+		);
+	}
+	protected async  loadNext(): Promise<AxiosResponse<RoleDocument[]>> {
+		const response = await this.client.paginatedSearchRoles(
+			this.filters,
+			this.limit,
+			this.currentOffset,
+			(this._total === 0)
+		);
+		return response;
+	}
+}
 
-			if (this.hasMore) {
-				this.children.push(new LoadMoreNode(
-					this.tenantId,
-					this.tenantName,
-					this.tenantDisplayName,
-					this
-				));
-				this.currentOffset += this.limit;
-			}
-		});
+/**
+ * Represents the single role.
+ * Added by richastral 06/07/2023
+ */
+export class RoleTreeItem extends IdentityNowResourceTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string) {
+		super(
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			"roles",
+			id,
+			vscode.TreeItemCollapsibleState.None,
+			undefined,
+			undefined,
+			true
+		);
 	}
 
-	get hasMore(): boolean {
-		return this._total > this.children.length;
-	}
-
-	async getChildren(): Promise<BaseTreeItem[]> {
-		if (this.children.length === 0) {
-			await this.loadMore();
-		}
-		return this.children;
-	}
+	contextValue = "role";
+	iconPath = new vscode.ThemeIcon("account");
 }
 
 export class LoadMoreNode extends BaseTreeItem {
@@ -951,34 +944,4 @@ export class MessageNode extends BaseTreeItem {
 	getChildren(): Promise<BaseTreeItem[]> {
 		throw new Error("Method not implemented.");
 	}
-}
-
-
-/**
- * Represents the single role.
- * Added by richastral 06/07/2023
- */
-export class RoleTreeItem extends IdentityNowResourceTreeItem {
-	constructor(
-		tenantId: string,
-		tenantName: string,
-		tenantDisplayName: string,
-		label: string,
-		id: string) {
-		super(
-			tenantId,
-			tenantName,
-			tenantDisplayName,
-			label,
-			"roles",
-			id,
-			vscode.TreeItemCollapsibleState.None,
-			undefined,
-			undefined,
-			true
-		);
-	}
-
-	contextValue = "role";
-	iconPath = new vscode.ThemeIcon("account");
 }

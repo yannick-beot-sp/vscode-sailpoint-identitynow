@@ -1,6 +1,5 @@
 export const OPEN_RESOURCE = 'vscode-sailpoint-identitynow.open-resource';
 export const REMOVE_RESOURCE = 'vscode-sailpoint-identitynow.remove-resource';
-export const LOAD_MORE = 'vscode-sailpoint-identitynow.load-more';
 export const REFRESH_FORCED = 'vscode-sailpoint-identitynow.refresh-forced';
 export const REFRESH = 'vscode-sailpoint-identitynow.refresh';
 export const ADD_TENANT = 'vscode-sailpoint-identitynow.add-tenant';
@@ -45,6 +44,20 @@ export const REFRESH_IDENTITY_PROFILE = 'vscode-sailpoint-identitynow.identity-p
 export const TREE_VIEW = 'vscode-sailpoint-identitynow.view';
 export const WORKFLOW_TESTER_VIEW = 'vscode-sailpoint-identitynow.workflow.test-view';
 
+export const LOAD_MORE = 'vscode-sailpoint-identitynow.load-more';
+export const FILTER_VIEW = 'vscode-sailpoint-identitynow.filter';
+export const UPDATE_FILTER_VIEW = 'vscode-sailpoint-identitynow.update-filter';
+
+// New Access Profile
+export const NEW_ACCESS_PROFILE_VIEW = 'vscode-sailpoint-identitynow.new-access-profile.view';
+export const NEW_ACCESS_PROFILE_VIEW_ICON = 'vscode-sailpoint-identitynow.new-access-profile.view-icon';
+export const NEW_ACCESS_PROFILE_PALETTE = 'vscode-sailpoint-identitynow.new-access-profile.palette';
+
+// New Role
+export const NEW_ROLE_VIEW = 'vscode-sailpoint-identitynow.new-role.view';
+export const NEW_ROLE_VIEW_ICON = 'vscode-sailpoint-identitynow.new-role.view-icon';
+export const NEW_ROLE_PALETTE = 'vscode-sailpoint-identitynow.new-role.palette';
+
 // Access Profile Import / Export
 export const EXPORT_ACCESS_PROFILE_VIEW = 'vscode-sailpoint-identitynow.csv.export.access-profiles.view';
 export const EXPORT_ACCESS_PROFILE_ICON_VIEW = 'vscode-sailpoint-identitynow.csv.export.access-profiles-icon.view';
@@ -56,13 +69,3 @@ export const EXPORT_ROLE_VIEW = 'vscode-sailpoint-identitynow.csv.export.roles.v
 export const EXPORT_ROLE_ICON_VIEW = 'vscode-sailpoint-identitynow.csv.export.roles-icon.view';
 export const IMPORT_ROLE_VIEW = 'vscode-sailpoint-identitynow.csv.import.roles.view';
 export const IMPORT_ROLE_ICON_VIEW = 'vscode-sailpoint-identitynow.csv.import.roles-icon.view';
-
-// New Access Profile
-export const NEW_ACCESS_PROFILE_VIEW = 'vscode-sailpoint-identitynow.new-access-profile.view';
-export const NEW_ACCESS_PROFILE_VIEW_ICON = 'vscode-sailpoint-identitynow.new-access-profile.view-icon';
-export const NEW_ACCESS_PROFILE_PALETTE = 'vscode-sailpoint-identitynow.new-access-profile.palette';
-
-// New Role
-export const NEW_ROLE_VIEW = 'vscode-sailpoint-identitynow.new-role.view';
-export const NEW_ROLE_VIEW_ICON = 'vscode-sailpoint-identitynow.new-role.view-icon';
-export const NEW_ROLE_PALETTE = 'vscode-sailpoint-identitynow.new-role.palette';

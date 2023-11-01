@@ -133,6 +133,16 @@
         "title": "Load More"
       },
       {
+        "command": "vscode-sailpoint-identitynow.filter",
+        "title": "Filter",
+        "icon": "$(filter)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.update-filter",
+        "title": "Filter",
+        "icon": "$(filter-filled)"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.aggregate-source",
         "title": "Aggregate source"
       },
@@ -377,6 +387,14 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.load-more",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.filter",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.update-filter",
           "when": "never"
         },
         {
@@ -748,6 +766,11 @@
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == service-desk-integration"
         },
         {
+          "command": "vscode-sailpoint-identitynow.filter",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles",
+          "group": "inline@0"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.new-access-profile.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles"
         },
@@ -757,6 +780,16 @@
           "group": "inline"
         },
         {
+          "command": "vscode-sailpoint-identitynow.refresh-forced",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles",
+          "group": "inline@3"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.filter",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles",
+          "group": "inline@0"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.new-role.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles"
         },
@@ -764,11 +797,6 @@
           "command": "vscode-sailpoint-identitynow.new-role.view-icon",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles",
           "group": "inline@1"
-        },
-        {
-          "command": "vscode-sailpoint-identitynow.refresh-forced",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles",
-          "group": "inline@3"
         },
         {
           "command": "vscode-sailpoint-identitynow.refresh-forced",
