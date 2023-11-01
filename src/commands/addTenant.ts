@@ -88,7 +88,7 @@ export class AddTenantCommand {
                 [tenantId],
                 { createIfNone: true });
             if (session !== undefined && !isEmpty(session.accessToken)) {
-                await vscode.commands.executeCommand(commands.REFRESH);
+                await vscode.commands.executeCommand(commands.REFRESH_FORCED);
                 await vscode.window.showInformationMessage(`Tenant ${displayName} added!`);
             } else {
                 this.tenantService.removeTenant(tenantId);

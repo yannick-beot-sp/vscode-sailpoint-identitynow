@@ -1,5 +1,7 @@
 export const OPEN_RESOURCE = 'vscode-sailpoint-identitynow.open-resource';
 export const REMOVE_RESOURCE = 'vscode-sailpoint-identitynow.remove-resource';
+export const LOAD_MORE = 'vscode-sailpoint-identitynow.load-more';
+export const REFRESH_FORCED = 'vscode-sailpoint-identitynow.refresh-forced';
 export const REFRESH = 'vscode-sailpoint-identitynow.refresh';
 export const ADD_TENANT = 'vscode-sailpoint-identitynow.add-tenant';
 export const RENAME_TENANT = 'vscode-sailpoint-identitynow.rename-tenant';

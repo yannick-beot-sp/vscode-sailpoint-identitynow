@@ -27,7 +27,7 @@ export class RenameTenantCommand {
         if (tenantInfo) {
             tenantInfo.name = displayName;
             await this.tenantService.setTenant(tenantInfo);
-            vscode.commands.executeCommand(commands.REFRESH);
+            vscode.commands.executeCommand(commands.REFRESH_FORCED);
         }
     }
 }

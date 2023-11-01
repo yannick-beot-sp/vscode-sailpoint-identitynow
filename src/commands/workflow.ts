@@ -37,7 +37,7 @@ async function updateWorkflowStatus(node: WorkflowTreeItem, enable: boolean): Pr
     }, async (task, token) => {
         await client.updateWorkflowStatus(node.id, enable);
         node.enabled = enable;
-        await vscode.commands.executeCommand(commands.REFRESH, node);
+        await vscode.commands.executeCommand(commands.REFRESH_FORCED, node);
     });
     console.log("< updateWorkflowStatus");
 }

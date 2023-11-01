@@ -33,6 +33,6 @@ export class SortIdentityProfileCommand {
 
     private async  sortBy(criteria: IdentityProfileSorting, node?: IdentityProfilesTreeItem): Promise<void> {
         node?.sortBy(criteria);
-        await vscode.commands.executeCommand(commands.REFRESH, node);
+        await vscode.commands.executeCommand(commands.REFRESH_FORCED, node);
     }
 }

@@ -43,6 +43,7 @@ import { AccessProfileImporterCommand } from './commands/access-profile/ImportAc
 import { RoleImporterCommand } from './commands/roles/ImportRoles';
 import { NewAccessProfileCommand } from './commands/access-profile/NewAccessProfileCommand';
 import { NewRoleCommand } from './commands/roles/NewRoleCommand';
+import { LoadMoreNode } from './models/IdentityNowTreeItem';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -79,6 +80,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const identityNowDataProvider = new IdentityNowDataProvider(context, tenantService);
 	vscode.window.registerTreeDataProvider(commands.TREE_VIEW, identityNowDataProvider);
 
+	vscode.commands.registerCommand(commands.REFRESH_FORCED, identityNowDataProvider.forceRefresh, identityNowDataProvider);
 	vscode.commands.registerCommand(commands.REFRESH, identityNowDataProvider.refresh, identityNowDataProvider);
 
 	const transformEvaluator = new TransformEvaluator(tenantService);
@@ -148,6 +150,12 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.REMOVE_RESOURCE,
 			deleteResource));
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.LOAD_MORE,
+			async (n: LoadMoreNode)=>{await n.loadMore()}));
+
+
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.ENABLE_WORKFLOW,
 			enableWorkflow));

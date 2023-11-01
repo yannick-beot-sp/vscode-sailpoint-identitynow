@@ -79,7 +79,7 @@ export class IdentityNowUriHandler implements vscode.UriHandler {
                     clientSecret: q.clientSecret as string
                 });
         }
-        await vscode.commands.executeCommand(commands.REFRESH);
+        await vscode.commands.executeCommand(commands.REFRESH_FORCED);
     }
 
 }

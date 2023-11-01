@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import * as vscode from 'vscode';
 import { TenantTreeItem } from "../../models/IdentityNowTreeItem";
 import { TenantService } from "../../services/TenantService";
 import { WizardBasedImporterCommand } from "./WizardBasedImporterCommand";

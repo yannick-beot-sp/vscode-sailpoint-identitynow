@@ -11,6 +11,12 @@ export class IdentityNowDataProvider implements TreeDataProvider<BaseTreeItem> {
         private readonly tenantService: TenantService) {
     }
 
+    forceRefresh(node: BaseTreeItem): void {
+        console.log('> IdentityNowDataProvider.forceRefresh');
+        node.reset();
+        this.refresh(node);
+    }
+    
     refresh(node?: BaseTreeItem): void {
         console.log('> IdentityNowDataProvider.refresh');
         if (node) {

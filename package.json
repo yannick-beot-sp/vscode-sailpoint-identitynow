@@ -110,8 +110,13 @@
         "icon": "$(import)"
       },
       {
-        "command": "vscode-sailpoint-identitynow.refresh",
+        "command": "vscode-sailpoint-identitynow.refresh-forced",
         "title": "IdentityNow: Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.refresh",
+        "title": "Refresh",
         "icon": "$(refresh)"
       },
       {
@@ -122,6 +127,10 @@
         "command": "vscode-sailpoint-identitynow.remove-resource",
         "title": "Delete",
         "icon": "$(trash)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.load-more",
+        "title": "Load More"
       },
       {
         "command": "vscode-sailpoint-identitynow.aggregate-source",
@@ -339,6 +348,10 @@
     "menus": {
       "commandPalette": [
         {
+          "command": "vscode-sailpoint-identitynow.refresh",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.export-config.view",
           "when": "never"
         },
@@ -360,6 +373,10 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.open-resource",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.load-more",
           "when": "never"
         },
         {
@@ -486,7 +503,7 @@
           "group": "navigation"
         },
         {
-          "command": "vscode-sailpoint-identitynow.refresh",
+          "command": "vscode-sailpoint-identitynow.refresh-forced",
           "when": "view == vscode-sailpoint-identitynow.view",
           "group": "navigation"
         }
@@ -513,7 +530,7 @@
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
         },
         {
-          "command": "vscode-sailpoint-identitynow.refresh",
+          "command": "vscode-sailpoint-identitynow.refresh-forced",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == sources",
           "group": "inline"
         },
@@ -587,7 +604,7 @@
           "group": "inline@1"
         },
         {
-          "command": "vscode-sailpoint-identitynow.refresh",
+          "command": "vscode-sailpoint-identitynow.refresh-forced",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == transforms",
           "group": "inline@2"
         },
@@ -605,7 +622,7 @@
           "group": "inline@1"
         },
         {
-          "command": "vscode-sailpoint-identitynow.refresh",
+          "command": "vscode-sailpoint-identitynow.refresh-forced",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == provisioning-policies",
           "group": "inline@2"
         },
@@ -619,7 +636,7 @@
           "group": "inline@1"
         },
         {
-          "command": "vscode-sailpoint-identitynow.refresh",
+          "command": "vscode-sailpoint-identitynow.refresh-forced",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == schemas",
           "group": "inline@2"
         },
@@ -628,7 +645,7 @@
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == schema"
         },
         {
-          "command": "vscode-sailpoint-identitynow.refresh",
+          "command": "vscode-sailpoint-identitynow.refresh-forced",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == workflows",
           "group": "inline"
         },
@@ -666,7 +683,7 @@
           "group": "inline@1"
         },
         {
-          "command": "vscode-sailpoint-identitynow.refresh",
+          "command": "vscode-sailpoint-identitynow.refresh-forced",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rules",
           "group": "inline@2"
         },
@@ -687,7 +704,7 @@
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-profile"
         },
         {
-          "command": "vscode-sailpoint-identitynow.refresh",
+          "command": "vscode-sailpoint-identitynow.refresh-forced",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-profiles",
           "group": "inline@3"
         },
@@ -718,7 +735,7 @@
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == lifecycle-state"
         },
         {
-          "command": "vscode-sailpoint-identitynow.refresh",
+          "command": "vscode-sailpoint-identitynow.refresh-forced",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == service-desk-integrations",
           "group": "inline@2"
         },
@@ -749,12 +766,12 @@
           "group": "inline@1"
         },
         {
-          "command": "vscode-sailpoint-identitynow.refresh",
+          "command": "vscode-sailpoint-identitynow.refresh-forced",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles",
           "group": "inline@3"
         },
         {
-          "command": "vscode-sailpoint-identitynow.refresh",
+          "command": "vscode-sailpoint-identitynow.refresh-forced",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles",
           "group": "inline@3"
         },

@@ -78,7 +78,7 @@ export class ConnectorRuleCommand {
         document = await vscode.languages.setTextDocumentLanguage(document, 'json');
         vscode.window.showTextDocument(document, { preview: false, preserveFocus: true });
         const rulesNode = new RulesTreeItem(tenantInfo.id, tenantInfo.tenantName, tenantInfo.name);
-        vscode.commands.executeCommand(commands.REFRESH, rulesNode);
+        vscode.commands.executeCommand(commands.REFRESH_FORCED, rulesNode);
 
     }
 
