@@ -67,6 +67,7 @@ export class Wizard<T extends WizardContext> {
                     this.currentStepId = getEffectiveStepId(step);
                     await step.prompt(this, this._context);
                     step.prompted = true;
+                    step.onWayback = false;
                 } catch (err) {
                     if (err instanceof GoBackError) {
                         step = this.goBack(step);

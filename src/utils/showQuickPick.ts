@@ -42,6 +42,7 @@ export async function showQuickPick<TPick extends QuickPickItem, T>(
         let zeroItem = false;
         if (quickPick.items.length === 0) {
             zeroItem = true;
+            quickPick.canSelectMany = false;
             quickPick.items = [
                 {
                     label: "No item"

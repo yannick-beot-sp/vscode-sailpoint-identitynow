@@ -3,6 +3,7 @@ import { WizardPromptStep } from "./wizardPromptStep";
 import { Wizard } from "./wizard";
 import { isEmpty } from "../utils/stringUtils";
 import { showQuickPick } from "../utils/showQuickPick";
+import { GoBackError } from "../errors";
 
 
 export interface QuickPickPromptStepOptions<WizardContext, T extends QuickPickItem> {
@@ -22,7 +23,7 @@ export interface QuickPickPromptStepOptions<WizardContext, T extends QuickPickIt
      */
     storeString?: boolean;
 
-    skipIfOne?:boolean;
+    skipIfOne?: boolean;
 }
 
 export class QuickPickPromptStep<WizardContext, T extends QuickPickItem> extends WizardPromptStep<WizardContext> {
@@ -30,7 +31,7 @@ export class QuickPickPromptStep<WizardContext, T extends QuickPickItem> extends
     private readonly _name: string;
     private readonly _displayName!: string;
     private readonly _storeString!: boolean;
-    private readonly _skipIfOne!:boolean;
+    private readonly _skipIfOne!: boolean;
     private readonly _items: string[] | T[] | ((context: WizardContext) => string[] | T[] | Promise<string[] | T[]>);
     private _project?(value: T): any;
 
@@ -64,22 +65,30 @@ export class QuickPickPromptStep<WizardContext, T extends QuickPickItem> extends
     public async prompt(wizard: Wizard<WizardContext>, wizardContext: WizardContext): Promise<void> {
         // special case as "await" will be done in showQuickPick
         const items = this.getPicks(wizardContext);
-        let value: T | T[] | string | string[] = await showQuickPick(
-            wizard,
-            items,
-            this._options,
-            this._skipIfOne,
-            this.onWayback
-        );
+        try {
 
-        if (this._project) {
-            if (this._options.canPickMany) {
-                value = (value as T[]).map(this._project);
-            } else {
-                value = this._project(value as T);
+            let value: T | T[] | string | string[] = await showQuickPick(
+                wizard,
+                items,
+                this._options,
+                this._skipIfOne,
+                this.onWayback
+            );
+
+            if (this._project) {
+                if (this._options.canPickMany) {
+                    value = (value as T[]).map(this._project);
+                } else {
+                    value = this._project(value as T);
+                }
             }
+            wizardContext[this._name] = value;
+        } catch (err) {
+            if (err instanceof GoBackError) {
+                this.onWayback = false;
+            }
+            throw err;
         }
-        wizardContext[this._name] = value;
     }
 
     protected async getPicks(wizardContext: WizardContext): Promise<T[]> {
