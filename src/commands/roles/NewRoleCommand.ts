@@ -11,6 +11,9 @@ import { QuickPickPromptStep } from '../../wizard/quickPickPromptStep';
 import { Validator } from '../../validator/validator';
 import { WizardContext } from '../../wizard/wizardContext';
 import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
+import { requiredValidator } from '../../validator/requiredValidator';
+import { InputOwnerStep } from '../../wizard/inputOwnerStep';
+import { QuickPickOwnerStep } from '../../wizard/quickPickOwnerStep';
 
 const role: Role = require('../../../snippets/role.json');
 
@@ -21,9 +24,6 @@ const roleNameValidator = new Validator({
     regexp: '^[A-Za-z0-9 _:;,={}@()#-|^%$!?.*]+$'
 });
 
-const requiredValidator = new Validator({
-    required: true
-});
 
 /**
  * Command used to open a source or a role
@@ -37,12 +37,11 @@ export class NewRoleCommand {
         console.log("> NewRoleCommand.newRole", rolesTreeItem);
         const context: WizardContext = {};
 
-        // assessing that item is a TenantTreeItem
+        // if the command is called from the Tree View
         if (rolesTreeItem !== undefined && rolesTreeItem instanceof RolesTreeItem) {
             context["tenant"] = await this.tenantService.getTenant(rolesTreeItem.tenantId);
         }
 
-        // const client = new IdentityNowClient(rolesTreeItem.tenantId, rolesTreeItem.tenantName);
         let client: IdentityNowClient | undefined = undefined;
 
         const values = await runWizard({
@@ -61,33 +60,11 @@ export class NewRoleCommand {
                         validateInput: (s: string) => { return roleNameValidator.validate(s); }
                     }
                 }),
-                new InputPromptStep({
-                    name: "ownerQuery",
-                    displayName: "owner",
-                    options: {
-                        validateInput: (s: string) => { return requiredValidator.validate(s); }
-                    }
-                }),
-                new QuickPickPromptStep({
-                    name: "owner",
-                    displayName: "role owner",
-                    skipIfOne: true,
-                    items: async (context: WizardContext): Promise<vscode.QuickPickItem[]> => {
-                        const results = (await client.searchIdentities(context["ownerQuery"], 100, ["id", "name", "displayName", "email"]))
-                            .map(x => {
-                                const email = x.email ? `(${x.email})` : undefined;
-                                const description = x.displayName ? [x.displayName, email].join(' ') : x.email;
-
-                                return {
-                                    ...x,
-                                    label: x.name,
-                                    description
-                                };
-                            });
-
-                        return results;
-                    }
-                }),
+                new InputOwnerStep(),
+                new QuickPickOwnerStep(
+                    "role owner",
+                    () => {return client}
+                ),
                 new InputPromptStep({
                     name: "accessProfileQuery",
                     displayName: "access profile",
