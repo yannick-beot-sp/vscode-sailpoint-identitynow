@@ -786,7 +786,7 @@ export class AccessProfilesTreeItem extends PageableFolderTreeItem<AccessProfile
 		tenantDisplayName: string,
 	) {
 		super("Access Profiles", "access-profiles", tenantId, tenantName, tenantDisplayName, 'No access profile found',
-			(role => new RoleTreeItem(
+			(role => new AccessProfileTreeItem(
 				tenantId,
 				tenantName,
 				tenantDisplayName,
