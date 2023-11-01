@@ -767,7 +767,22 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.filter",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles && config.vscode-sailpoint-identitynow.defaultFilter.roles == *",
+          "group": "inline@0"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.filter",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles && config.vscode-sailpoint-identitynow.defaultFilter.access-profiles == *",
+          "group": "inline@0"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.update-filter",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles && config.vscode-sailpoint-identitynow.defaultFilter.roles != *",
+          "group": "inline@0"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.update-filter",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles && config.vscode-sailpoint-identitynow.defaultFilter.access-profiles != *",
           "group": "inline@0"
         },
         {
@@ -783,11 +798,6 @@
           "command": "vscode-sailpoint-identitynow.refresh-forced",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles",
           "group": "inline@3"
-        },
-        {
-          "command": "vscode-sailpoint-identitynow.filter",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles",
-          "group": "inline@0"
         },
         {
           "command": "vscode-sailpoint-identitynow.new-role.view",
@@ -942,6 +952,15 @@
         "vscode-sailpoint-identitynow.report.csv.filename": {
           "type": "string",
           "default": "%x/reports/%T-%J-%y%M%d-%h%m%s.csv"
+        }
+        ,
+        "vscode-sailpoint-identitynow.defaultFilter.roles": {
+          "type": "string",
+          "default": "*"
+        },
+        "vscode-sailpoint-identitynow.defaultFilter.access-profiles": {
+          "type": "string",
+          "default": "*"
         }
       }
     }

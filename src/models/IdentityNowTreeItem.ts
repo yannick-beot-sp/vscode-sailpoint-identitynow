@@ -692,7 +692,6 @@ export interface PageableNode {
 	filters?: string | undefined
 	children: BaseTreeItem[]
 	loadMore(): Promise<void>;
-
 }
 
 /**
@@ -714,7 +713,7 @@ export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implement
 		tenantName: string,
 		tenantDisplayName: string,
 		private readonly notFoundMessage: string,
-		private readonly mapper: (x: any) => BaseTreeItem
+		private readonly mapper: (x: any) => BaseTreeItem,
 	) {
 		super(label, contextValue, tenantId, tenantName, tenantDisplayName);
 		this.limit = 250;
@@ -780,7 +779,6 @@ export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implement
 /**
  * Contains the access profiles in tree view
  */
-
 export class AccessProfilesTreeItem extends PageableFolderTreeItem<AccessProfileDocument> {
 	constructor(
 		tenantId: string,
@@ -797,7 +795,7 @@ export class AccessProfilesTreeItem extends PageableFolderTreeItem<AccessProfile
 			))
 		);
 	}
-	protected async  loadNext(): Promise<AxiosResponse<AccessProfileDocument[]>> {
+	protected async loadNext(): Promise<AxiosResponse<AccessProfileDocument[]>> {
 		const response = await this.client.paginatedSearchAccessProfiles(
 			this.filters,
 			this.limit,
@@ -824,19 +822,13 @@ export class AccessProfileTreeItem extends IdentityNowResourceTreeItem {
 			tenantDisplayName,
 			label,
 			"access-profiles",
-			id,
-			vscode.TreeItemCollapsibleState.None,
-			undefined,
-			undefined,
-			true
+			id
 		);
 	}
 
 	contextValue = "access-profile";
 	iconPath = new vscode.ThemeIcon("archive");
 }
-
-
 
 /**
  * Contains the roles in tree view
@@ -857,7 +849,8 @@ export class RolesTreeItem extends PageableFolderTreeItem<RoleDocument> {
 			))
 		);
 	}
-	protected async  loadNext(): Promise<AxiosResponse<RoleDocument[]>> {
+
+	protected async loadNext(): Promise<AxiosResponse<RoleDocument[]>> {
 		const response = await this.client.paginatedSearchRoles(
 			this.filters,
 			this.limit,
@@ -885,12 +878,7 @@ export class RoleTreeItem extends IdentityNowResourceTreeItem {
 			tenantDisplayName,
 			label,
 			"roles",
-			id,
-			vscode.TreeItemCollapsibleState.None,
-			undefined,
-			undefined,
-			true
-		);
+			id);
 	}
 
 	contextValue = "role";
