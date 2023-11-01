@@ -140,12 +140,26 @@
             "description": "Access request configuration for this object",
             "properties": {
                 "commentsRequired": {
-                    "type": "boolean",
+                    "anyOf": [
+                        {
+                            "type": "boolean"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
                     "description": "Whether the requester of the containing object must provide comments justifying the request",
                     "example": true
                 },
                 "denialCommentsRequired": {
-                    "type": "boolean",
+                    "anyOf": [
+                        {
+                            "type": "boolean"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
                     "description": "Whether an approver must provide comments when denying the request",
                     "example": true
                 },
