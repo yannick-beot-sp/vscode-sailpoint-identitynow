@@ -41,8 +41,18 @@
       "example": "Technical Name",
       "description": "The technical name for lifecycle state. This is for internal use."
     },
+    "identityState":{
+      "type": "null"
+    },
     "description": {
-      "type": "string",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
       "example": "Lifecycle description",
       "description": "Lifecycle state description."
     },
