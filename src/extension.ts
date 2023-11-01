@@ -259,7 +259,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_ACCESS_PROFILE_ICON_VIEW,
 			accessProfileExporterCommand.execute, accessProfileExporterCommand));
-	
+
 	// Access Profile Importer
 	const accessProfileImporterCommand = new AccessProfileImporterCommand();
 	context.subscriptions.push(
@@ -288,20 +288,23 @@ export function activate(context: vscode.ExtensionContext) {
 			roleImporterCommand.execute, roleImporterCommand));
 
 	const newRoleCommand = new NewRoleCommand(tenantService);
-		context.subscriptions.push(
-			vscode.commands.registerCommand(commands.NEW_ROLE,
-				newRoleCommand.newRole, newRoleCommand));
-		context.subscriptions.push(
-			vscode.commands.registerCommand(commands.NEW_ROLE_ICON,
-				newRoleCommand.newRole, newRoleCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_ROLE_VIEW,
+			newRoleCommand.newRole, newRoleCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_ROLE_VIEW_ICON,
+			newRoleCommand.newRole, newRoleCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_ROLE_PALETTE,
+			newRoleCommand.newRole, newRoleCommand));
 
 	const newAccessProfileCommand = new NewAccessProfileCommand(tenantService);
-		context.subscriptions.push(
-			vscode.commands.registerCommand(commands.NEW_ACCESS_PROFILE,
-				newAccessProfileCommand.newAccessProfile, newAccessProfileCommand));
-		context.subscriptions.push(
-			vscode.commands.registerCommand(commands.NEW_ACCESS_PROFILE_ICON,
-				newAccessProfileCommand.newAccessProfile, newAccessProfileCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_ACCESS_PROFILE,
+			newAccessProfileCommand.newAccessProfile, newAccessProfileCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_ACCESS_PROFILE_ICON,
+			newAccessProfileCommand.newAccessProfile, newAccessProfileCommand));
 
 }
 

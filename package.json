@@ -267,11 +267,17 @@
         "icon": "$(add)"
       },
       {
-        "command": "vscode-sailpoint-identitynow.new-role",
-        "title": "New Role"
+        "command": "vscode-sailpoint-identitynow.new-role.view",
+        "title": "New Role",
+        "icon": "$(add)"
       },
       {
-        "command": "vscode-sailpoint-identitynow.new-role-icon",
+        "command": "vscode-sailpoint-identitynow.new-role.palette",
+        "title": "IdentityNow: Add a new role...",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.new-role.view-icon",
         "title": "New Role",
         "icon": "$(add)"
       },
@@ -712,11 +718,11 @@
           "group": "inline"
         },
         {
-          "command": "vscode-sailpoint-identitynow.new-role",
+          "command": "vscode-sailpoint-identitynow.new-role.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles"
         },
         {
-          "command": "vscode-sailpoint-identitynow.new-role-icon",
+          "command": "vscode-sailpoint-identitynow.new-role.view-icon",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles",
           "group": "inline@1"
         },

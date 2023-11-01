@@ -60,5 +60,6 @@ export const NEW_ACCESS_PROFILE = 'vscode-sailpoint-identitynow.new-access-profi
 export const NEW_ACCESS_PROFILE_ICON = 'vscode-sailpoint-identitynow.new-access-profile-icon';
 
 // New Role
-export const NEW_ROLE = 'vscode-sailpoint-identitynow.new-role';
-export const NEW_ROLE_ICON = 'vscode-sailpoint-identitynow.new-role-icon';
+export const NEW_ROLE_VIEW = 'vscode-sailpoint-identitynow.new-role.view';
+export const NEW_ROLE_VIEW_ICON = 'vscode-sailpoint-identitynow.new-role.view-icon';
+export const NEW_ROLE_PALETTE = 'vscode-sailpoint-identitynow.new-role.palette';

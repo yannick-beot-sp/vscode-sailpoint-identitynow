@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import { TenantService } from "../../services/TenantService";
 import { RolesTreeItem } from '../../models/IdentityNowTreeItem';
-import { isEmpty } from '../../utils/stringUtils';
 import { NEW_ID } from '../../constants';
 import { IdentityNowClient } from '../../services/IdentityNowClient';
 import { getResourceUri } from '../../utils/UriUtils';
@@ -97,8 +96,11 @@ export class NewRoleCommand {
                     }
                 }),
                 new QuickPickPromptStep({
-                    name: "accessProfile",
-                    displayName: "access profile",
+                    name: "accessProfiles",
+                    displayName: "access profiles",
+                    options: {
+                        canPickMany: true
+                    },
                     items: async (context: WizardContext): Promise<vscode.QuickPickItem[]> => {
                         const results = (await client.searchAccessProfiles(context["accessProfileQuery"], 100, ["id", "name", "description", "source.name"]))
                             .map(x => ({
@@ -118,7 +120,7 @@ export class NewRoleCommand {
         if (values === undefined) { return; }
 
         // Deep copy of "role" template
-        const newRole = JSON.parse(JSON.stringify(role));
+        const newRole: Role = JSON.parse(JSON.stringify(role));
 
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
@@ -138,11 +140,11 @@ export class NewRoleCommand {
             newRole.owner.name = values["owner"].name.trim();
             newRole.owner.type = 'IDENTITY';
 
-            newRole.accessProfiles.push({
-                id: values["accessProfile"].id,
-                name: values["accessProfile"].name,
+            newRole.accessProfiles.push(...values["accessProfiles"].map(x => ({
+                id: x.id,
+                name: x.name,
                 type: 'ACCESS_PROFILE'
-            });
+            })));
 
             const strContent = JSON.stringify(newRole, null, 4);
             edit.insert(newUri, new vscode.Position(0, 0), strContent);
