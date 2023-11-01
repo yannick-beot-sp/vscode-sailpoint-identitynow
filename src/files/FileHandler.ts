@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { URL_PREFIX } from '../constants';
-import { RulesTreeItem, TransformsTreeItem } from '../models/IdentityNowTreeItem';
+import { RolesTreeItem, RulesTreeItem, TransformsTreeItem } from '../models/IdentityNowTreeItem';
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { TenantService } from '../services/TenantService';
 import { getIdByUri, getResourceUri } from '../utils/UriUtils';
@@ -17,7 +17,7 @@ export class FileHandler {
             return;
         }
 
-        if (!document.uri.path.match(/transforms|connector-rules/)) {
+        if (!document.uri.path.match(/transforms|connector-rules|roles/)) {
             return;
         }
 
@@ -28,26 +28,17 @@ export class FileHandler {
         let resourceType: string;
         let isBeta = false;
         const tenantInfo = await this.tenantService.getTenantByTenantName(tenantName);
-        if (olduri.path.match('transforms')) {
-            node = new TransformsTreeItem(tenantInfo?.id ?? "", tenantName, tenantInfo?.name ?? "");
-            resourceType = 'transforms';
-        } else if (olduri.path.match('lifecycle-states')) {
-            node = new TransformsTreeItem(tenantInfo?.id ?? "", tenantName, tenantInfo?.name ?? "");
-            resourceType = 'lifecycle-states';
-        } else {
-            node = new RulesTreeItem(tenantInfo?.id ?? "", tenantName, tenantInfo?.name ?? "");
-            resourceType = 'connector-rules';
-            isBeta = true;
+        
+        if (tenantInfo === undefined) {
+            return;
         }
-
-        vscode.commands.executeCommand(commands.REFRESH, node);
 
         //////////////////////////////////////////
         // Get generated object to get the ID
         //////////////////////////////////////////
-        const client = new IdentityNowClient(tenantInfo?.id ?? "", tenantName);
+        const client = new IdentityNowClient(tenantInfo.id!, tenantName);
 
-        // 1. Get name
+        // 1. Get name from the document
         const editorText = document.getText();
         const editorObject = JSON.parse(editorText);
         const name = editorObject.name;
@@ -57,13 +48,14 @@ export class FileHandler {
         }
         console.log('onFileSaved: name = ', name);
 
-        // 2. Get transform to get ID
-        // As it is a "search", an array should be returned
+        // 2. get the object by name to get the new id
         let data: any;
         if (resourceType === 'transforms') {
             data = await client.getTransformByName(name);
-        } else {
+        } else if (resourceType === 'connector-rules') {
             data = await client.getConnectorRuleByName(name);
+        } else if (resourceType === 'roles') {
+            data = await client.getRoleByName(name);
         }
 
         if (!data) {

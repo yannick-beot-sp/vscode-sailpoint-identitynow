@@ -419,7 +419,7 @@ export class IdentityNowClient {
 			},
 			sort: ["-name"],
 			includeNested: includeNested,
-			queryResultFilter:{
+			queryResultFilter: {
 				includes: fields
 			}
 		};
@@ -438,7 +438,7 @@ export class IdentityNowClient {
 			},
 			sort: ["-name"],
 			includeNested: includeNested,
-			queryResultFilter:{
+			queryResultFilter: {
 				includes: fields
 			}
 		};
@@ -1054,6 +1054,23 @@ export class IdentityNowClient {
 	//////////////////////////////
 	//#region Roles
 	//////////////////////////////
+
+	public async getRoleByName(name: string): Promise<Role> {
+		console.log("> getRoleByName", name);
+		const result = await this.getRoles({
+			filters: `name eq "${name}"`,
+			limit: 1
+		});
+		const roles = result.data;
+
+		if (!roles || !(roles instanceof Array) || roles.length !== 1) {
+			console.log("getRoleByName returns ", roles);
+			throw new Error(`Could not find role "${name} "`);
+		}
+		// returning only one role
+		return roles[0];
+	}
+
 	public async getRoles(
 		query: RolesApiListRolesRequest = DEFAULT_ROLES_QUERY_PARAMS
 	): Promise<AxiosResponse<Role[], any>> {
