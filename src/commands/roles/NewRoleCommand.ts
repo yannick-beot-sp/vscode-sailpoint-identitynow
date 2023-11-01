@@ -11,8 +11,20 @@ import { InputPromptStep } from '../../wizard/inputPromptStep';
 import { QuickPickPromptStep } from '../../wizard/quickPickPromptStep';
 import { Validator } from '../../validator/validator';
 import { WizardContext } from '../../wizard/wizardContext';
+import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
 
 const role: Role = require('../../../snippets/role.json');
+
+
+const roleNameValidator = new Validator({
+    required: true,
+    maxLength: 128,
+    regexp: '^[A-Za-z0-9 _:;,={}@()#-|^%$!?.*]+$'
+});
+
+const requiredValidator = new Validator({
+    required: true
+});
 
 /**
  * Command used to open a source or a role
@@ -21,36 +33,29 @@ export class NewRoleCommand {
 
     constructor(private readonly tenantService: TenantService) { }
 
-    async newRole(tenant: RolesTreeItem): Promise<void> {
+    async newRole(rolesTreeItem?: RolesTreeItem): Promise<void> {
 
-        console.log("> NewRoleCommand.newRole", tenant);
+        console.log("> NewRoleCommand.newRole", rolesTreeItem);
+        const context: WizardContext = {};
 
         // assessing that item is a TenantTreeItem
-        if (tenant === undefined || !(tenant instanceof RolesTreeItem)) {
-            console.log("WARNING: NewRoleCommand.newRole: invalid node", tenant);
-            throw new Error("NewRoleCommand.newRole: invalid node");
-        }
-        const tenantName = tenant.tenantName || "";
-        if (isEmpty(tenantName)) {
-            return;
+        if (rolesTreeItem !== undefined && rolesTreeItem instanceof RolesTreeItem) {
+            context["tenant"] = await this.tenantService.getTenant(rolesTreeItem.tenantId);
         }
 
-        const client = new IdentityNowClient(tenant.tenantId, tenant.tenantName);
-
-
-        const roleNameValidator = new Validator({
-            required: true,
-            maxLength: 128,
-            regexp: '^[A-Za-z0-9 _:;,={}@()#-|^%$!?.*]+$'
-        });
-        const requiredValidator = new Validator({
-            required: true
-        });
+        // const client = new IdentityNowClient(rolesTreeItem.tenantId, rolesTreeItem.tenantName);
+        let client: IdentityNowClient | undefined = undefined;
 
         const values = await runWizard({
             title: "Creation of a role",
             hideStepCount: false,
             promptSteps: [
+                new QuickPickTenantStep(
+                    this.tenantService,
+                    async (wizardContext) => {
+                        client = new IdentityNowClient(
+                            wizardContext["tenant"].id, wizardContext["tenant"].tenantName);
+                    }),
                 new InputPromptStep({
                     name: "role",
                     options: {
@@ -67,6 +72,7 @@ export class NewRoleCommand {
                 new QuickPickPromptStep({
                     name: "owner",
                     displayName: "role owner",
+                    skipIfOne: true,
                     items: async (context: WizardContext): Promise<vscode.QuickPickItem[]> => {
                         const results = (await client.searchIdentities(context["ownerQuery"], 100, ["id", "name", "displayName", "email"]))
                             .map(x => {
@@ -94,11 +100,12 @@ export class NewRoleCommand {
                     name: "accessProfile",
                     displayName: "access profile",
                     items: async (context: WizardContext): Promise<vscode.QuickPickItem[]> => {
-                        const results = (await client.searchAccessProfiles(context["accessProfileQuery"], 100, ["id", "name", "description"]))
+                        const results = (await client.searchAccessProfiles(context["accessProfileQuery"], 100, ["id", "name", "description", "source.name"]))
                             .map(x => ({
                                 id: x.id,
                                 label: x.name,
                                 name: x.name,
+                                description: x.source.name,
                                 detail: x.description
                             }));
 
@@ -106,11 +113,11 @@ export class NewRoleCommand {
                     }
                 }),
             ]
-        });
+        }, context);
         console.log({ values });
         if (values === undefined) { return; }
 
-        // Deep copy of "role"
+        // Deep copy of "role" template
         const newRole = JSON.parse(JSON.stringify(role));
 
         await vscode.window.withProgress({
@@ -119,6 +126,7 @@ export class NewRoleCommand {
             cancellable: false
         }, async (task, token) => {
             const name = values["role"].trim();
+            const tenantName = values["tenant"].tenantName;
             const newUri = getResourceUri(tenantName, 'roles', NEW_ID, name);
             let document = await vscode.workspace.openTextDocument(newUri);
             document = await vscode.languages.setTextDocumentLanguage(document, 'json');

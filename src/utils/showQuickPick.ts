@@ -11,7 +11,10 @@ import { GoBackError, UserCancelledError } from '../errors';
 export async function showQuickPick<TPick extends QuickPickItem, T>(
     wizard: Wizard<T>,
     picks: TPick[] | Promise<TPick[]>,
-    options: QuickPickOptions): Promise<TPick | TPick[]> {
+    options: QuickPickOptions,
+    skipIfOne?: boolean,
+    onWayback = false
+): Promise<TPick | TPick[]> {
 
 
     const disposables: Disposable[] = [];
@@ -26,11 +29,32 @@ export async function showQuickPick<TPick extends QuickPickItem, T>(
 
         picks = await picks;
         quickPick.items = await createQuickPickItems(picks, wizard);
-        if (options.canPickMany){
-            quickPick.selectedItems = quickPick.items.filter(x => x.picked);
-        } else {
-            quickPick.activeItems = quickPick.items.filter(x => x.picked);
+
+        if (skipIfOne && quickPick.items && quickPick.items.length === 1) {
+            if (onWayback) {
+                // very likely that this prompt was skipped the first time as there is only 1 value
+                // Throw an error to go back one more step
+                throw new GoBackError();
+            }
+            quickPick.hide();
+            return quickPick.items[0];
         }
+        let zeroItem = false;
+        if (quickPick.items.length === 0) {
+            zeroItem = true;
+            quickPick.items = [
+                {
+                    label: "No item"
+                } as TPick
+            ];
+        } else {
+            if (options.canPickMany) {
+                quickPick.selectedItems = quickPick.items.filter(x => x.picked);
+            } else {
+                quickPick.activeItems = quickPick.items.filter(x => x.picked);
+            }
+        }
+
         quickPick.placeholder = options.placeHolder;
         quickPick.busy = false;
         quickPick.enabled = true;
@@ -44,8 +68,7 @@ export async function showQuickPick<TPick extends QuickPickItem, T>(
                             resolve(Array.from(quickPick.selectedItems));
                         } else {
                             const selectedItem: TPick | undefined = quickPick.selectedItems[0];
-
-                            if (selectedItem) {
+                            if (!zeroItem && selectedItem) {
                                 resolve(selectedItem);
                             }
                         }

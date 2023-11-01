@@ -17,9 +17,6 @@ export class Wizard<T extends WizardContext> {
     private _stepHideStepCount?: boolean;
     private _wizardHideStepCount?: boolean;
     private _showLoadingPrompt?: boolean;
-    private _cachedInputBoxValues: { [step: string]: string | undefined } = {};
-
-
 
     public constructor(context: T, options: IWizardOptions<T>) {
         // reverse steps to make it easier to use push/pop
@@ -90,10 +87,12 @@ export class Wizard<T extends WizardContext> {
                 }
             }
 
+            if (step.afterPrompt) {
+                await step.afterPrompt(this._context);
+            }
+
             this._finishedPromptSteps.push(step);
             step = this._promptSteps.pop();
-
-
         }
     }
 
@@ -124,7 +123,9 @@ export class Wizard<T extends WizardContext> {
                 removeFromEnd(this._promptSteps, step.numSubPromptSteps);
             }
         } while (!step.prompted);
-
+        // let key: keyof T = step.id;
+        // delete this._context[key];
+        step.onWayback = true;
         return step;
     }
 

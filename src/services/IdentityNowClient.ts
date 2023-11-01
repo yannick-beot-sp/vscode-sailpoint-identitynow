@@ -410,7 +410,7 @@ export class IdentityNowClient {
 	public async searchAccessProfiles(query: string, limit?: number, fields?: string[], includeNested = false): Promise<AccessProfileDocument[]> {
 		console.log("> searchIdentity", query);
 
-		let search: Search = {
+		const search: Search = {
 			indices: [
 				"accessprofiles"
 			],
@@ -429,7 +429,7 @@ export class IdentityNowClient {
 	public async searchIdentities(query: string, limit?: number, fields?: string[], includeNested = false): Promise<IdentityDocument[]> {
 		console.log("> searchIdentity", query);
 
-		let search: Search = {
+		const search: Search = {
 			indices: [
 				"identities"
 			],

@@ -21,6 +21,8 @@ export interface QuickPickPromptStepOptions<WizardContext, T extends QuickPickIt
      * It is possible to override this behavior by defining a custom _project
      */
     storeString?: boolean;
+
+    skipIfOne?:boolean;
 }
 
 export class QuickPickPromptStep<WizardContext, T extends QuickPickItem> extends WizardPromptStep<WizardContext> {
@@ -28,6 +30,7 @@ export class QuickPickPromptStep<WizardContext, T extends QuickPickItem> extends
     private readonly _name: string;
     private readonly _displayName!: string;
     private readonly _storeString!: boolean;
+    private readonly _skipIfOne!:boolean;
     private readonly _items: string[] | T[] | ((context: WizardContext) => string[] | T[] | Promise<string[] | T[]>);
     private _project?(value: T): any;
 
@@ -52,6 +55,7 @@ export class QuickPickPromptStep<WizardContext, T extends QuickPickItem> extends
         this._items = quickPickPromptStepOptions.items;
         this._project = quickPickPromptStepOptions.project;
         this._storeString = quickPickPromptStepOptions.storeString ?? false;
+        this._skipIfOne = quickPickPromptStepOptions.skipIfOne ?? false;
         if (this._storeString && !this._project) {
             this._project = (x: T) => { return x.label; };
         }
@@ -63,7 +67,9 @@ export class QuickPickPromptStep<WizardContext, T extends QuickPickItem> extends
         let value: T | T[] | string | string[] = await showQuickPick(
             wizard,
             items,
-            this._options
+            this._options,
+            this._skipIfOne,
+            this.onWayback
         );
 
         if (this._project) {
@@ -88,6 +94,5 @@ export class QuickPickPromptStep<WizardContext, T extends QuickPickItem> extends
         }
 
         return items as T[];
-
     }
 }

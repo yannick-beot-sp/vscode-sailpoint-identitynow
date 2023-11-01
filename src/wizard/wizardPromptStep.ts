@@ -10,6 +10,10 @@ export abstract class WizardPromptStep<T extends WizardContext>  {
     public numSubPromptSteps!: number;
     public propertiesBeforePrompt!: string[];
     public prompted = false;
+    /**
+     * true if prompted again because back button was pushed
+     */
+    public onWayback = false;
     public id?: string;
 
     public abstract prompt(wizard: Wizard<T>, wizardContext: T): Promise<void>;
@@ -18,12 +22,16 @@ export abstract class WizardPromptStep<T extends WizardContext>  {
     public undo?(wizardContext: T): void;
 
     public configureBeforePrompt?(wizardContext: T): Promise<void>;
+    public afterPrompt?(wizardContext: T): Promise<void>;
+
     public shouldPrompt(wizardContext: T): boolean {
-        return true;
+        // if has not been prompted before and does not have a value, then prompt
+        return (!this.prompted && !wizardContext.hasOwnProperty(this.id))
+                || (this.prompted);
     }
 
     public reset(): void {
         this.hasSubWizard = false;
-        this.prompted = false;
+        //this.prompted = false;
     }
 }
