@@ -455,6 +455,22 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.new-access-profile.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-access-profile.view-icon",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-role.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-role.view-icon",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.csv.export.access-profiles.view",
           "when": "never"
         },
