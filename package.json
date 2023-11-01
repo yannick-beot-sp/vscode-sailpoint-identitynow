@@ -258,11 +258,17 @@
         }
       },
       {
-        "command": "vscode-sailpoint-identitynow.new-access-profile",
-        "title": "New Access Profile"
+        "command": "vscode-sailpoint-identitynow.new-access-profile.view",
+        "title": "New Access Profile",
+        "icon": "$(add)"
       },
       {
-        "command": "vscode-sailpoint-identitynow.new-access-profile-icon",
+        "command": "vscode-sailpoint-identitynow.new-access-profile.palette",
+        "title": "IdentityNow: Add a new access profile...",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.new-access-profile.view-icon",
         "title": "New Access Profile",
         "icon": "$(add)"
       },
@@ -709,11 +715,11 @@
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == service-desk-integration"
         },
         {
-          "command": "vscode-sailpoint-identitynow.new-access-profile",
+          "command": "vscode-sailpoint-identitynow.new-access-profile.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles"
         },
         {
-          "command": "vscode-sailpoint-identitynow.new-access-profile-icon",
+          "command": "vscode-sailpoint-identitynow.new-access-profile.view-icon",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profiles",
           "group": "inline"
         },

@@ -300,10 +300,13 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const newAccessProfileCommand = new NewAccessProfileCommand(tenantService);
 	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.NEW_ACCESS_PROFILE,
+		vscode.commands.registerCommand(commands.NEW_ACCESS_PROFILE_VIEW,
 			newAccessProfileCommand.newAccessProfile, newAccessProfileCommand));
 	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.NEW_ACCESS_PROFILE_ICON,
+		vscode.commands.registerCommand(commands.NEW_ACCESS_PROFILE_VIEW_ICON,
+			newAccessProfileCommand.newAccessProfile, newAccessProfileCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_ACCESS_PROFILE_PALETTE,
 			newAccessProfileCommand.newAccessProfile, newAccessProfileCommand));
 
 }
