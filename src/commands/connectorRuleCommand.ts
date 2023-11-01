@@ -6,7 +6,7 @@ import { TenantService } from '../services/TenantService';
 import { compareByName } from '../utils';
 import { isEmpty } from '../utils/stringUtils';
 import { getResourceUri } from '../utils/UriUtils';
-import { chooseTenant, getSelectionContent } from '../utils/vsCodeHelpers';
+import { chooseTenant, createNewFile, getSelectionContent } from '../utils/vsCodeHelpers';
 import * as commands from './constants';
 import { ConnectorRuleResponseBeta } from 'sailpoint-api-client';
 const rules: ConnectorRuleResponseBeta[] = require('../../snippets/connector-rules.json');
@@ -140,15 +140,8 @@ export class ConnectorRuleCommand {
         }, async (task, token) => {
 
             const newUri = getResourceUri(tenantName, 'connector-rules', NEW_ID, ruleName, true);
-            let document = await vscode.workspace.openTextDocument(newUri);
-            document = await vscode.languages.setTextDocumentLanguage(document, 'json');
-            await vscode.window.showTextDocument(document, { preview: true });
-
-            const edit = new vscode.WorkspaceEdit();
             rule.name = ruleName;
-            const strContent = JSON.stringify(rule, null, 4);
-            edit.insert(newUri, new vscode.Position(0, 0), strContent);
-            let success = await vscode.workspace.applyEdit(edit);
+            await createNewFile(newUri,rule);
         });
     }
 

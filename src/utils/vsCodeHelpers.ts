@@ -244,3 +244,15 @@ export async function askSelectObjectTypes(title: string, objectTypeItems: Array
 	console.log("< askSelectObjectTypes: no objectType");
 	return undefined;
 }
+
+export async function createNewFile(newUri: vscode.Uri, obj: any): Promise<void> {
+	let document = await vscode.workspace.openTextDocument(newUri);
+	document = await vscode.languages.setTextDocumentLanguage(document, 'json');
+	await vscode.window.showTextDocument(document, { preview: true });
+
+	const strContent = typeof obj === 'object' ? JSON.stringify(obj, null, 4) : obj;
+
+	const edit = new vscode.WorkspaceEdit();
+	edit.insert(newUri, new vscode.Position(0, 0), strContent);
+	let success = await vscode.workspace.applyEdit(edit);
+}
