@@ -10,5 +10,3 @@ export const SPCONFIG_MULTIPLE_FILES_FOLDER_CONF = "sP-Config.multipleFiles.fold
 export const SPCONFIG_MULTIPLE_FILES_FILENAME_CONF = "sP-Config.multipleFiles.filename";
 
 export const GENERIC_CSV_REPORT_VIEW = "report.csv.filename";
-
-export const FILTER_PREFIX = "defaultFilter";

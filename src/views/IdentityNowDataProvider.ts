@@ -16,7 +16,7 @@ export class IdentityNowDataProvider implements TreeDataProvider<BaseTreeItem> {
         node.reset();
         this.refresh(node);
     }
-    
+
     refresh(node?: BaseTreeItem): void {
         console.log('> IdentityNowDataProvider.refresh');
         if (node) {
@@ -52,6 +52,16 @@ export class IdentityNowDataProvider implements TreeDataProvider<BaseTreeItem> {
         console.log("> getTreeItem", item);
         item.updateIcon(this.context);
         console.log("after update", item);
-        return item;
+        
+        if (item.contextValue !== item.computedContextValue) {
+            const newItem = {
+                ...item,
+                contextValue: item.computedContextValue
+            };
+            return newItem;
+        } else {
+
+            return item;
+        }
     }
 }

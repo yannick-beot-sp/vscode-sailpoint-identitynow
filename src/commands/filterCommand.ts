@@ -1,9 +1,6 @@
 import * as vscode from "vscode";
 import { BaseTreeItem, PageableNode } from "../models/IdentityNowTreeItem";
 import * as commands from "../commands/constants";
-import { FILTER_PREFIX } from "../configurationConstants";
-import { setConfigKey } from "../utils/configurationUtils";
-
 
 export class FilterCommand {
 
@@ -24,7 +21,6 @@ export class FilterCommand {
             newFilter = "*";
         }
         node.filters = newFilter;
-        setConfigKey(`${FILTER_PREFIX}.${node.contextValue}`, newFilter);
         vscode.commands.executeCommand(commands.REFRESH_FORCED, node);
     }
 }

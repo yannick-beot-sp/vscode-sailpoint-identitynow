@@ -31,6 +31,10 @@ export abstract class BaseTreeItem extends vscode.TreeItem {
 	updateIcon(context: vscode.ExtensionContext) {
 		// Do nothing by default
 	}
+
+	get computedContextValue(): string {
+		return this.contextValue;
+	}
 }
 
 /**
@@ -768,6 +772,15 @@ export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implement
 		return this._total > this.children.length;
 	}
 
+
+	get isFiltered(): boolean {
+		return this.filters !== undefined && this.filters !== "*";
+	}
+
+	get computedContextValue() {
+		return this.contextValue + (this.isFiltered ? "Filtered" : "Unfiltered");
+	}
+
 	async getChildren(): Promise<BaseTreeItem[]> {
 		if (this.children.length === 0) {
 			await this.loadMore();
@@ -795,6 +808,7 @@ export class AccessProfilesTreeItem extends PageableFolderTreeItem<AccessProfile
 			))
 		);
 	}
+
 	protected async loadNext(): Promise<AxiosResponse<AccessProfileDocument[]>> {
 		const response = await this.client.paginatedSearchAccessProfiles(
 			this.filters,
