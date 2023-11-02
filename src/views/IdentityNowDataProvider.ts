@@ -13,7 +13,7 @@ export class IdentityNowDataProvider implements TreeDataProvider<BaseTreeItem> {
 
     forceRefresh(node: BaseTreeItem): void {
         console.log('> IdentityNowDataProvider.forceRefresh');
-        node.reset();
+        node?.reset();
         this.refresh(node);
     }
 
