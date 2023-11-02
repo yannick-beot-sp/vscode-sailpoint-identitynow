@@ -38,11 +38,11 @@ import { ImportConfigExplorerCommand } from './commands/spconfig-import/ImportCo
 import { ImportConfigPaletteCommand } from './commands/spconfig-import/ImportConfigPaletteCommand';
 import { ImportConfigTreeViewCommand } from './commands/spconfig-import/ImportConfigTreeViewCommand';
 import { AccessProfileExporterCommand } from './commands/access-profile/ExportAccessProfiles';
-import { RoleExporterCommand } from './commands/roles/ExportRoles';
+import { RoleExporterCommand } from './commands/role/ExportRoles';
 import { AccessProfileImporterCommand } from './commands/access-profile/ImportAccessProfiles';
-import { RoleImporterCommand } from './commands/roles/ImportRoles';
+import { RoleImporterCommand } from './commands/role/ImportRoles';
 import { NewAccessProfileCommand } from './commands/access-profile/NewAccessProfileCommand';
-import { NewRoleCommand } from './commands/roles/NewRoleCommand';
+import { NewRoleCommand } from './commands/role/NewRoleCommand';
 import { LoadMoreNode } from './models/IdentityNowTreeItem';
 import { FilterCommand } from './commands/filterCommand';
 
