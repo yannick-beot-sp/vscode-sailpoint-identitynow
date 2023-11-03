@@ -1112,6 +1112,14 @@ export class IdentityNowClient {
 		return result.data;
 	}
 
+	public async getGovernanceGroupById(id: string): Promise<WorkgroupDtoBeta> {
+		console.log("> getGovernanceGroupById");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new GovernanceGroupsBetaApi(apiConfig);
+		const result = await api.getWorkgroup({id});
+		return result.data;
+	}
+
 	//////////////////////////////
 	//#endregion Governance Groups
 	//////////////////////////////

@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { CSVWriter } from '../services/CSVWriter';
 import { ensureFolderExists } from '../utils/fileutils';
+import { map } from 'lodash';
 
 /**
  * Base class for all importer
@@ -33,7 +34,7 @@ export abstract class BaseCSVExporter<T> {
         }, async (task, token) =>
             await this.exportFile(task, token)
         )
-            .then(async () =>{
+            .then(async () => {
                 vscode.window.showInformationMessage(
                     `Successfully exported ${this.objectType} from ${this.tenantName}`
                 );
@@ -54,18 +55,22 @@ export abstract class BaseCSVExporter<T> {
         paths: string[],
         unwindablePaths: string[],
         iterator: AsyncIterable<T[]>,
-        task: any, 
+        task: any,
         token: vscode.CancellationToken,
-        transforms: any[] = []) {
+        mapper?: (x: T) => any | Promise<any>,
+    ) {
         ensureFolderExists(this.filePath);
         const csvWriter = new CSVWriter(
             this.filePath,
             headers,
             paths,
-            unwindablePaths,
-            transforms);
+            unwindablePaths);
 
-        for await (const data of iterator) {
+        for await (let data of iterator) {
+            // Not using json2csv transforms as these transforms are non-async method, so very limited
+            if (mapper) {
+                data = await Promise.all(data.map(x => mapper(x)));
+            }
             await csvWriter.write(data);
             if (token.isCancellationRequested) {
                 break;

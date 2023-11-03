@@ -11,7 +11,7 @@ export function ensureNotEmpty(paramName: string, value: any) {
 
 export function getConfigKey(key: string): string {
     let path: unknown | string = vscode.workspace.getConfiguration(configuration.SECTION_CONF).get(key);
-    this.ensureNotEmpty(key, path);
+    ensureNotEmpty(key, path);
     return path as string;
 }
 

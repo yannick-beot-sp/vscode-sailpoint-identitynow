@@ -3,9 +3,11 @@ import { BaseCSVExporter } from "../BaseExporter";
 import { AccessProfilesTreeItem } from '../../models/IdentityNowTreeItem';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
-import { isEmpty } from 'lodash';
-import { AccessProfile, AccessProfilesApiListAccessProfilesRequest } from 'sailpoint-api-client';
+import { AccessProfile, AccessProfileSourceRef, AccessProfilesApiListAccessProfilesRequest, OwnerReference, Requestability, Revocability } from 'sailpoint-api-client';
 import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator';
+import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
+import { GovernanceGroupCacheService } from '../../services/cache/GovernanceGroupCacheService';
+import { accessProfileApprovalSchemeConverter } from '../../utils/approvalSchemeConverter';
 
 export class AccessProfileExporterCommand {
     /**
@@ -28,7 +30,7 @@ export class AccessProfileExporterCommand {
         );
 
         const filePath = await askFile(
-            "Enter the file to save the account report to",
+            "Enter the file to save the CSV for access profile export",
             proposedPath
         );
 
@@ -44,6 +46,63 @@ export class AccessProfileExporterCommand {
         );
         await exporter.exportFileWithProgression();
     }
+}
+interface AccessProfileDto {
+    /**
+     * Name of the Access Profile
+     * @type {string}
+     */
+    'name': string;
+    /**
+     * Information about the Access Profile
+     * @type {string}
+     */
+    'description'?: string;
+
+    /**
+     * Whether the Access Profile is enabled. If the Access Profile is enabled then you must include at least one Entitlement.
+     * @type {boolean}
+     */
+    'enabled'?: boolean;
+    /**
+     *
+     * @type {OwnerReference}
+     */
+    'owner': OwnerReference | null;
+    /**
+     *
+     * @type {AccessProfileSourceRef}
+     */
+    'source': AccessProfileSourceRef;
+
+    /**
+     * List describing the steps in approving the request
+     */
+    'approvalSchemes'?: string;
+
+    /**
+     * List describing the steps in approving the revocation request
+     */
+    'revokeApprovalSchemes'?: string;
+    /**
+     * A list of entitlements associated with the Access Profile. If enabled is false this is allowed to be empty otherwise it needs to contain at least one Entitlement.
+     */
+    'entitlements'?: string;
+    /**
+     * Whether the Access Profile is requestable via access request. Currently, making an Access Profile non-requestable is only supported  for customers enabled with the new Request Center. Otherwise, attempting to create an Access Profile with a value  **false** in this field results in a 400 error.
+     * @type {boolean}
+     */
+    'requestable'?: boolean;
+    /**
+     *
+     * @type {Requestability}
+     */
+    'accessRequestConfig'?: Requestability;
+    /**
+     *
+     * @type {Revocability}
+     */
+    'revocationRequestConfig'?: Revocability;
 }
 
 class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
@@ -64,128 +123,76 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
     protected async exportFile(task: any, token: vscode.CancellationToken): Promise<void> {
         console.log("> AccessProfileExporter.exportFile");
         const headers = [
-            "name", 
-            "description", 
-            "enabled", 
-            "source", 
-            "owner", 
-            "commentsRequired", 
-            "denialCommentsRequired", 
-            "approvalSchemes", 
-            "revokeCommentsRequired", 
-            "revokeDenialCommentsRequired", 
-            "revokeApprovalSchemes", 
+            "name",
+            "description",
+            "enabled",
+            "source",
+            "owner",
+            "commentsRequired",
+            "denialCommentsRequired",
+            "approvalSchemes",
+            "revokeCommentsRequired",
+            "revokeDenialCommentsRequired",
+            "revokeApprovalSchemes",
             "entitlements"
         ];
         const paths = [
-            "name", 
-            "description", 
-            "enabled", 
-            "source.name", 
-            "owner.name", 
-            "accessRequestConfig.commentsRequired", 
-            "accessRequestConfig.denialCommentsRequired", 
+            "name",
+            "description",
+            "enabled",
+            "source.name",
+            "owner.name",
+            "accessRequestConfig.commentsRequired",
+            "accessRequestConfig.denialCommentsRequired",
             "approvalSchemes",
-            "revocationRequestConfig.commentsRequired", 
-            "revocationRequestConfig.denialCommentsRequired", 
-            "revokeApprovalSchemes", 
+            "revocationRequestConfig.commentsRequired",
+            "revocationRequestConfig.denialCommentsRequired",
+            "revokeApprovalSchemes",
             "entitlements"
         ];
         const unwindablePaths: string[] = [];
 
-        const governanceGroups = await this.client.getGovernanceGroups();
+        const governanceGroupCache = new GovernanceGroupCacheService(this.client);
 
-        const customTransform: any[] | undefined = [
-            function(item:any) {
-                let entitlements = '';
-                
-                for (let index = 0; index < item.entitlements.length; index++){
-                    const ent = item.entitlements[index];
-                    entitlements += ent.name + ';';
-                }
-                item.entitlements = entitlements.substring(0, entitlements.length-1);
-
-                if (item.accessRequestConfig) {
-                    let approvalSchemes = '';
-                    for (let index = 0; index < item.accessRequestConfig.approvalSchemes.length; index++){
-                        const scheme = item.accessRequestConfig.approvalSchemes[index];
-                        
-                        if (scheme.approverType === 'GOVERNANCE_GROUP') {
-                            let governanceGroupName = '';
-                            if (governanceGroups !== undefined && governanceGroups instanceof Array) {
-                                for (let group of governanceGroups) {
-                                    if (group.id.trim() === scheme.approverId.trim()) {
-                                        // cf. https://github.com/sailpoint-oss/typescript-sdk/issues/15
-                                        // @ts-ignore
-                                        governanceGroupName =  group.name;
-                                    }
-                                }
-                            }
-                            
-                            if (!isEmpty(governanceGroupName)) {
-                                approvalSchemes += governanceGroupName  + ';';
-                            }
-                        } else {
-                            approvalSchemes += scheme.approverType  + ';';
-                        }
-                    }
-                    item.approvalSchemes = approvalSchemes.substring(0, approvalSchemes.length-1);
-
-                    if (isEmpty(item.accessRequestConfig.commentsRequired)) {
-                        item.accessRequestConfig.commentsRequired = false;
-                    }
-
-                    if (isEmpty(item.accessRequestConfig.denialCommentsRequired)) {
-                        item.accessRequestConfig.denialCommentsRequired = false;
-                    }
-                }
-
-                if (item.revocationRequestConfig) {
-                    let approvalSchemes = '';
-                    for (let index = 0; index < item.revocationRequestConfig.approvalSchemes.length; index++){
-                        const scheme = item.revocationRequestConfig.approvalSchemes[index];
-                        
-                        if (scheme.approverType === 'GOVERNANCE_GROUP') {
-                            let governanceGroupName = '';
-                            if (governanceGroups !== undefined && governanceGroups instanceof Array) {
-                                for (let group of governanceGroups) {
-                                    if (group.id.trim() === scheme.approverId.trim()) {
-                                        // cf. https://github.com/sailpoint-oss/typescript-sdk/issues/15
-                                        // @ts-ignore
-                                        governanceGroupName =  group.name;
-                                    }
-                                }
-                            }
-                            
-                            if (!isEmpty(governanceGroupName)) {
-                                approvalSchemes += governanceGroupName  + ';';
-                            }
-                        } else {
-                            approvalSchemes += scheme.approverType  + ';';
-                        }
-                    }
-                    item.revokeApprovalSchemes = approvalSchemes.substring(0, approvalSchemes.length-1);
-
-                    if (isEmpty(item.revocationRequestConfig.commentsRequired)) {
-                        item.revocationRequestConfig.commentsRequired = false;
-                    }
-
-                    if (isEmpty(item.revocationRequestConfig.denialCommentsRequired)) {
-                        item.revocationRequestConfig.denialCommentsRequired = false;
-                    }
-                }
-
-                // Escape carriage returns in description.
-                if (item.description) {
-                    item.description = item.description.replaceAll('\r\n', '\\r\\n').replaceAll('\r', '\\r').replaceAll('\n', '\\n');
-                }
-                return item;
-            }
-        ];
-
-        const iterator = new GenericAsyncIterableIterator<AccessProfile,AccessProfilesApiListAccessProfilesRequest>(
+        const iterator = new GenericAsyncIterableIterator<AccessProfile, AccessProfilesApiListAccessProfilesRequest>(
             this.client,
             this.client.getAccessProfiles);
-        await this.writeData(headers, paths, unwindablePaths, iterator, task, token, customTransform);
+
+        await this.writeData(headers, paths, unwindablePaths, iterator, task, token,
+            async (item: AccessProfile): Promise<AccessProfileDto> => {
+                const itemDto: AccessProfileDto = {
+                    name: item.name,
+                    // Escape carriage returns in description.
+                    description: item.description?.replaceAll('\r', "\\r").replaceAll('\n', "\\n"),
+                    enabled: item.enabled,
+                    source: {
+                        name: item.source.name
+                    },
+                    owner: {
+                        name: item.owner.name
+                    },
+                    entitlements: item.entitlements?.map(x => x.name).join(CSV_MULTIVALUE_SEPARATOR),
+                    accessRequestConfig: {
+                        commentsRequired: item.accessRequestConfig?.commentsRequired ?? false,
+                        denialCommentsRequired: item.accessRequestConfig?.denialCommentsRequired ?? false,
+                    },
+                    revocationRequestConfig: {
+                        commentsRequired: item.revocationRequestConfig?.commentsRequired ?? false,
+                        denialCommentsRequired: item.revocationRequestConfig?.denialCommentsRequired ?? false
+                    },
+                    approvalSchemes: await accessProfileApprovalSchemeConverter(
+                        item.accessRequestConfig?.approvalSchemes,
+                        governanceGroupCache),
+                    revokeApprovalSchemes: await accessProfileApprovalSchemeConverter(
+                        item.revocationRequestConfig?.approvalSchemes,
+                        governanceGroupCache)
+                };
+
+                return itemDto;
+
+            });
+        console.log("Governance Group Cache stats", governanceGroupCache.getStats());
+        governanceGroupCache.flushAll();
+
     }
 }

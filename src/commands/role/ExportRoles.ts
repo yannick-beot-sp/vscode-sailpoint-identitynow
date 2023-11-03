@@ -14,7 +14,7 @@ export class RoleExporterCommand {
      * @returns 
      */
     async execute(node?: RolesTreeItem) {
-        console.log("> AccessProfileExporterCommand.execute");
+        console.log("> RoleExporterCommand.execute");
 
         if (node === undefined) {
             console.error("WARNING: RoleExporterCommand: invalid item", node);
@@ -28,7 +28,7 @@ export class RoleExporterCommand {
         );
 
         const filePath = await askFile(
-            "Enter the file to save the account report to",
+            "Enter the file to save the CSV for role export",
             proposedPath
         );
 

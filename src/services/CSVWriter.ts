@@ -1,20 +1,18 @@
 
 
 import { EOL } from 'os';
-import { pipeline } from 'node:stream/promises';
 
 import { createWriteStream, WriteStream } from 'fs';
 // @ts-ignore
 import { AsyncParser } from '@json2csv/node';
 import { customUnwind } from '../utils/CSVTransform';
-import { Stream } from 'stream';
 
 export class CSVWriter {
     private initialized = false;
     private output!: WriteStream;
     private parser: AsyncParser;
 
-    constructor(private outputPath: string, private headers: string[], private paths: string[], private unwindablePaths: string[] = [], transforms:any [] = []) {
+    constructor(private outputPath: string, private headers: string[], private paths: string[], unwindablePaths: string[] = [], private transforms: any[] = []) {
         // Construct options for AsyncParser
         const opts: any = {
             fields: this.paths,
@@ -22,10 +20,10 @@ export class CSVWriter {
             header: false,
             defaultValue: ''
         };
-        if (Array.isArray(unwindablePaths) && unwindablePaths.length > 0) {
-            opts.transforms = [customUnwind({ paths: unwindablePaths })];
+        if (unwindablePaths.length > 0) {
+            opts.transforms.push(customUnwind({ paths: unwindablePaths }));
         }
-        this.parser = new AsyncParser(opts);
+        this.parser = new AsyncParser(opts,);
     }
 
     private async initialize(): Promise<void> {
