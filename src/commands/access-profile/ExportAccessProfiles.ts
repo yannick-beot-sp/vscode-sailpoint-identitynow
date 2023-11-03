@@ -23,10 +23,9 @@ export class AccessProfileExporterCommand {
             throw new Error("AccessProfileExporterCommand: invalid item");
         }
 
-        const proposedPath = PathProposer.getGenericCSVFilename(
+        const proposedPath = PathProposer.getAccessProfileReportFilename(
             node.tenantName,
-            node.tenantDisplayName,
-            "AccessProfile"
+            node.tenantDisplayName
         );
 
         const filePath = await askFile(

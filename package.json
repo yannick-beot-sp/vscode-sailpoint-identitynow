@@ -827,6 +827,14 @@
           "type": "string",
           "default": "%x/reports/%T-%S-Entitlements-%y%M%d-%h%m%s.csv"
         },
+        "vscode-sailpoint-identitynow.report.accessProfiles.filename": {
+          "type": "string",
+          "default": "%x/reports/%T-%S-AccessProfiles-%y%M%d-%h%m%s.csv"
+        },
+        "vscode-sailpoint-identitynow.report.roles.filename": {
+          "type": "string",
+          "default": "%x/reports/%T-%S-Roles-%y%M%d-%h%m%s.csv"
+        },
         "vscode-sailpoint-identitynow.sP-Config.singleResource.filename": {
           "type": "string",
           "default": "%x/exportedObjects/identitynowconfig-%t-%S-%y%M%d-%h%m%s.json"
@@ -842,10 +850,6 @@
         "vscode-sailpoint-identitynow.sP-Config.multipleFiles.filename": {
           "type": "string",
           "default": "%o/%S.json"
-        },
-        "vscode-sailpoint-identitynow.report.csv.filename": {
-          "type": "string",
-          "default": "%x/reports/%T-%J-%y%M%d-%h%m%s.csv"
         }
       }
     }

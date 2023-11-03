@@ -21,10 +21,9 @@ export class RoleExporterCommand {
             throw new Error("RoleExporterCommand: invalid item");
         }
 
-        const proposedPath = PathProposer.getGenericCSVFilename(
+        const proposedPath = PathProposer.getRoleReportFilename(
             node.tenantName,
-            node.tenantDisplayName,
-            "Roles"
+            node.tenantDisplayName
         );
 
         const filePath = await askFile(

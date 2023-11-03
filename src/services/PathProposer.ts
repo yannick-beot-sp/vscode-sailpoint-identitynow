@@ -40,10 +40,6 @@ interface ContextValues {
     /** Source name */
     // eslint-disable-next-line @typescript-eslint/naming-convention
     S?: string
-
-    /** Type name */
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    J?: string
 }
 
 
@@ -210,32 +206,21 @@ export class PathProposer {
             objectName);
     }
 
-    private static getGenericCSVFilenameWithKey(
-        key: string,
+    public static getAccessProfileReportFilename(
         tenantName: string,
-        tenantDisplayName: string,
-        type: string
+        tenantDisplayName: string
     ): string {
-        let path = getConfigKey(key);
-        path = this.replaceVariables(path, {
-            t: tenantName,
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            T: tenantDisplayName,
-            J: type
-        });
-        return path as string;
-    }
-
-    public static getGenericCSVFilename(
-        tenantName: string,
-        tenantDisplayName: string,
-        type: string
-    ): string {
-        return this.getGenericCSVFilenameWithKey(
-            configuration.GENERIC_CSV_REPORT_VIEW,
+        return this.getTenantBasedReportFilename(configuration.ACCESS_PROFILE_REPORT_FILENAME_CONF,
             tenantName,
-            tenantDisplayName,
-            type
-        );
+            tenantDisplayName);
+    }
+    
+    public static getRoleReportFilename(
+        tenantName: string,
+        tenantDisplayName: string
+    ): string {
+        return this.getTenantBasedReportFilename(configuration.ROLE_REPORT_FILENAME_CONF,
+            tenantName,
+            tenantDisplayName);
     }
 }
