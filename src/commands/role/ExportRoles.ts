@@ -5,7 +5,10 @@ import { askFile } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
 import RolePaginator from './RolePaginator';
 import { isEmpty } from 'lodash';
-import { Role } from 'sailpoint-api-client';
+import { AccessProfileRef, OwnerReference, RequestabilityForRole, Revocability, Role } from 'sailpoint-api-client';
+import { GovernanceGroupCacheService } from '../../services/cache/GovernanceGroupCacheService';
+import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
+import { accessProfileApprovalSchemeConverter } from '../../utils/approvalSchemeConverter';
 
 export class RoleExporterCommand {
     /**
@@ -45,6 +48,81 @@ export class RoleExporterCommand {
     }
 }
 
+/**
+ * A Role as exported
+ * @interface RoleDto
+ */
+export interface RoleDto {
+    /**
+     * The human-readable display name of the Role
+     * @type {string}
+     * @memberof Role
+     */
+    'name': string;
+
+    /**
+     * A human-readable description of the Role
+     * @type {string}
+     * @memberof Role
+     */
+    'description'?: string;
+    /**
+     *
+     * @type {OwnerReference}
+     * @memberof Role
+     */
+    'owner': OwnerReference | null;
+    /**
+     *
+     * @type {Array<AccessProfileRef>}
+     * @memberof Role
+     */
+    'accessProfiles'?: string;
+    /**
+     *
+     * @type {RoleMembershipSelector}
+     * @memberof Role
+     */
+    //'membership'?: RoleMembershipSelector | null;
+    /**
+
+    /**
+     * Whether the Role is enabled or not.
+     * @type {boolean}
+     * @memberof Role
+     */
+    'enabled'?: boolean;
+    /**
+     * Whether the Role can be the target of access requests.
+     * @type {boolean}
+     * @memberof Role
+     */
+    'requestable'?: boolean;
+    /**
+     *
+     * @type {RequestabilityForRole}
+     * @memberof Role
+     */
+    'accessRequestConfig'?: RequestabilityForRole;
+    /**
+     *
+     * @type {Revocability}
+     * @memberof Role
+     */
+    'revocationRequestConfig'?: Revocability;
+
+    /**
+     * List describing the steps in approving the request
+     */
+    'approvalSchemes'?: string;
+
+    /**
+     * List describing the steps in approving the revocation request
+     */
+    'revokeApprovalSchemes'?: string;
+
+}
+
 class RoleExporter extends BaseCSVExporter<Role> {
     constructor(
         tenantId: string,
@@ -66,120 +144,67 @@ class RoleExporter extends BaseCSVExporter<Role> {
             "name",
             "description",
             "enabled",
+            "requestable",
             "owner",
             "commentsRequired",
             "denialCommentsRequired",
             "approvalSchemes",
-            "revokeCommentsRequired", 
-            "revokeDenialCommentsRequired", 
-            "revokeApprovalSchemes", 
+            "revokeCommentsRequired",
+            "revokeDenialCommentsRequired",
+            "revokeApprovalSchemes",
             "accessProfiles"
         ];
         const paths = [
             "name",
             "description",
             "enabled",
+            "requestable",
             "owner.name",
-            "accessRequestConfig.denialCommentsRequired",
+            "accessRequestConfig.commentsRequired",
             "accessRequestConfig.denialCommentsRequired",
             "approvalSchemes",
-            "revocationRequestConfig.denialCommentsRequired", 
-            "revocationRequestConfig.denialCommentsRequired", 
+            "revocationRequestConfig.commentsRequired",
+            "revocationRequestConfig.denialCommentsRequired",
             "revokeApprovalSchemes",
             "accessProfiles"
         ];
         const unwindablePaths: string[] = [];
 
-        const governanceGroups = await this.client.getGovernanceGroups();
+        const governanceGroupCache = new GovernanceGroupCacheService(this.client);
 
-        const customTransform: any[] | undefined = [
-            function(item:any) {
-                let accessProfiles = '';
-                
-                for (let index = 0; index < item.accessProfiles.length; index++){
-                    const app = item.accessProfiles[index];
-                    accessProfiles += app.name + ';';
-                }
-                item.accessProfiles = accessProfiles.substring(0, accessProfiles.length-1);
-                if (item.accessRequestConfig) {
-                    let approvalSchemes = '';
-                    for (let index = 0; index < item.accessRequestConfig.approvalSchemes.length; index++){
-                        const scheme = item.accessRequestConfig.approvalSchemes[index];
-                        
-                        if (scheme.approverType === 'GOVERNANCE_GROUP') {
-                            let governanceGroupName = '';
-                            if (governanceGroups !== undefined && governanceGroups instanceof Array) {
-                                for (let group of governanceGroups) {
-                                    if (group.id.trim() === scheme.approverId.trim()) {
-                                        // cf. https://github.com/sailpoint-oss/typescript-sdk/issues/15
-                                        // @ts-ignore                                        
-                                        governanceGroupName =  group.name;
-                                    }
-                                }
-                            }
-                            
-                            if (!isEmpty(governanceGroupName)) {
-                                approvalSchemes += governanceGroupName  + ';';
-                            }
-                        } else {
-                            approvalSchemes += scheme.approverType  + ';';
-                        }
-                    }
-                    item.approvalSchemes = approvalSchemes.substring(0, approvalSchemes.length-1);
-
-                    if (isEmpty(item.accessRequestConfig.commentsRequired)) {
-                        item.accessRequestConfig.commentsRequired = false;
-                    }
-
-                    if (isEmpty(item.accessRequestConfig.denialCommentsRequired)) {
-                        item.accessRequestConfig.denialCommentsRequired = false;
-                    }
-                }
-
-                if (item.revocationRequestConfig) {
-                    let approvalSchemes = '';
-                    for (let index = 0; index < item.revocationRequestConfig.approvalSchemes.length; index++){
-                        const scheme = item.revocationRequestConfig.approvalSchemes[index];
-                        
-                        if (scheme.approverType === 'GOVERNANCE_GROUP') {
-                            let governanceGroupName = '';
-                            if (governanceGroups !== undefined && governanceGroups instanceof Array) {
-                                for (let group of governanceGroups) {
-                                    if (group.id.trim() === scheme.approverId.trim()) {
-                                        // cf. https://github.com/sailpoint-oss/typescript-sdk/issues/15
-                                        // @ts-ignore                                        
-                                        governanceGroupName =  group.name;
-                                    }
-                                }
-                            }
-                            
-                            if (!isEmpty(governanceGroupName)) {
-                                approvalSchemes += governanceGroupName  + ';';
-                            }
-                        } else {
-                            approvalSchemes += scheme.approverType  + ';';
-                        }
-                    }
-                    item.revokeApprovalSchemes = approvalSchemes.substring(0, approvalSchemes.length-1);
-
-                    if (isEmpty(item.revocationRequestConfig.commentsRequired)) {
-                        item.revocationRequestConfig.commentsRequired = false;
-                    }
-
-                    if (isEmpty(item.revocationRequestConfig.denialCommentsRequired)) {
-                        item.revocationRequestConfig.denialCommentsRequired = false;
-                    }
-                }
-
-                // Escape carriage returns in description.
-                if (item.description) {
-                    item.description = item.description.replaceAll('\r\n', '\\r\\n').replaceAll('\r', '\\r').replaceAll('\n', '\\n');
-                }
-                return item;
-            }
-        ];
 
         const iterator = new RolePaginator(this.client);
-        await this.writeData(headers, paths, unwindablePaths, iterator, task, token, customTransform);
+        await this.writeData(headers, paths, unwindablePaths, iterator, task, token,
+            async (item: Role): Promise<RoleDto> => {
+                const itemDto: RoleDto = {
+                    name: item.name,
+                    // Escape carriage returns in description.
+                    description: item.description?.replaceAll('\r', "\\r").replaceAll('\n', "\\n"),
+                    enabled: item.enabled,
+                    requestable: item.requestable,
+                    owner: {
+                        name: item.owner.name
+                    },
+                    accessProfiles: item.accessProfiles?.map(x => x.name).join(CSV_MULTIVALUE_SEPARATOR),
+                    accessRequestConfig: {
+                        commentsRequired: item.accessRequestConfig?.commentsRequired ?? false,
+                        denialCommentsRequired: item.accessRequestConfig?.denialCommentsRequired ?? false,
+                    },
+                    revocationRequestConfig: {
+                        commentsRequired: item.revocationRequestConfig?.commentsRequired ?? false,
+                        denialCommentsRequired: item.revocationRequestConfig?.denialCommentsRequired ?? false
+                    },
+                    approvalSchemes: await accessProfileApprovalSchemeConverter(
+                        item.accessRequestConfig?.approvalSchemes,
+                        governanceGroupCache),
+                    revokeApprovalSchemes: await accessProfileApprovalSchemeConverter(
+                        item.revocationRequestConfig?.approvalSchemes,
+                        governanceGroupCache)
+                };
+
+                return itemDto;
+            });
+        console.log("Governance Group Cache stats", governanceGroupCache.getStats());
+        governanceGroupCache.flushAll();
     }
 }

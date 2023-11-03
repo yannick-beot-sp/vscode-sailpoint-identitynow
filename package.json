@@ -829,11 +829,11 @@
         },
         "vscode-sailpoint-identitynow.report.accessProfiles.filename": {
           "type": "string",
-          "default": "%x/reports/%T-%S-AccessProfiles-%y%M%d-%h%m%s.csv"
+          "default": "%x/reports/%T-AccessProfiles-%y%M%d-%h%m%s.csv"
         },
         "vscode-sailpoint-identitynow.report.roles.filename": {
           "type": "string",
-          "default": "%x/reports/%T-%S-Roles-%y%M%d-%h%m%s.csv"
+          "default": "%x/reports/%T-Roles-%y%M%d-%h%m%s.csv"
         },
         "vscode-sailpoint-identitynow.sP-Config.singleResource.filename": {
           "type": "string",

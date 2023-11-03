@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { CSVWriter } from '../services/CSVWriter';
 import { ensureFolderExists } from '../utils/fileutils';
-import { map } from 'lodash';
 
 /**
  * Base class for all importer

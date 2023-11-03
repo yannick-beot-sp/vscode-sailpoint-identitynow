@@ -125,6 +125,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
             "name",
             "description",
             "enabled",
+            "requestable",
             "source",
             "owner",
             "commentsRequired",
@@ -139,6 +140,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
             "name",
             "description",
             "enabled",
+            "requestable",
             "source.name",
             "owner.name",
             "accessRequestConfig.commentsRequired",
@@ -161,9 +163,11 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
             async (item: AccessProfile): Promise<AccessProfileDto> => {
                 const itemDto: AccessProfileDto = {
                     name: item.name,
+
                     // Escape carriage returns in description.
                     description: item.description?.replaceAll('\r', "\\r").replaceAll('\n', "\\n"),
                     enabled: item.enabled,
+                    requestable: item.requestable,
                     source: {
                         name: item.source.name
                     },
@@ -188,7 +192,6 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
                 };
 
                 return itemDto;
-
             });
         console.log("Governance Group Cache stats", governanceGroupCache.getStats());
         governanceGroupCache.flushAll();
