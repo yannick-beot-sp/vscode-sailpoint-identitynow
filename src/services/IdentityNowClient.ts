@@ -1,5 +1,4 @@
 import * as vscode from "vscode";
-import { authentication } from "vscode";
 import { EndpointUtils } from "../utils/EndpointUtils";
 import { SailPointIdentityNowAuthenticationProvider } from "./AuthenticationProvider";
 import { withQuery } from "../utils/UriUtils";
@@ -47,7 +46,7 @@ export class IdentityNowClient {
 	}
 
 	private async prepareAuthenticationHeader(): Promise<any> {
-		const session = await authentication.getSession(
+		const session = await vscode.authentication.getSession(
 			SailPointIdentityNowAuthenticationProvider.id,
 			[this.tenantId]
 		);
@@ -58,11 +57,21 @@ export class IdentityNowClient {
 		};
 	}
 
+	private ensureOne<T>(response: AxiosResponse<T[]>, type: string, value: string): T {
+		const nb = Number(response.headers[TOTAL_COUNT_HEADER]);
+		if (nb !== 1) {
+			const message = `Could not find ${type} ${value}. Found ${nb}`;
+			console.error(message);
+			throw new Error(message);
+		}
+		return response.data[0] as T;
+	}
+
 	/**
 	 * Returns the Configuration needed by sailpoint typescript SDK 
 	 */
 	private async getApiConfiguration(): Promise<Configuration> {
-		const session = await authentication.getSession(
+		const session = await vscode.authentication.getSession(
 			SailPointIdentityNowAuthenticationProvider.id,
 			[this.tenantId]
 		);
@@ -81,7 +90,7 @@ export class IdentityNowClient {
 	 * @returns Create an Axios Instance
 	 */
 	private async getAxios(contentType = CONTENT_TYPE_JSON): Promise<AxiosInstance> {
-		const session = await authentication.getSession(
+		const session = await vscode.authentication.getSession(
 			SailPointIdentityNowAuthenticationProvider.id,
 			[this.tenantId]
 		);
@@ -123,21 +132,21 @@ export class IdentityNowClient {
 		return result.data;
 	}
 
-	public async getSourceByName(name: string): Promise<any> {
-		console.log("> getSourceByName", name);
+	/**
+	 * @param sourceName - A reference to the source to search for accounts.
+	 */
+	public async getSourceId(sourceName: string): Promise<string> {
+		console.log("> getSourceId", sourceName);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SourcesApi(apiConfig);
-		const result = await api.listSources({ filters: `name eq "${name}"` });
-
-		const res = result.data;
-
-		if (!res || !(res instanceof Array) || res.length !== 1) {
-			console.log("getSourceByName returns ", res);
-			throw new Error(`Could not find source "${name} "`);
-		}
-		// returning only one source
-		return res[0];
+		const response = await api.listSources({
+			filters: `name eq "${sourceName}" or id eq "${sourceName}"`,
+			count: true
+		});
+		const source = this.ensureOne(response, "source", sourceName);
+		return source.id;
 	}
+
 
 	public async startEntitlementAggregation(
 		sourceID: number,
@@ -245,31 +254,6 @@ export class IdentityNowClient {
 		return undefined;
 	}
 
-	public async getSourceId(sourceName: string): Promise<string> {
-		/*
-			sourceName - A reference to the source to search for accounts.
-	
-			This is a reference by a source's display name attribute (e.g. Active Directory). If the display name is updated, this reference will also need to be updated.
-	
-			As an alternative an applicationId or applicationName can be provided instead.
-	
-			applicationId - This is a reference by a source's external GUID/ID attribute (e.g. "ff8081815a8b3925015a8b6adac901ff")
-			applicationName - This is a reference by a source's immutable name attribute (e.g. "Active Directory [source]")
-		*/
-		console.log("> getSourceId", sourceName);
-		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesApi(apiConfig);
-		const response = await api.listSources({
-			filters: `name eq "${sourceName}" or id eq "${sourceName}"`
-		});
-		const sources = response.data;
-		if (sources.length !== 1) {
-			vscode.window.showErrorMessage(
-				`Source '${sourceName}' does not exist`
-			);
-		}
-		return sources[0].id;
-	}
 
 	////////////////////////
 	//#endregion Sources
@@ -299,16 +283,14 @@ export class IdentityNowClient {
 		console.log("> getTransformByName", name);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new TransformsApi(apiConfig);
-		const result = await api.listTransforms({ filters: `name eq "${name}"` });
+		const response = await api.listTransforms({
+			filters: `name eq "${name}"`,
+			limit: 1,
+			count: true
+		});
 
-		const res = result.data;
-
-		if (!res || !(res instanceof Array) || res.length !== 1) {
-			console.log("getTransformByName returns ", res);
-			throw new Error(`Could not find transform "${name} "`);
-		}
-		// returning only one transform
-		return res[0];
+		const transform = this.ensureOne(response, "transform", name);
+		return transform;
 	}
 	////////////////////////
 	//#endregion Transforms
@@ -1020,18 +1002,14 @@ export class IdentityNowClient {
 		console.log("> getEntitlementByName", sourceId, entitlementName);
 
 		const filters = `source.id eq "${sourceId}" and name eq "${entitlementName}"`;
-		const result = await this.getEntitlements({
-			filters
+		const response = await this.getEntitlements({
+			filters,
+			limit: 1,
+			count: true
 		});
 
-		const res = result.data;
-
-		if (!res || !(res instanceof Array) || res.length !== 1) {
-			console.log("getEntitlementByName returns ", res);
-			throw new Error(`Could not find entitlement "${entitlementName}"`);
-		}
-		// returning only one entitlement
-		return res[0];
+		const entitlement = this.ensureOne(response, "entitlement", entitlementName);
+		return entitlement;
 	}
 
 	/**
@@ -1119,16 +1097,14 @@ export class IdentityNowClient {
 
 	public async getPublicIdentityByAlias(alias: string): Promise<PublicIdentity> {
 		const filters = `alias eq "${alias}"`;
-		const resp = await this.getPublicIdentities({
+		const response = await this.getPublicIdentities({
 			filters,
 			limit: 1,
 			count: true
 		});
-		const nbIdentity = Number(resp.headers[TOTAL_COUNT_HEADER]);
-		if (nbIdentity !== 1) {
-			throw new Error("Could Not Find Identity");
-		}
-		return resp.data[0];
+		const identity = this.ensureOne(response, "identity", alias);
+
+		return identity;
 	}
 
 	/**
@@ -1136,21 +1112,20 @@ export class IdentityNowClient {
 	 * @param id Id
 	 */
 	public async getPublicIdentityById(
-		id:string
+		id: string
 	): Promise<PublicIdentity> {
 		console.log("> getPublicIdentityById", id);
 
 		const filters = `id eq "${id}"`;
-		const resp = await this.getPublicIdentities({
+		const response = await this.getPublicIdentities({
 			filters,
 			limit: 1,
 			count: true
 		});
-		const nbIdentity = Number(resp.headers[TOTAL_COUNT_HEADER]);
-		if (nbIdentity !== 1) {
-			throw new Error("Could Not Find Identity");
-		}
-		return resp.data[0];
+
+		const identity = this.ensureOne(response, "identity", id);
+		console.log("< getPublicIdentityById", identity);
+		return identity;
 	}
 	//////////////////////////////
 	//#endregion Public Identities
@@ -1169,11 +1144,32 @@ export class IdentityNowClient {
 	}
 
 	public async getGovernanceGroupById(id: string): Promise<WorkgroupDtoBeta> {
-		console.log("> getGovernanceGroupById");
+		console.log("> getGovernanceGroupById", id);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new GovernanceGroupsBetaApi(apiConfig);
-		const result = await api.getWorkgroup({id});
+		const result = await api.getWorkgroup({ id });
 		return result.data;
+	}
+	public async getGovernanceGroupByName(name: string): Promise<WorkgroupDtoBeta> {
+		console.log("> getGovernanceGroupByName", name);
+		// cf. https://github.com/sailpoint-oss/typescript-sdk/issues/16
+		/*
+		const apiConfig = await this.getApiConfiguration();
+		const api = new GovernanceGroupsBetaApi(apiConfig);
+		const response = await api.listWorkgroups({
+			// @ts-ignore
+			filters: `name eq "${name}"`,
+			limit: 1,
+			count: true
+		});
+		const workgroup = this.ensureOne(response, "workgroup", name);
+		*/
+
+		const workgroups = await this.getGovernanceGroups();
+		// cf. https://github.com/sailpoint-oss/typescript-sdk/issues/15
+		// @ts-ignore
+		const workgroup = workgroups.find((x: WorkgroupDtoBeta) => x.name === name);
+		return workgroup;
 	}
 
 	//////////////////////////////
@@ -1202,16 +1198,13 @@ export class IdentityNowClient {
 		console.log("> getAccessProfileByName", name);
 		let filters = `name eq "${name}"`;
 		const response = await this.getAccessProfiles({
-			filters
+			filters,
+			limit: 1,
+			count: true
 		});
 
-		const result = response.data;
-
-		if (!result || !(result instanceof Array) || result.length !== 1) {
-			console.log("getAccessProfileByName returns ", result);
-			throw new Error(`Could not find Access Profile "${name}"`);
-		}
-		return result[0];
+		const accessProfile = this.ensureOne(response, "access profile", name);
+		return accessProfile;
 	}
 
 	//////////////////////////////
@@ -1226,16 +1219,12 @@ export class IdentityNowClient {
 		console.log("> getRoleByName", name);
 		const result = await this.getRoles({
 			filters: `name eq "${name}"`,
-			limit: 1
+			limit: 1,
+			count: true
 		});
-		const roles = result.data;
-
-		if (!roles || !(roles instanceof Array) || roles.length !== 1) {
-			console.log("getRoleByName returns ", roles);
-			throw new Error(`Could not find role "${name} "`);
-		}
-		// returning only one role
-		return roles[0];
+		const role = this.ensureOne(result, "role", name);
+		console.log("< getRoleByName", role);
+		return role;
 	}
 
 	public async getRoles(

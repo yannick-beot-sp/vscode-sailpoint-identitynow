@@ -29,8 +29,9 @@ export function inspectConfig(key: string, scope?: vscode.ConfigurationScope | n
         .inspect(key);
 }
 
-export function setConfigKey(key: string, value: string): Thenable<void> {
+export function setConfigKey(key: string, value: string) {
     const inspect = inspectConfig(key);
+    if (inspect === undefined) { return; }
     if (inspect.workspaceFolderValue !== undefined) {
         if (value === inspect.workspaceFolderValue) { return Promise.resolve(undefined); }
 
@@ -58,6 +59,6 @@ function update(
     key: string,
     value: string,
     target: vscode.ConfigurationTarget,
-): Thenable<void> {
+) {
     return vscode.workspace.getConfiguration(configuration.SECTION_CONF).update(key, value, target);
 }

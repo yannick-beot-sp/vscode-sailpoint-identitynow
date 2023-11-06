@@ -6,7 +6,7 @@ import { PathProposer } from '../../services/PathProposer';
 import { AccessProfile, AccessProfileSourceRef, AccessProfilesApiListAccessProfilesRequest, OwnerReference, Requestability, Revocability } from 'sailpoint-api-client';
 import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
-import { GovernanceGroupCacheService } from '../../services/cache/GovernanceGroupCacheService';
+import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { accessProfileApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
 import { IdentityCacheIdToName } from '../../services/cache/IdentityCacheIdToName';
 
@@ -153,7 +153,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
         ];
         const unwindablePaths: string[] = [];
 
-        const governanceGroupCache = new GovernanceGroupCacheService(this.client);
+        const governanceGroupCache = new GovernanceGroupIdToNameCacheService(this.client);
         const identityCacheIdToName = new IdentityCacheIdToName(this.client);
 
         const iterator = new GenericAsyncIterableIterator<AccessProfile, AccessProfilesApiListAccessProfilesRequest>(
@@ -173,7 +173,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
                         name: item.source.name
                     },
                     owner: {
-                        name: (await identityCacheIdToName.get(item.owner.id))
+                        name: (await identityCacheIdToName.get(item.owner!.id!))
                     },
                     entitlements: item.entitlements?.map(x => x.name).join(CSV_MULTIVALUE_SEPARATOR),
                     accessRequestConfig: {

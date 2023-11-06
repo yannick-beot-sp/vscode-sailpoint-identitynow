@@ -4,7 +4,7 @@ import { CacheService } from "./CacheService";
 /**
  * Cache the governance group name by id
  */
-export class GovernanceGroupCacheService extends CacheService<string>{
+export class GovernanceGroupIdToNameCacheService extends CacheService<string>{
     constructor(readonly client: IdentityNowClient) {
         super(
             async (key: string) => {

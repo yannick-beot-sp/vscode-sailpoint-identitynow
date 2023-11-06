@@ -61,7 +61,7 @@ export class NewAccessProfileCommand {
                 new InputOwnerStep(),
                 new QuickPickOwnerStep(
                     "access profile owner",
-                    () => { return client; }
+                    () => { return client!; }
                 ),
                 new QuickPickPromptStep({
                     name: "source",
@@ -70,7 +70,7 @@ export class NewAccessProfileCommand {
                         matchOnDetail: true
                     },
                     items: async (context: WizardContext): Promise<vscode.QuickPickItem[]> => {
-                        const results = (await client.getSources())
+                        const results = (await client!.getSources())
                             .map(x => ({
                                 ...x,
                                 label: x.name,
@@ -87,11 +87,11 @@ export class NewAccessProfileCommand {
                         matchOnDetail: true
                     },
                     items: async (context: WizardContext): Promise<vscode.QuickPickItem[]> => {
-                        const results = (await client.getAllEntitlementsBySource(context["source"].id))
+                        const results = (await client!.getAllEntitlementsBySource(context["source"].id))
                             .map((x: Entitlement) => ({
-                                id: x.id,
-                                label: x.name,
-                                name: x.name,
+                                id: x.id!,
+                                label: x.name!,
+                                name: x.name!,
                                 detail: x.description
                             }));
 
@@ -129,7 +129,7 @@ export class NewAccessProfileCommand {
                 type: 'SOURCE'
             };
 
-            newAccessProfile.entitlements.push(...values["entitlements"].map((x: EntitlementBeta) => ({
+            newAccessProfile.entitlements?.push(...values["entitlements"].map((x: EntitlementBeta) => ({
                 id: x.id,
                 name: x.name,
                 type: 'ENTITLEMENT'

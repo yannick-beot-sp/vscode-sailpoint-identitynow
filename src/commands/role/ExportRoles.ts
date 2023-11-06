@@ -5,7 +5,7 @@ import { askFile } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
 import RolePaginator from './RolePaginator';
 import { OwnerReference, RequestabilityForRole, Revocability, Role } from 'sailpoint-api-client';
-import { GovernanceGroupCacheService } from '../../services/cache/GovernanceGroupCacheService';
+import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { accessProfileApprovalSchemeToStringConverter, roleApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
 
@@ -169,7 +169,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
         ];
         const unwindablePaths: string[] = [];
 
-        const governanceGroupCache = new GovernanceGroupCacheService(this.client);
+        const governanceGroupCache = new GovernanceGroupIdToNameCacheService(this.client);
 
 
         const iterator = new RolePaginator(this.client);
@@ -182,7 +182,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
                     enabled: item.enabled,
                     requestable: item.requestable,
                     owner: {
-                        name: item.owner.name
+                        name: item.owner!.name
                     },
                     accessProfiles: item.accessProfiles?.map(x => x.name).join(CSV_MULTIVALUE_SEPARATOR),
                     accessRequestConfig: {

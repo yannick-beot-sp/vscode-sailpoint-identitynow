@@ -6,6 +6,9 @@ export class AccessProfileImporterTreeViewCommand {
 
     async execute(node?: AccessProfilesTreeItem): Promise<void> {
         console.log("> AccessProfileImporterTreeViewCommand.execute");
+        if (node ===undefined) {
+            return;
+        }
 
         const fileUri = await chooseFile('CSV files', 'csv');
         if (fileUri === undefined) { return; }

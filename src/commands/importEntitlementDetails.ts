@@ -4,6 +4,7 @@ import { IdentityNowClient } from '../services/IdentityNowClient';
 import { CSVReader } from '../services/CSVReader';
 import { isNotEmpty } from '../utils/stringUtils';
 import { chooseFile } from '../utils/vsCodeHelpers';
+import { JsonPatchOperationBeta } from 'sailpoint-api-client';
 
 // List of mandatory headers to update the description of entitlements
 const mandatoryHeadersDescription = ["attributeName", "attributeValue", "displayName", "description", "schema"];
@@ -155,7 +156,7 @@ class EntitlementDetailsImporter {
             }
             const entitlement = entitlements[0];
 
-            const payload = [];
+            const payload : JsonPatchOperationBeta[] = [];
 
             if (isNotEmpty(data.requestable)) {
                 payload.push({
@@ -207,7 +208,7 @@ class EntitlementDetailsImporter {
                 return;
             }
             try {
-                await this.client.updateEntitlement(entitlement.id, payload);
+                await this.client.updateEntitlement(entitlement.id!, payload);
                 this.result.metadataUpdated++;
             } catch (error) {
                 this.result.error++;

@@ -58,7 +58,7 @@ export async function stringToAccessProfileApprovalSchemeConverter(
     schemes: string | undefined,
     governanceId2Name: CacheService<string>): Promise<AccessProfileApprovalScheme[] | undefined> {
 
-    if (schemes === undefined || isEmpty(schemes)) { return undefined; }
+    if (schemes === undefined || isEmpty(schemes)) { return new Array<AccessProfileApprovalScheme>; }
 
     return await Promise.all(schemes.split(CSV_MULTIVALUE_SEPARATOR).map(async (approver) => {
 

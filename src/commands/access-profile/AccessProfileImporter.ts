@@ -1,17 +1,17 @@
+import * as tmp from "tmp";
 import * as vscode from 'vscode';
-import { IdentityNowClient } from "../../services/IdentityNowClient";
-import { isEmpty } from 'lodash';
-import { openPreview } from '../../utils/vsCodeHelpers';
+import { AccessProfile, EntitlementBeta } from 'sailpoint-api-client';
+import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
+import { CSVReader } from '../../services/CSVReader';
+import { IdentityNowClient } from "../../services/IdentityNowClient";
+import { EntitlementCacheService, KEY_SEPARATOR } from '../../services/cache/EntitlementCacheService';
+import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
 import { IdentityCacheNameToIdService } from '../../services/cache/IdentityCacheNameToIdService';
 import { SourceCacheService } from '../../services/cache/SourceCacheService';
-import { AccessProfile, EntitlementBeta } from 'sailpoint-api-client';
-import * as tmp from "tmp";
-import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
-import { EntitlementCacheService, KEY_SEPARATOR } from '../../services/cache/EntitlementCacheService';
 import { stringToAccessProfileApprovalSchemeConverter } from '../../utils/approvalSchemeConverter';
-import { GovernanceGroupCacheService } from '../../services/cache/GovernanceGroupCacheService';
-import { CSVReader } from '../../services/CSVReader';
+import { openPreview } from '../../utils/vsCodeHelpers';
+import { isEmpty } from "../../utils/stringUtils";
 
 
 interface AccessProfileImportResult {
@@ -89,7 +89,7 @@ export class AccessProfileImporter {
             error: 0
         };
 
-        const governanceGroupCache = new GovernanceGroupCacheService(this.client);
+        const governanceGroupCache = new GovernanceGroupNameToIdCacheService(this.client);
         const identityCacheService = new IdentityCacheNameToIdService(this.client);
         const sourceCacheService = new SourceCacheService(this.client);
         const entitlementCacheService = new EntitlementCacheService(this.client);
