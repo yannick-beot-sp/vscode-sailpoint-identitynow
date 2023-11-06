@@ -357,6 +357,10 @@
           "light": "resources/light/import.svg",
           "dark": "resources/dark/import.svg"
         }
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.csv.import.roles.explorer",
+        "title": "IdentityNow: Import Roles CSV..."
       }
     ],
     "menus": {
@@ -514,11 +518,39 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.csv.export.access-profiles-icon.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.csv.import.access-profiles.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.csv.import.access-profiles-icon.view",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.csv.import.access-profiles.explorer",
           "when": "never"
         },
         {
           "command": "vscode-sailpoint-identitynow.csv.export.roles.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.csv.export.roles-icon.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.csv.import.roles.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.csv.import.roles-icon.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.csv.import.roles.explorer",
           "when": "never"
         }
       ],
@@ -789,6 +821,11 @@
         {
           "when": "resourceLangId == csv",
           "command": "vscode-sailpoint-identitynow.csv.import.access-profiles.explorer",
+          "group": "idn"
+        },
+        {
+          "when": "resourceLangId == csv",
+          "command": "vscode-sailpoint-identitynow.csv.import.roles.explorer",
           "group": "idn"
         }
       ]

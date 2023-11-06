@@ -70,3 +70,4 @@ export const EXPORT_ROLE_VIEW = 'vscode-sailpoint-identitynow.csv.export.roles.v
 export const EXPORT_ROLE_ICON_VIEW = 'vscode-sailpoint-identitynow.csv.export.roles-icon.view';
 export const IMPORT_ROLE_VIEW = 'vscode-sailpoint-identitynow.csv.import.roles.view';
 export const IMPORT_ROLE_ICON_VIEW = 'vscode-sailpoint-identitynow.csv.import.roles-icon.view';
+export const IMPORT_ROLE_EXPLORER = 'vscode-sailpoint-identitynow.csv.import.roles.explorer';

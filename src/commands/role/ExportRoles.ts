@@ -8,6 +8,7 @@ import { OwnerReference, RequestabilityForRole, Revocability, Role } from 'sailp
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { accessProfileApprovalSchemeToStringConverter, roleApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
+import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
 
 export class RoleExporterCommand {
     /**
@@ -170,7 +171,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
         const unwindablePaths: string[] = [];
 
         const governanceGroupCache = new GovernanceGroupIdToNameCacheService(this.client);
-
+        const identityCacheIdToName = new IdentityIdToNameCacheService(this.client);
 
         const iterator = new RolePaginator(this.client);
         await this.writeData(headers, paths, unwindablePaths, iterator, task, token,
@@ -182,7 +183,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
                     enabled: item.enabled,
                     requestable: item.requestable,
                     owner: {
-                        name: item.owner!.name
+                        name: (await identityCacheIdToName.get(item.owner!.id!))
                     },
                     accessProfiles: item.accessProfiles?.map(x => x.name).join(CSV_MULTIVALUE_SEPARATOR),
                     accessRequestConfig: {
@@ -206,5 +207,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
             });
         console.log("Governance Group Cache stats", governanceGroupCache.getStats());
         governanceGroupCache.flushAll();
+        console.log("Identity Cache stats", identityCacheIdToName.getStats());
+        identityCacheIdToName.flushAll();
     }
 }

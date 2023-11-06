@@ -70,7 +70,36 @@ export async function stringToAccessProfileApprovalSchemeConverter(
             approverType = AccessProfileApprovalSchemeApproverTypeEnum.GovernanceGroup;
             approverId = await governanceId2Name.get(approver);
         }
-        
+
+        return {
+            approverType: approverType,
+            approverId: approverId
+        };
+
+    }));
+}
+/**
+ * Convert a string to ApprovalSchemeForRole[] for import
+ * Very difficult to work with generics and Enums... So I've just duplicated stringToAccessProfileApprovalSchemeConverter & stringToRoleApprovalSchemeConverter
+ * @param params 
+ */
+export async function stringToRoleApprovalSchemeConverter(
+    schemes: string | undefined,
+    governanceId2Name: CacheService<string>): Promise<ApprovalSchemeForRole[] | undefined> {
+
+    if (schemes === undefined || isEmpty(schemes)) { return new Array<ApprovalSchemeForRole>; }
+
+    return await Promise.all(schemes.split(CSV_MULTIVALUE_SEPARATOR).map(async (approver) => {
+
+        let approverType: ApprovalSchemeForRoleApproverTypeEnum;
+        let approverId: string | undefined = undefined;
+        if (Object.values(ApprovalSchemeForRoleApproverTypeEnum).includes(approver as ApprovalSchemeForRoleApproverTypeEnum)) {
+            approverType = approver as ApprovalSchemeForRoleApproverTypeEnum;
+        } else {
+            approverType = ApprovalSchemeForRoleApproverTypeEnum.GovernanceGroup;
+            approverId = await governanceId2Name.get(approver);
+        }
+
         return {
             approverType: approverType,
             approverId: approverId

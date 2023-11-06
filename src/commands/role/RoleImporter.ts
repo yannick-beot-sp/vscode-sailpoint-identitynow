@@ -1,41 +1,39 @@
-import * as tmp from "tmp";
 import * as vscode from 'vscode';
-import { AccessProfile, EntitlementBeta } from 'sailpoint-api-client';
-import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
-import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
-import { CSVReader } from '../../services/CSVReader';
+import * as tmp from "tmp";
+
 import { IdentityNowClient } from "../../services/IdentityNowClient";
-import { EntitlementCacheService, KEY_SEPARATOR } from '../../services/cache/EntitlementCacheService';
+import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
+import { AccessProfileApprovalScheme, AccessProfileRef, ApprovalSchemeForRole, Role } from 'sailpoint-api-client';
+import { CSVReader } from '../../services/CSVReader';
 import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
 import { IdentityNameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
-import { SourceCacheService } from '../../services/cache/SourceCacheService';
-import { stringToAccessProfileApprovalSchemeConverter } from '../../utils/approvalSchemeConverter';
+import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
+import { AccessProfileNameToIdCacheService } from '../../services/cache/AccessProfileNameToIdCacheService';
+import { stringToRoleApprovalSchemeConverter, stringToAccessProfileApprovalSchemeConverter } from '../../utils/approvalSchemeConverter';
 import { openPreview } from '../../utils/vsCodeHelpers';
-import { isEmpty } from "../../utils/stringUtils";
+import { isEmpty } from '../../utils/stringUtils';
 
-
-interface AccessProfileImportResult {
+interface RolesImportResult {
     success: number
     error: number
 }
 
-interface AccessProfileCSVRecord {
+interface RoleCSVRecord {
     name: string
     description: string
     enabled: boolean
     requestable: boolean
-    source: string
     owner: string
-    entitlements: string
     commentsRequired: boolean
     denialCommentsRequired: boolean
+    approvalSchemes: string
     revokeCommentsRequired: boolean
     revokeDenialCommentsRequired: boolean
     revokeApprovalSchemes: string
-    approvalSchemes: string
+    accessProfiles: string
 }
 
-export class AccessProfileImporter {
+export class RoleImporter {
     readonly client: IdentityNowClient;
     readonly logFilePath: string;
     readonly logWriter: CSVLogWriter;
@@ -47,7 +45,6 @@ export class AccessProfileImporter {
         private fileUri: vscode.Uri
     ) {
         this.client = new IdentityNowClient(this.tenantId, this.tenantName);
-
 
         this.logFilePath = tmp.tmpNameSync({
             prefix: 'import-accessprofiles',
@@ -65,7 +62,7 @@ export class AccessProfileImporter {
     async importFileWithProgression(): Promise<void> {
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
-            title: `Importing access profiles...`,
+            title: `Importing roles to ${this.tenantDisplayName}...`,
             cancellable: false
         }, async (task, token) =>
             await this.importFile(task, token)
@@ -73,27 +70,27 @@ export class AccessProfileImporter {
     }
 
     protected async importFile(task: any, token: vscode.CancellationToken): Promise<void> {
-        console.log("> AccessProfileImporter.importFile");
-        const csvReader = new CSVReader<AccessProfileCSVRecord>(this.fileUri.fsPath);
-        await this.writeLog(null, 'Access Profile', CSVLogWriterLogType.INFO, `Importing file from ${this.fileUri.fsPath} in ${this.tenantDisplayName}`);
+        console.log("> RoleImporter.importFile");
+        const csvReader = new CSVReader<RoleCSVRecord>(this.fileUri.fsPath);
+        await this.writeLog(null, 'Role', CSVLogWriterLogType.INFO, `Importing file from ${this.fileUri.fsPath} in ${this.tenantDisplayName}`);
 
         const nbLines = await csvReader.getLines();
         const incr = 100 / nbLines;
         task.report({ increment: 0 });
 
-        const result: AccessProfileImportResult = {
+        let processedLines = 0;
+
+        const result: RolesImportResult = {
             success: 0,
             error: 0
         };
 
         const governanceGroupCache = new GovernanceGroupNameToIdCacheService(this.client);
+        const accessProfileNameToIdCacheService = new AccessProfileNameToIdCacheService(this.client);
         const identityCacheService = new IdentityNameToIdCacheService(this.client);
-        const sourceCacheService = new SourceCacheService(this.client);
-        const entitlementCacheService = new EntitlementCacheService(this.client);
 
-        let processedLines = 0;
 
-        await csvReader.processLine(async (data: AccessProfileCSVRecord) => {
+        await csvReader.processLine(async (data: RoleCSVRecord) => {
 
             processedLines++;
 
@@ -105,37 +102,18 @@ export class AccessProfileImporter {
             if (isEmpty(data.name)) {
                 result.error++;
                 const nameMessage = `Missing attribute 'name' in record`;
-                await this.writeLog(processedLines, 'Access Profile', CSVLogWriterLogType.ERROR, nameMessage);
+                await this.writeLog(processedLines, 'role', CSVLogWriterLogType.ERROR, nameMessage);
                 vscode.window.showErrorMessage(nameMessage);
                 return;
             }
 
-            const apName = data.name.trim();
-
-            if (isEmpty(data.source)) {
-                result.error++;
-                const srcMessage = `Missing 'source' in CSV`;
-                await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, srcMessage);
-                vscode.window.showErrorMessage(srcMessage);
-                return;
-            }
+            const roleName = data.name.trim();
 
             if (isEmpty(data.owner)) {
                 result.error++;
                 const owMessage = `Missing 'owner' in CSV`;
-                await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, owMessage);
+                await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, owMessage);
                 vscode.window.showErrorMessage(owMessage);
-                return;
-            }
-
-            let sourceId: string;
-            try {
-                sourceId = await sourceCacheService.get(data.source);
-            } catch (error) {
-                result.error++;
-                const srcMessage = `Unable to find source with name '${data.source}' in IDN`;
-                await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, srcMessage);
-                vscode.window.showErrorMessage(srcMessage);
                 return;
             }
 
@@ -145,54 +123,52 @@ export class AccessProfileImporter {
             } catch (error) {
                 result.error++;
                 const srcMessage = `Unable to find owner with name '${data.owner}' in IDN`;
-                await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, srcMessage);
+                await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, srcMessage);
                 vscode.window.showErrorMessage(srcMessage);
                 return;
             }
 
-            let entitlements: EntitlementBeta[];
+            let accessProfiles: AccessProfileRef[] = [];
             try {
-                entitlements = await Promise.all(data.entitlements?.split(CSV_MULTIVALUE_SEPARATOR).map(async (entitlementName) => ({
-                    name: entitlementName,
-                    "id": (await entitlementCacheService.get([sourceId, entitlementName].join(KEY_SEPARATOR))),
-                    "type": "ENTITLEMENT"
+                accessProfiles = await Promise.all(data.accessProfiles?.split(CSV_MULTIVALUE_SEPARATOR).map(async (apName) => ({
+                    name: apName,
+                    "id": (await accessProfileNameToIdCacheService.get(apName)),
+                    "type": "ACCESS_PROFILE"
                 })));
             } catch (error) {
                 result.error++;
-                const srcMessage = `Unable to find entitlement: ${error}`;
-                await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, srcMessage);
-                vscode.window.showErrorMessage(srcMessage);
+                const etMessage = `Unable to find access an access profile: ${error}`;
+                await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, etMessage);
+                vscode.window.showErrorMessage(etMessage);
                 return;
             }
 
-            let approvalSchemes, revokeApprovalSchemes;
+            let approvalSchemes: ApprovalSchemeForRole[],
+                revokeApprovalSchemes: AccessProfileApprovalScheme[];
             try {
-                approvalSchemes = await stringToAccessProfileApprovalSchemeConverter(
+                approvalSchemes = await stringToRoleApprovalSchemeConverter(
                     data.approvalSchemes, governanceGroupCache);
                 revokeApprovalSchemes = await stringToAccessProfileApprovalSchemeConverter(
                     data.revokeApprovalSchemes, governanceGroupCache);
             } catch (error) {
                 result.error++;
                 const srcMessage = `Unable to build approval scheme: ${error}`;
-                await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, srcMessage);
+                await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, srcMessage);
                 vscode.window.showErrorMessage(srcMessage);
                 return;
             }
 
-            const accessProfilePayload: AccessProfile = {
-                "name": data.name,
-                "description": data.description?.replaceAll("\\r", "\r").replaceAll("\\n", "\n"),
+
+
+            const rolePayload: Role = {
+                "name": roleName,
+                "description": data.description?.replaceAll('\\r', '\r').replaceAll('\\n', '\n'),
                 "enabled": data.enabled ?? false,
-                "requestable": data.requestable ?? false,
+                requestable: data.requestable ?? false,
                 "owner": {
                     "id": ownerId,
                     "type": "IDENTITY",
                     "name": data.owner
-                },
-                "source": {
-                    "id": sourceId,
-                    "type": "SOURCE",
-                    "name": data.source
                 },
                 "accessRequestConfig": {
                     "commentsRequired": data.commentsRequired ?? false,
@@ -204,20 +180,20 @@ export class AccessProfileImporter {
                     "denialCommentsRequired": data.revokeDenialCommentsRequired ?? false,
                     "approvalSchemes": revokeApprovalSchemes
                 },
-                "entitlements": entitlements
+                "accessProfiles": accessProfiles
             };
 
             try {
-                await this.client.createResource('/v3/access-profiles', JSON.stringify(accessProfilePayload));
-                await this.writeLog(processedLines, apName, CSVLogWriterLogType.SUCCESS, `Successfully imported access profile '${data.name}'`);
+                await this.client.createRole(rolePayload);
+                await this.writeLog(processedLines, roleName, CSVLogWriterLogType.SUCCESS, `Successfully imported role '${data.name}'`);
                 result.success++;
             } catch (error: any) {
                 result.error++;
-                await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, `Cannot create access profile: '${error.message}'`);
+                await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, `Cannot create role: '${error.message}' in IDN`);
             }
         });
 
-        const message = `${nbLines} line(s) processed. ${result.success} sucessfully imported. ${result.error} error(s).`;
+        const message = `${nbLines} line(s) processed. ${result.success} sucessfully import. ${result.error} error(s).`;
 
         if (result.error === nbLines) {
             vscode.window.showErrorMessage(message);
@@ -232,18 +208,15 @@ export class AccessProfileImporter {
         } catch (_exc) {
             // do nothing hopefully
         }
+
         console.log("Governance Group Cache stats", governanceGroupCache.getStats());
         governanceGroupCache.flushAll();
         console.log("Identity Cache stats", identityCacheService.getStats());
         identityCacheService.flushAll();
-        console.log("Source Cache stats", sourceCacheService.getStats());
-        sourceCacheService.flushAll();
-        console.log("Entitlement Cache stats", entitlementCacheService.getStats());
-        entitlementCacheService.flushAll();
+        console.log("Access Profile Cache stats", accessProfileNameToIdCacheService.getStats());
+        accessProfileNameToIdCacheService.flushAll();
         await openPreview(vscode.Uri.file(this.logFilePath), "csv");
     }
-
-
 
     private async writeLog(csvLine: number | string | null, objectName: string, type: CSVLogWriterLogType, message: string) {
         let logMessage = '';

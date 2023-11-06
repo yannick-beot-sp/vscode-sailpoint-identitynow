@@ -1,49 +1,50 @@
 import * as vscode from 'vscode';
 import * as commands from './commands/constants';
+import { AccessProfileImporterExplorerCommand } from './commands/access-profile/AccessProfileImporterExplorerCommand';
+import { AccessProfileImporterTreeViewCommand } from './commands/access-profile/AccessProfileImporterTreeViewCommand';
+import { AccessProfileExporterCommand } from './commands/access-profile/ExportAccessProfiles';
+import { NewAccessProfileCommand } from './commands/access-profile/NewAccessProfileCommand';
 import { AddTenantCommand } from './commands/addTenant';
-import { NewTransformCommand } from './commands/newTransform';
-import { OpenResourceCommand } from './commands/openResource';
-import { IdentityNowResourceProvider } from './files/IdentityNowResourceProvider';
-import { SailPointIdentityNowAuthenticationProvider } from './services/AuthenticationProvider';
-import { TenantService } from './services/TenantService';
-import { TreeManager } from './services/TreeManager';
-import { IdentityNowDataProvider } from './views/IdentityNowDataProvider';
-import { URL_PREFIX } from './constants';
-import { deleteResource } from './commands/deleteResource';
-import { newProvisioningPolicy } from './commands/newProvisioningPolicy';
-import { newSchema } from './commands/newSchema';
-import { disableWorkflow, enableWorkflow } from './commands/workflow';
-import { viewWorkflowExecutionHistory } from './commands/viewWorkflowExecutionHistory';
-import { WorkflowTesterWebviewViewProvider } from './views/WorkflowTesterWebviewViewProvider';
-import { TestWorkflowCommand } from './commands/testWorkflow';
-import { TransformEvaluator } from './services/TransformEvaluator';
 import { ConnectorRuleCommand } from './commands/connectorRuleCommand';
-import { ExportScriptFromRuleCommand } from './commands/exportScriptFromRuleCommand';
-import { FileHandler } from './files/FileHandler';
-import { RenameTenantCommand } from './commands/renameTenant';
-import { IdentityNowUriHandler } from './uriHandler';
-import { SortIdentityProfileCommand } from './commands/sortIdentityProfile';
-import { refreshIdentityProfile } from './commands/refreshIdentityProfile';
+import { deleteResource } from './commands/deleteResource';
 import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './commands/exportAccounts';
 import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from './commands/exportEntitlementDetails';
+import { ExportScriptFromRuleCommand } from './commands/exportScriptFromRuleCommand';
+import { FilterCommand } from './commands/filterCommand';
 import { AccountImportNodeCommand } from './commands/importAccount';
-import { UncorrelatedAccountImportNodeCommand } from './commands/importUncorrelatedAccount';
 import { EntitlementDetailsImportNodeCommand } from './commands/importEntitlementDetails';
-import { ExportConfigTreeViewCommand } from './commands/spconfig-export/ExportConfigTreeViewCommand';
-import { ExportConfigPaletteCommand } from './commands/spconfig-export/ExportConfigPaletteCommand';
+import { UncorrelatedAccountImportNodeCommand } from './commands/importUncorrelatedAccount';
+import { newProvisioningPolicy } from './commands/newProvisioningPolicy';
+import { newSchema } from './commands/newSchema';
+import { NewTransformCommand } from './commands/newTransform';
+import { OpenResourceCommand } from './commands/openResource';
+import { refreshIdentityProfile } from './commands/refreshIdentityProfile';
+import { RenameTenantCommand } from './commands/renameTenant';
+import { RoleExporterCommand } from './commands/role/ExportRoles';
+import { NewRoleCommand } from './commands/role/NewRoleCommand';
+import { RoleImporterExplorerCommand } from './commands/role/RoleImporterExplorerCommand';
+import { RoleImporterTreeViewCommand } from './commands/role/RoleImporterTreeViewCommand';
+import { SortIdentityProfileCommand } from './commands/sortIdentityProfile';
 import { ExportConfigNodeTreeViewCommand } from './commands/spconfig-export/ExportConfigNodeTreeViewCommand';
+import { ExportConfigPaletteCommand } from './commands/spconfig-export/ExportConfigPaletteCommand';
+import { ExportConfigTreeViewCommand } from './commands/spconfig-export/ExportConfigTreeViewCommand';
 import { ImportConfigExplorerCommand } from './commands/spconfig-import/ImportConfigExplorerCommand';
 import { ImportConfigPaletteCommand } from './commands/spconfig-import/ImportConfigPaletteCommand';
 import { ImportConfigTreeViewCommand } from './commands/spconfig-import/ImportConfigTreeViewCommand';
-import { AccessProfileExporterCommand } from './commands/access-profile/ExportAccessProfiles';
-import { RoleExporterCommand } from './commands/role/ExportRoles';
-import { NewAccessProfileCommand } from './commands/access-profile/NewAccessProfileCommand';
-import { NewRoleCommand } from './commands/role/NewRoleCommand';
+import { TestWorkflowCommand } from './commands/testWorkflow';
+import { viewWorkflowExecutionHistory } from './commands/viewWorkflowExecutionHistory';
+import { disableWorkflow, enableWorkflow } from './commands/workflow';
+import { URL_PREFIX } from './constants';
+import { FileHandler } from './files/FileHandler';
+import { IdentityNowResourceProvider } from './files/IdentityNowResourceProvider';
 import { LoadMoreNode } from './models/IdentityNowTreeItem';
-import { FilterCommand } from './commands/filterCommand';
-import { AccessProfileImporterTreeViewCommand } from './commands/access-profile/AccessProfileImporterTreeViewCommand';
-import { RoleImporterCommand } from './commands/role/ImportRoles';
-import { AccessProfileImporterExplorerCommand } from './commands/access-profile/AccessProfileImporterExplorerCommand';
+import { SailPointIdentityNowAuthenticationProvider } from './services/AuthenticationProvider';
+import { TenantService } from './services/TenantService';
+import { TransformEvaluator } from './services/TransformEvaluator';
+import { TreeManager } from './services/TreeManager';
+import { IdentityNowUriHandler } from './uriHandler';
+import { IdentityNowDataProvider } from './views/IdentityNowDataProvider';
+import { WorkflowTesterWebviewViewProvider } from './views/WorkflowTesterWebviewViewProvider';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -298,13 +299,17 @@ export function activate(context: vscode.ExtensionContext) {
 			roleExporterCommand.execute, roleExporterCommand));
 
 	// Role Importer
-	const roleImporterCommand = new RoleImporterCommand();
+	const roleImporterCommand = new RoleImporterTreeViewCommand();
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_ROLE_VIEW,
 			roleImporterCommand.execute, roleImporterCommand));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_ROLE_ICON_VIEW,
 			roleImporterCommand.execute, roleImporterCommand));
+	const roleImporterExplorerCommand = new RoleImporterExplorerCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_ROLE_EXPLORER,
+			roleImporterExplorerCommand.execute, roleImporterExplorerCommand));
 
 	const newRoleCommand = new NewRoleCommand(tenantService);
 	context.subscriptions.push(

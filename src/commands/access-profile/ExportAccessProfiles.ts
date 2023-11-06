@@ -8,7 +8,7 @@ import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIt
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { accessProfileApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
-import { IdentityCacheIdToName } from '../../services/cache/IdentityCacheIdToName';
+import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
 
 export class AccessProfileExporterCommand {
     /**
@@ -154,7 +154,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
         const unwindablePaths: string[] = [];
 
         const governanceGroupCache = new GovernanceGroupIdToNameCacheService(this.client);
-        const identityCacheIdToName = new IdentityCacheIdToName(this.client);
+        const identityCacheIdToName = new IdentityIdToNameCacheService(this.client);
 
         const iterator = new GenericAsyncIterableIterator<AccessProfile, AccessProfilesApiListAccessProfilesRequest>(
             this.client,
@@ -164,7 +164,6 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
             async (item: AccessProfile): Promise<AccessProfileDto> => {
                 const itemDto: AccessProfileDto = {
                     name: item.name,
-
                     // Escape carriage returns in description.
                     description: item.description?.replaceAll('\r', "\\r").replaceAll('\n', "\\n"),
                     enabled: item.enabled,
@@ -198,6 +197,5 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
         governanceGroupCache.flushAll();
         console.log("Identity Cache stats", identityCacheIdToName.getStats());
         identityCacheIdToName.flushAll();
-
     }
 }

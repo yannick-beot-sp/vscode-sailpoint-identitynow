@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
-import { AccessProfileImporter } from './AccessProfileImporter';
 import { TenantService } from '../../services/TenantService';
 import { chooseTenant } from '../../utils/vsCodeHelpers';
+import { RoleImporter } from './RoleImporter';
 
 
-export class AccessProfileImporterExplorerCommand {
+export class RoleImporterExplorerCommand {
     constructor(
         private readonly tenantService: TenantService
     ) {  }
@@ -12,20 +12,19 @@ export class AccessProfileImporterExplorerCommand {
     async execute(fileUri: vscode.Uri, selectedFiles: vscode.Uri[]): Promise<void> {
         console.log("> AccessProfileImporterExplorerCommand.execute");
 
-        const tenantInfo = await chooseTenant(this.tenantService, 'To which tenant do you want to import access profiles?');
+        const tenantInfo = await chooseTenant(this.tenantService, 'To which tenant do you want to import the config?');
         console.log("AccessProfileImporterExplorerCommand.execute: tenant = ", tenantInfo);
         if (!tenantInfo) {
             return;
         }
 
-        const accessProfileImporter = new AccessProfileImporter(
+        const roleImporter = new RoleImporter(
             tenantInfo.id,
             tenantInfo.tenantName,
             tenantInfo.name,
             fileUri
         );
-
-        await accessProfileImporter.importFileWithProgression();
+        await roleImporter.importFileWithProgression();
     }
 }
 
