@@ -7,7 +7,8 @@ import { AccessProfile, AccessProfileSourceRef, AccessProfilesApiListAccessProfi
 import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { GovernanceGroupCacheService } from '../../services/cache/GovernanceGroupCacheService';
-import { accessProfileApprovalSchemeConverter } from '../../utils/approvalSchemeConverter';
+import { accessProfileApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
+import { IdentityCacheIdToName } from '../../services/cache/IdentityCacheIdToName';
 
 export class AccessProfileExporterCommand {
     /**
@@ -103,7 +104,6 @@ interface AccessProfileDto {
      */
     'revocationRequestConfig'?: Revocability;
 }
-
 class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
     constructor(
         tenantId: string,
@@ -154,6 +154,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
         const unwindablePaths: string[] = [];
 
         const governanceGroupCache = new GovernanceGroupCacheService(this.client);
+        const identityCacheIdToName = new IdentityCacheIdToName(this.client);
 
         const iterator = new GenericAsyncIterableIterator<AccessProfile, AccessProfilesApiListAccessProfilesRequest>(
             this.client,
@@ -172,7 +173,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
                         name: item.source.name
                     },
                     owner: {
-                        name: item.owner.name
+                        name: (await identityCacheIdToName.get(item.owner.id))
                     },
                     entitlements: item.entitlements?.map(x => x.name).join(CSV_MULTIVALUE_SEPARATOR),
                     accessRequestConfig: {
@@ -183,10 +184,10 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
                         commentsRequired: item.revocationRequestConfig?.commentsRequired ?? false,
                         denialCommentsRequired: item.revocationRequestConfig?.denialCommentsRequired ?? false
                     },
-                    approvalSchemes: await accessProfileApprovalSchemeConverter(
+                    approvalSchemes: await accessProfileApprovalSchemeToStringConverter(
                         item.accessRequestConfig?.approvalSchemes,
                         governanceGroupCache),
-                    revokeApprovalSchemes: await accessProfileApprovalSchemeConverter(
+                    revokeApprovalSchemes: await accessProfileApprovalSchemeToStringConverter(
                         item.revocationRequestConfig?.approvalSchemes,
                         governanceGroupCache)
                 };
@@ -195,6 +196,8 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
             });
         console.log("Governance Group Cache stats", governanceGroupCache.getStats());
         governanceGroupCache.flushAll();
+        console.log("Identity Cache stats", identityCacheIdToName.getStats());
+        identityCacheIdToName.flushAll();
 
     }
 }

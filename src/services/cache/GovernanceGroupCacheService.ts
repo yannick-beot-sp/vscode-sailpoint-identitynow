@@ -5,7 +5,7 @@ import { CacheService } from "./CacheService";
  * Cache the governance group name by id
  */
 export class GovernanceGroupCacheService extends CacheService<string>{
-    constructor(private readonly client: IdentityNowClient) {
+    constructor(readonly client: IdentityNowClient) {
         super(
             async (key: string) => {
                 const group = await client.getGovernanceGroupById(key);

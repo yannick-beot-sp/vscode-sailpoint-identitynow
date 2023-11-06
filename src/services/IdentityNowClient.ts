@@ -123,6 +123,22 @@ export class IdentityNowClient {
 		return result.data;
 	}
 
+	public async getSourceByName(name: string): Promise<any> {
+		console.log("> getSourceByName", name);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesApi(apiConfig);
+		const result = await api.listSources({ filters: `name eq "${name}"` });
+
+		const res = result.data;
+
+		if (!res || !(res instanceof Array) || res.length !== 1) {
+			console.log("getSourceByName returns ", res);
+			throw new Error(`Could not find source "${name} "`);
+		}
+		// returning only one source
+		return res[0];
+	}
+
 	public async startEntitlementAggregation(
 		sourceID: number,
 		types: string[] | null = null
@@ -1000,6 +1016,24 @@ export class IdentityNowClient {
 		return Number(resp.headers[TOTAL_COUNT_HEADER]);
 	}
 
+	public async getEntitlementByName(sourceId: string, entitlementName: string): Promise<EntitlementBeta> {
+		console.log("> getEntitlementByName", sourceId, entitlementName);
+
+		const filters = `source.id eq "${sourceId}" and name eq "${entitlementName}"`;
+		const result = await this.getEntitlements({
+			filters
+		});
+
+		const res = result.data;
+
+		if (!res || !(res instanceof Array) || res.length !== 1) {
+			console.log("getEntitlementByName returns ", res);
+			throw new Error(`Could not find entitlement "${entitlementName}"`);
+		}
+		// returning only one entitlement
+		return res[0];
+	}
+
 	/**
 	 * This function is used to support "manual" pagination and only returns a maximum of 250 records
 	 * @param sourceId Id of the source
@@ -1015,6 +1049,7 @@ export class IdentityNowClient {
 		});
 		return await resp.data;
 	}
+
 	public async getAllEntitlementsBySource(sourceId: string): Promise<EntitlementBeta[]> {
 		console.log("> getAllEntitlementsBySource", sourceId);
 		const filters = `source.id eq "${sourceId}"`;
@@ -1082,12 +1117,33 @@ export class IdentityNowClient {
 		return response;
 	}
 
-	public async getPublicIdentitiesByAlias(alias: string): Promise<PublicIdentity> {
+	public async getPublicIdentityByAlias(alias: string): Promise<PublicIdentity> {
 		const filters = `alias eq "${alias}"`;
 		const resp = await this.getPublicIdentities({
 			filters,
 			limit: 1,
-			offset: 0,
+			count: true
+		});
+		const nbIdentity = Number(resp.headers[TOTAL_COUNT_HEADER]);
+		if (nbIdentity !== 1) {
+			throw new Error("Could Not Find Identity");
+		}
+		return resp.data[0];
+	}
+
+	/**
+	 * Note: public identities endpoint does not have a "get"
+	 * @param id Id
+	 */
+	public async getPublicIdentityById(
+		id:string
+	): Promise<PublicIdentity> {
+		console.log("> getPublicIdentityById", id);
+
+		const filters = `id eq "${id}"`;
+		const resp = await this.getPublicIdentities({
+			filters,
+			limit: 1,
 			count: true
 		});
 		const nbIdentity = Number(resp.headers[TOTAL_COUNT_HEADER]);

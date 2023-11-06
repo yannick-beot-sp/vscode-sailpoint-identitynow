@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
 import { IdentityNowClient } from "../../services/IdentityNowClient";
 import { isEmpty } from 'lodash';
-import { GenericCSVReader } from '../../services/GenericCSVReader';
 import { chooseFile } from '../../utils/vsCodeHelpers';
 import { RolesTreeItem } from '../../models/IdentityNowTreeItem';
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
 import { Role } from 'sailpoint-api-client';
 import { truethy } from '../../utils/booleanUtils';
+import { CSVReader } from '../../services/CSVReader';
 
 interface RolesImportResult {
     success: number
@@ -82,7 +82,7 @@ export class RoleImporter {
 
     protected async importFile(task: any, token: vscode.CancellationToken): Promise<void> {
         console.log("> RoleImporter.importFile");
-        const csvReader = new GenericCSVReader(this.fileUri.fsPath);
+        const csvReader = new CSVReader<RoleCSVRecord>(this.fileUri.fsPath);
 
         try {
             this.logWriter = new CSVLogWriter(this.fileUri.fsPath);

@@ -63,6 +63,7 @@ export const EXPORT_ACCESS_PROFILE_VIEW = 'vscode-sailpoint-identitynow.csv.expo
 export const EXPORT_ACCESS_PROFILE_ICON_VIEW = 'vscode-sailpoint-identitynow.csv.export.access-profiles-icon.view';
 export const IMPORT_ACCESS_PROFILE_VIEW = 'vscode-sailpoint-identitynow.csv.import.access-profiles.view';
 export const IMPORT_ACCESS_PROFILE_ICON_VIEW = 'vscode-sailpoint-identitynow.csv.import.access-profiles-icon.view';
+export const IMPORT_ACCESS_PROFILE_EXPLORER = 'vscode-sailpoint-identitynow.csv.import.access-profiles.explorer';
 
 // Role Import / Export
 export const EXPORT_ROLE_VIEW = 'vscode-sailpoint-identitynow.csv.export.roles.view';

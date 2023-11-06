@@ -25,7 +25,7 @@ interface UncorrelatedAccountImportResult {
 
 class EntitlementDetailsImporter {
     readonly client: IdentityNowClient;
-    readonly csvReader: CSVReader;
+    readonly csvReader: CSVReader<any>;
     readonly result: UncorrelatedAccountImportResult = {
         totalDescription: 0,
         totalDescriptionUpdated: 0,
@@ -48,7 +48,7 @@ class EntitlementDetailsImporter {
         private fileUri: vscode.Uri
     ) {
         this.client = new IdentityNowClient(this.tenantId, this.tenantName);
-        this.csvReader = new CSVReader(this.fileUri.fsPath);
+        this.csvReader = new CSVReader<any>(this.fileUri.fsPath);
     }
 
     public async importFileWithProgression(): Promise<void> {
@@ -185,7 +185,7 @@ class EntitlementDetailsImporter {
                 } else {
                     // need to get id 
                     try {
-                        const ownerIdentity = await this.client.getPublicIdentitiesByAlias(data.owner);
+                        const ownerIdentity = await this.client.getPublicIdentityByAlias(data.owner);
 
                         payload.push({
                             "op": "replace",

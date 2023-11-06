@@ -343,6 +343,10 @@
         }
       },
       {
+        "command": "vscode-sailpoint-identitynow.csv.import.access-profiles.explorer",
+        "title": "IdentityNow: Import Access Profiles CSV..."
+      },
+      {
         "command": "vscode-sailpoint-identitynow.csv.import.roles.view",
         "title": "Import Roles CSV..."
       },
@@ -507,6 +511,10 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.csv.export.access-profiles.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.csv.import.access-profiles.explorer",
           "when": "never"
         },
         {
@@ -777,6 +785,11 @@
           "when": "resourceLangId == json",
           "command": "vscode-sailpoint-identitynow.import-config.menu",
           "group": "idn"
+        },
+        {
+          "when": "resourceLangId == csv",
+          "command": "vscode-sailpoint-identitynow.csv.import.access-profiles.explorer",
+          "group": "idn"
         }
       ]
     },
@@ -873,12 +886,13 @@
     "@types/lodash": "^4.14.191",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.15.0",
+    "@types/tmp": "^0.2.5",
     "@types/vscode": "^1.74.0",
     "@typescript-eslint/eslint-plugin": "^5.47.0",
     "@typescript-eslint/parser": "^5.47.0",
     "@vscode/test-electron": "^2.2.1",
-    "eslint": "^8.30.0",
     "esbuild": "^0.16.17",
+    "eslint": "^8.30.0",
     "glob": "^8.0.3",
     "mocha": "^10.2.0",
     "rimraf": "^3.0.2"
@@ -891,6 +905,7 @@
     "csv-parse": "^5.4.0",
     "fast-json-patch": "^3.1.1",
     "lodash": "^4.17.21",
-    "sailpoint-api-client": "^1.2.3"
+    "sailpoint-api-client": "^1.2.3",
+    "tmp": "^0.2.1"
   }
 }

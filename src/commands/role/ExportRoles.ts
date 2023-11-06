@@ -4,11 +4,10 @@ import { RolesTreeItem } from '../../models/IdentityNowTreeItem';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
 import RolePaginator from './RolePaginator';
-import { isEmpty } from 'lodash';
-import { AccessProfileRef, OwnerReference, RequestabilityForRole, Revocability, Role } from 'sailpoint-api-client';
+import { OwnerReference, RequestabilityForRole, Revocability, Role } from 'sailpoint-api-client';
 import { GovernanceGroupCacheService } from '../../services/cache/GovernanceGroupCacheService';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
-import { accessProfileApprovalSchemeConverter } from '../../utils/approvalSchemeConverter';
+import { accessProfileApprovalSchemeToStringConverter, roleApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
 
 export class RoleExporterCommand {
     /**
@@ -194,10 +193,11 @@ class RoleExporter extends BaseCSVExporter<Role> {
                         commentsRequired: item.revocationRequestConfig?.commentsRequired ?? false,
                         denialCommentsRequired: item.revocationRequestConfig?.denialCommentsRequired ?? false
                     },
-                    approvalSchemes: await accessProfileApprovalSchemeConverter(
+                    approvalSchemes: await roleApprovalSchemeToStringConverter(
                         item.accessRequestConfig?.approvalSchemes,
                         governanceGroupCache),
-                    revokeApprovalSchemes: await accessProfileApprovalSchemeConverter(
+                        // TODO cf. https://github.com/sailpoint-oss/developer.sailpoint.com/issues/413
+                    revokeApprovalSchemes: await accessProfileApprovalSchemeToStringConverter(
                         item.revocationRequestConfig?.approvalSchemes,
                         governanceGroupCache)
                 };

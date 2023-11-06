@@ -1,5 +1,3 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as commands from './commands/constants';
 import { AddTenantCommand } from './commands/addTenant';
@@ -39,12 +37,13 @@ import { ImportConfigPaletteCommand } from './commands/spconfig-import/ImportCon
 import { ImportConfigTreeViewCommand } from './commands/spconfig-import/ImportConfigTreeViewCommand';
 import { AccessProfileExporterCommand } from './commands/access-profile/ExportAccessProfiles';
 import { RoleExporterCommand } from './commands/role/ExportRoles';
-import { AccessProfileImporterCommand } from './commands/access-profile/ImportAccessProfiles';
-import { RoleImporterCommand } from './commands/role/ImportRoles';
 import { NewAccessProfileCommand } from './commands/access-profile/NewAccessProfileCommand';
 import { NewRoleCommand } from './commands/role/NewRoleCommand';
 import { LoadMoreNode } from './models/IdentityNowTreeItem';
 import { FilterCommand } from './commands/filterCommand';
+import { AccessProfileImporterTreeViewCommand } from './commands/access-profile/AccessProfileImporterTreeViewCommand';
+import { RoleImporterCommand } from './commands/role/ImportRoles';
+import { AccessProfileImporterExplorerCommand } from './commands/access-profile/AccessProfileImporterExplorerCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -277,13 +276,17 @@ export function activate(context: vscode.ExtensionContext) {
 			accessProfileExporterCommand.execute, accessProfileExporterCommand));
 
 	// Access Profile Importer
-	const accessProfileImporterCommand = new AccessProfileImporterCommand();
+	const accessProfileImporterCommand = new AccessProfileImporterTreeViewCommand();
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_ACCESS_PROFILE_VIEW,
 			accessProfileImporterCommand.execute, accessProfileImporterCommand));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_ACCESS_PROFILE_ICON_VIEW,
 			accessProfileImporterCommand.execute, accessProfileImporterCommand));
+	const accessProfileImporterExplorerCommand = new AccessProfileImporterExplorerCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_ACCESS_PROFILE_EXPLORER,
+			accessProfileImporterExplorerCommand.execute, accessProfileImporterExplorerCommand));
 
 	// Role Exporter
 	const roleExporterCommand = new RoleExporterCommand();
