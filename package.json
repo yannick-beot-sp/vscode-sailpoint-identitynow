@@ -932,7 +932,8 @@
     "eslint": "^8.30.0",
     "glob": "^8.0.3",
     "mocha": "^10.2.0",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.9.1"
   },
   "dependencies": {
     "@json2csv/node": "^6.1.2",

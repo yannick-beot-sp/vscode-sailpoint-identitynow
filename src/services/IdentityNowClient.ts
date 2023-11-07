@@ -1139,7 +1139,7 @@ export class IdentityNowClient {
 		console.log("> getGovernanceGroups");
 		const apiConfig = await this.getApiConfiguration();
 		const api = new GovernanceGroupsBetaApi(apiConfig);
-		const result = await Paginator.paginate(api, api.listWorkgroups, { sorters: "name" });
+		const result = await Paginator.paginate(api, api.listWorkgroups, { sorters: "name" }, 50);
 		return result.data;
 	}
 

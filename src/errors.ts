@@ -17,3 +17,11 @@ export class GoBackError extends Error {
         super('Go back.');
     }
 }
+
+export class ParseException extends Error {
+
+    constructor(message?: string) {
+        const msg = message ? 'Invalid expression: ' + message : 'Invalid expression';
+        super(msg);
+    }
+}
