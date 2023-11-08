@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import { it, describe, suite } from 'mocha';
 import { Parser } from '../../parser/parser';
-import { Attribute, ComparisonOperator, Expression, Literal } from '../../parser/ast';
+import { Attribute, ComparisonOperator, Expression, Literal, LogicalOperator } from '../../parser/ast';
 import { RoleCriteriaKeyType } from 'sailpoint-api-client';
 
 
@@ -21,7 +21,7 @@ suite('Parser Test Suite', () => {
             new Literal("Customer Service")
         );
 
-        const tests:ParameterizedTest [] = [
+        const tests: ParameterizedTest[] = [
             {
                 should: "should parse an identity attribute",
                 input: "identity.department eq \"Accounting\"",
@@ -67,16 +67,14 @@ suite('Parser Test Suite', () => {
     });
 
     describe('Invalid Identity expression', () => {
-        const tests:ParameterizedTest [] = [
+        const tests: ParameterizedTest[] = [
             {
                 should: "No matching parenthese",
                 input: "(identity.department eq \"Accounting\"",
-                
             },
             {
                 should: "No matching quote",
                 input: "identity.department eq \"Accounting",
-                
             },
             {
                 should: "No identity attribute ",
@@ -85,15 +83,17 @@ suite('Parser Test Suite', () => {
             {
                 should: "Dot but no identity attribute ",
                 input: "identity eq Accounting",
-            }
+            },
+            {
+                should: "Mix between AND and OR",
+                input: "identity.department EQ 'Accounting' and 'Active Directory'.entitlement.memberOf EQ \"CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com\" or 'Active Directory'.attribute.departmentNumber eq \"1234\"",
+            },
         ];
         tests.forEach((t: ParameterizedTest) => {
             it("should throw an exception as " + t.should, () => {
                 assert.throws(
                     () => parser.parse(t.input)
                 );
-
-                
             });
         });
     });
@@ -116,7 +116,7 @@ suite('Parser Test Suite', () => {
             new Literal("true")
         );
 
-        const tests:ParameterizedTest [] = [
+        const tests: ParameterizedTest[] = [
             {
                 should: "should parse an account attribute",
                 input: "'Active Directory'.attribute.departmentNumber eq \"1234\"",
@@ -151,8 +151,8 @@ suite('Parser Test Suite', () => {
             new Literal("CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com")
         );
 
-        
-        const tests:ParameterizedTest [] = [
+
+        const tests: ParameterizedTest[] = [
             {
                 should: "should parse an account attribute",
                 input: "'Active Directory'.entitlement.memberOf eq \"CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com\"",
@@ -162,6 +162,129 @@ suite('Parser Test Suite', () => {
                 should: "should parse an account attribute with single-quoted value",
                 input: "'Active Directory'.entitlement.memberOf eq 'CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com'",
                 expected
+            }
+        ];
+        tests.forEach((t: ParameterizedTest) => {
+            it(t.should, () => {
+                const result = parser.parse(t.input);
+                assert.deepEqual(result, t.expected);
+            });
+        });
+    });
+    describe('Complex expression Membership Criteria', () => {
+
+        const expected = new LogicalOperator(
+            "AND", [
+            new ComparisonOperator(
+                "eq",
+                Attribute.fromIdentityAttribute("department"),
+                new Literal("Accounting")
+            ),
+            new ComparisonOperator(
+                "eq",
+                Attribute.fromSourceBased(
+                    "Active Directory",
+                    RoleCriteriaKeyType.Entitlement,
+                    "memberOf"),
+                new Literal("CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com")
+            )
+        ]
+        );
+
+        const expected2 = new LogicalOperator(
+            "OR", [
+            new ComparisonOperator(
+                "eq",
+                Attribute.fromIdentityAttribute("department"),
+                new Literal("Accounting")
+            ),
+            new ComparisonOperator(
+                "eq",
+                Attribute.fromSourceBased(
+                    "Active Directory",
+                    RoleCriteriaKeyType.Entitlement,
+                    "memberOf"),
+                new Literal("CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com")
+            )
+        ]
+        );
+
+        const expected3 = new LogicalOperator(
+            "AND", [
+            new ComparisonOperator(
+                "eq",
+                Attribute.fromIdentityAttribute("department"),
+                new Literal("Accounting")
+            ),
+            new ComparisonOperator(
+                "eq",
+                Attribute.fromSourceBased(
+                    "Active Directory",
+                    RoleCriteriaKeyType.Entitlement,
+                    "memberOf"),
+                new Literal("CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com")
+            ),
+            new ComparisonOperator(
+                "eq",
+                Attribute.fromSourceBased(
+                    "Active Directory",
+                    RoleCriteriaKeyType.Account,
+                    "departmentNumber"),
+                new Literal("1234")
+            )
+        ]
+        );
+
+        const expected4 = new LogicalOperator(
+            "OR", [
+            new LogicalOperator(
+                "AND", [
+                new ComparisonOperator(
+                    "eq",
+                    Attribute.fromIdentityAttribute("department"),
+                    new Literal("Accounting")
+                ),
+                new ComparisonOperator(
+                    "eq",
+                    Attribute.fromSourceBased(
+                        "Active Directory",
+                        RoleCriteriaKeyType.Entitlement,
+                        "memberOf"),
+                    new Literal("CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com")
+                )
+            ]),
+            new ComparisonOperator(
+                "eq",
+                Attribute.fromIdentityAttribute("department"),
+                new Literal("Customer Service")
+            )
+        ]);
+
+        const tests: ParameterizedTest[] = [
+            {
+                should: "should parse a complex expression with parentheses",
+                input: "(identity.department eq 'Accounting') and ('Active Directory'.entitlement.memberOf eq \"CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com\")",
+                expected
+            },
+            {
+                should: "should parse a complex expression without parentheses",
+                input: "identity.department eq 'Accounting' and 'Active Directory'.entitlement.memberOf eq \"CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com\"",
+                expected
+            },
+            {
+                should: "should parse a complex OR expression uppercase operators",
+                input: "identity.department EQ Accounting OR 'Active Directory'.entitlement.memberOf EQ \"CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com\"",
+                expected: expected2
+            },
+            {
+                should: "should parse multiple ANDs",
+                input: "identity.department EQ 'Accounting' and 'Active Directory'.entitlement.memberOf EQ \"CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com\" and 'Active Directory'.attribute.departmentNumber eq \"1234\"",
+                expected: expected3
+            },
+            {
+                should: "should parse nested complex expression",
+                input: "(identity.department EQ 'Accounting' and 'Active Directory'.entitlement.memberOf EQ \"CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com\") or identity.department EQ 'Customer Service' ",
+                expected: expected4
             }
         ];
         tests.forEach((t: ParameterizedTest) => {

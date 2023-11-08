@@ -21,7 +21,12 @@ export class Parser {
                 const token = stringIterator.readToken();
 
                 if (isLogicalOperation(token)) {
-                    operator = token.toLowerCase() === "and" ? "AND" : "OR";
+                    const currentOperator = token.toLowerCase() === "and" ? "AND" : "OR";
+                    if (operator !== undefined && operator !== currentOperator){
+                        throw new ParseException("All operators should be either \"sand\" or \"or\"");
+                    }
+                    operator = currentOperator;
+
                 } else if (token.toLowerCase() === "identity") {
                     children.push(this.parseIdentityCriteria(stringIterator));
                 } else {
@@ -78,7 +83,7 @@ export class Parser {
     }
 
     /**
-     * Next character should be a dot
+     * Next character should be a dot and skip it
      */
     private checkDot(stringIterator: StringIterator) {
         const tmpChar = stringIterator.current;
@@ -103,7 +108,7 @@ export class Parser {
     }
 
     private parseComparisonOperation(stringIterator: StringIterator): ComparisonOperation {
-        const opStr = stringIterator.readToken();
+        const opStr = stringIterator.readToken().toLowerCase();
         if (!isComparisonOperation(opStr)) {
             throw new ParseException("Invalid operator :" + opStr);
 

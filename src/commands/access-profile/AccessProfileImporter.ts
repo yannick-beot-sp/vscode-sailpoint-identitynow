@@ -8,7 +8,7 @@ import { IdentityNowClient } from "../../services/IdentityNowClient";
 import { EntitlementCacheService, KEY_SEPARATOR } from '../../services/cache/EntitlementCacheService';
 import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
 import { IdentityNameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
-import { SourceCacheService } from '../../services/cache/SourceCacheService';
+import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService';
 import { stringToAccessProfileApprovalSchemeConverter } from '../../utils/approvalSchemeConverter';
 import { openPreview } from '../../utils/vsCodeHelpers';
 import { isEmpty } from "../../utils/stringUtils";
@@ -88,7 +88,7 @@ export class AccessProfileImporter {
 
         const governanceGroupCache = new GovernanceGroupNameToIdCacheService(this.client);
         const identityCacheService = new IdentityNameToIdCacheService(this.client);
-        const sourceCacheService = new SourceCacheService(this.client);
+        const sourceCacheService = new SourceNameToIdCacheService(this.client);
         const entitlementCacheService = new EntitlementCacheService(this.client);
 
         let processedLines = 0;

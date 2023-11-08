@@ -4,7 +4,7 @@ import { CacheService } from "./CacheService";
 /**
  * Cache the mapping name->id
  */
-export class SourceCacheService extends CacheService<string>{
+export class SourceNameToIdCacheService extends CacheService<string>{
     constructor(readonly client: IdentityNowClient) {
         super(
             async (key: string) => {

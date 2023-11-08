@@ -3,7 +3,7 @@ import * as tmp from "tmp";
 
 import { IdentityNowClient } from "../../services/IdentityNowClient";
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
-import { AccessProfileApprovalScheme, AccessProfileRef, ApprovalSchemeForRole, Role } from 'sailpoint-api-client';
+import { AccessProfileApprovalScheme, AccessProfileRef, ApprovalSchemeForRole, Role, RoleMembershipSelector, RoleMembershipSelectorType } from 'sailpoint-api-client';
 import { CSVReader } from '../../services/CSVReader';
 import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
 import { IdentityNameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
@@ -11,7 +11,10 @@ import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { AccessProfileNameToIdCacheService } from '../../services/cache/AccessProfileNameToIdCacheService';
 import { stringToRoleApprovalSchemeConverter, stringToAccessProfileApprovalSchemeConverter } from '../../utils/approvalSchemeConverter';
 import { openPreview } from '../../utils/vsCodeHelpers';
-import { isEmpty } from '../../utils/stringUtils';
+import { isEmpty, isNotBlank } from '../../utils/stringUtils';
+import { RoleMembershipSelectorConverter } from '../../parser/RoleMembershipSelectorConverter';
+import { Parser } from '../../parser/parser';
+import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService';
 
 interface RolesImportResult {
     success: number
@@ -31,6 +34,7 @@ interface RoleCSVRecord {
     revokeDenialCommentsRequired: boolean
     revokeApprovalSchemes: string
     accessProfiles: string
+    membershipCriteria: string
 }
 
 export class RoleImporter {
@@ -88,7 +92,8 @@ export class RoleImporter {
         const governanceGroupCache = new GovernanceGroupNameToIdCacheService(this.client);
         const accessProfileNameToIdCacheService = new AccessProfileNameToIdCacheService(this.client);
         const identityCacheService = new IdentityNameToIdCacheService(this.client);
-
+        const sourceCacheService = new SourceNameToIdCacheService(this.client);
+        const parser = new Parser();
 
         await csvReader.processLine(async (data: RoleCSVRecord) => {
 
@@ -158,6 +163,27 @@ export class RoleImporter {
                 return;
             }
 
+            let membership: RoleMembershipSelector | undefined = undefined;
+            if (isNotBlank(data.membershipCriteria)) {
+                try {
+                    const expression = parser.parse(data.membershipCriteria);
+
+                    const converter = new RoleMembershipSelectorConverter(sourceCacheService);
+                    await converter.visitExpression(expression, undefined);
+
+                    membership = {
+                        type: RoleMembershipSelectorType.Standard,
+                        criteria: converter.root
+                    };
+                } catch (error) {
+                    result.error++;
+                    const srcMessage = `Unable to build membership criteria: ${error}`;
+                    await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, srcMessage);
+                    vscode.window.showErrorMessage(srcMessage);
+                    return;
+                }
+            }
+
 
 
             const rolePayload: Role = {
@@ -180,7 +206,8 @@ export class RoleImporter {
                     "denialCommentsRequired": data.revokeDenialCommentsRequired ?? false,
                     "approvalSchemes": revokeApprovalSchemes
                 },
-                "accessProfiles": accessProfiles
+                "accessProfiles": accessProfiles,
+                membership
             };
 
             try {
@@ -215,6 +242,8 @@ export class RoleImporter {
         identityCacheService.flushAll();
         console.log("Access Profile Cache stats", accessProfileNameToIdCacheService.getStats());
         accessProfileNameToIdCacheService.flushAll();
+        console.log("Source Cache stats", sourceCacheService.getStats());
+        sourceCacheService.flushAll();
         await openPreview(vscode.Uri.file(this.logFilePath), "csv");
     }
 

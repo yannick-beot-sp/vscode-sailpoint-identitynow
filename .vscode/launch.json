@@ -59,7 +59,8 @@
         "${file}"
       ],
       "internalConsoleOptions": "openOnSessionStart",
-      "skipFiles": ["<node_internals>/**"]
+      "skipFiles": ["<node_internals>/**"],
+      "envFile": "${workspaceFolder}/.env"
     }
   ]
 }

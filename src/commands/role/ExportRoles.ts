@@ -4,11 +4,13 @@ import { RolesTreeItem } from '../../models/IdentityNowTreeItem';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
 import RolePaginator from './RolePaginator';
-import { OwnerReference, RequestabilityForRole, Revocability, Role } from 'sailpoint-api-client';
+import { OwnerReference, RequestabilityForRole, Revocability, Role, RoleMembershipSelectorType } from 'sailpoint-api-client';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { accessProfileApprovalSchemeToStringConverter, roleApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
 import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
+import { roleMembershipSelectorToStringConverter } from '../../parser/roleMembershipSelectorToStringConverter';
+import { SourceIdToNameCacheService } from '../../services/cache/SourceIdToNameCacheService';
 
 export class RoleExporterCommand {
     /**
@@ -121,6 +123,11 @@ export interface RoleDto {
      */
     'revokeApprovalSchemes'?: string;
 
+    /**
+     * String representation of the membership criteria
+     */
+    membershipCriteria?: string;
+
 }
 
 class RoleExporter extends BaseCSVExporter<Role> {
@@ -152,7 +159,8 @@ class RoleExporter extends BaseCSVExporter<Role> {
             "revokeCommentsRequired",
             "revokeDenialCommentsRequired",
             "revokeApprovalSchemes",
-            "accessProfiles"
+            "accessProfiles",
+            "membershipCriteria"
         ];
         const paths = [
             "name",
@@ -166,16 +174,26 @@ class RoleExporter extends BaseCSVExporter<Role> {
             "revocationRequestConfig.commentsRequired",
             "revocationRequestConfig.denialCommentsRequired",
             "revokeApprovalSchemes",
-            "accessProfiles"
+            "accessProfiles",
+            "membershipCriteria"
         ];
         const unwindablePaths: string[] = [];
 
         const governanceGroupCache = new GovernanceGroupIdToNameCacheService(this.client);
         const identityCacheIdToName = new IdentityIdToNameCacheService(this.client);
+        const sourceIdToNameCacheService = new SourceIdToNameCacheService(this.client);
 
         const iterator = new RolePaginator(this.client);
         await this.writeData(headers, paths, unwindablePaths, iterator, task, token,
             async (item: Role): Promise<RoleDto> => {
+                let membershipCriteria: string | undefined = undefined;
+                if (item.membership !== undefined && item.membership !== null
+                    && RoleMembershipSelectorType.Standard === item.membership.type
+                ) {
+                    membershipCriteria = await roleMembershipSelectorToStringConverter(
+                        item.membership.criteria, sourceIdToNameCacheService);
+                }
+
                 const itemDto: RoleDto = {
                     name: item.name,
                     // Escape carriage returns in description.
@@ -197,10 +215,11 @@ class RoleExporter extends BaseCSVExporter<Role> {
                     approvalSchemes: await roleApprovalSchemeToStringConverter(
                         item.accessRequestConfig?.approvalSchemes,
                         governanceGroupCache),
-                        // TODO cf. https://github.com/sailpoint-oss/developer.sailpoint.com/issues/413
+                    // TODO cf. https://github.com/sailpoint-oss/developer.sailpoint.com/issues/413
                     revokeApprovalSchemes: await accessProfileApprovalSchemeToStringConverter(
                         item.revocationRequestConfig?.approvalSchemes,
-                        governanceGroupCache)
+                        governanceGroupCache),
+                    membershipCriteria
                 };
 
                 return itemDto;
@@ -209,5 +228,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
         governanceGroupCache.flushAll();
         console.log("Identity Cache stats", identityCacheIdToName.getStats());
         identityCacheIdToName.flushAll();
+        console.log("Source Cache stats", sourceIdToNameCacheService.getStats());
+        sourceIdToNameCacheService.flushAll();
     }
 }
