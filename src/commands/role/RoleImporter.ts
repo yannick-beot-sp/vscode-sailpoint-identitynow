@@ -51,7 +51,7 @@ export class RoleImporter {
         this.client = new IdentityNowClient(this.tenantId, this.tenantName);
 
         this.logFilePath = tmp.tmpNameSync({
-            prefix: 'import-accessprofiles',
+            prefix: 'import-roles',
             postfix: ".log",
         });
 

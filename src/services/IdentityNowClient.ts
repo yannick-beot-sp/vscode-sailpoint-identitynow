@@ -1152,23 +1152,15 @@ export class IdentityNowClient {
 	}
 	public async getGovernanceGroupByName(name: string): Promise<WorkgroupDtoBeta> {
 		console.log("> getGovernanceGroupByName", name);
-		// cf. https://github.com/sailpoint-oss/typescript-sdk/issues/16
-		/*
 		const apiConfig = await this.getApiConfiguration();
 		const api = new GovernanceGroupsBetaApi(apiConfig);
 		const response = await api.listWorkgroups({
-			// @ts-ignore
 			filters: `name eq "${name}"`,
 			limit: 1,
 			count: true
 		});
 		const workgroup = this.ensureOne(response, "workgroup", name);
-		*/
-
-		const workgroups = await this.getGovernanceGroups();
-		// cf. https://github.com/sailpoint-oss/typescript-sdk/issues/15
-		// @ts-ignore
-		const workgroup = workgroups.find((x: WorkgroupDtoBeta) => x.name === name);
+		
 		return workgroup;
 	}
 

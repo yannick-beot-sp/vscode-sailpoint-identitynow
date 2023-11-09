@@ -9,8 +9,6 @@ export class GovernanceGroupIdToNameCacheService extends CacheService<string>{
         super(
             async (key: string) => {
                 const group = await client.getGovernanceGroupById(key);
-                // cf. https://github.com/sailpoint-oss/typescript-sdk/issues/15
-                // @ts-ignore
                 return group.name;
             }
         );
