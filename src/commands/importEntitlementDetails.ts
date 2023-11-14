@@ -162,6 +162,7 @@ class EntitlementDetailsImporter {
                 payload.push({
                     "op": "replace",
                     "path": "/requestable",
+                    //@ts-ignore cf. https://github.com/sailpoint-oss/typescript-sdk/issues/18
                     "value": ("TRUE" === data.requestable.toUpperCase())
                 });
             }
@@ -169,6 +170,7 @@ class EntitlementDetailsImporter {
                 payload.push({
                     "op": "replace",
                     "path": "/privileged",
+                    //@ts-ignore cf. https://github.com/sailpoint-oss/typescript-sdk/issues/18
                     "value": ("TRUE" === data.privileged.toUpperCase())
                 });
             }

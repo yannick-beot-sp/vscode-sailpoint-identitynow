@@ -698,6 +698,7 @@ export class IdentityNowClient {
 				{
 					op: "replace",
 					path: "/enabled",
+                    //@ts-ignore cf. https://github.com/sailpoint-oss/typescript-sdk/issues/18
 					value: status,
 				},
 			]

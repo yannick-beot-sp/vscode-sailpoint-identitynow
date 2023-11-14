@@ -6,7 +6,7 @@ import { ComparisonOperation, isLogicalOperation } from "./ast";
  * Single quote is privileged as in the CSV export, long string are between double quotes. So a double quote should be properly escaped, resulting in a double double-quote.
  * As I support single quote for import, I'll use single quote for now
  */
-const EXPORT_QUOTE="'";
+const EXPORT_QUOTE = "'";
 
 export async function roleMembershipSelectorToStringConverter(
     roleCriteriaLevel1: RoleCriteriaLevel1,
@@ -44,10 +44,13 @@ function join(op: RoleCriteriaOperation, expressions: string[]) {
 async function convertRoleCriteriaLevel2(
     roleCriteriaLevel2: RoleCriteriaLevel2,
     sourceIdToName: CacheService<string>): Promise<string> {
+    if (roleCriteriaLevel2.children === null) {
+        return await convertRoleCriteriaLevel3(roleCriteriaLevel2, sourceIdToName);
+    }
 
     return join(roleCriteriaLevel2.operation,
         (await Promise.all(
-            roleCriteriaLevel2.children?.map(
+            roleCriteriaLevel2.children.map(
                 async x => await convertRoleCriteriaLevel3(x, sourceIdToName)))));
 }
 
