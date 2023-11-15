@@ -4,7 +4,7 @@ import { RolesTreeItem } from '../../models/IdentityNowTreeItem';
 import { NEW_ID } from '../../constants';
 import { IdentityNowClient } from '../../services/IdentityNowClient';
 import { getResourceUri } from '../../utils/UriUtils';
-import { Role } from 'sailpoint-api-client';
+import { Role, RoleMembershipSelectorType } from 'sailpoint-api-client';
 import { runWizard } from '../../wizard/wizard';
 import { InputPromptStep } from '../../wizard/inputPromptStep';
 import { QuickPickPromptStep } from '../../wizard/quickPickPromptStep';
@@ -15,6 +15,10 @@ import { requiredValidator } from '../../validator/requiredValidator';
 import { InputOwnerStep } from '../../wizard/inputOwnerStep';
 import { QuickPickOwnerStep } from '../../wizard/quickPickOwnerStep';
 import { createNewFile } from '../../utils/vsCodeHelpers';
+import { isNotBlank } from '../../utils/stringUtils';
+import { Parser } from '../../parser/parser';
+import { RoleMembershipSelectorConverter } from '../../parser/RoleMembershipSelectorConverter';
+import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService';
 
 const role: Role = require('../../../snippets/role.json');
 
@@ -44,7 +48,7 @@ export class NewRoleCommand {
         }
 
         let client: IdentityNowClient | undefined = undefined;
-
+        const parser = new Parser();
         const values = await runWizard({
             title: "Creation of a role",
             hideStepCount: false,
@@ -92,6 +96,26 @@ export class NewRoleCommand {
                         return results;
                     }
                 }),
+                new InputPromptStep({
+                    name: "membershipCriteria",
+                    displayName: "membership criteria",
+
+                    options: {
+                        prompt: "Enter a membership criteria if needed",
+                        placeHolder: "Membership criteria (e.g identity.cloudLifecycleState eq 'active')",
+                                                validateInput: (s: string) => {
+                            if (isNotBlank(s)) {
+                                try {
+                                    const _ = parser.parse(s);
+                                } catch (error) {
+                                    return `Invalid membership criteria`;
+                                }
+                            }
+                            // no error
+                            return undefined;
+                        }
+                    }
+                }),
             ]
         }, context);
         console.log({ values });
@@ -110,16 +134,37 @@ export class NewRoleCommand {
             const newUri = getResourceUri(tenantName, 'roles', NEW_ID, name);
 
             newRole.name = name;
+
             newRole.owner = {
                 id: values["owner"].id,
                 name: values["owner"].name,
                 type: "IDENTITY"
             };
-            newRole.accessProfiles.push(...values["accessProfiles"].map(x => ({
+
+            newRole.accessProfiles?.push(...values["accessProfiles"].map(x => ({
                 id: x.id,
                 name: x.name,
                 type: 'ACCESS_PROFILE'
             })));
+
+            if (isNotBlank(values["membershipCriteria"])) {
+                try {
+                    const expression = parser.parse(values["membershipCriteria"]);
+                    const sourceCacheService = new SourceNameToIdCacheService(client);
+                    const converter = new RoleMembershipSelectorConverter(sourceCacheService);
+                    await converter.visitExpression(expression, undefined);
+
+                    const membership = {
+                        type: RoleMembershipSelectorType.Standard,
+                        criteria: converter.root
+                    };
+                    newRole.membership = membership;
+
+                } catch (error) {
+                   vscode.window.showErrorMessage(`Could not create the role: ${error}`);
+                   return;
+                }
+            }
 
             await createNewFile(newUri, newRole);
         });
