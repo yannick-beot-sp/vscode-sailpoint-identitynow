@@ -24,7 +24,8 @@ export class CSVReader<T> {
                 // eslint-disable-next-line @typescript-eslint/naming-convention
                 skip_empty_lines: true,
                 columns: true,
-                comment: '#'
+                comment: '#',
+                delimiter: [",", ";"]
             }));
 
         for await (const record of parser) {
@@ -45,7 +46,7 @@ export class CSVReader<T> {
         this.checkExists();
         const headers = await getFirstLine(this.filepath);
 
-        const records = parseSync(headers, {columns:false});
+        const records = parseSync(headers, { columns: false });
         return records[0];
     }
 
