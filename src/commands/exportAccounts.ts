@@ -6,6 +6,7 @@ import { askFile } from '../utils/vsCodeHelpers';
 import { BaseCSVExporter } from './BaseExporter';
 import AccountPaginator from './AccountPaginator';
 import { Account } from 'sailpoint-api-client';
+import { isEmpty } from '../utils/stringUtils';
 
 export class AccountExporterCommand {
 
@@ -37,12 +38,15 @@ export class AccountExporterCommand {
             return;
         }
 
+        const delimiter = isEmpty(node.delimiter) ? "," : node.delimiter;
+
         const exporter = new AccountExporter(
             node.tenantId,
             node.tenantName,
             node.tenantDisplayName,
             node.id as string,
-            filePath
+            filePath,
+            delimiter
         );
         await exporter.exportFileWithProgression();
     }
@@ -54,15 +58,16 @@ class AccountExporter extends BaseCSVExporter<Account> {
         tenantName: string,
         tenantDisplayName: string,
         sourceId: string,
-        path: string
-
+        path: string,
+        delimiter: string
     ) {
         super("accounts",
             tenantId,
             tenantName,
             tenantDisplayName,
             sourceId,
-            path);
+            path,
+            delimiter);
     }
 
     protected async exportFile(task: any, token: vscode.CancellationToken): Promise<void> {

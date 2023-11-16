@@ -6,8 +6,15 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+### Added 
+
+- View, edit, create, delete, export, import access profiles
+- View, edit, create, delete, export, import roles
+
 ### Changed
 
+- Upgrade sailpoint-api-client dependency
+- Honor delimiter parameter for account export
 - Add better error message when resetting a source fails (cf. [#54](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/54))
 
 ## [0.0.23] - 2023-10-11

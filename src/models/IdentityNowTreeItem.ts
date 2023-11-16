@@ -124,7 +124,8 @@ export class SourcesTreeItem extends FolderTreeItem {
 				source.name,
 				source.id,
 				source.connectorAttributes["cloudExternalId"],
-				source.type
+				source.type,
+				source.connectorAttributes["delimiter"],
 			));
 		}
 		return results;
@@ -225,7 +226,8 @@ export class SourceTreeItem extends IdentityNowResourceTreeItem {
 		label: string,
 		id: string,
 		public readonly ccId: number,
-		public readonly type: string
+		public readonly type: string,
+		public readonly delimiter: string,
 	) {
 		super(
 			tenantId,

@@ -16,7 +16,8 @@ export abstract class BaseCSVExporter<T> {
         protected tenantName: string,
         protected tenantDisplayName: string,
         protected sourceId: string,
-        protected filePath: string
+        protected filePath: string,
+        protected delimiter: string = ","
     ) {
         this.client = new IdentityNowClient(tenantId, tenantName);
     }
@@ -29,7 +30,7 @@ export abstract class BaseCSVExporter<T> {
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Exporting ${this.objectType} from ${this.tenantName}...`,
-            cancellable: false
+            cancellable: true
         }, async (task, token) =>
             await this.exportFile(task, token)
         )
@@ -63,7 +64,9 @@ export abstract class BaseCSVExporter<T> {
             this.filePath,
             headers,
             paths,
-            unwindablePaths);
+            unwindablePaths,
+            [],
+            this.delimiter);
 
         for await (let data of iterator) {
             // Not using json2csv transforms as these transforms are non-async method, so very limited

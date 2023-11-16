@@ -12,13 +12,14 @@ export class CSVWriter {
     private output!: WriteStream;
     private parser: AsyncParser;
 
-    constructor(private outputPath: string, private headers: string[], private paths: string[], unwindablePaths: string[] = [], private transforms: any[] = []) {
+    constructor(private outputPath: string, private headers: string[], private paths: string[], unwindablePaths: string[] = [], private transforms: any[] = [], private delimiter = ",") {
         // Construct options for AsyncParser
         const opts: any = {
             fields: this.paths,
             transforms: transforms,
             header: false,
-            defaultValue: ''
+            defaultValue: '',
+            delimiter
         };
         if (unwindablePaths.length > 0) {
             opts.transforms.push(customUnwind({ paths: unwindablePaths }));
