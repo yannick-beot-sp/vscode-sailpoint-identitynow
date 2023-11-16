@@ -3,6 +3,8 @@ import { isEmpty } from "./stringUtils";
 import { titleCase } from "./titleCase";
 import * as configuration from '../configurationConstants';
 
+const isNumber = (val: any) => typeof val === "number" && val === val;
+
 export function ensureNotEmpty(paramName: string, value: any) {
     if (isEmpty(value)) {
         throw new Error("Invalid configuration parameter: " + titleCase(paramName));
@@ -13,6 +15,14 @@ export function getConfigKey(key: string): string {
     let path: unknown | string = vscode.workspace.getConfiguration(configuration.SECTION_CONF).get(key);
     ensureNotEmpty(key, path);
     return path as string;
+}
+
+export function getConfigNumber(key: string): Number {
+    let value: unknown | Number = vscode.workspace.getConfiguration(configuration.SECTION_CONF).get(key);
+    if (!isNumber(value)) {
+        throw new Error("Invalid configuration parameter: " + titleCase(key));
+    }
+    return value as Number;
 }
 
 export function getWorkspaceFolder(): undefined | string {

@@ -139,12 +139,16 @@ This extension includes the following snippets for schemas:
 
 The extension supports the following settings:
 
+* `vscode-sailpoint-identitynow.report.accessProfiles.filename`: Define the pattern for the folder to export access profiles.
+  * Default value: `%x/reports/%T-AccessProfiles-%y%M%d-%h%m%s.csv`
 * `vscode-sailpoint-identitynow.report.accounts.filename`: Define the pattern for the folder to export accounts.
   * Default value: `%x/reports/%T-%S-Accounts-%y%M%d-%h%m%s.csv`
 * `vscode-sailpoint-identitynow.report.uncorrelatedAccounts.filename`: Define the pattern for the folder to export uncorrelated accounts.
   * Default value: `%x/reports/%T-%S-Uncorrelated-Accounts-%y%M%d-%h%m%s.csv`
 * `vscode-sailpoint-identitynow.report.entitlements.filename`: Define the pattern for the folder to export entitlement details.
   * Default value: `%x/reports/%T-%S-Entitlements-%y%M%d-%h%m%s.csv`
+* `vscode-sailpoint-identitynow.report.roles.filename`: Define the pattern for the folder to export roles.
+  * Default value: `%x/reports/%T-Roles-%y%M%d-%h%m%s.csv`
 * `vscode-sailpoint-identitynow.sP-Config.singleResource.filename`: Define the pattern for the SP-Config file of a single resource (Source, Identity Profile, Connector Rule, or Transform).
   * Default value: `%x/exportedObjects/identitynowconfig-%t-%S-%y%M%d-%h%m%s.json`
 * `vscode-sailpoint-identitynow.sP-Config.singleFile.filename`: Define the pattern for the SP-Config file as a single file for multiple resources
@@ -153,6 +157,8 @@ The extension supports the following settings:
   * Default value: `%x/exportedObjects`
 * `vscode-sailpoint-identitynow.sP-Config.multipleFiles.filename`: Define the pattern for the SP-Config filename as multiple files for multiple resources. It will be concatenated to the export folder. These filenames are not confirmed.
   * Default value: `%o/%S.json`
+* `vscode-sailpoint-identitynow.treeView.pagination`: Define the number of roles and access profiles that are displayed in the tree view
+  * Default value: 100
 
 The pattern defined above use the following tokens:
     * `%u`: User Home Dir

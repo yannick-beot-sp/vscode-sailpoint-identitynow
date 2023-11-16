@@ -900,6 +900,10 @@
         "vscode-sailpoint-identitynow.sP-Config.multipleFiles.filename": {
           "type": "string",
           "default": "%o/%S.json"
+        },
+        "vscode-sailpoint-identitynow.treeView.pagination": {
+          "type": "number",
+          "default": 100
         }
       }
     }

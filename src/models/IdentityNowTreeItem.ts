@@ -6,6 +6,8 @@ import { IdentityNowClient, TOTAL_COUNT_HEADER } from "../services/IdentityNowCl
 import { compareByName, compareByPriority } from "../utils";
 import { AxiosResponse } from "axios";
 import { AccessProfileDocument, RoleDocument } from "sailpoint-api-client";
+import * as configuration from '../configurationConstants';
+import { getConfigNumber } from '../utils/configurationUtils';
 
 /**
  * Base class to expose getChildren and updateIcon methods
@@ -705,7 +707,6 @@ export interface PageableNode {
  */
 export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implements PageableNode {
 	currentOffset = 0;
-	limit?: number;
 	filters?: string = "*";
 	children: BaseTreeItem[] = [];
 	client: IdentityNowClient;
@@ -722,7 +723,6 @@ export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implement
 		private readonly mapper: (x: any) => BaseTreeItem,
 	) {
 		super(label, contextValue, tenantId, tenantName, tenantDisplayName);
-		this.limit = 250;
 		this.client = new IdentityNowClient(this.tenantId, this.tenantName);
 	}
 
@@ -739,6 +739,7 @@ export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implement
 				viewId: commands.TREE_VIEW
 			}
 		}, async () => {
+			const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
 			if (this.children.length > 0) {
 				// remove "Load More" or Message node 
 				this.children.pop();
@@ -765,7 +766,7 @@ export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implement
 					this.tenantDisplayName,
 					this
 				));
-				this.currentOffset += this.limit;
+				this.currentOffset += limit;
 			}
 		});
 	}
@@ -812,9 +813,10 @@ export class AccessProfilesTreeItem extends PageableFolderTreeItem<AccessProfile
 	}
 
 	protected async loadNext(): Promise<AxiosResponse<AccessProfileDocument[]>> {
+		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
 		const response = await this.client.paginatedSearchAccessProfiles(
 			this.filters,
-			this.limit,
+			limit,
 			this.currentOffset,
 			(this._total === 0)
 		);
@@ -867,9 +869,10 @@ export class RolesTreeItem extends PageableFolderTreeItem<RoleDocument> {
 	}
 
 	protected async loadNext(): Promise<AxiosResponse<RoleDocument[]>> {
+		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
 		const response = await this.client.paginatedSearchRoles(
 			this.filters,
-			this.limit,
+			limit,
 			this.currentOffset,
 			(this._total === 0)
 		);
