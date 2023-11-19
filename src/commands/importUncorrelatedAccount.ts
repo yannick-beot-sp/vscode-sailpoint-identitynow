@@ -89,7 +89,7 @@ class UncorrelatedAccountImporter {
             let identity = undefined;
             try {
                 // Getting identity
-                identity = await this.client.getPublicIdentitiesByAlias(data.userName);
+                identity = await this.client.getPublicIdentityByAlias(data.userName);
             } catch (error) {
                 console.error(error);
             }

@@ -1,30 +1,34 @@
 import * as vscode from "vscode";
-import { authentication } from "vscode";
 import { EndpointUtils } from "../utils/EndpointUtils";
 import { SailPointIdentityNowAuthenticationProvider } from "./AuthenticationProvider";
 import { withQuery } from "../utils/UriUtils";
-import { compareByName, convertToText, isEmpty } from "../utils";
+import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, Transform, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, Entitlement, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, ImportSpConfigRequestBeta, TransformRead } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, Transform, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, Entitlement, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, ImportSpConfigRequestBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
 import { basename } from 'path';
 import { createReadStream } from 'fs';
 import { onErrorResponse, onRequest, onResponse } from "./AxiosHandlers";
+import { DEFAULT_ACCESSPROFILES_QUERY_PARAMS } from "../models/AccessProfiles";
+import { DEFAULT_ROLES_QUERY_PARAMS } from "../models/Roles";
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const FormData = require('form-data');
 
 // cf. https://axios-http.com/docs/res_schema
 // All header names are lower cased.
 const CONTENT_TYPE_HEADER = "Content-Type";
-const TOTAL_COUNT_HEADER = "x-total-count";
+export const TOTAL_COUNT_HEADER = "x-total-count";
 
 // Content types
 const CONTENT_TYPE_JSON = "application/json";
 const CONTENT_TYPE_FORM_URLENCODED = "application/x-www-form-urlencoded";
 const CONTENT_TYPE_FORM_JSON_PATCH = "application/json-patch+json";
+
+
+const DEFAULT_PAGINATION = 250;
 
 export class IdentityNowClient {
 
@@ -42,7 +46,7 @@ export class IdentityNowClient {
 	}
 
 	private async prepareAuthenticationHeader(): Promise<any> {
-		const session = await authentication.getSession(
+		const session = await vscode.authentication.getSession(
 			SailPointIdentityNowAuthenticationProvider.id,
 			[this.tenantId]
 		);
@@ -53,11 +57,21 @@ export class IdentityNowClient {
 		};
 	}
 
+	private ensureOne<T>(response: AxiosResponse<T[]>, type: string, value: string): T {
+		const nb = Number(response.headers[TOTAL_COUNT_HEADER]);
+		if (nb !== 1) {
+			const message = `Could not find ${type} ${value}. Found ${nb}`;
+			console.error(message);
+			throw new Error(message);
+		}
+		return response.data[0] as T;
+	}
+
 	/**
 	 * Returns the Configuration needed by sailpoint typescript SDK 
 	 */
 	private async getApiConfiguration(): Promise<Configuration> {
-		const session = await authentication.getSession(
+		const session = await vscode.authentication.getSession(
 			SailPointIdentityNowAuthenticationProvider.id,
 			[this.tenantId]
 		);
@@ -76,11 +90,11 @@ export class IdentityNowClient {
 	 * @returns Create an Axios Instance
 	 */
 	private async getAxios(contentType = CONTENT_TYPE_JSON): Promise<AxiosInstance> {
-		const session = await authentication.getSession(
+		const session = await vscode.authentication.getSession(
 			SailPointIdentityNowAuthenticationProvider.id,
 			[this.tenantId]
 		);
-		const instance =  axios.create({
+		const instance = axios.create({
 			baseURL: EndpointUtils.getBaseUrl(this.tenantName),
 			headers: {
 				// eslint-disable-next-line @typescript-eslint/naming-convention
@@ -88,7 +102,7 @@ export class IdentityNowClient {
 				// eslint-disable-next-line @typescript-eslint/naming-convention
 				"Authorization": `Bearer ${session?.accessToken}`
 			}
-			
+
 		});
 		instance.interceptors.request.use(
 			onRequest);
@@ -117,6 +131,22 @@ export class IdentityNowClient {
 		const result = await api.getSource({ id });
 		return result.data;
 	}
+
+	/**
+	 * @param sourceName - A reference to the source to search for accounts.
+	 */
+	public async getSourceId(sourceName: string): Promise<string> {
+		console.log("> getSourceId", sourceName);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesApi(apiConfig);
+		const response = await api.listSources({
+			filters: `name eq "${sourceName}" or id eq "${sourceName}"`,
+			count: true
+		});
+		const source = this.ensureOne(response, "source", sourceName);
+		return source.id;
+	}
+
 
 	public async startEntitlementAggregation(
 		sourceID: number,
@@ -224,31 +254,6 @@ export class IdentityNowClient {
 		return undefined;
 	}
 
-	public async getSourceId(sourceName: string): Promise<string> {
-		/*
-			sourceName - A reference to the source to search for accounts.
-	
-			This is a reference by a source's display name attribute (e.g. Active Directory). If the display name is updated, this reference will also need to be updated.
-	
-			As an alternative an applicationId or applicationName can be provided instead.
-	
-			applicationId - This is a reference by a source's external GUID/ID attribute (e.g. "ff8081815a8b3925015a8b6adac901ff")
-			applicationName - This is a reference by a source's immutable name attribute (e.g. "Active Directory [source]")
-		*/
-		console.log("> getSourceId", sourceName);
-		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesApi(apiConfig);
-		const response = await api.listSources({
-			filters: `name eq "${sourceName}" or id eq "${sourceName}"`
-		});
-		const sources = response.data;
-		if (sources.length !== 1) {
-			vscode.window.showErrorMessage(
-				`Source '${sourceName}' does not exist`
-			);
-		}
-		return sources[0].id;
-	}
 
 	////////////////////////
 	//#endregion Sources
@@ -278,21 +283,18 @@ export class IdentityNowClient {
 		console.log("> getTransformByName", name);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new TransformsApi(apiConfig);
-		const result = await api.listTransforms({ filters: `name eq "${name}"` });
+		const response = await api.listTransforms({
+			filters: `name eq "${name}"`,
+			limit: 1,
+			count: true
+		});
 
-		const res = result.data;
-
-		if (!res || !(res instanceof Array) || res.length !== 1) {
-			console.log("getTransformByName returns ", res);
-			throw new Error('Could not find transform "' + name + '"');
-		}
-		// returning only one transform
-		return res[0];
+		const transform = this.ensureOne(response, "transform", name);
+		return transform;
 	}
 	////////////////////////
 	//#endregion Transforms
 	////////////////////////
-
 
 	/////////////////////////////
 	//#region Generic methods
@@ -403,6 +405,133 @@ export class IdentityNowClient {
 		}
 	}
 
+	public async searchAccessProfiles(query: string, limit?: number, fields?: string[], includeNested = false): Promise<AccessProfileDocument[]> {
+		console.log("> searchAccessProfiles", query);
+
+		const search: Search = {
+			indices: [
+				"accessprofiles"
+			],
+			query: {
+				query: query
+			},
+			sort: ["name"],
+			includeNested: includeNested,
+			queryResultFilter: {
+				includes: fields
+			}
+		};
+
+		return await this.search(search, limit) as IdentityDocument[];
+	}
+
+	public async searchEntitlements(query: string, limit?: number, fields?: string[], includeNested = false): Promise<EntitlementDocument[]> {
+		console.log("> searchIdentity", query);
+
+		const search: Search = {
+			indices: [
+				"entitlements"
+			],
+			query: {
+				query: query
+			},
+			sort: ["name"],
+			includeNested: includeNested,
+			queryResultFilter: {
+				includes: fields
+			}
+		};
+
+		return await this.search(search, limit) as EntitlementDocument[];
+	}
+
+	public async searchIdentities(query: string, limit?: number, fields?: string[]): Promise<IdentityDocument[]> {
+		console.log("> searchIdentity", query);
+
+		const search: Search = {
+			indices: [
+				"identities"
+			],
+			query: {
+				query: query
+			},
+			sort: ["name"],
+			includeNested: false,
+			queryResultFilter: {
+				includes: fields
+			}
+		};
+
+		return await this.search(search, limit) as IdentityDocument[];
+	}
+
+	public async search(query: Search, limit?: number): Promise<SearchDocument[]> {
+		console.log("> search", query);
+
+		const increment = limit ? Math.min(DEFAULT_PAGINATION, limit) : DEFAULT_PAGINATION;
+
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SearchApi(apiConfig);
+		const resp = await Paginator.paginateSearchApi(api, query, increment, limit);
+		return resp.data;
+	}
+
+
+	public async paginatedSearchRoles(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"]): Promise<AxiosResponse<RoleDocument[]>> {
+		console.log("> paginatedSearchRoles", query);
+
+		const search: Search = {
+			indices: [
+				"roles"
+			],
+			query: {
+				query: query
+			},
+			sort: ["name"],
+			includeNested: false,
+			queryResultFilter: {
+				includes: fields
+			}
+		};
+
+		return await this.paginatedSearch(search, limit, offset, count);
+	}
+	public async paginatedSearchAccessProfiles(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"], includeNested = false): Promise<AxiosResponse<AccessProfileDocument[]>> {
+		console.log("> paginatedSearchAccessProfiles", query);
+
+		const search: Search = {
+			indices: [
+				"accessprofiles"
+			],
+			query: {
+				query: query
+			},
+			sort: ["name"],
+			includeNested: includeNested,
+			queryResultFilter: {
+				includes: fields
+			}
+		};
+
+		return await this.paginatedSearch(search, limit, offset, count);
+	}
+
+	public async paginatedSearch(query: Search, limit?: number, offset?: number, count?: boolean): Promise<AxiosResponse<SearchDocument[]>> {
+		console.log("> paginatedSearch", query);
+
+		limit = limit ? Math.min(DEFAULT_PAGINATION, limit) : DEFAULT_PAGINATION;
+
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SearchApi(apiConfig);
+		const resp = await api.searchPost({
+			search: query,
+			limit,
+			offset,
+			count
+		});
+		return resp;
+	}
+
 	/////////////////////////////
 	//#endregion Search
 	/////////////////////////////
@@ -487,7 +616,7 @@ export class IdentityNowClient {
 		console.log("< startImportJob. jobId =", jobId);
 		return jobId;
 		*/
-		
+
 		const endpoint = "beta/sp-config/import";
 
 		console.log("startImportJob: endpoint = " + endpoint);
@@ -502,10 +631,10 @@ export class IdentityNowClient {
 		console.log("startImportJob: requesting");
 
 		const response = await httpClient.post(
-			endpoint, 
+			endpoint,
 			formData
 		);
-		
+
 		const jobId = response.data.jobId;
 		console.log("< startImportJob. jobId =", jobId);
 		return jobId;
@@ -569,6 +698,7 @@ export class IdentityNowClient {
 				{
 					op: "replace",
 					path: "/enabled",
+                    //@ts-ignore cf. https://github.com/sailpoint-oss/typescript-sdk/issues/18
 					value: status,
 				},
 			]
@@ -732,7 +862,6 @@ export class IdentityNowClient {
 	//#endregion ServiceDesk
 	/////////////////////////
 
-
 	/////////////////////////
 	//#region Accounts
 	/////////////////////////
@@ -765,7 +894,7 @@ export class IdentityNowClient {
 		return Number(resp.headers[TOTAL_COUNT_HEADER]);
 	}
 
-	public async getAccountsBySource(sourceId: string, exportUncorrelatedAccountOnly = false, offset = 0, limit = 250): Promise<Account[]> {
+	public async getAccountsBySource(sourceId: string, exportUncorrelatedAccountOnly = false, offset = 0, limit = DEFAULT_PAGINATION): Promise<Account[]> {
 		let filters = `sourceId eq "${sourceId}"`;
 		if (exportUncorrelatedAccountOnly) {
 			filters += " and uncorrelated eq true";
@@ -828,6 +957,21 @@ export class IdentityNowClient {
 	//#region Entitlements
 	/////////////////////////
 
+	public async getAllEntitlements(query: string): Promise<EntitlementBeta[]> {
+		console.log("> getAllEntitlements");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new EntitlementsBetaApi(apiConfig);
+		const result = await Paginator.paginate(api,
+			api.listEntitlements,
+			{ filters: query, sorters: "name" });
+		return result.data;
+	}
+
+	/**
+	 * This function is used to support "manual" pagination and only returns a maximum of 250 records
+	 * @param query parameters for query
+	 * @returns list of entitlements
+	 */
 	public async getEntitlements(
 		query: EntitlementsBetaApiListEntitlementsRequest = DEFAULT_ENTITLEMENTS_QUERY_PARAMS
 		// @ts-ignore 
@@ -844,6 +988,7 @@ export class IdentityNowClient {
 	}
 
 	public async getEntitlementCountBySource(sourceId: string): Promise<number> {
+		console.log("> getEntitlementCountBySource", sourceId);
 		const filters = `source.id eq "${sourceId}"`;
 		const resp = await this.getEntitlements({
 			filters,
@@ -854,7 +999,27 @@ export class IdentityNowClient {
 		return Number(resp.headers[TOTAL_COUNT_HEADER]);
 	}
 
-	public async getEntitlementsBySource(sourceId: string, offset = 0, limit = 250): Promise<Entitlement[]> {
+	public async getEntitlementByName(sourceId: string, entitlementName: string): Promise<EntitlementBeta> {
+		console.log("> getEntitlementByName", sourceId, entitlementName);
+
+		const filters = `source.id eq "${sourceId}" and name eq "${entitlementName}"`;
+		const response = await this.getEntitlements({
+			filters,
+			limit: 1,
+			count: true
+		});
+
+		const entitlement = this.ensureOne(response, "entitlement", entitlementName);
+		return entitlement;
+	}
+
+	/**
+	 * This function is used to support "manual" pagination and only returns a maximum of 250 records
+	 * @param sourceId Id of the source
+	 * @returns list of entitlements
+	*/
+	public async getEntitlementsBySource(sourceId: string, offset = 0, limit = DEFAULT_PAGINATION): Promise<EntitlementBeta[]> {
+		console.log("> getEntitlementsBySource", sourceId, offset, limit);
 		const filters = `source.id eq "${sourceId}"`;
 		const resp = await this.getEntitlements({
 			filters,
@@ -864,11 +1029,18 @@ export class IdentityNowClient {
 		return await resp.data;
 	}
 
+	public async getAllEntitlementsBySource(sourceId: string): Promise<EntitlementBeta[]> {
+		console.log("> getAllEntitlementsBySource", sourceId);
+		const filters = `source.id eq "${sourceId}"`;
+		const resp = await this.getAllEntitlements(filters);
+		return resp;
+	}
+
 	/**
- * cf. https://developer.sailpoint.com/idn/api/beta/patch-entitlement
- * @param id
- * @param payload
- */
+	 * cf. https://developer.sailpoint.com/idn/api/beta/patch-entitlement
+	 * @param id
+	 * @param payload
+	  */
 	public async updateEntitlement(
 		id: string,
 		payload: Array<JsonPatchOperationBeta>
@@ -881,6 +1053,24 @@ export class IdentityNowClient {
 			jsonPatchOperationBeta: payload
 		});
 		console.log("< updateEntitlement");
+	}
+
+	public async importEntitlements(
+		sourceId: string,
+		filePath: string
+	): Promise<ImportEntitlementsResult> {
+		console.log("> IdentityNowClient.importEntitlements");
+		const endpoint = `beta/entitlements/sources/${sourceId}/entitlements/import`;
+		console.log("endpoint = " + endpoint);
+		const httpClient = await this.getAxios(CONTENT_TYPE_FORM_URLENCODED);
+
+		var formData = new FormData();
+		formData.append("slpt-source-entitlements-panel-search-entitlements-inputEl", 'Search Entitlements');
+		formData.append('csvFile', createReadStream(filePath));
+
+		const response = await httpClient.post(endpoint, formData);
+
+		return response.data;
 	}
 
 	/////////////////////////
@@ -906,41 +1096,155 @@ export class IdentityNowClient {
 		return response;
 	}
 
-	public async getPublicIdentitiesByAlias(alias: string): Promise<PublicIdentity> {
+	public async getPublicIdentityByAlias(alias: string): Promise<PublicIdentity> {
 		const filters = `alias eq "${alias}"`;
-		const resp = await this.getPublicIdentities({
+		const response = await this.getPublicIdentities({
 			filters,
 			limit: 1,
-			offset: 0,
 			count: true
 		});
-		const nbIdentity = Number(resp.headers[TOTAL_COUNT_HEADER]);
-		if (nbIdentity !== 1) {
-			throw new Error("Could Not Find Identity");
-		}
-		return resp.data[0];
+		const identity = this.ensureOne(response, "identity", alias);
+
+		return identity;
+	}
+
+	/**
+	 * Note: public identities endpoint does not have a "get"
+	 * @param id Id
+	 */
+	public async getPublicIdentityById(
+		id: string
+	): Promise<PublicIdentity> {
+		console.log("> getPublicIdentityById", id);
+
+		const filters = `id eq "${id}"`;
+		const response = await this.getPublicIdentities({
+			filters,
+			limit: 1,
+			count: true
+		});
+
+		const identity = this.ensureOne(response, "identity", id);
+		console.log("< getPublicIdentityById", identity);
+		return identity;
 	}
 	//////////////////////////////
 	//#endregion Public Identities
 	//////////////////////////////
 
-	public async importEntitlements(
-		sourceId: string,
-		filePath: string
-	): Promise<ImportEntitlementsResult> {
-		console.log("> IdentityNowClient.importEntitlements");
-		const endpoint = `beta/entitlements/sources/${sourceId}/entitlements/import`;
-		console.log("endpoint = " + endpoint);
-		const httpClient = await this.getAxios(CONTENT_TYPE_FORM_URLENCODED);
+	//////////////////////////////
+	//#region Governance Groups
+	//////////////////////////////
 
-		var formData = new FormData();
-		formData.append("slpt-source-entitlements-panel-search-entitlements-inputEl", 'Search Entitlements');
-		formData.append('csvFile', createReadStream(filePath));
+	public async getGovernanceGroups(): Promise<WorkgroupDtoBeta[]> {
+		console.log("> getGovernanceGroups");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new GovernanceGroupsBetaApi(apiConfig);
+		const result = await Paginator.paginate(api, api.listWorkgroups, { sorters: "name" }, 50);
+		return result.data;
+	}
 
-		const response = await httpClient.post(endpoint, formData);
+	public async getGovernanceGroupById(id: string): Promise<WorkgroupDtoBeta> {
+		console.log("> getGovernanceGroupById", id);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new GovernanceGroupsBetaApi(apiConfig);
+		const result = await api.getWorkgroup({ id });
+		return result.data;
+	}
+	public async getGovernanceGroupByName(name: string): Promise<WorkgroupDtoBeta> {
+		console.log("> getGovernanceGroupByName", name);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new GovernanceGroupsBetaApi(apiConfig);
+		const response = await api.listWorkgroups({
+			filters: `name eq "${name}"`,
+			limit: 1,
+			count: true
+		});
+		const workgroup = this.ensureOne(response, "workgroup", name);
+		
+		return workgroup;
+	}
 
+	//////////////////////////////
+	//#endregion Governance Groups
+	//////////////////////////////
+
+	//////////////////////////////
+	//#region Access Profiles
+	//////////////////////////////
+
+	public async getAccessProfiles(
+		query: AccessProfilesApiListAccessProfilesRequest = DEFAULT_ACCESSPROFILES_QUERY_PARAMS
+	): Promise<AxiosResponse<AccessProfile[], any>> {
+		console.log("> getAccessProfiles", query);
+		const queryValues: AccessProfilesApiListAccessProfilesRequest = {
+			...DEFAULT_ACCESSPROFILES_QUERY_PARAMS,
+			...query
+		};
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AccessProfilesApi(apiConfig);
+		const response = await api.listAccessProfiles(queryValues);
+		return response;
+	}
+
+	public async getAccessProfileByName(name: string): Promise<AccessProfile> {
+		console.log("> getAccessProfileByName", name);
+		let filters = `name eq "${name}"`;
+		const response = await this.getAccessProfiles({
+			filters,
+			limit: 1,
+			count: true
+		});
+
+		const accessProfile = this.ensureOne(response, "access profile", name);
+		return accessProfile;
+	}
+
+	//////////////////////////////
+	//#endregion Access Profiles
+	//////////////////////////////
+
+	//////////////////////////////
+	//#region Roles
+	//////////////////////////////
+
+	public async getRoleByName(name: string): Promise<Role> {
+		console.log("> getRoleByName", name);
+		const result = await this.getRoles({
+			filters: `name eq "${name}"`,
+			limit: 1,
+			count: true
+		});
+		const role = this.ensureOne(result, "role", name);
+		console.log("< getRoleByName", role);
+		return role;
+	}
+
+	public async getRoles(
+		query: RolesApiListRolesRequest = DEFAULT_ROLES_QUERY_PARAMS
+	): Promise<AxiosResponse<Role[], any>> {
+		console.log("> getRoles", query);
+		const queryValues: RolesApiListRolesRequest = {
+			...DEFAULT_ROLES_QUERY_PARAMS,
+			...query
+		};
+		const apiConfig = await this.getApiConfiguration();
+		const api = new RolesApi(apiConfig);
+		const response = await api.listRoles(queryValues);
+		return response;
+	}
+
+	public async createRole(role: Role): Promise<Role> {
+		console.log("> createRole", role);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new RolesApi(apiConfig);
+		const response = await api.createRole({ role });
 		return response.data;
 	}
+
+	//////////////////////////////
+	//#endregion Roles
+	//////////////////////////////
 }
 
 export enum AggregationJob {

@@ -1,18 +1,6 @@
-import { isEmpty } from '../utils';
-import * as vscode from 'vscode';
 import * as os from 'os';
-import { titleCase } from '../utils/titleCase';
-
-const SECTION_CONF = "vscode-sailpoint-identitynow";
-const ACCOUNT_REPORT_FILENAME_CONF = "report.accounts.filename";
-const UNCORRELATED_ACCOUNT_REPORT_FILENAME_CONF = "report.uncorrelatedAccounts.filename";
-const ENTITLEMENT_REPORT_FILENAME_CONF = "report.entitlements.filename";
-
-const SPCONFIG_SINGLE_RESOURCE_CONF = "sP-Config.singleResource.filename";
-const SPCONFIG_SINGLE_FILE_CONF = "sP-Config.singleFile.filename";
-const SPCONFIG_MULTIPLE_FILES_FOLDER_CONF = "sP-Config.multipleFiles.folder";
-const SPCONFIG_MULTIPLE_FILES_FILENAME_CONF = "sP-Config.multipleFiles.filename";
-
+import * as configuration from '../configurationConstants';
+import { getConfigKey, getWorkspaceFolder } from '../utils/configurationUtils';
 
 interface ContextValues {
     /**
@@ -52,7 +40,6 @@ interface ContextValues {
     /** Source name */
     // eslint-disable-next-line @typescript-eslint/naming-convention
     S?: string
-
 }
 
 
@@ -62,29 +49,9 @@ interface ContextValues {
  */
 export class PathProposer {
 
-    private static ensureNotEmpty(paramName: string, value: any) {
-        if (isEmpty(value)) {
-            throw new Error("Invalid configuration parameter: " + titleCase(paramName));
-        }
-    }
-
-    private static getConfigKey(key: string): string {
-        let path: unknown | string = vscode.workspace.getConfiguration(SECTION_CONF).get(key);
-        this.ensureNotEmpty(key, path);
-        return path as string;
-    }
-
-    private static getWorkspaceFolder(): undefined | string {
-        if (vscode.workspace.workspaceFolders !== undefined && vscode.workspace.workspaceFolders.length > 0) {
-            const proposedFolder = vscode.workspace.workspaceFolders[0].uri.fsPath.replace(/\\/g, "/");
-            return proposedFolder;
-        }
-        return undefined;
-    }
-
     public static replaceVariables(path: string, context: ContextValues = {}): string {
         // compute default values
-        const w = this.getWorkspaceFolder();
+        const w = getWorkspaceFolder();
         const now = new Date();
         const defaultContextValues: ContextValues = {
             u: os.homedir(),
@@ -117,7 +84,7 @@ export class PathProposer {
         tenantDisplayName: string,
         sourceName: string,
     ): string {
-        let path = this.getConfigKey(key);
+        let path = getConfigKey(key);
         path = this.replaceVariables(path, {
             t: tenantName,
             // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -135,7 +102,7 @@ export class PathProposer {
         objectType: string,
         objectName: string,
     ): string {
-        let path = this.getConfigKey(key);
+        let path = getConfigKey(key);
         path = this.replaceVariables(path, {
             t: tenantName,
             // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -152,7 +119,7 @@ export class PathProposer {
         tenantName: string,
         tenantDisplayName: string,
     ): string {
-        let path = this.getConfigKey(key);
+        let path = getConfigKey(key);
         path = this.replaceVariables(path, {
             t: tenantName,
             // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -166,7 +133,7 @@ export class PathProposer {
         tenantDisplayName: string,
         sourceName: string,
     ): string {
-        return this.getSourceBasedReportFilename(ACCOUNT_REPORT_FILENAME_CONF,
+        return this.getSourceBasedReportFilename(configuration.ACCOUNT_REPORT_FILENAME_CONF,
             tenantName,
             tenantDisplayName,
             sourceName);
@@ -177,7 +144,7 @@ export class PathProposer {
         tenantDisplayName: string,
         sourceName: string,
     ): string {
-        return this.getSourceBasedReportFilename(UNCORRELATED_ACCOUNT_REPORT_FILENAME_CONF,
+        return this.getSourceBasedReportFilename(configuration.UNCORRELATED_ACCOUNT_REPORT_FILENAME_CONF,
             tenantName,
             tenantDisplayName,
             sourceName);
@@ -188,7 +155,7 @@ export class PathProposer {
         tenantDisplayName: string,
         sourceName: string,
     ): string {
-        return this.getSourceBasedReportFilename(ENTITLEMENT_REPORT_FILENAME_CONF,
+        return this.getSourceBasedReportFilename(configuration.ENTITLEMENT_REPORT_FILENAME_CONF,
             tenantName,
             tenantDisplayName,
             sourceName);
@@ -200,7 +167,7 @@ export class PathProposer {
         objectType: string,
         objectName: string,
     ): string {
-        return this.getObjectBasedReportFilename(SPCONFIG_SINGLE_RESOURCE_CONF,
+        return this.getObjectBasedReportFilename(configuration.SPCONFIG_SINGLE_RESOURCE_CONF,
             tenantName,
             tenantDisplayName,
             objectType,
@@ -211,7 +178,7 @@ export class PathProposer {
         tenantName: string,
         tenantDisplayName: string,
     ): string {
-        return this.getTenantBasedReportFilename(SPCONFIG_SINGLE_FILE_CONF,
+        return this.getTenantBasedReportFilename(configuration.SPCONFIG_SINGLE_FILE_CONF,
             tenantName,
             tenantDisplayName);
     }
@@ -221,7 +188,7 @@ export class PathProposer {
         tenantDisplayName: string
     ): string {
 
-        return this.getTenantBasedReportFilename(SPCONFIG_MULTIPLE_FILES_FOLDER_CONF,
+        return this.getTenantBasedReportFilename(configuration.SPCONFIG_MULTIPLE_FILES_FOLDER_CONF,
             tenantName,
             tenantDisplayName);
     }
@@ -232,10 +199,28 @@ export class PathProposer {
         objectType: string,
         objectName: string,
     ): string {
-        return this.getObjectBasedReportFilename(SPCONFIG_MULTIPLE_FILES_FILENAME_CONF,
+        return this.getObjectBasedReportFilename(configuration.SPCONFIG_MULTIPLE_FILES_FILENAME_CONF,
             tenantName,
             tenantDisplayName,
             objectType,
             objectName);
+    }
+
+    public static getAccessProfileReportFilename(
+        tenantName: string,
+        tenantDisplayName: string
+    ): string {
+        return this.getTenantBasedReportFilename(configuration.ACCESS_PROFILE_REPORT_FILENAME_CONF,
+            tenantName,
+            tenantDisplayName);
+    }
+    
+    public static getRoleReportFilename(
+        tenantName: string,
+        tenantDisplayName: string
+    ): string {
+        return this.getTenantBasedReportFilename(configuration.ROLE_REPORT_FILENAME_CONF,
+            tenantName,
+            tenantDisplayName);
     }
 }

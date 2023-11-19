@@ -3,8 +3,8 @@ import { TenantService } from "../services/TenantService";
 import * as fs from 'fs';
 import { TenantInfo } from "../models/TenantInfo";
 import { TenantInfoQuickPickItem } from "../models/TenantInfoQuickPickItem";
-import { compareByName, isEmpty } from "../utils";
-import { isBlank } from "./stringUtils";
+import { compareByName } from "../utils";
+import { isBlank, isEmpty } from "./stringUtils";
 import { ObjectPickItem } from "../models/ObjectPickItem";
 import { OBJECT_TYPE_ITEMS, ObjectTypeQuickPickItem } from "../models/ObjectTypeQuickPickItem";
 
@@ -243,4 +243,16 @@ export async function askSelectObjectTypes(title: string, objectTypeItems: Array
 	}
 	console.log("< askSelectObjectTypes: no objectType");
 	return undefined;
+}
+
+export async function createNewFile(newUri: vscode.Uri, obj: any): Promise<void> {
+	let document = await vscode.workspace.openTextDocument(newUri);
+	document = await vscode.languages.setTextDocumentLanguage(document, 'json');
+	await vscode.window.showTextDocument(document, { preview: true });
+
+	const strContent = typeof obj === 'object' ? JSON.stringify(obj, null, 4) : obj;
+
+	const edit = new vscode.WorkspaceEdit();
+	edit.insert(newUri, new vscode.Position(0, 0), strContent);
+	let success = await vscode.workspace.applyEdit(edit);
 }

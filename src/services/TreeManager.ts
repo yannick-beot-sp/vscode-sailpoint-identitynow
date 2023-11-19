@@ -43,7 +43,7 @@ export class TreeManager {
             console.error("Session for ", tenantName, "does not exist:", err);
         }
         await this.tenantService.removeTenant(item.tenantId);
-        vscode.commands.executeCommand(commands.REFRESH);
+        vscode.commands.executeCommand(commands.REFRESH_FORCED);
         vscode.window.showInformationMessage(`Successfully deleted tenant ${tenantName}`);
     }
 

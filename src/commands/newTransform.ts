@@ -2,8 +2,9 @@ import * as vscode from 'vscode';
 import { NEW_ID } from '../constants';
 import { TransformsTreeItem } from "../models/IdentityNowTreeItem";
 import { TransformQuickPickItem } from '../models/TransformQuickPickItem';
-import { isEmpty } from '../utils';
+import { isEmpty } from '../utils/stringUtils';
 import { getResourceUri } from '../utils/UriUtils';
+import { createNewFile } from '../utils/vsCodeHelpers';
 const transforms = require('../../snippets/transforms.json');
 
 /**
@@ -84,17 +85,11 @@ export class NewTransformCommand {
             title: 'Creating File...',
             cancellable: false
         }, async (task, token) => {
-
             const newUri = getResourceUri(tenantName, 'transforms', NEW_ID, transformName);
-            let document = await vscode.workspace.openTextDocument(newUri);
-            document = await vscode.languages.setTextDocumentLanguage(document, 'json');
-            await vscode.window.showTextDocument(document, { preview: true });
-
-            const edit = new vscode.WorkspaceEdit();
 
             const strContent = transform.template.replaceAll("{TRANSFORM_NAME}", transformName);
-            edit.insert(newUri, new vscode.Position(0, 0), strContent);
-            let success = await vscode.workspace.applyEdit(edit);
+
+            await createNewFile(newUri, strContent);
         });
     }
 }

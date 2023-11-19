@@ -2,7 +2,7 @@ import path = require('path');
 import * as vscode from 'vscode';
 import { NEW_ID } from '../constants';
 import { SchemasTreeItem } from "../models/IdentityNowTreeItem";
-import { isEmpty } from '../utils';
+import { isEmpty } from '../utils/stringUtils';
 import { getPathByUri } from '../utils/UriUtils';
 
 

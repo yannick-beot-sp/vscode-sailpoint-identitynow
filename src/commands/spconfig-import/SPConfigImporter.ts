@@ -60,7 +60,7 @@ export class SPConfigImporter {
             for (objectType in importJobresult.results) {
                 importJobresult.results[objectType]?.errors
                     .forEach((element) => {
-                        errors.push(element.detail.exceptionMessage);
+                        errors.push(element.detail.exceptionMessage ?? element.text);
                     });
             }
 

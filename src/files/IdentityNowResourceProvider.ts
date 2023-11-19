@@ -118,7 +118,9 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 			} else if (
 				resourcePath.match("schemas") ||
 				resourcePath.match("provisioning-policies") ||
-				resourcePath.match("connector-rules")
+				resourcePath.match("connector-rules") ||
+				resourcePath.match("access-profiles") ||
+				resourcePath.match("roles")
 			) {
 				const createdData = await client.createResource(
 					path.posix.dirname(resourcePath),
@@ -139,7 +141,7 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 				data = JSON.stringify(transform);
 			}
 
-			if (resourcePath.match("identity-profiles")) {
+			if (resourcePath.match("identity-profiles") || resourcePath.match("access-profiles") || resourcePath.match("roles")) {
 				// match identity profiles & lifecycle states
 				const oldData = await client.getResource(resourcePath);
 				const newData = JSON.parse(data);

@@ -3,7 +3,8 @@ import * as vscode from 'vscode';
 import { AddTenantQueryString } from './models/AddTenantQueryString';
 import { AuthenticationMethod, TenantCredentials, TenantToken } from './models/TenantInfo';
 import { TenantService } from './services/TenantService';
-import { isEmpty, normalizeTenant, parseJwt } from './utils';
+import { normalizeTenant, parseJwt } from './utils';
+import { isEmpty } from './utils/stringUtils';
 import { randomUUID } from 'crypto';
 const querystring = require('querystring');
 
@@ -78,7 +79,7 @@ export class IdentityNowUriHandler implements vscode.UriHandler {
                     clientSecret: q.clientSecret as string
                 });
         }
-        await vscode.commands.executeCommand(commands.REFRESH);
+        await vscode.commands.executeCommand(commands.REFRESH_FORCED);
     }
 
 }

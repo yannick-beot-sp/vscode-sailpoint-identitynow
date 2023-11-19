@@ -4,6 +4,7 @@ import { IdentityNowClient } from '../services/IdentityNowClient';
 import { CSVReader } from '../services/CSVReader';
 import { isNotEmpty } from '../utils/stringUtils';
 import { chooseFile } from '../utils/vsCodeHelpers';
+import { JsonPatchOperationBeta } from 'sailpoint-api-client';
 
 // List of mandatory headers to update the description of entitlements
 const mandatoryHeadersDescription = ["attributeName", "attributeValue", "displayName", "description", "schema"];
@@ -25,7 +26,7 @@ interface UncorrelatedAccountImportResult {
 
 class EntitlementDetailsImporter {
     readonly client: IdentityNowClient;
-    readonly csvReader: CSVReader;
+    readonly csvReader: CSVReader<any>;
     readonly result: UncorrelatedAccountImportResult = {
         totalDescription: 0,
         totalDescriptionUpdated: 0,
@@ -48,7 +49,7 @@ class EntitlementDetailsImporter {
         private fileUri: vscode.Uri
     ) {
         this.client = new IdentityNowClient(this.tenantId, this.tenantName);
-        this.csvReader = new CSVReader(this.fileUri.fsPath);
+        this.csvReader = new CSVReader<any>(this.fileUri.fsPath);
     }
 
     public async importFileWithProgression(): Promise<void> {
@@ -155,12 +156,13 @@ class EntitlementDetailsImporter {
             }
             const entitlement = entitlements[0];
 
-            const payload = [];
+            const payload : JsonPatchOperationBeta[] = [];
 
             if (isNotEmpty(data.requestable)) {
                 payload.push({
                     "op": "replace",
                     "path": "/requestable",
+                    //@ts-ignore cf. https://github.com/sailpoint-oss/typescript-sdk/issues/18
                     "value": ("TRUE" === data.requestable.toUpperCase())
                 });
             }
@@ -168,6 +170,7 @@ class EntitlementDetailsImporter {
                 payload.push({
                     "op": "replace",
                     "path": "/privileged",
+                    //@ts-ignore cf. https://github.com/sailpoint-oss/typescript-sdk/issues/18
                     "value": ("TRUE" === data.privileged.toUpperCase())
                 });
             }
@@ -185,7 +188,7 @@ class EntitlementDetailsImporter {
                 } else {
                     // need to get id 
                     try {
-                        const ownerIdentity = await this.client.getPublicIdentitiesByAlias(data.owner);
+                        const ownerIdentity = await this.client.getPublicIdentityByAlias(data.owner);
 
                         payload.push({
                             "op": "replace",
@@ -207,7 +210,7 @@ class EntitlementDetailsImporter {
                 return;
             }
             try {
-                await this.client.updateEntitlement(entitlement.id, payload);
+                await this.client.updateEntitlement(entitlement.id!, payload);
                 this.result.metadataUpdated++;
             } catch (error) {
                 this.result.error++;

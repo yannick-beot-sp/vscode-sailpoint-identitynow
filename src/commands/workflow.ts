@@ -1,9 +1,7 @@
 import * as vscode from 'vscode';
 import * as commands from './constants';
-import { WorkflowsTreeItem, WorkflowTreeItem } from '../models/IdentityNowTreeItem';
+import { WorkflowTreeItem } from '../models/IdentityNowTreeItem';
 import { IdentityNowClient } from '../services/IdentityNowClient';
-import { getPathByUri } from '../utils/UriUtils';
-
 
 export async function enableWorkflow(node: WorkflowTreeItem): Promise<void> {
 
@@ -37,7 +35,7 @@ async function updateWorkflowStatus(node: WorkflowTreeItem, enable: boolean): Pr
     }, async (task, token) => {
         await client.updateWorkflowStatus(node.id, enable);
         node.enabled = enable;
-        await vscode.commands.executeCommand(commands.REFRESH, node);
+        await vscode.commands.executeCommand(commands.REFRESH_FORCED, node);
     });
     console.log("< updateWorkflowStatus");
 }

@@ -1,36 +1,43 @@
-import {
-	ExtensionContext,
-	ThemeIcon,
-	TreeItem,
-	TreeItemCollapsibleState,
-	TreeItemLabel,
-	Uri,
-} from "vscode";
+import * as vscode from "vscode";
+import * as path from 'path';
+import { IdentityNowClient, TOTAL_COUNT_HEADER } from "../services/IdentityNowClient";
+import { AccessProfileDocument, RoleDocument } from "sailpoint-api-client";
 import { getIdByUri, getPathByUri, getResourceUri } from "../utils/UriUtils";
-import * as commands from "../commands/constants";
-import path = require("path");
-import { IdentityNowClient } from "../services/IdentityNowClient";
 import { compareByName, compareByPriority } from "../utils";
+import { AxiosResponse } from "axios";
+import { getConfigNumber } from '../utils/configurationUtils';
+import * as commands from "../commands/constants";
+import * as configuration from '../configurationConstants';
+import { isNotEmpty } from "../utils/stringUtils";
+import { isEmpty } from "lodash";
 
 /**
  * Base class to expose getChildren and updateIcon methods
  */
-export abstract class BaseTreeItem extends TreeItem {
+export abstract class BaseTreeItem extends vscode.TreeItem {
 
 	constructor(
-		label: string | TreeItemLabel,
+		label: string | vscode.TreeItemLabel,
 		public readonly tenantId: string,
 		public readonly tenantName: string,
 		public readonly tenantDisplayName: string,
-		collapsibleState: TreeItemCollapsibleState = TreeItemCollapsibleState.None,
+		collapsibleState: vscode.TreeItemCollapsibleState = vscode.TreeItemCollapsibleState.None,
 	) {
 		super(label, collapsibleState);
 	}
 
 	abstract getChildren(): Promise<BaseTreeItem[]>;
 
-	updateIcon(context: ExtensionContext) {
+	reset(): void {
 		// Do nothing by default
+	}
+
+	updateIcon(context: vscode.ExtensionContext) {
+		// Do nothing by default
+	}
+
+	get computedContextValue(): string {
+		return this.contextValue;
 	}
 }
 
@@ -48,10 +55,10 @@ export class TenantTreeItem extends BaseTreeItem {
 			tenantId,
 			tenantName,
 			tenantDisplayName,
-			TreeItemCollapsibleState.Collapsed);
+			vscode.TreeItemCollapsibleState.Collapsed);
 		this.tooltip = tenantName;
 	}
-	iconPath = new ThemeIcon("organization");
+	iconPath = new vscode.ThemeIcon("organization");
 	contextValue = "tenant";
 
 	getChildren(): Promise<BaseTreeItem[]> {
@@ -62,6 +69,9 @@ export class TenantTreeItem extends BaseTreeItem {
 		results.push(new RulesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new ServiceDesksTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new IdentityProfilesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new AccessProfilesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new RolesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+
 		return new Promise((resolve) => resolve(results));
 	}
 }
@@ -76,20 +86,20 @@ export abstract class FolderTreeItem extends BaseTreeItem {
 		tenantId: string,
 		tenantName: string,
 		tenantDisplayName: string,
-		public readonly parentUri?: Uri
+		public readonly parentUri?: vscode.Uri
 	) {
 		super(label,
 			tenantId,
 			tenantName,
 			tenantDisplayName,
-			TreeItemCollapsibleState.Collapsed);
+			vscode.TreeItemCollapsibleState.Collapsed);
 	}
 
 	updateIcon(): void {
-		if (this.collapsibleState === TreeItemCollapsibleState.Expanded) {
-			this.iconPath = new ThemeIcon("folder-opened");
+		if (this.collapsibleState === vscode.TreeItemCollapsibleState.Expanded) {
+			this.iconPath = new vscode.ThemeIcon("folder-opened");
 		} else {
-			this.iconPath = new ThemeIcon("folder");
+			this.iconPath = new vscode.ThemeIcon("folder");
 		}
 	}
 }
@@ -118,7 +128,8 @@ export class SourcesTreeItem extends FolderTreeItem {
 				source.name,
 				source.id,
 				source.connectorAttributes["cloudExternalId"],
-				source.type
+				source.type,
+				source.connectorAttributes["delimiter"],
 			));
 		}
 		return results;
@@ -169,7 +180,7 @@ export class IdentityProfilesTreeItem extends FolderTreeItem {
 }
 
 export class IdentityNowResourceTreeItem extends BaseTreeItem {
-	public readonly uri: Uri;
+	public readonly uri: vscode.Uri;
 	constructor(
 		tenantId: string,
 		tenantName: string,
@@ -178,7 +189,7 @@ export class IdentityNowResourceTreeItem extends BaseTreeItem {
 		resourceType: string,
 		//public readonly
 		id: string,
-		collapsible: TreeItemCollapsibleState = TreeItemCollapsibleState.None,
+		collapsible: vscode.TreeItemCollapsibleState = vscode.TreeItemCollapsibleState.None,
 		public readonly subResourceType: string = "",
 		public readonly subId: string = "",
 		public readonly beta = false
@@ -219,7 +230,8 @@ export class SourceTreeItem extends IdentityNowResourceTreeItem {
 		label: string,
 		id: string,
 		public readonly ccId: number,
-		public readonly type: string
+		public readonly type: string,
+		public readonly delimiter: string,
 	) {
 		super(
 			tenantId,
@@ -228,7 +240,7 @@ export class SourceTreeItem extends IdentityNowResourceTreeItem {
 			label,
 			"sources",
 			id,
-			TreeItemCollapsibleState.Collapsed
+			vscode.TreeItemCollapsibleState.Collapsed
 		);
 
 		this.contextValue = type.replace(" ", "") + "source";
@@ -245,7 +257,7 @@ export class SourceTreeItem extends IdentityNowResourceTreeItem {
 		return new Promise((resolve) => resolve(results));
 	}
 
-	updateIcon(context: ExtensionContext): void {
+	updateIcon(context: vscode.ExtensionContext): void {
 		this.iconPath = {
 			light: context.asAbsolutePath("resources/light/source.svg"),
 			dark: context.asAbsolutePath("resources/dark/source.svg"),
@@ -303,7 +315,7 @@ export class TransformTreeItem extends IdentityNowResourceTreeItem {
 		);
 	}
 
-	updateIcon(context: ExtensionContext): void {
+	updateIcon(context: vscode.ExtensionContext): void {
 		this.iconPath = {
 			light: context.asAbsolutePath("resources/light/transform.svg"),
 			dark: context.asAbsolutePath("resources/dark/transform.svg"),
@@ -316,7 +328,7 @@ export class SchemasTreeItem extends FolderTreeItem {
 		tenantId: string,
 		tenantName: string,
 		tenantDisplayName: string,
-		parentUri: Uri
+		parentUri: vscode.Uri
 	) {
 		super("Schemas", "schemas", tenantId, tenantName, tenantDisplayName, parentUri);
 	}
@@ -361,13 +373,13 @@ export class SchemaTreeItem extends IdentityNowResourceTreeItem {
 			label,
 			"sources",
 			id,
-			TreeItemCollapsibleState.None,
+			vscode.TreeItemCollapsibleState.None,
 			"schemas",
 			subId
 		);
 	}
 
-	iconPath = new ThemeIcon("symbol-class");
+	iconPath = new vscode.ThemeIcon("symbol-class");
 
 	contextValue = "schema";
 }
@@ -380,7 +392,7 @@ export class ProvisioningPoliciesTreeItem extends FolderTreeItem {
 		tenantId: string,
 		tenantName: string,
 		tenantDisplayName: string,
-		parentUri: Uri
+		parentUri: vscode.Uri
 	) {
 		super("Provisioning Policies", "provisioning-policies", tenantId, tenantName, tenantDisplayName, parentUri);
 	}
@@ -437,7 +449,7 @@ export class ProvisioningPolicyTreeItem extends IdentityNowResourceTreeItem {
 		);
 	}
 
-	updateIcon(context: ExtensionContext): void {
+	updateIcon(context: vscode.ExtensionContext): void {
 		this.iconPath = {
 			light: context.asAbsolutePath("resources/light/provisioning-policy.svg"),
 			dark: context.asAbsolutePath("resources/dark/provisioning-policy.svg"),
@@ -491,7 +503,7 @@ export class WorkflowTreeItem extends IdentityNowResourceTreeItem {
 			label,
 			"workflows",
 			id,
-			TreeItemCollapsibleState.None,
+			vscode.TreeItemCollapsibleState.None,
 			undefined,
 			undefined,
 			true
@@ -499,7 +511,7 @@ export class WorkflowTreeItem extends IdentityNowResourceTreeItem {
 		this.contextValue = enabled ? "enabledWorkflow" : "disabledWorkflow";
 	}
 
-	updateIcon(context: ExtensionContext): void {
+	updateIcon(context: vscode.ExtensionContext): void {
 		if (this.enabled) {
 			this.iconPath = {
 				light: context.asAbsolutePath("resources/light/workflow-enabled.svg"),
@@ -550,7 +562,7 @@ export class RuleTreeItem extends IdentityNowResourceTreeItem {
 			label,
 			"connector-rules",
 			id,
-			TreeItemCollapsibleState.None,
+			vscode.TreeItemCollapsibleState.None,
 			undefined,
 			undefined,
 			true
@@ -558,7 +570,7 @@ export class RuleTreeItem extends IdentityNowResourceTreeItem {
 	}
 
 	contextValue = "connector-rule";
-	iconPath = new ThemeIcon("file-code");
+	iconPath = new vscode.ThemeIcon("file-code");
 }
 
 export class IdentityProfileTreeItem extends IdentityNowResourceTreeItem {
@@ -576,13 +588,13 @@ export class IdentityProfileTreeItem extends IdentityNowResourceTreeItem {
 			label,
 			"identity-profiles",
 			id,
-			TreeItemCollapsibleState.Collapsed
+			vscode.TreeItemCollapsibleState.Collapsed
 		);
 	}
 
 	contextValue = "identity-profile";
 
-	iconPath = new ThemeIcon("person-add");
+	iconPath = new vscode.ThemeIcon("person-add");
 
 	async getChildren(): Promise<BaseTreeItem[]> {
 		const results: BaseTreeItem[] = [];
@@ -625,13 +637,13 @@ export class LifecycleStateTreeItem extends IdentityNowResourceTreeItem {
 			label,
 			"identity-profiles",
 			id,
-			TreeItemCollapsibleState.None,
+			vscode.TreeItemCollapsibleState.None,
 			"lifecycle-states",
 			subId
 		);
 	}
 
-	iconPath = new ThemeIcon("activate-breakpoints");
+	iconPath = new vscode.ThemeIcon("activate-breakpoints");
 
 	contextValue = "lifecycle-state";
 }
@@ -680,5 +692,301 @@ export class ServiceDeskTreeItem extends IdentityNowResourceTreeItem {
 		);
 	}
 
-	iconPath = new ThemeIcon("gear");
+	iconPath = new vscode.ThemeIcon("gear");
+}
+
+export interface PageableNode {
+	currentOffset: number
+	limit?: number;
+	readonly hasMore: boolean;
+	filters?: string | undefined;
+	filterType: FilterType;
+	children: BaseTreeItem[];
+	loadMore(): Promise<void>;
+}
+
+interface Document {
+	/**
+	 * The unique ID of the referenced object.
+	 */
+	id: string;
+	/**
+	 * The human readable name of the referenced object.
+	 */
+	name: string;
+}
+
+export enum FilterType {
+	api = "API",
+	search = "Search"
+}
+
+/**
+ * Contains the roles in tree view
+ */
+export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implements PageableNode {
+	currentOffset = 0;
+	filters?: string = "";
+	filterType = FilterType.api;
+	children: BaseTreeItem[] = [];
+	client: IdentityNowClient;
+
+	protected _total = 0;
+
+	constructor(
+		label: string,
+		contextValue: string,
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		private readonly notFoundMessage: string,
+		private readonly mapper: (x: any) => BaseTreeItem,
+	) {
+		super(label, contextValue, tenantId, tenantName, tenantDisplayName);
+		this.client = new IdentityNowClient(this.tenantId, this.tenantName);
+	}
+
+	reset(): void {
+		this.currentOffset = 0;
+		this._total = 0;
+		this.children = [];
+	}
+
+	protected abstract loadNext(): Promise<AxiosResponse<T[]>>;
+
+	async loadMore(): Promise<void> {
+		await vscode.window.withProgress({
+			location: {
+				viewId: commands.TREE_VIEW
+			}
+		}, async () => {
+			const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
+			if (this.children.length > 0) {
+				// remove "Load More" or Message node 
+				this.children.pop();
+			}
+
+			const response = await this.loadNext();
+
+			if (this._total === 0) {
+				this._total = Number(response.headers[TOTAL_COUNT_HEADER]);
+			}
+
+			if (this._total === 0) {
+				this.children = [new MessageNode(this.notFoundMessage)];
+				return;
+			}
+
+			const results: BaseTreeItem[] = response.data.map(this.mapper);
+			this.children.push(...results);
+
+			if (this.hasMore) {
+				this.children.push(new LoadMoreNode(
+					this.tenantId,
+					this.tenantName,
+					this.tenantDisplayName,
+					this
+				));
+				this.currentOffset += limit;
+			}
+		});
+	}
+
+	get hasMore(): boolean {
+		return this._total > this.children.length;
+	}
+
+
+	get isFiltered(): boolean {
+		return isNotEmpty(this.filters);
+	}
+
+	get computedContextValue() {
+		return this.contextValue + (this.isFiltered ? "Filtered" : "Unfiltered");
+	}
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		if (this.children.length === 0) {
+			await this.loadMore();
+		}
+		return this.children;
+	}
+}
+
+/**
+ * Contains the access profiles in tree view
+ */
+export class AccessProfilesTreeItem extends PageableFolderTreeItem<Document> {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {
+		super("Access Profiles", "access-profiles", tenantId, tenantName, tenantDisplayName, 'No access profile found',
+			(role => new AccessProfileTreeItem(
+				tenantId,
+				tenantName,
+				tenantDisplayName,
+				role.name,
+				role.id
+			))
+		);
+	}
+
+	protected async loadNext(): Promise<AxiosResponse<Document[]>> {
+		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
+		if (this.filterType === FilterType.api) {
+			return await this.client.getAccessProfiles({
+				filters: this.filters,
+				limit,
+				offset: this.currentOffset,
+				count: (this._total === 0)
+			}) as AxiosResponse<Document[]>;
+		}
+		const filters = isEmpty(this.filters) ? "*" : this.filters;
+		return await this.client.paginatedSearchAccessProfiles(
+			filters,
+			limit,
+			this.currentOffset,
+			(this._total === 0)
+		) as AxiosResponse<Document[]>;
+	}
+}
+
+/**
+ * Represents the single access profile.
+ */
+export class AccessProfileTreeItem extends IdentityNowResourceTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string) {
+		super(
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			"access-profiles",
+			id
+		);
+	}
+
+	contextValue = "access-profile";
+	iconPath = new vscode.ThemeIcon("archive");
+}
+
+/**
+ * Contains the roles in tree view
+ */
+export class RolesTreeItem extends PageableFolderTreeItem<Document> {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {
+		super("Roles", "roles", tenantId, tenantName, tenantDisplayName, 'No role found',
+			(role => new RoleTreeItem(
+				tenantId,
+				tenantName,
+				tenantDisplayName,
+				role.name,
+				role.id
+			))
+		);
+	}
+
+	protected async loadNext(): Promise<AxiosResponse<Document[]>> {
+		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
+		if (this.filterType === FilterType.api) {
+			return await this.client.getRoles({
+				filters: this.filters,
+				limit,
+				offset: this.currentOffset,
+				count: (this._total === 0)
+			}) as AxiosResponse<Document[]>;
+		} else {
+			const filters = isEmpty(this.filters) ? "*" : this.filters;
+			return await this.client.paginatedSearchRoles(
+				filters,
+				limit,
+				this.currentOffset,
+				(this._total === 0)
+			) as AxiosResponse<Document[]>;
+		}
+	}
+}
+
+/**
+ * Represents the single role.
+ * Added by richastral 06/07/2023
+ */
+export class RoleTreeItem extends IdentityNowResourceTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string) {
+		super(
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			"roles",
+			id);
+	}
+
+	contextValue = "role";
+	iconPath = new vscode.ThemeIcon("account");
+}
+
+export class LoadMoreNode extends BaseTreeItem {
+	contextValue = "loadMore";
+
+	command = {
+		title: "Load More",
+		command: commands.LOAD_MORE,
+		arguments: [this],
+	};
+
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		private readonly parentNode: PageableNode) {
+		super(
+			'Load more',
+			tenantId,
+			tenantName,
+			tenantDisplayName
+		);
+
+	}
+
+	getChildren(): Promise<BaseTreeItem[]> {
+		throw new Error("Method not implemented.");
+	}
+
+	async loadMore(): Promise<void> {
+		await this.parentNode.loadMore();
+		vscode.commands.executeCommand(commands.REFRESH, this.parentNode);
+	}
+}
+
+export class MessageNode extends BaseTreeItem {
+	contextValue = "message";
+
+	constructor(label) {
+		super(
+			label,
+			"", "", ""
+		);
+
+	}
+
+	getChildren(): Promise<BaseTreeItem[]> {
+		throw new Error("Method not implemented.");
+	}
 }

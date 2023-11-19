@@ -1,23 +1,21 @@
 import * as fs from 'fs';
 import * as readline from 'readline';
-import { UncorrelatedAccount } from '../models/UncorrelatedAccount';
 import { parse } from 'csv-parse';
 import { parse as parseSync } from 'csv-parse/sync';
 
 
 // Note, the `stream/promises` module is only available
 // starting with Node.js version 16
-import { finished } from 'stream/promises';
 import { getFirstLine } from '../utils/fileutils';
 
 
-export class CSVReader {
+export class CSVReader<T> {
 
     constructor(private filepath: string) {
 
     }
 
-    public async processLine(callback: ((line: UncorrelatedAccount) => void | Promise<void>)): Promise<void> {
+    public async processLine(callback: ((line: T) => void | Promise<void>)): Promise<void> {
         this.checkExists();
 
         const parser = fs
@@ -26,11 +24,12 @@ export class CSVReader {
                 // eslint-disable-next-line @typescript-eslint/naming-convention
                 skip_empty_lines: true,
                 columns: true,
-                comment: '#'
+                comment: '#',
+                delimiter: [",", ";"]
             }));
 
         for await (const record of parser) {
-            let result = callback(record as UncorrelatedAccount);
+            let result = callback(record as T);
             if (result instanceof Promise) {
                 await result;
             }
@@ -47,7 +46,7 @@ export class CSVReader {
         this.checkExists();
         const headers = await getFirstLine(this.filepath);
 
-        const records = parseSync(headers, {columns:false});
+        const records = parseSync(headers, { columns: false });
         return records[0];
     }
 

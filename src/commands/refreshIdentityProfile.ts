@@ -1,8 +1,6 @@
 import * as vscode from 'vscode';
-import * as commands from './constants';
-import { IdentityNowResourceTreeItem, IdentityProfileTreeItem, TransformsTreeItem } from '../models/IdentityNowTreeItem';
+import { IdentityProfileTreeItem } from '../models/IdentityNowTreeItem';
 import { IdentityNowClient } from '../services/IdentityNowClient';
-import { getPathByUri } from '../utils/UriUtils';
 
 
 export async function refreshIdentityProfile(node?: IdentityProfileTreeItem): Promise<void> {

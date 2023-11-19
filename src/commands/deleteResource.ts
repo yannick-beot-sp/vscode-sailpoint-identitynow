@@ -32,7 +32,7 @@ export async function deleteResource(node?: IdentityNowResourceTreeItem): Promis
     }, async (task, token) => {
         await client.deleteResource(getPathByUri(node.uri) || "");
         const transformsNode = new TransformsTreeItem(node.tenantId,  node.tenantName, node.tenantDisplayName);
-        await vscode.commands.executeCommand(commands.REFRESH, transformsNode);
+        await vscode.commands.executeCommand(commands.REFRESH_FORCED, transformsNode);
     });
     await vscode.window.showInformationMessage(`Successfully deleted ${node.contextValue} ${node.label}`);
 

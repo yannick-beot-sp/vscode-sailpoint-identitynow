@@ -3,9 +3,10 @@ import { NEW_ID } from '../constants';
 import { RulesTreeItem } from "../models/IdentityNowTreeItem";
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { TenantService } from '../services/TenantService';
-import { compareByName, isEmpty } from '../utils';
+import { compareByName } from '../utils';
+import { isEmpty } from '../utils/stringUtils';
 import { getResourceUri } from '../utils/UriUtils';
-import { chooseTenant, getSelectionContent } from '../utils/vsCodeHelpers';
+import { chooseTenant, createNewFile, getSelectionContent } from '../utils/vsCodeHelpers';
 import * as commands from './constants';
 import { ConnectorRuleResponseBeta } from 'sailpoint-api-client';
 const rules: ConnectorRuleResponseBeta[] = require('../../snippets/connector-rules.json');
@@ -77,7 +78,7 @@ export class ConnectorRuleCommand {
         document = await vscode.languages.setTextDocumentLanguage(document, 'json');
         vscode.window.showTextDocument(document, { preview: false, preserveFocus: true });
         const rulesNode = new RulesTreeItem(tenantInfo.id, tenantInfo.tenantName, tenantInfo.name);
-        vscode.commands.executeCommand(commands.REFRESH, rulesNode);
+        vscode.commands.executeCommand(commands.REFRESH_FORCED, rulesNode);
 
     }
 
@@ -139,15 +140,8 @@ export class ConnectorRuleCommand {
         }, async (task, token) => {
 
             const newUri = getResourceUri(tenantName, 'connector-rules', NEW_ID, ruleName, true);
-            let document = await vscode.workspace.openTextDocument(newUri);
-            document = await vscode.languages.setTextDocumentLanguage(document, 'json');
-            await vscode.window.showTextDocument(document, { preview: true });
-
-            const edit = new vscode.WorkspaceEdit();
             rule.name = ruleName;
-            const strContent = JSON.stringify(rule, null, 4);
-            edit.insert(newUri, new vscode.Position(0, 0), strContent);
-            let success = await vscode.workspace.applyEdit(edit);
+            await createNewFile(newUri,rule);
         });
     }
 
@@ -210,7 +204,7 @@ export class ConnectorRuleCommand {
 
                 // '+' removed from allowed character as known issue during search/filter of transform 
                 // If search/filter is failing, the transform is not properly closed and reopened
-                const regex = new RegExp('^[a-z0-9 _:;,={}@()#-|^%$!?.*]{1,50}$', 'i');
+                const regex = new RegExp('^[a-z0-9 _:;,={}@()#-|^%$!?.*]{1,128}$', 'i');
                 if (regex.test(text)) {
                     return null;
                 }

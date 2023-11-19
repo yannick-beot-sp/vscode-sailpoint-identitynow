@@ -28,7 +28,7 @@ export async function viewWorkflowExecutionHistory(node: WorkflowTreeItem): Prom
     }
 
     // Sorting descendant to get latest execution first
-    history.sort((a, b) => (a < b.startTime) ? 1 : -1);
+    history.sort((a, b) => (a.startTime! < b.startTime!) ? 1 : -1);
 
     // At this moment, the execution history is kept 2 days. No need to display more
     const oldest = new Date();
@@ -36,13 +36,13 @@ export async function viewWorkflowExecutionHistory(node: WorkflowTreeItem): Prom
     const oldestStr = oldest.toISOString();
     console.log('Looking for execution more recent than ', oldestStr);
 
-    history = history.filter(a => a.startTime > oldestStr);
+    history = history.filter(a => a.startTime! > oldestStr);
     if (history.length < 1) {
         await vscode.window.showErrorMessage('No execution history');
         return;
     }
     const items = history.map<vscode.QuickPickItem>(x => ({
-        label: x.id,
+        label: x.id!,
         detail: x.startTime
     }));
 

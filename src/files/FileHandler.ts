@@ -1,11 +1,15 @@
 import * as vscode from 'vscode';
 import { URL_PREFIX } from '../constants';
-import { RulesTreeItem, TransformsTreeItem } from '../models/IdentityNowTreeItem';
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { TenantService } from '../services/TenantService';
 import { getIdByUri, getResourceUri } from '../utils/UriUtils';
-import * as commands from '../commands/constants';
 
+enum FileHandlerObjectType {
+    transform = "transforms",
+    connectorRule = "connector-rules",
+    role = "roles",
+    accessProfile = "access-profiles",
+}
 
 export class FileHandler {
 
@@ -17,37 +21,26 @@ export class FileHandler {
             return;
         }
 
-        if (!document.uri.path.match(/transforms|connector-rules/)) {
+        const uriRegexp = new RegExp(Object.values(FileHandlerObjectType).join('|'));
+        if (!uriRegexp.test(document.uri.path)) {
             return;
         }
 
         const olduri = document.uri;
         const tenantName = olduri.authority;
-        // Refresh tree
-        let node: any;
-        let resourceType: string;
-        let isBeta = false;
-        const tenantInfo = await this.tenantService.getTenantByTenantName(tenantName);
-        if (olduri.path.match('transforms')) {
-            node = new TransformsTreeItem(tenantInfo?.id ?? "", tenantName, tenantInfo?.name ?? "");
-            resourceType = 'transforms';
-        } else if (olduri.path.match('lifecycle-states')) {
-            node = new TransformsTreeItem(tenantInfo?.id ?? "", tenantName, tenantInfo?.name ?? "");
-            resourceType = 'lifecycle-states';
-        } else {
-            node = new RulesTreeItem(tenantInfo?.id ?? "", tenantName, tenantInfo?.name ?? "");
-            resourceType = 'connector-rules';
-            isBeta = true;
-        }
 
-        vscode.commands.executeCommand(commands.REFRESH, node);
+        const tenantInfo = await this.tenantService.getTenantByTenantName(tenantName);
+
+        if (tenantInfo === undefined) {
+            return;
+        }
 
         //////////////////////////////////////////
         // Get generated object to get the ID
         //////////////////////////////////////////
-        const client = new IdentityNowClient(tenantInfo?.id ?? "", tenantName);
+        const client = new IdentityNowClient(tenantInfo.id!, tenantName);
 
-        // 1. Get name
+        // 1. Get name from the document
         const editorText = document.getText();
         const editorObject = JSON.parse(editorText);
         const name = editorObject.name;
@@ -57,13 +50,34 @@ export class FileHandler {
         }
         console.log('onFileSaved: name = ', name);
 
-        // 2. Get transform to get ID
-        // As it is a "search", an array should be returned
+        // 2. get the object type
+        // going through all object types for a more "dynamic" approach 
+        // => you only need to update FileHandlerObjectType
+        let resourceType: FileHandlerObjectType;
+        let isBeta = false;
+        const objectType = Object.keys(FileHandlerObjectType).find(x => olduri.path.match(FileHandlerObjectType[x]));
+        resourceType = FileHandlerObjectType[objectType];
+        if (resourceType === FileHandlerObjectType.connectorRule) {
+            isBeta = true;
+        }
+
+        // 3. get the object by name to get the new id
         let data: any;
-        if (resourceType === 'transforms') {
-            data = await client.getTransformByName(name);
-        } else {
-            data = await client.getConnectorRuleByName(name);
+        switch (resourceType) {
+            case FileHandlerObjectType.transform:
+                data = await client.getTransformByName(name);
+                break;
+            case FileHandlerObjectType.connectorRule:
+                data = await client.getConnectorRuleByName(name);
+                break;
+            case FileHandlerObjectType.role:
+                data = await client.getRoleByName(name);
+                break;
+            case FileHandlerObjectType.accessProfile:
+                data = await client.getAccessProfileByName(name);
+                break;
+            default:
+                break;
         }
 
         if (!data) {

@@ -1,42 +1,50 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as commands from './commands/constants';
+import { AccessProfileImporterExplorerCommand } from './commands/access-profile/AccessProfileImporterExplorerCommand';
+import { AccessProfileImporterTreeViewCommand } from './commands/access-profile/AccessProfileImporterTreeViewCommand';
+import { AccessProfileExporterCommand } from './commands/access-profile/ExportAccessProfiles';
+import { NewAccessProfileCommand } from './commands/access-profile/NewAccessProfileCommand';
 import { AddTenantCommand } from './commands/addTenant';
-import { NewTransformCommand } from './commands/newTransform';
-import { OpenResourceCommand } from './commands/openResource';
-import { IdentityNowResourceProvider } from './files/IdentityNowResourceProvider';
-import { SailPointIdentityNowAuthenticationProvider } from './services/AuthenticationProvider';
-import { TenantService } from './services/TenantService';
-import { TreeManager } from './services/TreeManager';
-import { IdentityNowDataProvider } from './views/IdentityNowDataProvider';
-import { URL_PREFIX } from './constants';
-import { deleteResource } from './commands/deleteResource';
-import { newProvisioningPolicy } from './commands/newProvisioningPolicy';
-import { newSchema } from './commands/newSchema';
-import { disableWorkflow, enableWorkflow } from './commands/workflow';
-import { viewWorkflowExecutionHistory } from './commands/viewWorkflowExecutionHistory';
-import { WorkflowTesterWebviewViewProvider } from './views/WorkflowTesterWebviewViewProvider';
-import { TestWorkflowCommand } from './commands/testWorkflow';
-import { TransformEvaluator } from './services/TransformEvaluator';
 import { ConnectorRuleCommand } from './commands/connectorRuleCommand';
-import { ExportScriptFromRuleCommand } from './commands/exportScriptFromRuleCommand';
-import { FileHandler } from './files/FileHandler';
-import { RenameTenantCommand } from './commands/renameTenant';
-import { IdentityNowUriHandler } from './uriHandler';
-import { SortIdentityProfileCommand } from './commands/sortIdentityProfile';
-import { refreshIdentityProfile } from './commands/refreshIdentityProfile';
+import { deleteResource } from './commands/deleteResource';
 import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './commands/exportAccounts';
 import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from './commands/exportEntitlementDetails';
+import { ExportScriptFromRuleCommand } from './commands/exportScriptFromRuleCommand';
+import { AccessProfileFilterCommand, FilterCommand, RoleFilterCommand } from './commands/filterCommand';
 import { AccountImportNodeCommand } from './commands/importAccount';
-import { UncorrelatedAccountImportNodeCommand } from './commands/importUncorrelatedAccount';
 import { EntitlementDetailsImportNodeCommand } from './commands/importEntitlementDetails';
-import { ExportConfigTreeViewCommand } from './commands/spconfig-export/ExportConfigTreeViewCommand';
-import { ExportConfigPaletteCommand } from './commands/spconfig-export/ExportConfigPaletteCommand';
+import { UncorrelatedAccountImportNodeCommand } from './commands/importUncorrelatedAccount';
+import { newProvisioningPolicy } from './commands/newProvisioningPolicy';
+import { newSchema } from './commands/newSchema';
+import { NewTransformCommand } from './commands/newTransform';
+import { OpenResourceCommand } from './commands/openResource';
+import { refreshIdentityProfile } from './commands/refreshIdentityProfile';
+import { RenameTenantCommand } from './commands/renameTenant';
+import { RoleExporterCommand } from './commands/role/ExportRoles';
+import { NewRoleCommand } from './commands/role/NewRoleCommand';
+import { RoleImporterExplorerCommand } from './commands/role/RoleImporterExplorerCommand';
+import { RoleImporterTreeViewCommand } from './commands/role/RoleImporterTreeViewCommand';
+import { SortIdentityProfileCommand } from './commands/sortIdentityProfile';
 import { ExportConfigNodeTreeViewCommand } from './commands/spconfig-export/ExportConfigNodeTreeViewCommand';
+import { ExportConfigPaletteCommand } from './commands/spconfig-export/ExportConfigPaletteCommand';
+import { ExportConfigTreeViewCommand } from './commands/spconfig-export/ExportConfigTreeViewCommand';
 import { ImportConfigExplorerCommand } from './commands/spconfig-import/ImportConfigExplorerCommand';
 import { ImportConfigPaletteCommand } from './commands/spconfig-import/ImportConfigPaletteCommand';
 import { ImportConfigTreeViewCommand } from './commands/spconfig-import/ImportConfigTreeViewCommand';
+import { TestWorkflowCommand } from './commands/testWorkflow';
+import { viewWorkflowExecutionHistory } from './commands/viewWorkflowExecutionHistory';
+import { disableWorkflow, enableWorkflow } from './commands/workflow';
+import { URL_PREFIX } from './constants';
+import { FileHandler } from './files/FileHandler';
+import { IdentityNowResourceProvider } from './files/IdentityNowResourceProvider';
+import { LoadMoreNode } from './models/IdentityNowTreeItem';
+import { SailPointIdentityNowAuthenticationProvider } from './services/AuthenticationProvider';
+import { TenantService } from './services/TenantService';
+import { TransformEvaluator } from './services/TransformEvaluator';
+import { TreeManager } from './services/TreeManager';
+import { IdentityNowUriHandler } from './uriHandler';
+import { IdentityNowDataProvider } from './views/IdentityNowDataProvider';
+import { WorkflowTesterWebviewViewProvider } from './views/WorkflowTesterWebviewViewProvider';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -73,6 +81,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const identityNowDataProvider = new IdentityNowDataProvider(context, tenantService);
 	vscode.window.registerTreeDataProvider(commands.TREE_VIEW, identityNowDataProvider);
 
+	vscode.commands.registerCommand(commands.REFRESH_FORCED, identityNowDataProvider.forceRefresh, identityNowDataProvider);
 	vscode.commands.registerCommand(commands.REFRESH, identityNowDataProvider.refresh, identityNowDataProvider);
 
 	const transformEvaluator = new TransformEvaluator(tenantService);
@@ -142,6 +151,26 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.REMOVE_RESOURCE,
 			deleteResource));
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.LOAD_MORE,
+			async (n: LoadMoreNode) => { await n.loadMore(); }));
+
+	const rolefilterCommand = new RoleFilterCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.ROLE_FILTER_VIEW,
+			rolefilterCommand.execute, rolefilterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.ROLE_UPDATE_FILTER_VIEW,
+			rolefilterCommand.execute, rolefilterCommand));
+	const accessProfileFilterCommand = new AccessProfileFilterCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.ACCESS_PROFILE_FILTER_VIEW,
+			accessProfileFilterCommand.execute, accessProfileFilterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.ACCESS_PROFILE_UPDATE_FILTER_VIEW,
+			accessProfileFilterCommand.execute, accessProfileFilterCommand));
+
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.ENABLE_WORKFLOW,
 			enableWorkflow));
@@ -244,6 +273,72 @@ export function activate(context: vscode.ExtensionContext) {
 	const uriHandler = new IdentityNowUriHandler(tenantService);
 	context.subscriptions.push(
 		vscode.window.registerUriHandler(uriHandler));
+
+	// Access Profile Exporter
+	const accessProfileExporterCommand = new AccessProfileExporterCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_ACCESS_PROFILE_VIEW,
+			accessProfileExporterCommand.execute, accessProfileExporterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_ACCESS_PROFILE_ICON_VIEW,
+			accessProfileExporterCommand.execute, accessProfileExporterCommand));
+
+	// Access Profile Importer
+	const accessProfileImporterCommand = new AccessProfileImporterTreeViewCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_ACCESS_PROFILE_VIEW,
+			accessProfileImporterCommand.execute, accessProfileImporterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_ACCESS_PROFILE_ICON_VIEW,
+			accessProfileImporterCommand.execute, accessProfileImporterCommand));
+	const accessProfileImporterExplorerCommand = new AccessProfileImporterExplorerCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_ACCESS_PROFILE_EXPLORER,
+			accessProfileImporterExplorerCommand.execute, accessProfileImporterExplorerCommand));
+
+	// Role Exporter
+	const roleExporterCommand = new RoleExporterCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_ROLE_VIEW,
+			roleExporterCommand.execute, roleExporterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_ROLE_ICON_VIEW,
+			roleExporterCommand.execute, roleExporterCommand));
+
+	// Role Importer
+	const roleImporterCommand = new RoleImporterTreeViewCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_ROLE_VIEW,
+			roleImporterCommand.execute, roleImporterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_ROLE_ICON_VIEW,
+			roleImporterCommand.execute, roleImporterCommand));
+	const roleImporterExplorerCommand = new RoleImporterExplorerCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_ROLE_EXPLORER,
+			roleImporterExplorerCommand.execute, roleImporterExplorerCommand));
+
+	const newRoleCommand = new NewRoleCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_ROLE_VIEW,
+			newRoleCommand.newRole, newRoleCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_ROLE_VIEW_ICON,
+			newRoleCommand.newRole, newRoleCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_ROLE_PALETTE,
+			newRoleCommand.newRole, newRoleCommand));
+
+	const newAccessProfileCommand = new NewAccessProfileCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_ACCESS_PROFILE_VIEW,
+			newAccessProfileCommand.newAccessProfile, newAccessProfileCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_ACCESS_PROFILE_VIEW_ICON,
+			newAccessProfileCommand.newAccessProfile, newAccessProfileCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_ACCESS_PROFILE_PALETTE,
+			newAccessProfileCommand.newAccessProfile, newAccessProfileCommand));
 
 }
 
