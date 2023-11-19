@@ -8,8 +8,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added 
 
-- View, edit, create, delete, export, import access profiles
-- View, edit, create, delete, export, import roles
+- View, edit, create, delete, export, import access profiles (cf. [#55](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/55))
+- View, edit, create, delete, export, import roles (cf. [#55](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/55))
 
 ### Changed
 

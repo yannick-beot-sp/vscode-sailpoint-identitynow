@@ -16,6 +16,9 @@ The SailPoint IdentityNow extension makes it easy to:
 - View, edit, delete service desk integrations
 - View, edit, delete identity profiles and lifecycle states, and refreshes all the identities under a profile
 - Import/Export Accounts (import for delimited files only), uncorrelated accounts, entitlement details
+- View, edit, create, delete, export, import access profiles
+- View, edit, create, delete, export, import roles
+
 
 ## Installation
 
@@ -180,6 +183,12 @@ The pattern defined above use the following tokens:
 None
 
 ## Release Notes
+
+- View, edit, create, delete, export, import access profiles (cf. [#55](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/55))
+- View, edit, create, delete, export, import roles (cf. [#55](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/55))
+- Upgrade sailpoint-api-client dependency
+- Honor delimiter parameter for account export
+- Add better error message when resetting a source fails (cf. [#54](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/54))
 
 ### 0.0.23
 
