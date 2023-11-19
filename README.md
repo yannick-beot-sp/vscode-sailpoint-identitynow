@@ -184,8 +184,8 @@ None
 
 ## Release Notes
 
-- View, edit, create, delete, export, import access profiles (cf. [#55](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/55))
-- View, edit, create, delete, export, import roles (cf. [#55](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/55))
+- View, edit, create, delete, export, import access profiles with the help of @richastral (cf. [#55](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/55))
+- View, edit, create, delete, export, import roles with the help of @richastral (cf. [#55](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/55))
 - Upgrade sailpoint-api-client dependency
 - Honor delimiter parameter for account export
 - Add better error message when resetting a source fails (cf. [#54](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/54))
