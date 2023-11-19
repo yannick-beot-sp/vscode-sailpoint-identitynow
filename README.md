@@ -184,8 +184,10 @@ None
 
 ## Release Notes
 
-- View, edit, create, delete, export, import access profiles with the help of @richastral (cf. [#55](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/55))
-- View, edit, create, delete, export, import roles with the help of @richastral (cf. [#55](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/55))
+### 0.0.24
+
+- View, edit, create, delete, export, import access profiles with the help of [@richastral](https://github.com/richastral) (cf. [#55](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/55))
+- View, edit, create, delete, export, import roles with the help of [@richastral](https://github.com/richastral) (cf. [#55](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/55))
 - Upgrade sailpoint-api-client dependency
 - Honor delimiter parameter for account export
 - Add better error message when resetting a source fails (cf. [#54](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/54))
@@ -249,7 +251,7 @@ Almost Christmas!
 
 ### 0.0.15
 
-- Add supports for Service Desk Integrations (@fernando-delosrios-sp)
+- Add supports for Service Desk Integrations ([@fernando-delosrios-sp](https://github.com/fernando-delosrios-sp))
 - Fix supports of UTF-8 values in transform (cf. [#33](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/33))
 
 ### 0.0.14
@@ -291,7 +293,7 @@ Added:
 - Add step to creation of transform to have a non-empty file
 - If only 1 tenant, automatically selected in the workflow tester
 - Added refresh buttons in the view
-- Add the capacity to evaluate transforms [#7](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/7) thanks to @cristian-grau-sp
+- Add the capacity to evaluate transforms [#7](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/7) thanks to [@cristian-grau-sp](https://github.com/cristian-grau-sp)
 
 ### 0.0.6
 

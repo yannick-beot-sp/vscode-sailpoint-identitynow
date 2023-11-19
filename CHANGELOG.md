@@ -6,10 +6,12 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [0.0.24] - 2023-11-19
+
 ### Added 
 
-- View, edit, create, delete, export, import access profiles with the help of @richastral (cf. [#55](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/55))
-- View, edit, create, delete, export, import roles with the help of @richastral (cf. [#55](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/55))
+- View, edit, create, delete, export, import access profiles with the help of [@richastral](https://github.com/richastral) (cf. [#55](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/55))
+- View, edit, create, delete, export, import roles with the help of [@richastral](https://github.com/richastral) (cf. [#55](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/55))
 
 ### Changed
 
@@ -108,7 +110,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
-- Add supports for Service Desk Integrations (@fernando-delosrios-sp)
+- Add supports for Service Desk Integrations ([@fernando-delosrios-sp](https://github.com/fernando-delosrios-sp))
 
 ### Fixed
 
@@ -176,7 +178,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 - Add step to creation of transform to have a non-empty file
 - If only 1 tenant, automatically selected in the workflow tester
 - Added refresh buttons in the view
-- Add the capacity to evaluate transforms [#7](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/7) thanks to @cristian-grau-sp
+- Add the capacity to evaluate transforms [#7](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/7) thanks to [@cristian-grau-sp](https://github.com/cristian-grau-sp)
 
 ## [0.0.6] - 2022-04-27
 
