@@ -1,13 +1,15 @@
 import * as vscode from "vscode";
 import * as path from 'path';
-import { getIdByUri, getPathByUri, getResourceUri } from "../utils/UriUtils";
-import * as commands from "../commands/constants";
 import { IdentityNowClient, TOTAL_COUNT_HEADER } from "../services/IdentityNowClient";
+import { AccessProfileDocument, RoleDocument } from "sailpoint-api-client";
+import { getIdByUri, getPathByUri, getResourceUri } from "../utils/UriUtils";
 import { compareByName, compareByPriority } from "../utils";
 import { AxiosResponse } from "axios";
-import { AccessProfileDocument, RoleDocument } from "sailpoint-api-client";
-import * as configuration from '../configurationConstants';
 import { getConfigNumber } from '../utils/configurationUtils';
+import * as commands from "../commands/constants";
+import * as configuration from '../configurationConstants';
+import { isNotEmpty } from "../utils/stringUtils";
+import { isEmpty } from "lodash";
 
 /**
  * Base class to expose getChildren and updateIcon methods
@@ -697,9 +699,26 @@ export interface PageableNode {
 	currentOffset: number
 	limit?: number;
 	readonly hasMore: boolean;
-	filters?: string | undefined
-	children: BaseTreeItem[]
+	filters?: string | undefined;
+	filterType: FilterType;
+	children: BaseTreeItem[];
 	loadMore(): Promise<void>;
+}
+
+interface Document {
+	/**
+	 * The unique ID of the referenced object.
+	 */
+	id: string;
+	/**
+	 * The human readable name of the referenced object.
+	 */
+	name: string;
+}
+
+export enum FilterType {
+	api = "API",
+	search = "Search"
 }
 
 /**
@@ -707,7 +726,8 @@ export interface PageableNode {
  */
 export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implements PageableNode {
 	currentOffset = 0;
-	filters?: string = "*";
+	filters?: string = "";
+	filterType = FilterType.api;
 	children: BaseTreeItem[] = [];
 	client: IdentityNowClient;
 
@@ -728,6 +748,7 @@ export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implement
 
 	reset(): void {
 		this.currentOffset = 0;
+		this._total = 0;
 		this.children = [];
 	}
 
@@ -777,7 +798,7 @@ export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implement
 
 
 	get isFiltered(): boolean {
-		return this.filters !== undefined && this.filters !== "*";
+		return isNotEmpty(this.filters);
 	}
 
 	get computedContextValue() {
@@ -795,7 +816,7 @@ export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implement
 /**
  * Contains the access profiles in tree view
  */
-export class AccessProfilesTreeItem extends PageableFolderTreeItem<AccessProfileDocument> {
+export class AccessProfilesTreeItem extends PageableFolderTreeItem<Document> {
 	constructor(
 		tenantId: string,
 		tenantName: string,
@@ -812,15 +833,23 @@ export class AccessProfilesTreeItem extends PageableFolderTreeItem<AccessProfile
 		);
 	}
 
-	protected async loadNext(): Promise<AxiosResponse<AccessProfileDocument[]>> {
+	protected async loadNext(): Promise<AxiosResponse<Document[]>> {
 		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
-		const response = await this.client.paginatedSearchAccessProfiles(
-			this.filters,
+		if (this.filterType === FilterType.api) {
+			return await this.client.getAccessProfiles({
+				filters: this.filters,
+				limit,
+				offset: this.currentOffset,
+				count: (this._total === 0)
+			}) as AxiosResponse<Document[]>;
+		}
+		const filters = isEmpty(this.filters) ? "*" : this.filters;
+		return await this.client.paginatedSearchAccessProfiles(
+			filters,
 			limit,
 			this.currentOffset,
 			(this._total === 0)
-		);
-		return response;
+		) as AxiosResponse<Document[]>;
 	}
 }
 
@@ -851,7 +880,7 @@ export class AccessProfileTreeItem extends IdentityNowResourceTreeItem {
 /**
  * Contains the roles in tree view
  */
-export class RolesTreeItem extends PageableFolderTreeItem<RoleDocument> {
+export class RolesTreeItem extends PageableFolderTreeItem<Document> {
 	constructor(
 		tenantId: string,
 		tenantName: string,
@@ -868,15 +897,24 @@ export class RolesTreeItem extends PageableFolderTreeItem<RoleDocument> {
 		);
 	}
 
-	protected async loadNext(): Promise<AxiosResponse<RoleDocument[]>> {
+	protected async loadNext(): Promise<AxiosResponse<Document[]>> {
 		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
-		const response = await this.client.paginatedSearchRoles(
-			this.filters,
-			limit,
-			this.currentOffset,
-			(this._total === 0)
-		);
-		return response;
+		if (this.filterType === FilterType.api) {
+			return await this.client.getRoles({
+				filters: this.filters,
+				limit,
+				offset: this.currentOffset,
+				count: (this._total === 0)
+			}) as AxiosResponse<Document[]>;
+		} else {
+			const filters = isEmpty(this.filters) ? "*" : this.filters;
+			return await this.client.paginatedSearchRoles(
+				filters,
+				limit,
+				this.currentOffset,
+				(this._total === 0)
+			) as AxiosResponse<Document[]>;
+		}
 	}
 }
 

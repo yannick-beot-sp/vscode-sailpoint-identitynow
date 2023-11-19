@@ -3,13 +3,16 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { Disposable, InputBox, InputBoxOptions, QuickInputButton, QuickInputButtons, window } from 'vscode';
+import { Disposable, InputBox, InputBoxOptions, QuickInputButton, QuickInputButtons, Uri, env, window } from 'vscode';
 import { GoBackError, UserCancelledError } from '../errors';
 import { Wizard } from '../wizard/wizard';
+import { LearnMore } from '../wizard/LearnMoreButton';
+import { ExtInputBoxOptions } from '../wizard/ExtInputBoxOptions';
+import { isNotEmpty } from './stringUtils';
 
-export type InputBoxValidationResult = Awaited<ReturnType<Required<InputBoxOptions>['validateInput']>>;
+export type InputBoxValidationResult = Awaited<ReturnType<Required<ExtInputBoxOptions>['validateInput']>>;
 
-export async function showInputBox<T>(wizard: Wizard<T>, options: InputBoxOptions): Promise<string> {
+export async function showInputBox<T>(wizard: Wizard<T>, options: ExtInputBoxOptions): Promise<string> {
     const disposables: Disposable[] = [];
     try {
         const inputBox: InputBox = createInputBox(wizard, options);
@@ -38,7 +41,7 @@ export async function showInputBox<T>(wizard: Wizard<T>, options: InputBoxOption
                         resolve(inputBox.value);
                     } else if (validateInputResult) {
                         inputBox.validationMessage = validateInputResult;
-                    } 
+                    }
 
                     inputBox.enabled = true;
                     inputBox.busy = false;
@@ -46,7 +49,9 @@ export async function showInputBox<T>(wizard: Wizard<T>, options: InputBoxOption
                 inputBox.onDidTriggerButton(async btn => {
                     if (btn === QuickInputButtons.Back) {
                         reject(new GoBackError());
-                    } 
+                    } else if (btn === LearnMore && isNotEmpty(options.learnMoreLink)) {
+                        await env.openExternal(Uri.parse(options.learnMoreLink));
+                    }
                 }),
                 inputBox.onDidHide(() => {
                     reject(new UserCancelledError());
@@ -59,7 +64,7 @@ export async function showInputBox<T>(wizard: Wizard<T>, options: InputBoxOption
     }
 }
 
-function createInputBox<T>(wizard: Wizard<T>, options: InputBoxOptions): InputBox {
+function createInputBox<T>(wizard: Wizard<T>, options: ExtInputBoxOptions): InputBox {
     const inputBox: InputBox = window.createInputBox();
 
     if (wizard && wizard.showTitle) {
@@ -73,6 +78,10 @@ function createInputBox<T>(wizard: Wizard<T>, options: InputBoxOptions): InputBo
     const buttons: QuickInputButton[] = [];
     if (wizard.showBackButton) {
         buttons.push(QuickInputButtons.Back);
+    }
+
+    if (options.learnMoreLink) {
+        buttons.push(LearnMore);
     }
 
     inputBox.buttons = buttons;

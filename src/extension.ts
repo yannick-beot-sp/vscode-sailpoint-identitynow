@@ -10,7 +10,7 @@ import { deleteResource } from './commands/deleteResource';
 import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './commands/exportAccounts';
 import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from './commands/exportEntitlementDetails';
 import { ExportScriptFromRuleCommand } from './commands/exportScriptFromRuleCommand';
-import { FilterCommand } from './commands/filterCommand';
+import { AccessProfileFilterCommand, FilterCommand, RoleFilterCommand } from './commands/filterCommand';
 import { AccountImportNodeCommand } from './commands/importAccount';
 import { EntitlementDetailsImportNodeCommand } from './commands/importEntitlementDetails';
 import { UncorrelatedAccountImportNodeCommand } from './commands/importUncorrelatedAccount';
@@ -156,13 +156,20 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.LOAD_MORE,
 			async (n: LoadMoreNode) => { await n.loadMore(); }));
 
-	const filterCommand = new FilterCommand();
+	const rolefilterCommand = new RoleFilterCommand();
 	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.FILTER_VIEW,
-			filterCommand.execute));
+		vscode.commands.registerCommand(commands.ROLE_FILTER_VIEW,
+			rolefilterCommand.execute, rolefilterCommand));
 	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.UPDATE_FILTER_VIEW,
-			filterCommand.execute));
+		vscode.commands.registerCommand(commands.ROLE_UPDATE_FILTER_VIEW,
+			rolefilterCommand.execute, rolefilterCommand));
+	const accessProfileFilterCommand = new AccessProfileFilterCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.ACCESS_PROFILE_FILTER_VIEW,
+			accessProfileFilterCommand.execute, accessProfileFilterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.ACCESS_PROFILE_UPDATE_FILTER_VIEW,
+			accessProfileFilterCommand.execute, accessProfileFilterCommand));
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.ENABLE_WORKFLOW,

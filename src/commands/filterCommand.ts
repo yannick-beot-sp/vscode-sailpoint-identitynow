@@ -1,26 +1,103 @@
 import * as vscode from "vscode";
-import { BaseTreeItem, PageableNode } from "../models/IdentityNowTreeItem";
+import { BaseTreeItem, FilterType, PageableNode } from "../models/IdentityNowTreeItem";
 import * as commands from "../commands/constants";
+import { WizardContext } from "../wizard/wizardContext";
+import { InputPromptStep } from "../wizard/inputPromptStep";
+import { runWizard } from "../wizard/wizard";
+import { QuickPickPromptStep } from "../wizard/quickPickPromptStep";
 
-export class FilterCommand {
 
-    async execute(node: PageableNode & BaseTreeItem): Promise<void> {
-        let newFilter = await vscode.window.showInputBox({
-            value: node.filters,
-            ignoreFocusOut: true,
-            placeHolder: 'Filter using search',
-            title: `Enter a filter for ${node.label}`
+const newFilter = (nodeFilterType: FilterType) => new QuickPickPromptStep({
+    name: "filterType",
+    project: x => x.value,
+    items: [{
+        label: FilterType.api,
+        value: FilterType.api,
+        picked: (nodeFilterType === FilterType.api)
+    },
+    {
+        label: FilterType.search,
+        value: FilterType.search,
+        picked: (nodeFilterType === FilterType.search)
+    }]
+});
+
+class FilterInputStep extends InputPromptStep<WizardContext> {
+    constructor(
+        label: string,
+        private filterType: FilterType,
+        help: string) {
+        super({
+            name: "filter" + filterType,
+            options: {
+                placeHolder: `Filter using ${filterType}`,
+                title: `Enter a filter for ${label}`,
+                learnMoreLink: help
+            },
         });
+    }
 
-        if (newFilter === undefined) {
-            // cancel by user
-            return;
-        }
-        newFilter = newFilter.trim();
-        if (newFilter === "") {
-            newFilter = "*";
-        }
-        node.filters = newFilter;
-        vscode.commands.executeCommand(commands.REFRESH_FORCED, node);
+    public shouldPrompt(wizardContext: WizardContext): boolean {
+        return wizardContext["filterType"] === this.filterType;
     }
 }
+
+export abstract class FilterCommand {
+
+    public async execute(node: PageableNode & BaseTreeItem): Promise<void> {
+        const wizardContext: WizardContext = {};
+        wizardContext["filter" + node.filterType] = node.filters;
+        const values = await this.runWizard(node.filterType, wizardContext);
+
+        node.filterType = values["filterType"];
+        node.filters = values["filter" + node.filterType];
+        vscode.commands.executeCommand(commands.REFRESH_FORCED, node);
+    }
+
+    protected abstract runWizard(filterType: FilterType, wizardContext: WizardContext): Promise<WizardContext>;
+}
+
+export class AccessProfileFilterCommand extends FilterCommand {
+    constructor() {
+        super();
+    }
+
+    protected async runWizard(filterType: FilterType, wizardContext: WizardContext): Promise<WizardContext> {
+        return await runWizard({
+            title: "Filter access profiles",
+            hideStepCount: true,
+            promptSteps: [
+                newFilter(filterType),
+                new FilterInputStep("access profiles",
+                    FilterType.search,
+                    "https://documentation.sailpoint.com/saas/help/search/searchable-fields.html#searching-access-profile-data"),
+                new FilterInputStep("access profiles",
+                    FilterType.api,
+                    "https://developer.sailpoint.com/idn/api/v3/list-access-profiles")
+            ],
+        }, wizardContext);
+    }
+}
+
+export class RoleFilterCommand extends FilterCommand {
+    constructor() {
+        super();
+    }
+
+    protected async runWizard(filterType: FilterType, wizardContext: WizardContext): Promise<WizardContext> {
+        return await runWizard({
+            title: "Filter roles",
+            hideStepCount: true,
+            promptSteps: [
+                newFilter(filterType),
+                new FilterInputStep("roles",
+                    FilterType.search,
+                    "https://documentation.sailpoint.com/saas/help/search/searchable-fields.html#searching-role-data"),
+                new FilterInputStep("roles",
+                    FilterType.api,
+                    "https://developer.sailpoint.com/idn/api/v3/list-roles")
+            ],
+        }, wizardContext);
+    }
+}
+

@@ -3,18 +3,19 @@ import { WizardPromptStep } from "./wizardPromptStep";
 import { isEmpty } from "../utils/stringUtils";
 import { showInputBox } from "../utils/showInputBox";
 import { Wizard } from "./wizard";
+import { ExtInputBoxOptions } from "./ExtInputBoxOptions";
 
 
 export interface InputPromptStepOptions {
     name: string
     displayName?: string
-    options?: InputBoxOptions
+    options?: ExtInputBoxOptions
 }
 
 
 export class InputPromptStep<WizardContext> extends WizardPromptStep<WizardContext> {
 
-    private readonly _options: InputBoxOptions;
+    private readonly _options: ExtInputBoxOptions;
     private readonly _name: string;
     private readonly _displayName!: string;
     constructor(

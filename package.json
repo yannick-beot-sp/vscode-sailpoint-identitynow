@@ -133,12 +133,22 @@
         "title": "Load More"
       },
       {
-        "command": "vscode-sailpoint-identitynow.filter",
+        "command": "vscode-sailpoint-identitynow.roles.filter",
         "title": "Filter",
         "icon": "$(filter)"
       },
       {
-        "command": "vscode-sailpoint-identitynow.update-filter",
+        "command": "vscode-sailpoint-identitynow.roles.update-filter",
+        "title": "Filter",
+        "icon": "$(filter-filled)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.access-profiles.filter",
+        "title": "Filter",
+        "icon": "$(filter)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.access-profiles.update-filter",
         "title": "Filter",
         "icon": "$(filter-filled)"
       },
@@ -398,11 +408,19 @@
           "when": "never"
         },
         {
-          "command": "vscode-sailpoint-identitynow.filter",
+          "command": "vscode-sailpoint-identitynow.roles.filter",
           "when": "never"
         },
         {
-          "command": "vscode-sailpoint-identitynow.update-filter",
+          "command": "vscode-sailpoint-identitynow.roles.update-filter",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.access-profiles.filter",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.access-profiles.update-filter",
           "when": "never"
         },
         {
@@ -728,13 +746,23 @@
           "group": "inline@1"
         },
         {
-          "command": "vscode-sailpoint-identitynow.filter",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /Unfiltered$/",
+          "command": "vscode-sailpoint-identitynow.roles.filter",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == rolesUnfiltered",
           "group": "inline@0"
         },
         {
-          "command": "vscode-sailpoint-identitynow.update-filter",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /Filtered$/",
+          "command": "vscode-sailpoint-identitynow.roles.update-filter",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == rolesFiltered",
+          "group": "inline@0"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.access-profiles.filter",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profilesUnfiltered",
+          "group": "inline@0"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.access-profiles.update-filter",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profilesFiltered",
           "group": "inline@0"
         },
         {
