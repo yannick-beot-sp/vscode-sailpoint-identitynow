@@ -1,5 +1,5 @@
 import { Entitlement } from "sailpoint-api-client";
-import { IdentityNowClient } from "../services/IdentityNowClient";
+import { IdentityNowClient } from "../../services/IdentityNowClient";
 
 
 export default class EntitlementPaginator implements AsyncIterable<Entitlement[]> {

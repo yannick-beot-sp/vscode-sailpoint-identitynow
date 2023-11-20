@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
-import { SourceTreeItem } from "../models/IdentityNowTreeItem";
-import { IdentityNowClient } from '../services/IdentityNowClient';
-import { CSVReader } from '../services/CSVReader';
-import { UncorrelatedAccount } from '../models/UncorrelatedAccount';
+import { SourceTreeItem } from "../../models/IdentityNowTreeItem";
+import { IdentityNowClient } from '../../services/IdentityNowClient';
+import { CSVReader } from '../../services/CSVReader';
+import { UncorrelatedAccount } from '../../models/UncorrelatedAccount';
 import { isEmpty } from 'lodash';
-import { chooseFile } from '../utils/vsCodeHelpers';
+import { chooseFile } from '../../utils/vsCodeHelpers';
 
 interface UncorrelatedAccountImportResult {
     correlated: number

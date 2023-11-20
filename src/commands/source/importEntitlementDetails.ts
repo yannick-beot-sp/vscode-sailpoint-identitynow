@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
-import { SourceTreeItem } from "../models/IdentityNowTreeItem";
-import { IdentityNowClient } from '../services/IdentityNowClient';
-import { CSVReader } from '../services/CSVReader';
-import { isNotEmpty } from '../utils/stringUtils';
-import { chooseFile } from '../utils/vsCodeHelpers';
+import { SourceTreeItem } from "../../models/IdentityNowTreeItem";
+import { IdentityNowClient } from '../../services/IdentityNowClient';
+import { CSVReader } from '../../services/CSVReader';
+import { isNotEmpty } from '../../utils/stringUtils';
+import { chooseFile } from '../../utils/vsCodeHelpers';
 import { JsonPatchOperationBeta } from 'sailpoint-api-client';
 
 // List of mandatory headers to update the description of entitlements

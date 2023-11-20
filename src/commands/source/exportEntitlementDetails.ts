@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { SourceTreeItem } from '../models/IdentityNowTreeItem';
-import { PathProposer } from '../services/PathProposer';
-import { askFile } from '../utils/vsCodeHelpers';
-import { BaseCSVExporter } from './BaseExporter';
+import { SourceTreeItem } from '../../models/IdentityNowTreeItem';
+import { PathProposer } from '../../services/PathProposer';
+import { askFile } from '../../utils/vsCodeHelpers';
+import { BaseCSVExporter } from '../BaseExporter';
 import EntitlementPaginator from './EntitlementPaginator';
 import { Entitlement } from 'sailpoint-api-client';
 

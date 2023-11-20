@@ -165,6 +165,11 @@
         "title": "Aggregate entitlements"
       },
       {
+        "command": "vscode-sailpoint-identitynow.test-source",
+        "title": "Test connection",
+        "group": "test"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.reset-source",
         "title": "Reset source",
         "group": "reset@2"
@@ -436,6 +441,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.test-source",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.reset-source",
           "when": "never"
         },
@@ -635,6 +644,11 @@
           "command": "vscode-sailpoint-identitynow.aggregate-entitlements",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/",
           "group": "aggregate@2"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.test-source",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^((?!DelimitedFilesource).)*$/",
+          "group": "test"
         },
         {
           "command": "vscode-sailpoint-identitynow.reset-source",

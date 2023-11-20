@@ -7,13 +7,13 @@ import { NewAccessProfileCommand } from './commands/access-profile/NewAccessProf
 import { AddTenantCommand } from './commands/addTenant';
 import { ConnectorRuleCommand } from './commands/connectorRuleCommand';
 import { deleteResource } from './commands/deleteResource';
-import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './commands/exportAccounts';
-import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from './commands/exportEntitlementDetails';
+import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './commands/source/exportAccounts';
+import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from './commands/source/exportEntitlementDetails';
 import { ExportScriptFromRuleCommand } from './commands/exportScriptFromRuleCommand';
 import { AccessProfileFilterCommand, FilterCommand, RoleFilterCommand } from './commands/filterCommand';
-import { AccountImportNodeCommand } from './commands/importAccount';
-import { EntitlementDetailsImportNodeCommand } from './commands/importEntitlementDetails';
-import { UncorrelatedAccountImportNodeCommand } from './commands/importUncorrelatedAccount';
+import { AccountImportNodeCommand } from './commands/source/importAccount';
+import { EntitlementDetailsImportNodeCommand } from './commands/source/importEntitlementDetails';
+import { UncorrelatedAccountImportNodeCommand } from './commands/source/importUncorrelatedAccount';
 import { newProvisioningPolicy } from './commands/newProvisioningPolicy';
 import { newSchema } from './commands/newSchema';
 import { NewTransformCommand } from './commands/newTransform';
@@ -45,6 +45,7 @@ import { TreeManager } from './services/TreeManager';
 import { IdentityNowUriHandler } from './uriHandler';
 import { IdentityNowDataProvider } from './views/IdentityNowDataProvider';
 import { WorkflowTesterWebviewViewProvider } from './views/WorkflowTesterWebviewViewProvider';
+import { TestConnectionCommand } from './commands/source/TestConnectionCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -111,6 +112,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.RESET_SOURCE_ENTITLEMENTS,
 			(tenantTreeItem) => treeManager.resetSource(tenantTreeItem, "accounts")));
+	const testConnectionCommand = new TestConnectionCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.TEST_SOURCE,
+			testConnectionCommand.execute));
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM,

@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { SourceTreeItem } from "../models/IdentityNowTreeItem";
-import { AggregationJob, IdentityNowClient } from '../services/IdentityNowClient';
-import { delay } from '../utils';
-import { chooseFile } from '../utils/vsCodeHelpers';
+import { SourceTreeItem } from "../../models/IdentityNowTreeItem";
+import { AggregationJob, IdentityNowClient } from '../../services/IdentityNowClient';
+import { delay } from '../../utils';
+import { chooseFile } from '../../utils/vsCodeHelpers';
 
 class AccountImporter {
     readonly client: IdentityNowClient;
