@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import { IdentityNowResourceTreeItem, SourceTreeItem } from '../../models/IdentityNowTreeItem';
-import { Schema } from '../../models/Schema';
 import { PathProposer } from '../../services/PathProposer';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { BaseCSVExporter } from '../BaseExporter';
@@ -73,22 +72,26 @@ class AccountExporter extends BaseCSVExporter<Account> {
     protected async exportFile(task: any, token: vscode.CancellationToken): Promise<void> {
 
         console.log("> AccountExporter.exportFile");
-        const schemas = await this.client.getResource(`/v3/sources/${this.sourceId}/schemas`);
+        const schemas = await this.client.getSchemas(this.sourceId);
         if (schemas === null || !Array.isArray(schemas)) {
             console.error("Could not retrieve account schema");
             throw new Error("Could not retrieve account schema");
         }
-        const schema = schemas.find(x => x.name === 'account') as Schema;
+        const schema = schemas.find(x => x.name === 'account');
 
         if (token.isCancellationRequested) {
+            return;
+        }
+
+        if (schema === undefined) {
             return;
         }
 
         const headers: string[] = [];
         const paths: string[] = [];
         const unwindablePaths: string[] = [];
-        schema.attributes.forEach(x => {
-            headers.push(x.name);
+        schema.attributes?.forEach(x => {
+            headers.push(x.name!);
             const path = 'attributes.' + x.name;
             paths.push(path);
             if (x.isMulti) { unwindablePaths.push(path); }
