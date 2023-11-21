@@ -46,6 +46,7 @@ import { IdentityNowUriHandler } from './uriHandler';
 import { IdentityNowDataProvider } from './views/IdentityNowDataProvider';
 import { WorkflowTesterWebviewViewProvider } from './views/WorkflowTesterWebviewViewProvider';
 import { TestConnectionCommand } from './commands/source/TestConnectionCommand';
+import { PeekSourceCommand } from './commands/source/PeekSourceCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -116,6 +117,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.TEST_SOURCE,
 			testConnectionCommand.execute));
+	const peekConnectionCommand = new PeekSourceCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.PEEK_SOURCE,
+			peekConnectionCommand.execute, peekConnectionCommand));
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM,

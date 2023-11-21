@@ -4,7 +4,7 @@ import { PathProposer } from '../../services/PathProposer';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { BaseCSVExporter } from '../BaseExporter';
 import AccountPaginator from './AccountPaginator';
-import { Account } from 'sailpoint-api-client';
+import { Account, Schema } from 'sailpoint-api-client';
 import { isEmpty } from '../../utils/stringUtils';
 
 export class AccountExporterCommand {
@@ -186,7 +186,7 @@ class UncorrelatedAccountExporter extends BaseCSVExporter<Account> {
         }
 
         if (this.exportAccountAttributes) {
-            const schemas = await this.client.getResource(`/v3/sources/${this.sourceId}/schemas`);
+            const schemas = await this.client.getSchemas(this.sourceId);
             if (schemas === null || !Array.isArray(schemas)) {
                 console.error("Could not retrieve account schema");
                 throw new Error("Could not retrieve account schema");

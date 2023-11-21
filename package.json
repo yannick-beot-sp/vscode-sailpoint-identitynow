@@ -167,7 +167,12 @@
       {
         "command": "vscode-sailpoint-identitynow.test-source",
         "title": "Test connection",
-        "group": "test"
+        "icon": "$(beaker)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.peek-source",
+        "title": "Peek objects",
+        "icon": "$(eye)"
       },
       {
         "command": "vscode-sailpoint-identitynow.reset-source",
@@ -445,6 +450,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.peek-source",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.reset-source",
           "when": "never"
         },
@@ -647,7 +656,12 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.test-source",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^((?!DelimitedFilesource).)*$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^((?!DelimitedFilesource).)*$/ && viewItem =~ /source$/",
+          "group": "test"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.peek-source",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^((?!DelimitedFilesource).)*$/ && viewItem =~ /source$/",
           "group": "test"
         },
         {

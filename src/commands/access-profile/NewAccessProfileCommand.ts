@@ -14,6 +14,7 @@ import { Validator } from '../../validator/validator';
 import { WizardContext } from '../../wizard/wizardContext';
 import { QuickPickPromptStep } from '../../wizard/quickPickPromptStep';
 import { createNewFile } from '../../utils/vsCodeHelpers';
+import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep';
 
 const accessProfileTemplate: AccessProfile = require('../../../snippets/access-profile.json');
 
@@ -63,23 +64,7 @@ export class NewAccessProfileCommand {
                     "access profile owner",
                     () => { return client!; }
                 ),
-                new QuickPickPromptStep({
-                    name: "source",
-                    options: {
-                        matchOnDescription: true,
-                        matchOnDetail: true
-                    },
-                    items: async (context: WizardContext): Promise<vscode.QuickPickItem[]> => {
-                        const results = (await client!.getSources())
-                            .map(x => ({
-                                ...x,
-                                label: x.name,
-                                detail: x.description,
-                                description: x.connectorName
-                            }));
-                        return results;
-                    }
-                }),
+                new QuickPickSourceStep(() => { return client!; }),
                 new QuickPickPromptStep({
                     name: "entitlements",
                     options: {
