@@ -10,17 +10,16 @@ export const onErrorResponse = (error: AxiosError | Error): Promise<AxiosError> 
         console.error(
             `[IdentityNowClient] ${method?.toUpperCase()} ${url} | Error ${status} ${message} | ${data}`, error
         );
-
-        if ('error' in data) {
+        if (data !== undefined && 'error' in data) {
             errorMessage = data.error;
             if ("error_description" in data) {
                 errorMessage += `: ${data.error_description}`;
             }
-        } else if ('message' in data) {
+        } else if (data !== undefined && 'message' in data) {
             errorMessage = data.message;
-        } else if ('messages' in data) {
+        } else if (data !== undefined && 'messages' in data) {
             errorMessage = data.messages[0].text;
-        } else if ('formatted_msg' in data) {
+        } else if (data !== undefined && 'formatted_msg' in data) {
             errorMessage = data.formatted_msg;
         } else {
             errorMessage = message;
