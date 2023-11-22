@@ -23,6 +23,7 @@ export const IMPORT_ENTITLEMENT_DETAILS_VIEW = 'vscode-sailpoint-identitynow.sou
 export const EXPORT_ENTITLEMENT_DETAILS_VIEW = 'vscode-sailpoint-identitynow.source.export.entitlement-details.view';
 export const TEST_SOURCE = 'vscode-sailpoint-identitynow.test-source';
 export const PEEK_SOURCE = 'vscode-sailpoint-identitynow.peek-source';
+export const PEEK_SOURCE_PALETTE = 'vscode-sailpoint-identitynow.peek-source.palette';
 export const RESET_SOURCE = 'vscode-sailpoint-identitynow.reset-source';
 export const RESET_SOURCE_ACCOUNTS = 'vscode-sailpoint-identitynow.reset-source-accounts';
 export const RESET_SOURCE_ENTITLEMENTS = 'vscode-sailpoint-identitynow.reset-source-entitlements';

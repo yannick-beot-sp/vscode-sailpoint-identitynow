@@ -121,6 +121,9 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.PEEK_SOURCE,
 			peekConnectionCommand.execute, peekConnectionCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.PEEK_SOURCE_PALETTE,
+			peekConnectionCommand.execute, peekConnectionCommand));
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM,

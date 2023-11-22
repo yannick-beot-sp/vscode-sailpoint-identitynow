@@ -175,6 +175,11 @@
         "icon": "$(eye)"
       },
       {
+        "command": "vscode-sailpoint-identitynow.peek-source.palette",
+        "title": "IdentityNow: Peek objects...",
+        "icon": "$(eye)"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.reset-source",
         "title": "Reset source",
         "group": "reset@2"
