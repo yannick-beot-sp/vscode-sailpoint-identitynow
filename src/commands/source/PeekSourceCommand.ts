@@ -81,13 +81,13 @@ export class PeekSourceCommand {
         }, async (task, token) => {
 
             const resources = await client!.peekSourceConnection(
-                context["source"].id,
-                context["schema"].name,
+                values["source"].id,
+                values["schema"].name,
                 10
             )
 
             const tmpPath = tmp.tmpNameSync({
-                prefix: `${context["source"].name}-${values["schema"].name}`,
+                prefix: `${values["source"].name}-${values["schema"].name}`,
                 postfix: ".json",
             });
             // creating tmp file

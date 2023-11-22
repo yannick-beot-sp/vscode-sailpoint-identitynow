@@ -113,10 +113,13 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.RESET_SOURCE_ENTITLEMENTS,
 			(tenantTreeItem) => treeManager.resetSource(tenantTreeItem, "accounts")));
-	const testConnectionCommand = new TestConnectionCommand();
+	const testConnectionCommand = new TestConnectionCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.TEST_SOURCE,
-			testConnectionCommand.execute));
+			testConnectionCommand.execute, testConnectionCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.TEST_SOURCE_PALETTE,
+			testConnectionCommand.execute, testConnectionCommand));
 	const peekConnectionCommand = new PeekSourceCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.PEEK_SOURCE,

@@ -22,6 +22,7 @@ export const EXPORT_UNCORRELATED_ACCOUNTS_VIEW = 'vscode-sailpoint-identitynow.s
 export const IMPORT_ENTITLEMENT_DETAILS_VIEW = 'vscode-sailpoint-identitynow.source.import.entitlement-details.view';
 export const EXPORT_ENTITLEMENT_DETAILS_VIEW = 'vscode-sailpoint-identitynow.source.export.entitlement-details.view';
 export const TEST_SOURCE = 'vscode-sailpoint-identitynow.test-source';
+export const TEST_SOURCE_PALETTE = 'vscode-sailpoint-identitynow.test-source.palette';
 export const PEEK_SOURCE = 'vscode-sailpoint-identitynow.peek-source';
 export const PEEK_SOURCE_PALETTE = 'vscode-sailpoint-identitynow.peek-source.palette';
 export const RESET_SOURCE = 'vscode-sailpoint-identitynow.reset-source';

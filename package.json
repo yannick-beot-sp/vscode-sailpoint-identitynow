@@ -170,6 +170,11 @@
         "icon": "$(beaker)"
       },
       {
+        "command": "vscode-sailpoint-identitynow.test-source.palette",
+        "title": "IdentityNow: Test connection...",
+        "icon": "$(beaker)"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.peek-source",
         "title": "Peek objects",
         "icon": "$(eye)"

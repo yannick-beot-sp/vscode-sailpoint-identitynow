@@ -3,36 +3,67 @@ import * as vscode from 'vscode';
 import { StatusResponseBeta, StatusResponseBetaStatusEnum } from 'sailpoint-api-client';
 import { SourceTreeItem } from '../../models/IdentityNowTreeItem';
 import { IdentityNowClient } from '../../services/IdentityNowClient';
+import { TenantService } from '../../services/TenantService';
+import { WizardContext } from '../../wizard/wizardContext';
+import { runWizard } from '../../wizard/wizard';
+import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
+import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep';
 
 export class TestConnectionCommand {
 
+    constructor(private readonly tenantService: TenantService) { }
+    
     /**
      * Entry point 
      * @param node 
      * @returns 
      */
-    async execute(node: SourceTreeItem) {
+    async execute(node?: SourceTreeItem) {
 
         console.log("> TestConnectionCommand.execute");
-        const client = new IdentityNowClient(
-            node.tenantId,
-            node.tenantName
-        );
+        const context: WizardContext = {};
+
+        // if the command is called from the Tree View
+        if (node !== undefined && node instanceof SourceTreeItem) {
+            context["tenant"] = await this.tenantService.getTenant(node.tenantId);
+            context["source"] = {
+                id: node.id!,
+                name: node.label!
+            }
+        }
+
+        let client: IdentityNowClient | undefined = undefined;
+
+        const values = await runWizard({
+            title: "Peek resources",
+            hideStepCount: false,
+            promptSteps: [
+                new QuickPickTenantStep(
+                    this.tenantService,
+                    async (wizardContext) => {
+                        client = new IdentityNowClient(
+                            wizardContext["tenant"].id, wizardContext["tenant"].tenantName);
+                    }),
+                new QuickPickSourceStep(() => { return client!; }),
+            ]
+        }, context);
+        console.log({ values });
+        if (values === undefined) { return; }
 
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
-            title: `Testing  ${node.label} from ${node.tenantDisplayName}...`,
+            title: `Testing  ${values["source"].name} from ${values["tenant"].name}...`,
             cancellable: false
-        }, async (task, token) => { return await client.testSourceConnection(node.id!) })
+        }, async (task, token) => { return await client.testSourceConnection(values["source"].id) })
             .then(async (result: StatusResponseBeta) => {
                 if (StatusResponseBetaStatusEnum.Success === result.status) {
                     vscode.window.showInformationMessage(
-                        `Connection test successfull for ${node.label} from ${node.tenantDisplayName}`
+                        `Connection test successfull for ${values["source"].name} from ${values["tenant"].name}`
                     );
                 } else {
                     const errorMessage = (result.details as any)?.error
                     vscode.window.showErrorMessage(
-                        `Connection test failed for ${node.label} from ${node.tenantDisplayName}: ${errorMessage}`
+                        `Connection test failed for ${values["source"].name} from ${values["tenant"].name}: ${errorMessage}`
                     );
                 }
             });
