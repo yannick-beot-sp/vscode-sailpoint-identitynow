@@ -6,9 +6,12 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [0.0.25] - 2023-11-22
+
 ### Added 
 
 - Add test connection (cf. [#58](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/58))
+- Add peek objects on a source (cf. [#59](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/59))
 
 ## [0.0.24] - 2023-11-19
 

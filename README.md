@@ -184,6 +184,11 @@ None
 
 ## Release Notes
 
+### 0.0.25
+
+- Add test connection (cf. [#58](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/58))
+- Add peek objects on a source (cf. [#59](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/59))
+
 ### 0.0.24
 
 - View, edit, create, delete, export, import access profiles with the help of [@richastral](https://github.com/richastral) (cf. [#55](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/55))
