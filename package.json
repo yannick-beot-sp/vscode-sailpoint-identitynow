@@ -185,6 +185,16 @@
         "icon": "$(eye)"
       },
       {
+        "command": "vscode-sailpoint-identitynow.ping-source",
+        "title": "Ping cluster",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.ping-source.palette",
+        "title": "IdentityNow: Pinging Cluster ...",
+        "icon": "$(eye)"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.reset-source",
         "title": "Reset source",
         "group": "reset@2"
@@ -671,6 +681,11 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.peek-source",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^((?!DelimitedFilesource).)*$/ && viewItem =~ /source$/",
+          "group": "test"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.ping-source",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^((?!DelimitedFilesource).)*$/ && viewItem =~ /source$/",
           "group": "test"
         },

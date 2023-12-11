@@ -7,7 +7,7 @@ The SailPoint IdentityNow extension makes it easy to:
 
 - Connect to several tenants
 - Import and export config of a tenant
-- View, edit, aggregate or reset sources
+- View, edit, aggregate, test, peek, ping or reset sources
 - View, create, edit, delete, and test transforms
 - View, create, edit, delete provisioning policies of a source
 - View, create, edit, delete schemas of a source
