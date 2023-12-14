@@ -32,24 +32,19 @@ export class RoleMembershipSelectorConverter implements Visitor<RoleCriteriaLeve
         await val.accept(this, arg);
 
         if (this.root?.children === undefined || this.root?.children.length === 0) {
-            // We have only 1 level so far. Needs to create 2 levels artifically
+            // We have only 1 level so far. Needs to create at least 2 levels artifically
             this.root = {
                 operation: "OR",
-                children: [
-                    {
-                        operation: "AND",
-                        children: [this.root]
-                    }
-                ]
-
+                children: [this.root]
             };
-        } else if (this.root.children[0].children === undefined || this.root.children[0].children.length === 0) {
+        } else if (this.root.children.every(x => x.children === undefined || x.children.length === 0)) {
             // We have already 2 level2. Needs to create 1 level artifically
             this.root = {
                 operation: this.root.operation === "AND" ? "OR" : "AND",
                 children: [this.root]
             };
         }
+
     }
 
     async visitAttribute(val: Attribute, arg: RoleCriteriaLevel1): Promise<void> {

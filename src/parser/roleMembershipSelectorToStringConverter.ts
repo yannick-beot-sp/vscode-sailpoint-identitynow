@@ -22,7 +22,7 @@ export async function roleMembershipSelectorToStringConverter(
         return await convertRoleCriteriaLevel2(roleCriteriaLevel1.children[0], sourceIdToName);
     }
 
-    if (isLogicalOperation(roleCriteriaLevel1.children[0].operation)) {
+    if (roleCriteriaLevel1.children.some(c => isLogicalOperation(c.operation))) {
         return join(roleCriteriaLevel1.operation,
             (await Promise.all(
                 roleCriteriaLevel1.children
@@ -44,7 +44,9 @@ function join(op: RoleCriteriaOperation, expressions: string[]) {
 async function convertRoleCriteriaLevel2(
     roleCriteriaLevel2: RoleCriteriaLevel2,
     sourceIdToName: CacheService<string>): Promise<string> {
-    if (roleCriteriaLevel2.children === null) {
+    if (roleCriteriaLevel2.children === null
+        || roleCriteriaLevel2.children === undefined ||
+        roleCriteriaLevel2.children.length === 0) {
         return await convertRoleCriteriaLevel3(roleCriteriaLevel2, sourceIdToName);
     }
 

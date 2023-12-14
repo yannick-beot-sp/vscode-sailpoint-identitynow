@@ -23,7 +23,7 @@ export class Parser {
                 if (isLogicalOperation(token)) {
                     const currentOperator = token.toLowerCase() === "and" ? "AND" : "OR";
                     if (operator !== undefined && operator !== currentOperator){
-                        throw new ParseException("All operators should be either \"sand\" or \"or\"");
+                        throw new ParseException("All operators should be either \"and\" or \"or\"");
                     }
                     operator = currentOperator;
 

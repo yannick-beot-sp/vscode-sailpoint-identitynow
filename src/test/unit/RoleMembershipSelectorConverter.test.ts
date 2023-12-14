@@ -20,24 +20,20 @@ class MockupCache extends CacheService<string>{
 
 suite('RoleMembershipSelectorConverter Test Suite', () => {
     const parser = new Parser();
+
     describe('1 level conversion', async () => {
 
         const expectedComparisonOperator: RoleCriteriaLevel1 = {
             "operation": "OR",
             "children": [
                 {
-                    "operation": "AND",
-                    "children": [
-                        {
-                            "operation": "EQUALS",
-                            "key": {
-                                "type": "IDENTITY",
-                                "property": "attribute.department",
-                                sourceId: undefined
-                            },
-                            "stringValue": "Customer Service"
-                        }
-                    ]
+                    "operation": "EQUALS",
+                    "key": {
+                        "type": "IDENTITY",
+                        "property": "attribute.department",
+                        sourceId: undefined
+                    },
+                    "stringValue": "Customer Service"
                 }
             ]
         };
@@ -67,35 +63,34 @@ suite('RoleMembershipSelectorConverter Test Suite', () => {
             assert.deepEqual(converter.root, expectedComparisonOperator);
         });
     });
+
     describe('2 level conversion', async () => {
         it("should parse an expression with 2 comparisons and convert it", async () => {
             const expectedComparisonOperator2: RoleCriteriaLevel1 = {
                 "operation": "OR",
-                "children": [
-                    {
-                        "operation": "AND",
-                        "children": [
-                            {
-                                "operation": "EQUALS",
-                                "key": {
-                                    "type": "IDENTITY",
-                                    "property": "attribute.department",
-                                    sourceId: undefined
-                                },
-                                "stringValue": "Customer Service"
+                "children": [{
+                    "operation": "AND",
+                    "children": [
+                        {
+                            "operation": "EQUALS",
+                            "key": {
+                                "type": "IDENTITY",
+                                "property": "attribute.department",
+                                sourceId: undefined
                             },
-                            {
-                                "operation": "EQUALS",
-                                "key": {
-                                    "type": "IDENTITY",
-                                    "property": "attribute.cloudLifecycleState",
-                                    "sourceId": undefined
-                                },
-                                "stringValue": "active",
+                            "stringValue": "Customer Service"
+                        },
+                        {
+                            "operation": "EQUALS",
+                            "key": {
+                                "type": "IDENTITY",
+                                "property": "attribute.cloudLifecycleState",
+                                "sourceId": undefined
                             },
-                        ]
-                    }
-                ]
+                            "stringValue": "active",
+                        },
+                    ]
+                }]
             };
 
             const converter = new RoleMembershipSelectorConverter(new MockupCache());
@@ -109,32 +104,30 @@ suite('RoleMembershipSelectorConverter Test Suite', () => {
         it("should parse an expression with 2 non-identity and convert it", async () => {
             const expectedComparisonOperator3: RoleCriteriaLevel1 = {
                 "operation": "OR",
-                "children": [
-                    {
-                        "operation": "AND",
-                        "children": [
-                            {
-                                "operation": "EQUALS",
-                                "key": {
-                                    "type": "ENTITLEMENT",
-                                    "property": "attribute.memberOf",
-                                    "sourceId": "6ba6925ebc1a4e5d98ca6fd3fc542ea4"
-                                },
-                                "stringValue": "CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com",
+                "children": [{
+                    "operation": "AND",
+                    "children": [
+                        {
+                            "operation": "EQUALS",
+                            "key": {
+                                "type": "ENTITLEMENT",
+                                "property": "attribute.memberOf",
+                                "sourceId": "6ba6925ebc1a4e5d98ca6fd3fc542ea4"
                             },
-                            {
-                                "operation": "EQUALS",
-                                "key": {
-                                    "type": "ACCOUNT",
-                                    "property": "attribute.departmentNumber",
-                                    "sourceId": "6ba6925ebc1a4e5d98ca6fd3fc542ea4"
-                                },
-                                "stringValue": "1234",
+                            "stringValue": "CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com",
+                        },
+                        {
+                            "operation": "EQUALS",
+                            "key": {
+                                "type": "ACCOUNT",
+                                "property": "attribute.departmentNumber",
+                                "sourceId": "6ba6925ebc1a4e5d98ca6fd3fc542ea4"
                             },
-                        ]
-                    }
-                ]
-            }
+                            "stringValue": "1234",
+                        },
+                    ]
+                }]
+            };
 
             const converter = new RoleMembershipSelectorConverter(new MockupCache());
 
@@ -210,4 +203,104 @@ suite('RoleMembershipSelectorConverter Test Suite', () => {
         });
 
     });
+
+    describe('unbalanced level conversion', async () => {
+        it("should parse an expression and convert it with parenthesis", async () => {
+            const expectedComparisonOperator2: RoleCriteriaLevel1 = {
+                "operation": "OR",
+                "children": [
+                    {
+                        "operation": "EQUALS",
+                        "key": {
+                            "type": "ENTITLEMENT",
+                            "property": "attribute.ProfileId",
+                            "sourceId": "6ba6925ebc1a4e5d98ca6fd3fc542ea4"
+                        },
+                        "stringValue": "00e1i000000eM2qAAE"
+                    },
+                    {
+                        "operation": "AND",
+                        "children": [
+                            {
+                                "operation": "EQUALS",
+                                "key": {
+                                    "type": "IDENTITY",
+                                    "property": "attribute.cloudLifecycleState",
+                                    "sourceId": undefined
+                                },
+                                "stringValue": "active",
+                            },
+                            {
+                                "operation": "EQUALS",
+                                "key": {
+                                    "type": "IDENTITY",
+                                    "property": "attribute.usertype",
+                                    "sourceId": undefined
+                                },
+                                "stringValue": "External",
+                            }
+                        ]
+                    }
+                ]
+            };
+
+            const converter = new RoleMembershipSelectorConverter(new MockupCache());
+
+            const expression = parser.parse("('Active Directory'.entitlement.ProfileId eq '00e1i000000eM2qAAE') or (identity.cloudLifecycleState eq 'active' and identity.usertype eq 'External')");
+
+            await converter.visitExpression(expression, undefined);
+
+            assert.deepEqual(converter.root, expectedComparisonOperator2);
+        });
+
+        it("should parse an expression and convert it without parenthesis", async () => {
+            const expectedComparisonOperator2: RoleCriteriaLevel1 = {
+                "operation": "OR",
+                "children": [
+                    {
+                        "operation": "EQUALS",
+                        "key": {
+                            "type": "ENTITLEMENT",
+                            "property": "attribute.ProfileId",
+                            "sourceId": "6ba6925ebc1a4e5d98ca6fd3fc542ea4"
+                        },
+                        "stringValue": "00e1i000000eM2qAAE"
+                    },
+                    {
+                        "operation": "AND",
+                        "children": [
+                            {
+                                "operation": "EQUALS",
+                                "key": {
+                                    "type": "IDENTITY",
+                                    "property": "attribute.cloudLifecycleState",
+                                    "sourceId": undefined
+                                },
+                                "stringValue": "active",
+                            },
+                            {
+                                "operation": "EQUALS",
+                                "key": {
+                                    "type": "IDENTITY",
+                                    "property": "attribute.usertype",
+                                    "sourceId": undefined
+                                },
+                                "stringValue": "External",
+                            }
+                        ]
+                    }
+                ]
+            };;
+
+            const converter = new RoleMembershipSelectorConverter(new MockupCache());
+
+            const expression = parser.parse("'Active Directory'.entitlement.ProfileId eq '00e1i000000eM2qAAE' or (identity.cloudLifecycleState eq 'active' and identity.usertype eq 'External')");
+
+            await converter.visitExpression(expression, undefined);
+
+            assert.deepEqual(converter.root, expectedComparisonOperator2);
+        });
+
+    });
+
 });
