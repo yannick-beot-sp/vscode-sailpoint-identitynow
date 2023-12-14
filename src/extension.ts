@@ -47,6 +47,7 @@ import { IdentityNowDataProvider } from './views/IdentityNowDataProvider';
 import { WorkflowTesterWebviewViewProvider } from './views/WorkflowTesterWebviewViewProvider';
 import { TestConnectionCommand } from './commands/source/TestConnectionCommand';
 import { PeekSourceCommand } from './commands/source/PeekSourceCommand';
+import { PingClusterCommand } from './commands/source/PingClusterCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -127,6 +128,13 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.PEEK_SOURCE_PALETTE,
 			peekConnectionCommand.execute, peekConnectionCommand));
+	const pingClusterCommand = new PingClusterCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.PING_SOURCE,
+			pingClusterCommand.execute, pingClusterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.PING_SOURCE_PALETTE,
+			pingClusterCommand.execute, pingClusterCommand));
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM,
