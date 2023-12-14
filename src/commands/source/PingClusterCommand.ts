@@ -54,7 +54,7 @@ export class PingClusterCommand {
             location: vscode.ProgressLocation.Notification,
             title: `Ping connection  ${values["source"].name} from ${values["tenant"].name}...`,
             cancellable: false
-        }, async (task, token) => { return await client.pingSourceConnection(values["source"].id) })
+        }, async (task, token) => { return await client.pingCluster(values["source"].id) })
             .then(async (result: StatusResponseBeta) => {
                 if (StatusResponseBetaStatusEnum.Success === result.status) {
                     vscode.window.showInformationMessage(

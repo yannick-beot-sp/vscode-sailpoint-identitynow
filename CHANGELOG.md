@@ -6,6 +6,12 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+### Added 
+- Add the command "Ping Cluster" on sources (cf. [#61](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/61))
+
+### Fixed
+- Export of roles was failing due to 1-level Membership Criteria
+
 ## [0.0.25] - 2023-11-22
 
 ### Added 

@@ -116,7 +116,7 @@ export class IdentityNowClient {
 	/////////////////////
 	//#region Sources
 	/////////////////////
-	public async pingSourceConnection(sourceId: string): Promise<StatusResponseBeta> {
+	public async pingCluster(sourceId: string): Promise<StatusResponseBeta> {
 		console.log("> pingClusterConnection")
 		const apiConfig = await this.getApiConfiguration()
 		const api = new SourcesBetaApi(apiConfig)
