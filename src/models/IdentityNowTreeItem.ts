@@ -121,16 +121,18 @@ export class SourcesTreeItem extends FolderTreeItem {
 		const client = new IdentityNowClient(this.tenantId, this.tenantName);
 		const sources = await client.getSources();
 		if (sources !== undefined && sources instanceof Array) {
-			results = sources.map(source => new SourceTreeItem(
-				this.tenantId,
-				this.tenantName,
-				this.tenantDisplayName,
-				source.name,
-				source.id,
-				source.connectorAttributes["cloudExternalId"],
-				source.type,
-				source.connectorAttributes["delimiter"],
-			));
+			results = sources
+				.filter(source => source.name && source.id && source.connectorAttributes?.["cloudExternalId"] && source.type) // filter any source that does not have name or id
+				.map(source => new SourceTreeItem(
+					this.tenantId,
+					this.tenantName,
+					this.tenantDisplayName,
+					source.name,
+					source.id,
+					source.connectorAttributes["cloudExternalId"],
+					source.type,
+					source.connectorAttributes["delimiter"],
+				));
 		}
 		return results;
 	}
