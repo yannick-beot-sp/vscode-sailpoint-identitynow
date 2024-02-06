@@ -31,7 +31,7 @@ class FilterInputStep extends InputPromptStep<WizardContext> {
             name: "filter" + filterType,
             options: {
                 placeHolder: `Filter using ${filterType}`,
-                title: `Enter a filter for ${label}`,
+                prompt: `Enter a filter for ${label}`,
                 learnMoreLink: help
             },
         });
@@ -48,6 +48,8 @@ export abstract class FilterCommand {
         const wizardContext: WizardContext = {};
         wizardContext["filter" + node.filterType] = node.filters;
         const values = await this.runWizard(node.filterType, wizardContext);
+        console.log({ values });
+        if (values === undefined) { return; }
 
         node.filterType = values["filterType"];
         node.filters = values["filter" + node.filterType];
