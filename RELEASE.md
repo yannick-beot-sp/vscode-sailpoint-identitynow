@@ -30,3 +30,9 @@ git push origin --tags
 git tag -d releases/v0.0.3
 git push --delete origin releases/v0.0.3
 ```
+
+== Other
+
+Compare a tag and HEAD:
+
+https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/compare/releases%2Fv0.0.25..HEAD
