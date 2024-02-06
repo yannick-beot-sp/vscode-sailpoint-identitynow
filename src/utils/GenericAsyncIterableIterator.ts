@@ -35,7 +35,7 @@ export class GenericAsyncIterableIterator<TResult, A extends PaginationParams & 
             yield response.data;
             nbResult += response.data.length;
             params.offset += params.limit;
-        } while (params.offset < count || (nbResult >= maxLimit && maxLimit > 0));
+        } while (params.offset < count || (maxLimit > 0 && nbResult <= maxLimit));
 
     }
 }
