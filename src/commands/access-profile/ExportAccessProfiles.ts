@@ -66,9 +66,10 @@ interface AccessProfileDto {
     'enabled'?: boolean;
     /**
      *
-     * @type {OwnerReference}
+     * @type {string}
+     * @memberof Role
      */
-    'owner': OwnerReference | null;
+    'owner': string | null;
     /**
      *
      * @type {AccessProfileSourceRef}
@@ -142,7 +143,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
             "enabled",
             "requestable",
             "source.name",
-            "owner.name",
+            "owner",
             "accessRequestConfig.commentsRequired",
             "accessRequestConfig.denialCommentsRequired",
             "approvalSchemes",
@@ -162,6 +163,8 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
 
         await this.writeData(headers, paths, unwindablePaths, iterator, task, token,
             async (item: AccessProfile): Promise<AccessProfileDto> => {
+                const owner = item.owner ? (await identityCacheIdToName.get(item.owner.id!)) : null
+
                 const itemDto: AccessProfileDto = {
                     name: item.name,
                     // Escape carriage returns in description.
@@ -171,9 +174,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
                     source: {
                         name: item.source.name
                     },
-                    owner: {
-                        name: (await identityCacheIdToName.get(item.owner!.id!))
-                    },
+                    owner: owner,
                     entitlements: item.entitlements?.map(x => x.name).join(CSV_MULTIVALUE_SEPARATOR),
                     accessRequestConfig: {
                         commentsRequired: item.accessRequestConfig?.commentsRequired ?? false,

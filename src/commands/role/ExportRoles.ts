@@ -70,10 +70,10 @@ export interface RoleDto {
     'description'?: string;
     /**
      *
-     * @type {OwnerReference}
+     * @type {string}
      * @memberof Role
      */
-    'owner': OwnerReference | null;
+    'owner': string | null;
     /**
      *
      * @type {Array<AccessProfileRef>}
@@ -167,7 +167,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
             "description",
             "enabled",
             "requestable",
-            "owner.name",
+            "owner",
             "accessRequestConfig.commentsRequired",
             "accessRequestConfig.denialCommentsRequired",
             "approvalSchemes",
@@ -194,15 +194,15 @@ class RoleExporter extends BaseCSVExporter<Role> {
                         item.membership.criteria, sourceIdToNameCacheService);
                 }
 
+                const owner = item.owner ? (await identityCacheIdToName.get(item.owner.id!)) : null
+
                 const itemDto: RoleDto = {
                     name: item.name,
                     // Escape carriage returns in description.
                     description: item.description?.replaceAll('\r', "\\r").replaceAll('\n', "\\n"),
                     enabled: item.enabled,
                     requestable: item.requestable,
-                    owner: {
-                        name: (await identityCacheIdToName.get(item.owner!.id!))
-                    },
+                    owner: owner,
                     accessProfiles: item.accessProfiles?.map(x => x.name).join(CSV_MULTIVALUE_SEPARATOR),
                     accessRequestConfig: {
                         commentsRequired: item.accessRequestConfig?.commentsRequired ?? false,
