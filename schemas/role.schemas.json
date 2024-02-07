@@ -68,6 +68,38 @@
                 }
             }
         },
+        "entitlements": {
+            "anyOf": [
+                {
+                    "type": "array"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Entitlement's ID.",
+                        "example": "ff808081751e6e129f1518161919ecca"
+                    },
+                    "type": {
+                        "type": "string",
+                        "description": "Entitlement's DTO type.",
+                        "enum": [
+                            "ENTITLEMENT"
+                        ],
+                        "example": "ENTITLEMENT"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Entitlement's display name."
+                    }
+                }
+            }
+        },
         "accessProfiles": {
             "anyOf": [
                 {
