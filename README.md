@@ -184,6 +184,10 @@ None
 
 ## Release Notes
 
+## 0.0.27
+
+- Export of roles and access profiles without owner
+- Pagination during export
 
 ## 0.0.26
 

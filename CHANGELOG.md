@@ -6,6 +6,13 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [0.0.27] - 2024-02-07
+
+### Fixed
+
+- Export of roles and access profiles without owner
+- Pagination during export
+
 ## [0.0.26] - 2024-02-06
 
 ### Added 
