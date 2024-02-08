@@ -15,7 +15,7 @@ export class GenericAsyncIterableIterator<TResult, A extends PaginationParams & 
     ) { }
 
     async *[Symbol.asyncIterator](): AsyncIterableIterator<TResult[]> {
-        let params: PaginationParams = this.args ? this.args : { limit: 250, offset: 0 };
+        let params: PaginationParams = this.args ? this.args : { limit: 0, offset: 0 };
 
         const maxLimit = params && params.limit ? params.limit : 0;
         let count = 0,
@@ -35,7 +35,7 @@ export class GenericAsyncIterableIterator<TResult, A extends PaginationParams & 
             yield response.data;
             nbResult += response.data.length;
             params.offset += params.limit;
-        } while (params.offset < count && (maxLimit > 0 && nbResult <= maxLimit));
+        } while (params.offset < count || (maxLimit > 0 && nbResult < maxLimit));
 
     }
 }

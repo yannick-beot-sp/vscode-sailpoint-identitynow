@@ -134,18 +134,20 @@ export class RoleImporter {
             }
 
             let accessProfiles: AccessProfileRef[] = [];
-            try {
-                accessProfiles = await Promise.all(data.accessProfiles?.split(CSV_MULTIVALUE_SEPARATOR).map(async (apName) => ({
-                    name: apName,
-                    "id": (await accessProfileNameToIdCacheService.get(apName)),
-                    "type": "ACCESS_PROFILE"
-                })));
-            } catch (error) {
-                result.error++;
-                const etMessage = `Unable to find access an access profile: ${error}`;
-                await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, etMessage);
-                vscode.window.showErrorMessage(etMessage);
-                return;
+            if (isNotBlank(data.accessProfiles)) {
+                try {
+                    accessProfiles = await Promise.all(data.accessProfiles.split(CSV_MULTIVALUE_SEPARATOR).map(async (apName) => ({
+                        name: apName,
+                        "id": (await accessProfileNameToIdCacheService.get(apName)),
+                        "type": "ACCESS_PROFILE"
+                    })));
+                } catch (error) {
+                    result.error++;
+                    const etMessage = `Unable to find access an access profile: ${error}`;
+                    await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, etMessage);
+                    vscode.window.showErrorMessage(etMessage);
+                    return;
+                }
             }
 
             let approvalSchemes: ApprovalSchemeForRole[],
@@ -183,8 +185,6 @@ export class RoleImporter {
                     return;
                 }
             }
-
-
 
             const rolePayload: Role = {
                 "name": roleName,

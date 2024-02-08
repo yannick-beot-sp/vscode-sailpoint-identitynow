@@ -3,14 +3,14 @@ import { BaseCSVExporter } from "../BaseExporter";
 import { RolesTreeItem } from '../../models/IdentityNowTreeItem';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
-import RolePaginator from './RolePaginator';
-import { OwnerReference, RequestabilityForRole, Revocability, Role, RoleMembershipSelectorType } from 'sailpoint-api-client';
+import { RequestabilityForRole, Revocability, Role, RoleMembershipSelectorType, RolesApiListRolesRequest } from 'sailpoint-api-client';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { accessProfileApprovalSchemeToStringConverter, roleApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
 import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
 import { roleMembershipSelectorToStringConverter } from '../../parser/roleMembershipSelectorToStringConverter';
 import { SourceIdToNameCacheService } from '../../services/cache/SourceIdToNameCacheService';
+import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator';
 
 export class RoleExporterCommand {
     /**
@@ -183,7 +183,10 @@ class RoleExporter extends BaseCSVExporter<Role> {
         const identityCacheIdToName = new IdentityIdToNameCacheService(this.client);
         const sourceIdToNameCacheService = new SourceIdToNameCacheService(this.client);
 
-        const iterator = new RolePaginator(this.client);
+        const iterator = new GenericAsyncIterableIterator<Role, RolesApiListRolesRequest>(
+            this.client,
+            this.client.getRoles);
+
         await this.writeData(headers, paths, unwindablePaths, iterator, task, token,
             async (item: Role): Promise<RoleDto> => {
                 let membershipCriteria: string | undefined = undefined;
