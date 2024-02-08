@@ -187,7 +187,7 @@ None
 ## 0.0.27
 
 - Export of roles and access profiles without owner
-- Pagination during export
+- Fix pagination during export of roles and access
 
 ## 0.0.26
 
