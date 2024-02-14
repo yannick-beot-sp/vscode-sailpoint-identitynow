@@ -184,8 +184,7 @@ None
 
 ## Release Notes
 
-- Clone a source
-
+- Clone a source (cf. [#60](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/60))
 
 ## 0.0.27
 

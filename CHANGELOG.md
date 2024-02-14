@@ -8,7 +8,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
-- Clone a source
+- Clone a source (cf. [#60](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/60))
 
 ## [0.0.27] - 2024-02-08
 
