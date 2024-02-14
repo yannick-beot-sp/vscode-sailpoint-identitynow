@@ -195,6 +195,16 @@
         "icon": "$(eye)"
       },
       {
+        "command": "vscode-sailpoint-identitynow.clone-source",
+        "title": "Clone source",
+        "icon": "$(symbol-enum)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.clone-source.palette",
+        "title": "IdentityNow: Clone source...",
+        "icon": "$(symbol-enum)"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.reset-source",
         "title": "Reset source",
         "group": "reset@2"
@@ -474,6 +484,14 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.ping-source",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.clone-source",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.reset-source",
           "when": "never"
         },
@@ -688,6 +706,11 @@
           "command": "vscode-sailpoint-identitynow.ping-source",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^((?!DelimitedFilesource).)*$/ && viewItem =~ /source$/",
           "group": "test"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.clone-source",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/",
+          "group": "clone"
         },
         {
           "command": "vscode-sailpoint-identitynow.reset-source",

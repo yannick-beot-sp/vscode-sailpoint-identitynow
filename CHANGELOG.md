@@ -6,6 +6,10 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+### Added
+
+- Clone a source
+
 ## [0.0.27] - 2024-02-08
 
 ### Fixed
@@ -15,7 +19,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [0.0.26] - 2024-02-06
 
-### Added 
+### Added
+
 - Add the command "Ping Cluster" on sources by [@henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#61](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/61))
 
 ### Fixed

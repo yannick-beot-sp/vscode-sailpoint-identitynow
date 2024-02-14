@@ -156,12 +156,27 @@ export class IdentityNowClient {
 		return result.data;
 	}
 
-	public async getSourceById(id: string): Promise<any> {
+	public async getSourceById(id: string): Promise<Source> {
 		console.log("> getSourceById", id);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SourcesApi(apiConfig);
 		const result = await api.getSource({ id });
 		return result.data;
+	}
+
+	public async getSourceByName(name: string): Promise<Source> {
+		console.log("> getSourceByName", name);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesApi(apiConfig);
+		const result = await api.listSources({
+			filters: `name eq "${name}"`,
+			limit: 2
+		})
+
+		if (result === undefined || (result instanceof Array && result.length !==1 )) {
+			throw new Error(`Could not find source ${name}`);
+		}
+		return result.data[0];
 	}
 
 	/**

@@ -48,6 +48,7 @@ import { WorkflowTesterWebviewViewProvider } from './views/WorkflowTesterWebview
 import { TestConnectionCommand } from './commands/source/TestConnectionCommand';
 import { PeekSourceCommand } from './commands/source/PeekSourceCommand';
 import { PingClusterCommand } from './commands/source/PingClusterCommand';
+import { CloneSourceCommand } from './commands/source/CloneSourceCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -135,6 +136,14 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.PING_SOURCE_PALETTE,
 			pingClusterCommand.execute, pingClusterCommand));
+
+	const cloneSourceCommand = new CloneSourceCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.CLONE_SOURCE,
+			cloneSourceCommand.execute, cloneSourceCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.CLONE_SOURCE_PALETTE,
+			cloneSourceCommand.execute, cloneSourceCommand));
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM,

@@ -78,7 +78,7 @@ export class SPConfigImporter {
                 // It is a success
                 const message = this.formatImportedObjects(importJobresult);
                 // At this moment it is not possible to have a multi-line notification
-                await vscode.window.showInformationMessage(
+                vscode.window.showInformationMessage(
                     `Successfully imported configuration to ${this.tenantDisplayName}. ${message}`);
             }
         }, (error) => {
