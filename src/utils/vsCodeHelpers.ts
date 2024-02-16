@@ -161,7 +161,10 @@ export async function askFolder(prompt: string, exportFolder: string): Promise<s
 /**
  * Open in preview a file/uri
  */
-export async function openPreview(uri: vscode.Uri, language = "json") {
+export async function openPreview(uri: vscode.Uri|string, language = "json") {
+	if (typeof uri === 'string') {
+		uri = vscode.Uri.file(uri)
+	}
 
 	let document = await vscode.workspace.openTextDocument(uri);
 	document = await vscode.languages.setTextDocumentLanguage(document, language);

@@ -49,6 +49,9 @@ import { TestConnectionCommand } from './commands/source/TestConnectionCommand';
 import { PeekSourceCommand } from './commands/source/PeekSourceCommand';
 import { PingClusterCommand } from './commands/source/PingClusterCommand';
 import { CloneSourceCommand } from './commands/source/CloneSourceCommand';
+import { FormDefinitionExportCommand } from './commands/form/FormDefinitionExportCommand';
+import { FormDefinitionImporter } from './commands/form/FormDefinitionImporter';
+import { FormDefinitionImporterTreeViewCommand } from './commands/form/FormDefinitionImporterTreeViewCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -373,6 +376,26 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.NEW_ACCESS_PROFILE_PALETTE,
 			newAccessProfileCommand.newAccessProfile, newAccessProfileCommand));
 
+
+	//Forms
+	const formDefinitionExportCommand = new FormDefinitionExportCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_FORM_VIEW,
+			formDefinitionExportCommand.execute, formDefinitionExportCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_FORMS_VIEW,
+			formDefinitionExportCommand.execute, formDefinitionExportCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_FORMS_ICON_VIEW,
+			formDefinitionExportCommand.execute, formDefinitionExportCommand));
+
+	const formDefinitionImporterTreeViewCommand = new FormDefinitionImporterTreeViewCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_FORMS_VIEW,
+			formDefinitionImporterTreeViewCommand.execute, formDefinitionImporterTreeViewCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_FORMS_ICON_VIEW,
+			formDefinitionImporterTreeViewCommand.execute, formDefinitionImporterTreeViewCommand));
 }
 
 // this method is called when your extension is deactivated

@@ -223,4 +223,25 @@ export class PathProposer {
             tenantName,
             tenantDisplayName);
     }
+
+    public static getFormsExportFilename(
+        tenantName: string,
+        tenantDisplayName: string
+    ): string {
+        return this.getTenantBasedReportFilename(configuration.FORMS_EXPORT_FILENAME_CONF,
+            tenantName,
+            tenantDisplayName);
+    }
+
+    public static getFormExportFilename(
+        tenantName: string,
+        tenantDisplayName: string,
+        objectName: string
+    ): string {
+        return this.getObjectBasedReportFilename(configuration.FORM_EXPORT_FILENAME_CONF,
+            tenantName,
+            tenantDisplayName,
+            "FORM_DEFINITION",
+            objectName);
+    }
 }

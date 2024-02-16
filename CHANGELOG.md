@@ -1,4 +1,4 @@
-00# Change Log
+# Change Log
 
 All notable changes to the "vscode-sailpoint-identitynow" extension will be documented in this file.
 
@@ -7,7 +7,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 ## [Unreleased]
 
 ### Added
-
+- Add support for Forms
 - Clone a source (cf. [#60](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/60))
 
 ## [0.0.27] - 2024-02-08

@@ -18,7 +18,7 @@ The SailPoint IdentityNow extension makes it easy to:
 - Import/Export Accounts (import for delimited files only), uncorrelated accounts, entitlement details
 - View, edit, create, delete, export, import access profiles
 - View, edit, create, delete, export, import roles
-
+- View, edit, create, delete, export, import forms
 
 ## Installation
 
@@ -184,6 +184,7 @@ None
 
 ## Release Notes
 
+- Add support for Forms
 - Clone a source (cf. [#60](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/60))
 
 ## 0.0.27

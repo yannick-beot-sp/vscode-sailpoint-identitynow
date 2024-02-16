@@ -1,16 +1,15 @@
 import { ExportPayloadBetaIncludeTypesEnum } from 'sailpoint-api-client';
-import { IdentityNowResourceTreeItem, IdentityProfileTreeItem, RuleTreeItem, SourceTreeItem, TransformTreeItem } from '../../models/IdentityNowTreeItem';
+import { FormTreeItem, IdentityNowResourceTreeItem, IdentityProfileTreeItem, RuleTreeItem, SourceTreeItem, TransformTreeItem } from '../../models/IdentityNowTreeItem';
 import { PathProposer } from '../../services/PathProposer';
 import { askFile, openPreview } from '../../utils/vsCodeHelpers';
 import { SPConfigExporter } from './SPConfigExporter';
-import { Uri } from 'vscode';
 
 
 /**
  * Entrypoint to export a Node (Source, Rule, Identity Profile or transform). Tenant is known.
  */
 export class ExportConfigNodeTreeViewCommand {
-    constructor() {}
+    constructor() { }
 
 
     private getObjectType(node: IdentityNowResourceTreeItem): ExportPayloadBetaIncludeTypesEnum {
@@ -23,6 +22,8 @@ export class ExportConfigNodeTreeViewCommand {
                 return ExportPayloadBetaIncludeTypesEnum.IdentityProfile;
             case RuleTreeItem.name:
                 return ExportPayloadBetaIncludeTypesEnum.Rule;
+            case FormTreeItem.name:
+                return ExportPayloadBetaIncludeTypesEnum.FormDefinition;
             default:
                 throw new Error("Invalid node type:" + node.label);
 
@@ -62,11 +63,21 @@ export class ExportConfigNodeTreeViewCommand {
             return;
         }
         const options: any = {};
-        options[objectType] = {
-            "includedIds": [
-                node.id
-            ]
-        };
+        // FIXME
+        // Issue while exporting FORM_DEFINITION: needs to rely on names instead of ids
+        if (ExportPayloadBetaIncludeTypesEnum.FormDefinition === objectType) {
+            options[objectType] = {
+                "includedNames": [
+                    node.label
+                ]
+            };
+        } else {
+            options[objectType] = {
+                "includedIds": [
+                    node.id
+                ]
+            };
+        }
 
         const exporter = new SPConfigExporter(
             node.tenantId as string,
@@ -78,6 +89,6 @@ export class ExportConfigNodeTreeViewCommand {
         );
 
         await exporter.exportConfigWithProgression();
-        await openPreview(Uri.file(target));
+        await openPreview(target);
     }
 }

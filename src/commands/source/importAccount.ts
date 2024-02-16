@@ -40,7 +40,7 @@ class AccountImporter {
         let job = await this.client.startAccountAggregation(
             this.sourceCCId,
             false,
-            source.connectorAttributes.deleteThresholdPercentage,
+            source.connectorAttributes["deleteThresholdPercentage"],
             this.fileUri.fsPath
         );
 

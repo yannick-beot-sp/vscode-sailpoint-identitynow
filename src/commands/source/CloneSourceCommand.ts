@@ -21,7 +21,9 @@ const sourceNameValidator = new Validator({
     regexp: '^[A-Za-z0-9 _:;,={}@()#-|^%$!?.*]+$'
 });
 
-
+/**
+ * Simplified version of SPConfigExporter
+ */
 class SPConfigExporter {
     constructor(
         private client: IdentityNowClient,

@@ -13,3 +13,7 @@ export const SPCONFIG_MULTIPLE_FILES_FILENAME_CONF = "sP-Config.multipleFiles.fi
 
 export const TREEVIEW_PAGINATION = "treeView.pagination";
 
+
+export const FORMS_EXPORT_FILENAME_CONF = "export.forms.filename";
+export const FORM_EXPORT_FILENAME_CONF = "export.form.filename";
+

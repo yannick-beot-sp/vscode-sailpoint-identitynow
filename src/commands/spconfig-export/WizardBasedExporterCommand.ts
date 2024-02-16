@@ -190,7 +190,7 @@ export abstract class WizardBasedExporterCommand {
 
         await exporter.exportConfigWithProgression();
         if (exportSingle) {
-            await openPreview(vscode.Uri.file(target));
+            await openPreview(target);
         }
     }
 }

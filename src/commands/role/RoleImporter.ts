@@ -244,7 +244,7 @@ export class RoleImporter {
         accessProfileNameToIdCacheService.flushAll();
         console.log("Source Cache stats", sourceCacheService.getStats());
         sourceCacheService.flushAll();
-        await openPreview(vscode.Uri.file(this.logFilePath), "csv");
+        await openPreview(this.logFilePath, "csv");
     }
 
     private async writeLog(csvLine: number | string | null, objectName: string, type: CSVLogWriterLogType, message: string) {

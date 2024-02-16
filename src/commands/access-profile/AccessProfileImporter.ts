@@ -240,7 +240,7 @@ export class AccessProfileImporter {
         sourceCacheService.flushAll();
         console.log("Entitlement Cache stats", entitlementCacheService.getStats());
         entitlementCacheService.flushAll();
-        await openPreview(vscode.Uri.file(this.logFilePath), "csv");
+        await openPreview(this.logFilePath, "csv");
     }
 
 

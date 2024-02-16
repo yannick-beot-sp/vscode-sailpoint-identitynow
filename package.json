@@ -411,6 +411,34 @@
       {
         "command": "vscode-sailpoint-identitynow.csv.import.roles.explorer",
         "title": "IdentityNow: Import Roles CSV..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.forms.export.view",
+        "title": "Export all forms..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.form.export.view",
+        "title": "Export form..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.forms.export.icon-view",
+        "title": "Export all forms...",
+        "icon": {
+          "light": "resources/light/export.svg",
+          "dark": "resources/dark/export.svg"
+        }
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.forms.import.view",
+        "title": "Import forms..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.forms.import.icon-view",
+        "title": "Import forms...",
+        "icon": {
+          "light": "resources/light/import.svg",
+          "dark": "resources/dark/import.svg"
+        }
       }
     ],
     "menus": {
@@ -626,6 +654,26 @@
         {
           "command": "vscode-sailpoint-identitynow.csv.import.roles.explorer",
           "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.forms.export.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.form.export.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.forms.export.icon-view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.form.import.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.forms.import.icon-view",
+          "when": "never"
         }
       ],
       "view/title": [
@@ -643,7 +691,7 @@
       "view/item/context": [
         {
           "command": "vscode-sailpoint-identitynow.open-resource",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /transform|Workflow$|source$|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /transform|Workflow$|source$|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition/",
           "group": "_@0"
         },
         {
@@ -653,12 +701,12 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.remove-resource",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /transform|Workflow$|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /transform|Workflow$|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition/",
           "group": "zzzremove@100"
         },
         {
           "command": "vscode-sailpoint-identitynow.refresh-forced",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|transforms|provisioning-policies|roles|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|transforms|provisioning-policies|roles|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions/",
           "group": "inline@50"
         },
         {
@@ -894,6 +942,28 @@
           "command": "vscode-sailpoint-identitynow.csv.import.roles-icon.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^roles/",
           "group": "inline@2"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.forms.export.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == form-definitions"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.forms.export.icon-view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == form-definitions",
+          "group": "inline@3"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.form.export.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == form-definition"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.forms.import.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == form-definitions"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.forms.import.icon-view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == form-definitions",
+          "group": "inline@2"
         }
       ],
       "editor/context": [
@@ -1004,6 +1074,14 @@
         "vscode-sailpoint-identitynow.sP-Config.multipleFiles.filename": {
           "type": "string",
           "default": "%o/%S.json"
+        },
+        "vscode-sailpoint-identitynow.export.forms.filename": {
+          "type": "string",
+          "default": "%x/Forms/Forms-%t-%y%M%d-%h%m%s.json"
+        },
+        "vscode-sailpoint-identitynow.export.form.filename": {
+          "type": "string",
+          "default": "%x/Forms/Forms-%t-%S-%y%M%d-%h%m%s.json"
         },
         "vscode-sailpoint-identitynow.treeView.pagination": {
           "type": "number",

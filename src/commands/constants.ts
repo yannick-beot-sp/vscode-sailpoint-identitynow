@@ -81,3 +81,11 @@ export const IMPORT_ROLE_ICON_VIEW = 'vscode-sailpoint-identitynow.csv.import.ro
 export const IMPORT_ROLE_EXPLORER = 'vscode-sailpoint-identitynow.csv.import.roles.explorer';
 export const ROLE_FILTER_VIEW = 'vscode-sailpoint-identitynow.roles.filter';
 export const ROLE_UPDATE_FILTER_VIEW = 'vscode-sailpoint-identitynow.roles.update-filter';
+
+// FORMS
+export const EXPORT_FORMS_VIEW = 'vscode-sailpoint-identitynow.forms.export.view';
+export const EXPORT_FORMS_ICON_VIEW = 'vscode-sailpoint-identitynow.forms.export.icon-view';
+export const EXPORT_FORM_VIEW = 'vscode-sailpoint-identitynow.form.export.view';
+export const IMPORT_FORMS_VIEW = 'vscode-sailpoint-identitynow.forms.import.view';
+export const IMPORT_FORMS_ICON_VIEW = 'vscode-sailpoint-identitynow.forms.import.icon-view';
+

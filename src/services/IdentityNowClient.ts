@@ -5,7 +5,7 @@ import { withQuery } from "../utils/UriUtils";
 import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, Transform, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, Entitlement, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, ImportSpConfigRequestBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, ConnectorsBetaApi } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, Transform, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, Entitlement, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, ImportSpConfigRequestBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, ConnectorsBetaApi, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -121,7 +121,7 @@ export class IdentityNowClient {
 		const apiConfig = await this.getApiConfiguration()
 		const api = new SourcesBetaApi(apiConfig)
 
-		const response = await api.pingCluster({ sourceId} )
+		const response = await api.pingCluster({ sourceId })
 		return response.data;
 	}
 
@@ -173,7 +173,7 @@ export class IdentityNowClient {
 			limit: 2
 		})
 
-		if (result === undefined || (result instanceof Array && result.length !==1 )) {
+		if (result === undefined || (result instanceof Array && result.length !== 1)) {
 			throw new Error(`Could not find source ${name}`);
 		}
 		return result.data[0];
@@ -1299,6 +1299,77 @@ export class IdentityNowClient {
 
 	//////////////////////////////
 	//#endregion Roles
+	//////////////////////////////
+
+	//////////////////////////////
+	//#region Forms
+	//////////////////////////////
+
+
+	public async *getForms(filters: string | undefined = undefined): AsyncGenerator<FormBeta> {
+		console.log("> getForms");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new CustomFormsBetaApi(apiConfig);
+		let args = {
+			offset: 0,
+			limit: DEFAULT_PAGINATION,
+			filters
+		}
+		let count = -1
+		do {
+			const response = await api.searchFormDefinitionsByTenant(args)
+			count = response.data.count
+			if (response.data.results) {
+				for (const f of response.data.results) {
+					yield f
+				}
+			}
+			args.offset += DEFAULT_PAGINATION
+
+			// if requesting an offset > text": "offset is greater than number of form definitions results"
+			// By using this criteria, we may fall on some edge cases where the total number of forms is a muliple of 250
+			// If using more than 200 Forms, the display would be slow, so it would mean that we would need to paginate like access profiles or roles.
+			// For now, we will stay like this
+		} while (count === DEFAULT_PAGINATION)
+	}
+
+	public async exportForms(filters: string | undefined = undefined): Promise<ExportFormDefinitionsByTenant200ResponseInnerBeta[]> {
+		console.log("> exportForms");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new CustomFormsBetaApi(apiConfig);
+		let args = {
+			offset: 0,
+			limit: DEFAULT_PAGINATION,
+			filters
+		}
+		let count = -1
+		const result: ExportFormDefinitionsByTenant200ResponseInnerBeta[] = []
+		do {
+			const response = await api.exportFormDefinitionsByTenant(args)
+			count = response.data.length
+			if (response.data && response.data.length > 0) {
+				result.push(...response.data)
+			}
+			args.offset += DEFAULT_PAGINATION
+		} while (count === DEFAULT_PAGINATION)
+
+		return result
+	}
+
+	public async importForms(forms: ExportFormDefinitionsByTenant200ResponseInnerBeta[]) {
+		console.log("> importForms");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new CustomFormsBetaApi(apiConfig);
+		const response = await api.importFormDefinitions({
+			body: forms
+		})
+		return response.data
+	}
+
+
+
+	//////////////////////////////
+	//#endregion Forms
 	//////////////////////////////
 }
 

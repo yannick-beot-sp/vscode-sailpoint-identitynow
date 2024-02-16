@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
 import * as path from 'path';
 import { IdentityNowClient, TOTAL_COUNT_HEADER } from "../services/IdentityNowClient";
-import { AccessProfileDocument, RoleDocument } from "sailpoint-api-client";
 import { getIdByUri, getPathByUri, getResourceUri } from "../utils/UriUtils";
 import { compareByName, compareByPriority } from "../utils";
 import { AxiosResponse } from "axios";
@@ -71,6 +70,7 @@ export class TenantTreeItem extends BaseTreeItem {
 		results.push(new IdentityProfilesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new AccessProfilesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new RolesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new FormsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 
 		return new Promise((resolve) => resolve(results));
 	}
@@ -991,4 +991,58 @@ export class MessageNode extends BaseTreeItem {
 	getChildren(): Promise<BaseTreeItem[]> {
 		throw new Error("Method not implemented.");
 	}
+}
+
+/**
+ * Contains the Forms in tree view
+ */
+export class FormsTreeItem extends FolderTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {
+		super("Forms", "form-definitions", tenantId, tenantName, tenantDisplayName);
+	}
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		const client = new IdentityNowClient(this.tenantId, this.tenantName);
+		const forms: FormTreeItem[] = []
+		for await (const form of client.getForms()) {
+			forms.push(new FormTreeItem(
+				this.tenantId,
+				this.tenantName,
+				this.tenantDisplayName,
+				form.name,
+				form.id
+			))
+		}
+
+		return forms;
+	}
+}
+
+export class FormTreeItem extends IdentityNowResourceTreeItem {
+	contextValue = "form-definition";
+
+	constructor(tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string) {
+		super(
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			"form-definitions",
+			id,
+			vscode.TreeItemCollapsibleState.None,
+			undefined,
+			undefined,
+			true
+		);
+	}
+
+	iconPath = new vscode.ThemeIcon("preview");
 }
