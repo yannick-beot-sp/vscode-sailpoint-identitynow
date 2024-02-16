@@ -10,11 +10,11 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Install Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
-        node-version: 16.x
+        node-version: 20.x
     - name: Install the dependencies
       run: npm i
 
@@ -27,7 +27,7 @@ jobs:
     - name: Compile and create vsix
       run: vsce package
     - name: Upload vsix as artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         path: ${{github.workspace}}/vscode-sailpoint-identitynow-*.vsix
 
