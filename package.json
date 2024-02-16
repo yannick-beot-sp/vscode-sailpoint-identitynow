@@ -668,7 +668,7 @@
           "when": "never"
         },
         {
-          "command": "vscode-sailpoint-identitynow.form.import.view",
+          "command": "vscode-sailpoint-identitynow.forms.import.view",
           "when": "never"
         },
         {
@@ -1020,7 +1020,7 @@
         "url": "./schemas/provisioning-policy.schemas.json"
       },
       {
-        "fileMatch": "idn://**/identity-profiles/*/*",
+        "fileMatch": "idn://**/identity-profiles/**/*",
         "url": "./schemas/identity-profile.schemas.json"
       },
       {
@@ -1034,6 +1034,10 @@
       {
         "fileMatch": "idn://**/access-profiles/**/*",
         "url": "./schemas/access-profile.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/form-definitions/**/*",
+        "url": "./schemas/form-definition.schemas.json"
       }
     ],
     "configuration": {

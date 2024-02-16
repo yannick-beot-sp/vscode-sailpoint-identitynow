@@ -19,7 +19,8 @@ import {
 	uint8Array2Str,
 } from "../utils";
 import { getIdByUri, getPathByUri } from "../utils/UriUtils";
-import { compare } from "fast-json-patch";
+import { Operation, compare } from "fast-json-patch";
+import { FormDefinitionResponseBeta } from "sailpoint-api-client";
 
 export class IdentityNowResourceProvider implements FileSystemProvider {
 	private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
@@ -141,15 +142,56 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 				data = JSON.stringify(transform);
 			}
 
-			if (resourcePath.match("identity-profiles") || resourcePath.match("access-profiles") || resourcePath.match("roles")) {
-				// match identity profiles & lifecycle states
+			if (resourcePath.match("form-definitions")) {
+				// UI is pushing all data as a Patch. Doing the same for form definitions
+				const newData = JSON.parse(data) as FormDefinitionResponseBeta
+				const jsonpatch: Operation[] = [
+					{
+						op: 'replace',
+						path : "/formElements",
+						value: newData.formElements ?? []
+					},
+					{
+						op: 'replace',
+						path : "/formConditions",
+						value: newData.formConditions ?? []
+					},
+					{
+						op: 'replace',
+						path : "/formInput",
+						value: newData.formInput ?? []
+					},
+					{
+						op: 'replace',
+						path : "/name",
+						value: newData.name
+					},
+					{
+						op: 'replace',
+						path : "/description",
+						value: newData.description
+					},
+					{
+						op: 'replace',
+						path : "/usedBy",
+						value: newData.usedBy ?? []
+					},
+
+				]
+				await client.patchResource(
+					resourcePath,
+					JSON.stringify(jsonpatch)
+				);
+
+			} else if (resourcePath.match("identity-profiles|access-profiles|roles")) {
+				// special treatment to send patch as PUT is not supported
 				const oldData = await client.getResource(resourcePath);
 				const newData = JSON.parse(data);
 				if (!oldData) {
 					throw vscode.FileSystemError.FileNotFound(uri);
 				}
 				let jsonpatch = compare(oldData, newData);
-				jsonpatch = jsonpatch.filter((p) => p.path !== "/modified");
+				jsonpatch = jsonpatch.filter((p) => p.path !== "/modified" && p.path !== "/identityRefreshRequired");
 				let patchResourcePath;
 				// Patch support for identity profiles only in beta for now
 				if (!resourcePath.match("lifecycle-states")) {
