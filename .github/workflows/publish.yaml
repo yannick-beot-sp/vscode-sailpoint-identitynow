@@ -19,7 +19,7 @@ jobs:
       run: npm i
 
     - name: Install vsce
-      run: npm i -g vsce
+      run: npm i -g @vscode/vsce
     # - run: xvfb-run -a npm test
     #   if: runner.os == 'Linux'
     # - run: npm test
