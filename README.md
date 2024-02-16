@@ -160,6 +160,10 @@ The extension supports the following settings:
   * Default value: `%x/exportedObjects`
 * `vscode-sailpoint-identitynow.sP-Config.multipleFiles.filename`: Define the pattern for the SP-Config filename as multiple files for multiple resources. It will be concatenated to the export folder. These filenames are not confirmed.
   * Default value: `%o/%S.json`
+* `vscode-sailpoint-identitynow.export.forms.filename`: Define the pattern to export all forms of a tenant
+  * Default value: `%x/Forms/Forms-%t-%y%M%d-%h%m%s.json`
+* `vscode-sailpoint-identitynow.export.form.filename`: Define the pattern to export a single form from a tenant
+  * Default value: `%x/Forms/Forms-%t-%S-%y%M%d-%h%m%s.json`
 * `vscode-sailpoint-identitynow.treeView.pagination`: Define the number of roles and access profiles that are displayed in the tree view
   * Default value: 100
 
