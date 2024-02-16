@@ -188,6 +188,8 @@ None
 
 ## Release Notes
 
+## 0.0.28
+
 - Add support for Forms
 - Clone a source (cf. [#60](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/60))
 
