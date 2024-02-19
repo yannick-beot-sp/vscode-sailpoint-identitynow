@@ -83,9 +83,9 @@ function comparisonOperationMapper(op: RoleCriteriaOperation): ComparisonOperati
         case "CONTAINS":
             return "co";
         case "STARTS_WITH":
-            return "ew";
-        case "ENDS_WITH":
             return "sw";
+        case "ENDS_WITH":
+            return "ew";
         default:
             throw new Error("Invalid operation");
     }

@@ -142,21 +142,95 @@ This extension includes the following snippets for schemas:
 
 ### Access Profiles
 
-The following table provides the expected column for the CSV to import Access Profiles
+The following table provides the expected column for the CSV to import Access Profiles:
 
-| Header                       | Mandatory | Description                                                                                                                | Default Value    |
-| ---------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------- | ---------------- |
-| name                         | Yes       | Name of the access profile                                                                                                 |                  |
-| description                  | No        | Description of the access profile                                                                                          | null             |
-| enabled                      | No        | Is the access profile enabled?                                                                                             | false            |
-| requestable                  | No        | Is the access profile requestable?                                                                                         | false            |
-| source                       | Yes       | Source associated with the access profile                                                                                  |                  |
-| owner                        | Yes       | Owner of the access profile                                                                                                |                  |
-| commentsRequired             | No        | Require comments when the user requests access                                                                             | false            |
-| denialCommentsRequired       | No        | Require comments when a reviewer denies the request                                                                        | false            |
-| approvalSchemes              | No        | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`,`MANAGER`, or the name of the governance group separated by ; | [] (No approval) |
-| revokeApprovalSchemes        | No        | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`,`MANAGER`, or the name of the governance group separated by ; | [] (No approval) |
-| entitlements                 | No        | Entitlements of the access profile                                                                                         | []               |
+| Header                   | M[^1] | Description                                                                                                                 | Default Value      |
+| ------------------------ | ----- | --------------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| `name`                   | Yes   | Name of the access profile                                                                                                  |                    |
+| `owner`                  | Yes   | Owner of the access profile                                                                                                 |                    |
+| `source`                 | Yes   | Source associated with the access profile                                                                                   |                    |
+| `description`            | No    | Description of the access profile                                                                                           | `null`             |
+| `enabled`                | No    | Is the access profile enabled?                                                                                              | `false`            |
+| `requestable`            | No    | Is the access profile requestable?                                                                                          | `false`            |
+| `commentsRequired`       | No    | Require comments when the user requests access                                                                              | `false`            |
+| `denialCommentsRequired` | No    | Require comments when a reviewer denies the request                                                                         | `false`            |
+| `approvalSchemes`        | No    | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
+| `revokeApprovalSchemes`  | No    | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
+| `entitlements`           | No    | Entitlements of the access profile                                                                                          | `[]`               |
+
+[^1]: Mandatory
+
+### Roles
+
+The following table provides the expected column for the CSV to import Roles:
+
+| Header                         | M[^1] | Description                                                                                    | Default Value      |
+| ------------------------------ | ----- | ---------------------------------------------------------------------------------------------- | ------------------ |
+| `name`                         | Yes   | Name of the role                                                                               |                    |
+| `owner`                        | Yes   | Owner of the role                                                                              |                    |
+| `description`                  | No    | Description of the role                                                                        | `null`             |
+| `enabled`                      | No    | Is the role enabled?                                                                           | `false`            |
+| `requestable`                  | No    | Is the role requestable?                                                                       | `false`            |
+| `commentsRequired`             | No    | Require comments when the user requests access                                                 | `false`            |
+| `denialCommentsRequired`       | No    | Require comments when a reviewer denies the request                                            | `false`            |
+| `approvalSchemes`              | No    | List of reviewers among `OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
+| `revokeCommentsRequired`       | No    | Require comments when the user requests revocation                                             | `false`            |
+| `revokeDenialCommentsRequired` | No    | Require comments when a reviewer denies the revocation request                                 | `false`            |
+| `revokeApprovalSchemes`        | No    | List of reviewers among `OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
+| `accessProfiles`               | No    | List of access profiles                                                                        | `[]`               |
+| `membershipCriteria`           | No    | Membership criteria for automatic assignment                                                   |                    |
+
+[^1]: Mandatory
+
+#### Membership criteria
+
+`membershipCriteria` follows _kind of_ SCIM filters
+
+##### Attributes
+
+There are 3 kind of attributes:
+
+- **Identity Attribute**: the format is `identity.{attribute name}`. Ex: `identity.cloudLifecycleState`, `identity.type`, etc.
+- **Account Attribute**: the format is `{source name}.attribute.{attribute name}`. If the source name constains space, the source name must be put between quotes or double-quotes
+- **Entitlements**: the format is `{source name}.entitlement.{attribute name}`. If the source name constains space, the source name must be put between quotes or double-quotes
+
+##### Attribute operators
+
+| Operator | Description |
+| -------- | ----------- |
+| eq       | equals      |
+| ne       | not equals  |
+| co       | contains    |
+| sw       | starts with |
+| ew       | ends with   |
+
+##### Logical operators
+
+
+| Operator | Description |
+| -------- | ----------- |
+| and       | Logical "and"      |
+| or       | Logical "or"  |
+
+
+##### Values
+
+Values must be within `"` or `'`.
+
+##### Grouping
+
+Expressions can be grouped by using parenthesis.
+Parenthesis are mandatory for 3-level expression but are optional otherwise.
+
+##### Examples
+
+Here are a few examples extracted from the unit tests:
+
+```
+identity.department eq 'Customer Service' and identity.cloudLifecycleState eq 'active'
+'Active Directory'.entitlement.memberOf eq 'CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com' and 'Active Directory'.attribute.departmentNumber eq '1234'
+(identity.department eq 'Customer Service' and identity.cloudLifecycleState eq 'active') or (identity.cloudLifecycleState eq 'active' and identity.jobTitle co 'Accounts Payable Analyst')
+```
 
 ## Extension Settings
 
