@@ -99,11 +99,6 @@ interface AccessProfileDto {
      * @type {Requestability}
      */
     'accessRequestConfig'?: Requestability;
-    /**
-     *
-     * @type {Revocability}
-     */
-    'revocationRequestConfig'?: Revocability;
 }
 class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
     constructor(
@@ -132,8 +127,6 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
             "commentsRequired",
             "denialCommentsRequired",
             "approvalSchemes",
-            "revokeCommentsRequired",
-            "revokeDenialCommentsRequired",
             "revokeApprovalSchemes",
             "entitlements"
         ];
@@ -147,8 +140,6 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
             "accessRequestConfig.commentsRequired",
             "accessRequestConfig.denialCommentsRequired",
             "approvalSchemes",
-            "revocationRequestConfig.commentsRequired",
-            "revocationRequestConfig.denialCommentsRequired",
             "revokeApprovalSchemes",
             "entitlements"
         ];
@@ -179,10 +170,6 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
                     accessRequestConfig: {
                         commentsRequired: item.accessRequestConfig?.commentsRequired ?? false,
                         denialCommentsRequired: item.accessRequestConfig?.denialCommentsRequired ?? false,
-                    },
-                    revocationRequestConfig: {
-                        commentsRequired: item.revocationRequestConfig?.commentsRequired ?? false,
-                        denialCommentsRequired: item.revocationRequestConfig?.denialCommentsRequired ?? false
                     },
                     approvalSchemes: await accessProfileApprovalSchemeToStringConverter(
                         item.accessRequestConfig?.approvalSchemes,

@@ -11,7 +11,8 @@ import { IdentityNameToIdCacheService } from '../../services/cache/IdentityNameT
 import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService';
 import { stringToAccessProfileApprovalSchemeConverter } from '../../utils/approvalSchemeConverter';
 import { openPreview } from '../../utils/vsCodeHelpers';
-import { isEmpty } from "../../utils/stringUtils";
+import { isEmpty, isNotBlank } from "../../utils/stringUtils";
+import { truethy } from "../../utils/booleanUtils";
 
 
 interface AccessProfileImportResult {
@@ -29,8 +30,6 @@ interface AccessProfileCSVRecord {
     entitlements: string
     commentsRequired: boolean
     denialCommentsRequired: boolean
-    revokeCommentsRequired: boolean
-    revokeDenialCommentsRequired: boolean
     revokeApprovalSchemes: string
     approvalSchemes: string
 }
@@ -150,19 +149,21 @@ export class AccessProfileImporter {
                 return;
             }
 
-            let entitlements: EntitlementBeta[];
-            try {
-                entitlements = await Promise.all(data.entitlements?.split(CSV_MULTIVALUE_SEPARATOR).map(async (entitlementName) => ({
-                    name: entitlementName,
-                    "id": (await entitlementCacheService.get([sourceId, entitlementName].join(KEY_SEPARATOR))),
-                    "type": "ENTITLEMENT"
-                })));
-            } catch (error) {
-                result.error++;
-                const srcMessage = `Unable to find entitlement: ${error}`;
-                await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, srcMessage);
-                vscode.window.showErrorMessage(srcMessage);
-                return;
+            let entitlements: EntitlementBeta[] = [];
+            if (isNotBlank(data.entitlements)) {
+                try {
+                    entitlements = await Promise.all(data.entitlements?.split(CSV_MULTIVALUE_SEPARATOR).map(async (entitlementName) => ({
+                        name: entitlementName,
+                        "id": (await entitlementCacheService.get([sourceId, entitlementName].join(KEY_SEPARATOR))),
+                        "type": "ENTITLEMENT"
+                    })));
+                } catch (error) {
+                    result.error++;
+                    const srcMessage = `Unable to find entitlement: ${error}`;
+                    await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, srcMessage);
+                    vscode.window.showErrorMessage(srcMessage);
+                    return;
+                }
             }
 
             let approvalSchemes, revokeApprovalSchemes;
@@ -195,13 +196,11 @@ export class AccessProfileImporter {
                     "name": data.source
                 },
                 "accessRequestConfig": {
-                    "commentsRequired": data.commentsRequired ?? false,
-                    "denialCommentsRequired": data.denialCommentsRequired ?? false,
+                    "commentsRequired": truethy(data.commentsRequired),
+                    "denialCommentsRequired": truethy(data.denialCommentsRequired),
                     "approvalSchemes": approvalSchemes
                 },
                 "revocationRequestConfig": {
-                    "commentsRequired": data.revokeCommentsRequired ?? false,
-                    "denialCommentsRequired": data.revokeDenialCommentsRequired ?? false,
                     "approvalSchemes": revokeApprovalSchemes
                 },
                 "entitlements": entitlements

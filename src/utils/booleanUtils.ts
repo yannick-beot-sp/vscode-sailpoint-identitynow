@@ -1,4 +1,4 @@
-export function truethy(input:string|undefined|boolean):boolean {
+export function truethy(input: string | undefined | boolean): boolean {
     if (input === undefined) {
         return false;
     }
@@ -6,13 +6,13 @@ export function truethy(input:string|undefined|boolean):boolean {
         return input;
     }
     input = input.trim().toLowerCase();
-    switch(input){
+    switch (input) {
         case "true":
         case "1":
         case "on":
         case "yes":
             return true;
-        default: 
+        default:
             return false;
     }
 }

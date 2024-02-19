@@ -1,6 +1,6 @@
 # SailPoint IdentityNow for Visual Studio Code
 
-> This extension is not developed, maintained or supported by SailPoint. 
+> This extension is not developed, maintained or supported by SailPoint.
 > It is a community effort to help manage IdentityNow from Visual Studio Code.
 
 The SailPoint IdentityNow extension makes it easy to:
@@ -39,7 +39,7 @@ You can add a tenant by using a Personal Access Token (PAT) or by using a short-
 ![Add tenant](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/add-tenant.gif)
 
 It is also possible to add a tenant by using the following URIs:
-`vscode://yannick-beot-sp.vscode-sailpoint-identitynow/addtenant?tenantName=company&accessToken=eyJh...&authenticationMethod=AccessToken` or 
+`vscode://yannick-beot-sp.vscode-sailpoint-identitynow/addtenant?tenantName=company&accessToken=eyJh...&authenticationMethod=AccessToken` or
 `vscode://yannick-beot-sp.vscode-sailpoint-identitynow/addtenant?tenantName=company&clientId=806c451e057b442ba67b5d459716e97a&clientSecret=***&authenticationMethod=PersonalAccessToken`.
 
 ## Import and export the config of a tenant
@@ -138,49 +138,70 @@ This extension includes the following snippets for schemas:
 | `New provisioning policy` | Create a new provisioning policy |
 | `New field`               | Create a new field               |
 
+## Import format
+
+### Access Profiles
+
+The following table provides the expected column for the CSV to import Access Profiles
+
+| Header                       | Mandatory | Description                                                                                                                | Default Value    |
+| ---------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| name                         | Yes       | Name of the access profile                                                                                                 |                  |
+| description                  | No        | Description of the access profile                                                                                          | null             |
+| enabled                      | No        | Is the access profile enabled?                                                                                             | false            |
+| requestable                  | No        | Is the access profile requestable?                                                                                         | false            |
+| source                       | Yes       | Source associated with the access profile                                                                                  |                  |
+| owner                        | Yes       | Owner of the access profile                                                                                                |                  |
+| commentsRequired             | No        | Require comments when the user requests access                                                                             | false            |
+| denialCommentsRequired       | No        | Require comments when a reviewer denies the request                                                                        | false            |
+| approvalSchemes              | No        | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`,`MANAGER`, or the name of the governance group separated by ; | [] (No approval) |
+| revokeApprovalSchemes        | No        | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`,`MANAGER`, or the name of the governance group separated by ; | [] (No approval) |
+| entitlements                 | No        | Entitlements of the access profile                                                                                         | []               |
+
 ## Extension Settings
 
 The extension supports the following settings:
 
-* `vscode-sailpoint-identitynow.report.accessProfiles.filename`: Define the pattern for the folder to export access profiles.
-  * Default value: `%x/reports/%T-AccessProfiles-%y%M%d-%h%m%s.csv`
-* `vscode-sailpoint-identitynow.report.accounts.filename`: Define the pattern for the folder to export accounts.
-  * Default value: `%x/reports/%T-%S-Accounts-%y%M%d-%h%m%s.csv`
-* `vscode-sailpoint-identitynow.report.uncorrelatedAccounts.filename`: Define the pattern for the folder to export uncorrelated accounts.
-  * Default value: `%x/reports/%T-%S-Uncorrelated-Accounts-%y%M%d-%h%m%s.csv`
-* `vscode-sailpoint-identitynow.report.entitlements.filename`: Define the pattern for the folder to export entitlement details.
-  * Default value: `%x/reports/%T-%S-Entitlements-%y%M%d-%h%m%s.csv`
-* `vscode-sailpoint-identitynow.report.roles.filename`: Define the pattern for the folder to export roles.
-  * Default value: `%x/reports/%T-Roles-%y%M%d-%h%m%s.csv`
-* `vscode-sailpoint-identitynow.sP-Config.singleResource.filename`: Define the pattern for the SP-Config file of a single resource (Source, Identity Profile, Connector Rule, or Transform).
-  * Default value: `%x/exportedObjects/identitynowconfig-%t-%S-%y%M%d-%h%m%s.json`
-* `vscode-sailpoint-identitynow.sP-Config.singleFile.filename`: Define the pattern for the SP-Config file as a single file for multiple resources
-  * Default value: `%x/exportedObjects/identitynowconfig-%t-%y%M%d-%h%m%s.json`
-* `vscode-sailpoint-identitynow.sP-Config.multipleFiles.folder`: Define the pattern for the SP-Config folder as multiple files for multiple resources. This folder is proposed.
-  * Default value: `%x/exportedObjects`
-* `vscode-sailpoint-identitynow.sP-Config.multipleFiles.filename`: Define the pattern for the SP-Config filename as multiple files for multiple resources. It will be concatenated to the export folder. These filenames are not confirmed.
-  * Default value: `%o/%S.json`
-* `vscode-sailpoint-identitynow.export.forms.filename`: Define the pattern to export all forms of a tenant
-  * Default value: `%x/Forms/Forms-%t-%y%M%d-%h%m%s.json`
-* `vscode-sailpoint-identitynow.export.form.filename`: Define the pattern to export a single form from a tenant
-  * Default value: `%x/Forms/Forms-%t-%S-%y%M%d-%h%m%s.json`
-* `vscode-sailpoint-identitynow.treeView.pagination`: Define the number of roles and access profiles that are displayed in the tree view
-  * Default value: 100
+- `vscode-sailpoint-identitynow.report.accessProfiles.filename`: Define the pattern for the folder to export access profiles.
+  - Default value: `%x/reports/%T-AccessProfiles-%y%M%d-%h%m%s.csv`
+- `vscode-sailpoint-identitynow.report.accounts.filename`: Define the pattern for the folder to export accounts.
+  - Default value: `%x/reports/%T-%S-Accounts-%y%M%d-%h%m%s.csv`
+- `vscode-sailpoint-identitynow.report.uncorrelatedAccounts.filename`: Define the pattern for the folder to export uncorrelated accounts.
+  - Default value: `%x/reports/%T-%S-Uncorrelated-Accounts-%y%M%d-%h%m%s.csv`
+- `vscode-sailpoint-identitynow.report.entitlements.filename`: Define the pattern for the folder to export entitlement details.
+  - Default value: `%x/reports/%T-%S-Entitlements-%y%M%d-%h%m%s.csv`
+- `vscode-sailpoint-identitynow.report.roles.filename`: Define the pattern for the folder to export roles.
+  - Default value: `%x/reports/%T-Roles-%y%M%d-%h%m%s.csv`
+- `vscode-sailpoint-identitynow.sP-Config.singleResource.filename`: Define the pattern for the SP-Config file of a single resource (Source, Identity Profile, Connector Rule, or Transform).
+  - Default value: `%x/exportedObjects/identitynowconfig-%t-%S-%y%M%d-%h%m%s.json`
+- `vscode-sailpoint-identitynow.sP-Config.singleFile.filename`: Define the pattern for the SP-Config file as a single file for multiple resources
+  - Default value: `%x/exportedObjects/identitynowconfig-%t-%y%M%d-%h%m%s.json`
+- `vscode-sailpoint-identitynow.sP-Config.multipleFiles.folder`: Define the pattern for the SP-Config folder as multiple files for multiple resources. This folder is proposed.
+  - Default value: `%x/exportedObjects`
+- `vscode-sailpoint-identitynow.sP-Config.multipleFiles.filename`: Define the pattern for the SP-Config filename as multiple files for multiple resources. It will be concatenated to the export folder. These filenames are not confirmed.
+  - Default value: `%o/%S.json`
+- `vscode-sailpoint-identitynow.export.forms.filename`: Define the pattern to export all forms of a tenant
+  - Default value: `%x/Forms/Forms-%t-%y%M%d-%h%m%s.json`
+- `vscode-sailpoint-identitynow.export.form.filename`: Define the pattern to export a single form from a tenant
+  - Default value: `%x/Forms/Forms-%t-%S-%y%M%d-%h%m%s.json`
+- `vscode-sailpoint-identitynow.treeView.pagination`: Define the number of roles and access profiles that are displayed in the tree view
+  - Default value: 100
 
 The pattern defined above use the following tokens:
-    * `%u`: User Home Dir
-    * `%w`: Workspace folder
-    * `%x`: Either workspace folder if defined, or home dir
-    * `%d`: Day
-    * `%M`: Month
-    * `%y`: Year
-    * `%h`: Hour
-    * `%m`: Minute
-    * `%s`: Second
-    * `%t`: Tenant name
-    * `%T`: Tenant display name
-    * `%o`: Object type
-    * `%S`: Source name for source-based report or object name
+
+- `%u`: User Home Dir
+- `%w`: Workspace folder
+- `%x`: Either workspace folder if defined, or home dir
+- `%d`: Day
+- `%M`: Month
+- `%y`: Year
+- `%h`: Hour
+- `%m`: Minute
+- `%s`: Second
+- `%t`: Tenant name
+- `%T`: Tenant display name
+- `%o`: Object type
+- `%S`: Source name for source-based report or object name
 
 ## Known Issues
 
@@ -221,7 +242,7 @@ None
 ### 0.0.23
 
 - Issue when importing SP-Config: when selecting items, the list of object Ids was not properly sent
-- Issue when refreshing identities of an identity profile  (cf. [#53](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/53))
+- Issue when refreshing identities of an identity profile (cf. [#53](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/53))
 
 ### 0.0.22
 
@@ -308,7 +329,7 @@ Almost Christmas!
 
 Transforms for ever!
 
-- New transforms (E.164 Phone, Random Alphanumeric Random Numeric,  Replace All, Rule, UUID Generator), cf. [#8](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/8)
+- New transforms (E.164 Phone, Random Alphanumeric Random Numeric, Replace All, Rule, UUID Generator), cf. [#8](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/8)
 - [#6](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/6) update regexp for transform names
 
 ### 0.0.7
@@ -316,6 +337,7 @@ Transforms for ever!
 Transforms are the best!
 
 Added:
+
 - Add step to creation of transform to have a non-empty file
 - If only 1 tenant, automatically selected in the workflow tester
 - Added refresh buttons in the view
@@ -324,12 +346,14 @@ Added:
 ### 0.0.6
 
 Fixed:
+
 - Regexp for provisioning policy
 - Issue #3 with new transform
 
 ### 0.0.5
 
 Fixed:
+
 - Regexp for tenant, with or without domain
 - Remove PAT when removing tenant
 
@@ -337,7 +361,7 @@ Fixed:
 
 Fix regexp for PAT secret
 
-### 0.0.3 
+### 0.0.3
 
 Workflows for ever!
 

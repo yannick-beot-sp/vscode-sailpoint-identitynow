@@ -209,32 +209,6 @@
             ],
             "description": "Revocation request configuration for this object.",
             "properties": {
-                "commentsRequired": {
-                    "anyOf": [
-                        {
-                            "type": "boolean"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "description": "Whether the requester of the containing object must provide comments justifying the request",
-                    "example": false,
-                    "default": false
-                },
-                "denialCommentsRequired": {
-                    "anyOf": [
-                        {
-                            "type": "boolean"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "description": "Whether an approver must provide comments when denying the request",
-                    "example": false,
-                    "default": false
-                },
                 "approvalSchemes": {
                     "type": "array",
                     "description": "List describing the steps in approving the revocation request",
