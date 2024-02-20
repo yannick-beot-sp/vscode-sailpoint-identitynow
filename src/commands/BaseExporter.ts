@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { CSVWriter } from '../services/CSVWriter';
 import { ensureFolderExists } from '../utils/fileutils';
+import { openPreview } from '../utils/vsCodeHelpers';
 
 /**
  * Base class for all importer
@@ -38,8 +39,7 @@ export abstract class BaseCSVExporter<T> {
                 vscode.window.showInformationMessage(
                     `Successfully exported ${this.objectType} from ${this.tenantName}`
                 );
-                const document = await vscode.workspace.openTextDocument(vscode.Uri.file(this.filePath));
-                vscode.window.showTextDocument(document);
+                openPreview(this.filePath, "csv")
             });
     }
 
