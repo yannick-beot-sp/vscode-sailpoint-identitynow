@@ -3,7 +3,7 @@ import { RuleTreeItem } from '../models/IdentityNowTreeItem';
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { toDateSuffix } from '../utils';
 import * as fs from 'fs';
-import { confirmFileOverwrite } from '../utils/vsCodeHelpers';
+import { confirmFileOverwrite, openPreview } from '../utils/vsCodeHelpers';
 import { getIdByUri, getNameByUri } from '../utils/UriUtils';
 import { TenantService } from '../services/TenantService';
 import { ensureFolderExists } from '../utils/fileutils';
@@ -103,8 +103,7 @@ export class ExportScriptFromRuleCommand {
             }
 
             fs.writeFileSync(exportFile as string, rule.sourceCode?.script ?? '', { encoding: "utf8" });
-            let document = await vscode.workspace.openTextDocument(vscode.Uri.file(exportFile as string));
-            await vscode.window.showTextDocument(document, { preview: true });
+            openPreview(exportFile, 'java')
             vscode.window.showInformationMessage(`Successfully exported script from rule ${ruleName}`);
         });
     }

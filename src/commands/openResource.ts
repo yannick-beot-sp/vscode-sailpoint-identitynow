@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { IdentityNowResourceTreeItem } from "../models/IdentityNowTreeItem";
+import { openPreview } from '../utils/vsCodeHelpers';
 
 /**
  * Command used to open a source or a transform
@@ -20,14 +21,7 @@ export class OpenResourceCommand {
             title: 'Opening File(s)...',
             cancellable: false
         }, async (task, token) => {
-
-            let document = await vscode.workspace.openTextDocument(node.uri);
-            document = await vscode.languages.setTextDocumentLanguage(document, 'json');
-
-            if (token.isCancellationRequested) {
-                return;
-            }
-            await vscode.window.showTextDocument(document, { preview: true });
+            await openPreview(node.uri)
         });
     }
 }

@@ -3,6 +3,7 @@ import { URL_PREFIX } from '../constants';
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { TenantService } from '../services/TenantService';
 import { getIdByUri, getResourceUri } from '../utils/UriUtils';
+import { openPreview } from '../utils/vsCodeHelpers';
 
 enum FileHandlerObjectType {
     transform = "transforms",
@@ -93,9 +94,7 @@ export class FileHandler {
             const newUri = getResourceUri(tenantName, resourceType, data.id, data.name, isBeta);
 
             // Open document and then show document to force JSON
-            let document = await vscode.workspace.openTextDocument(newUri);
-            document = await vscode.languages.setTextDocumentLanguage(document, 'json');
-            await vscode.window.showTextDocument(document, { preview: false, preserveFocus: true });
+           openPreview(newUri, 'json', false)
         }
     }
 }

@@ -4,6 +4,7 @@ import { IdentityNowClient } from '../services/IdentityNowClient';
 import { TenantService } from '../services/TenantService';
 import { delay } from '../utils';
 import { getWorkflowExecutionDetailUri } from '../utils/UriUtils';
+import { openPreview } from '../utils/vsCodeHelpers';
 
 
 export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProvider {
@@ -111,9 +112,7 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
                             const uri = getWorkflowExecutionDetailUri(data.tenant, workflowExecutionId);
                             console.log('testWorkflow: uri:', uri);
 
-                            let document = await vscode.workspace.openTextDocument(uri);
-                            document = await vscode.languages.setTextDocumentLanguage(document, 'json');
-                            await vscode.window.showTextDocument(document, { preview: true });
+                            openPreview(uri)
                             console.log("< testWorkflow");
 
                         });

@@ -158,25 +158,30 @@ export async function askFolder(prompt: string, exportFolder: string): Promise<s
 }
 
 /**
+ * Max allowed size to be opened by an extension
  * https://github.com/microsoft/vscode/blob/2110f107dbe361913294b1e1d43f9118144fc54f/src/vs/editor/common/model/textModel.ts#L177
  */
 const _MODEL_SYNC_LIMIT = 50 * 1024 * 1024; // 50 MB,  // used in tests
 /**
  * Open in preview a file/uri
  */
-export async function openPreview(uri: vscode.Uri | string, language = "json") {
+export async function openPreview(uri: vscode.Uri | string, language = "json", preview = true) {
 	if (typeof uri === 'string') {
 		uri = vscode.Uri.file(uri)
 	}
+	let fileSize = -1
 
-	const stats = fs.statSync(uri.fsPath)
+	if (isEmpty(uri.authority)) {
+		const stats = fs.statSync(uri.fsPath)
+		fileSize = stats.size
+	}
 
-	if (stats.size >= _MODEL_SYNC_LIMIT) {
+	if (fileSize >= _MODEL_SYNC_LIMIT) {
 		vscode.window.showWarningMessage(`Could not open ${uri.fsPath} because its size exceed 50MB.`)
 	} else {
 		let document = await vscode.workspace.openTextDocument(uri);
 		document = await vscode.languages.setTextDocumentLanguage(document, language);
-		vscode.window.showTextDocument(document, { preview: true, preserveFocus: true });
+		vscode.window.showTextDocument(document, { preview: preview, preserveFocus: true });
 	}
 }
 

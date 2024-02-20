@@ -195,13 +195,22 @@ export class IdentityNowClient {
 	}
 
 	public async getSchemas(sourceId: string): Promise<Schema[]> {
-		console.log("> getSourceId", sourceId);
+		console.log("> getSchemas", sourceId);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SourcesApi(apiConfig);
 		const response = await api.listSourceSchemas({ sourceId });
 
 		return response.data;
 	}
+
+	public async createSchema(sourceId: string, schema: Schema): Promise<Schema> {
+		console.log("> createSchema", sourceId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesApi(apiConfig);
+		const response = await api.createSourceSchema({ sourceId, schema });
+		return response.data;
+	}
+
 
 	public async startEntitlementAggregation(
 		sourceID: number,

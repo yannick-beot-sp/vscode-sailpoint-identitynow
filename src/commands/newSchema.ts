@@ -1,11 +1,11 @@
 import path = require('path');
 import * as vscode from 'vscode';
-import { NEW_ID } from '../constants';
 import { SchemasTreeItem } from "../models/IdentityNowTreeItem";
 import { isEmpty } from '../utils/stringUtils';
-import { getPathByUri } from '../utils/UriUtils';
-
-
+import { getIdByUri, getPathByUri } from '../utils/UriUtils';
+import { openPreview } from '../utils/vsCodeHelpers';
+import { IdentityNowClient } from '../services/IdentityNowClient';
+import * as commands from './constants';
 
 async function askSchemaName(): Promise<string | undefined> {
     const result = await vscode.window.showInputBox({
@@ -32,16 +32,6 @@ export async function newSchema(treeItem: SchemasTreeItem): Promise<void> {
 
     console.log("> newSchema", treeItem);
 
-    // assessing that item is a TenantTreeItem
-    if (treeItem === undefined || !(treeItem instanceof SchemasTreeItem)) {
-        console.log("WARNING: newSchema: invalid node", treeItem);
-        throw new Error("newSchema: invalid node");
-    }
-    const tenantName = treeItem.tenantName || "";
-    if (isEmpty(tenantName)) {
-        return;
-    }
-
     let schemaName = await askSchemaName() || "";
     if (isEmpty(schemaName)) {
         return;
@@ -51,27 +41,35 @@ export async function newSchema(treeItem: SchemasTreeItem): Promise<void> {
         title: 'Creating File...',
         cancellable: false
     }, async (task, token) => {
+        const data = {
+            "name": schemaName,
+            "nativeObjectType": "",
+            "identityAttribute": "",
+            "displayAttribute": "",
+            "hierarchyAttribute": null,
+            "includePermissions": false,
+            "features": [],
+            "configuration": {},
+            "attributes": []
+        }
 
-        const newUri = treeItem.parentUri?.with({
+        const client = new IdentityNowClient(treeItem.tenantId, treeItem.tenantName);
+        const schema = await client.createSchema(
+            getIdByUri(treeItem.parentUri), 
+            data)
+
+        const newUri = treeItem.parentUri!.with({
             path: path.posix.join(
                 getPathByUri(treeItem.parentUri) || "",
                 'schemas',
-                NEW_ID,
+                schema.id!,
                 schemaName
             )
         });
+
         console.log('newSchema: newUri =', newUri);
-        if (!newUri) { return; }
-        let document = await vscode.workspace.openTextDocument(newUri);
-        // const untitled = vscode.Uri.parse(newUri).with({ scheme: 'untitled' });
-        // let document = await vscode.workspace.openTextDocument(untitled);
-        document = await vscode.languages.setTextDocumentLanguage(document, 'json');
-
-        if (token.isCancellationRequested) {
-            return;
-        }
-        await vscode.window.showTextDocument(document, { preview: true });
-
+        openPreview(newUri)
+        vscode.commands.executeCommand(commands.REFRESH_FORCED);
     });
 }
 

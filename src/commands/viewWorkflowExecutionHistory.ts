@@ -3,6 +3,7 @@ import { WorkflowTreeItem } from '../models/IdentityNowTreeItem';
 import { IdentityNowClient } from '../services/IdentityNowClient';
 import { getWorkflowExecutionDetailUri } from '../utils/UriUtils';
 import { WorkflowExecutionBeta } from 'sailpoint-api-client';
+import { openPreview } from '../utils/vsCodeHelpers';
 
 export async function viewWorkflowExecutionHistory(node: WorkflowTreeItem): Promise<void> {
 
@@ -56,9 +57,8 @@ export async function viewWorkflowExecutionHistory(node: WorkflowTreeItem): Prom
 
     const uri = getWorkflowExecutionDetailUri(node.tenantName, item?.label as string);
     console.log('viewWorkflowExecutionHistory: uri:', uri);
+    
+    openPreview(uri)
 
-    let document = await vscode.workspace.openTextDocument(uri);
-    document = await vscode.languages.setTextDocumentLanguage(document, 'json');
-    await vscode.window.showTextDocument(document, { preview: true });
     console.log("< viewWorkflowExecutionHistory");
 }

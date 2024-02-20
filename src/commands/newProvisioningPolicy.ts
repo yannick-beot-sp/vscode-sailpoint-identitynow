@@ -8,6 +8,7 @@ import { getPathByUri } from '../utils/UriUtils';
 import { UsageTypeBeta } from 'sailpoint-api-client';
 import { convertPascalCase2SpaceBased } from '../utils/stringUtils';
 import { ProvisioningPolicyTypeQuickPickItem } from '../models/ProvisioningPolicyTypeQuickPickItem';
+import { openPreview } from '../utils/vsCodeHelpers';
 
 
 
@@ -66,21 +67,10 @@ export async function newProvisioningPolicy(treeItem: ProvisioningPoliciesTreeIt
 
     console.log("> newProvisioningPolicy", treeItem);
 
-    // assessing that item is a TenantTreeItem
-    if (treeItem === undefined || !(treeItem instanceof ProvisioningPoliciesTreeItem)) {
-        console.log("WARNING: newProvisioningPolicy: invalid node", treeItem);
-        throw new Error("newProvisioningPolicy: invalid node");
-    }
-    const tenantName = treeItem.tenantName || "";
-    if (isEmpty(tenantName)) {
-        return;
-    }
-
     const usageType = await askProvisioningPolicyType();
     if (usageType === undefined) {
         return;
     }
-
 
     const provisioningPolicyName = await askProvisioningPolicyName() || "";
     if (isEmpty(provisioningPolicyName)) {
@@ -121,13 +111,7 @@ export async function newProvisioningPolicy(treeItem: ProvisioningPoliciesTreeIt
             )
         });
         if (!newUri) { return; }
-        let document = await vscode.workspace.openTextDocument(newUri);
-        document = await vscode.languages.setTextDocumentLanguage(document, 'json');
 
-        if (token.isCancellationRequested) {
-            return;
-        }
-        await vscode.window.showTextDocument(document, { preview: true });
-
+        openPreview(newUri)
     });
 }
