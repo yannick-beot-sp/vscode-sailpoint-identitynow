@@ -6,6 +6,10 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+### Fixed
+
+- Display warning if file is too big (cf. [#66](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/66))
+
 ## [0.0.28] - 2024-02-16
 
 ### Added

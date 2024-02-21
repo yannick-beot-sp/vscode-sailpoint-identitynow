@@ -277,23 +277,22 @@ The pattern defined above use the following tokens:
 - `%o`: Object type
 - `%S`: Source name for source-based report or object name
 
-## Known Issues
-
-None
-
 ## Release Notes
 
-## 0.0.28
+- Display warning if file is too big (cf. [#66](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/66))
+
+
+### 0.0.28
 
 - Add support for Forms
 - Clone a source (cf. [#60](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/60))
 
-## 0.0.27
+### 0.0.27
 
 - Export of roles and access profiles without owner
 - Fix pagination during export of roles and access
 
-## 0.0.26
+### 0.0.26
 
 - Add the command "Ping Cluster" on sources by [@henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#61](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/61))
 - Export of roles was failing due to 1-level Membership Criteria
