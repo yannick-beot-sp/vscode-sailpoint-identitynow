@@ -739,13 +739,24 @@ export class IdentityNowClient {
 	//#region Workflows
 	///////////////////////
 
+	public async createWorflow(workflow: WorkflowBeta): Promise<WorkflowBeta> {
+		const apiConfig = await this.getApiConfiguration()
+		const api = new WorkflowsBetaApi(apiConfig)
+		const resp = await api.createWorkflow({
+			// @ts-ignore
+			createWorkflowRequestBeta: workflow
+		})
+		return resp.data;
+	}
+
+
 	public async getWorflow(id: string): Promise<WorkflowBeta> {
 		const apiConfig = await this.getApiConfiguration()
 		const api = new WorkflowsBetaApi(apiConfig)
 		const resp = await api.getWorkflow({ id })
 		return resp.data;
 	}
-	
+
 	public async getWorflows(): Promise<WorkflowBeta[]> {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new WorkflowsBetaApi(apiConfig);
@@ -823,6 +834,7 @@ export class IdentityNowClient {
 		});
 		return resp.data.workflowExecutionId;
 	}
+
 	///////////////////////
 	//#endregion Workflows
 	///////////////////////

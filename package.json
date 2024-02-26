@@ -282,6 +282,22 @@
         }
       },
       {
+        "command": "vscode-sailpoint-identitynow.workflow.import.view-icon",
+        "title": "Import...",
+        "icon": {
+          "light": "resources/light/import.svg",
+          "dark": "resources/dark/import.svg"
+        }
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.workflow.import",
+        "title": "Import...",
+        "icon": {
+          "light": "resources/light/import.svg",
+          "dark": "resources/dark/import.svg"
+        }
+      },
+      {
         "command": "vscode-sailpoint-identitynow.workflow.view-execution-history",
         "title": "View execution history..."
       },
@@ -596,6 +612,14 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.workflow.import",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.workflow.import.view-icon",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.transform.evaluate",
           "when": "never"
         },
@@ -831,6 +855,15 @@
           "command": "vscode-sailpoint-identitynow.new-schema",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == schemas",
           "group": "inline@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.workflow.import.view-icon",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == workflows",
+          "group": "inline@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.workflow.import",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == workflows"
         },
         {
           "command": "vscode-sailpoint-identitynow.workflow.enable",

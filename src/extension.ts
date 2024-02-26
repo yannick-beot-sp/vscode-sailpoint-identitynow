@@ -53,6 +53,7 @@ import { FormDefinitionExportCommand } from './commands/form/FormDefinitionExpor
 import { FormDefinitionImporter } from './commands/form/FormDefinitionImporter';
 import { FormDefinitionImporterTreeViewCommand } from './commands/form/FormDefinitionImporterTreeViewCommand';
 import { WorkflowExportCommand } from './commands/workflow/WorkflowExportCommand';
+import { WorkflowImporterTreeViewCommand } from './commands/workflow/WorkflowImporterTreeViewCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -221,6 +222,13 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_WORKFLOW,
 			workflowExportCommand.execute, workflowExportCommand))
+	const workflowImporterTreeViewCommand = new WorkflowImporterTreeViewCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_WORKFLOW,
+			workflowImporterTreeViewCommand.execute, workflowImporterTreeViewCommand))
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_WORKFLOW_VIEW_ICON,
+			workflowImporterTreeViewCommand.execute, workflowImporterTreeViewCommand))
 
 	const exportConfigViewCommand = new ExportConfigTreeViewCommand();
 	context.subscriptions.push(
