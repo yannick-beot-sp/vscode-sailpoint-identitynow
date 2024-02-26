@@ -739,6 +739,13 @@ export class IdentityNowClient {
 	//#region Workflows
 	///////////////////////
 
+	public async getWorflow(id: string): Promise<WorkflowBeta> {
+		const apiConfig = await this.getApiConfiguration()
+		const api = new WorkflowsBetaApi(apiConfig)
+		const resp = await api.getWorkflow({ id })
+		return resp.data;
+	}
+	
 	public async getWorflows(): Promise<WorkflowBeta[]> {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new WorkflowsBetaApi(apiConfig);

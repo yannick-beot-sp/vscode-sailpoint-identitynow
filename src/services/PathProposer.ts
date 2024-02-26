@@ -244,4 +244,16 @@ export class PathProposer {
             "FORM_DEFINITION",
             objectName);
     }
+
+    public static getWorkflowFilename(
+        tenantName: string,
+        tenantDisplayName: string,
+        objectName: string
+    ): string {
+        return this.getObjectBasedReportFilename(configuration.WORKFLOW_EXPORT_FILENAME_CONF,
+            tenantName,
+            tenantDisplayName,
+            "WORKFLOW",
+            objectName);
+    }
 }

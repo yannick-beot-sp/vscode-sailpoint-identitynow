@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
-import { WorkflowTreeItem } from '../models/IdentityNowTreeItem';
-import { IdentityNowClient } from '../services/IdentityNowClient';
-import { getWorkflowExecutionDetailUri } from '../utils/UriUtils';
+import { WorkflowTreeItem } from '../../models/IdentityNowTreeItem';
+import { IdentityNowClient } from '../../services/IdentityNowClient';
+import { getWorkflowExecutionDetailUri } from '../../utils/UriUtils';
 import { WorkflowExecutionBeta } from 'sailpoint-api-client';
-import { openPreview } from '../utils/vsCodeHelpers';
+import { openPreview } from '../../utils/vsCodeHelpers';
 
 export async function viewWorkflowExecutionHistory(node: WorkflowTreeItem): Promise<void> {
 

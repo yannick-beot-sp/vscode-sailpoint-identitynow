@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import * as commands from './constants';
-import { WorkflowTreeItem } from '../models/IdentityNowTreeItem';
-import { IdentityNowClient } from '../services/IdentityNowClient';
+import * as commands from '../constants';
+import { WorkflowTreeItem } from '../../models/IdentityNowTreeItem';
+import { IdentityNowClient } from '../../services/IdentityNowClient';
 
 export async function enableWorkflow(node: WorkflowTreeItem): Promise<void> {
 

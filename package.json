@@ -274,6 +274,14 @@
         "icon": "$(debug-stop)"
       },
       {
+        "command": "vscode-sailpoint-identitynow.workflow.export",
+        "title": "Export",
+        "icon": {
+          "light": "resources/light/export.svg",
+          "dark": "resources/dark/export.svg"
+        }
+      },
+      {
         "command": "vscode-sailpoint-identitynow.workflow.view-execution-history",
         "title": "View execution history..."
       },
@@ -584,6 +592,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.workflow.export",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.transform.evaluate",
           "when": "never"
         },
@@ -832,6 +844,11 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.workflow.view-execution-history",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /workflow$/i",
+          "group": "workflow"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.workflow.export",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /workflow$/i",
           "group": "workflow"
         },
@@ -1085,7 +1102,11 @@
         },
         "vscode-sailpoint-identitynow.export.form.filename": {
           "type": "string",
-          "default": "%x/Forms/Forms-%t-%S-%y%M%d-%h%m%s.json"
+          "default": "%x/Forms/Form-%t-%S-%y%M%d-%h%m%s.json"
+        },
+        "vscode-sailpoint-identitynow.export.workflow.filename": {
+          "type": "string",
+          "default": "%x/Workflows/Workflow-%t-%S-%y%M%d-%h%m%s.json"
         },
         "vscode-sailpoint-identitynow.treeView.pagination": {
           "type": "number",

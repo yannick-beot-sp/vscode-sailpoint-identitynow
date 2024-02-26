@@ -47,12 +47,12 @@ export class FormDefinitionExportCommand {
         const client = new IdentityNowClient(node.tenantId, node.tenantName);
         const data = await client.exportForms(filters)
 
-        console.log('Writing to ', exportFile);
-        ensureFolderExists(exportFile);
-        fs.writeFileSync(exportFile, JSON.stringify(data, null, 2), { encoding: "utf8" });
+        console.log('Writing to ', target);
+        ensureFolderExists(target);
+        fs.writeFileSync(target, JSON.stringify(data, null, 2), { encoding: "utf8" });
 
         vscode.window.showInformationMessage(successfullMessage);
-        await openPreview(exportFile)
+        await openPreview(target)
     }
 }
 

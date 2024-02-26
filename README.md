@@ -11,7 +11,7 @@ The SailPoint IdentityNow extension makes it easy to:
 - View, create, edit, delete, and test transforms
 - View, create, edit, delete provisioning policies of a source
 - View, create, edit, delete schemas of a source
-- View, edit, enable, disable, and test workflows and view execution history
+- View, edit, enable, disable, export, import and test workflows and view execution history
 - View, create, edit, delete connector rules and export/import the script of a rule
 - View, edit, delete service desk integrations
 - View, edit, delete identity profiles and lifecycle states, and refreshes all the identities under a profile
@@ -69,6 +69,10 @@ The extension allows you to manage rules and upload the script to a new or exist
 ![Export config](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/rules-management.gif)
 
 ## Workflow management
+
+Export and Import workflows automatically:
+- Remove the properties "created", "creator", "modified", "modifiedBy", and "owner"
+- Nullify any value that starts with `$.secrets.`
 
 The extension allows you to test the workflow:
 
@@ -257,7 +261,9 @@ The extension supports the following settings:
 - `vscode-sailpoint-identitynow.export.forms.filename`: Define the pattern to export all forms of a tenant
   - Default value: `%x/Forms/Forms-%t-%y%M%d-%h%m%s.json`
 - `vscode-sailpoint-identitynow.export.form.filename`: Define the pattern to export a single form from a tenant
-  - Default value: `%x/Forms/Forms-%t-%S-%y%M%d-%h%m%s.json`
+  - Default value: `%x/Forms/Form-%t-%S-%y%M%d-%h%m%s.json`
+- `vscode-sailpoint-identitynow.export.workflow.filename`: Define the pattern to export a single workflow from a tenant
+  - Default value: `%x/Workflows/Workflow-%t-%S-%y%M%d-%h%m%s.json`
 - `vscode-sailpoint-identitynow.treeView.pagination`: Define the number of roles and access profiles that are displayed in the tree view
   - Default value: 100
 
@@ -280,7 +286,7 @@ The pattern defined above use the following tokens:
 ## Release Notes
 
 - Display warning if file is too big (cf. [#66](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/66))
-
+- Export/Import workflows
 
 ### 0.0.28
 

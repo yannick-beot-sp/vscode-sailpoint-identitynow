@@ -31,9 +31,9 @@ import { ExportConfigTreeViewCommand } from './commands/spconfig-export/ExportCo
 import { ImportConfigExplorerCommand } from './commands/spconfig-import/ImportConfigExplorerCommand';
 import { ImportConfigPaletteCommand } from './commands/spconfig-import/ImportConfigPaletteCommand';
 import { ImportConfigTreeViewCommand } from './commands/spconfig-import/ImportConfigTreeViewCommand';
-import { TestWorkflowCommand } from './commands/testWorkflow';
-import { viewWorkflowExecutionHistory } from './commands/viewWorkflowExecutionHistory';
-import { disableWorkflow, enableWorkflow } from './commands/workflow';
+import { TestWorkflowCommand } from './commands/workflow/testWorkflow';
+import { viewWorkflowExecutionHistory } from './commands/workflow/viewWorkflowExecutionHistory';
+import { disableWorkflow, enableWorkflow } from './commands/workflow/updateWorkflowStatus';
 import { URL_PREFIX } from './constants';
 import { FileHandler } from './files/FileHandler';
 import { IdentityNowResourceProvider } from './files/IdentityNowResourceProvider';
@@ -52,6 +52,7 @@ import { CloneSourceCommand } from './commands/source/CloneSourceCommand';
 import { FormDefinitionExportCommand } from './commands/form/FormDefinitionExportCommand';
 import { FormDefinitionImporter } from './commands/form/FormDefinitionImporter';
 import { FormDefinitionImporterTreeViewCommand } from './commands/form/FormDefinitionImporterTreeViewCommand';
+import { WorkflowExportCommand } from './commands/workflow/WorkflowExportCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -216,6 +217,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.VIEW_WORKFLOW_EXECUTION_HISTORY,
 			viewWorkflowExecutionHistory));
+	const workflowExportCommand = new WorkflowExportCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_WORKFLOW,
+			workflowExportCommand.execute, workflowExportCommand))
 
 	const exportConfigViewCommand = new ExportConfigTreeViewCommand();
 	context.subscriptions.push(
