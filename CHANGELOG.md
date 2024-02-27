@@ -9,6 +9,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 ### Added
 
 - Export/Import workflows
+- Edit Public Identities Config
 
 ### Fixed
 

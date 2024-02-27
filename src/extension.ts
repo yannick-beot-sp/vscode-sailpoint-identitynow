@@ -54,6 +54,7 @@ import { FormDefinitionImporter } from './commands/form/FormDefinitionImporter';
 import { FormDefinitionImporterTreeViewCommand } from './commands/form/FormDefinitionImporterTreeViewCommand';
 import { WorkflowExportCommand } from './commands/workflow/WorkflowExportCommand';
 import { WorkflowImporterTreeViewCommand } from './commands/workflow/WorkflowImporterTreeViewCommand';
+import { EditPublicIdentitiesConfigCommand } from './commands/editPublicIdentitiesConfigCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -87,6 +88,12 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.RENAME_TENANT, renameTenantCommand.execute,
 			renameTenantCommand));
 
+	const editPublicIdentitiesConfigCommand = new EditPublicIdentitiesConfigCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EDIT_PUBLIC_IDENTITIES_CONFIG,
+			editPublicIdentitiesConfigCommand.execute,
+			editPublicIdentitiesConfigCommand));
+			
 	const identityNowDataProvider = new IdentityNowDataProvider(context, tenantService);
 	vscode.window.registerTreeDataProvider(commands.TREE_VIEW, identityNowDataProvider);
 

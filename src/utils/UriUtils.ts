@@ -10,7 +10,7 @@ export function withQuery(baseUrl: string, params: any): string {
     Object.keys(params)
         .filter(k => params[k] !== undefined)
         .forEach(k => urlParams.set(k, params[k]));
-        
+
     url.search = urlParams.toString();
     return url.toString();
 }
@@ -25,12 +25,17 @@ export function withQuery(baseUrl: string, params: any): string {
  */
 export function getResourceUri(tenantName: string, resourceType: string, id: string, name: string, beta = false): Uri {
     const baseUri = Uri.from({ scheme: URL_PREFIX, authority: tenantName, path: '/' });
-    return Uri.joinPath(
-        baseUri,
-        (beta ? 'beta' : 'v3'),
+    // ensure all parts are not null
+    const pathParts = [(beta ? 'beta' : 'v3'),
         resourceType,
         id,
-        name
+        name].filter(x => !!x)
+
+    // You can pass an array to a rest parameter by using the spread operator
+    // cf. https://stackoverflow.com/a/43897911
+    return Uri.joinPath(
+        baseUri,
+        ...pathParts
     );
 }
 

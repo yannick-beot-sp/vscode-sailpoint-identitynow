@@ -80,6 +80,10 @@
         "title": "Rename tenant"
       },
       {
+        "command": "vscode-sailpoint-identitynow.tenant.edit.public-identities-config",
+        "title": "Edit public identities configuration..."
+      },
+      {
         "command": "vscode-sailpoint-identitynow.export-config.view",
         "title": "Export config...",
         "icon": "$(export)"
@@ -472,6 +476,18 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.rename-tenant",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.remove-tenant",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.tenant.edit.public-identities-config",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.export-config.view",
           "when": "never"
         },
@@ -751,6 +767,10 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.rename-tenant",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.tenant.edit.public-identities-config",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
         },
         {

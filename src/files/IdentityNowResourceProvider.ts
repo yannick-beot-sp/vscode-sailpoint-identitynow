@@ -82,7 +82,10 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 		const tenantInfo = await this.tenantService.getTenantByTenantName(
 			tenantName
 		);
-		const client = new IdentityNowClient(tenantInfo?.id ?? "", tenantName);
+		if (tenantInfo === undefined) {
+			throw new Error(`Could not find tenant ${tenantName}`);
+		}
+		const client = new IdentityNowClient(tenantInfo.id!, tenantName);
 
 		const data = await client.getResource(resourcePath);
 		if (!data) {
@@ -148,32 +151,32 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 				const jsonpatch: Operation[] = [
 					{
 						op: 'replace',
-						path : "/formElements",
+						path: "/formElements",
 						value: newData.formElements ?? []
 					},
 					{
 						op: 'replace',
-						path : "/formConditions",
+						path: "/formConditions",
 						value: newData.formConditions ?? []
 					},
 					{
 						op: 'replace',
-						path : "/formInput",
+						path: "/formInput",
 						value: newData.formInput ?? []
 					},
 					{
 						op: 'replace',
-						path : "/name",
+						path: "/name",
 						value: newData.name
 					},
 					{
 						op: 'replace',
-						path : "/description",
+						path: "/description",
 						value: newData.description
 					},
 					{
 						op: 'replace',
-						path : "/usedBy",
+						path: "/usedBy",
 						value: newData.usedBy ?? []
 					},
 
