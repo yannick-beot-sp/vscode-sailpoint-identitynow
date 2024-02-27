@@ -24,7 +24,7 @@ const sourceNameValidator = new Validator({
 /**
  * Simplified version of SPConfigExporter
  */
-class SPConfigExporter {
+export class SimpleSPConfigExporter {
     constructor(
         private client: IdentityNowClient,
         private readonly tenantDisplayName: string,
@@ -136,7 +136,7 @@ export class CloneSourceCommand {
                 values["source"].id
             ]
         };
-        const exporter = new SPConfigExporter(
+        const exporter = new SimpleSPConfigExporter(
             client,
             values["tenant"].name,
             options,

@@ -210,7 +210,10 @@ export async function chooseFile(fileType: string, extension: string): Promise<u
  * @param items List of ObjectPickItem 
  * @returns List of ids
  */
-export async function askChosenItems(title: string, placeHolder: string, items: Array<any>): Promise<Array<string> | undefined> {
+export async function askChosenItems(title: string,
+	placeHolder: string,
+	items: Array<any>,
+	mapFn: (item: any) => string = x => x.id): Promise<Array<string> | undefined> {
 	const pickItems: ObjectPickItem[] = items
 		.sort(compareByName)
 		.map((x: any) => ({
@@ -230,7 +233,7 @@ export async function askChosenItems(title: string, placeHolder: string, items: 
 		});
 
 	if (result && result.length > 0) {
-		return result.map(x => x.id);
+		return result.map(mapFn);
 	}
 	return undefined;
 };

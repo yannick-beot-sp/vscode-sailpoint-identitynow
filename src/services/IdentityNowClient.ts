@@ -5,7 +5,7 @@ import { withQuery } from "../utils/UriUtils";
 import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, Transform, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, Entitlement, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, ImportSpConfigRequestBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, ConnectorsBetaApi, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, Transform, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, Entitlement, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, ImportSpConfigRequestBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, ConnectorsBetaApi, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SODPolicyApi, SodPolicy } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -1361,6 +1361,15 @@ export class IdentityNowClient {
 		} while (count === DEFAULT_PAGINATION)
 	}
 
+	public async listForms(): Promise<FormDefinitionResponseBeta[]> {
+		console.log("> listForms");
+		const forms: FormDefinitionResponseBeta[] = []
+		for await (const form of this.getForms()) {
+			forms.push(form)
+		}
+		return forms
+	}
+
 	public async exportForms(filters: string | undefined = undefined): Promise<ExportFormDefinitionsByTenant200ResponseInnerBeta[]> {
 		console.log("> exportForms");
 		const apiConfig = await this.getApiConfiguration();
@@ -1394,11 +1403,54 @@ export class IdentityNowClient {
 		return response.data
 	}
 
-
-
 	//////////////////////////////
 	//#endregion Forms
 	//////////////////////////////
+
+	/////////////////////////
+	//#region Notification Templates
+	/////////////////////////
+
+	public async getNotificationTemplates(): Promise<TemplateDtoBeta[]> {
+		console.log("> getNotificationTemplates");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new NotificationsBetaApi(apiConfig);
+		const result = await Paginator.paginate(api, api.listNotificationTemplates);
+		return result.data;
+	}
+	/////////////////////////
+	//#endregion Notification Templates
+	/////////////////////////
+
+	/////////////////////////
+	//#region Segments
+	/////////////////////////
+
+	public async getSegments(): Promise<Segment[]> {
+		console.log("> getSegments");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SegmentsApi(apiConfig);
+		const result = await Paginator.paginate(api, api.listSegments);
+		return result.data;
+	}
+	/////////////////////////
+	//#endregion Segments
+	/////////////////////////
+
+	/////////////////////////
+	//#region SoD policies
+	/////////////////////////
+
+	public async getSoDPolicies(): Promise<SodPolicy[]> {
+		console.log("> getSoDPolicies");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SODPolicyApi(apiConfig);
+		const result = await Paginator.paginate(api, api.listSodPolicies);
+		return result.data;
+	}
+	/////////////////////////
+	//#endregion SoD policies
+	/////////////////////////
 }
 
 export enum AggregationJob {

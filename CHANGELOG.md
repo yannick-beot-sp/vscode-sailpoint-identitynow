@@ -11,6 +11,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 - Export/Import workflows
 - Edit Public Identities Config
 - Edit Access Request Configuration
+- Can export everything with SP-Config
+- Can select cloud rules for export with SP-Config
 
 ### Fixed
 

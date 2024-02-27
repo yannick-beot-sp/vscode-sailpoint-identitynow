@@ -289,6 +289,8 @@ The pattern defined above use the following tokens:
 - Export/Import workflows
 - Edit Public Identities Configuration
 - Edit Access Request Configuration
+- Can export everything with SP-Config
+- Can select cloud rules for export with SP-Config
 
 ### 0.0.28
 

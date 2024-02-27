@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
 
-import { ObjectPickItem } from '../../models/ObjectPickItem';
-import { OBJECT_TYPE_ITEMS, ObjectTypeQuickPickItem } from '../../models/ObjectTypeQuickPickItem';
+import { EXPORTABLE_OBJECT_TYPE_ITEMS, ObjectTypeQuickPickItem } from '../../models/ObjectTypeQuickPickItem';
 import { askChosenItems, askFile, askFolder, openPreview } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
 import { IdentityNowClient } from '../../services/IdentityNowClient';
 import { SPConfigExporter } from './SPConfigExporter';
 import { ExportPayloadBetaIncludeTypesEnum, ObjectExportImportOptionsBeta } from 'sailpoint-api-client';
+import { SimpleSPConfigExporter } from '../source/CloneSourceCommand';
 
 const ALL: vscode.QuickPickItem = {
     label: "Export everything",
@@ -108,7 +108,7 @@ export abstract class WizardBasedExporterCommand {
         //
         // Which objects do we export?
         //
-        const sortedObjectTypeItems = OBJECT_TYPE_ITEMS.sort(((a, b) => (a.label > b.label) ? 1 : -1));
+        const sortedObjectTypeItems = EXPORTABLE_OBJECT_TYPE_ITEMS.sort(((a, b) => (a.label > b.label) ? 1 : -1));
 
         const objectTypeItemsToExport = await vscode.window.showQuickPick<ObjectTypeQuickPickItem>(sortedObjectTypeItems, {
             ignoreFocusOut: false,
@@ -120,7 +120,7 @@ export abstract class WizardBasedExporterCommand {
             console.log("< chooseAndExport: no objectType");
             return;
         }
-        const objectTypes: ExportPayloadBetaIncludeTypesEnum[] = objectTypeItemsToExport.map(x=>x.objectType);
+        let objectTypes: ExportPayloadBetaIncludeTypesEnum[] = objectTypeItemsToExport.map(x => x.objectType);
         const options: { [key: string]: ObjectExportImportOptionsBeta } = {};
 
         //
@@ -141,39 +141,97 @@ export abstract class WizardBasedExporterCommand {
             for (const objectTypeItem of objectTypeItemsToExport) {
                 let items: any[] = [];
                 switch (objectTypeItem.objectType) {
-                    case ExportPayloadBetaIncludeTypesEnum.Source:
-                        items = await client.getSources();
+                    case ExportPayloadBetaIncludeTypesEnum.FormDefinition:
+                        items = await client.listForms();
                         break;
+                    case ExportPayloadBetaIncludeTypesEnum.GovernanceGroup:
+                        items = await client.getGovernanceGroups()
+                        break;
+
                     case ExportPayloadBetaIncludeTypesEnum.IdentityProfile:
                         items = await client.getIdentityProfiles();
+                        break;
+                    case ExportPayloadBetaIncludeTypesEnum.NotificationTemplate:
+                        items = await client.getNotificationTemplates();
+                        break;
+                    case ExportPayloadBetaIncludeTypesEnum.Rule:
+                        // SP Config allows to export cloud rules
+                        // Need to leverage SP Config API and not only "connector rules" endpoints
+                        const exporter = new SimpleSPConfigExporter(
+                            client,
+                            tenantDisplayName,
+                            {},
+                            [ExportPayloadBetaIncludeTypesEnum.Rule]
+                        );
+                        const data = await exporter.exportConfigWithProgression();
+                        items = data.objects.map(x => ({
+                            name: x.self.name,
+                            description: x.object?.description,
+                            id: x.self.id
+                        }))
+                        break;
+                    case ExportPayloadBetaIncludeTypesEnum.Segment:
+                        items = await client.getSegments()
+                        break;
+                    // Cf. SAASTRIAGE-2179
+                    // cannot filter sod policies
+                    // case ExportPayloadBetaIncludeTypesEnum.SodPolicy:
+                    //     items = await client.getSoDPolicies()
+                    //     break;
+                    case ExportPayloadBetaIncludeTypesEnum.ServiceDeskIntegration:
+                        items = await client.getServiceDesks()
+                        break;
+                    case ExportPayloadBetaIncludeTypesEnum.Source:
+                        items = await client.getSources();
                         break;
                     case ExportPayloadBetaIncludeTypesEnum.Transform:
                         items = await client.getTransforms();
                         break;
-                    case ExportPayloadBetaIncludeTypesEnum.Rule:
-                        items = await client.getConnectorRules();
+                    case ExportPayloadBetaIncludeTypesEnum.Workflow:
+                        items = await client.getWorflows();
                         break;
-                    case ExportPayloadBetaIncludeTypesEnum.TriggerSubscription:
-                        options["TRIGGER_SUBSCRIPTION"] = {
+                    default:
+                        // By default export everything
+                        // No pick and choose
+                        options[objectTypeItem.objectType.toString()] = {
                             includedIds: [],
                             includedNames: []
                         };
-                        continue;
-                    default:
                         break;
                 }
                 if (items === undefined || !Array.isArray(items) || items.length === 0) {
                     continue;
                 }
+                const placeHolder = "What do you want to export?";
+                // cf. SAASTRIAGE-2178 & SAASTRIAGE-2076
+                if (objectTypeItem.objectType === ExportPayloadBetaIncludeTypesEnum.Segment
+                    // || objectTypeItem.objectType === ExportPayloadBetaIncludeTypesEnum.SodPolicy
+                    || objectTypeItem.objectType === ExportPayloadBetaIncludeTypesEnum.FormDefinition) {
 
-                const includeIds = await askChosenItems(objectTypeItem.label, "What do you want to export?", items);
-                if (includeIds === undefined) { continue; }
-                // objectTypes.push(objectTypeItem.objectType);
-                if (items.length !== includeIds.length) {
-                    // XXX What is the expected behavior of the SP Config import if includedIds is empty?
-                    options[objectTypeItem.objectType] = {
-                        includedIds: includeIds
-                    };
+                    const includedNames = await askChosenItems(objectTypeItem.label, placeHolder, items, x => x.label);
+                    if (includedNames === undefined || !Array.isArray(items) || items.length === 0) { // No selection
+                        // removes the object type from the list so it is not exported
+                        objectTypes = objectTypes.slice(objectTypes.indexOf(objectTypeItem.objectType), 1)
+                        continue
+                    }
+                    if (items.length !== includedNames.length) {
+                        options[objectTypeItem.objectType] = {
+                            includedNames
+                        };
+                    }
+                } else {
+                    const includedIds = await askChosenItems(objectTypeItem.label, placeHolder, items);
+                    if (includedIds === undefined || !Array.isArray(items) || items.length === 0) {
+                        // No selection
+                        // removes the object type from the list so it is not exported
+                        objectTypes = objectTypes.slice(objectTypes.indexOf(objectTypeItem.objectType), 1)
+                        continue;
+                    }
+                    if (items.length !== includedIds.length) {
+                        options[objectTypeItem.objectType] = {
+                            includedIds
+                        };
+                    }
                 }
 
             }
