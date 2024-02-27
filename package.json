@@ -1120,6 +1120,14 @@
       {
         "fileMatch": "idn://**/form-definitions/**/*",
         "url": "./schemas/form-definition.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/public-identities-config/**/*",
+        "url": "./schemas/public-identities-config.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/access-request-config/**/*",
+        "url": "./schemas/access-request-config.schemas.json"
       }
     ],
     "configuration": {
