@@ -10,6 +10,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 - Export/Import workflows
 - Edit Public Identities Config
+- Edit Access Request Configuration
 
 ### Fixed
 

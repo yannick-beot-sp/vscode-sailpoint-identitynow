@@ -84,6 +84,10 @@
         "title": "Edit public identities configuration..."
       },
       {
+        "command": "vscode-sailpoint-identitynow.tenant.edit.access-request-config",
+        "title": "Edit access request configuration..."
+      },
+      {
         "command": "vscode-sailpoint-identitynow.export-config.view",
         "title": "Export config...",
         "icon": "$(export)"
@@ -488,6 +492,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.tenant.edit.access-request-config",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.export-config.view",
           "when": "never"
         },
@@ -771,6 +779,10 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.tenant.edit.public-identities-config",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.tenant.edit.access-request-config",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
         },
         {

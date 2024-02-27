@@ -287,7 +287,8 @@ The pattern defined above use the following tokens:
 
 - Display warning if file is too big (cf. [#66](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/66))
 - Export/Import workflows
-- Edit Public Identities Config
+- Edit Public Identities Configuration
+- Edit Access Request Configuration
 
 ### 0.0.28
 
