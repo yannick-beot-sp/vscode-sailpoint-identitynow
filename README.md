@@ -71,6 +71,7 @@ The extension allows you to manage rules and upload the script to a new or exist
 ## Workflow management
 
 Export and Import workflows automatically:
+
 - Remove the properties "created", "creator", "modified", "modifiedBy", and "owner"
 - Nullify any value that starts with `$.secrets.`
 
@@ -142,6 +143,22 @@ This extension includes the following snippets for schemas:
 | `New provisioning policy` | Create a new provisioning policy |
 | `New field`               | Create a new field               |
 
+### Forms
+
+This extension includes the following snippets for forms:
+
+| Trigger          | Content                 |
+| ---------------- | ----------------------- |
+| `New Form Input` | Create a new form input |
+
+### Public Identities Configuration
+
+This extension includes the following snippets for the Public Identities Configuration:
+
+| Trigger                  | Content                                 |
+| ------------------------ | --------------------------------------- |
+| `New identity attribute` | Create a new identity attribute mapping |
+
 ## Import format
 
 ### Access Profiles
@@ -210,12 +227,10 @@ There are 3 kind of attributes:
 
 ##### Logical operators
 
-
-| Operator | Description |
-| -------- | ----------- |
-| and       | Logical "and"      |
+| Operator | Description   |
+| -------- | ------------- |
+| and      | Logical "and" |
 | or       | Logical "or"  |
-
 
 ##### Values
 
@@ -286,11 +301,12 @@ The pattern defined above use the following tokens:
 ## Release Notes
 
 - Display warning if file is too big (cf. [#66](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/66))
-- Export/Import workflows
-- Edit Public Identities Configuration
+- Export/Import workflows (cf. [#57](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/57))
+- Edit Public Identities Config
 - Edit Access Request Configuration
-- Can export everything with SP-Config
+- Can export everything with SP-Config (cf. [#56](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/56))
 - Can select cloud rules for export with SP-Config
+- Add IDENTITY_OBJECT_CONFIG as an importable object from SP-Config
 
 ### 0.0.28
 

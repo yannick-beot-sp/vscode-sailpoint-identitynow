@@ -8,11 +8,12 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
-- Export/Import workflows
+- Export/Import workflows (cf. [#57](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/57))
 - Edit Public Identities Config
 - Edit Access Request Configuration
-- Can export everything with SP-Config
+- Can export everything with SP-Config (cf. [#56](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/56))
 - Can select cloud rules for export with SP-Config
+- Add IDENTITY_OBJECT_CONFIG as an importable object from SP-Config
 
 ### Fixed
 
