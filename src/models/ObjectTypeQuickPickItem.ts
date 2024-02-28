@@ -6,7 +6,6 @@ export interface ObjectTypeQuickPickItem extends QuickPickItem {
 }
 
 export const EXPORTABLE_OBJECT_TYPE_ITEMS: ObjectTypeQuickPickItem[] = [
-
     { objectType: ExportPayloadBetaIncludeTypesEnum.AccessProfile, label: "Access Profiles", picked: true },
     { objectType: ExportPayloadBetaIncludeTypesEnum.AccessRequestConfig, label: "Access Request Configuration", picked: true },
     { objectType: ExportPayloadBetaIncludeTypesEnum.AttrSyncSourceConfig, label: "Attribute Sync Source Configuration", picked: true },
@@ -33,31 +32,11 @@ export const EXPORTABLE_OBJECT_TYPE_ITEMS: ObjectTypeQuickPickItem[] = [
     { objectType: ExportPayloadBetaIncludeTypesEnum.Workflow, label: "Workflows", picked: true },
 ]
 
-export const OBJECT_TYPE_ITEMS: ObjectTypeQuickPickItem[] = [
-
-    {
-        objectType: ExportPayloadBetaIncludeTypesEnum.Source,
-        label: "Sources",
-        picked: true
-    },
-    {
-        objectType: ExportPayloadBetaIncludeTypesEnum.TriggerSubscription,
-        label: "Trigger subscriptions",
-        picked: true
-    },
-    {
-        objectType: ExportPayloadBetaIncludeTypesEnum.IdentityProfile,
-        label: "Identity profiles",
-        picked: true
-    },
-    {
-        objectType: ExportPayloadBetaIncludeTypesEnum.Transform,
-        label: "Transforms",
-        picked: true
-    },
-    {
-        objectType: ExportPayloadBetaIncludeTypesEnum.Rule,
-        label: "Rules",
-        picked: true
-    }
+export const IMPORTABLE_OBJECT_TYPE_ITEMS: ObjectTypeQuickPickItem[] = [
+    { objectType: ExportPayloadBetaIncludeTypesEnum.TriggerSubscription, label: "Event Trigger subscriptions", picked: true },
+    { objectType: ExportPayloadBetaIncludeTypesEnum.IdentityObjectConfig, label: "Identity Object Configuration", picked: true },
+    { objectType: ExportPayloadBetaIncludeTypesEnum.IdentityProfile, label: "Identity Profiles", picked: true },
+    { objectType: ExportPayloadBetaIncludeTypesEnum.Rule, label: "Rules", picked: true },
+    { objectType: ExportPayloadBetaIncludeTypesEnum.Source, label: "Sources", picked: true },
+    { objectType: ExportPayloadBetaIncludeTypesEnum.Transform, label: "Transforms", picked: true },
 ];

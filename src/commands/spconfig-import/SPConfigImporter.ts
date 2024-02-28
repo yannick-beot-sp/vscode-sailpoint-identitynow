@@ -1,19 +1,9 @@
 import * as vscode from 'vscode';
 import { IdentityNowClient } from '../../services/IdentityNowClient';
 import { delay } from '../../utils';
-import { OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
+import { IMPORTABLE_OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
 import { ImportOptionsBeta, SpConfigJobBetaStatusEnum } from 'sailpoint-api-client';
 import { ImportJobResults } from '../../models/JobStatus';
-
-const ALL: vscode.QuickPickItem = {
-    label: "Import everything",
-    picked: true
-};
-
-const PICK_AND_CHOOSE: vscode.QuickPickItem = {
-    label: "Choose what to import"
-};
-
 
 /**
  * Base class for all importer
@@ -103,7 +93,7 @@ export class SPConfigImporter {
     }
 
     private mapObjectTypeToLabel(objectType: string): string {
-        return OBJECT_TYPE_ITEMS.find(x => x.objectType === objectType)?.label ?? "UNKOWN";
+        return IMPORTABLE_OBJECT_TYPE_ITEMS.find(x => x.objectType === objectType)?.label ?? "UNKOWN";
     }
 
 

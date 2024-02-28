@@ -6,7 +6,7 @@ import { TenantInfoQuickPickItem } from "../models/TenantInfoQuickPickItem";
 import { compareByName } from "../utils";
 import { isBlank, isEmpty } from "./stringUtils";
 import { ObjectPickItem } from "../models/ObjectPickItem";
-import { OBJECT_TYPE_ITEMS, ObjectTypeQuickPickItem } from "../models/ObjectTypeQuickPickItem";
+import { IMPORTABLE_OBJECT_TYPE_ITEMS, ObjectTypeQuickPickItem } from "../models/ObjectTypeQuickPickItem";
 
 export async function chooseTenant(tenantService: TenantService, title: string): Promise<TenantInfo | undefined> {
 	console.log("> chooseTenant");
@@ -244,7 +244,7 @@ export async function askChosenItems(title: string,
  * @param objectTypes List of object types to choose from
  * @returns 
  */
-export async function askSelectObjectTypes(title: string, objectTypeItems: Array<ObjectTypeQuickPickItem> = OBJECT_TYPE_ITEMS): Promise<Array<ObjectTypeQuickPickItem> | undefined> {
+export async function askSelectObjectTypes(title: string, objectTypeItems: Array<ObjectTypeQuickPickItem> = IMPORTABLE_OBJECT_TYPE_ITEMS): Promise<Array<ObjectTypeQuickPickItem> | undefined> {
 	const sortedObjectTypeItems = objectTypeItems
 		.sort(((a, b) => (a.label > b.label) ? 1 : -1));
 
