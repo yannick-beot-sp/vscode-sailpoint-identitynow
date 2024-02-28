@@ -1,3 +1,5 @@
+const path = require('node:path');
+
 export function delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -14,7 +16,7 @@ export function str2Uint8Array(str: string): Uint8Array {
 }
 
 export function toTimestamp(strDate: string): number {
-    var datum = Date.parse(strDate);
+    const datum = Date.parse(strDate);
     return datum / 1000;
 }
 
@@ -23,7 +25,7 @@ export function toTimestamp(strDate: string): number {
  * It is modified from the ISO8601 string to remove ':' and second
  */
 export function toDateSuffix(): string {
-    var date = new Date();
+    const date = new Date();
     let str = date.toISOString(); //"2011-12-19T15:28:46.493Z"
     str = str.replaceAll(':', '-').replace(/\..*$/, '');
     return str;
@@ -44,7 +46,7 @@ export const compareByName = (a: any, b: any) => (a.name.toLowerCase() > b.name.
 /**
  * Function used to compare 2 objects by the property 'priority'. Useful for sorting identity profiles
  */
- export const compareByPriority = (a: any, b: any) => (a.priority > b.priority) ? 1 : -1;
+export const compareByPriority = (a: any, b: any) => (a.priority > b.priority) ? 1 : -1;
 
 
 /**
@@ -62,3 +64,56 @@ export function normalizeTenant(tenantName: string) {
 export function parseJwt(token: string): any {
     return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
 }
+
+
+// cf. https://github.com/parshap/node-sanitize-filename/blob/master/index.js
+
+const illegalRe = /[\/\\\?<>:\*\|":]/g;
+const controlRe = /[\x00-\x1f\x80-\x9f]/g;
+const reservedRe = /^\.+$/;
+const windowsReservedRe = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
+
+function sanitizeImpl(input: any, replacement: string, maxLength: number) {
+    if (typeof input !== 'string') {
+        throw new Error('Input must be string')
+    }
+    const sanitized = input
+        .replace(illegalRe, replacement)
+        .replace(controlRe, replacement)
+        .replace(reservedRe, replacement)
+        .replace(windowsReservedRe, replacement);
+
+    if (maxLength > 0) {
+        return truncate(sanitized, maxLength);
+    }
+    return sanitized
+}
+
+// cf. https://gist.github.com/barbietunnie/7bc6d48a424446c44ff4
+function truncate(sanitized: string, length: number): string {
+    const uint8Array = new TextEncoder().encode(sanitized)
+    const truncated = uint8Array.slice(0, length)
+    return new TextDecoder().decode(truncated)
+}
+
+/**
+ * 
+ * @param input Can be a path. For instance: WORKFLOW/Template: my super workflow.json
+ * @param options optional parameters for invalid character remplacement ('' by default) and max length (255 by default)
+ * @returns sanitized path
+ */
+export function sanitizePath(input: string, options: undefined | { replacement?: string, maxLength?: number } = undefined) {
+    const replacement: string = (options && options.replacement) || '';
+    let maxLength: number = (options && options.maxLength) || 255;
+
+    const parts = path.parse(input);
+    maxLength = maxLength - (parts.ext ?? '').length
+    parts.name = sanitizeImpl(parts.name, replacement, maxLength)
+    if (replacement !== '') {
+        parts.name = sanitizeImpl(parts.name, '', maxLength);
+    }
+    // Need to remove base otherwise it takes precedence
+    parts.base = undefined;
+    const output =  path.format(parts);
+    return output
+};
