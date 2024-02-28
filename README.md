@@ -72,7 +72,7 @@ The extension allows you to manage rules and upload the script to a new or exist
 
 Export and Import workflows automatically:
 
-- Remove the properties "created", "creator", "modified", "modifiedBy", and "owner"
+- Remove the properties `created`, `creator`, `modified`, `modifiedBy`, and `owner`
 - Nullify any value that starts with `$.secrets.`
 
 The extension allows you to test the workflow:
@@ -212,8 +212,8 @@ The following table provides the expected column for the CSV to import Roles:
 There are 3 kind of attributes:
 
 - **Identity Attribute**: the format is `identity.{attribute name}`. Ex: `identity.cloudLifecycleState`, `identity.type`, etc.
-- **Account Attribute**: the format is `{source name}.attribute.{attribute name}`. If the source name constains space, the source name must be put between quotes or double-quotes
-- **Entitlements**: the format is `{source name}.entitlement.{attribute name}`. If the source name constains space, the source name must be put between quotes or double-quotes
+- **Account Attribute**: the format is `{source name}.attribute.{attribute name}`. If the source name contains space, the source name must be put between quotes or double-quotes
+- **Entitlements**: the format is `{source name}.entitlement.{attribute name}`. If the source name contains space, the source name must be put between quotes or double-quotes
 
 ##### Attribute operators
 
@@ -282,7 +282,7 @@ The extension supports the following settings:
 - `vscode-sailpoint-identitynow.treeView.pagination`: Define the number of roles and access profiles that are displayed in the tree view
   - Default value: 100
 
-The pattern defined above use the following tokens:
+The patterns defined above use the following tokens:
 
 - `%u`: User Home Dir
 - `%w`: Workspace folder
@@ -299,6 +299,8 @@ The pattern defined above use the following tokens:
 - `%S`: Source name for source-based report or object name
 
 ## Release Notes
+
+### 0.0.29
 
 - Display warning if file is too big (cf. [#66](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/66))
 - Export/Import workflows (cf. [#57](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/57))
@@ -458,7 +460,7 @@ Fixed:
 
 ### 0.0.4
 
-Fix regexp for PAT secret
+- Fix regexp for PAT secret
 
 ### 0.0.3
 
