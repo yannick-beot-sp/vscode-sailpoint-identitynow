@@ -3,8 +3,8 @@ import { SourceTreeItem } from "../../models/IdentityNowTreeItem";
 import { IdentityNowClient } from '../../services/IdentityNowClient';
 import { CSVReader } from '../../services/CSVReader';
 import { UncorrelatedAccount } from '../../models/UncorrelatedAccount';
-import { isEmpty } from 'lodash';
 import { chooseFile } from '../../utils/vsCodeHelpers';
+import { isEmpty } from '../../utils/stringUtils';
 
 interface UncorrelatedAccountImportResult {
     correlated: number

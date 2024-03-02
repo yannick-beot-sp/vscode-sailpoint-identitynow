@@ -7,8 +7,8 @@ import { AxiosResponse } from "axios";
 import { getConfigNumber } from '../utils/configurationUtils';
 import * as commands from "../commands/constants";
 import * as configuration from '../configurationConstants';
-import { isNotEmpty } from "../utils/stringUtils";
-import { isEmpty } from "lodash";
+import { isEmpty, isNotEmpty } from "../utils/stringUtils";
+
 
 /**
  * Base class to expose getChildren and updateIcon methods
@@ -71,6 +71,7 @@ export class TenantTreeItem extends BaseTreeItem {
 		results.push(new AccessProfilesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new RolesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new FormsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new SearchAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 
 		return new Promise((resolve) => resolve(results));
 	}
@@ -1045,4 +1046,53 @@ export class FormTreeItem extends IdentityNowResourceTreeItem {
 	}
 
 	iconPath = new vscode.ThemeIcon("preview");
+}
+
+/**
+ * Contains the Search Attributes in tree view
+ */
+export class SearchAttributesTreeItem extends FolderTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {
+		super("Search Attributes", "search-attributes", tenantId, tenantName, tenantDisplayName);
+	}
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		const client = new IdentityNowClient(this.tenantId, this.tenantName);
+		return (await client.getSearchAttributes()).map(x=>new SearchAttributeTreeItem(
+			this.tenantId,
+			this.tenantName,
+			this.tenantDisplayName,
+			x.name,
+		))
+
+	}
+}
+
+export class SearchAttributeTreeItem extends IdentityNowResourceTreeItem {
+	contextValue = "search-attribute";
+
+	constructor(tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		name: string,
+		) {
+		super(
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			name,
+			"accounts/search-attribute-config",
+			name,
+			vscode.TreeItemCollapsibleState.None,
+			undefined,
+			undefined,
+			true
+		);
+	}
+
+	iconPath = new vscode.ThemeIcon("search");
 }

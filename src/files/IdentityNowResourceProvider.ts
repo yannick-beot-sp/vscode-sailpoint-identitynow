@@ -143,9 +143,7 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 				delete transform.id;
 				delete transform.internal;
 				data = JSON.stringify(transform);
-			}
-
-			if (resourcePath.match("form-definitions")) {
+			} else if (resourcePath.match("form-definitions")) {
 				// UI is pushing all data as a Patch. Doing the same for form definitions
 				const newData = JSON.parse(data) as FormDefinitionResponseBeta
 				const jsonpatch: Operation[] = [
@@ -186,7 +184,7 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 					JSON.stringify(jsonpatch)
 				);
 
-			} else if (resourcePath.match("identity-profiles|access-profiles|roles")) {
+			} else if (resourcePath.match("identity-profiles|access-profiles|roles|search-attribute-config")) {
 				// special treatment to send patch as PUT is not supported
 				const oldData = await client.getResource(resourcePath);
 				const newData = JSON.parse(data);
@@ -202,6 +200,28 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 				} else {
 					patchResourcePath = resourcePath;
 				}
+
+				if (resourcePath.match("search-attribute-config")) {
+					// Supported patchable fields are: /displayName, /name, /applicationAttributes
+					// @ts-ignore
+					jsonpatch = jsonpatch.map(p => {
+						if (p.path.match("\/applicationAttributes")) {
+							const value: any = {};
+							const appId = path.posix.basename(p.path)
+							// @ts-ignore
+							value[appId] = p.op === "add" ? p.value : oldData.applicationAttributes[appId]
+							return {
+								op: p.op,
+								path: "/applicationAttributes",
+								value
+							}
+						} else {
+							return p
+						}
+					})
+
+				}
+
 				await client.patchResource(
 					patchResourcePath,
 					JSON.stringify(jsonpatch)
