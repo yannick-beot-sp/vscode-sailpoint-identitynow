@@ -56,6 +56,7 @@ import { WorkflowExportCommand } from './commands/workflow/WorkflowExportCommand
 import { WorkflowImporterTreeViewCommand } from './commands/workflow/WorkflowImporterTreeViewCommand';
 import { EditPublicIdentitiesConfigCommand } from './commands/editPublicIdentitiesConfigCommand';
 import { EditAccessRequestConfigCommand } from './commands/editAccessRequestConfigCommand';
+import { NewAttributeSearchConfigCommand } from './commands/NewAttributeSearchConfigCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -423,6 +424,12 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_FORMS_ICON_VIEW,
 			formDefinitionImporterTreeViewCommand.execute, formDefinitionImporterTreeViewCommand));
+
+	// Attribute Search Config
+	const newAttributeSearchConfigCommand = new NewAttributeSearchConfigCommand(tenantService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_SEARCH_ATTRIBUTE,
+			newAttributeSearchConfigCommand.execute, newAttributeSearchConfigCommand));
 }
 
 // this method is called when your extension is deactivated

@@ -1463,6 +1463,14 @@ export class IdentityNowClient {
 		const result = await api.getSearchAttributeConfig()
 		return result.data;
 	}
+
+	public async createSearchAttribute(searchAttributeConfigBeta: SearchAttributeConfigBeta): Promise<void> {
+		console.log("> createSearchAttribute");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SearchAttributeConfigurationBetaApi(apiConfig);
+		await api.createSearchAttributeConfig({searchAttributeConfigBeta})
+	}
+	
 	/////////////////////////
 	//#endregion Search attributes
 	/////////////////////////
