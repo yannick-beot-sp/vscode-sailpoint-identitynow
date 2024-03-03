@@ -8,7 +8,8 @@ export class InputOwnerStep extends InputPromptStep<WizardContext> {
             name: "ownerQuery",
             displayName: "owner",
             options: {
-                validateInput: (s: string) => { return requiredValidator.validate(s); }
+                validateInput: (s: string) => { return requiredValidator.validate(s); },
+                learnMoreLink: "https://documentation.sailpoint.com/saas/help/search/searchable-fields.html#searching-identity-data"
             }
         });
     }
