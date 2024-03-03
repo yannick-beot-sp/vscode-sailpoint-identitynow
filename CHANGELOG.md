@@ -6,6 +6,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [0.0.30] - 2024-03-03
+
 ### Added
 
 - Add support for Search attribute config (cf. [#64](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/64))
