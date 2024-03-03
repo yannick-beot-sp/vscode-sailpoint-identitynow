@@ -302,6 +302,8 @@ The patterns defined above use the following tokens:
 
 ## Release Notes
 
+### 1.0.0
+
 - Import/Export entitlements for roles
 
 ### 0.0.30
