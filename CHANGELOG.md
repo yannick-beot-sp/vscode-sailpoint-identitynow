@@ -6,6 +6,10 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+### Added
+
+- Import/Export entitlements for roles
+
 ## [0.0.30] - 2024-03-03
 
 ### Added

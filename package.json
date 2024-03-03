@@ -991,11 +991,11 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.new-role.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^roles/"
         },
         {
           "command": "vscode-sailpoint-identitynow.new-role.view-icon",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^roles/",
           "group": "inline@1"
         },
         {
@@ -1018,20 +1018,20 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.csv.export.roles.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^roles/"
         },
         {
           "command": "vscode-sailpoint-identitynow.csv.export.roles-icon.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^roles/",
           "group": "inline@3"
         },
         {
           "command": "vscode-sailpoint-identitynow.csv.import.roles.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^roles/"
         },
         {
           "command": "vscode-sailpoint-identitynow.csv.import.roles-icon.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == roles",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^roles/",
           "group": "inline@2"
         },
         {

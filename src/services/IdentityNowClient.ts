@@ -78,7 +78,10 @@ export class IdentityNowClient {
 		const apiConfig = new Configuration({
 			baseurl: EndpointUtils.getBaseUrl(this.tenantName),
 			tokenUrl: EndpointUtils.getAccessTokenUrl(this.tenantName),
-			accessToken: session?.accessToken
+			accessToken: session?.accessToken,
+			// TODO https://github.com/sailpoint-oss/typescript-sdk/issues/30
+			clientId: "",
+			clientSecret: ""
 		});
 
 		return apiConfig;
@@ -1040,6 +1043,13 @@ export class IdentityNowClient {
 	//#region Entitlements
 	/////////////////////////
 
+	public async getEntitlement(id: string): Promise<EntitlementBeta> {
+		console.log("> getEntitlement");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new EntitlementsBetaApi(apiConfig);
+		const response = await api.getEntitlement({ id })
+		return response.data
+	}
 	public async getAllEntitlements(query: string): Promise<EntitlementBeta[]> {
 		console.log("> getAllEntitlements");
 		const apiConfig = await this.getApiConfiguration();

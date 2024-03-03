@@ -302,6 +302,8 @@ The patterns defined above use the following tokens:
 
 ## Release Notes
 
+- Import/Export entitlements for roles
+
 ### 0.0.30
 
 - Add support for Search attribute config (cf. [#64](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/64))

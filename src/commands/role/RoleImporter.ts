@@ -3,7 +3,7 @@ import * as tmp from "tmp";
 
 import { IdentityNowClient } from "../../services/IdentityNowClient";
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
-import { AccessProfileApprovalScheme, AccessProfileRef, ApprovalSchemeForRole, Role, RoleMembershipSelector, RoleMembershipSelectorType } from 'sailpoint-api-client';
+import { AccessProfileApprovalScheme, AccessProfileRef, ApprovalSchemeForRole, Entitlement, EntitlementRef, Role, RoleMembershipSelector, RoleMembershipSelectorType } from 'sailpoint-api-client';
 import { CSVReader } from '../../services/CSVReader';
 import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
 import { IdentityNameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
@@ -15,6 +15,7 @@ import { isEmpty, isNotBlank } from '../../utils/stringUtils';
 import { RoleMembershipSelectorConverter } from '../../parser/RoleMembershipSelectorConverter';
 import { Parser } from '../../parser/parser';
 import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService';
+import { EntitlementCacheService, KEY_SEPARATOR } from '../../services/cache/EntitlementCacheService';
 
 interface RolesImportResult {
     success: number
@@ -34,6 +35,7 @@ interface RoleCSVRecord {
     revokeDenialCommentsRequired: boolean
     revokeApprovalSchemes: string
     accessProfiles: string
+    entitlements: string
     membershipCriteria: string
 }
 
@@ -93,6 +95,7 @@ export class RoleImporter {
         const accessProfileNameToIdCacheService = new AccessProfileNameToIdCacheService(this.client);
         const identityCacheService = new IdentityNameToIdCacheService(this.client);
         const sourceCacheService = new SourceNameToIdCacheService(this.client);
+        const entitlementCacheService = new EntitlementCacheService(this.client);
         const parser = new Parser();
 
         await csvReader.processLine(async (data: RoleCSVRecord) => {
@@ -149,13 +152,36 @@ export class RoleImporter {
                     return;
                 }
             }
+            let entitlements: EntitlementRef[] = []
+            if (isNotBlank(data.entitlements)) {
+                try {
+                    entitlements = await Promise.all(data.entitlements
+                        .split(CSV_MULTIVALUE_SEPARATOR)
+                        .map(async (sourceAndEntitlementNames) => {
+                            const [sourceName, entitlementName] = sourceAndEntitlementNames.split(KEY_SEPARATOR)
+                            const sourceId = await sourceCacheService.get(sourceName)
+                            const entitlementId = await entitlementCacheService.get([sourceId, entitlementName].join(KEY_SEPARATOR))
+                            return {
+                                name: entitlementName,
+                                "id": entitlementId,
+                                "type": "ENTITLEMENT"
+                            }
+                        }));
+                } catch (error) {
+                    result.error++;
+                    const etMessage = `Unable to find access an entitlement: ${error}`;
+                    await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, etMessage);
+                    vscode.window.showErrorMessage(etMessage);
+                    return;
+                }
+            }
 
-            let approvalSchemes: ApprovalSchemeForRole[],
-                revokeApprovalSchemes: AccessProfileApprovalScheme[];
+            let approvalSchemes: ApprovalSchemeForRole[] | undefined = undefined,
+                revokeApprovalSchemes: ApprovalSchemeForRole[] | undefined = undefined;
             try {
                 approvalSchemes = await stringToRoleApprovalSchemeConverter(
                     data.approvalSchemes, governanceGroupCache);
-                revokeApprovalSchemes = await stringToAccessProfileApprovalSchemeConverter(
+                revokeApprovalSchemes = await stringToRoleApprovalSchemeConverter(
                     data.revokeApprovalSchemes, governanceGroupCache);
             } catch (error) {
                 result.error++;
@@ -206,7 +232,8 @@ export class RoleImporter {
                     "denialCommentsRequired": data.revokeDenialCommentsRequired ?? false,
                     "approvalSchemes": revokeApprovalSchemes
                 },
-                "accessProfiles": accessProfiles,
+                accessProfiles,
+                entitlements,
                 membership
             };
 
@@ -244,6 +271,8 @@ export class RoleImporter {
         accessProfileNameToIdCacheService.flushAll();
         console.log("Source Cache stats", sourceCacheService.getStats());
         sourceCacheService.flushAll();
+        console.log("Entitlement Cache stats", entitlementCacheService.getStats());
+        entitlementCacheService.flushAll();
         await openPreview(this.logFilePath, "csv");
     }
 
