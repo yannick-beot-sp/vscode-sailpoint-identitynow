@@ -3,13 +3,13 @@ import * as tmp from "tmp";
 
 import { IdentityNowClient } from "../../services/IdentityNowClient";
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
-import { AccessProfileApprovalScheme, AccessProfileRef, ApprovalSchemeForRole, Entitlement, EntitlementRef, Role, RoleMembershipSelector, RoleMembershipSelectorType } from 'sailpoint-api-client';
+import { AccessProfileRef, ApprovalSchemeForRole, EntitlementRef, Role, RoleMembershipSelector, RoleMembershipSelectorType } from 'sailpoint-api-client';
 import { CSVReader } from '../../services/CSVReader';
 import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
 import { IdentityNameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { AccessProfileNameToIdCacheService } from '../../services/cache/AccessProfileNameToIdCacheService';
-import { stringToRoleApprovalSchemeConverter, stringToAccessProfileApprovalSchemeConverter } from '../../utils/approvalSchemeConverter';
+import { stringToRoleApprovalSchemeConverter } from '../../utils/approvalSchemeConverter';
 import { openPreview } from '../../utils/vsCodeHelpers';
 import { isEmpty, isNotBlank } from '../../utils/stringUtils';
 import { RoleMembershipSelectorConverter } from '../../parser/RoleMembershipSelectorConverter';

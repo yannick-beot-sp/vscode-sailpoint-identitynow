@@ -6,7 +6,7 @@ import { PathProposer } from '../../services/PathProposer';
 import { EntitlementRef, RequestabilityForRole, Revocability, RevocabilityForRole, Role, RoleMembershipSelectorType, RolesApiListRolesRequest } from 'sailpoint-api-client';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
-import { accessProfileApprovalSchemeToStringConverter, roleApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
+import { roleApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
 import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
 import { roleMembershipSelectorToStringConverter } from '../../parser/roleMembershipSelectorToStringConverter';
 import { SourceIdToNameCacheService } from '../../services/cache/SourceIdToNameCacheService';
