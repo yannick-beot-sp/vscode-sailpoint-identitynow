@@ -41,13 +41,21 @@ export function convertToText(data: any): string {
 /**
  * Function used to compare 2 objects by the property 'name'. Useful for sorting most IDN objects
  */
-export const compareByName = (a: any, b: any) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1;
+export const compareByName = (a: any, b: any) => compareCaseInsensitive(a, b, "name");
 
 /**
  * Function used to compare 2 objects by the property 'priority'. Useful for sorting identity profiles
  */
 export const compareByPriority = (a: any, b: any) => (a.priority > b.priority) ? 1 : -1;
 
+/**
+ * Function used to compare 2 objects by the property 'priority'. Useful for sorting QuickPickItem or TreeItem
+ */
+export const compareByLabel = (a: any, b: any) => compareCaseInsensitive(a, b, "label");
+
+function compareCaseInsensitive(a: any, b: any, property: string) {
+    return a[property].localeCompare(b[property], undefined, { sensitivity: 'base' })
+}
 
 /**
  * Use to get the full tenant name. The idea is to prevent the creation of the same tenant if already present
@@ -114,6 +122,6 @@ export function sanitizePath(input: string, options: undefined | { replacement?:
     }
     // Need to remove base otherwise it takes precedence
     parts.base = undefined;
-    const output =  path.format(parts);
+    const output = path.format(parts);
     return output
 };

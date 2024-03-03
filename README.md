@@ -19,6 +19,8 @@ The SailPoint IdentityNow extension makes it easy to:
 - View, edit, create, delete, export, import access profiles
 - View, edit, create, delete, export, import roles
 - View, edit, create, delete, export, import forms
+- View, edit, create search attribute config
+- View, edit identity attributes
 
 ## Installation
 
@@ -299,6 +301,9 @@ The patterns defined above use the following tokens:
 - `%S`: Source name for source-based report or object name
 
 ## Release Notes
+
+- Add support for Search attribute config (cf. [#64](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/64))
+- Add support for Identity Attributes
 
 ### 0.0.29
 

@@ -2,7 +2,7 @@ import path = require('path');
 import * as vscode from 'vscode';
 import { NEW_ID } from '../constants';
 import { ProvisioningPoliciesTreeItem } from "../models/IdentityNowTreeItem";
-import { str2Uint8Array } from '../utils';
+import { compareByLabel, str2Uint8Array } from '../utils';
 import { isEmpty } from '../utils/stringUtils';
 import { getPathByUri } from '../utils/UriUtils';
 import { UsageTypeBeta } from 'sailpoint-api-client';
@@ -19,7 +19,7 @@ function prepareUsageTypePickItems(): Array<ProvisioningPolicyTypeQuickPickItem>
         description: (UsageTypeBeta[key] === FIRST ? "(default)" : ""),
         value: UsageTypeBeta[key]
     }))
-        .sort(((a, b) => (a.label > b.label) ? 1 : -1))
+        .sort(compareByLabel)
         // To move "Create" at the top. cf. https://stackoverflow.com/a/23921775
         .sort((a, b) => a.value === FIRST ? -1 : b.value === FIRST ? 1 : 0);
 }

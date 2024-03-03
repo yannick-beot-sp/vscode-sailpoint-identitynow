@@ -9,6 +9,7 @@ import { QuickPickPromptStep } from "../wizard/quickPickPromptStep";
 
 const newFilter = (nodeFilterType: FilterType) => new QuickPickPromptStep({
     name: "filterType",
+    displayName: "filter type",
     project: x => x.value,
     items: [{
         label: FilterType.api,

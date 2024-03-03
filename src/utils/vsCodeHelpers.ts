@@ -3,7 +3,7 @@ import { TenantService } from "../services/TenantService";
 import * as fs from 'fs';
 import { TenantInfo } from "../models/TenantInfo";
 import { TenantInfoQuickPickItem } from "../models/TenantInfoQuickPickItem";
-import { compareByName } from "../utils";
+import { compareByLabel, compareByName } from "../utils";
 import { isBlank, isEmpty } from "./stringUtils";
 import { ObjectPickItem } from "../models/ObjectPickItem";
 import { IMPORTABLE_OBJECT_TYPE_ITEMS, ObjectTypeQuickPickItem } from "../models/ObjectTypeQuickPickItem";
@@ -245,8 +245,7 @@ export async function askChosenItems(title: string,
  * @returns 
  */
 export async function askSelectObjectTypes(title: string, objectTypeItems: Array<ObjectTypeQuickPickItem> = IMPORTABLE_OBJECT_TYPE_ITEMS): Promise<Array<ObjectTypeQuickPickItem> | undefined> {
-	const sortedObjectTypeItems = objectTypeItems
-		.sort(((a, b) => (a.label > b.label) ? 1 : -1));
+	const sortedObjectTypeItems = objectTypeItems.sort(compareByLabel);
 
 	const selectedObjectTypeItems = await vscode.window.showQuickPick<ObjectTypeQuickPickItem>(sortedObjectTypeItems, {
 		ignoreFocusOut: false,

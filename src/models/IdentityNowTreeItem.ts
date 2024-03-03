@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import * as path from 'path';
 import { IdentityNowClient, TOTAL_COUNT_HEADER } from "../services/IdentityNowClient";
 import { getIdByUri, getPathByUri, getResourceUri } from "../utils/UriUtils";
-import { compareByName, compareByPriority } from "../utils";
+import { compareByLabel, compareByName, compareByPriority } from "../utils";
 import { AxiosResponse } from "axios";
 import { getConfigNumber } from '../utils/configurationUtils';
 import * as commands from "../commands/constants";
@@ -72,6 +72,7 @@ export class TenantTreeItem extends BaseTreeItem {
 		results.push(new RolesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new FormsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new SearchAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new IdentityAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 
 		return new Promise((resolve) => resolve(results));
 	}
@@ -1057,12 +1058,12 @@ export class SearchAttributesTreeItem extends FolderTreeItem {
 		tenantName: string,
 		tenantDisplayName: string,
 	) {
-		super("Search Attributes", "search-attributes", tenantId, tenantName, tenantDisplayName);
+		super("Search Attribute Config", "search-attributes", tenantId, tenantName, tenantDisplayName);
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
 		const client = new IdentityNowClient(this.tenantId, this.tenantName);
-		return (await client.getSearchAttributes()).map(x=>new SearchAttributeTreeItem(
+		return (await client.getSearchAttributes()).map(x => new SearchAttributeTreeItem(
 			this.tenantId,
 			this.tenantName,
 			this.tenantDisplayName,
@@ -1079,7 +1080,7 @@ export class SearchAttributeTreeItem extends IdentityNowResourceTreeItem {
 		tenantName: string,
 		tenantDisplayName: string,
 		name: string,
-		) {
+	) {
 		super(
 			tenantId,
 			tenantName,
@@ -1095,4 +1096,55 @@ export class SearchAttributeTreeItem extends IdentityNowResourceTreeItem {
 	}
 
 	iconPath = new vscode.ThemeIcon("search");
+}
+
+/**
+ * Contains the Identity Attributes in tree view
+ */
+export class IdentityAttributesTreeItem extends FolderTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {
+		super("Identity Attributes", "identity-attributes", tenantId, tenantName, tenantDisplayName);
+	}
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		const client = new IdentityNowClient(this.tenantId, this.tenantName);
+		return (await client.getIdentityAttributes()).map(x => new IdentityAttributeTreeItem(
+			this.tenantId,
+			this.tenantName,
+			this.tenantDisplayName,
+			x.name,
+			`${x.displayName} (${x.name})`,
+		)).sort(compareByLabel)
+
+	}
+}
+
+export class IdentityAttributeTreeItem extends IdentityNowResourceTreeItem {
+	contextValue = "identity-attribute";
+
+	constructor(tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		name: string,
+		displayName: string,
+	) {
+		super(
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			displayName,
+			"identity-attributes",
+			name,
+			vscode.TreeItemCollapsibleState.None,
+			undefined,
+			undefined,
+			true
+		);
+	}
+
+	iconPath = new vscode.ThemeIcon("list-selection");
 }

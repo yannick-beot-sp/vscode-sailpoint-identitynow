@@ -5,6 +5,7 @@ import { TransformQuickPickItem } from '../models/TransformQuickPickItem';
 import { isEmpty } from '../utils/stringUtils';
 import { getResourceUri } from '../utils/UriUtils';
 import { createNewFile } from '../utils/vsCodeHelpers';
+import { compareByLabel } from '../utils';
 const transforms = require('../../snippets/transforms.json');
 
 /**
@@ -47,7 +48,7 @@ export class NewTransformCommand {
                 "detail": transforms[k].description,
                 "template": transforms[k].newtemplate
             }))
-            .sort(((a, b) => (a.label > b.label) ? 1 : -1));
+            .sort(compareByLabel);
 
         const transform = await vscode.window.showQuickPick(transformPickList, {
             ignoreFocusOut: false,
