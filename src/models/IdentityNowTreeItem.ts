@@ -185,6 +185,20 @@ export class IdentityProfilesTreeItem extends FolderTreeItem {
 
 export class IdentityNowResourceTreeItem extends BaseTreeItem {
 	public readonly uri: vscode.Uri;
+	/**
+	 * Constructor
+	 * @param tenantId 
+	 * @param tenantName 
+	 * @param tenantDisplayName 
+	 * @param label Label of the node
+	 * @param resourceType type of resource, used to build the URI
+	 * @param id id of node in the tree. Must be globally unique in the tree. If resourceId is not defined, id is used to build the URI
+	 * @param collapsible define if the node is collapsible, collapsed or not. By defaut, not collapsible
+	 * @param subResourceType 
+	 * @param subId 
+	 * @param beta true if relying on beta API
+	 * @param resourceId Id of the object if the id is globally unique. Used in the URI.
+	 */
 	constructor(
 		tenantId: string,
 		tenantName: string,
@@ -196,15 +210,13 @@ export class IdentityNowResourceTreeItem extends BaseTreeItem {
 		collapsible: vscode.TreeItemCollapsibleState = vscode.TreeItemCollapsibleState.None,
 		public readonly subResourceType: string = "",
 		public readonly subId: string = "",
-		public readonly beta = false
+		public readonly beta = false,
+		resourceId: string | undefined = undefined
 	) {
 		// By default, a IdentityNowResourceTreeItem will be a leaf, meaning that there will not be any childs
 		super(label, tenantId, tenantName, tenantDisplayName, collapsible);
 		this.id = id;
-		if (resourceType === 'identity-attributes') {
-			id = id.split("||")[1];
-		}
-		this.uri = getResourceUri(tenantName, resourceType, id, label, beta);
+		this.uri = getResourceUri(tenantName, resourceType, resourceId ?? id, label, beta);
 		if (subResourceType && subId) {
 			this.uri = this.uri.with({
 				path: path.posix.join(
@@ -1084,17 +1096,19 @@ export class SearchAttributeTreeItem extends IdentityNowResourceTreeItem {
 		tenantDisplayName: string,
 		name: string,
 	) {
+		const uniqueId = `${tenantId}/${name}`;
 		super(
 			tenantId,
 			tenantName,
 			tenantDisplayName,
 			name,
 			"accounts/search-attribute-config",
-			name,
+			uniqueId,
 			vscode.TreeItemCollapsibleState.None,
 			undefined,
 			undefined,
-			true
+			true,
+			name
 		);
 	}
 
@@ -1135,7 +1149,7 @@ export class IdentityAttributeTreeItem extends IdentityNowResourceTreeItem {
 		name: string,
 		displayName: string,
 	) {
-		const uniqueId = `${tenantId}||${name}`;
+		const uniqueId = `${tenantId}/${name}`;
 		super(
 			tenantId,
 			tenantName,
@@ -1146,7 +1160,8 @@ export class IdentityAttributeTreeItem extends IdentityNowResourceTreeItem {
 			vscode.TreeItemCollapsibleState.None,
 			undefined,
 			undefined,
-			true
+			true,
+			name
 		);
 	}
 
