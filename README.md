@@ -302,7 +302,11 @@ The patterns defined above use the following tokens:
 
 ## Release Notes
 
-## 1.0.1
+## 1.0.3
+
+- Publication issue
+
+## 1.0.2
 
 - Could not open Identity Attributes from several tenants (cf. [#69](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/69))
 

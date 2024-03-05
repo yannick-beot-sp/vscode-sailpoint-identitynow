@@ -6,6 +6,12 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [1.0.3] - 2024-03-05
+
+### Fixed
+
+- Publication issue
+
 ## [1.0.2] - 2024-03-05
 
 ### Fixed
