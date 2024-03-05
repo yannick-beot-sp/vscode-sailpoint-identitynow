@@ -6,6 +6,12 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [1.0.1] - 2024-03-05
+
+### Fixed
+
+- Transform not correctly saved (cf. [#68](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/68))
+
 ## [1.0.0] - 2024-03-04
 
 ### Added

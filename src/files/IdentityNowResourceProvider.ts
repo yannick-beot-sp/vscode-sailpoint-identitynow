@@ -136,14 +136,8 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 
 			this._emitter.fire([{ type: vscode.FileChangeType.Created, uri }]);
 		} else {
-			// Need to update the content to remove id and internal properties from the payload
-			// to prevent a bad request error
-			if (resourcePath.match("transform")) {
-				let transform = JSON.parse(data);
-				delete transform.id;
-				delete transform.internal;
-				data = JSON.stringify(transform);
-			} else if (resourcePath.match("form-definitions")) {
+
+			if (resourcePath.match("form-definitions")) {
 				// UI is pushing all data as a Patch. Doing the same for form definitions
 				const newData = JSON.parse(data) as FormDefinitionResponseBeta
 				const jsonpatch: Operation[] = [
@@ -227,8 +221,20 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 					JSON.stringify(jsonpatch)
 				);
 			} else {
+				// Need to update the content to remove id and internal properties from the payload
+				// to prevent a bad request error
+				if (resourcePath.match("transform")) {
+					console.log("Removing id from transform payload")
+					let transform = JSON.parse(data);
+					delete transform.id;
+					delete transform.internal;
+					data = JSON.stringify(transform);
+				}
+
 				const updatedData = await client.updateResource(resourcePath, data);
+				console.log(`Payload updated for ${resourcePath}`)
 				if (!updatedData) {
+					console.error(`Issue with ${uri}`);
 					throw vscode.FileSystemError.FileNotFound(uri);
 				}
 			}

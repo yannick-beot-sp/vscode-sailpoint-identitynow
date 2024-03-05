@@ -302,6 +302,10 @@ The patterns defined above use the following tokens:
 
 ## Release Notes
 
+## 1.0.1
+
+- Transform not correctly saved (cf. [#68](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/68))
+
 ### 1.0.0
 
 - Import/Export entitlements for roles
