@@ -304,6 +304,10 @@ The patterns defined above use the following tokens:
 
 ## 1.0.1
 
+- Could not open Identity Attributes from several tenants (cf. [#69](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/69))
+
+## 1.0.1
+
 - Transform not correctly saved (cf. [#68](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/68))
 
 ### 1.0.0

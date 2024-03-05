@@ -6,6 +6,12 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [1.0.2] - 2024-03-05
+
+### Fixed
+
+- Could not open Identity Attributes from several tenants (cf. [#69](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/69))
+
 ## [1.0.1] - 2024-03-05
 
 ### Fixed
