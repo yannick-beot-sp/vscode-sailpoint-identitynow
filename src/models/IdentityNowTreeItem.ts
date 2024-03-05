@@ -201,6 +201,9 @@ export class IdentityNowResourceTreeItem extends BaseTreeItem {
 		// By default, a IdentityNowResourceTreeItem will be a leaf, meaning that there will not be any childs
 		super(label, tenantId, tenantName, tenantDisplayName, collapsible);
 		this.id = id;
+		if (resourceType === 'identity-attributes') {
+			id = id.split("||")[1];
+		}
 		this.uri = getResourceUri(tenantName, resourceType, id, label, beta);
 		if (subResourceType && subId) {
 			this.uri = this.uri.with({
@@ -1132,13 +1135,14 @@ export class IdentityAttributeTreeItem extends IdentityNowResourceTreeItem {
 		name: string,
 		displayName: string,
 	) {
+		const uniqueId = `${tenantId}||${name}`;
 		super(
 			tenantId,
 			tenantName,
 			tenantDisplayName,
 			displayName,
 			"identity-attributes",
-			name,
+			uniqueId,
 			vscode.TreeItemCollapsibleState.None,
 			undefined,
 			undefined,
