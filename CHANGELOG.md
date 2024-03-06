@@ -6,6 +6,14 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [1.0.4] - 2024-03-06
+
+### Fixed
+
+- New attempt to publish extension
+- Refactoring of IdentityNowTreeItem.ts and fixed refreshing issue with Workflows
+- Non-matching schema for lifecycle states
+
 ## [1.0.3] - 2024-03-05
 
 ### Fixed

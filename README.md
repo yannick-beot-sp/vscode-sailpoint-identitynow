@@ -302,6 +302,12 @@ The patterns defined above use the following tokens:
 
 ## Release Notes
 
+## 1.0.4
+
+- New attempt to publish extension
+- Refactoring of IdentityNowTreeItem.ts and fixed refreshing issue with Workflows
+- Non-matching schema for lifecycle states
+
 ## 1.0.3
 
 - Publication issue

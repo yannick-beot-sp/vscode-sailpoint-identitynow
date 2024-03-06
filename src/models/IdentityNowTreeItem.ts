@@ -199,34 +199,51 @@ export class IdentityNowResourceTreeItem extends BaseTreeItem {
 	 * @param beta true if relying on beta API
 	 * @param resourceId Id of the object if the id is globally unique. Used in the URI.
 	 */
-	constructor(
-		tenantId: string,
-		tenantName: string,
-		tenantDisplayName: string,
-		label: string,
-		resourceType: string,
-		//public readonly
-		id: string,
-		collapsible: vscode.TreeItemCollapsibleState = vscode.TreeItemCollapsibleState.None,
-		public readonly subResourceType: string = "",
-		public readonly subId: string = "",
-		public readonly beta = false,
-		resourceId: string | undefined = undefined
-	) {
-		// By default, a IdentityNowResourceTreeItem will be a leaf, meaning that there will not be any childs
-		super(label, tenantId, tenantName, tenantDisplayName, collapsible);
-		this.id = id;
-		this.uri = getResourceUri(tenantName, resourceType, resourceId ?? id, label, beta);
-		if (subResourceType && subId) {
+	constructor(options: {
+		tenantId: string;
+		tenantName: string;
+		tenantDisplayName: string;
+		label: string;
+		resourceType: string;
+		id: string;
+		resourceId?: string,
+		beta?: boolean;
+		collapsible?: vscode.TreeItemCollapsibleState;
+		parentId?: string;
+		subId?: string;
+		subResourceType?: string;
+		resourceSubId?: string,
+	}) {
+
+		options = {
+			...{
+				// By default, a IdentityNowResourceTreeItem will be a leaf, meaning that there will not be any childs
+				collapsible: vscode.TreeItemCollapsibleState.None,
+				beta: false // v3 by default
+			},
+			...options
+		}
+		super(options.label, options.tenantId, options.tenantName, options.tenantDisplayName, options.collapsible);
+		this.id = options.id;
+
+		if (options.subResourceType && options.subId) {
+			this.uri = getResourceUri(options.tenantName,
+				options.resourceType,
+				options.parentId,
+				options.label, options.beta)
 			this.uri = this.uri.with({
 				path: path.posix.join(
 					getPathByUri(this.uri) || "",
-					subResourceType,
-					subId,
-					label
+					options.subResourceType,
+					options.resourceSubId ?? options.subId,
+					options.label
 				),
-			});
-			this.id = subId;
+			})
+		} else {
+			this.uri = getResourceUri(options.tenantName,
+				options.resourceType,
+				options.resourceId ?? options.id,
+				options.label, options.beta);
 		}
 	}
 
@@ -252,16 +269,15 @@ export class SourceTreeItem extends IdentityNowResourceTreeItem {
 		public readonly type: string,
 		public readonly delimiter: string,
 	) {
-		super(
+		super({
 			tenantId,
 			tenantName,
 			tenantDisplayName,
 			label,
-			"sources",
+			resourceType: "sources",
 			id,
-			vscode.TreeItemCollapsibleState.Collapsed
-		);
-
+			collapsible: vscode.TreeItemCollapsibleState.Collapsed
+		})
 		this.contextValue = type.replace(" ", "") + "source";
 	}
 
@@ -324,14 +340,14 @@ export class TransformTreeItem extends IdentityNowResourceTreeItem {
 		tenantDisplayName: string,
 		label: string,
 		id: string) {
-		super(
+		super({
 			tenantId,
 			tenantName,
 			tenantDisplayName,
 			label,
-			"transforms",
+			resourceType: "transforms",
 			id
-		);
+		})
 	}
 
 	updateIcon(context: vscode.ExtensionContext): void {
@@ -383,19 +399,19 @@ export class SchemaTreeItem extends IdentityNowResourceTreeItem {
 		tenantDisplayName: string,
 		label: string,
 		id: string,
-		subId: string
+		schemaId: string
 	) {
-		super(
+		super({
 			tenantId,
 			tenantName,
 			tenantDisplayName,
 			label,
-			"sources",
-			id,
-			vscode.TreeItemCollapsibleState.None,
-			"schemas",
-			subId
-		);
+			resourceType: "sources",
+			id: schemaId,
+			parentId: id,
+			subResourceType: "schemas",
+			subId: schemaId
+		})
 	}
 
 	iconPath = new vscode.ThemeIcon("symbol-class");
@@ -430,17 +446,14 @@ export class ProvisioningPoliciesTreeItem extends FolderTreeItem {
 		) {
 			results = provisioningPolicies
 				.sort(compareByName)
-				.map(
-					(provisioningPolicy) =>
-						new ProvisioningPolicyTreeItem(
-							this.tenantId,
-							this.tenantName,
-							this.tenantDisplayName,
-							provisioningPolicy.name,
-							getIdByUri(this.parentUri) || "",
-							provisioningPolicy.usageType
-						)
-				);
+				.map((provisioningPolicy) => new ProvisioningPolicyTreeItem(
+					this.tenantId,
+					this.tenantName,
+					this.tenantDisplayName,
+					provisioningPolicy.name,
+					getIdByUri(this.parentUri) || "",
+					provisioningPolicy.usageType
+				));
 		}
 		return results;
 	}
@@ -454,18 +467,20 @@ export class ProvisioningPolicyTreeItem extends IdentityNowResourceTreeItem {
 		tenantName: string,
 		tenantDisplayName: string,
 		label: string,
-		id: string,
-		subId: string
+		parentId: string,
+		provisioningPolicyName: string
 	) {
-		// For ProvisioningPolicyTreeItem, subId is equal to CREATE, so not unique.
-		super(
+		super({
 			tenantId,
 			tenantName,
 			tenantDisplayName,
 			label,
-			"sources",
-			id + "/provisioning-policies/" + subId
-		);
+			resourceType: "sources",
+			id: `${parentId}/provisioning-policies/${provisioningPolicyName}`,
+			parentId,
+			subResourceType: "provisioning-policies",
+			subId: provisioningPolicyName,
+		})
 	}
 
 	updateIcon(context: vscode.ExtensionContext): void {
@@ -515,19 +530,21 @@ export class WorkflowTreeItem extends IdentityNowResourceTreeItem {
 		id: string,
 		public enabled: boolean
 	) {
-		super(
+		super({
 			tenantId,
 			tenantName,
 			tenantDisplayName,
 			label,
-			"workflows",
+			resourceType: "workflows",
 			id,
-			vscode.TreeItemCollapsibleState.None,
-			undefined,
-			undefined,
-			true
-		);
-		this.contextValue = enabled ? "enabledWorkflow" : "disabledWorkflow";
+			beta: true
+		})
+	}
+
+	contextValue = "workflow";
+
+	get computedContextValue() {
+		return this.enabled ? "enabledWorkflow" : "disabledWorkflow";
 	}
 
 	updateIcon(context: vscode.ExtensionContext): void {
@@ -574,18 +591,15 @@ export class RuleTreeItem extends IdentityNowResourceTreeItem {
 		tenantDisplayName: string,
 		label: string,
 		id: string) {
-		super(
+		super({
 			tenantId,
 			tenantName,
 			tenantDisplayName,
 			label,
-			"connector-rules",
+			resourceType: "connector-rules",
 			id,
-			vscode.TreeItemCollapsibleState.None,
-			undefined,
-			undefined,
-			true
-		);
+			beta: true
+		})
 	}
 
 	contextValue = "connector-rule";
@@ -600,15 +614,15 @@ export class IdentityProfileTreeItem extends IdentityNowResourceTreeItem {
 		label: string,
 		id: string
 	) {
-		super(
+		super({
 			tenantId,
 			tenantName,
 			tenantDisplayName,
 			label,
-			"identity-profiles",
+			resourceType: "identity-profiles",
 			id,
-			vscode.TreeItemCollapsibleState.Collapsed
-		);
+			collapsible: vscode.TreeItemCollapsibleState.Collapsed
+		})
 	}
 
 	contextValue = "identity-profile";
@@ -616,21 +630,17 @@ export class IdentityProfileTreeItem extends IdentityNowResourceTreeItem {
 	iconPath = new vscode.ThemeIcon("person-add");
 
 	async getChildren(): Promise<BaseTreeItem[]> {
-		const results: BaseTreeItem[] = [];
 		const client = new IdentityNowClient(this.tenantId, this.tenantName);
-		const lifecycleStates = await client.getLifecycleStates(this.id as string);
+		const lifecycleStates = await client.getLifecycleStates(this.id);
 
-		const lifecycleStateItems = lifecycleStates.map(
-			(w) =>
-				new LifecycleStateTreeItem(
-					this.tenantId,
-					this.tenantName,
-					this.tenantDisplayName,
-					w.name,
-					this.id as string,
-					w.id
-				)
-		);
+		const lifecycleStateItems = lifecycleStates.map((w) => new LifecycleStateTreeItem(
+			this.tenantId,
+			this.tenantName,
+			this.tenantDisplayName,
+			w.name,
+			this.id as string,
+			w.id
+		))
 		return lifecycleStateItems;
 	}
 }
@@ -646,20 +656,20 @@ export class LifecycleStateTreeItem extends IdentityNowResourceTreeItem {
 		tenantName: string,
 		tenantDisplayName: string,
 		label: string,
-		id: string,
-		subId: string
+		parentId: string,
+		lifecycleStateId: string
 	) {
-		super(
+		super({
 			tenantId,
 			tenantName,
 			tenantDisplayName,
 			label,
-			"identity-profiles",
-			id,
-			vscode.TreeItemCollapsibleState.None,
-			"lifecycle-states",
-			subId
-		);
+			resourceType: "identity-profiles",
+			id: lifecycleStateId,
+			parentId,
+			subResourceType: "lifecycle-states",
+			subId: lifecycleStateId
+		})
 	}
 
 	iconPath = new vscode.ThemeIcon("activate-breakpoints");
@@ -701,14 +711,14 @@ export class ServiceDeskTreeItem extends IdentityNowResourceTreeItem {
 		tenantDisplayName: string,
 		label: string,
 		id: string) {
-		super(
+		super({
 			tenantId,
 			tenantName,
 			tenantDisplayName,
 			label,
-			"service-desk-integrations",
+			resourceType: "service-desk-integrations",
 			id
-		);
+		})
 	}
 
 	iconPath = new vscode.ThemeIcon("gear");
@@ -808,7 +818,7 @@ export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implement
 				));
 				this.currentOffset += limit;
 			}
-		});
+		})
 	}
 
 	get hasMore(): boolean {
@@ -882,14 +892,14 @@ export class AccessProfileTreeItem extends IdentityNowResourceTreeItem {
 		tenantDisplayName: string,
 		label: string,
 		id: string) {
-		super(
+		super({
 			tenantId,
 			tenantName,
 			tenantDisplayName,
 			label,
-			"access-profiles",
+			resourceType: "access-profiles",
 			id
-		);
+		})
 	}
 
 	contextValue = "access-profile";
@@ -948,13 +958,14 @@ export class RoleTreeItem extends IdentityNowResourceTreeItem {
 		tenantDisplayName: string,
 		label: string,
 		id: string) {
-		super(
+		super({
 			tenantId,
 			tenantName,
 			tenantDisplayName,
 			label,
-			"roles",
-			id);
+			resourceType: "roles",
+			id
+		})
 	}
 
 	contextValue = "role";
@@ -1047,18 +1058,15 @@ export class FormTreeItem extends IdentityNowResourceTreeItem {
 		tenantDisplayName: string,
 		label: string,
 		id: string) {
-		super(
+		super({
 			tenantId,
 			tenantName,
 			tenantDisplayName,
 			label,
-			"form-definitions",
+			resourceType: "form-definitions",
 			id,
-			vscode.TreeItemCollapsibleState.None,
-			undefined,
-			undefined,
-			true
-		);
+			beta: true
+		})
 	}
 
 	iconPath = new vscode.ThemeIcon("preview");
@@ -1097,19 +1105,16 @@ export class SearchAttributeTreeItem extends IdentityNowResourceTreeItem {
 		name: string,
 	) {
 		const uniqueId = `${tenantId}/${name}`;
-		super(
+		super({
 			tenantId,
 			tenantName,
 			tenantDisplayName,
-			name,
-			"accounts/search-attribute-config",
-			uniqueId,
-			vscode.TreeItemCollapsibleState.None,
-			undefined,
-			undefined,
-			true,
-			name
-		);
+			label: name,
+			resourceType: "accounts/search-attribute-config",
+			id: uniqueId,
+			beta: true,
+			resourceId: name
+		})
 	}
 
 	iconPath = new vscode.ThemeIcon("search");
@@ -1150,19 +1155,16 @@ export class IdentityAttributeTreeItem extends IdentityNowResourceTreeItem {
 		displayName: string,
 	) {
 		const uniqueId = `${tenantId}/${name}`;
-		super(
+		super({
 			tenantId,
 			tenantName,
 			tenantDisplayName,
-			displayName,
-			"identity-attributes",
-			uniqueId,
-			vscode.TreeItemCollapsibleState.None,
-			undefined,
-			undefined,
-			true,
-			name
-		);
+			label: displayName,
+			resourceType: "identity-attributes",
+			id: uniqueId,
+			beta: true,
+			resourceId: name
+		})
 	}
 
 	iconPath = new vscode.ThemeIcon("list-selection");

@@ -2,7 +2,7 @@
   "name": "vscode-sailpoint-identitynow",
   "displayName": "SailPoint IdentityNow",
   "description": "Customize SailPoint IdentityNow",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "publisher": "yannick-beot-sp",
   "icon": "resources/idn.png",
   "bugs": {
@@ -1116,12 +1116,12 @@
         "url": "./schemas/provisioning-policy.schemas.json"
       },
       {
-        "fileMatch": "idn://**/identity-profiles/**/*",
-        "url": "./schemas/identity-profile.schemas.json"
-      },
-      {
         "fileMatch": "idn://**/lifecycle-states/**/*",
         "url": "./schemas/lifecycle-state.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/identity-profiles/*/*",
+        "url": "./schemas/identity-profile.schemas.json"
       },
       {
         "fileMatch": "idn://**/roles/**/*",
