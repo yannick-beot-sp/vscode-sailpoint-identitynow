@@ -10,7 +10,7 @@ import { deleteResource } from './commands/deleteResource';
 import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './commands/source/exportAccounts';
 import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from './commands/source/exportEntitlementDetails';
 import { ExportScriptFromRuleCommand } from './commands/exportScriptFromRuleCommand';
-import { AccessProfileFilterCommand, FilterCommand, RoleFilterCommand } from './commands/filterCommand';
+import { AccessProfileFilterCommand, RoleFilterCommand } from './commands/filterCommand';
 import { AccountImportNodeCommand } from './commands/source/importAccount';
 import { EntitlementDetailsImportNodeCommand } from './commands/source/importEntitlementDetails';
 import { UncorrelatedAccountImportNodeCommand } from './commands/source/importUncorrelatedAccount';
@@ -50,13 +50,13 @@ import { PeekSourceCommand } from './commands/source/PeekSourceCommand';
 import { PingClusterCommand } from './commands/source/PingClusterCommand';
 import { CloneSourceCommand } from './commands/source/CloneSourceCommand';
 import { FormDefinitionExportCommand } from './commands/form/FormDefinitionExportCommand';
-import { FormDefinitionImporter } from './commands/form/FormDefinitionImporter';
 import { FormDefinitionImporterTreeViewCommand } from './commands/form/FormDefinitionImporterTreeViewCommand';
 import { WorkflowExportCommand } from './commands/workflow/WorkflowExportCommand';
 import { WorkflowImporterTreeViewCommand } from './commands/workflow/WorkflowImporterTreeViewCommand';
-import { EditPublicIdentitiesConfigCommand } from './commands/editPublicIdentitiesConfigCommand';
-import { EditAccessRequestConfigCommand } from './commands/editAccessRequestConfigCommand';
+import { EditPublicIdentitiesConfigCommand } from './commands/tenant/editPublicIdentitiesConfigCommand';
+import { EditAccessRequestConfigCommand } from './commands/tenant/editAccessRequestConfigCommand';
 import { NewAttributeSearchConfigCommand } from './commands/NewAttributeSearchConfigCommand';
+import { EditPasswordConfigCommand } from './commands/tenant/editPasswordConfigCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -101,6 +101,11 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.EDIT_ACCESS_REQUEST_CONFIG,
 			editAccessRequestConfigCommand.execute,
 			editAccessRequestConfigCommand));
+	const editPasswordConfigCommand = new EditPasswordConfigCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EDIT_PASSWORD_ORG_CONFIG,
+			editPasswordConfigCommand.execute,
+			editPasswordConfigCommand));
 
 	const identityNowDataProvider = new IdentityNowDataProvider(context, tenantService);
 	vscode.window.registerTreeDataProvider(commands.TREE_VIEW, identityNowDataProvider);

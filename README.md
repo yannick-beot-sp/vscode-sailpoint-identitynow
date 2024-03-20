@@ -302,6 +302,8 @@ The patterns defined above use the following tokens:
 
 ## Release Notes
 
+- Edit Password Org Config
+
 ## 1.0.4
 
 - New attempt to publish extension

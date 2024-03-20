@@ -94,5 +94,6 @@ export const IMPORT_FORMS_ICON_VIEW = 'vscode-sailpoint-identitynow.forms.import
 
 export const EDIT_PUBLIC_IDENTITIES_CONFIG = 'vscode-sailpoint-identitynow.tenant.edit.public-identities-config';
 export const EDIT_ACCESS_REQUEST_CONFIG = 'vscode-sailpoint-identitynow.tenant.edit.access-request-config';
+export const EDIT_PASSWORD_ORG_CONFIG = 'vscode-sailpoint-identitynow.tenant.edit.password-org-config';
 
 export const NEW_SEARCH_ATTRIBUTE = 'vscode-sailpoint-identitynow.new-attribute-search.view'

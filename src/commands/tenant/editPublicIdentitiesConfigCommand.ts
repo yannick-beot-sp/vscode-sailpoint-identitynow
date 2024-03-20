@@ -1,7 +1,7 @@
-import { TenantTreeItem } from "../models/IdentityNowTreeItem";
+import { TenantTreeItem } from "../../models/IdentityNowTreeItem";
 import * as vscode from 'vscode';
-import { getResourceUri } from "../utils/UriUtils";
-import { openPreview } from "../utils/vsCodeHelpers";
+import { getResourceUri } from "../../utils/UriUtils";
+import { openPreview } from "../../utils/vsCodeHelpers";
 
 export class EditPublicIdentitiesConfigCommand {
 
