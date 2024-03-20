@@ -25,6 +25,7 @@ export function withQuery(baseUrl: string, params: any): string {
  */
 export function getResourceUri(tenantName: string, resourceType: string, id: string, name: string, beta = false): Uri {
     const baseUri = Uri.from({ scheme: URL_PREFIX, authority: tenantName, path: '/' });
+    name = name?.replaceAll("/", "%2F")
     // ensure all parts are not null
     const pathParts = [(beta ? 'beta' : 'v3'),
         resourceType,

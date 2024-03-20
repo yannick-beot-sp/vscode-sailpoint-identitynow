@@ -11,6 +11,10 @@ This changelog is following the recommended format by [keepachangelog](https://k
 - Edit Password Org Config
 - Generate a digit token for password reset
 
+### Fixed
+
+- 404 error when sources had '/' in their name (cf. [#71](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/71))
+
 ## [1.0.4] - 2024-03-06
 
 ### Fixed
