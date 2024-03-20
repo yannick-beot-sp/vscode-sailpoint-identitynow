@@ -92,6 +92,10 @@
         "title": "Edit password org configuration..."
       },
       {
+        "command": "vscode-sailpoint-identitynow.tenant.generate-digit-token",
+        "title": "Generate a digit token for password reset..."
+      },
+      {
         "command": "vscode-sailpoint-identitynow.export-config.view",
         "title": "Export config...",
         "icon": "$(export)"
@@ -509,6 +513,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.tenant.generate-digit-token",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.export-config.view",
           "when": "never"
         },
@@ -804,15 +812,23 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.tenant.edit.password-org-config",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant",
+          "group": "password"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.tenant.generate-digit-token",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant",
+          "group": "password"
         },
         {
           "command": "vscode-sailpoint-identitynow.export-config.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant",
+          "group": "config"
         },
         {
           "command": "vscode-sailpoint-identitynow.import-config.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant",
+          "group": "config"
         },
         {
           "command": "vscode-sailpoint-identitynow.aggregate-source",

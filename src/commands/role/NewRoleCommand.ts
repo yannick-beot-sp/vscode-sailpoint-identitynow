@@ -10,8 +10,8 @@ import { InputPromptStep } from '../../wizard/inputPromptStep';
 import { Validator } from '../../validator/validator';
 import { WizardContext } from '../../wizard/wizardContext';
 import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
-import { InputOwnerStep } from '../../wizard/inputOwnerStep';
-import { QuickPickOwnerStep } from '../../wizard/quickPickOwnerStep';
+import { InputIdentityQueryStep } from '../../wizard/inputIdentityQueryStep';
+import { QuickPickIdentityStep } from '../../wizard/quickPickIdentityStep';
 import { createNewFile } from '../../utils/vsCodeHelpers';
 import { isNotBlank } from '../../utils/stringUtils';
 import { Parser } from '../../parser/parser';
@@ -65,8 +65,8 @@ export class NewRoleCommand {
                         validateInput: (s: string) => { return roleNameValidator.validate(s); }
                     }
                 }),
-                new InputOwnerStep(),
-                new QuickPickOwnerStep(
+                new InputIdentityQueryStep(),
+                new QuickPickIdentityStep(
                     "role owner",
                     () => { return client; }
                 ),

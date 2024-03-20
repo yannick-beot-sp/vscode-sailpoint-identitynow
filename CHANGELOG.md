@@ -9,6 +9,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 ### Added
 
 - Edit Password Org Config
+- Generate a digit token for password reset
 
 ## [1.0.4] - 2024-03-06
 

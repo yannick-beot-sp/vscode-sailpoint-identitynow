@@ -303,6 +303,7 @@ The patterns defined above use the following tokens:
 ## Release Notes
 
 - Edit Password Org Config
+- Generate a digit token for password reset
 
 ## 1.0.4
 

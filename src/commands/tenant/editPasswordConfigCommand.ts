@@ -11,8 +11,7 @@ export class EditPasswordConfigCommand {
         const passwordOrgConfigUri = getResourceUri(node.tenantName,
             'password-org-config',
             null,
-            "Password Org Config",
-            true);
+            "Password Org Config");
 
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,

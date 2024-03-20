@@ -8,13 +8,13 @@ import { AccessProfile, Entitlement, EntitlementBeta } from 'sailpoint-api-clien
 import { runWizard } from '../../wizard/wizard';
 import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
 import { InputPromptStep } from '../../wizard/inputPromptStep';
-import { InputOwnerStep } from '../../wizard/inputOwnerStep';
-import { QuickPickOwnerStep } from '../../wizard/quickPickOwnerStep';
+import { QuickPickIdentityStep } from '../../wizard/quickPickIdentityStep';
 import { Validator } from '../../validator/validator';
 import { WizardContext } from '../../wizard/wizardContext';
 import { QuickPickPromptStep } from '../../wizard/quickPickPromptStep';
 import { createNewFile } from '../../utils/vsCodeHelpers';
 import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep';
+import { InputIdentityQueryStep } from '../../wizard/inputIdentityQueryStep';
 
 const accessProfileTemplate: AccessProfile = require('../../../snippets/access-profile.json');
 
@@ -59,8 +59,8 @@ export class NewAccessProfileCommand {
                         validateInput: (s: string) => { return accessProfileNameValidator.validate(s); }
                     }
                 }),
-                new InputOwnerStep(),
-                new QuickPickOwnerStep(
+                new InputIdentityQueryStep(),
+                new QuickPickIdentityStep(
                     "access profile owner",
                     () => { return client!; }
                 ),
