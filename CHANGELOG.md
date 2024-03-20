@@ -6,6 +6,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [1.1.0] - 2024-03-20
+
 ### Added
 
 - Edit Password Org Config
