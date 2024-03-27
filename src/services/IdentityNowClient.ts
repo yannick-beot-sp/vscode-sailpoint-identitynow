@@ -1527,7 +1527,7 @@ export class IdentityNowClient {
 
 		})
 		console.log(`generateDigitToken: Request Id = ${result.data.requestId}`);
-		
+
 		return result.data.digitToken
 	}
 

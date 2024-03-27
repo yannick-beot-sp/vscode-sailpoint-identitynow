@@ -6,6 +6,11 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+### Added
+
+- Logging every call to ISC
+- Catch error message if peek objects fails
+
 ## [1.1.0] - 2024-03-20
 
 ### Added

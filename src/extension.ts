@@ -58,6 +58,8 @@ import { EditAccessRequestConfigCommand } from './commands/tenant/editAccessRequ
 import { NewAttributeSearchConfigCommand } from './commands/NewAttributeSearchConfigCommand';
 import { EditPasswordConfigCommand } from './commands/tenant/editPasswordConfigCommand';
 import { GenerateDigitTokenCommand } from './commands/tenant/generateDigitTokenCommand';
+import { onErrorResponse, onRequest, onResponse } from './services/AxiosHandlers';
+import axios from 'axios';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -102,13 +104,13 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.EDIT_ACCESS_REQUEST_CONFIG,
 			editAccessRequestConfigCommand.execute,
 			editAccessRequestConfigCommand));
-	
+
 	const editPasswordConfigCommand = new EditPasswordConfigCommand()
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EDIT_PASSWORD_ORG_CONFIG,
 			editPasswordConfigCommand.execute,
 			editPasswordConfigCommand));
-	
+
 	const generateDigitTokenCommand = new GenerateDigitTokenCommand(tenantService)
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.GENERATE_DIGIT_TOKEN,
@@ -443,6 +445,14 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.NEW_SEARCH_ATTRIBUTE,
 			newAttributeSearchConfigCommand.execute, newAttributeSearchConfigCommand));
+
+
+	axios.interceptors.request.use(onRequest)
+
+	// Add a response interceptor
+	axios.interceptors.response.use(
+		onResponse,
+		onErrorResponse)
 }
 
 // this method is called when your extension is deactivated
