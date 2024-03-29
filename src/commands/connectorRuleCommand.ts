@@ -46,35 +46,40 @@ export class ConnectorRuleCommand {
         }
         const client = new IdentityNowClient(tenantInfo.id, tenantInfo.tenantName);
         let newUri: vscode.Uri;
-        if (answer === UPDATE_RULE) {
+        try {
+            if (answer === UPDATE_RULE) {
 
-            const rule = await this.chooseExistingRule(client);
-            if (!rule) {
-                return;
-            }
+                const rule = await this.chooseExistingRule(client);
+                if (!rule) {
+                    return;
+                }
 
-            rule.sourceCode.script = selection;
-            const path = '/beta/connector-rules/' + rule.id;
-            client.updateResource(path, JSON.stringify(rule));
-            newUri = getResourceUri(tenantInfo.tenantName, 'connector-rules', rule.id, rule.name, true);
-        } else {
-            // NEW_RULE
-            let ruleName = await this.askRuleName() || "";
-            if (isEmpty(ruleName)) {
-                return;
-            }
+                rule.sourceCode.script = selection;
+                const path = '/beta/connector-rules/' + rule.id;
+                client.updateResource(path, JSON.stringify(rule));
+                newUri = getResourceUri(tenantInfo.tenantName, 'connector-rules', rule.id, rule.name, true);
+            } else {
+                // NEW_RULE
+                let ruleName = await this.askRuleName() || "";
+                if (isEmpty(ruleName)) {
+                    return;
+                }
 
-            const rule = await this.askRuleType();
-            if (!rule) {
-                return;
+                const rule = await this.askRuleType();
+                if (!rule) {
+                    return;
+                }
+                rule.sourceCode.script = selection;
+                rule.name = ruleName;
+                const data = await client.createResource('/beta/connector-rules', JSON.stringify(rule));
+                newUri = getResourceUri(tenantInfo.tenantName, 'connector-rules', data.id, data.name, true);
             }
-            rule.sourceCode.script = selection;
-            rule.name = ruleName;
-            const data = await client.createResource('/beta/connector-rules', JSON.stringify(rule));
-            newUri = getResourceUri(tenantInfo.tenantName, 'connector-rules', data.id, data.name, true);
+            openPreview(newUri)
+            vscode.commands.executeCommand(commands.REFRESH_FORCED)
+        } catch (error) {
+            const errorMessage = `Could not ${answer === UPDATE_RULE ? "update" : "create"} the rule: ${error}` 
+            vscode.window.showErrorMessage(errorMessage)
         }
-        openPreview(newUri)
-        vscode.commands.executeCommand(commands.REFRESH_FORCED)
 
     }
 
