@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { SourceTreeItem } from "../../models/IdentityNowTreeItem";
-import { IdentityNowClient } from '../../services/IdentityNowClient';
+import { SourceTreeItem } from "../../models/ISCTreeItem";
+import { ISCClient } from '../../services/ISCClient';
 import { CSVReader } from '../../services/CSVReader';
 import { isNotEmpty } from '../../utils/stringUtils';
 import { chooseFile } from '../../utils/vsCodeHelpers';
@@ -25,7 +25,7 @@ interface UncorrelatedAccountImportResult {
 }
 
 class EntitlementDetailsImporter {
-    readonly client: IdentityNowClient;
+    readonly client: ISCClient;
     readonly csvReader: CSVReader<any>;
     readonly result: UncorrelatedAccountImportResult = {
         totalDescription: 0,
@@ -48,7 +48,7 @@ class EntitlementDetailsImporter {
         private sourceCCId: number,
         private fileUri: vscode.Uri
     ) {
-        this.client = new IdentityNowClient(this.tenantId, this.tenantName);
+        this.client = new ISCClient(this.tenantId, this.tenantName);
         this.csvReader = new CSVReader<any>(this.fileUri.fsPath);
     }
 

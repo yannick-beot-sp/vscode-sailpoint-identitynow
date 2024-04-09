@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import { TenantService } from "../../services/TenantService";
-import { AccessProfilesTreeItem } from '../../models/IdentityNowTreeItem';
+import { AccessProfilesTreeItem } from '../../models/ISCTreeItem';
 import { NEW_ID } from '../../constants';
-import { IdentityNowClient } from '../../services/IdentityNowClient';
+import { ISCClient } from '../../services/ISCClient';
 import { getResourceUri } from '../../utils/UriUtils';
 import { AccessProfile, Entitlement, EntitlementBeta } from 'sailpoint-api-client';
 import { runWizard } from '../../wizard/wizard';
@@ -40,7 +40,7 @@ export class NewAccessProfileCommand {
             context["tenant"] = await this.tenantService.getTenant(accessProfilesTreeItem.tenantId);
         }
 
-        let client: IdentityNowClient | undefined = undefined;
+        let client: ISCClient | undefined = undefined;
 
         const values = await runWizard({
             title: "Creation of an access profile",
@@ -49,7 +49,7 @@ export class NewAccessProfileCommand {
                 new QuickPickTenantStep(
                     this.tenantService,
                     async (wizardContext) => {
-                        client = new IdentityNowClient(
+                        client = new ISCClient(
                             wizardContext["tenant"].id, wizardContext["tenant"].tenantName);
                     }),
                 new InputPromptStep({

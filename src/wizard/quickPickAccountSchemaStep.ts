@@ -2,11 +2,11 @@
 import * as vscode from 'vscode';
 import { QuickPickPromptStep } from "./quickPickPromptStep";
 import { WizardContext } from "./wizardContext";
-import { IdentityNowClient } from "../services/IdentityNowClient";
+import { ISCClient } from "../services/ISCClient";
 
 export class QuickPickAccountSchemaStep extends QuickPickPromptStep<WizardContext, vscode.QuickPickItem> {
     constructor(
-        getIdentityNowClient: () => IdentityNowClient,
+        getIdentityNowClient: () => ISCClient,
     ) {
         super({
             name: "attribute",

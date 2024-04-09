@@ -1,8 +1,8 @@
 import { EventEmitter, ExtensionContext, TreeDataProvider, TreeItem, Event, TreeItemCollapsibleState } from 'vscode';
-import { BaseTreeItem, TenantTreeItem } from '../models/IdentityNowTreeItem';
+import { BaseTreeItem, TenantTreeItem } from '../models/ISCTreeItem';
 import { TenantService } from '../services/TenantService';
 
-export class IdentityNowDataProvider implements TreeDataProvider<BaseTreeItem> {
+export class ISCDataProvider implements TreeDataProvider<BaseTreeItem> {
 
     private _onDidChangeTreeData: EventEmitter<BaseTreeItem | undefined | null | void> = new EventEmitter<BaseTreeItem | undefined | null | void>();
     readonly onDidChangeTreeData?: Event<BaseTreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
@@ -12,13 +12,13 @@ export class IdentityNowDataProvider implements TreeDataProvider<BaseTreeItem> {
     }
 
     forceRefresh(node: BaseTreeItem): void {
-        console.log('> IdentityNowDataProvider.forceRefresh');
+        console.log('> ISCDataProvider.forceRefresh');
         node?.reset();
         this.refresh(node);
     }
 
     refresh(node?: BaseTreeItem): void {
-        console.log('> IdentityNowDataProvider.refresh');
+        console.log('> ISCDataProvider.refresh');
         if (node) {
             this._onDidChangeTreeData.fire(node);
         } else {

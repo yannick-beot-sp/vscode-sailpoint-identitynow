@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { BaseCSVExporter } from "../BaseExporter";
-import { RolesTreeItem } from '../../models/IdentityNowTreeItem';
+import { RolesTreeItem } from '../../models/ISCTreeItem';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
 import { EntitlementRef, RequestabilityForRole, Revocability, RevocabilityForRole, Role, RoleMembershipSelectorType, RolesApiListRolesRequest } from 'sailpoint-api-client';

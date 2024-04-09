@@ -1,8 +1,8 @@
-import { TenantTreeItem } from "../../models/IdentityNowTreeItem";
+import { TenantTreeItem } from "../../models/ISCTreeItem";
 import * as vscode from 'vscode';
 import { TenantService } from "../../services/TenantService";
 import { WizardContext } from "../../wizard/wizardContext";
-import { IdentityNowClient } from "../../services/IdentityNowClient";
+import { ISCClient } from "../../services/ISCClient";
 import { runWizard } from "../../wizard/wizard";
 import { QuickPickTenantStep } from "../../wizard/quickPickTenantStep";
 import { InputIdentityQueryStep } from "../../wizard/inputIdentityQueryStep";
@@ -20,7 +20,7 @@ export class GenerateDigitTokenCommand {
         if (node !== undefined && node instanceof TenantTreeItem) {
             context["tenant"] = await this.tenantService.getTenant(node.tenantId);
         }
-        let client: IdentityNowClient | undefined = undefined;
+        let client: ISCClient | undefined = undefined;
 
         const values = await runWizard({
             title: "Generate a digit token",
@@ -29,7 +29,7 @@ export class GenerateDigitTokenCommand {
                 new QuickPickTenantStep(
                     this.tenantService,
                     async (wizardContext) => {
-                        client = new IdentityNowClient(
+                        client = new ISCClient(
                             wizardContext["tenant"].id, wizardContext["tenant"].tenantName);
                     }),
                 new InputIdentityQueryStep("identityQuery", "Identity to generate a digit token for"),

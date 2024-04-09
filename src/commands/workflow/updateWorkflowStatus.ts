@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as commands from '../constants';
-import { WorkflowTreeItem } from '../../models/IdentityNowTreeItem';
-import { IdentityNowClient } from '../../services/IdentityNowClient';
+import { WorkflowTreeItem } from '../../models/ISCTreeItem';
+import { ISCClient } from '../../services/ISCClient';
 
 export async function enableWorkflow(node: WorkflowTreeItem): Promise<void> {
 
@@ -26,7 +26,7 @@ async function updateWorkflowStatus(node: WorkflowTreeItem, enable: boolean): Pr
         console.log("WARNING: updateWorkflowStatus: invalid item", node);
         throw new Error("updateWorkflowStatus: invalid item");
     }
-    const client = new IdentityNowClient(node.tenantId,node.tenantName);
+    const client = new ISCClient(node.tenantId,node.tenantName);
     
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,

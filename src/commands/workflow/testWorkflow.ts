@@ -1,4 +1,4 @@
-import { WorkflowTreeItem } from '../../models/IdentityNowTreeItem';
+import { WorkflowTreeItem } from '../../models/ISCTreeItem';
 import { WorkflowTesterWebviewViewProvider } from '../../views/WorkflowTesterWebviewViewProvider';
 
 

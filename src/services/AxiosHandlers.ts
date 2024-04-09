@@ -29,7 +29,7 @@ export const onErrorResponse = (error: AxiosError | Error): Promise<AxiosError> 
 
     } else {
         const caller = (new Error()).stack?.split("\n")[2].trim().split(" ")[1];
-        console.error(`[IdentityNowClient] ${caller?.toUpperCase()} ${error.message}`, error);
+        console.error(`[ISCClient] ${caller?.toUpperCase()} ${error.message}`, error);
         errorMessage = error.message;
     }
 

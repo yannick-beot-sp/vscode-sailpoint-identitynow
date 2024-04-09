@@ -40,7 +40,7 @@ class SailPointIdentityNowPatSession implements AuthenticationSession {
     }
 }
 
-export class SailPointIdentityNowAuthenticationProvider implements AuthenticationProvider, Disposable {
+export class SailPointISCAuthenticationProvider implements AuthenticationProvider, Disposable {
 
 
     static id = 'SailPointIdentityNowPAT';
@@ -76,7 +76,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
                 // }),
                 // This fires when the user initiates a "silent" auth flow via the Accounts menu.
                 authentication.onDidChangeSessions(e => {
-                    if (e.provider.id === SailPointIdentityNowAuthenticationProvider.id) {
+                    if (e.provider.id === SailPointISCAuthenticationProvider.id) {
                         //void this.checkForUpdates();
                     }
                 }),
@@ -276,11 +276,11 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
     }
 
     private getSessionId(tenantId: string): string {
-        return SailPointIdentityNowAuthenticationProvider.id + '_' + tenantId;
+        return SailPointISCAuthenticationProvider.id + '_' + tenantId;
     }
 
     private getTenantNameFromSessionId(sessionId: string) {
-        const regexp = new RegExp(SailPointIdentityNowAuthenticationProvider.id + '_' + '(.*)');
+        const regexp = new RegExp(SailPointISCAuthenticationProvider.id + '_' + '(.*)');
         return sessionId.replace(regexp, "$1");
     }
 

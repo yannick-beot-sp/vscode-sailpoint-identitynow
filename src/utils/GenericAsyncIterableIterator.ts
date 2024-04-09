@@ -3,14 +3,14 @@
  */
 
 import { ExtraParams, PaginationParams } from "sailpoint-api-client";
-import { IdentityNowClient, TOTAL_COUNT_HEADER } from "../services/IdentityNowClient";
+import { ISCClient, TOTAL_COUNT_HEADER } from "../services/ISCClient";
 import { AxiosResponse } from "axios";
 
 export class GenericAsyncIterableIterator<TResult, A extends PaginationParams & ExtraParams> implements AsyncIterable<TResult[]> {
 
     constructor(
-        private client: IdentityNowClient,
-        private callbackFn: (this: IdentityNowClient, args: A) => Promise<AxiosResponse<TResult[], any>>,
+        private client: ISCClient,
+        private callbackFn: (this: ISCClient, args: A) => Promise<AxiosResponse<TResult[], any>>,
         private args?: A
     ) { }
 

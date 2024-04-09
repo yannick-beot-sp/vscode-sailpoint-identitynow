@@ -1,6 +1,6 @@
 import { chooseFile } from '../../utils/vsCodeHelpers';
-import { WorkflowsTreeItem } from '../../models/IdentityNowTreeItem';
-import { IdentityNowClient } from '../../services/IdentityNowClient';
+import { WorkflowsTreeItem } from '../../models/ISCTreeItem';
+import { ISCClient } from '../../services/ISCClient';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 import { WorkflowBeta } from 'sailpoint-api-client';
@@ -47,7 +47,7 @@ export class WorkflowImporterTreeViewCommand {
         const cleanedWorkflow = cleanUpWorkflow(workflow)
         cleanedWorkflow.name = name
         cleanedWorkflow.enabled = false
-        const client = new IdentityNowClient(node.tenantId, node.tenantName);
+        const client = new ISCClient(node.tenantId, node.tenantName);
         await client.createWorflow(workflow)
         vscode.window.showInformationMessage(`Successfully imported workflow ${name}`);
         vscode.commands.executeCommand(commands.REFRESH_FORCED);

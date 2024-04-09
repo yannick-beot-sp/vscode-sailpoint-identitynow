@@ -36,14 +36,14 @@ import { viewWorkflowExecutionHistory } from './commands/workflow/viewWorkflowEx
 import { disableWorkflow, enableWorkflow } from './commands/workflow/updateWorkflowStatus';
 import { URL_PREFIX } from './constants';
 import { FileHandler } from './files/FileHandler';
-import { IdentityNowResourceProvider } from './files/IdentityNowResourceProvider';
-import { LoadMoreNode } from './models/IdentityNowTreeItem';
-import { SailPointIdentityNowAuthenticationProvider } from './services/AuthenticationProvider';
+import { ISCResourceProvider } from './files/ISCResourceProvider';
+import { LoadMoreNode } from './models/ISCTreeItem';
+import { SailPointISCAuthenticationProvider } from './services/AuthenticationProvider';
 import { TenantService } from './services/TenantService';
 import { TransformEvaluator } from './services/TransformEvaluator';
 import { TreeManager } from './services/TreeManager';
-import { IdentityNowUriHandler } from './uriHandler';
-import { IdentityNowDataProvider } from './views/IdentityNowDataProvider';
+import { ISCUriHandler } from './ISCUriHandler';
+import { ISCDataProvider } from './views/ISCDataProvider';
 import { WorkflowTesterWebviewViewProvider } from './views/WorkflowTesterWebviewViewProvider';
 import { TestConnectionCommand } from './commands/source/TestConnectionCommand';
 import { PeekSourceCommand } from './commands/source/PeekSourceCommand';
@@ -73,10 +73,10 @@ export function activate(context: vscode.ExtensionContext) {
 	// any other extension can use this provider via the `getSession` API.
 	// NOTE: when implementing an auth provider, don't forget to register an activation event for that provider
 	// in your package.json file: "onAuthenticationRequest:AzureDevOpsPAT"
-	const authProvider = new SailPointIdentityNowAuthenticationProvider(tenantService);
+	const authProvider = new SailPointISCAuthenticationProvider(tenantService);
 
 	context.subscriptions.push(vscode.authentication.registerAuthenticationProvider(
-		SailPointIdentityNowAuthenticationProvider.id,
+		SailPointISCAuthenticationProvider.id,
 		'SailPoint Identity Now',
 		authProvider,
 		{
@@ -117,7 +117,7 @@ export function activate(context: vscode.ExtensionContext) {
 			generateDigitTokenCommand.execute,
 			generateDigitTokenCommand));
 
-	const identityNowDataProvider = new IdentityNowDataProvider(context, tenantService);
+	const identityNowDataProvider = new ISCDataProvider(context, tenantService);
 	vscode.window.registerTreeDataProvider(commands.TREE_VIEW, identityNowDataProvider);
 
 	vscode.commands.registerCommand(commands.REFRESH_FORCED, identityNowDataProvider.forceRefresh, identityNowDataProvider);
@@ -291,7 +291,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.workspace.registerFileSystemProvider(
 			URL_PREFIX,
-			new IdentityNowResourceProvider(tenantService)
+			new ISCResourceProvider(tenantService)
 		));
 
 	const newTransformCommand = new NewTransformCommand();
@@ -349,7 +349,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const fileHandler = new FileHandler(tenantService);
 	vscode.workspace.onDidSaveTextDocument(fileHandler.onFileSaved, fileHandler);
 
-	const uriHandler = new IdentityNowUriHandler(tenantService);
+	const uriHandler = new ISCUriHandler(tenantService);
 	context.subscriptions.push(
 		vscode.window.registerUriHandler(uriHandler));
 

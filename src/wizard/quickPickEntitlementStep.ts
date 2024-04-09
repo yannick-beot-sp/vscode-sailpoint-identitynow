@@ -2,12 +2,12 @@
 import * as vscode from 'vscode';
 import { QuickPickPromptStep } from "./quickPickPromptStep";
 import { WizardContext } from "./wizardContext";
-import { IdentityNowClient } from "../services/IdentityNowClient";
+import { ISCClient } from "../services/ISCClient";
 import { isEmpty } from '../utils/stringUtils';
 
 export class QuickPickEntitlementStep extends QuickPickPromptStep<WizardContext, vscode.QuickPickItem> {
     constructor(
-        getIdentityNowClient: () => IdentityNowClient,
+        getIdentityNowClient: () => ISCClient,
         private readonly entitlementQueryKey = "entitlementQuery",
     ) {
         super({

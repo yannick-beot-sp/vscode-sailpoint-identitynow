@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { BaseTreeItem, FilterType, PageableNode } from "../models/IdentityNowTreeItem";
+import { BaseTreeItem, FilterType, PageableNode } from "../models/ISCTreeItem";
 import * as commands from "../commands/constants";
 import { WizardContext } from "../wizard/wizardContext";
 import { InputPromptStep } from "../wizard/inputPromptStep";

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { IdentityNowResourceTreeItem } from "../models/IdentityNowTreeItem";
+import { ISCResourceTreeItem } from "../models/ISCTreeItem";
 import { openPreview } from '../utils/vsCodeHelpers';
 
 /**
@@ -7,11 +7,11 @@ import { openPreview } from '../utils/vsCodeHelpers';
  */
 export class OpenResourceCommand {
 
-    async execute(node?: IdentityNowResourceTreeItem, nodes?: IdentityNowResourceTreeItem[]): Promise<void> {
+    async execute(node?: ISCResourceTreeItem, nodes?: ISCResourceTreeItem[]): Promise<void> {
 
         console.log("> OpenResourceCommand.execute", node);
         // assessing that item is a SourceTreeItem
-        if (node === undefined || !(node instanceof IdentityNowResourceTreeItem)) {
+        if (node === undefined || !(node instanceof ISCResourceTreeItem)) {
             console.log("WARNING: OpenResourceCommand: invalid item", node);
             throw new Error("OpenResourceCommand: invalid item");
         }

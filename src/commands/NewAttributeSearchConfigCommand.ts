@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { TenantService } from "../services/TenantService";
-import { SearchAttributesTreeItem } from '../models/IdentityNowTreeItem';
-import { IdentityNowClient } from '../services/IdentityNowClient';
+import { SearchAttributesTreeItem } from '../models/ISCTreeItem';
+import { ISCClient } from '../services/ISCClient';
 import { getResourceUri } from '../utils/UriUtils';
 import { SearchAttributeConfigBeta } from 'sailpoint-api-client';
 import { runWizard } from '../wizard/wizard';
@@ -37,7 +37,7 @@ export class NewAttributeSearchConfigCommand {
             context["tenant"] = await this.tenantService.getTenant(node.tenantId);
         }
 
-        let client: IdentityNowClient | undefined = undefined;
+        let client: ISCClient | undefined = undefined;
         const values = await runWizard({
             title: "Creation of a search attribute",
             hideStepCount: false,
@@ -45,7 +45,7 @@ export class NewAttributeSearchConfigCommand {
                 new QuickPickTenantStep(
                     this.tenantService,
                     async (wizardContext) => {
-                        client = new IdentityNowClient(
+                        client = new ISCClient(
                             wizardContext["tenant"].id, wizardContext["tenant"].tenantName);
                     }),
                 new InputPromptStep({

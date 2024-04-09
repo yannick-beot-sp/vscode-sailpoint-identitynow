@@ -1,13 +1,13 @@
 import * as vscode from 'vscode';
 import * as commands from '../commands/constants';
-import { IdentityNowResourceTreeItem, IdentityProfileSorting, IdentityProfilesTreeItem } from "../models/IdentityNowTreeItem";
+import { ISCResourceTreeItem, IdentityProfileSorting, IdentityProfilesTreeItem } from "../models/ISCTreeItem";
 
 /**
  * Command used to open a source or a transform
  */
 export class SortIdentityProfileCommand {
 
-    async sortByName(node?: IdentityNowResourceTreeItem, nodes?: IdentityNowResourceTreeItem[]): Promise<void> {
+    async sortByName(node?: ISCResourceTreeItem, nodes?: ISCResourceTreeItem[]): Promise<void> {
 
         console.log("> SortIdentityProfileCommand.sortByName", node);
         // assessing that item is a SourceTreeItem
@@ -19,7 +19,7 @@ export class SortIdentityProfileCommand {
         await this.sortBy(IdentityProfileSorting.name, node);
     }
 
-    async sortByPriority(node?: IdentityNowResourceTreeItem, nodes?: IdentityNowResourceTreeItem[]): Promise<void> {
+    async sortByPriority(node?: ISCResourceTreeItem, nodes?: ISCResourceTreeItem[]): Promise<void> {
 
         console.log("> SortIdentityProfileCommand.sortByPriority", node);
         // assessing that item is a SourceTreeItem

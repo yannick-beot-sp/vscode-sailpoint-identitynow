@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import * as path from 'path';
-import { IdentityNowClient, TOTAL_COUNT_HEADER } from "../services/IdentityNowClient";
+import { ISCClient, TOTAL_COUNT_HEADER } from "../services/ISCClient";
 import { getIdByUri, getPathByUri, getResourceUri } from "../utils/UriUtils";
 import { compareByLabel, compareByName, compareByPriority } from "../utils";
 import { AxiosResponse } from "axios";
@@ -120,7 +120,7 @@ export class SourcesTreeItem extends FolderTreeItem {
 
 	async getChildren(): Promise<BaseTreeItem[]> {
 		let results: BaseTreeItem[] = [];
-		const client = new IdentityNowClient(this.tenantId, this.tenantName);
+		const client = new ISCClient(this.tenantId, this.tenantName);
 		const sources = await client.getSources();
 		if (sources !== undefined && sources instanceof Array) {
 			results = sources
@@ -159,7 +159,7 @@ export class IdentityProfilesTreeItem extends FolderTreeItem {
 
 	async getChildren(): Promise<BaseTreeItem[]> {
 		const results: BaseTreeItem[] = [];
-		const client = new IdentityNowClient(this.tenantId, this.tenantName);
+		const client = new ISCClient(this.tenantId, this.tenantName);
 		let identityProfiles = await client.getIdentityProfiles();
 		if (this.criteria === IdentityProfileSorting.name) {
 			identityProfiles = identityProfiles.sort(compareByName);
@@ -183,7 +183,7 @@ export class IdentityProfilesTreeItem extends FolderTreeItem {
 	}
 }
 
-export class IdentityNowResourceTreeItem extends BaseTreeItem {
+export class ISCResourceTreeItem extends BaseTreeItem {
 	public readonly uri: vscode.Uri;
 	/**
 	 * Constructor
@@ -217,7 +217,7 @@ export class IdentityNowResourceTreeItem extends BaseTreeItem {
 
 		options = {
 			...{
-				// By default, a IdentityNowResourceTreeItem will be a leaf, meaning that there will not be any childs
+				// By default, a ISCResourceTreeItem will be a leaf, meaning that there will not be any childs
 				collapsible: vscode.TreeItemCollapsibleState.None,
 				beta: false // v3 by default
 			},
@@ -258,7 +258,7 @@ export class IdentityNowResourceTreeItem extends BaseTreeItem {
 	}
 }
 
-export class SourceTreeItem extends IdentityNowResourceTreeItem {
+export class SourceTreeItem extends ISCResourceTreeItem {
 	constructor(
 		tenantId: string,
 		tenantName: string,
@@ -314,7 +314,7 @@ export class TransformsTreeItem extends FolderTreeItem {
 
 	async getChildren(): Promise<BaseTreeItem[]> {
 		let results: BaseTreeItem[] = [];
-		const client = new IdentityNowClient(this.tenantId, this.tenantName);
+		const client = new ISCClient(this.tenantId, this.tenantName);
 		const transforms = await client.getTransforms();
 		if (transforms !== undefined && transforms instanceof Array) {
 			results = transforms.map((element) =>
@@ -331,7 +331,7 @@ export class TransformsTreeItem extends FolderTreeItem {
 	}
 }
 
-export class TransformTreeItem extends IdentityNowResourceTreeItem {
+export class TransformTreeItem extends ISCResourceTreeItem {
 	contextValue = "transform";
 
 	constructor(
@@ -371,7 +371,7 @@ export class SchemasTreeItem extends FolderTreeItem {
 	async getChildren(): Promise<BaseTreeItem[]> {
 		let results: BaseTreeItem[] = [];
 
-		const client = new IdentityNowClient(this.tenantId, this.tenantName);
+		const client = new ISCClient(this.tenantId, this.tenantName);
 		const schemaPath = getPathByUri(this.parentUri) + "/schemas";
 		const schemas = await client.getResource(schemaPath);
 		if (schemas !== undefined && schemas instanceof Array) {
@@ -392,7 +392,7 @@ export class SchemasTreeItem extends FolderTreeItem {
 	}
 }
 
-export class SchemaTreeItem extends IdentityNowResourceTreeItem {
+export class SchemaTreeItem extends ISCResourceTreeItem {
 	constructor(
 		tenantId: string,
 		tenantName: string,
@@ -434,7 +434,7 @@ export class ProvisioningPoliciesTreeItem extends FolderTreeItem {
 
 	async getChildren(): Promise<BaseTreeItem[]> {
 		let results: BaseTreeItem[] = [];
-		const client = new IdentityNowClient(this.tenantId, this.tenantName);
+		const client = new ISCClient(this.tenantId, this.tenantName);
 		const provisioningPoliciesPath =
 			getPathByUri(this.parentUri) + "/provisioning-policies";
 		const provisioningPolicies = await client.getResource(
@@ -459,7 +459,7 @@ export class ProvisioningPoliciesTreeItem extends FolderTreeItem {
 	}
 }
 
-export class ProvisioningPolicyTreeItem extends IdentityNowResourceTreeItem {
+export class ProvisioningPolicyTreeItem extends ISCResourceTreeItem {
 	contextValue = "provisioning-policy";
 
 	constructor(
@@ -504,7 +504,7 @@ export class WorkflowsTreeItem extends FolderTreeItem {
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
-		const client = new IdentityNowClient(this.tenantId, this.tenantName);
+		const client = new ISCClient(this.tenantId, this.tenantName);
 		const workflows = await client.getWorflows();
 		const workflowTreeItems = workflows.map(
 			(w) =>
@@ -521,7 +521,7 @@ export class WorkflowsTreeItem extends FolderTreeItem {
 	}
 }
 
-export class WorkflowTreeItem extends IdentityNowResourceTreeItem {
+export class WorkflowTreeItem extends ISCResourceTreeItem {
 	constructor(
 		tenantId: string,
 		tenantName: string,
@@ -575,7 +575,7 @@ export class RulesTreeItem extends FolderTreeItem {
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
-		const client = new IdentityNowClient(this.tenantId, this.tenantName);
+		const client = new ISCClient(this.tenantId, this.tenantName);
 		const rules = await client.getConnectorRules();
 		const ruleTreeItems = rules.map(
 			(r) => new RuleTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, r.name, r.id)
@@ -584,7 +584,7 @@ export class RulesTreeItem extends FolderTreeItem {
 	}
 }
 
-export class RuleTreeItem extends IdentityNowResourceTreeItem {
+export class RuleTreeItem extends ISCResourceTreeItem {
 	constructor(
 		tenantId: string,
 		tenantName: string,
@@ -606,7 +606,7 @@ export class RuleTreeItem extends IdentityNowResourceTreeItem {
 	iconPath = new vscode.ThemeIcon("file-code");
 }
 
-export class IdentityProfileTreeItem extends IdentityNowResourceTreeItem {
+export class IdentityProfileTreeItem extends ISCResourceTreeItem {
 	constructor(
 		tenantId: string,
 		tenantName: string,
@@ -630,7 +630,7 @@ export class IdentityProfileTreeItem extends IdentityNowResourceTreeItem {
 	iconPath = new vscode.ThemeIcon("person-add");
 
 	async getChildren(): Promise<BaseTreeItem[]> {
-		const client = new IdentityNowClient(this.tenantId, this.tenantName);
+		const client = new ISCClient(this.tenantId, this.tenantName);
 		const lifecycleStates = await client.getLifecycleStates(this.id);
 
 		const lifecycleStateItems = lifecycleStates.map((w) => new LifecycleStateTreeItem(
@@ -650,7 +650,7 @@ export enum IdentityProfileSorting {
 	priority,
 }
 
-export class LifecycleStateTreeItem extends IdentityNowResourceTreeItem {
+export class LifecycleStateTreeItem extends ISCResourceTreeItem {
 	constructor(
 		tenantId: string,
 		tenantName: string,
@@ -690,7 +690,7 @@ export class ServiceDesksTreeItem extends FolderTreeItem {
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
-		const client = new IdentityNowClient(this.tenantId, this.tenantName);
+		const client = new ISCClient(this.tenantId, this.tenantName);
 		const serviceDesks = await client.getServiceDesks();
 		const serviceDeskItems = serviceDesks.map((w) =>
 			new ServiceDeskTreeItem(this.tenantId,
@@ -703,7 +703,7 @@ export class ServiceDesksTreeItem extends FolderTreeItem {
 	}
 }
 
-export class ServiceDeskTreeItem extends IdentityNowResourceTreeItem {
+export class ServiceDeskTreeItem extends ISCResourceTreeItem {
 	contextValue = "service-desk-integration";
 
 	constructor(tenantId: string,
@@ -758,7 +758,7 @@ export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implement
 	filters?: string = "";
 	filterType = FilterType.api;
 	children: BaseTreeItem[] = [];
-	client: IdentityNowClient;
+	client: ISCClient;
 
 	protected _total = 0;
 
@@ -772,7 +772,7 @@ export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implement
 		private readonly mapper: (x: any) => BaseTreeItem,
 	) {
 		super(label, contextValue, tenantId, tenantName, tenantDisplayName);
-		this.client = new IdentityNowClient(this.tenantId, this.tenantName);
+		this.client = new ISCClient(this.tenantId, this.tenantName);
 	}
 
 	reset(): void {
@@ -885,7 +885,7 @@ export class AccessProfilesTreeItem extends PageableFolderTreeItem<Document> {
 /**
  * Represents the single access profile.
  */
-export class AccessProfileTreeItem extends IdentityNowResourceTreeItem {
+export class AccessProfileTreeItem extends ISCResourceTreeItem {
 	constructor(
 		tenantId: string,
 		tenantName: string,
@@ -951,7 +951,7 @@ export class RolesTreeItem extends PageableFolderTreeItem<Document> {
  * Represents the single role.
  * Added by richastral 06/07/2023
  */
-export class RoleTreeItem extends IdentityNowResourceTreeItem {
+export class RoleTreeItem extends ISCResourceTreeItem {
 	constructor(
 		tenantId: string,
 		tenantName: string,
@@ -1034,7 +1034,7 @@ export class FormsTreeItem extends FolderTreeItem {
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
-		const client = new IdentityNowClient(this.tenantId, this.tenantName);
+		const client = new ISCClient(this.tenantId, this.tenantName);
 		const forms: FormTreeItem[] = []
 		for await (const form of client.getForms()) {
 			forms.push(new FormTreeItem(
@@ -1050,7 +1050,7 @@ export class FormsTreeItem extends FolderTreeItem {
 	}
 }
 
-export class FormTreeItem extends IdentityNowResourceTreeItem {
+export class FormTreeItem extends ISCResourceTreeItem {
 	contextValue = "form-definition";
 
 	constructor(tenantId: string,
@@ -1085,7 +1085,7 @@ export class SearchAttributesTreeItem extends FolderTreeItem {
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
-		const client = new IdentityNowClient(this.tenantId, this.tenantName);
+		const client = new ISCClient(this.tenantId, this.tenantName);
 		return (await client.getSearchAttributes()).map(x => new SearchAttributeTreeItem(
 			this.tenantId,
 			this.tenantName,
@@ -1096,7 +1096,7 @@ export class SearchAttributesTreeItem extends FolderTreeItem {
 	}
 }
 
-export class SearchAttributeTreeItem extends IdentityNowResourceTreeItem {
+export class SearchAttributeTreeItem extends ISCResourceTreeItem {
 	contextValue = "search-attribute";
 
 	constructor(tenantId: string,
@@ -1133,7 +1133,7 @@ export class IdentityAttributesTreeItem extends FolderTreeItem {
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
-		const client = new IdentityNowClient(this.tenantId, this.tenantName);
+		const client = new ISCClient(this.tenantId, this.tenantName);
 		return (await client.getIdentityAttributes()).map(x => new IdentityAttributeTreeItem(
 			this.tenantId,
 			this.tenantName,
@@ -1145,7 +1145,7 @@ export class IdentityAttributesTreeItem extends FolderTreeItem {
 	}
 }
 
-export class IdentityAttributeTreeItem extends IdentityNowResourceTreeItem {
+export class IdentityAttributeTreeItem extends ISCResourceTreeItem {
 	contextValue = "identity-attribute";
 
 	constructor(tenantId: string,

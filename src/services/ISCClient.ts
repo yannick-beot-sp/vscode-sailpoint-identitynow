@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { EndpointUtils } from "../utils/EndpointUtils";
-import { SailPointIdentityNowAuthenticationProvider } from "./AuthenticationProvider";
+import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { withQuery } from "../utils/UriUtils";
 import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
@@ -30,7 +30,7 @@ const CONTENT_TYPE_FORM_JSON_PATCH = "application/json-patch+json";
 
 const DEFAULT_PAGINATION = 250;
 
-export class IdentityNowClient {
+export class ISCClient {
 
 	constructor(
 		private readonly tenantId: string,
@@ -47,7 +47,7 @@ export class IdentityNowClient {
 
 	private async prepareAuthenticationHeader(): Promise<any> {
 		const session = await vscode.authentication.getSession(
-			SailPointIdentityNowAuthenticationProvider.id,
+			SailPointISCAuthenticationProvider.id,
 			[this.tenantId]
 		);
 		return {
@@ -72,7 +72,7 @@ export class IdentityNowClient {
 	 */
 	private async getApiConfiguration(): Promise<Configuration> {
 		const session = await vscode.authentication.getSession(
-			SailPointIdentityNowAuthenticationProvider.id,
+			SailPointISCAuthenticationProvider.id,
 			[this.tenantId]
 		);
 		const apiConfig = new Configuration({
@@ -94,7 +94,7 @@ export class IdentityNowClient {
 	 */
 	private async getAxios(contentType = CONTENT_TYPE_JSON): Promise<AxiosInstance> {
 		const session = await vscode.authentication.getSession(
-			SailPointIdentityNowAuthenticationProvider.id,
+			SailPointISCAuthenticationProvider.id,
 			[this.tenantId]
 		);
 		const instance = axios.create({
@@ -219,7 +219,7 @@ export class IdentityNowClient {
 		sourceID: number,
 		types: string[] | null = null
 	): Promise<any> {
-		console.log("> IdentityNowClient.startEntitlementAggregation");
+		console.log("> ISCClient.startEntitlementAggregation");
 
 		const httpClient = await this.getAxios();
 		let endpoint =
@@ -240,7 +240,7 @@ export class IdentityNowClient {
 		deleteThreshold: number | undefined = undefined,
 		filePath: string | undefined = undefined
 	): Promise<any> {
-		console.log("> IdentityNowClient.startAccountAggregation");
+		console.log("> ISCClient.startAccountAggregation");
 		/*
 				const apiConfig = await this.getApiConfiguration();
 				const api = new SourcesAggregationCCApi(apiConfig);
@@ -284,7 +284,7 @@ export class IdentityNowClient {
 	}
 
 	public async resetSource(sourceID: number, skip: string | null = null): Promise<any> {
-		console.log('> IdentityNowClient.resetSource', sourceID);
+		console.log('> ISCClient.resetSource', sourceID);
 		let endpoint = EndpointUtils.getCCUrl(this.tenantName) + `/source/reset/${sourceID}`;
 		if (!!skip) {
 			endpoint += "?skip=" + skip;
@@ -373,26 +373,26 @@ export class IdentityNowClient {
 	 * @returns
 	 */
 	public async getResource(path: string): Promise<any> {
-		console.log("> IdentityNowClient.getResource", path);
+		console.log("> ISCClient.getResource", path);
 		const httpClient = await this.getAxios();
 		const response = await httpClient.get(path);
 		return response.data;
 	}
 
 	public async createResource(path: string, data: string): Promise<any> {
-		console.log("> IdentityNowClient.createResource", path);
+		console.log("> ISCClient.createResource", path);
 		const httpClient = await this.getAxios();
 		const response = await httpClient.post(path, data);
 		const res = await response.data;
-		console.log("< IdentityNowClient.createResource", res);
+		console.log("< ISCClient.createResource", res);
 		return res;
 	}
 
 	public async deleteResource(path: string): Promise<void> {
-		console.log("> IdentityNowClient.deleteResource", path);
+		console.log("> ISCClient.deleteResource", path);
 		const httpClient = await this.getAxios();
 		const response = await httpClient.delete(path);
-		console.log("< IdentityNowClient.deleteResource");
+		console.log("< ISCClient.deleteResource");
 	}
 
 	public async updateResource(path: string, data: string): Promise<any> {
@@ -1152,7 +1152,7 @@ export class IdentityNowClient {
 		sourceId: string,
 		filePath: string
 	): Promise<ImportEntitlementsResult> {
-		console.log("> IdentityNowClient.importEntitlements");
+		console.log("> ISCClient.importEntitlements");
 		const endpoint = `beta/entitlements/sources/${sourceId}/entitlements/import`;
 		console.log("endpoint = " + endpoint);
 		const httpClient = await this.getAxios(CONTENT_TYPE_FORM_URLENCODED);

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as commands from './constants';
-import { SailPointIdentityNowAuthenticationProvider } from '../services/AuthenticationProvider';
+import { SailPointISCAuthenticationProvider } from '../services/AuthenticationProvider';
 import { TenantService } from '../services/TenantService';
 import { normalizeTenant } from '../utils';
 import { askDisplayName } from '../utils/vsCodeHelpers';
@@ -84,7 +84,7 @@ export class AddTenantCommand {
         });
         try {
             const session: vscode.AuthenticationSession = await vscode.authentication.getSession(
-                SailPointIdentityNowAuthenticationProvider.id,
+                SailPointISCAuthenticationProvider.id,
                 [tenantId],
                 { createIfNone: true });
             if (session !== undefined && !isEmpty(session.accessToken)) {

@@ -1,7 +1,7 @@
 import path = require('path');
 import * as vscode from 'vscode';
 import { NEW_ID } from '../constants';
-import { ProvisioningPoliciesTreeItem } from "../models/IdentityNowTreeItem";
+import { ProvisioningPoliciesTreeItem } from "../models/ISCTreeItem";
 import { compareByLabel, str2Uint8Array } from '../utils';
 import { isEmpty } from '../utils/stringUtils';
 import { getPathByUri } from '../utils/UriUtils';

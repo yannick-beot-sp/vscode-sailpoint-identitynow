@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { EXPORTABLE_OBJECT_TYPE_ITEMS, ObjectTypeQuickPickItem } from '../../models/ObjectTypeQuickPickItem';
 import { askChosenItems, askFile, askFolder, openPreview } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
-import { IdentityNowClient } from '../../services/IdentityNowClient';
+import { ISCClient } from '../../services/ISCClient';
 import { SPConfigExporter } from './SPConfigExporter';
 import { ExportPayloadBetaIncludeTypesEnum, ObjectExportImportOptionsBeta } from 'sailpoint-api-client';
 import { SimpleSPConfigExporter } from '../source/CloneSourceCommand';
@@ -137,7 +137,7 @@ export abstract class WizardBasedExporterCommand {
             // Choose objects
             //
             // At this point, tenantId and tenantName already defined
-            const client = new IdentityNowClient(tenantId, tenantName);
+            const client = new ISCClient(tenantId, tenantName);
             for (const objectTypeItem of objectTypeItemsToExport) {
                 let items: any[] = [];
                 switch (objectTypeItem.objectType) {

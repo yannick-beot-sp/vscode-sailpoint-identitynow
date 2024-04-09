@@ -2,9 +2,9 @@ import * as fs from 'fs';
 import * as vscode from 'vscode';
 
 import { askFile, openPreview } from '../../utils/vsCodeHelpers';
-import { FormTreeItem, FormsTreeItem } from '../../models/IdentityNowTreeItem';
+import { FormTreeItem, FormsTreeItem } from '../../models/ISCTreeItem';
 import { PathProposer } from '../../services/PathProposer';
-import { IdentityNowClient } from '../../services/IdentityNowClient';
+import { ISCClient } from '../../services/ISCClient';
 import { ensureFolderExists } from '../../utils/fileutils';
 
 export class FormDefinitionExportCommand {
@@ -44,7 +44,7 @@ export class FormDefinitionExportCommand {
             return;
         }
 
-        const client = new IdentityNowClient(node.tenantId, node.tenantName);
+        const client = new ISCClient(node.tenantId, node.tenantName);
         const data = await client.exportForms(filters)
 
         console.log('Writing to ', target);

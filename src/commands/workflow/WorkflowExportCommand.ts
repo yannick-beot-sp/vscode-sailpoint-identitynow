@@ -3,9 +3,9 @@ import * as vscode from 'vscode';
 
 import { askFile, openPreview } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
-import { IdentityNowClient } from '../../services/IdentityNowClient';
+import { ISCClient } from '../../services/ISCClient';
 import { ensureFolderExists } from '../../utils/fileutils';
-import { WorkflowTreeItem } from '../../models/IdentityNowTreeItem';
+import { WorkflowTreeItem } from '../../models/ISCTreeItem';
 import { cleanUpWorkflow } from './utils';
 
 export class WorkflowExportCommand {
@@ -28,7 +28,7 @@ export class WorkflowExportCommand {
             return;
         }
 
-        const client = new IdentityNowClient(node.tenantId, node.tenantName);
+        const client = new ISCClient(node.tenantId, node.tenantName);
         const data = await client.getWorflow(node.id!)
 
         const cleanedWorkflow = cleanUpWorkflow(data)

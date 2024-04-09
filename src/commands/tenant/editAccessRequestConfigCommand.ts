@@ -1,4 +1,4 @@
-import { TenantTreeItem } from "../../models/IdentityNowTreeItem";
+import { TenantTreeItem } from "../../models/ISCTreeItem";
 import * as vscode from 'vscode';
 import { getResourceUri } from "../../utils/UriUtils";
 import { openPreview } from "../../utils/vsCodeHelpers";

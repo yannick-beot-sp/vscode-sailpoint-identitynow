@@ -1,5 +1,5 @@
 import { ExportPayloadBetaIncludeTypesEnum } from 'sailpoint-api-client';
-import { FormTreeItem, IdentityNowResourceTreeItem, IdentityProfileTreeItem, RuleTreeItem, SourceTreeItem, TransformTreeItem } from '../../models/IdentityNowTreeItem';
+import { FormTreeItem, ISCResourceTreeItem, IdentityProfileTreeItem, RuleTreeItem, SourceTreeItem, TransformTreeItem } from '../../models/ISCTreeItem';
 import { PathProposer } from '../../services/PathProposer';
 import { askFile, openPreview } from '../../utils/vsCodeHelpers';
 import { SPConfigExporter } from './SPConfigExporter';
@@ -12,7 +12,7 @@ export class ExportConfigNodeTreeViewCommand {
     constructor() { }
 
 
-    private getObjectType(node: IdentityNowResourceTreeItem): ExportPayloadBetaIncludeTypesEnum {
+    private getObjectType(node: ISCResourceTreeItem): ExportPayloadBetaIncludeTypesEnum {
         switch (node.constructor.name) {
             case SourceTreeItem.name:
                 return ExportPayloadBetaIncludeTypesEnum.Source;
@@ -30,11 +30,10 @@ export class ExportConfigNodeTreeViewCommand {
         }
     }
 
-    async execute(node?: IdentityNowResourceTreeItem): Promise<void> {
+    async execute(node?: ISCResourceTreeItem): Promise<void> {
 
         console.log("> ExportNodeConfig.execute");
-        // assessing that item is a IdentityNowResourceTreeItem
-        if (node === undefined || !(node instanceof IdentityNowResourceTreeItem)) {
+        if (node === undefined || !(node instanceof ISCResourceTreeItem)) {
             console.error("ExportNodeConfig: invalid item", node);
             throw new Error("ExportNodeConfig: invalid item");
         }

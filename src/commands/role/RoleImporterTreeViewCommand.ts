@@ -1,6 +1,6 @@
 import { RoleImporter } from './RoleImporter';
 import { chooseFile } from '../../utils/vsCodeHelpers';
-import { RolesTreeItem } from '../../models/IdentityNowTreeItem';
+import { RolesTreeItem } from '../../models/ISCTreeItem';
 
 export class RoleImporterTreeViewCommand {
 

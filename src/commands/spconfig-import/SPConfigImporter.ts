@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { IdentityNowClient } from '../../services/IdentityNowClient';
+import { ISCClient } from '../../services/ISCClient';
 import { delay } from '../../utils';
 import { IMPORTABLE_OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
 import { ImportOptionsBeta, SpConfigJobBetaStatusEnum } from 'sailpoint-api-client';
@@ -9,7 +9,7 @@ import { ImportJobResults } from '../../models/JobStatus';
  * Base class for all importer
  */
 export class SPConfigImporter {
-    private client!: IdentityNowClient;
+    private client!: ISCClient;
 
     constructor(
         private readonly tenantId: string,
@@ -19,7 +19,7 @@ export class SPConfigImporter {
         private data: string
 
     ) {
-        this.client = new IdentityNowClient(this.tenantId, this.tenantName);
+        this.client = new ISCClient(this.tenantId, this.tenantName);
     }
 
     /**

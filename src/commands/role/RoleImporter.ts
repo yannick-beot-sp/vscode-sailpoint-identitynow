@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as tmp from "tmp";
 
-import { IdentityNowClient } from "../../services/IdentityNowClient";
+import { ISCClient } from "../../services/ISCClient";
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
 import { AccessProfileRef, ApprovalSchemeForRole, EntitlementRef, Role, RoleMembershipSelector, RoleMembershipSelectorType } from 'sailpoint-api-client';
 import { CSVReader } from '../../services/CSVReader';
@@ -40,7 +40,7 @@ interface RoleCSVRecord {
 }
 
 export class RoleImporter {
-    readonly client: IdentityNowClient;
+    readonly client: ISCClient;
     readonly logFilePath: string;
     readonly logWriter: CSVLogWriter;
 
@@ -50,7 +50,7 @@ export class RoleImporter {
         private tenantDisplayName: string,
         private fileUri: vscode.Uri
     ) {
-        this.client = new IdentityNowClient(this.tenantId, this.tenantName);
+        this.client = new ISCClient(this.tenantId, this.tenantName);
 
         this.logFilePath = tmp.tmpNameSync({
             prefix: 'import-roles',

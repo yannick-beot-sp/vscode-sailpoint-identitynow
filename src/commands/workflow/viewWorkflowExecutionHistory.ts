@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { WorkflowTreeItem } from '../../models/IdentityNowTreeItem';
-import { IdentityNowClient } from '../../services/IdentityNowClient';
+import { WorkflowTreeItem } from '../../models/ISCTreeItem';
+import { ISCClient } from '../../services/ISCClient';
 import { getWorkflowExecutionDetailUri } from '../../utils/UriUtils';
 import { WorkflowExecutionBeta } from 'sailpoint-api-client';
 import { openPreview } from '../../utils/vsCodeHelpers';
@@ -8,12 +8,11 @@ import { openPreview } from '../../utils/vsCodeHelpers';
 export async function viewWorkflowExecutionHistory(node: WorkflowTreeItem): Promise<void> {
 
     console.log("> viewWorkflowExecutionHistory", node);
-    // assessing that item is a IdentityNowResourceTreeItem
     if (node === undefined || !(node instanceof WorkflowTreeItem)) {
         console.log("WARNING: viewWorkflowExecutionHistory: invalid item", node);
         throw new Error("viewWorkflowExecutionHistory: invalid item");
     }
-    const client = new IdentityNowClient(node.tenantId, node.tenantName);
+    const client = new ISCClient(node.tenantId, node.tenantName);
 
     let history = await vscode.window.withProgress<WorkflowExecutionBeta[]>({
         location: vscode.ProgressLocation.Notification,

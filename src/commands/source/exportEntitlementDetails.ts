@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { SourceTreeItem } from '../../models/IdentityNowTreeItem';
+import { SourceTreeItem } from '../../models/ISCTreeItem';
 import { PathProposer } from '../../services/PathProposer';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { BaseCSVExporter } from '../BaseExporter';

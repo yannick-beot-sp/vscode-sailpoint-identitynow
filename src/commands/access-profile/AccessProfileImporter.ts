@@ -4,7 +4,7 @@ import { AccessProfile, EntitlementBeta } from 'sailpoint-api-client';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
 import { CSVReader } from '../../services/CSVReader';
-import { IdentityNowClient } from "../../services/IdentityNowClient";
+import { ISCClient } from "../../services/ISCClient";
 import { EntitlementCacheService, KEY_SEPARATOR } from '../../services/cache/EntitlementCacheService';
 import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
 import { IdentityNameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
@@ -35,7 +35,7 @@ interface AccessProfileCSVRecord {
 }
 
 export class AccessProfileImporter {
-    readonly client: IdentityNowClient;
+    readonly client: ISCClient;
     readonly logFilePath: string;
     readonly logWriter: CSVLogWriter;
 
@@ -45,7 +45,7 @@ export class AccessProfileImporter {
         private tenantDisplayName: string,
         private fileUri: vscode.Uri
     ) {
-        this.client = new IdentityNowClient(this.tenantId, this.tenantName);
+        this.client = new ISCClient(this.tenantId, this.tenantName);
 
 
         this.logFilePath = tmp.tmpNameSync({

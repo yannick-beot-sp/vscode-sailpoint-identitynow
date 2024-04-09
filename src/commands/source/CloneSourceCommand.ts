@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import { TenantService } from '../../services/TenantService';
-import { SourceTreeItem, SourcesTreeItem } from '../../models/IdentityNowTreeItem';
+import { SourceTreeItem, SourcesTreeItem } from '../../models/ISCTreeItem';
 import { WizardContext } from '../../wizard/wizardContext';
-import { IdentityNowClient } from '../../services/IdentityNowClient';
+import { ISCClient } from '../../services/ISCClient';
 import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
 import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep';
 import { runWizard } from '../../wizard/wizard';
@@ -26,7 +26,7 @@ const sourceNameValidator = new Validator({
  */
 export class SimpleSPConfigExporter {
     constructor(
-        private client: IdentityNowClient,
+        private client: ISCClient,
         private readonly tenantDisplayName: string,
         private readonly options: {
             [key: string]: ObjectExportImportOptionsBeta;
@@ -103,7 +103,7 @@ export class CloneSourceCommand {
             }
         }
 
-        let client: IdentityNowClient | undefined = undefined;
+        let client: ISCClient | undefined = undefined;
 
         const values = await runWizard({
             title: "Clone Source",
@@ -112,7 +112,7 @@ export class CloneSourceCommand {
                 new QuickPickTenantStep(
                     this.tenantService,
                     async (wizardContext) => {
-                        client = new IdentityNowClient(
+                        client = new ISCClient(
                             wizardContext["tenant"].id, wizardContext["tenant"].tenantName);
                     }),
                 new QuickPickSourceStep(() => { return client!; }),

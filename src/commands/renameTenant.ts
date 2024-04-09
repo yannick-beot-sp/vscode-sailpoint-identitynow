@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as commands from './constants';
 import { TenantService } from '../services/TenantService';
 import { isEmpty } from '../utils/stringUtils';
-import { TenantTreeItem } from '../models/IdentityNowTreeItem';
+import { TenantTreeItem } from '../models/ISCTreeItem';
 import { askDisplayName } from '../utils/vsCodeHelpers';
 
 

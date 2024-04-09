@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as commands from '../commands/constants';
-import { IdentityNowClient } from '../services/IdentityNowClient';
+import { ISCClient } from '../services/ISCClient';
 import { TenantService } from '../services/TenantService';
 import { delay } from '../utils';
 import { getWorkflowExecutionDetailUri } from '../utils/UriUtils';
@@ -73,7 +73,7 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
                 case 'getWorkflowTriggers':
                     {
                         const tenantInfo = await this._tenantService.getTenant(data.tenantId);
-                        const client = new IdentityNowClient(data.tenantId, tenantInfo?.tenantName ?? "");
+                        const client = new ISCClient(data.tenantId, tenantInfo?.tenantName ?? "");
                         const workflowTriggers = await client.getWorflowTriggers();
 
                         if (this._view) {
@@ -90,7 +90,7 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
                 case 'testWorkflow':
                     {
                         const tenantInfo = await this._tenantService.getTenant(data.tenantId);
-                        const client = new IdentityNowClient(data.tenantId, tenantInfo?.tenantName ?? "");
+                        const client = new ISCClient(data.tenantId, tenantInfo?.tenantName ?? "");
                         await vscode.window.withProgress({
                             location: vscode.ProgressLocation.Notification,
                             title: `Testing workflow ${data.workflowName}...`,
@@ -127,7 +127,7 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
         if (this._view) {
             this._view.show?.(true);
             const tenantInfo = await this._tenantService.getTenant(tenantId);
-            const client = new IdentityNowClient(tenantId, tenantInfo?.tenantName ?? "");
+            const client = new ISCClient(tenantId, tenantInfo?.tenantName ?? "");
 
             const workflows = await client.getWorflows();
             // subset of info from workflows

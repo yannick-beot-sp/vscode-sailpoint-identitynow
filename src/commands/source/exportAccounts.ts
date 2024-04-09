@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { IdentityNowResourceTreeItem, SourceTreeItem } from '../../models/IdentityNowTreeItem';
+import { ISCResourceTreeItem, SourceTreeItem } from '../../models/ISCTreeItem';
 import { PathProposer } from '../../services/PathProposer';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { BaseCSVExporter } from '../BaseExporter';
@@ -14,7 +14,7 @@ export class AccountExporterCommand {
      * @param node 
      * @returns 
      */
-    async execute(node?: IdentityNowResourceTreeItem) {
+    async execute(node?: ISCResourceTreeItem) {
 
         console.log("> AccountExporter.execute");
 

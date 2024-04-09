@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import { TenantService } from "../../services/TenantService";
-import { RolesTreeItem } from '../../models/IdentityNowTreeItem';
+import { RolesTreeItem } from '../../models/ISCTreeItem';
 import { NEW_ID } from '../../constants';
-import { IdentityNowClient } from '../../services/IdentityNowClient';
+import { ISCClient } from '../../services/ISCClient';
 import { getResourceUri } from '../../utils/UriUtils';
 import { Role, RoleMembershipSelectorType } from 'sailpoint-api-client';
 import { runWizard } from '../../wizard/wizard';
@@ -47,7 +47,7 @@ export class NewRoleCommand {
             context["tenant"] = await this.tenantService.getTenant(rolesTreeItem.tenantId);
         }
 
-        let client: IdentityNowClient | undefined = undefined;
+        let client: ISCClient | undefined = undefined;
         const parser = new Parser();
         const values = await runWizard({
             title: "Creation of a role",
@@ -56,7 +56,7 @@ export class NewRoleCommand {
                 new QuickPickTenantStep(
                     this.tenantService,
                     async (wizardContext) => {
-                        client = new IdentityNowClient(
+                        client = new ISCClient(
                             wizardContext["tenant"].id, wizardContext["tenant"].tenantName);
                     }),
                 new InputPromptStep({

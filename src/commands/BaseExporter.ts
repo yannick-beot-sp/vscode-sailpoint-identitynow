@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { IdentityNowClient } from '../services/IdentityNowClient';
+import { ISCClient } from '../services/ISCClient';
 import { CSVWriter } from '../services/CSVWriter';
 import { ensureFolderExists } from '../utils/fileutils';
 import { openPreview } from '../utils/vsCodeHelpers';
@@ -9,7 +9,7 @@ import { openPreview } from '../utils/vsCodeHelpers';
  */
 export abstract class BaseCSVExporter<T> {
 
-    readonly client: IdentityNowClient;
+    readonly client: ISCClient;
 
 
     constructor(protected objectType: string,
@@ -20,7 +20,7 @@ export abstract class BaseCSVExporter<T> {
         protected filePath: string,
         protected delimiter: string = ","
     ) {
-        this.client = new IdentityNowClient(tenantId, tenantName);
+        this.client = new ISCClient(tenantId, tenantName);
     }
 
     /**

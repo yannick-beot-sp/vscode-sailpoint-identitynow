@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { NEW_ID } from '../constants';
-import { RulesTreeItem } from "../models/IdentityNowTreeItem";
-import { IdentityNowClient } from '../services/IdentityNowClient';
+import { RulesTreeItem } from "../models/ISCTreeItem";
+import { ISCClient } from '../services/ISCClient';
 import { TenantService } from '../services/TenantService';
 import { compareByName } from '../utils';
 import { isEmpty } from '../utils/stringUtils';
@@ -44,7 +44,7 @@ export class ConnectorRuleCommand {
         if (!tenantInfo) {
             return;
         }
-        const client = new IdentityNowClient(tenantInfo.id, tenantInfo.tenantName);
+        const client = new ISCClient(tenantInfo.id, tenantInfo.tenantName);
         let newUri: vscode.Uri;
         try {
             if (answer === UPDATE_RULE) {
@@ -99,7 +99,7 @@ export class ConnectorRuleCommand {
         if (!tenantInfo) {
             return;
         }
-        const client = new IdentityNowClient(tenantInfo.id, tenantInfo.tenantName);
+        const client = new ISCClient(tenantInfo.id, tenantInfo.tenantName);
         const res = await client.validateConnectorRule(selection);
 
         if (res.state === "OK") {
@@ -146,7 +146,7 @@ export class ConnectorRuleCommand {
         });
     }
 
-    private async chooseExistingRule(client: IdentityNowClient): Promise<ConnectorRuleResponseBeta | undefined> {
+    private async chooseExistingRule(client: ISCClient): Promise<ConnectorRuleResponseBeta | undefined> {
         const rules = await client.getConnectorRules();
         return await this.showPickRule(rules, 'Connector rule');
     }

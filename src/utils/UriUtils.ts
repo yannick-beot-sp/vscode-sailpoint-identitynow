@@ -16,7 +16,7 @@ export function withQuery(baseUrl: string, params: any): string {
 }
 
 /**
- * Construct the Uri for an IdentityNow resource
+ * Construct the Uri for an ISC resource
  * @param tenantName 
  * @param resourceType 
  * @param id 

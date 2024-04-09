@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { NEW_ID } from '../constants';
-import { TransformsTreeItem } from "../models/IdentityNowTreeItem";
+import { TransformsTreeItem } from "../models/ISCTreeItem";
 import { TransformQuickPickItem } from '../models/TransformQuickPickItem';
 import { isEmpty } from '../utils/stringUtils';
 import { getResourceUri } from '../utils/UriUtils';

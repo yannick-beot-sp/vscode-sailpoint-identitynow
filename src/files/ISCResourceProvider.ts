@@ -10,7 +10,7 @@ import {
 	Uri,
 } from "vscode";
 import { NEW_ID } from "../constants";
-import { IdentityNowClient } from "../services/IdentityNowClient";
+import { ISCClient } from "../services/ISCClient";
 import { TenantService } from "../services/TenantService";
 import {
 	convertToText,
@@ -22,7 +22,7 @@ import { getIdByUri, getPathByUri } from "../utils/UriUtils";
 import { Operation, compare } from "fast-json-patch";
 import { FormDefinitionResponseBeta } from "sailpoint-api-client";
 
-export class IdentityNowResourceProvider implements FileSystemProvider {
+export class ISCResourceProvider implements FileSystemProvider {
 	private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
 
 	constructor(private readonly tenantService: TenantService) { }
@@ -38,7 +38,7 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 	}
 
 	async stat(uri: Uri): Promise<FileStat> {
-		console.log("> IdentityNowResourceProvider.stat", uri);
+		console.log("> ISCResourceProvider.stat", uri);
 		// Not optimized here but do not
 		const data = await this.lookupResource(uri);
 		const id = getIdByUri(uri);
@@ -60,13 +60,13 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 		throw new Error("Method createDirectory not implemented.");
 	}
 	async readFile(uri: Uri): Promise<Uint8Array> {
-		console.log("> IdentityNowResourceProvider.readFile", uri);
+		console.log("> ISCResourceProvider.readFile", uri);
 		const data = await this.lookupResource(uri);
 		return str2Uint8Array(convertToText(data));
 	}
 
 	private async lookupResource(uri: Uri): Promise<any> {
-		console.log("> IdentityNowResourceProvider.lookupResource", uri);
+		console.log("> ISCResourceProvider.lookupResource", uri);
 		const tenantName = uri.authority;
 		console.log("tenantName =", tenantName);
 		const resourcePath = getPathByUri(uri);
@@ -85,7 +85,7 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 		if (tenantInfo === undefined) {
 			throw new Error(`Could not find tenant ${tenantName}`);
 		}
-		const client = new IdentityNowClient(tenantInfo.id!, tenantName);
+		const client = new ISCClient(tenantInfo.id!, tenantName);
 
 		const data = await client.getResource(resourcePath);
 		if (!data) {
@@ -99,7 +99,7 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 		content: Uint8Array,
 		options: { create: boolean; overwrite: boolean }
 	): Promise<void> {
-		console.log("> IdentityNowResourceProvider.writeFile", uri, options);
+		console.log("> ISCResourceProvider.writeFile", uri, options);
 
 		const tenantName = uri.authority;
 		console.log("tenantName =", tenantName);
@@ -111,7 +111,7 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 		const tenantInfo = await this.tenantService.getTenantByTenantName(
 			tenantName
 		);
-		const client = new IdentityNowClient(tenantInfo?.id ?? "", tenantName);
+		const client = new ISCClient(tenantInfo?.id ?? "", tenantName);
 		let data = uint8Array2Str(content);
 
 		const id = path.posix.basename(resourcePath);

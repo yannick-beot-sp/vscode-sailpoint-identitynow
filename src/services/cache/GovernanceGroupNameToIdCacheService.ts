@@ -1,11 +1,11 @@
-import { IdentityNowClient } from "../IdentityNowClient";
+import { ISCClient } from "../ISCClient";
 import { CacheService } from "./CacheService";
 
 /**
  * Cache the governance group name by id
  */
 export class GovernanceGroupNameToIdCacheService extends CacheService<string>{
-    constructor(readonly client: IdentityNowClient) {
+    constructor(readonly client: ISCClient) {
         super(
             async (key: string) => {
                 const group = await client.getGovernanceGroupByName(key);

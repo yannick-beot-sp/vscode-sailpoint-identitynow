@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import path = require('path');
 
-import { IdentityNowClient } from '../../services/IdentityNowClient';
+import { ISCClient } from '../../services/ISCClient';
 import { delay } from '../../utils';
 import { ensureFolderExists } from '../../utils/fileutils';
 import { PathProposer } from '../../services/PathProposer';
@@ -12,7 +12,7 @@ import { ExportPayloadBetaIncludeTypesEnum, ObjectExportImportOptionsBeta } from
  * Class use to export SP-Config
  */
 export class SPConfigExporter {
-    private client!: IdentityNowClient;
+    private client!: ISCClient;
     constructor(
         private readonly tenantId: string,
         private readonly tenantName: string,
@@ -24,7 +24,7 @@ export class SPConfigExporter {
         private objectTypes: ExportPayloadBetaIncludeTypesEnum[] = [],
         private readonly exportSingle = true
     ) {
-        this.client = new IdentityNowClient(this.tenantId, this.tenantName);
+        this.client = new ISCClient(this.tenantId, this.tenantName);
     }
 
     /**

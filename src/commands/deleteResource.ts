@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
 import * as commands from './constants';
-import { IdentityNowResourceTreeItem } from '../models/IdentityNowTreeItem';
-import { IdentityNowClient } from '../services/IdentityNowClient';
+import { ISCResourceTreeItem } from '../models/ISCTreeItem';
+import { ISCClient } from '../services/ISCClient';
 import { getPathByUri } from '../utils/UriUtils';
 
 
-export async function deleteResource(node: IdentityNowResourceTreeItem): Promise<void> {
+export async function deleteResource(node: ISCResourceTreeItem): Promise<void> {
 
     console.log("> deleteResource", node);
 
@@ -19,7 +19,7 @@ export async function deleteResource(node: IdentityNowResourceTreeItem): Promise
         return;
     }
 
-    const client = new IdentityNowClient(node.tenantId, node.tenantName);
+    const client = new ISCClient(node.tenantId, node.tenantName);
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: `Deleting ${node.contextValue}...`,
