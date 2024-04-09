@@ -44,6 +44,7 @@ export const IMPORT_WORKFLOW = 'vscode-sailpoint-identitynow.workflow.import';
 export const IMPORT_WORKFLOW_VIEW_ICON = 'vscode-sailpoint-identitynow.workflow.import.view-icon';
 export const TEST_WORKFLOW = 'vscode-sailpoint-identitynow.workflow.test';
 export const VIEW_WORKFLOW_EXECUTION_HISTORY = 'vscode-sailpoint-identitynow.workflow.view-execution-history';
+export const EDIT_CONNECTOR_RULE = 'vscode-sailpoint-identitynow.connector-rule.edit';
 export const NEW_CONNECTOR_RULE = 'vscode-sailpoint-identitynow.new-connector-rule';
 export const UPLOAD_CONNECTOR_RULE = 'vscode-sailpoint-identitynow.connector-rule.upload';
 export const VALIDATE_CONNECTOR_RULE = 'vscode-sailpoint-identitynow.connector-rule.validate';

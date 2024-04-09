@@ -302,9 +302,13 @@ The patterns defined above use the following tokens:
 
 ## Release Notes
 
+- Add new command to edit connector rule (Edit script)
+- Changing IdentityNow to Identity Security Cloud/ISC
+- Logging every call to ISC
+- Catch error message if peek objects fails
+
 ## 1.1.0
 
-- Changing IdentityNow to Identity Security Cloud/ISC
 - Edit Password Org Config
 - Generate a digit token for password reset
 - 404 error when sources had '/' in their name (cf. [#71](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/71))

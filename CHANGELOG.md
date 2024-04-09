@@ -8,8 +8,12 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- Add new command to edit connector rule (Edit script)
 - Changing IdentityNow to Identity Security Cloud/ISC
 - Logging every call to ISC
+
+### Fixed
+
 - Catch error message if peek objects fails
 
 ## [1.1.0] - 2024-03-20

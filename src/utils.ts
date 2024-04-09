@@ -33,7 +33,11 @@ export function toDateSuffix(): string {
 
 export function convertToText(data: any): string {
     if (data) {
-        return JSON.stringify(data, null, 4);
+        if (typeof data === 'object') {
+            return JSON.stringify(data, null, 4);
+        } else {
+            return data
+        }
     }
     return '';
 }

@@ -1,15 +1,15 @@
 import * as vscode from 'vscode';
-import { NEW_ID } from '../constants';
-import { RulesTreeItem } from "../models/ISCTreeItem";
-import { ISCClient } from '../services/ISCClient';
-import { TenantService } from '../services/TenantService';
-import { compareByName } from '../utils';
-import { isEmpty } from '../utils/stringUtils';
-import { getResourceUri } from '../utils/UriUtils';
-import { chooseTenant, createNewFile, getSelectionContent, openPreview } from '../utils/vsCodeHelpers';
-import * as commands from './constants';
+import { NEW_ID } from '../../constants';
+import { RulesTreeItem } from "../../models/ISCTreeItem";
+import { ISCClient } from '../../services/ISCClient';
+import { TenantService } from '../../services/TenantService';
+import { compareByName } from '../../utils';
+import { isEmpty } from '../../utils/stringUtils';
+import { getResourceUri } from '../../utils/UriUtils';
+import { chooseTenant, createNewFile, getSelectionContent, openPreview } from '../../utils/vsCodeHelpers';
+import * as commands from '../constants';
 import { ConnectorRuleResponseBeta } from 'sailpoint-api-client';
-const rules: ConnectorRuleResponseBeta[] = require('../../snippets/connector-rules.json');
+const rules: ConnectorRuleResponseBeta[] = require('../../../snippets/connector-rules.json');
 
 /**
  * Internal constants
@@ -55,8 +55,7 @@ export class ConnectorRuleCommand {
                 }
 
                 rule.sourceCode.script = selection;
-                const path = '/beta/connector-rules/' + rule.id;
-                client.updateResource(path, JSON.stringify(rule));
+                await client.updateConnectorRule(rule)
                 newUri = getResourceUri(tenantInfo.tenantName, 'connector-rules', rule.id, rule.name, true);
             } else {
                 // NEW_RULE

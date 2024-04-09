@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
-import { RuleTreeItem } from '../models/ISCTreeItem';
-import { ISCClient } from '../services/ISCClient';
-import { toDateSuffix } from '../utils';
+import { RuleTreeItem } from '../../models/ISCTreeItem';
+import { ISCClient } from '../../services/ISCClient';
+import { toDateSuffix } from '../../utils';
 import * as fs from 'fs';
-import { confirmFileOverwrite, openPreview } from '../utils/vsCodeHelpers';
-import { getIdByUri, getNameByUri } from '../utils/UriUtils';
-import { TenantService } from '../services/TenantService';
-import { ensureFolderExists } from '../utils/fileutils';
+import { confirmFileOverwrite, openPreview } from '../../utils/vsCodeHelpers';
+import { getIdByUri, getNameByUri } from '../../utils/UriUtils';
+import { TenantService } from '../../services/TenantService';
+import { ensureFolderExists } from '../../utils/fileutils';
 import { join } from 'path';
 
 

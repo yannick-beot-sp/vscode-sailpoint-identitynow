@@ -5,11 +5,11 @@ import { AccessProfileImporterTreeViewCommand } from './commands/access-profile/
 import { AccessProfileExporterCommand } from './commands/access-profile/ExportAccessProfiles';
 import { NewAccessProfileCommand } from './commands/access-profile/NewAccessProfileCommand';
 import { AddTenantCommand } from './commands/addTenant';
-import { ConnectorRuleCommand } from './commands/connectorRuleCommand';
+import { ConnectorRuleCommand } from './commands/rule/connectorRuleCommand';
 import { deleteResource } from './commands/deleteResource';
 import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './commands/source/exportAccounts';
 import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from './commands/source/exportEntitlementDetails';
-import { ExportScriptFromRuleCommand } from './commands/exportScriptFromRuleCommand';
+import { ExportScriptFromRuleCommand } from './commands/rule/exportScriptFromRuleCommand';
 import { AccessProfileFilterCommand, RoleFilterCommand } from './commands/filterCommand';
 import { AccountImportNodeCommand } from './commands/source/importAccount';
 import { EntitlementDetailsImportNodeCommand } from './commands/source/importEntitlementDetails';
@@ -60,6 +60,7 @@ import { EditPasswordConfigCommand } from './commands/tenant/editPasswordConfigC
 import { GenerateDigitTokenCommand } from './commands/tenant/generateDigitTokenCommand';
 import { onErrorResponse, onRequest, onResponse } from './services/AxiosHandlers';
 import axios from 'axios';
+import { OpenScriptCommand } from './commands/rule/openScriptCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -325,6 +326,11 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.VALIDATE_CONNECTOR_RULE,
 			newConnectorRuleCommand.validateScript, newConnectorRuleCommand));
+	
+	const openScriptCommand = new OpenScriptCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EDIT_CONNECTOR_RULE,
+			openScriptCommand.execute, openScriptCommand));
 
 	const exportScriptFromRuleCommand = new ExportScriptFromRuleCommand(tenantService);
 	context.subscriptions.push(

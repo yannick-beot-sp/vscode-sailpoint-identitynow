@@ -87,7 +87,13 @@ export class ISCResourceProvider implements FileSystemProvider {
 		}
 		const client = new ISCClient(tenantInfo.id!, tenantName);
 
-		const data = await client.getResource(resourcePath);
+		let data = null
+		if (/\/connector-rule-script\//.test(resourcePath)) {
+			const rule = await client.getConnectorRuleById(id);
+			data = rule.sourceCode?.script
+		} else {
+			data = await client.getResource(resourcePath);
+		}
 		if (!data) {
 			throw vscode.FileSystemError.FileNotFound(uri);
 		}
@@ -137,7 +143,11 @@ export class ISCResourceProvider implements FileSystemProvider {
 			this._emitter.fire([{ type: vscode.FileChangeType.Created, uri }]);
 		} else {
 
-			if (resourcePath.match("form-definitions")) {
+			if (resourcePath.match("connector-rule-script")) {
+				const rule = await client.getConnectorRuleById(id)
+				rule.sourceCode.script = data
+				await client.updateConnectorRule(rule)
+			} else if (resourcePath.match("form-definitions")) {
 				// UI is pushing all data as a Patch. Doing the same for form definitions
 				const newData = JSON.parse(data) as FormDefinitionResponseBeta
 				const jsonpatch: Operation[] = [

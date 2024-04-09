@@ -348,6 +348,10 @@
         "title": "Export the script..."
       },
       {
+        "command": "vscode-sailpoint-identitynow.connector-rule.edit",
+        "title": "Edit script"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.identity-profile.refresh",
         "title": "Refresh all identities"
       },
@@ -760,6 +764,14 @@
         {
           "command": "vscode-sailpoint-identitynow.new-attribute-search.view",
           "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.connector-rule.export-script.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.connector-rule.edit",
+          "when": "never"
         }
       ],
       "view/title": [
@@ -972,6 +984,10 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.connector-rule.export-script.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rule"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.connector-rule.edit",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rule"
         },
         {
