@@ -1,10 +1,10 @@
 {
   "name": "vscode-sailpoint-identitynow",
-  "displayName": "SailPoint IdentityNow",
-  "description": "Customize SailPoint IdentityNow",
+  "displayName": "SailPoint Identity Security Cloud",
+  "description": "Customize SailPoint Identity Security Cloud",
   "version": "1.1.0",
   "publisher": "yannick-beot-sp",
-  "icon": "resources/idn.png",
+  "icon": "resources/isc.png",
   "bugs": {
     "url": "https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues"
   },
@@ -26,7 +26,8 @@
   ],
   "keywords": [
     "SailPoint",
-    "IdentityNow"
+    "IdentityNow",
+    "Identity Security Cloud"
   ],
   "preview": true,
   "activationEvents": [
@@ -40,8 +41,8 @@
       "activitybar": [
         {
           "id": "sailpoint",
-          "title": "SailPoint IdentityNow",
-          "icon": "resources/idn.svg"
+          "title": "SailPoint Identity Security Cloud",
+          "icon": "resources/isc.svg"
         }
       ]
     },
@@ -49,8 +50,8 @@
       "sailpoint": [
         {
           "id": "vscode-sailpoint-identitynow.view",
-          "name": "IdentityNow Tenants",
-          "icon": "resources/idn.svg"
+          "name": "Identity Security Cloud Tenants",
+          "icon": "resources/isc.svg"
         },
         {
           "id": "vscode-sailpoint-identitynow.workflow.test-view",
@@ -68,7 +69,7 @@
     "commands": [
       {
         "command": "vscode-sailpoint-identitynow.add-tenant",
-        "title": "IdentityNow: Add tenant...",
+        "title": "ISC: Add tenant...",
         "icon": "$(add)"
       },
       {
@@ -102,7 +103,7 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.export-config.palette",
-        "title": "IdentityNow: Export config...",
+        "title": "ISC: Export config...",
         "icon": "$(export)"
       },
       {
@@ -117,17 +118,17 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.import-config.palette",
-        "title": "IdentityNow: Import config...",
+        "title": "ISC: Import config...",
         "icon": "$(import)"
       },
       {
         "command": "vscode-sailpoint-identitynow.import-config.menu",
-        "title": "IdentityNow: Import config...",
+        "title": "ISC: Import config...",
         "icon": "$(import)"
       },
       {
         "command": "vscode-sailpoint-identitynow.refresh-forced",
-        "title": "IdentityNow: Refresh",
+        "title": "ISC: Refresh",
         "icon": "$(refresh)"
       },
       {
@@ -187,7 +188,7 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.test-source.palette",
-        "title": "IdentityNow: Test connection...",
+        "title": "ISC: Test connection...",
         "icon": "$(beaker)"
       },
       {
@@ -197,7 +198,7 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.peek-source.palette",
-        "title": "IdentityNow: Peek objects...",
+        "title": "ISC: Peek objects...",
         "icon": "$(eye)"
       },
       {
@@ -207,7 +208,7 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.ping-source.palette",
-        "title": "IdentityNow: Pinging Cluster ...",
+        "title": "ISC: Pinging Cluster ...",
         "icon": "$(eye)"
       },
       {
@@ -217,7 +218,7 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.clone-source.palette",
-        "title": "IdentityNow: Clone source...",
+        "title": "ISC: Clone source...",
         "icon": "$(symbol-enum)"
       },
       {
@@ -332,15 +333,15 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.connector-rule.upload",
-        "title": "IdentityNow: Upload this code to a rule..."
+        "title": "ISC: Upload this code to a rule..."
       },
       {
         "command": "vscode-sailpoint-identitynow.connector-rule.validate",
-        "title": "IdentityNow: Validate this code..."
+        "title": "ISC: Validate this code..."
       },
       {
         "command": "vscode-sailpoint-identitynow.connector-rule.export-script.editor",
-        "title": "IdentityNow: Export the script from this rule..."
+        "title": "ISC: Export the script from this rule..."
       },
       {
         "command": "vscode-sailpoint-identitynow.connector-rule.export-script.view",
@@ -373,7 +374,7 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.new-access-profile.palette",
-        "title": "IdentityNow: Add a new access profile...",
+        "title": "ISC: Add a new access profile...",
         "icon": "$(add)"
       },
       {
@@ -388,7 +389,7 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.new-role.palette",
-        "title": "IdentityNow: Add a new role...",
+        "title": "ISC: Add a new role...",
         "icon": "$(add)"
       },
       {
@@ -434,7 +435,7 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.csv.import.access-profiles.explorer",
-        "title": "IdentityNow: Import Access Profiles CSV..."
+        "title": "ISC: Import Access Profiles CSV..."
       },
       {
         "command": "vscode-sailpoint-identitynow.csv.import.roles.view",
@@ -450,7 +451,7 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.csv.import.roles.explorer",
-        "title": "IdentityNow: Import Roles CSV..."
+        "title": "ISC: Import Roles CSV..."
       },
       {
         "command": "vscode-sailpoint-identitynow.forms.export.view",
@@ -1173,7 +1174,7 @@
       }
     ],
     "configuration": {
-      "title": "IdentityNow",
+      "title": "Identity Security Cloud",
       "properties": {
         "vscode-sailpoint-identitynow.report.accounts.filename": {
           "type": "string",

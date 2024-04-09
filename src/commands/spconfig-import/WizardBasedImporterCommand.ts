@@ -28,7 +28,7 @@ export abstract class WizardBasedImporterCommand {
             {
                 ignoreFocusOut: true,
                 placeHolder: "What do you want to import?",
-                title: "IdentityNow",
+                title: "Identity Security Cloud",
                 canPickMany: false
             });
 

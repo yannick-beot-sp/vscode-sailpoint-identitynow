@@ -19,7 +19,7 @@ export class AddTenantCommand {
             ignoreFocusOut: true,
             placeHolder: 'company or company.identitynow.com',
             prompt: "Enter the tenant name",
-            title: 'IdentityNow',
+            title: 'Identity Security Cloud',
             validateInput: text => {
                 // https://regexr.com/7798n
                 const regex = new RegExp('^([a-z0-9][a-z0-9\-]*[a-z0-9]\.)*([a-z0-9][a-z0-9\-]*[a-z0-9])$', 'i');
@@ -37,7 +37,7 @@ export class AddTenantCommand {
             ["Personal Access Token", "Access Token"], {
             ignoreFocusOut: true,
             placeHolder: "Authentication method",
-            title: "IdentityNow",
+            title: "Identity Security Cloud",
             canPickMany: false
         });
         if (authMethodStr === undefined) {

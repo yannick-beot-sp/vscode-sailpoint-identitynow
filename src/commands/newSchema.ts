@@ -13,7 +13,7 @@ async function askSchemaName(): Promise<string | undefined> {
         ignoreFocusOut: true,
         placeHolder: 'Schema name',
         prompt: "Enter the schema name",
-        title: 'IdentityNow',
+        title: 'Identity Security Cloud',
         validateInput: text => {
             const regex = new RegExp('^[A-Za-z]+$');
             if (regex.test(text)) {

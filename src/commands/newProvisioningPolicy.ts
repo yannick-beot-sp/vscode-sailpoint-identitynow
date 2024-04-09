@@ -43,7 +43,7 @@ async function askProvisioningPolicyName(): Promise<string | undefined> {
         ignoreFocusOut: true,
         placeHolder: 'Provisioning Policy name',
         prompt: "Enter the provisioning policy name",
-        title: 'IdentityNow',
+        title: 'Identity Security Cloud',
         validateInput: text => {
             if (text === '') {
                 return "You must provide a Provisioning Policy name.";

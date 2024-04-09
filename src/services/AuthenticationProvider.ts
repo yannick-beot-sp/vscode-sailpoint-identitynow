@@ -300,7 +300,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
             ignoreFocusOut: true,
             placeHolder: '806c451e057b442ba67b5d459716e97a',
             prompt: 'Enter a Personal Access Token (PAT) Client ID.',
-            title: 'IdentityNow',
+            title: 'Identity Security Cloud',
             validateInput: text => {
                 const regex = new RegExp('^[a-f0-9]{32}$');
                 if (regex.test(text)) {
@@ -320,7 +320,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
             ignoreFocusOut: true,
             placeHolder: '***',
             prompt: 'Enter a Personal Access Token (PAT) Secret.',
-            title: 'IdentityNow',
+            title: 'Identity Security Cloud',
             validateInput: text => {
                 const regex = new RegExp('^[a-f0-9]{63,64}$');
                 if (regex.test(text)) {
@@ -339,7 +339,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
             ignoreFocusOut: true,
             placeHolder: '***',
             prompt: 'Enter an Access Token.',
-            title: 'IdentityNow',
+            title: 'Identity Security Cloud',
             validateInput: text => {
                 const regex = new RegExp('^([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_+/=-]+)$');
                 if (regex.test(text)) {

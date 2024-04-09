@@ -95,7 +95,7 @@ export async function askDisplayName(tenantName: string): Promise<string | undef
 		ignoreFocusOut: true,
 		placeHolder: 'company',
 		prompt: "Enter a display name for this tenant",
-		title: 'IdentityNow',
+		title: 'Identity Security Cloud',
 		validateInput: text => {
 			if (isEmpty(text) || isEmpty(text.trim())) {
 				return "Display name must not be empty";

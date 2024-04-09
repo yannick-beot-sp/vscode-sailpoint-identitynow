@@ -18,7 +18,7 @@ export class NewTransformCommand {
             ignoreFocusOut: true,
             placeHolder: 'Transform name',
             prompt: "Enter the transform name",
-            title: 'IdentityNow',
+            title: 'Identity Security Cloud',
             validateInput: text => {
                 if (text && text.length > 50) {
                     return "Transform name cannot exceed 50 characters.";

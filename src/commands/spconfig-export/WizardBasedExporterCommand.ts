@@ -44,7 +44,7 @@ export abstract class WizardBasedExporterCommand {
             {
                 ignoreFocusOut: true,
                 placeHolder: "What do you want to export?",
-                title: "IdentityNow",
+                title: "Identity Security Cloud",
                 canPickMany: false
             });
 

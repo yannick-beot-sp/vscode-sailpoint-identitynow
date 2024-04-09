@@ -227,7 +227,7 @@ export class TransformEvaluator {
             ignoreFocusOut: true,
             placeHolder: placeHolder,
             prompt: prompt,
-            title: 'IdentityNow transform'
+            title: 'Identity Security Cloud transform'
         });
 
         if (input !== undefined) {

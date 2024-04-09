@@ -1,9 +1,9 @@
-# SailPoint IdentityNow for Visual Studio Code
+# SailPoint Identity Security Cloud for Visual Studio Code
 
 > This extension is not developed, maintained or supported by SailPoint.
-> It is a community effort to help manage IdentityNow from Visual Studio Code.
+> It is a community effort to help manage Identity Security Cloud from Visual Studio Code.
 
-The SailPoint IdentityNow extension makes it easy to:
+The SailPoint Identity Security Cloud extension makes it easy to:
 
 - Connect to several tenants
 - Import and export config of a tenant
@@ -24,7 +24,7 @@ The SailPoint IdentityNow extension makes it easy to:
 
 ## Installation
 
-Go to the extension menu or press `Ctrl`+`Shift`+`X` and look for the extension "IdentityNow". Click on the button `Install`.
+Go to the extension menu or press `Ctrl`+`Shift`+`X` and look for the extension "Identity Security Cloud". Click on the button `Install`.
 
 The VSIX can be installed from the extension menu. Press `Ctrl`+`Shift`+`X` and in the menu, click `Install from VSIX...`.
 
@@ -32,7 +32,7 @@ The VSIX can be installed from the extension menu. Press `Ctrl`+`Shift`+`X` and 
 
 The extension supports several tenants.
 
-Open the **Command Palette** with `Ctrl+Shift+P` (Windows or Linux) or `Cmd+Shift+P` (macOS) to find the command "IdentityNow: Add tenant...".
+Open the **Command Palette** with `Ctrl+Shift+P` (Windows or Linux) or `Cmd+Shift+P` (macOS) to find the command "ISC: Add tenant...".
 
 Alternatively, you can click on the `+` in the SailPoint view.
 
@@ -54,7 +54,7 @@ You can also export a single source, rule, identity profile or transform by righ
 
 ![Import/export config](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/export-node.png)
 
-Or, from the **Command Palette**, find the command "IdentityNow: Import config..." or "IdentityNow: Export config...".
+Or, from the **Command Palette**, find the command "ISC: Import config..." or "ISC: Export config...".
 
 ![Import/export config](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/import-export-palette.png)
 
@@ -304,6 +304,7 @@ The patterns defined above use the following tokens:
 
 ## 1.1.0
 
+- Changing IdentityNow to Identity Security Cloud/ISC
 - Edit Password Org Config
 - Generate a digit token for password reset
 - 404 error when sources had '/' in their name (cf. [#71](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/71))

@@ -8,6 +8,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- Changing IdentityNow to Identity Security Cloud/ISC
 - Logging every call to ISC
 - Catch error message if peek objects fails
 

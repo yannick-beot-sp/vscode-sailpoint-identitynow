@@ -16,7 +16,7 @@ async function askWorkflowName(defaultWorkflowName: string): Promise<string | un
         ignoreFocusOut: true,
         placeHolder: 'Workflow name',
         prompt: "Enter the workflow name",
-        title: 'IdentityNow',
+        title: 'Identity Security Cloud',
         validateInput: text => {
             if (isBlank(text)) {
                 return "You must provide a new name for the workflow.";
