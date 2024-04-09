@@ -21,7 +21,6 @@ export async function disableWorkflow(node: WorkflowTreeItem): Promise<void> {
 async function updateWorkflowStatus(node: WorkflowTreeItem, enable: boolean): Promise<void> {
 
     console.log("> updateWorkflowStatus", node);
-    // assessing that item is a IdentityNowResourceTreeItem
     if (node === undefined || !(node instanceof WorkflowTreeItem)) {
         console.log("WARNING: updateWorkflowStatus: invalid item", node);
         throw new Error("updateWorkflowStatus: invalid item");

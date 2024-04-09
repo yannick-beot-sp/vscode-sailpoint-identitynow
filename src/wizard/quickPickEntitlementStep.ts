@@ -7,7 +7,7 @@ import { isEmpty } from '../utils/stringUtils';
 
 export class QuickPickEntitlementStep extends QuickPickPromptStep<WizardContext, vscode.QuickPickItem> {
     constructor(
-        getIdentityNowClient: () => ISCClient,
+        getISCClient: () => ISCClient,
         private readonly entitlementQueryKey = "entitlementQuery",
     ) {
         super({
@@ -19,7 +19,7 @@ export class QuickPickEntitlementStep extends QuickPickPromptStep<WizardContext,
             },
             skipIfOne: true,
             items: async (context: WizardContext): Promise<vscode.QuickPickItem[]> => {
-                const client = getIdentityNowClient()
+                const client = getISCClient()
                 const results = (await client.searchEntitlements(context[entitlementQueryKey], 100, ["id", "name", "description", "source.name"]))
                     .map(x => ({
                         id: x.id,

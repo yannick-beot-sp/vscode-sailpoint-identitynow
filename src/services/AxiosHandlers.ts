@@ -8,7 +8,7 @@ export const onErrorResponse = (error: AxiosError | Error): Promise<AxiosError> 
         const { statusText, status, data } = error.response as AxiosResponse ?? {};
 
         console.error(
-            `[IdentityNowClient] ${method?.toUpperCase()} ${url} | Error ${status} ${message} | ${JSON.stringify(data)}`, error
+            `[ISCClient] ${method?.toUpperCase()} ${url} | Error ${status} ${message} | ${JSON.stringify(data)}`, error
         );
         if (data !== undefined && 'error' in data) {
             errorMessage = data.error;

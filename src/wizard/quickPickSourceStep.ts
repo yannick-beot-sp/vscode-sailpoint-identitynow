@@ -6,7 +6,7 @@ import { ISCClient } from "../services/ISCClient";
 
 export class QuickPickSourceStep extends QuickPickPromptStep<WizardContext, vscode.QuickPickItem> {
     constructor(
-        getIdentityNowClient: () => ISCClient,
+        getISCClient: () => ISCClient,
     ) {
         super({
             name: "source",
@@ -16,7 +16,7 @@ export class QuickPickSourceStep extends QuickPickPromptStep<WizardContext, vsco
             },
             skipIfOne: true,
             items: async (context: WizardContext): Promise<vscode.QuickPickItem[]> => {
-                const client = getIdentityNowClient();
+                const client = getISCClient();
                 const results = (await client.getSources())
                     .map(x => ({
                         ...x,

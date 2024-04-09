@@ -6,7 +6,7 @@ import { ISCClient } from "../services/ISCClient";
 
 export class QuickPickAccountSchemaStep extends QuickPickPromptStep<WizardContext, vscode.QuickPickItem> {
     constructor(
-        getIdentityNowClient: () => ISCClient,
+        getISCClient: () => ISCClient,
     ) {
         super({
             name: "attribute",
@@ -16,7 +16,7 @@ export class QuickPickAccountSchemaStep extends QuickPickPromptStep<WizardContex
             },
             skipIfOne: true,
             items: async (context: WizardContext): Promise<vscode.QuickPickItem[]> => {
-                const client = getIdentityNowClient();
+                const client = getISCClient();
                 const source = context["source"];
                 const results = (await client.getSchemas(source.id))
                     .find(x => x.name === "account")?.attributes?.map(x => ({

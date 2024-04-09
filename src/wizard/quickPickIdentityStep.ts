@@ -7,7 +7,7 @@ import { ISCClient } from "../services/ISCClient";
 export class QuickPickIdentityStep extends QuickPickPromptStep<WizardContext, vscode.QuickPickItem> {
     constructor(
         displayName: string,
-        getIdentityNowClient: () => ISCClient,
+        getISCClient: () => ISCClient,
         name = "owner",
         queryName = "ownerQuery"
     ) {
@@ -16,7 +16,7 @@ export class QuickPickIdentityStep extends QuickPickPromptStep<WizardContext, vs
             displayName,
             skipIfOne: true,
             items: async (context: WizardContext): Promise<vscode.QuickPickItem[]> => {
-                const client = getIdentityNowClient();
+                const client = getISCClient();
                 const results = (await client.searchIdentities(context[queryName], 100, ["id", "name", "displayName", "email"]))
                     .map(x => {
                         const email = x.email ? `(${x.email})` : undefined;
