@@ -2,7 +2,7 @@
   "name": "vscode-sailpoint-identitynow",
   "displayName": "SailPoint Identity Security Cloud",
   "description": "Customize SailPoint Identity Security Cloud",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "publisher": "yannick-beot-sp",
   "icon": "resources/isc.png",
   "bugs": {
