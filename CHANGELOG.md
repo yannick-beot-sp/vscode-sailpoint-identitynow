@@ -6,6 +6,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [1.2.0] - 2024-04-09
+
 ### Added
 
 - Add new command to edit connector rule (Edit script)

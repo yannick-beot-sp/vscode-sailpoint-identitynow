@@ -302,6 +302,8 @@ The patterns defined above use the following tokens:
 
 ## Release Notes
 
+## 1.2.0
+
 - Add new command to edit connector rule (Edit script)
 - Changing IdentityNow to Identity Security Cloud/ISC
 - Logging every call to ISC
