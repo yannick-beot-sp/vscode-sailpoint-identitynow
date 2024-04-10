@@ -89,3 +89,6 @@ export const EXPORT_FORM_VIEW = 'vscode-sailpoint-identitynow.form.export.view';
 export const IMPORT_FORMS_VIEW = 'vscode-sailpoint-identitynow.forms.import.view';
 export const IMPORT_FORMS_ICON_VIEW = 'vscode-sailpoint-identitynow.forms.import.icon-view';
 
+//IDENTITIES
+export const SEARCH_IDENTITY_VIEW = 'vscode-sailpoint-identitynow.identities.search-identity.view';
+export const SEARCH_IDENTITY_VIEW_ICON = 'vscode-sailpoint-identitynow.identities.search-identity.icon-view';

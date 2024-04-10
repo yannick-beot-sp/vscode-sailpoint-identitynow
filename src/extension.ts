@@ -52,6 +52,7 @@ import { CloneSourceCommand } from './commands/source/CloneSourceCommand';
 import { FormDefinitionExportCommand } from './commands/form/FormDefinitionExportCommand';
 import { FormDefinitionImporter } from './commands/form/FormDefinitionImporter';
 import { FormDefinitionImporterTreeViewCommand } from './commands/form/FormDefinitionImporterTreeViewCommand';
+import { IdentitySearchCommand } from './commands/identity/IdentitySearchCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -396,6 +397,12 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_FORMS_ICON_VIEW,
 			formDefinitionImporterTreeViewCommand.execute, formDefinitionImporterTreeViewCommand));
+
+	//Identities
+	const identitySearchCommand = new IdentitySearchCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.SEARCH_IDENTITY_VIEW,
+			identitySearchCommand.execute, IdentitySearchCommand));
 }
 
 // this method is called when your extension is deactivated

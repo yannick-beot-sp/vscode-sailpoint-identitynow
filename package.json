@@ -439,6 +439,18 @@
           "light": "resources/light/import.svg",
           "dark": "resources/dark/import.svg"
         }
+      },      
+      {      
+        "command": "vscode-sailpoint-identitynow.identities.search-identity.view",
+        "title": "Search Identities..."        
+      },      
+      {      
+        "command": "vscode-sailpoint-identitynow.identities.search-identity.icon-view",
+        "title": "Search Identities...",
+        "icon": {
+          "light": "resources/light/import.svg",
+          "dark": "resources/dark/import.svg"
+        }
       }
     ],
     "menus": {
@@ -675,6 +687,16 @@
           "command": "vscode-sailpoint-identitynow.forms.import.icon-view",
           "when": "never"
         }
+        ,
+        {
+          "command": "vscode-sailpoint-identitynow.identities.search-identity.view",
+          "when": "never"
+        }
+        ,
+        {
+          "command": "vscode-sailpoint-identitynow.identities.search-identity.icon-view",
+          "when": "never"
+        }
       ],
       "view/title": [
         {
@@ -691,7 +713,7 @@
       "view/item/context": [
         {
           "command": "vscode-sailpoint-identitynow.open-resource",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /transform|Workflow$|source$|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /transform|Workflow$|source$|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|identity-definition/",
           "group": "_@0"
         },
         {
@@ -701,12 +723,12 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.remove-resource",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /transform|Workflow$|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /transform|Workflow$|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|identity-definition/",
           "group": "zzzremove@100"
         },
         {
           "command": "vscode-sailpoint-identitynow.refresh-forced",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|transforms|provisioning-policies|roles|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|transforms|provisioning-policies|roles|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions|identity-definition/",
           "group": "inline@50"
         },
         {
@@ -964,6 +986,15 @@
           "command": "vscode-sailpoint-identitynow.forms.import.icon-view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == form-definitions",
           "group": "inline@2"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.search-identity.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-definitions"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.search-identity.icon-view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-definitions",
+          "group": "inline@2"
         }
       ],
       "editor/context": [
@@ -1038,6 +1069,10 @@
       {
         "fileMatch": "idn://**/form-definitions/**/*",
         "url": "./schemas/form-definition.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/identity-definitions/**/*",
+        "url": "./schemas/identity-definition.schemas.json"
       }
     ],
     "configuration": {

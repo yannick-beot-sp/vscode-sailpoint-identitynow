@@ -71,6 +71,7 @@ export class TenantTreeItem extends BaseTreeItem {
 		results.push(new AccessProfilesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new RolesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new FormsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new IdentitiesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 
 		return new Promise((resolve) => resolve(results));
 	}
@@ -1036,6 +1037,61 @@ export class FormTreeItem extends IdentityNowResourceTreeItem {
 			tenantDisplayName,
 			label,
 			"form-definitions",
+			id,
+			vscode.TreeItemCollapsibleState.None,
+			undefined,
+			undefined,
+			true
+		);
+	}
+
+	iconPath = new vscode.ThemeIcon("preview");
+}
+
+/**
+ * Contains the Identities in tree view
+ */
+export class IdentitiesTreeItem extends FolderTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {
+		super("Identities", "identity-definitions", tenantId, tenantName, tenantDisplayName);
+	}
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		const client = new IdentityNowClient(this.tenantId, this.tenantName);
+		const identities: IdentityTreeItem[] = []
+		
+		for await (const identity of client.getIdentity("")) {
+			identities.push(new IdentityTreeItem(
+				this.tenantId,
+				this.tenantName,
+				this.tenantDisplayName,
+				identity.name,
+				identity.id
+			))
+		}
+
+		return identities;
+	}
+}
+
+export class IdentityTreeItem extends IdentityNowResourceTreeItem {
+	contextValue = "identity-definitions";
+
+	constructor(tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string) {
+		super(
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			"identity-definitions",
 			id,
 			vscode.TreeItemCollapsibleState.None,
 			undefined,

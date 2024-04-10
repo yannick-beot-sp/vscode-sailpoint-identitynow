@@ -1,0 +1,119 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://developer.sailpoint.com/schemas/identity.json",
+    "title": "Identity Definition",
+    "description": "Schema of a identity definition",
+    "type": "object",    
+    "properties": {
+      "alias": {
+        "type": "string"
+      },
+      "emailAddress": {
+        "type": "string"
+      },
+      "isManager": {
+        "type": "boolean"
+      },
+      "managerRef": {
+        "type": "string"
+      },
+      "lastRefresh": {
+        "type": "string"
+      },
+      "lifecycleState": {
+        "type": "string"
+      },
+      "processingState": {
+        "type": "string"
+      },
+      "identityStatus": {
+        "type": "string"
+      },
+      "attributes": {
+        "type": "object",
+        "properties": {
+          "firstname": {
+            "type": "string"
+          },
+          "cloudStatus": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "lastSyncDate": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "personalEmail": {
+            "type": "string"
+          },
+          "lastLoginTimestamp": {
+            "type": "integer"
+          },
+          "uid": {
+            "type": "string"
+          },
+          "cloudAuthoritativeSource": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "internalCloudStatus": {
+            "type": "string"
+          },
+          "workPhone": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "firstname",
+          "cloudStatus",
+          "displayName",
+          "lastSyncDate",
+          "lastname",
+          "personalEmail",
+          "lastLoginTimestamp",
+          "uid",
+          "cloudAuthoritativeSource",
+          "phone",
+          "internalCloudStatus",
+          "workPhone",
+          "email"
+        ]
+      },
+      "id": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "created": {
+        "type": "string"
+      },
+      "modified": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "alias",
+      "emailAddress",
+      "isManager",
+      "managerRef",
+      "lastRefresh",
+      "lifecycleState",
+      "processingState",
+      "identityStatus",
+      "attributes",
+      "id",
+      "name",
+      "created",
+      "modified"
+    ]
+  }
