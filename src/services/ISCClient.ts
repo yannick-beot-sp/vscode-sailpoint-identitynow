@@ -1,11 +1,11 @@
 import * as vscode from "vscode";
 import { EndpointUtils } from "../utils/EndpointUtils";
-import { SailPointIdentityNowAuthenticationProvider } from "./AuthenticationProvider";
+import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { withQuery } from "../utils/UriUtils";
 import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, Transform, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, Entitlement, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, ImportSpConfigRequestBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, ConnectorsBetaApi, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, Transform, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, Entitlement, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, ImportSpConfigRequestBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, ConnectorsBetaApi, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SODPolicyApi, SodPolicy, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementApi, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -30,7 +30,7 @@ const CONTENT_TYPE_FORM_JSON_PATCH = "application/json-patch+json";
 
 const DEFAULT_PAGINATION = 250;
 
-export class IdentityNowClient {
+export class ISCClient {
 
 	constructor(
 		private readonly tenantId: string,
@@ -47,7 +47,7 @@ export class IdentityNowClient {
 
 	private async prepareAuthenticationHeader(): Promise<any> {
 		const session = await vscode.authentication.getSession(
-			SailPointIdentityNowAuthenticationProvider.id,
+			SailPointISCAuthenticationProvider.id,
 			[this.tenantId]
 		);
 		return {
@@ -72,13 +72,16 @@ export class IdentityNowClient {
 	 */
 	private async getApiConfiguration(): Promise<Configuration> {
 		const session = await vscode.authentication.getSession(
-			SailPointIdentityNowAuthenticationProvider.id,
+			SailPointISCAuthenticationProvider.id,
 			[this.tenantId]
 		);
 		const apiConfig = new Configuration({
 			baseurl: EndpointUtils.getBaseUrl(this.tenantName),
 			tokenUrl: EndpointUtils.getAccessTokenUrl(this.tenantName),
-			accessToken: session?.accessToken
+			accessToken: session?.accessToken,
+			// TODO https://github.com/sailpoint-oss/typescript-sdk/issues/30
+			clientId: "",
+			clientSecret: ""
 		});
 
 		return apiConfig;
@@ -91,7 +94,7 @@ export class IdentityNowClient {
 	 */
 	private async getAxios(contentType = CONTENT_TYPE_JSON): Promise<AxiosInstance> {
 		const session = await vscode.authentication.getSession(
-			SailPointIdentityNowAuthenticationProvider.id,
+			SailPointISCAuthenticationProvider.id,
 			[this.tenantId]
 		);
 		const instance = axios.create({
@@ -216,7 +219,7 @@ export class IdentityNowClient {
 		sourceID: number,
 		types: string[] | null = null
 	): Promise<any> {
-		console.log("> IdentityNowClient.startEntitlementAggregation");
+		console.log("> ISCClient.startEntitlementAggregation");
 
 		const httpClient = await this.getAxios();
 		let endpoint =
@@ -237,7 +240,7 @@ export class IdentityNowClient {
 		deleteThreshold: number | undefined = undefined,
 		filePath: string | undefined = undefined
 	): Promise<any> {
-		console.log("> IdentityNowClient.startAccountAggregation");
+		console.log("> ISCClient.startAccountAggregation");
 		/*
 				const apiConfig = await this.getApiConfiguration();
 				const api = new SourcesAggregationCCApi(apiConfig);
@@ -281,7 +284,7 @@ export class IdentityNowClient {
 	}
 
 	public async resetSource(sourceID: number, skip: string | null = null): Promise<any> {
-		console.log('> IdentityNowClient.resetSource', sourceID);
+		console.log('> ISCClient.resetSource', sourceID);
 		let endpoint = EndpointUtils.getCCUrl(this.tenantName) + `/source/reset/${sourceID}`;
 		if (!!skip) {
 			endpoint += "?skip=" + skip;
@@ -370,26 +373,26 @@ export class IdentityNowClient {
 	 * @returns
 	 */
 	public async getResource(path: string): Promise<any> {
-		console.log("> IdentityNowClient.getResource", path);
+		console.log("> ISCClient.getResource", path);
 		const httpClient = await this.getAxios();
 		const response = await httpClient.get(path);
 		return response.data;
 	}
 
 	public async createResource(path: string, data: string): Promise<any> {
-		console.log("> IdentityNowClient.createResource", path);
+		console.log("> ISCClient.createResource", path);
 		const httpClient = await this.getAxios();
 		const response = await httpClient.post(path, data);
 		const res = await response.data;
-		console.log("< IdentityNowClient.createResource", res);
+		console.log("< ISCClient.createResource", res);
 		return res;
 	}
 
 	public async deleteResource(path: string): Promise<void> {
-		console.log("> IdentityNowClient.deleteResource", path);
+		console.log("> ISCClient.deleteResource", path);
 		const httpClient = await this.getAxios();
 		const response = await httpClient.delete(path);
-		console.log("< IdentityNowClient.deleteResource");
+		console.log("< ISCClient.deleteResource");
 	}
 
 	public async updateResource(path: string, data: string): Promise<any> {
@@ -739,6 +742,24 @@ export class IdentityNowClient {
 	//#region Workflows
 	///////////////////////
 
+	public async createWorflow(workflow: WorkflowBeta): Promise<WorkflowBeta> {
+		const apiConfig = await this.getApiConfiguration()
+		const api = new WorkflowsBetaApi(apiConfig)
+		const resp = await api.createWorkflow({
+			// @ts-ignore
+			createWorkflowRequestBeta: workflow
+		})
+		return resp.data;
+	}
+
+
+	public async getWorflow(id: string): Promise<WorkflowBeta> {
+		const apiConfig = await this.getApiConfiguration()
+		const api = new WorkflowsBetaApi(apiConfig)
+		const resp = await api.getWorkflow({ id })
+		return resp.data;
+	}
+
 	public async getWorflows(): Promise<WorkflowBeta[]> {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new WorkflowsBetaApi(apiConfig);
@@ -816,6 +837,7 @@ export class IdentityNowClient {
 		});
 		return resp.data.workflowExecutionId;
 	}
+
 	///////////////////////
 	//#endregion Workflows
 	///////////////////////
@@ -872,6 +894,16 @@ export class IdentityNowClient {
 		const jsonBody = resp.data;
 		console.log("< validateConnectorRule", jsonBody);
 		return jsonBody;
+	}
+
+	public async updateConnectorRule(rule: ConnectorRuleUpdateRequestBeta): Promise<ConnectorRuleResponseBeta> {
+		const apiConfig = await this.getApiConfiguration();
+		const api = new ConnectorRuleManagementBetaApi(apiConfig);
+		const resp = await api.updateConnectorRule({
+			id: rule.id,
+			connectorRuleUpdateRequestBeta: rule
+		});
+		return resp.data;
 	}
 
 	/////////////////////////////
@@ -1021,6 +1053,13 @@ export class IdentityNowClient {
 	//#region Entitlements
 	/////////////////////////
 
+	public async getEntitlement(id: string): Promise<EntitlementBeta> {
+		console.log("> getEntitlement");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new EntitlementsBetaApi(apiConfig);
+		const response = await api.getEntitlement({ id })
+		return response.data
+	}
 	public async getAllEntitlements(query: string): Promise<EntitlementBeta[]> {
 		console.log("> getAllEntitlements");
 		const apiConfig = await this.getApiConfiguration();
@@ -1123,7 +1162,7 @@ export class IdentityNowClient {
 		sourceId: string,
 		filePath: string
 	): Promise<ImportEntitlementsResult> {
-		console.log("> IdentityNowClient.importEntitlements");
+		console.log("> ISCClient.importEntitlements");
 		const endpoint = `beta/entitlements/sources/${sourceId}/entitlements/import`;
 		console.log("endpoint = " + endpoint);
 		const httpClient = await this.getAxios(CONTENT_TYPE_FORM_URLENCODED);
@@ -1342,6 +1381,15 @@ export class IdentityNowClient {
 		} while (count === DEFAULT_PAGINATION)
 	}
 
+	public async listForms(): Promise<FormDefinitionResponseBeta[]> {
+		console.log("> listForms");
+		const forms: FormDefinitionResponseBeta[] = []
+		for await (const form of this.getForms()) {
+			forms.push(form)
+		}
+		return forms
+	}
+
 	public async exportForms(filters: string | undefined = undefined): Promise<ExportFormDefinitionsByTenant200ResponseInnerBeta[]> {
 		console.log("> exportForms");
 		const apiConfig = await this.getApiConfiguration();
@@ -1375,11 +1423,127 @@ export class IdentityNowClient {
 		return response.data
 	}
 
-
-
 	//////////////////////////////
 	//#endregion Forms
 	//////////////////////////////
+
+	/////////////////////////
+	//#region Notification Templates
+	/////////////////////////
+
+	public async getNotificationTemplates(): Promise<TemplateDtoBeta[]> {
+		console.log("> getNotificationTemplates");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new NotificationsBetaApi(apiConfig);
+		const result = await Paginator.paginate(api, api.listNotificationTemplates);
+		return result.data;
+	}
+	/////////////////////////
+	//#endregion Notification Templates
+	/////////////////////////
+
+	/////////////////////////
+	//#region Segments
+	/////////////////////////
+
+	public async getSegments(): Promise<Segment[]> {
+		console.log("> getSegments");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SegmentsApi(apiConfig);
+		const result = await Paginator.paginate(api, api.listSegments);
+		return result.data;
+	}
+	/////////////////////////
+	//#endregion Segments
+	/////////////////////////
+
+	/////////////////////////
+	//#region SoD policies
+	/////////////////////////
+
+	public async getSoDPolicies(): Promise<SodPolicy[]> {
+		console.log("> getSoDPolicies");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SODPolicyApi(apiConfig);
+		const result = await Paginator.paginate(api, api.listSodPolicies);
+		return result.data;
+	}
+	/////////////////////////
+	//#endregion SoD policies
+	/////////////////////////
+
+	/////////////////////////
+	//#region Search attributes
+	/////////////////////////
+
+	public async getSearchAttributes(): Promise<SearchAttributeConfigBeta[]> {
+		console.log("> getSearchAttributes");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SearchAttributeConfigurationBetaApi(apiConfig)
+		const result = await api.getSearchAttributeConfig()
+		return result.data.sort(compareByName)
+	}
+
+	public async createSearchAttribute(searchAttributeConfigBeta: SearchAttributeConfigBeta): Promise<void> {
+		console.log("> createSearchAttribute");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SearchAttributeConfigurationBetaApi(apiConfig);
+		await api.createSearchAttributeConfig({ searchAttributeConfigBeta })
+	}
+
+	/////////////////////////
+	//#endregion Search attributes
+	/////////////////////////
+
+	/////////////////////////
+	//#region Identity attributes
+	/////////////////////////
+
+	public async getIdentityAttributes(): Promise<IdentityAttributeBeta[]> {
+		console.log("> getIdentityAttributes");
+		const apiConfig = await this.getApiConfiguration()
+		const api = new IdentityAttributesBetaApi(apiConfig)
+		const result = await api.listIdentityAttributes()
+		return result.data
+	}
+
+	/////////////////////////
+	//#endregion Identity attributes
+	/////////////////////////
+
+
+	/////////////////////////
+	//#region Password Management
+	/////////////////////////
+
+	public async getPasswordOrgConfig(): Promise<PasswordOrgConfig> {
+		console.log("> getPasswordOrgConfig");
+		const apiConfig = await this.getApiConfiguration()
+		const api = new PasswordConfigurationApi(apiConfig)
+		const result = await api.getPasswordOrgConfig()
+		return result.data
+	}
+
+	public async generateDigitToken(identityId: string, durationMinutes: number, length: number): Promise<string> {
+		console.log("> generateDigitToken");
+		const apiConfig = await this.getApiConfiguration()
+		const api = new PasswordManagementBetaApi(apiConfig)
+		const result = await api.generateDigitToken({
+			passwordDigitTokenResetBeta: {
+				userId: identityId,
+				durationMinutes,
+				length
+			}
+
+		})
+		console.log(`generateDigitToken: Request Id = ${result.data.requestId}`);
+
+		return result.data.digitToken
+	}
+
+	/////////////////////////
+	//#endregion Password Management
+	/////////////////////////
 }
 
 export enum AggregationJob {

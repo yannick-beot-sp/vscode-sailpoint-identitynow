@@ -39,8 +39,12 @@ export const EVALUATE_TRANSFORM = 'vscode-sailpoint-identitynow.transform.evalua
 export const EVALUATE_TRANSFORM_EDITOR = 'vscode-sailpoint-identitynow.transform.evaluate.editor';
 export const ENABLE_WORKFLOW = 'vscode-sailpoint-identitynow.workflow.enable';
 export const DISABLE_WORKFLOW = 'vscode-sailpoint-identitynow.workflow.disable';
+export const EXPORT_WORKFLOW = 'vscode-sailpoint-identitynow.workflow.export';
+export const IMPORT_WORKFLOW = 'vscode-sailpoint-identitynow.workflow.import';
+export const IMPORT_WORKFLOW_VIEW_ICON = 'vscode-sailpoint-identitynow.workflow.import.view-icon';
 export const TEST_WORKFLOW = 'vscode-sailpoint-identitynow.workflow.test';
 export const VIEW_WORKFLOW_EXECUTION_HISTORY = 'vscode-sailpoint-identitynow.workflow.view-execution-history';
+export const EDIT_CONNECTOR_RULE = 'vscode-sailpoint-identitynow.connector-rule.edit';
 export const NEW_CONNECTOR_RULE = 'vscode-sailpoint-identitynow.new-connector-rule';
 export const UPLOAD_CONNECTOR_RULE = 'vscode-sailpoint-identitynow.connector-rule.upload';
 export const VALIDATE_CONNECTOR_RULE = 'vscode-sailpoint-identitynow.connector-rule.validate';
@@ -89,6 +93,9 @@ export const EXPORT_FORM_VIEW = 'vscode-sailpoint-identitynow.form.export.view';
 export const IMPORT_FORMS_VIEW = 'vscode-sailpoint-identitynow.forms.import.view';
 export const IMPORT_FORMS_ICON_VIEW = 'vscode-sailpoint-identitynow.forms.import.icon-view';
 
-//IDENTITIES
-export const SEARCH_IDENTITY_VIEW = 'vscode-sailpoint-identitynow.identities.search-identity.view';
-export const SEARCH_IDENTITY_VIEW_ICON = 'vscode-sailpoint-identitynow.identities.search-identity.icon-view';
+export const EDIT_PUBLIC_IDENTITIES_CONFIG = 'vscode-sailpoint-identitynow.tenant.edit.public-identities-config';
+export const EDIT_ACCESS_REQUEST_CONFIG = 'vscode-sailpoint-identitynow.tenant.edit.access-request-config';
+export const EDIT_PASSWORD_ORG_CONFIG = 'vscode-sailpoint-identitynow.tenant.edit.password-org-config';
+export const GENERATE_DIGIT_TOKEN = 'vscode-sailpoint-identitynow.tenant.generate-digit-token';
+
+export const NEW_SEARCH_ATTRIBUTE = 'vscode-sailpoint-identitynow.new-attribute-search.view'

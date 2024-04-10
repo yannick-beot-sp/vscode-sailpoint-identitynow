@@ -1,24 +1,24 @@
 import * as vscode from 'vscode';
 import { TenantService } from "../../services/TenantService";
-import { RolesTreeItem } from '../../models/IdentityNowTreeItem';
+import { RolesTreeItem } from '../../models/ISCTreeItem';
 import { NEW_ID } from '../../constants';
-import { IdentityNowClient } from '../../services/IdentityNowClient';
+import { ISCClient } from '../../services/ISCClient';
 import { getResourceUri } from '../../utils/UriUtils';
 import { Role, RoleMembershipSelectorType } from 'sailpoint-api-client';
 import { runWizard } from '../../wizard/wizard';
 import { InputPromptStep } from '../../wizard/inputPromptStep';
-import { QuickPickPromptStep } from '../../wizard/quickPickPromptStep';
 import { Validator } from '../../validator/validator';
 import { WizardContext } from '../../wizard/wizardContext';
 import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
-import { requiredValidator } from '../../validator/requiredValidator';
-import { InputOwnerStep } from '../../wizard/inputOwnerStep';
-import { QuickPickOwnerStep } from '../../wizard/quickPickOwnerStep';
+import { InputIdentityQueryStep } from '../../wizard/inputIdentityQueryStep';
+import { QuickPickIdentityStep } from '../../wizard/quickPickIdentityStep';
 import { createNewFile } from '../../utils/vsCodeHelpers';
 import { isNotBlank } from '../../utils/stringUtils';
 import { Parser } from '../../parser/parser';
 import { RoleMembershipSelectorConverter } from '../../parser/RoleMembershipSelectorConverter';
 import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService';
+import { QuickPickAccessProfileStep } from '../../wizard/quickPickAccessProfileStep';
+import { QuickPickEntitlementStep } from '../../wizard/quickPickEntitlementStep';
 
 const role: Role = require('../../../snippets/role.json');
 
@@ -47,7 +47,7 @@ export class NewRoleCommand {
             context["tenant"] = await this.tenantService.getTenant(rolesTreeItem.tenantId);
         }
 
-        let client: IdentityNowClient | undefined = undefined;
+        let client: ISCClient | undefined = undefined;
         const parser = new Parser();
         const values = await runWizard({
             title: "Creation of a role",
@@ -56,7 +56,7 @@ export class NewRoleCommand {
                 new QuickPickTenantStep(
                     this.tenantService,
                     async (wizardContext) => {
-                        client = new IdentityNowClient(
+                        client = new ISCClient(
                             wizardContext["tenant"].id, wizardContext["tenant"].tenantName);
                     }),
                 new InputPromptStep({
@@ -65,45 +65,36 @@ export class NewRoleCommand {
                         validateInput: (s: string) => { return roleNameValidator.validate(s); }
                     }
                 }),
-                new InputOwnerStep(),
-                new QuickPickOwnerStep(
+                new InputIdentityQueryStep(),
+                new QuickPickIdentityStep(
                     "role owner",
                     () => { return client; }
                 ),
                 new InputPromptStep({
                     name: "accessProfileQuery",
-                    displayName: "access profile",
                     options: {
-                        validateInput: (s: string) => { return requiredValidator.validate(s); }
+                        prompt: "Enter a query to find access profiles or leave empty",
+                        placeHolder: "Enter search query",
+                        learnMoreLink: "https://documentation.sailpoint.com/saas/help/search/searchable-fields.html#searching-access-profile-data"
                     }
                 }),
-                new QuickPickPromptStep({
-                    name: "accessProfiles",
-                    displayName: "access profiles",
+                new QuickPickAccessProfileStep(() => { return client; }),
+                new InputPromptStep({
+                    name: "entitlementQuery",
                     options: {
-                        canPickMany: true
-                    },
-                    items: async (context: WizardContext): Promise<vscode.QuickPickItem[]> => {
-                        const results = (await client.searchAccessProfiles(context["accessProfileQuery"], 100, ["id", "name", "description", "source.name"]))
-                            .map(x => ({
-                                id: x.id,
-                                label: x.name,
-                                name: x.name,
-                                description: x.source.name,
-                                detail: x.description
-                            }));
-
-                        return results;
+                        prompt: "Enter a query to find entitlements or leave empty",
+                        placeHolder: "Enter search query",
+                        learnMoreLink: "https://documentation.sailpoint.com/saas/help/search/searchable-fields.html#searching-entitlement-data"
                     }
                 }),
+                new QuickPickEntitlementStep(() => { return client; }),
                 new InputPromptStep({
                     name: "membershipCriteria",
                     displayName: "membership criteria",
-
                     options: {
                         prompt: "Enter a membership criteria if needed",
                         placeHolder: "Membership criteria (e.g identity.cloudLifecycleState eq 'active')",
-                                                validateInput: (s: string) => {
+                        validateInput: (s: string) => {
                             if (isNotBlank(s)) {
                                 try {
                                     const _ = parser.parse(s);
@@ -140,12 +131,20 @@ export class NewRoleCommand {
                 name: values["owner"].name,
                 type: "IDENTITY"
             };
-
-            newRole.accessProfiles?.push(...values["accessProfiles"].map(x => ({
-                id: x.id,
-                name: x.name,
-                type: 'ACCESS_PROFILE'
-            })));
+            if (values.hasOwnProperty("accessProfiles") && values["accessProfiles"] !== undefined) {
+                newRole.accessProfiles.push(...values["accessProfiles"].map(x => ({
+                    id: x.id,
+                    name: x.name,
+                    type: 'ACCESS_PROFILE'
+                })));
+            }
+            if (values.hasOwnProperty("entitlements") && values["entitlements"] !== undefined) {
+                newRole.entitlements.push(...values["entitlements"].map(x => ({
+                    id: x.id,
+                    name: x.name,
+                    type: 'ENTITLEMENT'
+                })));
+            }
 
             if (isNotBlank(values["membershipCriteria"])) {
                 try {
@@ -161,8 +160,8 @@ export class NewRoleCommand {
                     newRole.membership = membership;
 
                 } catch (error) {
-                   vscode.window.showErrorMessage(`Could not create the role: ${error}`);
-                   return;
+                    vscode.window.showErrorMessage(`Could not create the role: ${error}`);
+                    return;
                 }
             }
 

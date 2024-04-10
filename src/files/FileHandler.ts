@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { URL_PREFIX } from '../constants';
-import { IdentityNowClient } from '../services/IdentityNowClient';
+import { ISCClient } from '../services/ISCClient';
 import { TenantService } from '../services/TenantService';
 import { getIdByUri, getResourceUri } from '../utils/UriUtils';
 import { openPreview } from '../utils/vsCodeHelpers';
@@ -39,7 +39,7 @@ export class FileHandler {
         //////////////////////////////////////////
         // Get generated object to get the ID
         //////////////////////////////////////////
-        const client = new IdentityNowClient(tenantInfo.id!, tenantName);
+        const client = new ISCClient(tenantInfo.id!, tenantName);
 
         // 1. Get name from the document
         const editorText = document.getText();

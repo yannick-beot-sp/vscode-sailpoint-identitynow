@@ -8,7 +8,7 @@ import { isEmpty } from './utils/stringUtils';
 import { randomUUID } from 'crypto';
 const querystring = require('querystring');
 
-export class IdentityNowUriHandler implements vscode.UriHandler {
+export class ISCUriHandler implements vscode.UriHandler {
 
     /**
      * Constructor

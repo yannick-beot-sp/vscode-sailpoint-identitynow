@@ -1,10 +1,10 @@
 import path = require('path');
 import * as vscode from 'vscode';
-import { SchemasTreeItem } from "../models/IdentityNowTreeItem";
+import { SchemasTreeItem } from "../models/ISCTreeItem";
 import { isEmpty } from '../utils/stringUtils';
 import { getIdByUri, getPathByUri } from '../utils/UriUtils';
 import { openPreview } from '../utils/vsCodeHelpers';
-import { IdentityNowClient } from '../services/IdentityNowClient';
+import { ISCClient } from '../services/ISCClient';
 import * as commands from './constants';
 
 async function askSchemaName(): Promise<string | undefined> {
@@ -13,7 +13,7 @@ async function askSchemaName(): Promise<string | undefined> {
         ignoreFocusOut: true,
         placeHolder: 'Schema name',
         prompt: "Enter the schema name",
-        title: 'IdentityNow',
+        title: 'Identity Security Cloud',
         validateInput: text => {
             const regex = new RegExp('^[A-Za-z]+$');
             if (regex.test(text)) {
@@ -53,7 +53,7 @@ export async function newSchema(treeItem: SchemasTreeItem): Promise<void> {
             "attributes": []
         }
 
-        const client = new IdentityNowClient(treeItem.tenantId, treeItem.tenantName);
+        const client = new ISCClient(treeItem.tenantId, treeItem.tenantName);
         const schema = await client.createSchema(
             getIdByUri(treeItem.parentUri), 
             data)

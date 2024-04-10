@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { BaseCSVExporter } from "../BaseExporter";
-import { AccessProfilesTreeItem } from '../../models/IdentityNowTreeItem';
+import { AccessProfilesTreeItem } from '../../models/ISCTreeItem';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
 import { AccessProfile, AccessProfileSourceRef, AccessProfilesApiListAccessProfilesRequest, OwnerReference, Requestability, Revocability } from 'sailpoint-api-client';

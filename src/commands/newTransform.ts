@@ -1,10 +1,11 @@
 import * as vscode from 'vscode';
 import { NEW_ID } from '../constants';
-import { TransformsTreeItem } from "../models/IdentityNowTreeItem";
+import { TransformsTreeItem } from "../models/ISCTreeItem";
 import { TransformQuickPickItem } from '../models/TransformQuickPickItem';
 import { isEmpty } from '../utils/stringUtils';
 import { getResourceUri } from '../utils/UriUtils';
 import { createNewFile } from '../utils/vsCodeHelpers';
+import { compareByLabel } from '../utils';
 const transforms = require('../../snippets/transforms.json');
 
 /**
@@ -17,7 +18,7 @@ export class NewTransformCommand {
             ignoreFocusOut: true,
             placeHolder: 'Transform name',
             prompt: "Enter the transform name",
-            title: 'IdentityNow',
+            title: 'Identity Security Cloud',
             validateInput: text => {
                 if (text && text.length > 50) {
                     return "Transform name cannot exceed 50 characters.";
@@ -47,7 +48,7 @@ export class NewTransformCommand {
                 "detail": transforms[k].description,
                 "template": transforms[k].newtemplate
             }))
-            .sort(((a, b) => (a.label > b.label) ? 1 : -1));
+            .sort(compareByLabel);
 
         const transform = await vscode.window.showQuickPick(transformPickList, {
             ignoreFocusOut: false,

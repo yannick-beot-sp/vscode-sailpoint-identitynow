@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
-import { SourceTreeItem } from "../../models/IdentityNowTreeItem";
-import { AggregationJob, IdentityNowClient } from '../../services/IdentityNowClient';
+import { SourceTreeItem } from "../../models/ISCTreeItem";
+import { AggregationJob, ISCClient } from '../../services/ISCClient';
 import { delay } from '../../utils';
 import { chooseFile } from '../../utils/vsCodeHelpers';
 
 class AccountImporter {
-    readonly client: IdentityNowClient;
+    readonly client: ISCClient;
     constructor(
         private tenantId: string,
         private tenantName: string,
@@ -15,7 +15,7 @@ class AccountImporter {
         private sourceCCId: number,
         private fileUri: vscode.Uri
     ) {
-        this.client = new IdentityNowClient(this.tenantId, this.tenantName);
+        this.client = new ISCClient(this.tenantId, this.tenantName);
     }
 
     async importFileWithProgression(): Promise<void> {

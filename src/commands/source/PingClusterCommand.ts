@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 
 import { StatusResponseBeta, StatusResponseBetaStatusEnum } from 'sailpoint-api-client';
-import { SourceTreeItem } from '../../models/IdentityNowTreeItem';
-import { IdentityNowClient } from '../../services/IdentityNowClient';
+import { SourceTreeItem } from '../../models/ISCTreeItem';
+import { ISCClient } from '../../services/ISCClient';
 import { TenantService } from '../../services/TenantService';
 import { WizardContext } from '../../wizard/wizardContext';
 import { runWizard } from '../../wizard/wizard';
@@ -32,7 +32,7 @@ export class PingClusterCommand {
             }
         }
 
-        let client: IdentityNowClient | undefined = undefined;
+        let client: ISCClient | undefined = undefined;
 
         const values = await runWizard({
             title: "Ping resources",
@@ -41,7 +41,7 @@ export class PingClusterCommand {
                 new QuickPickTenantStep(
                     this.tenantService,
                     async (wizardContext) => {
-                        client = new IdentityNowClient(
+                        client = new ISCClient(
                             wizardContext["tenant"].id, wizardContext["tenant"].tenantName);
                     }),
                 new QuickPickSourceStep(() => { return client!; }),

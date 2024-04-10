@@ -7,7 +7,7 @@
             "{\n    \"type\": \"accountAttribute\",\n    \"attributes\": {\n        \"sourceName\": \"$1\",\n        \"attributeName\": \"$2\"\n    }\n}"
         ],
         "newtemplate": "{\n    \"type\": \"accountAttribute\",\n    \"attributes\": {\n        \"sourceName\": \"\",\n        \"attributeName\": \"\"\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
-        "description": "The account attribute transform is designed to look up an account for a particular source on an identity, and return a specific attribute value from that account. (ref)[https://community.sailpoint.com/t5/IdentityNow-Wiki/IdentityNow-Transforms-Account-Attribute/ta-p/180541]"
+        "description": "The account attribute transform is designed to look up an account for a particular source on an identity, and return a specific attribute value from that account."
     },
     "Base64 Decode": {
         "prefix": [

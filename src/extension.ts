@@ -5,12 +5,12 @@ import { AccessProfileImporterTreeViewCommand } from './commands/access-profile/
 import { AccessProfileExporterCommand } from './commands/access-profile/ExportAccessProfiles';
 import { NewAccessProfileCommand } from './commands/access-profile/NewAccessProfileCommand';
 import { AddTenantCommand } from './commands/addTenant';
-import { ConnectorRuleCommand } from './commands/connectorRuleCommand';
+import { ConnectorRuleCommand } from './commands/rule/connectorRuleCommand';
 import { deleteResource } from './commands/deleteResource';
 import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './commands/source/exportAccounts';
 import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from './commands/source/exportEntitlementDetails';
-import { ExportScriptFromRuleCommand } from './commands/exportScriptFromRuleCommand';
-import { AccessProfileFilterCommand, FilterCommand, RoleFilterCommand } from './commands/filterCommand';
+import { ExportScriptFromRuleCommand } from './commands/rule/exportScriptFromRuleCommand';
+import { AccessProfileFilterCommand, RoleFilterCommand } from './commands/filterCommand';
 import { AccountImportNodeCommand } from './commands/source/importAccount';
 import { EntitlementDetailsImportNodeCommand } from './commands/source/importEntitlementDetails';
 import { UncorrelatedAccountImportNodeCommand } from './commands/source/importUncorrelatedAccount';
@@ -31,28 +31,36 @@ import { ExportConfigTreeViewCommand } from './commands/spconfig-export/ExportCo
 import { ImportConfigExplorerCommand } from './commands/spconfig-import/ImportConfigExplorerCommand';
 import { ImportConfigPaletteCommand } from './commands/spconfig-import/ImportConfigPaletteCommand';
 import { ImportConfigTreeViewCommand } from './commands/spconfig-import/ImportConfigTreeViewCommand';
-import { TestWorkflowCommand } from './commands/testWorkflow';
-import { viewWorkflowExecutionHistory } from './commands/viewWorkflowExecutionHistory';
-import { disableWorkflow, enableWorkflow } from './commands/workflow';
+import { TestWorkflowCommand } from './commands/workflow/testWorkflow';
+import { viewWorkflowExecutionHistory } from './commands/workflow/viewWorkflowExecutionHistory';
+import { disableWorkflow, enableWorkflow } from './commands/workflow/updateWorkflowStatus';
 import { URL_PREFIX } from './constants';
 import { FileHandler } from './files/FileHandler';
-import { IdentityNowResourceProvider } from './files/IdentityNowResourceProvider';
-import { LoadMoreNode } from './models/IdentityNowTreeItem';
-import { SailPointIdentityNowAuthenticationProvider } from './services/AuthenticationProvider';
+import { ISCResourceProvider } from './files/ISCResourceProvider';
+import { LoadMoreNode } from './models/ISCTreeItem';
+import { SailPointISCAuthenticationProvider } from './services/AuthenticationProvider';
 import { TenantService } from './services/TenantService';
 import { TransformEvaluator } from './services/TransformEvaluator';
 import { TreeManager } from './services/TreeManager';
-import { IdentityNowUriHandler } from './uriHandler';
-import { IdentityNowDataProvider } from './views/IdentityNowDataProvider';
+import { ISCUriHandler } from './ISCUriHandler';
+import { ISCDataProvider } from './views/ISCDataProvider';
 import { WorkflowTesterWebviewViewProvider } from './views/WorkflowTesterWebviewViewProvider';
 import { TestConnectionCommand } from './commands/source/TestConnectionCommand';
 import { PeekSourceCommand } from './commands/source/PeekSourceCommand';
 import { PingClusterCommand } from './commands/source/PingClusterCommand';
 import { CloneSourceCommand } from './commands/source/CloneSourceCommand';
 import { FormDefinitionExportCommand } from './commands/form/FormDefinitionExportCommand';
-import { FormDefinitionImporter } from './commands/form/FormDefinitionImporter';
 import { FormDefinitionImporterTreeViewCommand } from './commands/form/FormDefinitionImporterTreeViewCommand';
-import { IdentitySearchCommand } from './commands/identity/IdentitySearchCommand';
+import { WorkflowExportCommand } from './commands/workflow/WorkflowExportCommand';
+import { WorkflowImporterTreeViewCommand } from './commands/workflow/WorkflowImporterTreeViewCommand';
+import { EditPublicIdentitiesConfigCommand } from './commands/tenant/editPublicIdentitiesConfigCommand';
+import { EditAccessRequestConfigCommand } from './commands/tenant/editAccessRequestConfigCommand';
+import { NewAttributeSearchConfigCommand } from './commands/NewAttributeSearchConfigCommand';
+import { EditPasswordConfigCommand } from './commands/tenant/editPasswordConfigCommand';
+import { GenerateDigitTokenCommand } from './commands/tenant/generateDigitTokenCommand';
+import { onErrorResponse, onRequest, onResponse } from './services/AxiosHandlers';
+import axios from 'axios';
+import { OpenScriptCommand } from './commands/rule/openScriptCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -66,10 +74,10 @@ export function activate(context: vscode.ExtensionContext) {
 	// any other extension can use this provider via the `getSession` API.
 	// NOTE: when implementing an auth provider, don't forget to register an activation event for that provider
 	// in your package.json file: "onAuthenticationRequest:AzureDevOpsPAT"
-	const authProvider = new SailPointIdentityNowAuthenticationProvider(tenantService);
+	const authProvider = new SailPointISCAuthenticationProvider(tenantService);
 
 	context.subscriptions.push(vscode.authentication.registerAuthenticationProvider(
-		SailPointIdentityNowAuthenticationProvider.id,
+		SailPointISCAuthenticationProvider.id,
 		'SailPoint Identity Now',
 		authProvider,
 		{
@@ -86,7 +94,31 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.RENAME_TENANT, renameTenantCommand.execute,
 			renameTenantCommand));
 
-	const identityNowDataProvider = new IdentityNowDataProvider(context, tenantService);
+	const editPublicIdentitiesConfigCommand = new EditPublicIdentitiesConfigCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EDIT_PUBLIC_IDENTITIES_CONFIG,
+			editPublicIdentitiesConfigCommand.execute,
+			editPublicIdentitiesConfigCommand));
+
+	const editAccessRequestConfigCommand = new EditAccessRequestConfigCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EDIT_ACCESS_REQUEST_CONFIG,
+			editAccessRequestConfigCommand.execute,
+			editAccessRequestConfigCommand));
+
+	const editPasswordConfigCommand = new EditPasswordConfigCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EDIT_PASSWORD_ORG_CONFIG,
+			editPasswordConfigCommand.execute,
+			editPasswordConfigCommand));
+
+	const generateDigitTokenCommand = new GenerateDigitTokenCommand(tenantService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.GENERATE_DIGIT_TOKEN,
+			generateDigitTokenCommand.execute,
+			generateDigitTokenCommand));
+
+	const identityNowDataProvider = new ISCDataProvider(context, tenantService);
 	vscode.window.registerTreeDataProvider(commands.TREE_VIEW, identityNowDataProvider);
 
 	vscode.commands.registerCommand(commands.REFRESH_FORCED, identityNowDataProvider.forceRefresh, identityNowDataProvider);
@@ -217,6 +249,17 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.VIEW_WORKFLOW_EXECUTION_HISTORY,
 			viewWorkflowExecutionHistory));
+	const workflowExportCommand = new WorkflowExportCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_WORKFLOW,
+			workflowExportCommand.execute, workflowExportCommand))
+	const workflowImporterTreeViewCommand = new WorkflowImporterTreeViewCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_WORKFLOW,
+			workflowImporterTreeViewCommand.execute, workflowImporterTreeViewCommand))
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_WORKFLOW_VIEW_ICON,
+			workflowImporterTreeViewCommand.execute, workflowImporterTreeViewCommand))
 
 	const exportConfigViewCommand = new ExportConfigTreeViewCommand();
 	context.subscriptions.push(
@@ -249,7 +292,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.workspace.registerFileSystemProvider(
 			URL_PREFIX,
-			new IdentityNowResourceProvider(tenantService)
+			new ISCResourceProvider(tenantService)
 		));
 
 	const newTransformCommand = new NewTransformCommand();
@@ -283,6 +326,11 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.VALIDATE_CONNECTOR_RULE,
 			newConnectorRuleCommand.validateScript, newConnectorRuleCommand));
+	
+	const openScriptCommand = new OpenScriptCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EDIT_CONNECTOR_RULE,
+			openScriptCommand.execute, openScriptCommand));
 
 	const exportScriptFromRuleCommand = new ExportScriptFromRuleCommand(tenantService);
 	context.subscriptions.push(
@@ -307,7 +355,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const fileHandler = new FileHandler(tenantService);
 	vscode.workspace.onDidSaveTextDocument(fileHandler.onFileSaved, fileHandler);
 
-	const uriHandler = new IdentityNowUriHandler(tenantService);
+	const uriHandler = new ISCUriHandler(tenantService);
 	context.subscriptions.push(
 		vscode.window.registerUriHandler(uriHandler));
 
@@ -398,11 +446,19 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.IMPORT_FORMS_ICON_VIEW,
 			formDefinitionImporterTreeViewCommand.execute, formDefinitionImporterTreeViewCommand));
 
-	//Identities
-	const identitySearchCommand = new IdentitySearchCommand()
+	// Attribute Search Config
+	const newAttributeSearchConfigCommand = new NewAttributeSearchConfigCommand(tenantService)
 	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.SEARCH_IDENTITY_VIEW,
-			identitySearchCommand.execute, IdentitySearchCommand));
+		vscode.commands.registerCommand(commands.NEW_SEARCH_ATTRIBUTE,
+			newAttributeSearchConfigCommand.execute, newAttributeSearchConfigCommand));
+
+
+	axios.interceptors.request.use(onRequest)
+
+	// Add a response interceptor
+	axios.interceptors.response.use(
+		onResponse,
+		onErrorResponse)
 }
 
 // this method is called when your extension is deactivated

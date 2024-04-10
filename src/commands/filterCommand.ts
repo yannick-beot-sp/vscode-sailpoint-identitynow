@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { BaseTreeItem, FilterType, PageableNode } from "../models/IdentityNowTreeItem";
+import { BaseTreeItem, FilterType, PageableNode } from "../models/ISCTreeItem";
 import * as commands from "../commands/constants";
 import { WizardContext } from "../wizard/wizardContext";
 import { InputPromptStep } from "../wizard/inputPromptStep";
@@ -9,6 +9,7 @@ import { QuickPickPromptStep } from "../wizard/quickPickPromptStep";
 
 const newFilter = (nodeFilterType: FilterType) => new QuickPickPromptStep({
     name: "filterType",
+    displayName: "filter type",
     project: x => x.value,
     items: [{
         label: FilterType.api,

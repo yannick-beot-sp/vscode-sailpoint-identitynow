@@ -1,0 +1,103 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://developer.sailpoint.com/schemas/public-identities-config.json",
+  "title": "Public Identities Config",
+  "description": "Details of up to 5 Identity attributes that will be publicly accessible for all Identities to anyone in the org.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "attributes": {
+      "type": "array",
+      "description": "Up to 5 identity attributes that will be available to everyone in the org for all users in the org.",
+      "items": {
+        "type": "object",
+        "description": "Used to map an attribute key for an Identity to its display name.",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "The attribute key",
+            "example": "country"
+          },
+          "name": {
+            "type": "string",
+            "description": "The attribute display name",
+            "example": "Country"
+          }
+        },
+        "required": [
+          "key",
+          "name"
+        ],
+        "defaultSnippets": [
+          {
+            "label": "New identity attribute",
+            "description": "Create a new identity attribute",
+            "body": {
+              "key": "${1:attribute}",
+              "name": "${2:display name}"
+            }
+          }
+        ]
+      }
+    },
+    "modified": {
+      "nullable": true,
+      "type": "string",
+      "description": "When this configuration was last modified.",
+      "format": "date-time",
+      "example": "2018-06-25T20:22:28.104Z"
+    },
+    "modifiedBy": {
+      "description": "The identity who last modified this configuration.",
+      "type": "object",
+      "nullable": true,
+      "properties": {
+        "type": {
+          "example": "IDENTITY",
+          "type": "string",
+          "enum": [
+            "ACCOUNT_CORRELATION_CONFIG",
+            "ACCESS_PROFILE",
+            "ACCESS_REQUEST_APPROVAL",
+            "ACCOUNT",
+            "APPLICATION",
+            "CAMPAIGN",
+            "CAMPAIGN_FILTER",
+            "CERTIFICATION",
+            "CLUSTER",
+            "CONNECTOR_SCHEMA",
+            "ENTITLEMENT",
+            "GOVERNANCE_GROUP",
+            "IDENTITY",
+            "IDENTITY_PROFILE",
+            "IDENTITY_REQUEST",
+            "LIFECYCLE_STATE",
+            "PASSWORD_POLICY",
+            "ROLE",
+            "RULE",
+            "SOD_POLICY",
+            "SOURCE",
+            "TAG",
+            "TAG_CATEGORY",
+            "TASK_RESULT",
+            "REPORT_RESULT",
+            "SOD_VIOLATION",
+            "ACCOUNT_ACTIVITY",
+            "WORKGROUP"
+          ],
+          "description": "An enumeration of the types of DTOs supported within the IdentityNow infrastructure."
+        },
+        "id": {
+          "type": "string",
+          "description": "Identity id",
+          "example": "2c9180a46faadee4016fb4e018c20639"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable display name of identity.",
+          "example": "Thomas Edison"
+        }
+      }
+    }
+  }
+}

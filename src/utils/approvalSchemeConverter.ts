@@ -8,7 +8,7 @@ import { isEmpty } from "./stringUtils";
  * @param params 
  */
 export async function accessProfileApprovalSchemeToStringConverter(
-    schemes: AccessProfileApprovalScheme[] | undefined,
+    schemes: AccessProfileApprovalScheme[] | undefined | null,
     governanceId2Name: CacheService<string>): Promise<string | undefined> {
 
     return await approvalSchemeToStringConverter(
@@ -32,7 +32,7 @@ export async function roleApprovalSchemeToStringConverter(
 }
 
 export async function approvalSchemeToStringConverter<SchemeEnum>(
-    schemes: { 'approverType'?: SchemeEnum; 'approverId'?: string | null; }[] | undefined,
+    schemes: { 'approverType'?: SchemeEnum; 'approverId'?: string | null; }[] | undefined | null,
     governanceId2Name: CacheService<string>,
     governanceGroup: SchemeEnum): Promise<string | undefined> {
 
@@ -41,7 +41,7 @@ export async function approvalSchemeToStringConverter<SchemeEnum>(
     return (await Promise.all(schemes.map(
         async (scheme) => {
             if (scheme.approverType === governanceGroup) {
-                return await governanceId2Name.get(scheme.approverId);
+                return await governanceId2Name.get(scheme.approverId!);
             } else {
                 return scheme.approverType;
             }

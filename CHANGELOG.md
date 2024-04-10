@@ -6,6 +6,79 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [1.2.0] - 2024-04-09
+
+### Added
+
+- Add new command to edit connector rule (Edit script)
+- Changing IdentityNow to Identity Security Cloud/ISC
+- Logging every call to ISC
+
+### Fixed
+
+- Catch error message if peek objects fails
+
+## [1.1.0] - 2024-03-20
+
+### Added
+
+- Edit Password Org Config
+- Generate a digit token for password reset
+
+### Fixed
+
+- 404 error when sources had '/' in their name (cf. [#71](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/71))
+
+## [1.0.4] - 2024-03-06
+
+### Fixed
+
+- New attempt to publish extension
+- Refactoring of IdentityNowTreeItem.ts and fixed refreshing issue with Workflows
+- Non-matching schema for lifecycle states
+
+## [1.0.3] - 2024-03-05
+
+### Fixed
+
+- Publication issue
+
+## [1.0.2] - 2024-03-05
+
+### Fixed
+
+- Could not open Identity Attributes from several tenants (cf. [#69](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/69))
+
+## [1.0.1] - 2024-03-05
+
+### Fixed
+
+- Transform not correctly saved (cf. [#68](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/68))
+
+## [1.0.0] - 2024-03-04
+
+### Added
+
+- Import/Export entitlements for roles
+
+## [0.0.30] - 2024-03-03
+
+### Added
+
+- Add support for Search attribute config (cf. [#64](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/64))
+- Add support for Identity Attributes
+
+## [0.0.29] - 2024-02-28
+
+### Added
+
+- Export/Import workflows (cf. [#57](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/57))
+- Edit Public Identities Config
+- Edit Access Request Configuration
+- Can export everything with SP-Config (cf. [#56](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/56))
+- Can select cloud rules for export with SP-Config
+- Add IDENTITY_OBJECT_CONFIG as an importable object from SP-Config
+
 ### Fixed
 
 - Display warning if file is too big (cf. [#66](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/66))

@@ -3,7 +3,7 @@ import { isEmpty } from '../utils/stringUtils';
 import { OpenResourceCommand } from "../commands/openResource";
 import { ATTRIBUTES } from '../models/TransformAttributes';
 import { COUNTRYCODES } from '../models/CountryCodes';
-import { IdentityNowClient } from './IdentityNowClient';
+import { ISCClient } from './ISCClient';
 import { VALID_OPERATORS } from '../constants';
 import { TenantService } from './TenantService';
 
@@ -227,7 +227,7 @@ export class TransformEvaluator {
             ignoreFocusOut: true,
             placeHolder: placeHolder,
             prompt: prompt,
-            title: 'IdentityNow transform'
+            title: 'Identity Security Cloud transform'
         });
 
         if (input !== undefined) {
@@ -439,7 +439,7 @@ export class TransformEvaluator {
         let attributeName: string = attributes.attributeName;
         console.log(">>> Required attribute 'attributeName': '" + attributeName + "'");
 
-        const client = new IdentityNowClient(this.tenantId, this.tenantName);
+        const client = new ISCClient(this.tenantId, this.tenantName);
 
         let sourceId: any = await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
@@ -1085,7 +1085,7 @@ export class TransformEvaluator {
         let attributeName = attributes.attributeName;
         console.log(">>> Required attribute 'attributeName': '" + attributeName + "'");
 
-        const client = new IdentityNowClient(this.tenantId, this.tenantName);
+        const client = new ISCClient(this.tenantId, this.tenantName);
 
         if (uid === 'manager') {
             this.input = await this.askInput("rule:getReferenceIdentityAttribute");
@@ -1185,7 +1185,7 @@ export class TransformEvaluator {
             return;
         }
 
-        const client = new IdentityNowClient(this.tenantId, this.tenantName);
+        const client = new ISCClient(this.tenantId, this.tenantName);
 
         let identity = await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
@@ -1501,7 +1501,7 @@ export class TransformEvaluator {
         let id = attributes.id;
         console.log(">>> Required attribute 'id': '" + id + "'");
 
-        const client = new IdentityNowClient(this.tenantId, this.tenantName);
+        const client = new ISCClient(this.tenantId, this.tenantName);
 
         let transform: any = await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,

@@ -1,6 +1,7 @@
 import * as os from 'os';
 import * as configuration from '../configurationConstants';
 import { getConfigKey, getWorkspaceFolder } from '../utils/configurationUtils';
+import { sanitizePath } from '../utils';
 
 interface ContextValues {
     /**
@@ -102,8 +103,8 @@ export class PathProposer {
         objectType: string,
         objectName: string,
     ): string {
-        let path = getConfigKey(key);
-        path = this.replaceVariables(path, {
+        let result = getConfigKey(key);
+        result = this.replaceVariables(result, {
             t: tenantName,
             // eslint-disable-next-line @typescript-eslint/naming-convention
             T: tenantDisplayName,
@@ -111,7 +112,7 @@ export class PathProposer {
             // eslint-disable-next-line @typescript-eslint/naming-convention
             S: objectName
         });
-        return path as string;
+        return sanitizePath(result);
     }
 
     private static getTenantBasedReportFilename(
@@ -214,7 +215,7 @@ export class PathProposer {
             tenantName,
             tenantDisplayName);
     }
-    
+
     public static getRoleReportFilename(
         tenantName: string,
         tenantDisplayName: string
@@ -242,6 +243,18 @@ export class PathProposer {
             tenantName,
             tenantDisplayName,
             "FORM_DEFINITION",
+            objectName);
+    }
+
+    public static getWorkflowFilename(
+        tenantName: string,
+        tenantDisplayName: string,
+        objectName: string
+    ): string {
+        return this.getObjectBasedReportFilename(configuration.WORKFLOW_EXPORT_FILENAME_CONF,
+            tenantName,
+            tenantDisplayName,
+            "WORKFLOW",
             objectName);
     }
 }

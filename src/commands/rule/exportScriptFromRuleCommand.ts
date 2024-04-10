@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
-import { RuleTreeItem } from '../models/IdentityNowTreeItem';
-import { IdentityNowClient } from '../services/IdentityNowClient';
-import { toDateSuffix } from '../utils';
+import { RuleTreeItem } from '../../models/ISCTreeItem';
+import { ISCClient } from '../../services/ISCClient';
+import { toDateSuffix } from '../../utils';
 import * as fs from 'fs';
-import { confirmFileOverwrite, openPreview } from '../utils/vsCodeHelpers';
-import { getIdByUri, getNameByUri } from '../utils/UriUtils';
-import { TenantService } from '../services/TenantService';
-import { ensureFolderExists } from '../utils/fileutils';
+import { confirmFileOverwrite, openPreview } from '../../utils/vsCodeHelpers';
+import { getIdByUri, getNameByUri } from '../../utils/UriUtils';
+import { TenantService } from '../../services/TenantService';
+import { ensureFolderExists } from '../../utils/fileutils';
 import { join } from 'path';
 
 
@@ -15,7 +15,6 @@ export class ExportScriptFromRuleCommand {
     
     public async exportScriptView(node?: RuleTreeItem): Promise<void> {
 
-        // assessing that item is a IdentityNowResourceTreeItem
         if (node === undefined || !(node instanceof RuleTreeItem)) {
             console.log("WARNING: exportScriptView: invalid item", node);
             throw new Error("exportScriptView: invalid item");
@@ -86,7 +85,7 @@ export class ExportScriptFromRuleCommand {
 
         ensureFolderExists(exportFile);
 
-        const client = new IdentityNowClient(tenantId, tenantName);
+        const client = new ISCClient(tenantId, tenantName);
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Exporting script from rule ${ruleName}...`,

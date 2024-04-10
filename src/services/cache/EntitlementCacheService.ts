@@ -1,4 +1,4 @@
-import { IdentityNowClient } from "../IdentityNowClient";
+import { ISCClient } from "../ISCClient";
 import { CacheService } from "./CacheService";
 
 /**
@@ -8,7 +8,7 @@ import { CacheService } from "./CacheService";
 export const KEY_SEPARATOR = "|";
 
 export class EntitlementCacheService extends CacheService<string>{
-    constructor(readonly client: IdentityNowClient) {
+    constructor(readonly client: ISCClient) {
         super(
             async (key: string) => {
                 const [sourceId, entitlementName] = key.split(KEY_SEPARATOR);

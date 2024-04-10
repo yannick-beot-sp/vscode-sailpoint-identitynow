@@ -1,11 +1,11 @@
 import { Account } from "sailpoint-api-client";
-import { IdentityNowClient } from "../../services/IdentityNowClient";
+import { ISCClient } from "../../services/ISCClient";
 
 
 export default class AccountPaginator implements AsyncIterable<Account[]> {
 
     constructor(
-        private client: IdentityNowClient,
+        private client: ISCClient,
         private sourceId: string,
         private exportUncorrelatedAccountOnly = false
     ) { }

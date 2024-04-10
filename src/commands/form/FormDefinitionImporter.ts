@@ -1,10 +1,10 @@
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 
-import { IdentityNowClient } from "../../services/IdentityNowClient";
+import { ISCClient } from "../../services/ISCClient";
 
 export class FormDefinitionImporter {
-    readonly client: IdentityNowClient;
+    readonly client: ISCClient;
 
     constructor(
         private tenantId: string,
@@ -12,7 +12,7 @@ export class FormDefinitionImporter {
         private tenantDisplayName: string,
         private fileUri: vscode.Uri
     ) {
-        this.client = new IdentityNowClient(this.tenantId, this.tenantName);
+        this.client = new ISCClient(this.tenantId, this.tenantName);
     }
 
     async importFileWithProgression(): Promise<void> {

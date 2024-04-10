@@ -1,5 +1,5 @@
 import { chooseFile } from '../../utils/vsCodeHelpers';
-import { FormsTreeItem } from '../../models/IdentityNowTreeItem';
+import { FormsTreeItem } from '../../models/ISCTreeItem';
 import { FormDefinitionImporter } from './FormDefinitionImporter';
 
 export class FormDefinitionImporterTreeViewCommand {

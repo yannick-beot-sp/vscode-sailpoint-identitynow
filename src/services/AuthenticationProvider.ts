@@ -16,7 +16,7 @@ import { EndpointUtils } from '../utils/EndpointUtils';
 import { TenantService } from './TenantService';
 import { OAuth2Client } from './OAuth2Client';
 
-class SailPointIdentityNowPatSession implements AuthenticationSession {
+class SailPointISCPatSession implements AuthenticationSession {
     readonly account: AuthenticationSessionAccountInformation;
     // readonly id: string;
     // No scope management for now
@@ -36,11 +36,10 @@ class SailPointIdentityNowPatSession implements AuthenticationSession {
 
     ) {
         this.account = { id: clientId, label: `Personal Access Token for ${tenantName}` };
-        // this.id = SailPointIdentityNowAuthenticationProvider.id + '-' + tenantName;
     }
 }
 
-export class SailPointIdentityNowAuthenticationProvider implements AuthenticationProvider, Disposable {
+export class SailPointISCAuthenticationProvider implements AuthenticationProvider, Disposable {
 
 
     static id = 'SailPointIdentityNowPAT';
@@ -76,7 +75,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
                 // }),
                 // This fires when the user initiates a "silent" auth flow via the Accounts menu.
                 authentication.onDidChangeSessions(e => {
-                    if (e.provider.id === SailPointIdentityNowAuthenticationProvider.id) {
+                    if (e.provider.id === SailPointISCAuthenticationProvider.id) {
                         //void this.checkForUpdates();
                     }
                 }),
@@ -122,7 +121,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
     async getSessions(_scopes?: string[]): Promise<readonly AuthenticationSession[]> {
         console.log("> getSessions", _scopes);
         this.ensureInitialized();
-        const result: SailPointIdentityNowPatSession[] = [];
+        const result: SailPointISCPatSession[] = [];
         if (_scopes === undefined || _scopes.length === 0) {
             // return all scopes
             _scopes = await this.getTenants();
@@ -138,7 +137,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
         return result;
     }
 
-    private async getSessionByTenant(tenantId: string): Promise<SailPointIdentityNowPatSession | null> {
+    private async getSessionByTenant(tenantId: string): Promise<SailPointISCPatSession | null> {
         console.log("> getSessionByTenant", tenantId);
         // Check if an access token already exists
         let token = await this.tenantService.getTenantAccessToken(tenantId);
@@ -154,7 +153,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
                 const token = new TenantToken(accessToken, new Date(jwt.exp * 1000), { clientId: jwt.client_id } as TenantCredentials);
                 this.tenantService.setTenantAccessToken(tenantId, token);
 
-                return new SailPointIdentityNowPatSession(
+                return new SailPointISCPatSession(
                     tenantInfo?.tenantName ?? "",
                     jwt.client_id,
                     accessToken,
@@ -168,7 +167,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
                     this.tenantService.setTenantAccessToken(tenantId, token);
                     
                     console.log("< getSessionByTenant for", tenantId);
-                    return new SailPointIdentityNowPatSession(tenantInfo?.tenantName ?? "",
+                    return new SailPointISCPatSession(tenantInfo?.tenantName ?? "",
                         credentials.clientId,
                         token.accessToken,
                         this.getSessionId(tenantId)
@@ -179,7 +178,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
             }
         } else {
             console.log("< getSessionByTenant existing token");
-            return new SailPointIdentityNowPatSession(
+            return new SailPointISCPatSession(
                 tenantInfo?.tenantName ?? "",
                 token.client.clientId,
                 token.accessToken,
@@ -214,7 +213,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
             const jwt = parseJwt(accessToken);
             const token = new TenantToken(accessToken, new Date(jwt.exp * 1000), {} as TenantCredentials);
             this.tenantService.setTenantAccessToken(tenantId, token);
-            return new SailPointIdentityNowPatSession(
+            return new SailPointISCPatSession(
                 tenantInfo?.tenantName ?? "",
                 jwt.client_id,
                 accessToken,
@@ -239,7 +238,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
                     clientSecret: clientSecret
                 });
 
-            return new SailPointIdentityNowPatSession(
+            return new SailPointISCPatSession(
                 tenantInfo?.tenantName ?? "",
                 clientId,
                 token.accessToken,
@@ -255,15 +254,14 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
      */
     async createAccessToken(tenantName: string, clientId: string, clientSecret: string): Promise<TenantToken> {
         console.log('> createAccessToken', tenantName, clientId);
-        const idnAuth = new OAuth2Client(
+        const iscAuth = new OAuth2Client(
             clientId,
             clientSecret,
             EndpointUtils.getAccessTokenUrl(tenantName)
         );
 
-        const oauth2token = await idnAuth.getAccessToken();
-        console.log('Successfully logged in to IdentityNow');
-        // To prevent issue with JSON.stringify and circular conversion
+        const oauth2token = await iscAuth.getAccessToken();
+        console.log('Successfully logged in to ISC');
         const token = new TenantToken(
             oauth2token.accessToken,
             oauth2token.expiresIn,
@@ -276,11 +274,11 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
     }
 
     private getSessionId(tenantId: string): string {
-        return SailPointIdentityNowAuthenticationProvider.id + '_' + tenantId;
+        return SailPointISCAuthenticationProvider.id + '_' + tenantId;
     }
 
     private getTenantNameFromSessionId(sessionId: string) {
-        const regexp = new RegExp(SailPointIdentityNowAuthenticationProvider.id + '_' + '(.*)');
+        const regexp = new RegExp(SailPointISCAuthenticationProvider.id + '_' + '(.*)');
         return sessionId.replace(regexp, "$1");
     }
 
@@ -300,7 +298,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
             ignoreFocusOut: true,
             placeHolder: '806c451e057b442ba67b5d459716e97a',
             prompt: 'Enter a Personal Access Token (PAT) Client ID.',
-            title: 'IdentityNow',
+            title: 'Identity Security Cloud',
             validateInput: text => {
                 const regex = new RegExp('^[a-f0-9]{32}$');
                 if (regex.test(text)) {
@@ -320,7 +318,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
             ignoreFocusOut: true,
             placeHolder: '***',
             prompt: 'Enter a Personal Access Token (PAT) Secret.',
-            title: 'IdentityNow',
+            title: 'Identity Security Cloud',
             validateInput: text => {
                 const regex = new RegExp('^[a-f0-9]{63,64}$');
                 if (regex.test(text)) {
@@ -339,7 +337,7 @@ export class SailPointIdentityNowAuthenticationProvider implements Authenticatio
             ignoreFocusOut: true,
             placeHolder: '***',
             prompt: 'Enter an Access Token.',
-            title: 'IdentityNow',
+            title: 'Identity Security Cloud',
             validateInput: text => {
                 const regex = new RegExp('^([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_+/=-]+)$');
                 if (regex.test(text)) {

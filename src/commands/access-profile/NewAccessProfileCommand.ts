@@ -1,20 +1,20 @@
 import * as vscode from 'vscode';
 import { TenantService } from "../../services/TenantService";
-import { AccessProfilesTreeItem } from '../../models/IdentityNowTreeItem';
+import { AccessProfilesTreeItem } from '../../models/ISCTreeItem';
 import { NEW_ID } from '../../constants';
-import { IdentityNowClient } from '../../services/IdentityNowClient';
+import { ISCClient } from '../../services/ISCClient';
 import { getResourceUri } from '../../utils/UriUtils';
 import { AccessProfile, Entitlement, EntitlementBeta } from 'sailpoint-api-client';
 import { runWizard } from '../../wizard/wizard';
 import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
 import { InputPromptStep } from '../../wizard/inputPromptStep';
-import { InputOwnerStep } from '../../wizard/inputOwnerStep';
-import { QuickPickOwnerStep } from '../../wizard/quickPickOwnerStep';
+import { QuickPickIdentityStep } from '../../wizard/quickPickIdentityStep';
 import { Validator } from '../../validator/validator';
 import { WizardContext } from '../../wizard/wizardContext';
 import { QuickPickPromptStep } from '../../wizard/quickPickPromptStep';
 import { createNewFile } from '../../utils/vsCodeHelpers';
 import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep';
+import { InputIdentityQueryStep } from '../../wizard/inputIdentityQueryStep';
 
 const accessProfileTemplate: AccessProfile = require('../../../snippets/access-profile.json');
 
@@ -40,7 +40,7 @@ export class NewAccessProfileCommand {
             context["tenant"] = await this.tenantService.getTenant(accessProfilesTreeItem.tenantId);
         }
 
-        let client: IdentityNowClient | undefined = undefined;
+        let client: ISCClient | undefined = undefined;
 
         const values = await runWizard({
             title: "Creation of an access profile",
@@ -49,7 +49,7 @@ export class NewAccessProfileCommand {
                 new QuickPickTenantStep(
                     this.tenantService,
                     async (wizardContext) => {
-                        client = new IdentityNowClient(
+                        client = new ISCClient(
                             wizardContext["tenant"].id, wizardContext["tenant"].tenantName);
                     }),
                 new InputPromptStep({
@@ -59,8 +59,8 @@ export class NewAccessProfileCommand {
                         validateInput: (s: string) => { return accessProfileNameValidator.validate(s); }
                     }
                 }),
-                new InputOwnerStep(),
-                new QuickPickOwnerStep(
+                new InputIdentityQueryStep(),
+                new QuickPickIdentityStep(
                     "access profile owner",
                     () => { return client!; }
                 ),

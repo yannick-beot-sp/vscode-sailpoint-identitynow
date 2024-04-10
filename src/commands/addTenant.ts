@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as commands from './constants';
-import { SailPointIdentityNowAuthenticationProvider } from '../services/AuthenticationProvider';
+import { SailPointISCAuthenticationProvider } from '../services/AuthenticationProvider';
 import { TenantService } from '../services/TenantService';
 import { normalizeTenant } from '../utils';
 import { askDisplayName } from '../utils/vsCodeHelpers';
@@ -19,7 +19,7 @@ export class AddTenantCommand {
             ignoreFocusOut: true,
             placeHolder: 'company or company.identitynow.com',
             prompt: "Enter the tenant name",
-            title: 'IdentityNow',
+            title: 'Identity Security Cloud',
             validateInput: text => {
                 // https://regexr.com/7798n
                 const regex = new RegExp('^([a-z0-9][a-z0-9\-]*[a-z0-9]\.)*([a-z0-9][a-z0-9\-]*[a-z0-9])$', 'i');
@@ -37,7 +37,7 @@ export class AddTenantCommand {
             ["Personal Access Token", "Access Token"], {
             ignoreFocusOut: true,
             placeHolder: "Authentication method",
-            title: "IdentityNow",
+            title: "Identity Security Cloud",
             canPickMany: false
         });
         if (authMethodStr === undefined) {
@@ -84,7 +84,7 @@ export class AddTenantCommand {
         });
         try {
             const session: vscode.AuthenticationSession = await vscode.authentication.getSession(
-                SailPointIdentityNowAuthenticationProvider.id,
+                SailPointISCAuthenticationProvider.id,
                 [tenantId],
                 { createIfNone: true });
             if (session !== undefined && !isEmpty(session.accessToken)) {

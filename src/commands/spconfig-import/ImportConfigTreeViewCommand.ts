@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { TenantTreeItem } from "../../models/IdentityNowTreeItem";
+import { TenantTreeItem } from "../../models/ISCTreeItem";
 import { TenantService } from "../../services/TenantService";
 import { WizardBasedImporterCommand } from "./WizardBasedImporterCommand";
 import { chooseFile } from '../../utils/vsCodeHelpers';
@@ -21,7 +21,6 @@ export class ImportConfigTreeViewCommand extends WizardBasedImporterCommand {
     async execute(node?: TenantTreeItem): Promise<void> {
         console.log("> ImportConfigTreeViewCommand.execute");
 
-        // assessing that item is a IdentityNowResourceTreeItem
         if (node === undefined || !(node instanceof TenantTreeItem)) {
             console.log("WARNING: ImportConfigTreeViewCommand.execute: invalid item", node);
             throw new Error("ImportConfigTreeViewCommand.execute: invalid item");

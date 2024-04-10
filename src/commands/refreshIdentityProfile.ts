@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { IdentityProfileTreeItem } from '../models/IdentityNowTreeItem';
-import { IdentityNowClient } from '../services/IdentityNowClient';
+import { IdentityProfileTreeItem } from '../models/ISCTreeItem';
+import { ISCClient } from '../services/ISCClient';
 
 
 export async function refreshIdentityProfile(node?: IdentityProfileTreeItem): Promise<void> {
@@ -13,7 +13,7 @@ export async function refreshIdentityProfile(node?: IdentityProfileTreeItem): Pr
     }
 
 
-    const client = new IdentityNowClient(node.tenantId, node.tenantName);
+    const client = new ISCClient(node.tenantId, node.tenantName);
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: `Refreshing ${node.label}...`,

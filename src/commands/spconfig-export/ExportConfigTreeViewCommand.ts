@@ -1,4 +1,4 @@
-import { TenantTreeItem } from "../../models/IdentityNowTreeItem";
+import { TenantTreeItem } from "../../models/ISCTreeItem";
 import { WizardBasedExporterCommand } from "./WizardBasedExporterCommand";
 
 /**
@@ -9,7 +9,6 @@ export class ExportConfigTreeViewCommand extends WizardBasedExporterCommand {
 
     async execute(node?: TenantTreeItem) {
         console.log("> ExportConfigTreeView.execute");
-        // assessing that item is a IdentityNowResourceTreeItem
         if (node === undefined || !(node instanceof TenantTreeItem)) {
             console.log("WARNING: ExportConfigTreeView: invalid item", node);
             throw new Error("ExportConfigTreeView: invalid item");

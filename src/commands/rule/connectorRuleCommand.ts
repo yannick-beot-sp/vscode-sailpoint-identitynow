@@ -1,15 +1,15 @@
 import * as vscode from 'vscode';
-import { NEW_ID } from '../constants';
-import { RulesTreeItem } from "../models/IdentityNowTreeItem";
-import { IdentityNowClient } from '../services/IdentityNowClient';
-import { TenantService } from '../services/TenantService';
-import { compareByName } from '../utils';
-import { isEmpty } from '../utils/stringUtils';
-import { getResourceUri } from '../utils/UriUtils';
-import { chooseTenant, createNewFile, getSelectionContent, openPreview } from '../utils/vsCodeHelpers';
-import * as commands from './constants';
+import { NEW_ID } from '../../constants';
+import { RulesTreeItem } from "../../models/ISCTreeItem";
+import { ISCClient } from '../../services/ISCClient';
+import { TenantService } from '../../services/TenantService';
+import { compareByName } from '../../utils';
+import { isEmpty } from '../../utils/stringUtils';
+import { getResourceUri } from '../../utils/UriUtils';
+import { chooseTenant, createNewFile, getSelectionContent, openPreview } from '../../utils/vsCodeHelpers';
+import * as commands from '../constants';
 import { ConnectorRuleResponseBeta } from 'sailpoint-api-client';
-const rules: ConnectorRuleResponseBeta[] = require('../../snippets/connector-rules.json');
+const rules: ConnectorRuleResponseBeta[] = require('../../../snippets/connector-rules.json');
 
 /**
  * Internal constants
@@ -44,37 +44,41 @@ export class ConnectorRuleCommand {
         if (!tenantInfo) {
             return;
         }
-        const client = new IdentityNowClient(tenantInfo.id, tenantInfo.tenantName);
+        const client = new ISCClient(tenantInfo.id, tenantInfo.tenantName);
         let newUri: vscode.Uri;
-        if (answer === UPDATE_RULE) {
+        try {
+            if (answer === UPDATE_RULE) {
 
-            const rule = await this.chooseExistingRule(client);
-            if (!rule) {
-                return;
-            }
+                const rule = await this.chooseExistingRule(client);
+                if (!rule) {
+                    return;
+                }
 
-            rule.sourceCode.script = selection;
-            const path = '/beta/connector-rules/' + rule.id;
-            client.updateResource(path, JSON.stringify(rule));
-            newUri = getResourceUri(tenantInfo.tenantName, 'connector-rules', rule.id, rule.name, true);
-        } else {
-            // NEW_RULE
-            let ruleName = await this.askRuleName() || "";
-            if (isEmpty(ruleName)) {
-                return;
-            }
+                rule.sourceCode.script = selection;
+                await client.updateConnectorRule(rule)
+                newUri = getResourceUri(tenantInfo.tenantName, 'connector-rules', rule.id, rule.name, true);
+            } else {
+                // NEW_RULE
+                let ruleName = await this.askRuleName() || "";
+                if (isEmpty(ruleName)) {
+                    return;
+                }
 
-            const rule = await this.askRuleType();
-            if (!rule) {
-                return;
+                const rule = await this.askRuleType();
+                if (!rule) {
+                    return;
+                }
+                rule.sourceCode.script = selection;
+                rule.name = ruleName;
+                const data = await client.createResource('/beta/connector-rules', JSON.stringify(rule));
+                newUri = getResourceUri(tenantInfo.tenantName, 'connector-rules', data.id, data.name, true);
             }
-            rule.sourceCode.script = selection;
-            rule.name = ruleName;
-            const data = await client.createResource('/beta/connector-rules', JSON.stringify(rule));
-            newUri = getResourceUri(tenantInfo.tenantName, 'connector-rules', data.id, data.name, true);
+            openPreview(newUri)
+            vscode.commands.executeCommand(commands.REFRESH_FORCED)
+        } catch (error) {
+            const errorMessage = `Could not ${answer === UPDATE_RULE ? "update" : "create"} the rule: ${error}` 
+            vscode.window.showErrorMessage(errorMessage)
         }
-        openPreview(newUri)
-        vscode.commands.executeCommand(commands.REFRESH_FORCED)
 
     }
 
@@ -94,7 +98,7 @@ export class ConnectorRuleCommand {
         if (!tenantInfo) {
             return;
         }
-        const client = new IdentityNowClient(tenantInfo.id, tenantInfo.tenantName);
+        const client = new ISCClient(tenantInfo.id, tenantInfo.tenantName);
         const res = await client.validateConnectorRule(selection);
 
         if (res.state === "OK") {
@@ -141,7 +145,7 @@ export class ConnectorRuleCommand {
         });
     }
 
-    private async chooseExistingRule(client: IdentityNowClient): Promise<ConnectorRuleResponseBeta | undefined> {
+    private async chooseExistingRule(client: ISCClient): Promise<ConnectorRuleResponseBeta | undefined> {
         const rules = await client.getConnectorRules();
         return await this.showPickRule(rules, 'Connector rule');
     }
@@ -188,7 +192,7 @@ export class ConnectorRuleCommand {
             ignoreFocusOut: true,
             placeHolder: 'Connector Rule name',
             prompt: "Enter the Connector Rule name",
-            title: 'IdentityNow',
+            title: 'Identity Security Cloud',
             validateInput: text => {
                 if (text && text.length > 128) {
                     return "Connector Rule name cannot exceed 128 characters.";

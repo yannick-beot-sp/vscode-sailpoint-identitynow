@@ -20,7 +20,7 @@ When a tag with the format "releases/*v0.0.3*" is created:
 To create the tag:
 
 ```
-git tag releases/v0.0.3
+git tag releases/v1.0.3
 git push origin --tags
 ```
 

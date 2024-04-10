@@ -1,5 +1,5 @@
 import { chooseFile } from '../../utils/vsCodeHelpers';
-import { AccessProfilesTreeItem } from '../../models/IdentityNowTreeItem';
+import { AccessProfilesTreeItem } from '../../models/ISCTreeItem';
 import { AccessProfileImporter } from './AccessProfileImporter';
 
 export class AccessProfileImporterTreeViewCommand {

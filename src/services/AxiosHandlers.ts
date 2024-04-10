@@ -8,7 +8,7 @@ export const onErrorResponse = (error: AxiosError | Error): Promise<AxiosError> 
         const { statusText, status, data } = error.response as AxiosResponse ?? {};
 
         console.error(
-            `[IdentityNowClient] ${method?.toUpperCase()} ${url} | Error ${status} ${message} | ${data}`, error
+            `[ISCClient] ${method?.toUpperCase()} ${url} | Error ${status} ${message} | ${JSON.stringify(data)}`, error
         );
         if (data !== undefined && 'error' in data) {
             errorMessage = data.error;
@@ -21,13 +21,15 @@ export const onErrorResponse = (error: AxiosError | Error): Promise<AxiosError> 
             errorMessage = data.messages[0].text;
         } else if (data !== undefined && 'formatted_msg' in data) {
             errorMessage = data.formatted_msg;
+        } else if (data !== undefined && 'errorMessage' in data) {
+            errorMessage = data.errorMessage;
         } else {
             errorMessage = message;
         }
 
     } else {
         const caller = (new Error()).stack?.split("\n")[2].trim().split(" ")[1];
-        console.error(`[IdentityNowClient] ${caller?.toUpperCase()} ${error.message}`, error);
+        console.error(`[ISCClient] ${caller?.toUpperCase()} ${error.message}`, error);
         errorMessage = error.message;
     }
 

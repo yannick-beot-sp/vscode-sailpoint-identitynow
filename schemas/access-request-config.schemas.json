@@ -1,0 +1,123 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://developer.sailpoint.com/schemas/access-request-config.json",
+  "title": "Access Request Configuration",
+  "description": "Access Request Configuration Details.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "approvalsMustBeExternal": {
+      "type": "boolean",
+      "description": "If true, then approvals must be processed by external system.",
+      "example": true
+    },
+    "autoApprovalEnabled": {
+      "type": "boolean",
+      "description": "If true and requester and reviewer are the same, then automatically approve the approval.",
+      "example": true
+    },
+    "requestOnBehalfOfConfig": {
+      "description": "Request On Behalf Of Configuration.",
+      "type": "object",
+      "properties": {
+        "allowRequestOnBehalfOfAnyoneByAnyone": {
+          "type": "boolean",
+          "description": "If anyone can request access for anyone.",
+          "example": true
+        },
+        "allowRequestOnBehalfOfEmployeeByManager": {
+          "type": "boolean",
+          "description": "If a manager can request access for his/her direct reports.",
+          "example": true
+        }
+      }
+    },
+    "approvalReminderAndEscalationConfig": {
+      "description": "Approval Reminder and Escalation Configuration.",
+      "type": "object",
+      "properties": {
+        "daysUntilEscalation": {
+          "type": "integer",
+          "description": "Number of days to wait before the first reminder. If no reminders are configured, then this is the number of days to wait before escalation.",
+          "format": "int32",
+          "example": 0,
+          "nullable": true
+        },
+        "daysBetweenReminders": {
+          "type": "integer",
+          "description": "Number of days to wait between reminder notifications.",
+          "format": "int32",
+          "example": 0,
+          "nullable": true
+        },
+        "maxReminders": {
+          "type": "integer",
+          "description": "Maximum number of reminder notification to send to the reviewer before approval escalation.",
+          "format": "int32",
+          "minimum": 1,
+          "example": 1,
+          "nullable": true
+        },
+        "fallbackApproverRef": {
+          "type": "object",
+          "nullable": true,
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "The type can only be IDENTITY. This is read-only",
+              "example": "IDENTITY",
+              "enum": [
+                "IDENTITY"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "description": "Identity id.",
+              "example": "5168015d32f890ca15812c9180835d2e"
+            },
+            "name": {
+              "type": "string",
+              "description": "Human-readable display name of identity. This is read-only",
+              "example": "Alison Ferguso"
+            },
+            "email": {
+              "type": "string",
+              "description": "Email address of identity. This is read-only",
+              "example": "alison.ferguso@identitysoon.com"
+            }
+          }
+        }
+      }
+    },
+    "entitlementRequestConfig": {
+      "description": "Entitlement Request Configuration.",
+      "type": "object",
+      "properties": {
+        "allowEntitlementRequest": {
+          "type": "boolean",
+          "description": "Flag for allowing entitlement request.",
+          "example": true
+        },
+        "requestCommentsRequired": {
+          "type": "boolean",
+          "description": "Flag for requiring comments while submitting an entitlement request.",
+          "default": false,
+          "example": false
+        },
+        "deniedCommentsRequired": {
+          "type": "boolean",
+          "description": "Flag for requiring comments while rejecting an entitlement request.",
+          "default": false,
+          "example": false
+        },
+        "grantRequestApprovalSchemes": {
+          "type": "string",
+          "description": "Approval schemes for granting entitlement request. This can be empty if no approval is needed.\nMultiple schemes must be comma-separated. The valid schemes are \"entitlementOwner\", \"sourceOwner\", \"manager\" and \"workgroup:{id}\".\nMultiple workgroups (governance groups) can be used.\n",
+          "default": "sourceOwner",
+          "nullable": true,
+          "example": "entitlementOwner, sourceOwner, manager, workgroup:2c918084660f45d6016617daa9210584"
+        }
+      }
+    }
+  }
+}

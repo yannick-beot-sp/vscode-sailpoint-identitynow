@@ -1,16 +1,18 @@
 import * as vscode from 'vscode';
 import { BaseCSVExporter } from "../BaseExporter";
-import { RolesTreeItem } from '../../models/IdentityNowTreeItem';
+import { RolesTreeItem } from '../../models/ISCTreeItem';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
-import { RequestabilityForRole, Revocability, Role, RoleMembershipSelectorType, RolesApiListRolesRequest } from 'sailpoint-api-client';
+import { EntitlementRef, RequestabilityForRole, Revocability, RevocabilityForRole, Role, RoleMembershipSelectorType, RolesApiListRolesRequest } from 'sailpoint-api-client';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
-import { accessProfileApprovalSchemeToStringConverter, roleApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
+import { roleApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
 import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
 import { roleMembershipSelectorToStringConverter } from '../../parser/roleMembershipSelectorToStringConverter';
 import { SourceIdToNameCacheService } from '../../services/cache/SourceIdToNameCacheService';
 import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator';
+import { CacheService } from '../../services/cache/CacheService';
+import { EntitlementIdToSourceNameCacheService } from '../../services/cache/EntitlementIdToSourceNameCacheService';
 
 export class RoleExporterCommand {
     /**
@@ -80,14 +82,7 @@ export interface RoleDto {
      * @memberof Role
      */
     'accessProfiles'?: string;
-    /**
-     *
-     * @type {RoleMembershipSelector}
-     * @memberof Role
-     */
-    //'membership'?: RoleMembershipSelector | null;
-    /**
-
+    'entitlements'?: string;
     /**
      * Whether the Role is enabled or not.
      * @type {boolean}
@@ -111,7 +106,7 @@ export interface RoleDto {
      * @type {Revocability}
      * @memberof Role
      */
-    'revocationRequestConfig'?: Revocability;
+    'revocationRequestConfig'?: RevocabilityForRole;
 
     /**
      * List describing the steps in approving the request
@@ -160,6 +155,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
             "revokeDenialCommentsRequired",
             "revokeApprovalSchemes",
             "accessProfiles",
+            "entitlements",
             "membershipCriteria"
         ];
         const paths = [
@@ -175,6 +171,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
             "revocationRequestConfig.denialCommentsRequired",
             "revokeApprovalSchemes",
             "accessProfiles",
+            "entitlements",
             "membershipCriteria"
         ];
         const unwindablePaths: string[] = [];
@@ -182,6 +179,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
         const governanceGroupCache = new GovernanceGroupIdToNameCacheService(this.client);
         const identityCacheIdToName = new IdentityIdToNameCacheService(this.client);
         const sourceIdToNameCacheService = new SourceIdToNameCacheService(this.client);
+        const entitlementIdToSourceNameCacheService = new EntitlementIdToSourceNameCacheService(this.client);
 
         const iterator = new GenericAsyncIterableIterator<Role, RolesApiListRolesRequest>(
             this.client,
@@ -198,7 +196,6 @@ class RoleExporter extends BaseCSVExporter<Role> {
                 }
 
                 const owner = item.owner ? (await identityCacheIdToName.get(item.owner.id!)) : null
-
                 const itemDto: RoleDto = {
                     name: item.name,
                     // Escape carriage returns in description.
@@ -207,6 +204,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
                     requestable: item.requestable,
                     owner: owner,
                     accessProfiles: item.accessProfiles?.map(x => x.name).join(CSV_MULTIVALUE_SEPARATOR),
+                    entitlements: (item.entitlements ? (await entitlementToStringConverter(item.entitlements, entitlementIdToSourceNameCacheService)) : null),
                     accessRequestConfig: {
                         commentsRequired: item.accessRequestConfig?.commentsRequired ?? false,
                         denialCommentsRequired: item.accessRequestConfig?.denialCommentsRequired ?? false,
@@ -218,8 +216,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
                     approvalSchemes: await roleApprovalSchemeToStringConverter(
                         item.accessRequestConfig?.approvalSchemes,
                         governanceGroupCache),
-                    // TODO cf. https://github.com/sailpoint-oss/developer.sailpoint.com/issues/413
-                    revokeApprovalSchemes: await accessProfileApprovalSchemeToStringConverter(
+                    revokeApprovalSchemes: await roleApprovalSchemeToStringConverter(
                         item.revocationRequestConfig?.approvalSchemes,
                         governanceGroupCache),
                     membershipCriteria
@@ -233,5 +230,22 @@ class RoleExporter extends BaseCSVExporter<Role> {
         identityCacheIdToName.flushAll();
         console.log("Source Cache stats", sourceIdToNameCacheService.getStats());
         sourceIdToNameCacheService.flushAll();
+        console.log("Entitlement Cache stats", entitlementIdToSourceNameCacheService.getStats());
+        entitlementIdToSourceNameCacheService.flushAll();
     }
+}
+
+async function entitlementToStringConverter(
+    entitlementRefs: Array<EntitlementRef> | null | undefined,
+    entitlementToString: CacheService<string>): Promise<string | undefined> {
+
+    if (entitlementRefs === undefined
+        || entitlementRefs === null
+        || !Array.isArray(entitlementRefs)
+        || entitlementRefs.length === 0) {
+        return undefined
+    }
+    return (await Promise.all(entitlementRefs
+        .map(ref => entitlementToString.get(ref.id))))
+        .join(CSV_MULTIVALUE_SEPARATOR)
 }

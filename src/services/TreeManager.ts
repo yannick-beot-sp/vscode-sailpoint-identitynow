@@ -1,19 +1,19 @@
 import * as vscode from 'vscode';
 import * as commands from '../commands/constants';
-import { SourceTreeItem, TenantTreeItem } from "../models/IdentityNowTreeItem";
+import { SourceTreeItem, TenantTreeItem } from "../models/ISCTreeItem";
 import { delay } from "../utils";
-import { IdentityNowDataProvider } from "../views/IdentityNowDataProvider";
-import { SailPointIdentityNowAuthenticationProvider } from "./AuthenticationProvider";
-import { AggregationJob, IdentityNowClient } from "./IdentityNowClient";
+import { ISCDataProvider } from "../views/ISCDataProvider";
+import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
+import { AggregationJob, ISCClient } from "./ISCClient";
 import { TenantService } from "./TenantService";
 import { TransformEvaluator } from './TransformEvaluator';
 
 export class TreeManager {
 
     constructor(
-        private readonly dataProvider: IdentityNowDataProvider,
+        private readonly dataProvider: ISCDataProvider,
         private readonly tenantService: TenantService,
-        private readonly authProvider: SailPointIdentityNowAuthenticationProvider,
+        private readonly authProvider: SailPointISCAuthenticationProvider,
         private readonly transformEvaluator: TransformEvaluator,
     ) { }
 
@@ -35,7 +35,7 @@ export class TreeManager {
             return;
         }
         try {
-            const session = await vscode.authentication.getSession(SailPointIdentityNowAuthenticationProvider.id, [item.tenantId], { createIfNone: false });
+            const session = await vscode.authentication.getSession(SailPointISCAuthenticationProvider.id, [item.tenantId], { createIfNone: false });
             if (session !== undefined) {
                 this.authProvider.removeSession(session.id);
             }
@@ -54,7 +54,7 @@ export class TreeManager {
             console.log("WARNING: aggregateSource: invalid item", item);
             throw new Error("aggregateSource: invalid item");
         }
-        const client = new IdentityNowClient(item.tenantId, item.tenantName);
+        const client = new ISCClient(item.tenantId, item.tenantName);
         vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Aggregation of ${type} from ${item.label}`,
@@ -117,7 +117,7 @@ export class TreeManager {
             return;
         }
 
-        const client = new IdentityNowClient(item.tenantId, item.tenantName);
+        const client = new ISCClient(item.tenantId, item.tenantName);
         vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Reset of ${item.label}${skipping}`,

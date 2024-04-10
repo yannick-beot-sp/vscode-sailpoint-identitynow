@@ -1,9 +1,9 @@
-# SailPoint IdentityNow for Visual Studio Code
+# SailPoint Identity Security Cloud for Visual Studio Code
 
 > This extension is not developed, maintained or supported by SailPoint.
-> It is a community effort to help manage IdentityNow from Visual Studio Code.
+> It is a community effort to help manage Identity Security Cloud from Visual Studio Code.
 
-The SailPoint IdentityNow extension makes it easy to:
+The SailPoint Identity Security Cloud extension makes it easy to:
 
 - Connect to several tenants
 - Import and export config of a tenant
@@ -11,7 +11,7 @@ The SailPoint IdentityNow extension makes it easy to:
 - View, create, edit, delete, and test transforms
 - View, create, edit, delete provisioning policies of a source
 - View, create, edit, delete schemas of a source
-- View, edit, enable, disable, and test workflows and view execution history
+- View, edit, enable, disable, export, import and test workflows and view execution history
 - View, create, edit, delete connector rules and export/import the script of a rule
 - View, edit, delete service desk integrations
 - View, edit, delete identity profiles and lifecycle states, and refreshes all the identities under a profile
@@ -19,10 +19,12 @@ The SailPoint IdentityNow extension makes it easy to:
 - View, edit, create, delete, export, import access profiles
 - View, edit, create, delete, export, import roles
 - View, edit, create, delete, export, import forms
+- View, edit, create search attribute config
+- View, edit identity attributes
 
 ## Installation
 
-Go to the extension menu or press `Ctrl`+`Shift`+`X` and look for the extension "IdentityNow". Click on the button `Install`.
+Go to the extension menu or press `Ctrl`+`Shift`+`X` and look for the extension "Identity Security Cloud". Click on the button `Install`.
 
 The VSIX can be installed from the extension menu. Press `Ctrl`+`Shift`+`X` and in the menu, click `Install from VSIX...`.
 
@@ -30,7 +32,7 @@ The VSIX can be installed from the extension menu. Press `Ctrl`+`Shift`+`X` and 
 
 The extension supports several tenants.
 
-Open the **Command Palette** with `Ctrl+Shift+P` (Windows or Linux) or `Cmd+Shift+P` (macOS) to find the command "IdentityNow: Add tenant...".
+Open the **Command Palette** with `Ctrl+Shift+P` (Windows or Linux) or `Cmd+Shift+P` (macOS) to find the command "ISC: Add tenant...".
 
 Alternatively, you can click on the `+` in the SailPoint view.
 
@@ -52,7 +54,7 @@ You can also export a single source, rule, identity profile or transform by righ
 
 ![Import/export config](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/export-node.png)
 
-Or, from the **Command Palette**, find the command "IdentityNow: Import config..." or "IdentityNow: Export config...".
+Or, from the **Command Palette**, find the command "ISC: Import config..." or "ISC: Export config...".
 
 ![Import/export config](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/import-export-palette.png)
 
@@ -69,6 +71,11 @@ The extension allows you to manage rules and upload the script to a new or exist
 ![Export config](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/rules-management.gif)
 
 ## Workflow management
+
+Export and Import workflows automatically:
+
+- Remove the properties `created`, `creator`, `modified`, `modifiedBy`, and `owner`
+- Nullify any value that starts with `$.secrets.`
 
 The extension allows you to test the workflow:
 
@@ -138,6 +145,22 @@ This extension includes the following snippets for schemas:
 | `New provisioning policy` | Create a new provisioning policy |
 | `New field`               | Create a new field               |
 
+### Forms
+
+This extension includes the following snippets for forms:
+
+| Trigger          | Content                 |
+| ---------------- | ----------------------- |
+| `New Form Input` | Create a new form input |
+
+### Public Identities Configuration
+
+This extension includes the following snippets for the Public Identities Configuration:
+
+| Trigger                  | Content                                 |
+| ------------------------ | --------------------------------------- |
+| `New identity attribute` | Create a new identity attribute mapping |
+
 ## Import format
 
 ### Access Profiles
@@ -191,8 +214,8 @@ The following table provides the expected column for the CSV to import Roles:
 There are 3 kind of attributes:
 
 - **Identity Attribute**: the format is `identity.{attribute name}`. Ex: `identity.cloudLifecycleState`, `identity.type`, etc.
-- **Account Attribute**: the format is `{source name}.attribute.{attribute name}`. If the source name constains space, the source name must be put between quotes or double-quotes
-- **Entitlements**: the format is `{source name}.entitlement.{attribute name}`. If the source name constains space, the source name must be put between quotes or double-quotes
+- **Account Attribute**: the format is `{source name}.attribute.{attribute name}`. If the source name contains space, the source name must be put between quotes or double-quotes
+- **Entitlements**: the format is `{source name}.entitlement.{attribute name}`. If the source name contains space, the source name must be put between quotes or double-quotes
 
 ##### Attribute operators
 
@@ -206,12 +229,10 @@ There are 3 kind of attributes:
 
 ##### Logical operators
 
-
-| Operator | Description |
-| -------- | ----------- |
-| and       | Logical "and"      |
+| Operator | Description   |
+| -------- | ------------- |
+| and      | Logical "and" |
 | or       | Logical "or"  |
-
 
 ##### Values
 
@@ -257,11 +278,13 @@ The extension supports the following settings:
 - `vscode-sailpoint-identitynow.export.forms.filename`: Define the pattern to export all forms of a tenant
   - Default value: `%x/Forms/Forms-%t-%y%M%d-%h%m%s.json`
 - `vscode-sailpoint-identitynow.export.form.filename`: Define the pattern to export a single form from a tenant
-  - Default value: `%x/Forms/Forms-%t-%S-%y%M%d-%h%m%s.json`
+  - Default value: `%x/Forms/Form-%t-%S-%y%M%d-%h%m%s.json`
+- `vscode-sailpoint-identitynow.export.workflow.filename`: Define the pattern to export a single workflow from a tenant
+  - Default value: `%x/Workflows/Workflow-%t-%S-%y%M%d-%h%m%s.json`
 - `vscode-sailpoint-identitynow.treeView.pagination`: Define the number of roles and access profiles that are displayed in the tree view
   - Default value: 100
 
-The pattern defined above use the following tokens:
+The patterns defined above use the following tokens:
 
 - `%u`: User Home Dir
 - `%w`: Workspace folder
@@ -279,8 +302,55 @@ The pattern defined above use the following tokens:
 
 ## Release Notes
 
-- Display warning if file is too big (cf. [#66](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/66))
+## 1.2.0
 
+- Add new command to edit connector rule (Edit script)
+- Changing IdentityNow to Identity Security Cloud/ISC
+- Logging every call to ISC
+- Catch error message if peek objects fails
+
+## 1.1.0
+
+- Edit Password Org Config
+- Generate a digit token for password reset
+- 404 error when sources had '/' in their name (cf. [#71](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/71))
+
+## 1.0.4
+
+- New attempt to publish extension
+- Refactoring of IdentityNowTreeItem.ts and fixed refreshing issue with Workflows
+- Non-matching schema for lifecycle states
+
+## 1.0.3
+
+- Publication issue
+
+## 1.0.2
+
+- Could not open Identity Attributes from several tenants (cf. [#69](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/69))
+
+## 1.0.1
+
+- Transform not correctly saved (cf. [#68](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/68))
+
+### 1.0.0
+
+- Import/Export entitlements for roles
+
+### 0.0.30
+
+- Add support for Search attribute config (cf. [#64](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/64))
+- Add support for Identity Attributes
+
+### 0.0.29
+
+- Display warning if file is too big (cf. [#66](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/66))
+- Export/Import workflows (cf. [#57](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/57))
+- Edit Public Identities Config
+- Edit Access Request Configuration
+- Can export everything with SP-Config (cf. [#56](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/56))
+- Can select cloud rules for export with SP-Config
+- Add IDENTITY_OBJECT_CONFIG as an importable object from SP-Config
 
 ### 0.0.28
 
@@ -432,7 +502,7 @@ Fixed:
 
 ### 0.0.4
 
-Fix regexp for PAT secret
+- Fix regexp for PAT secret
 
 ### 0.0.3
 

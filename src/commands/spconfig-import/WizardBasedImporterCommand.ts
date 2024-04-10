@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
+import { IMPORTABLE_OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
 import { SPConfigImporter } from './SPConfigImporter';
 import { askChosenItems, askSelectObjectTypes } from '../../utils/vsCodeHelpers';
 import { ImportOptionsBeta, ImportOptionsBetaIncludeTypesEnum } from 'sailpoint-api-client';
@@ -28,7 +28,7 @@ export abstract class WizardBasedImporterCommand {
             {
                 ignoreFocusOut: true,
                 placeHolder: "What do you want to import?",
-                title: "IdentityNow",
+                title: "Identity Security Cloud",
                 canPickMany: false
             });
 
@@ -81,7 +81,7 @@ export abstract class WizardBasedImporterCommand {
         // Ask the user to choose which object types
         // 
         // List of ObjectTypeItems based on object types present in the SP Config
-        const availableObjectTypeItems = OBJECT_TYPE_ITEMS
+        const availableObjectTypeItems = IMPORTABLE_OBJECT_TYPE_ITEMS
             .filter(x => objectTypes.has(x.objectType));
         const requestedObjectTypes = await askSelectObjectTypes("Object type to import", availableObjectTypeItems);
         if (requestedObjectTypes === undefined) { return; }
@@ -107,7 +107,7 @@ export abstract class WizardBasedImporterCommand {
 
             if (includeIds === undefined) { continue; }
             const includeType: ImportOptionsBetaIncludeTypesEnum = <ImportOptionsBetaIncludeTypesEnum>requestedObjectType.objectType;
-            options.includeTypes?.push(includeType);
+            options.includeTypes.push(includeType);
 
             if (pickItems.length !== includeIds.length) {
                 options.objectOptions[requestedObjectType.objectType] = {

@@ -10,7 +10,7 @@ import {
 	Uri,
 } from "vscode";
 import { NEW_ID } from "../constants";
-import { IdentityNowClient } from "../services/IdentityNowClient";
+import { ISCClient } from "../services/ISCClient";
 import { TenantService } from "../services/TenantService";
 import {
 	convertToText,
@@ -22,7 +22,7 @@ import { getIdByUri, getPathByUri } from "../utils/UriUtils";
 import { Operation, compare } from "fast-json-patch";
 import { FormDefinitionResponseBeta } from "sailpoint-api-client";
 
-export class IdentityNowResourceProvider implements FileSystemProvider {
+export class ISCResourceProvider implements FileSystemProvider {
 	private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
 
 	constructor(private readonly tenantService: TenantService) { }
@@ -38,7 +38,7 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 	}
 
 	async stat(uri: Uri): Promise<FileStat> {
-		console.log("> IdentityNowResourceProvider.stat", uri);
+		console.log("> ISCResourceProvider.stat", uri);
 		// Not optimized here but do not
 		const data = await this.lookupResource(uri);
 		const id = getIdByUri(uri);
@@ -60,13 +60,13 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 		throw new Error("Method createDirectory not implemented.");
 	}
 	async readFile(uri: Uri): Promise<Uint8Array> {
-		console.log("> IdentityNowResourceProvider.readFile", uri);
+		console.log("> ISCResourceProvider.readFile", uri);
 		const data = await this.lookupResource(uri);
 		return str2Uint8Array(convertToText(data));
 	}
 
 	private async lookupResource(uri: Uri): Promise<any> {
-		console.log("> IdentityNowResourceProvider.lookupResource", uri);
+		console.log("> ISCResourceProvider.lookupResource", uri);
 		const tenantName = uri.authority;
 		console.log("tenantName =", tenantName);
 		const resourcePath = getPathByUri(uri);
@@ -82,9 +82,18 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 		const tenantInfo = await this.tenantService.getTenantByTenantName(
 			tenantName
 		);
-		const client = new IdentityNowClient(tenantInfo?.id ?? "", tenantName);
+		if (tenantInfo === undefined) {
+			throw new Error(`Could not find tenant ${tenantName}`);
+		}
+		const client = new ISCClient(tenantInfo.id!, tenantName);
 
-		const data = await client.getResource(resourcePath);
+		let data = null
+		if (/\/connector-rule-script\//.test(resourcePath)) {
+			const rule = await client.getConnectorRuleById(id);
+			data = rule.sourceCode?.script
+		} else {
+			data = await client.getResource(resourcePath);
+		}
 		if (!data) {
 			throw vscode.FileSystemError.FileNotFound(uri);
 		}
@@ -96,7 +105,7 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 		content: Uint8Array,
 		options: { create: boolean; overwrite: boolean }
 	): Promise<void> {
-		console.log("> IdentityNowResourceProvider.writeFile", uri, options);
+		console.log("> ISCResourceProvider.writeFile", uri, options);
 
 		const tenantName = uri.authority;
 		console.log("tenantName =", tenantName);
@@ -108,7 +117,7 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 		const tenantInfo = await this.tenantService.getTenantByTenantName(
 			tenantName
 		);
-		const client = new IdentityNowClient(tenantInfo?.id ?? "", tenantName);
+		const client = new ISCClient(tenantInfo?.id ?? "", tenantName);
 		let data = uint8Array2Str(content);
 
 		const id = path.posix.basename(resourcePath);
@@ -133,47 +142,43 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 
 			this._emitter.fire([{ type: vscode.FileChangeType.Created, uri }]);
 		} else {
-			// Need to update the content to remove id and internal properties from the payload
-			// to prevent a bad request error
-			if (resourcePath.match("transform")) {
-				let transform = JSON.parse(data);
-				delete transform.id;
-				delete transform.internal;
-				data = JSON.stringify(transform);
-			}
 
-			if (resourcePath.match("form-definitions")) {
+			if (resourcePath.match("connector-rule-script")) {
+				const rule = await client.getConnectorRuleById(id)
+				rule.sourceCode.script = data
+				await client.updateConnectorRule(rule)
+			} else if (resourcePath.match("form-definitions")) {
 				// UI is pushing all data as a Patch. Doing the same for form definitions
 				const newData = JSON.parse(data) as FormDefinitionResponseBeta
 				const jsonpatch: Operation[] = [
 					{
 						op: 'replace',
-						path : "/formElements",
+						path: "/formElements",
 						value: newData.formElements ?? []
 					},
 					{
 						op: 'replace',
-						path : "/formConditions",
+						path: "/formConditions",
 						value: newData.formConditions ?? []
 					},
 					{
 						op: 'replace',
-						path : "/formInput",
+						path: "/formInput",
 						value: newData.formInput ?? []
 					},
 					{
 						op: 'replace',
-						path : "/name",
+						path: "/name",
 						value: newData.name
 					},
 					{
 						op: 'replace',
-						path : "/description",
+						path: "/description",
 						value: newData.description
 					},
 					{
 						op: 'replace',
-						path : "/usedBy",
+						path: "/usedBy",
 						value: newData.usedBy ?? []
 					},
 
@@ -183,7 +188,7 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 					JSON.stringify(jsonpatch)
 				);
 
-			} else if (resourcePath.match("identity-profiles|access-profiles|roles")) {
+			} else if (resourcePath.match("identity-profiles|access-profiles|roles|search-attribute-config")) {
 				// special treatment to send patch as PUT is not supported
 				const oldData = await client.getResource(resourcePath);
 				const newData = JSON.parse(data);
@@ -199,13 +204,47 @@ export class IdentityNowResourceProvider implements FileSystemProvider {
 				} else {
 					patchResourcePath = resourcePath;
 				}
+
+				if (resourcePath.match("search-attribute-config")) {
+					// Supported patchable fields are: /displayName, /name, /applicationAttributes
+					// @ts-ignore
+					jsonpatch = jsonpatch.map(p => {
+						if (p.path.match("\/applicationAttributes")) {
+							const value: any = {};
+							const appId = path.posix.basename(p.path)
+							// @ts-ignore
+							value[appId] = p.op === "add" ? p.value : oldData.applicationAttributes[appId]
+							return {
+								op: p.op,
+								path: "/applicationAttributes",
+								value
+							}
+						} else {
+							return p
+						}
+					})
+
+				}
+
 				await client.patchResource(
 					patchResourcePath,
 					JSON.stringify(jsonpatch)
 				);
 			} else {
+				// Need to update the content to remove id and internal properties from the payload
+				// to prevent a bad request error
+				if (resourcePath.match("transform")) {
+					console.log("Removing id from transform payload")
+					let transform = JSON.parse(data);
+					delete transform.id;
+					delete transform.internal;
+					data = JSON.stringify(transform);
+				}
+
 				const updatedData = await client.updateResource(resourcePath, data);
+				console.log(`Payload updated for ${resourcePath}`)
 				if (!updatedData) {
+					console.error(`Issue with ${uri}`);
 					throw vscode.FileSystemError.FileNotFound(uri);
 				}
 			}

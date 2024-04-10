@@ -3,10 +3,10 @@ import { TenantService } from "../services/TenantService";
 import * as fs from 'fs';
 import { TenantInfo } from "../models/TenantInfo";
 import { TenantInfoQuickPickItem } from "../models/TenantInfoQuickPickItem";
-import { compareByName } from "../utils";
+import { compareByLabel, compareByName } from "../utils";
 import { isBlank, isEmpty } from "./stringUtils";
 import { ObjectPickItem } from "../models/ObjectPickItem";
-import { OBJECT_TYPE_ITEMS, ObjectTypeQuickPickItem } from "../models/ObjectTypeQuickPickItem";
+import { IMPORTABLE_OBJECT_TYPE_ITEMS, ObjectTypeQuickPickItem } from "../models/ObjectTypeQuickPickItem";
 
 export async function chooseTenant(tenantService: TenantService, title: string): Promise<TenantInfo | undefined> {
 	console.log("> chooseTenant");
@@ -95,7 +95,7 @@ export async function askDisplayName(tenantName: string): Promise<string | undef
 		ignoreFocusOut: true,
 		placeHolder: 'company',
 		prompt: "Enter a display name for this tenant",
-		title: 'IdentityNow',
+		title: 'Identity Security Cloud',
 		validateInput: text => {
 			if (isEmpty(text) || isEmpty(text.trim())) {
 				return "Display name must not be empty";
@@ -210,7 +210,10 @@ export async function chooseFile(fileType: string, extension: string): Promise<u
  * @param items List of ObjectPickItem 
  * @returns List of ids
  */
-export async function askChosenItems(title: string, placeHolder: string, items: Array<any>): Promise<Array<string> | undefined> {
+export async function askChosenItems(title: string,
+	placeHolder: string,
+	items: Array<any>,
+	mapFn: (item: any) => string = x => x.id): Promise<Array<string> | undefined> {
 	const pickItems: ObjectPickItem[] = items
 		.sort(compareByName)
 		.map((x: any) => ({
@@ -230,7 +233,7 @@ export async function askChosenItems(title: string, placeHolder: string, items: 
 		});
 
 	if (result && result.length > 0) {
-		return result.map(x => x.id);
+		return result.map(mapFn);
 	}
 	return undefined;
 };
@@ -241,9 +244,8 @@ export async function askChosenItems(title: string, placeHolder: string, items: 
  * @param objectTypes List of object types to choose from
  * @returns 
  */
-export async function askSelectObjectTypes(title: string, objectTypeItems: Array<ObjectTypeQuickPickItem> = OBJECT_TYPE_ITEMS): Promise<Array<ObjectTypeQuickPickItem> | undefined> {
-	const sortedObjectTypeItems = objectTypeItems
-		.sort(((a, b) => (a.label > b.label) ? 1 : -1));
+export async function askSelectObjectTypes(title: string, objectTypeItems: Array<ObjectTypeQuickPickItem> = IMPORTABLE_OBJECT_TYPE_ITEMS): Promise<Array<ObjectTypeQuickPickItem> | undefined> {
+	const sortedObjectTypeItems = objectTypeItems.sort(compareByLabel);
 
 	const selectedObjectTypeItems = await vscode.window.showQuickPick<ObjectTypeQuickPickItem>(sortedObjectTypeItems, {
 		ignoreFocusOut: false,
