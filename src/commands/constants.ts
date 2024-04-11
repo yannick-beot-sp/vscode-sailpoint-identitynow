@@ -98,4 +98,18 @@ export const EDIT_ACCESS_REQUEST_CONFIG = 'vscode-sailpoint-identitynow.tenant.e
 export const EDIT_PASSWORD_ORG_CONFIG = 'vscode-sailpoint-identitynow.tenant.edit.password-org-config';
 export const GENERATE_DIGIT_TOKEN = 'vscode-sailpoint-identitynow.tenant.generate-digit-token';
 
-export const NEW_SEARCH_ATTRIBUTE = 'vscode-sailpoint-identitynow.new-attribute-search.view'
+//Search Attribute
+export const NEW_SEARCH_ATTRIBUTE = 'vscode-sailpoint-identitynow.new-attribute-search.view';
+
+//Identities
+export const IDENTITIES_SEARCH = 'vscode-sailpoint-identitynow.identities.search';
+export const IDENTITIES_ICON_SEARCH = 'vscode-sailpoint-identitynow.identities.icon-search';
+
+export const IDENTITIES_ICON_DELETE = 'vscode-sailpoint-identitynow.identities.icon-delete';
+export const IDENTITIES_DELETE = 'vscode-sailpoint-identitynow.identities.delete';
+
+export const IDENTITIES_ICON_ATT_SYNC = 'vscode-sailpoint-identitynow.identities.icon-att-sync';
+export const IDENTITIES_ATT_SYNC = 'vscode-sailpoint-identitynow.identities.att-sync';
+
+export const IDENTITIES_ICON_PROCESS = 'vscode-sailpoint-identitynow.identities.icon-process';
+export const IDENTITIES_PROCESS = 'vscode-sailpoint-identitynow.identities.process';

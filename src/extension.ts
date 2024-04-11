@@ -10,7 +10,7 @@ import { deleteResource } from './commands/deleteResource';
 import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './commands/source/exportAccounts';
 import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from './commands/source/exportEntitlementDetails';
 import { ExportScriptFromRuleCommand } from './commands/rule/exportScriptFromRuleCommand';
-import { AccessProfileFilterCommand, RoleFilterCommand } from './commands/filterCommand';
+import { AccessProfileFilterCommand, RoleFilterCommand, IdentityDefinitionFilterCommand } from './commands/filterCommand';
 import { AccountImportNodeCommand } from './commands/source/importAccount';
 import { EntitlementDetailsImportNodeCommand } from './commands/source/importEntitlementDetails';
 import { UncorrelatedAccountImportNodeCommand } from './commands/source/importUncorrelatedAccount';
@@ -61,6 +61,8 @@ import { GenerateDigitTokenCommand } from './commands/tenant/generateDigitTokenC
 import { onErrorResponse, onRequest, onResponse } from './services/AxiosHandlers';
 import axios from 'axios';
 import { OpenScriptCommand } from './commands/rule/openScriptCommand';
+import { IdentitySearchCommand } from './commands/identity/IdentitySearchCommand';
+import { IdentityDefinitionTreeViewCommand } from './commands/identity/IdentityDefinitionTreeViewCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -451,6 +453,25 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.NEW_SEARCH_ATTRIBUTE,
 			newAttributeSearchConfigCommand.execute, newAttributeSearchConfigCommand));
+
+	// Identity Definition Config
+	const newIdentityCommand = new IdentityDefinitionTreeViewCommand(tenantService)
+	const identityFilterCommand = new IdentityDefinitionFilterCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IDENTITIES_SEARCH,
+			identityFilterCommand.execute, identityFilterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IDENTITIES_ICON_SEARCH,
+			identityFilterCommand.execute, identityFilterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IDENTITIES_ATT_SYNC,
+			newIdentityCommand.attSyncIdentity, newIdentityCommand));	
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IDENTITIES_DELETE,
+			newIdentityCommand.deleteIdentity, newIdentityCommand));	
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IDENTITIES_PROCESS,
+			newIdentityCommand.processIdentity, newIdentityCommand));	
 
 
 	axios.interceptors.request.use(onRequest)

@@ -73,6 +73,7 @@ export class TenantTreeItem extends BaseTreeItem {
 		results.push(new FormsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new SearchAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new IdentityAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new IdentitiesDefinitionTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 
 		return new Promise((resolve) => resolve(results));
 	}
@@ -768,7 +769,7 @@ export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implement
 		tenantId: string,
 		tenantName: string,
 		tenantDisplayName: string,
-		private readonly notFoundMessage: string,
+		public notFoundMessage: string,
 		private readonly mapper: (x: any) => BaseTreeItem,
 	) {
 		super(label, contextValue, tenantId, tenantName, tenantDisplayName);
@@ -1168,4 +1169,77 @@ export class IdentityAttributeTreeItem extends ISCResourceTreeItem {
 	}
 
 	iconPath = new vscode.ThemeIcon("list-selection");
+}
+
+/* Contain Identity Definition */
+export class IdentitiesDefinitionTreeItem extends PageableFolderTreeItem<Document> {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {		
+		super("Identities", "identities", tenantId, tenantName, tenantDisplayName, 'No identities found',
+		(identity => new IdentityDefinitionTreeItem(
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			identity.name,
+			identity.id
+		))
+	);
+	}
+	protected async loadNext(): Promise<AxiosResponse<Document[]>> {		
+		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();		
+		if(!isEmpty(this.filters)){
+			this.notFoundMessage = "No identities found";
+			if (this.filterType === FilterType.api) {
+				return await this.client.listIdentityData({
+					filters: this.filters,
+					limit,
+					offset: this.currentOffset,
+					count: (this._total === 0)
+				}) as AxiosResponse<Document[]>;
+			} else {
+				const filters = isEmpty(this.filters) ? "*" : this.filters;
+				return await this.client.paginatedSearchIdentities(
+					filters,
+					limit,
+					this.currentOffset,
+					(this._total === 0)
+				) as AxiosResponse<Document[]>;
+			}
+		}
+		else{			
+			//Force return nothing
+			this.notFoundMessage = "Use search to load identities";
+			return await this.client.listIdentityData({
+				filters: `name eq "NOTHING"`,
+				limit,
+				offset: this.currentOffset,
+				count: (this._total === 0)
+			}) as AxiosResponse<Document[]>;
+		}
+	}	
+}
+
+export class IdentityDefinitionTreeItem extends ISCResourceTreeItem {
+	contextValue = "identity";
+
+	constructor(tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			resourceType: "identities",
+			id,
+			beta: true
+		})
+	}
+
+	iconPath = new vscode.ThemeIcon("person");
 }

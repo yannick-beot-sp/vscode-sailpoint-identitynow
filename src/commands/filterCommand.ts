@@ -104,3 +104,25 @@ export class RoleFilterCommand extends FilterCommand {
     }
 }
 
+export class IdentityDefinitionFilterCommand extends FilterCommand {
+    constructor() {
+        super();
+    }
+
+    protected async runWizard(filterType: FilterType, wizardContext: WizardContext): Promise<WizardContext> {
+        return await runWizard({
+            title: "Filter identities",
+            hideStepCount: true,
+            promptSteps: [
+                newFilter(filterType),
+                new FilterInputStep("identities",
+                    FilterType.search,
+                    "https://documentation.sailpoint.com/saas/help/search/searchable-fields.html#searching-role-data"),
+                new FilterInputStep("identities",
+                    FilterType.api,
+                    "https://developer.sailpoint.com/docs/api/beta/list-identities")
+            ],
+        }, wizardContext);
+    }
+}
+
