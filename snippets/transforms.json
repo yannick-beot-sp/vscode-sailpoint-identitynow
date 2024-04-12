@@ -104,9 +104,9 @@
             "tr-first"
         ],
         "body": [
-            "{\n    \"type\": \"firstValid\",\n    \"attributes\": {\n        \"values\": [\n            $1\n        ]\n    }\n}"
+            "{\n    \"type\": \"firstValid\",\n    \"attributes\": {\n        \"values\": [\n            $1\n        ]\n    },\n    \"ignoreErrors\": false\n}"
         ],
-        "newtemplate": "{\n    \"type\": \"firstValid\",\n    \"attributes\": {\n        \"values\": [\n            \n        ]\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
+        "newtemplate": "{\n    \"type\": \"firstValid\",\n    \"attributes\": {\n        \"values\": [\n            \n        ]\n    },\n    \"ignoreErrors\": false,\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The first valid transform is useful for quickly doing an if/then/else operation on several different data points to return the first piece of data that is not null."
     },
     "Generate Random String": {
