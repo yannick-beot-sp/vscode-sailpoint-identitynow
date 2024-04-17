@@ -61,7 +61,6 @@ import { GenerateDigitTokenCommand } from './commands/tenant/generateDigitTokenC
 import { onErrorResponse, onRequest, onResponse } from './services/AxiosHandlers';
 import axios from 'axios';
 import { OpenScriptCommand } from './commands/rule/openScriptCommand';
-import { IdentitySearchCommand } from './commands/identity/IdentitySearchCommand';
 import { IdentityDefinitionTreeViewCommand } from './commands/identity/IdentityDefinitionTreeViewCommand';
 
 // this method is called when your extension is activated
