@@ -42,6 +42,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 		// Not optimized here but do not
 		const data = await this.lookupResource(uri);
 		const id = getIdByUri(uri);
+		const resourcePath = getPathByUri(uri);
 		// const isFile = this.isUUID(id);
 		const isFile = id !== "provisioning-policies" && id !== "schemas";
 		return {
@@ -49,6 +50,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 			ctime: toTimestamp(data.created),
 			mtime: toTimestamp(data.modified),
 			size: convertToText(data).length,
+			permissions: resourcePath.match("identities") ? vscode.FilePermission.Readonly: null
 		};
 	}
 	readDirectory(
