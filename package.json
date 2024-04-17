@@ -497,7 +497,7 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.identities.search",
-        "title": "Find Identity"        
+        "title": "Find Identities"        
       },
       {
         "command": "vscode-sailpoint-identitynow.identities.delete",
@@ -792,6 +792,18 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.identities.icon-search",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.delete",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.att-sync",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.process",
           "when": "never"
         },
         {
@@ -1237,6 +1249,10 @@
       {
         "fileMatch": "idn://**/access-request-config/**/*",
         "url": "./schemas/access-request-config.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/identities/**/*",
+        "url": "./schemas/identity.schemas.json"
       }
     ],
     "configuration": {

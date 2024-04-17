@@ -1,0 +1,202 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://developer.sailpoint.com/schemas/identity.json",
+  "title": "Identity Definition",
+  "description": "Schema of an identity",
+  "type": "object",
+  "properties": {
+    "alias": {
+      "type": "string",
+      "description": "Alternate unique identifier for the identity"
+    },
+    "emailAddress": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The email address of the identity"
+    },
+    "isManager": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this identity is a manager of another identity"
+    },
+    "managerRef": {
+      "type": "object",
+      "nullable": false,
+      "description": "Identity's manager.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "IDENTITY"
+          ],
+          "description": "DTO type of identity's manager.",
+          "example": "IDENTITY"
+        },
+        "id": {
+          "type": "string",
+          "description": "ID of identity's manager.",
+          "example": "2c9180a46faadee4016fb4e018c20639"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable display name of identity's manager.",
+          "example": "support"
+        }
+      }
+    },
+    "lastRefresh": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2021-03-01T22:32:58.104Z",
+      "description": "The last time the identity was refreshed by the system"
+    },
+    "lifecycleState": {
+      "type": "object",
+      "nullable": true,
+      "description": "Lifecycle state details that include lifecycle state name and whether this lifecycle state has been set manually",
+      "properties": {
+        "stateName": {
+          "type": "string",
+          "description": "The name of the lifecycle state",
+          "example": "active"
+        },
+        "manuallyUpdated": {
+          "type": "boolean",
+          "description": "Whether the lifecycle state has been manually or automatically set",
+          "example": true
+        }
+      },
+      "required": [
+        "stateName",
+        "manuallyUpdated"
+      ]
+    },
+    "processingState": {
+      "description": "The processing state of the identity",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "enum": [
+        "ERROR",
+        "OK",
+        null
+      ]
+    },
+    "identityStatus": {
+      "type": "string",
+      "enum": [
+        "UNREGISTERED",
+        "REGISTERED",
+        "PENDING",
+        "WARNING",
+        "DISABLED",
+        "ACTIVE",
+        "DEACTIVATED",
+        "TERMINATED",
+        "ERROR",
+        "LOCKED"
+      ],
+      "description": "The identity's status in the system"
+    },
+    "attributes": {
+      "description": "A map with the identity attributes for the identity",
+      "type": "object",
+      "properties": {
+        "firstname": {
+          "type": "string"
+        },
+        "cloudStatus": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "lastSyncDate": {
+          "type": "string"
+        },
+        "lastname": {
+          "type": "string"
+        },
+        "personalEmail": {
+          "type": "string"
+        },
+        "uid": {
+          "type": "string"
+        },
+        "cloudAuthoritativeSource": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "internalCloudStatus": {
+          "type": "string"
+        },
+        "workPhone": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true,
+      "required": [
+        "firstname",
+        "cloudStatus",
+        "displayName",
+        "lastSyncDate",
+        "lastname",
+        "uid",
+        "cloudAuthoritativeSource",
+        "internalCloudStatus",
+        "email"
+      ]
+    },
+    "id": {
+      "type": "string",
+      "description": "System-generated unique ID of the Object"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name of the Object"
+    },
+    "created": {
+      "type": "string",
+      "description": "Creation date of the Object",
+      "format": "date-time",
+      "example": "2021-03-01T22:32:58.104Z",
+      "readOnly": true
+    },
+    "modified": {
+      "type": "string",
+      "description": "Last modification date of the Object",
+      "format": "date-time",
+      "example": "2021-03-02T20:22:28.104Z",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "alias",
+    "managerRef",
+    "lastRefresh",
+    "lifecycleState",
+    "processingState",
+    "identityStatus",
+    "attributes",
+    "id",
+    "name",
+    "created",
+    "modified"
+  ]
+}
