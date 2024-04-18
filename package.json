@@ -497,19 +497,19 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.identities.search",
-        "title": "Find Identities"        
+        "title": "Search identities..."
       },
       {
         "command": "vscode-sailpoint-identitynow.identities.delete",
-        "title": "Delete"        
+        "title": "Delete"
       },
       {
         "command": "vscode-sailpoint-identitynow.identities.att-sync",
-        "title": "Att Sync"        
+        "title": "Synchronize attributes"
       },
       {
         "command": "vscode-sailpoint-identitynow.identities.process",
-        "title": "Process"        
+        "title": "Process"
       }
     ],
     "menus": {
@@ -1149,24 +1149,24 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.identities.search",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identities/"          
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identities/"
         },
         {
           "command": "vscode-sailpoint-identitynow.identities.icon-search",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identities/",          
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identities/",
           "group": "inline@1"
         },
         {
           "command": "vscode-sailpoint-identitynow.identities.delete",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity/"          
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity/"
         },
         {
           "command": "vscode-sailpoint-identitynow.identities.att-sync",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity/"          
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity/"
         },
         {
           "command": "vscode-sailpoint-identitynow.identities.process",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity/"          
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity/"
         }
       ],
       "editor/context": [
