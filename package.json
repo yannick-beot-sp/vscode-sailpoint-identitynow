@@ -489,6 +489,27 @@
         "command": "vscode-sailpoint-identitynow.new-attribute-search.view",
         "title": "New Search Attribute",
         "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.identities.icon-search",
+        "title": "Search Identity",
+        "icon": "$(search)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.identities.search",
+        "title": "Search identities..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.identities.delete",
+        "title": "Delete"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.identities.att-sync",
+        "title": "Synchronize attributes"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.identities.process",
+        "title": "Process"
       }
     ],
     "menus": {
@@ -763,6 +784,26 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.new-attribute-search.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.search",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.icon-search",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.delete",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.att-sync",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.process",
           "when": "never"
         },
         {
@@ -1105,6 +1146,27 @@
           "command": "vscode-sailpoint-identitynow.new-attribute-search.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == search-attributes",
           "group": "inline@2"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.search",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identities/"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.icon-search",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identities/",
+          "group": "inline@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.delete",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity/"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.att-sync",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity/"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.process",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity/"
         }
       ],
       "editor/context": [
@@ -1187,6 +1249,10 @@
       {
         "fileMatch": "idn://**/access-request-config/**/*",
         "url": "./schemas/access-request-config.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/identities/**/*",
+        "url": "./schemas/identity.schemas.json"
       }
     ],
     "configuration": {

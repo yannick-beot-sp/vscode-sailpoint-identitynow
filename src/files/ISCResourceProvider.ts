@@ -42,6 +42,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 		// Not optimized here but do not
 		const data = await this.lookupResource(uri);
 		const id = getIdByUri(uri);
+		const resourcePath = getPathByUri(uri);
 		// const isFile = this.isUUID(id);
 		const isFile = id !== "provisioning-policies" && id !== "schemas";
 		return {
@@ -49,6 +50,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 			ctime: toTimestamp(data.created),
 			mtime: toTimestamp(data.modified),
 			size: convertToText(data).length,
+			permissions: resourcePath.match("identities") ? vscode.FilePermission.Readonly : null
 		};
 	}
 	readDirectory(
@@ -91,9 +93,22 @@ export class ISCResourceProvider implements FileSystemProvider {
 		if (/\/connector-rule-script\//.test(resourcePath)) {
 			const rule = await client.getConnectorRuleById(id);
 			data = rule.sourceCode?.script
+		} else if (/\/identities\//.test(resourcePath)) {
+			const response = await client.paginatedSearchIdentities(
+				`id:${id}`,
+				2,
+				0,
+				false,
+				null,
+				true
+			);
+			if (response.data.length ===1 ) {
+				data = response.data[0]
+			}
 		} else {
 			data = await client.getResource(resourcePath);
 		}
+
 		if (!data) {
 			throw vscode.FileSystemError.FileNotFound(uri);
 		}
@@ -230,7 +245,11 @@ export class ISCResourceProvider implements FileSystemProvider {
 					patchResourcePath,
 					JSON.stringify(jsonpatch)
 				);
-			} else {
+			} else if (resourcePath.match("identities")) {
+				console.log("save identities - cant do this folks");
+				vscode.window.showErrorMessage("Identities cannot be modified directly");
+			}
+			else {
 				// Need to update the content to remove id and internal properties from the payload
 				// to prevent a bad request error
 				if (resourcePath.match("transform")) {

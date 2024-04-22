@@ -1,0 +1,908 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://developer.sailpoint.com/schemas/identity.json",
+  "title": "Identity",
+  "description": "Schema of an identity",
+  "type": "object",
+  "properties": {
+    "displayName": {
+      "type": "string",
+      "example": "Carol.Adams",
+      "description": "Identity's display name."
+    },
+    "firstName": {
+      "type": "string",
+      "description": "Identity's first name.",
+      "example": "Carol"
+    },
+    "lastName": {
+      "type": "string",
+      "description": "Identity's last name.",
+      "example": "Adams"
+    },
+    "email": {
+      "type": "string",
+      "description": "Identity's primary email address.",
+      "example": "Carol.Adams@sailpointdemo.com"
+    },
+    "created": {
+      "type": "string",
+      "description": "ISO-8601 date-time referring to the time when the object was created.",
+      "nullable": true,
+      "format": "date-time",
+      "example": "2018-06-25T20:22:28.104Z"
+    },
+    "modified": {
+      "type": "string",
+      "description": "ISO-8601 date-time referring to the time when the object was last modified.",
+      "nullable": true,
+      "format": "date-time",
+      "example": "2018-06-25T20:22:28.104Z"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Identity's phone number.",
+      "example": "+1 440-527-3672"
+    },
+    "synced": {
+      "type": "string",
+      "description": "ISO-8601 date-time referring to the date-time when object was queued to be synced into search database for use in the search API.  \nThis date-time changes anytime there is an update to the object, which triggers a synchronization event being sent to the search database. \nThere may be some delay between the `synced` time and the time when the updated data is actually available in the search API. "
+    },
+    "inactive": {
+      "type": "boolean",
+      "description": "Indicates whether the identity is inactive.",
+      "default": false,
+      "example": false
+    },
+    "protected": {
+      "type": "boolean",
+      "description": "Indicates whether the identity is protected.",
+      "default": false,
+      "example": false
+    },
+    "status": {
+      "type": "string",
+      "description": "Identity's status in SailPoint.",
+      "example": "UNREGISTERED"
+    },
+    "employeeNumber": {
+      "type": "string",
+      "description": "Identity's employee number.",
+      "example": "1a2a3d4e"
+    },
+    "manager": {
+      "type": "object",
+      "description": "Identity's manager.",
+      "nullable": true,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID of identity's manager.",
+          "example": "2c9180867dfe694b017e208e27c05799"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of identity's manager.",
+          "example": "Amanda.Ross"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name of identity's manager.",
+          "example": "Amanda.Ross"
+        }
+      }
+    },
+    "isManager": {
+      "type": "boolean",
+      "description": "Indicates whether the identity is a manager of other identities.",
+      "example": false
+    },
+    "identityProfile": {
+      "type": "object",
+      "description": "Identity's identity profile.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Identity profile's ID.",
+          "example": "3bc8ad26b8664945866b31339d1ff7d2"
+        },
+        "name": {
+          "type": "string",
+          "description": "Identity profile's name.",
+          "example": "HR Employees"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "description": "Identity's source.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID of identity's source.",
+          "example": "2c91808b6e9e6fb8016eec1a2b6f7b5f"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of identity's source.",
+          "example": "ODS-HR-Employees"
+        }
+      }
+    },
+    "attributes": {
+      "type": "object",
+      "description": "Map or dictionary of key/value pairs.",
+      "additionalProperties": true,
+      "example": {
+        "country": "US",
+        "firstname": "Carol",
+        "cloudStatus": "UNREGISTERED"
+      }
+    },
+    "processingState": {
+      "type": "string",
+      "description": "Identity's processing state.",
+      "nullable": true,
+      "example": null
+    },
+    "processingDetails": {
+      "description": "Identity's processing details.",
+      "nullable": true,
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "nullable": true,
+          "format": "date-time",
+          "example": "2018-06-25T20:22:28.104Z",
+          "description": "A date-time in ISO-8601 format"
+        },
+        "stage": {
+          "type": "string",
+          "example": "In Process"
+        },
+        "retryCount": {
+          "type": "integer",
+          "example": 0,
+          "format": "int32"
+        },
+        "stackTrace": {
+          "type": "string",
+          "example": "<stack trace>"
+        },
+        "message": {
+          "type": "string",
+          "example": "<message>"
+        }
+      }
+    },
+    "accounts": {
+      "type": "array",
+      "description": "List of accounts associated with the identity.",
+      "items": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "2c91808568c529c60168cca6f90c1313",
+                "description": "The unique ID of the referenced object."
+              },
+              "name": {
+                "type": "string",
+                "example": "John Doe",
+                "description": "The human readable name of the referenced object."
+              }
+            }
+          },
+          {
+            "type": "object",
+            "properties": {
+              "accountId": {
+                "type": "string",
+                "description": "Account ID.",
+                "example": "John.Doe"
+              },
+              "source": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "2c91808568c529c60168cca6f90c1313",
+                        "description": "The unique ID of the referenced object."
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "John Doe",
+                        "description": "The human readable name of the referenced object."
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "example": "Delimited File",
+                        "description": "Type of source returned."
+                      }
+                    }
+                  }
+                ]
+              },
+              "disabled": {
+                "type": "boolean",
+                "description": "Indicates whether the account is disabled.",
+                "default": false,
+                "example": false
+              },
+              "locked": {
+                "type": "boolean",
+                "description": "Indicates whether the account is locked.",
+                "default": false,
+                "example": false
+              },
+              "privileged": {
+                "type": "boolean",
+                "description": "Indicates whether the account is privileged.",
+                "default": false,
+                "example": false
+              },
+              "manuallyCorrelated": {
+                "type": "boolean",
+                "description": "Indicates whether the account has been manually correlated to an identity.",
+                "default": false,
+                "example": false
+              },
+              "passwordLastSet": {
+                "type": "string",
+                "nullable": true,
+                "format": "date-time",
+                "example": "2018-06-25T20:22:28.104Z",
+                "description": "A date-time in ISO-8601 format"
+              },
+              "entitlementAttributes": {
+                "type": "object",
+                "nullable": true,
+                "description": "Map or dictionary of key/value pairs.",
+                "additionalProperties": true,
+                "example": {
+                  "moderator": true,
+                  "admin": true,
+                  "trust_level": "4"
+                }
+              },
+              "created": {
+                "type": "string",
+                "description": "ISO-8601 date-time referring to the time when the object was created.",
+                "nullable": true,
+                "format": "date-time",
+                "example": "2018-06-25T20:22:28.104Z"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "accountCount": {
+      "type": "integer",
+      "description": "Number of accounts associated with the identity.",
+      "format": "int32",
+      "example": 3
+    },
+    "apps": {
+      "type": "array",
+      "description": "List of applications the identity has access to.",
+      "items": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "2c91808568c529c60168cca6f90c1313",
+                "description": "The unique ID of the referenced object."
+              },
+              "name": {
+                "type": "string",
+                "example": "John Doe",
+                "description": "The human readable name of the referenced object."
+              }
+            }
+          },
+          {
+            "type": "object",
+            "properties": {
+              "source": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "2c91808568c529c60168cca6f90c1313",
+                    "description": "The unique ID of the referenced object."
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "John Doe",
+                    "description": "The human readable name of the referenced object."
+                  }
+                }
+              },
+              "account": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "The SailPoint generated unique ID",
+                    "example": "2c9180837dfe6949017e21f3d8cd6d49"
+                  },
+                  "accountId": {
+                    "type": "string",
+                    "description": "The account ID generated by the source",
+                    "example": "CN=Carol Adams,OU=Austin,OU=Americas,OU=Demo,DC=seri,DC=sailpointdemo,DC=com"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "appCount": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Number of applications the identity has access to.",
+      "example": 2
+    },
+    "access": {
+      "type": "array",
+      "description": "List of access items assigned to the identity.",
+      "items": {
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "ACCESS_PROFILE": "../access/AccessProfileSummary.yaml",
+            "ENTITLEMENT": "../access/AccessProfileEntitlement.yaml",
+            "ROLE": "../access/AccessProfileRole.yaml"
+          }
+        },
+        "oneOf": [
+          {
+            "description": "This is a summary representation of an access profile.",
+            "allOf": [
+              {
+                "allOf": [
+                  {
+                    "allOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "2c91808568c529c60168cca6f90c1313",
+                            "description": "The unique ID of the referenced object."
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "John Doe",
+                            "description": "The human readable name of the referenced object."
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "displayName": {
+                            "type": "string",
+                            "example": "John Q. Doe"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "ACCOUNT_CORRELATION_CONFIG",
+                          "ACCESS_PROFILE",
+                          "ACCESS_REQUEST_APPROVAL",
+                          "ACCOUNT",
+                          "APPLICATION",
+                          "CAMPAIGN",
+                          "CAMPAIGN_FILTER",
+                          "CERTIFICATION",
+                          "CLUSTER",
+                          "CONNECTOR_SCHEMA",
+                          "ENTITLEMENT",
+                          "GOVERNANCE_GROUP",
+                          "IDENTITY",
+                          "IDENTITY_PROFILE",
+                          "IDENTITY_REQUEST",
+                          "LIFECYCLE_STATE",
+                          "PASSWORD_POLICY",
+                          "ROLE",
+                          "RULE",
+                          "SOD_POLICY",
+                          "SOURCE",
+                          "TAG",
+                          "TAG_CATEGORY",
+                          "TASK_RESULT",
+                          "REPORT_RESULT",
+                          "SOD_VIOLATION",
+                          "ACCOUNT_ACTIVITY",
+                          "WORKGROUP"
+                        ],
+                        "description": "An enumeration of the types of DTOs supported within the IdentityNow infrastructure.",
+                        "example": "IDENTITY"
+                      },
+                      "description": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": null
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "2c91808568c529c60168cca6f90c1313",
+                        "description": "The unique ID of the referenced object."
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "John Doe",
+                        "description": "The human readable name of the referenced object."
+                      }
+                    }
+                  },
+                  "owner": {
+                    "allOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "2c91808568c529c60168cca6f90c1313",
+                            "description": "The unique ID of the referenced object."
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "John Doe",
+                            "description": "The human readable name of the referenced object."
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "displayName": {
+                            "type": "string",
+                            "example": "John Q. Doe"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "revocable": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "description": "EntitlementReference",
+            "allOf": [
+              {
+                "allOf": [
+                  {
+                    "allOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "2c91808568c529c60168cca6f90c1313",
+                            "description": "The unique ID of the referenced object."
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "John Doe",
+                            "description": "The human readable name of the referenced object."
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "displayName": {
+                            "type": "string",
+                            "example": "John Q. Doe"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "ACCOUNT_CORRELATION_CONFIG",
+                          "ACCESS_PROFILE",
+                          "ACCESS_REQUEST_APPROVAL",
+                          "ACCOUNT",
+                          "APPLICATION",
+                          "CAMPAIGN",
+                          "CAMPAIGN_FILTER",
+                          "CERTIFICATION",
+                          "CLUSTER",
+                          "CONNECTOR_SCHEMA",
+                          "ENTITLEMENT",
+                          "GOVERNANCE_GROUP",
+                          "IDENTITY",
+                          "IDENTITY_PROFILE",
+                          "IDENTITY_REQUEST",
+                          "LIFECYCLE_STATE",
+                          "PASSWORD_POLICY",
+                          "ROLE",
+                          "RULE",
+                          "SOD_POLICY",
+                          "SOURCE",
+                          "TAG",
+                          "TAG_CATEGORY",
+                          "TASK_RESULT",
+                          "REPORT_RESULT",
+                          "SOD_VIOLATION",
+                          "ACCOUNT_ACTIVITY",
+                          "WORKGROUP"
+                        ],
+                        "description": "An enumeration of the types of DTOs supported within the IdentityNow infrastructure.",
+                        "example": "IDENTITY"
+                      },
+                      "description": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": null
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "2c91808568c529c60168cca6f90c1313",
+                        "description": "The unique ID of the referenced object."
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "John Doe",
+                        "description": "The human readable name of the referenced object."
+                      }
+                    }
+                  },
+                  "privileged": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "attribute": {
+                    "type": "string",
+                    "example": "memberOf"
+                  },
+                  "value": {
+                    "type": "string",
+                    "example": "CN=Buyer,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com"
+                  },
+                  "standalone": {
+                    "type": "boolean",
+                    "example": false
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "description": "Role",
+            "allOf": [
+              {
+                "allOf": [
+                  {
+                    "allOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "2c91808568c529c60168cca6f90c1313",
+                            "description": "The unique ID of the referenced object."
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "John Doe",
+                            "description": "The human readable name of the referenced object."
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "displayName": {
+                            "type": "string",
+                            "example": "John Q. Doe"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "ACCOUNT_CORRELATION_CONFIG",
+                          "ACCESS_PROFILE",
+                          "ACCESS_REQUEST_APPROVAL",
+                          "ACCOUNT",
+                          "APPLICATION",
+                          "CAMPAIGN",
+                          "CAMPAIGN_FILTER",
+                          "CERTIFICATION",
+                          "CLUSTER",
+                          "CONNECTOR_SCHEMA",
+                          "ENTITLEMENT",
+                          "GOVERNANCE_GROUP",
+                          "IDENTITY",
+                          "IDENTITY_PROFILE",
+                          "IDENTITY_REQUEST",
+                          "LIFECYCLE_STATE",
+                          "PASSWORD_POLICY",
+                          "ROLE",
+                          "RULE",
+                          "SOD_POLICY",
+                          "SOURCE",
+                          "TAG",
+                          "TAG_CATEGORY",
+                          "TASK_RESULT",
+                          "REPORT_RESULT",
+                          "SOD_VIOLATION",
+                          "ACCOUNT_ACTIVITY",
+                          "WORKGROUP"
+                        ],
+                        "description": "An enumeration of the types of DTOs supported within the IdentityNow infrastructure.",
+                        "example": "IDENTITY"
+                      },
+                      "description": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": null
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "owner": {
+                    "allOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "2c91808568c529c60168cca6f90c1313",
+                            "description": "The unique ID of the referenced object."
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "John Doe",
+                            "description": "The human readable name of the referenced object."
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "displayName": {
+                            "type": "string",
+                            "example": "John Q. Doe"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "disabled": {
+                    "type": "boolean"
+                  },
+                  "revocable": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "accessCount": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Number of access items assigned to the identity.",
+      "example": 5
+    },
+    "entitlementCount": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Number of entitlements assigned to the identity.",
+      "example": 10
+    },
+    "roleCount": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Number of roles assigned to the identity.",
+      "example": 1
+    },
+    "accessProfileCount": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Number of access profiles assigned to the identity.",
+      "example": 1
+    },
+    "owns": {
+      "type": "object",
+      "description": "Access items the identity owns.",
+      "properties": {
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "2c91808568c529c60168cca6f90c1313",
+                "description": "The unique ID of the referenced object."
+              },
+              "name": {
+                "type": "string",
+                "example": "John Doe",
+                "description": "The human readable name of the referenced object."
+              }
+            }
+          }
+        },
+        "entitlements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "2c91808568c529c60168cca6f90c1313",
+                "description": "The unique ID of the referenced object."
+              },
+              "name": {
+                "type": "string",
+                "example": "John Doe",
+                "description": "The human readable name of the referenced object."
+              }
+            }
+          }
+        },
+        "accessProfiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "2c91808568c529c60168cca6f90c1313",
+                "description": "The unique ID of the referenced object."
+              },
+              "name": {
+                "type": "string",
+                "example": "John Doe",
+                "description": "The human readable name of the referenced object."
+              }
+            }
+          }
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "2c91808568c529c60168cca6f90c1313",
+                "description": "The unique ID of the referenced object."
+              },
+              "name": {
+                "type": "string",
+                "example": "John Doe",
+                "description": "The human readable name of the referenced object."
+              }
+            }
+          }
+        },
+        "apps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "2c91808568c529c60168cca6f90c1313",
+                "description": "The unique ID of the referenced object."
+              },
+              "name": {
+                "type": "string",
+                "example": "John Doe",
+                "description": "The human readable name of the referenced object."
+              }
+            }
+          }
+        },
+        "governanceGroups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "2c91808568c529c60168cca6f90c1313",
+                "description": "The unique ID of the referenced object."
+              },
+              "name": {
+                "type": "string",
+                "example": "John Doe",
+                "description": "The human readable name of the referenced object."
+              }
+            }
+          }
+        },
+        "fallbackApprover": {
+          "type": "boolean",
+          "example": false
+        }
+      },
+      "ownsCount": {
+        "type": "integer",
+        "format": "int32",
+        "description": "Number of access items the identity owns.",
+        "example": 5
+      },
+      "tags": {
+        "type": "array",
+        "description": "Tags that have been applied to the object.",
+        "items": {
+          "type": "string"
+        },
+        "example": [
+          "TAG_1",
+          "TAG_2"
+        ]
+      }
+    }
+  }
