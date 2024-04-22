@@ -61,7 +61,7 @@ import { GenerateDigitTokenCommand } from './commands/tenant/generateDigitTokenC
 import { onErrorResponse, onRequest, onResponse } from './services/AxiosHandlers';
 import axios from 'axios';
 import { OpenScriptCommand } from './commands/rule/openScriptCommand';
-import { IdentityDefinitionTreeViewCommand } from './commands/identity/IdentityDefinitionTreeViewCommand';
+import { IdentityTreeViewCommand } from './commands/identity/IdentityTreeViewCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -454,7 +454,7 @@ export function activate(context: vscode.ExtensionContext) {
 			newAttributeSearchConfigCommand.execute, newAttributeSearchConfigCommand));
 
 	// Identity Definition Config
-	const newIdentityCommand = new IdentityDefinitionTreeViewCommand(tenantService)
+	const newIdentityCommand = new IdentityTreeViewCommand()
 	const identityFilterCommand = new IdentityDefinitionFilterCommand();
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IDENTITIES_SEARCH,

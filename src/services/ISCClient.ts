@@ -5,7 +5,7 @@ import { withQuery } from "../utils/UriUtils";
 import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, Transform, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, Entitlement, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, ImportSpConfigRequestBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, ConnectorsBetaApi, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SODPolicyApi, SodPolicy, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementApi, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi,IdentitiesBetaApiListIdentitiesRequest, IdentityBeta,IdentitiesBetaApiStartIdentityProcessingRequest,IdentitySyncJobBeta,TaskResultResponseBeta } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SODPolicyApi, SodPolicy, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -582,7 +582,7 @@ export class ISCClient {
 
 		return await this.paginatedSearch(search, limit, offset, count);
 	}
-	public async paginatedSearchIdentities(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"]): Promise<AxiosResponse<IdentityDocument[]>> {
+	public async paginatedSearchIdentities(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"], includeNested = false): Promise<AxiosResponse<IdentityDocument[]>> {
 		console.log("> paginatedSearchIdentities", query);
 
 		const search: Search = {
@@ -593,7 +593,7 @@ export class ISCClient {
 				query: query
 			},
 			sort: ["name"],
-			includeNested: false,
+			includeNested,
 			queryResultFilter: {
 				includes: fields
 			}
@@ -1568,29 +1568,30 @@ export class ISCClient {
 	//#region Identity Management
 	////////////////////////
 
-	public async listIdentityData(identityFilter: IdentitiesBetaApiListIdentitiesRequest): Promise<AxiosResponse<IdentityBeta[]>> {
-		console.log("> getIdentityData");
+	public async listIdentities(identityFilter: IdentitiesBetaApiListIdentitiesRequest): Promise<AxiosResponse<IdentityBeta[]>> {
+		console.log("> listIdentities");
 		const apiConfig = await this.getApiConfiguration();
 		const api = new IdentitiesBetaApi(apiConfig);
-
-		const result = await api.listIdentities(identityFilter);		
-
-		console.log(`getIdentityData: = ${result}`);
-
+		const result = await api.listIdentities(identityFilter);
 		return result;
 	}
-	
-	public async processIdentities(identities: IdentitiesBetaApiStartIdentityProcessingRequest): Promise<AxiosResponse<TaskResultResponseBeta, any>> {
+
+	public async processIdentity(identityId: string): Promise<AxiosResponse<TaskResultResponseBeta, any>> {
 		console.log("> processIdentity");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new IdentitiesBetaApi(apiConfig);						
-
-		return await api.startIdentityProcessing(identities);
+		const api = new IdentitiesBetaApi(apiConfig);
+		const requestParameters = {
+			processIdentitiesRequestBeta:
+			{
+				identityIds: [identityId]
+			}
+		};
+		return await api.startIdentityProcessing(requestParameters);
 	}
 
-	public async syncIdentityAttributes(identityId: string): Promise<AxiosResponse<IdentitySyncJobBeta, any>>{
+	public async syncIdentityAttributes(identityId: string): Promise<AxiosResponse<IdentitySyncJobBeta, any>> {
 		console.log("> syncIdentityAttributes");
-		
+
 		const apiConfig = await this.getApiConfiguration();
 		const api = new IdentitiesBetaApi(apiConfig);
 
@@ -1598,20 +1599,18 @@ export class ISCClient {
 		return await api.synchronizeAttributesForIdentity(
 			{
 				identityId: identityId
-		});				
+			});
 	}
 
-	public async deleteIdentity(identityId: string):Promise<void>{
+	public async deleteIdentity(identityId: string): Promise<void> {
 		console.log("> deleteIdentity");
-		
+
 		const apiConfig = await this.getApiConfiguration();
 		const api = new IdentitiesBetaApi(apiConfig);
 
-		//IdentitiesBetaApiSynchronizeAttributesForIdentityRequest
-		await api.deleteIdentity(
-			{
-				id: identityId
-		});				
+		await api.deleteIdentity({
+			id: identityId
+		});
 	}
 
 	////////////////////////

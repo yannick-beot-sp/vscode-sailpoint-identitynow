@@ -3,7 +3,7 @@ import * as path from 'path';
 import { ISCClient, TOTAL_COUNT_HEADER } from "../services/ISCClient";
 import { getIdByUri, getPathByUri, getResourceUri } from "../utils/UriUtils";
 import { compareByLabel, compareByName, compareByPriority } from "../utils";
-import { AxiosResponse } from "axios";
+import { AxiosHeaders, AxiosResponse } from "axios";
 import { getConfigNumber } from '../utils/configurationUtils';
 import * as commands from "../commands/constants";
 import * as configuration from '../configurationConstants';
@@ -73,7 +73,7 @@ export class TenantTreeItem extends BaseTreeItem {
 		results.push(new FormsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new SearchAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new IdentityAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
-		results.push(new IdentitiesDefinitionTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new IdentitiesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 
 		return new Promise((resolve) => resolve(results));
 	}
@@ -763,13 +763,23 @@ export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implement
 
 	protected _total = 0;
 
+	/**
+	 * 
+	 * @param label 
+	 * @param contextValue 
+	 * @param tenantId 
+	 * @param tenantName 
+	 * @param tenantDisplayName 
+	 * @param noEntries Message to be displayed if the search does not return anything, or if a search needs to be run (cf. identities)
+	 * @param mapper 
+	 */
 	constructor(
 		label: string,
 		contextValue: string,
 		tenantId: string,
 		tenantName: string,
 		tenantDisplayName: string,
-		public notFoundMessage: string,
+		protected noEntries: string,
 		private readonly mapper: (x: any) => BaseTreeItem,
 	) {
 		super(label, contextValue, tenantId, tenantName, tenantDisplayName);
@@ -803,7 +813,7 @@ export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implement
 			}
 
 			if (this._total === 0) {
-				this.children = [new MessageNode(this.notFoundMessage)];
+				this.children = [new MessageNode(this.noEntries)];
 				return;
 			}
 
@@ -1172,28 +1182,28 @@ export class IdentityAttributeTreeItem extends ISCResourceTreeItem {
 }
 
 /* Contain Identity Definition */
-export class IdentitiesDefinitionTreeItem extends PageableFolderTreeItem<Document> {
+export class IdentitiesTreeItem extends PageableFolderTreeItem<Document> {
 	constructor(
 		tenantId: string,
 		tenantName: string,
 		tenantDisplayName: string,
-	) {		
+	) {
 		super("Identities", "identities", tenantId, tenantName, tenantDisplayName, 'No identities found',
-		(identity => new IdentityDefinitionTreeItem(
-			tenantId,
-			tenantName,
-			tenantDisplayName,
-			identity.name,
-			identity.id
-		))
-	);
+			(identity => new IdentityTreeItem(
+				tenantId,
+				tenantName,
+				tenantDisplayName,
+				identity.name,
+				identity.id
+			))
+		);
 	}
-	protected async loadNext(): Promise<AxiosResponse<Document[]>> {		
-		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();		
-		if(!isEmpty(this.filters)){
-			this.notFoundMessage = "No identities found";
+	protected async loadNext(): Promise<AxiosResponse<Document[]>> {
+		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
+		if (!isEmpty(this.filters)) {
+			this.noEntries = "No identities found";
 			if (this.filterType === FilterType.api) {
-				return await this.client.listIdentityData({
+				return await this.client.listIdentities({
 					filters: this.filters,
 					limit,
 					offset: this.currentOffset,
@@ -1209,20 +1219,23 @@ export class IdentitiesDefinitionTreeItem extends PageableFolderTreeItem<Documen
 				) as AxiosResponse<Document[]>;
 			}
 		}
-		else{			
+		else {
 			//Force return nothing
-			this.notFoundMessage = "Use search to load identities";
-			return await this.client.listIdentityData({
-				filters: `name eq "NOTHING"`,
-				limit,
-				offset: this.currentOffset,
-				count: (this._total === 0)
-			}) as AxiosResponse<Document[]>;
+			this.noEntries = "Use search to load identities";
+			return {
+				headers: new AxiosHeaders({
+					[TOTAL_COUNT_HEADER]: 0
+				}),
+				data: null,
+				status: 200,
+				statusText: "",
+				config: null
+			}
 		}
-	}	
+	}
 }
 
-export class IdentityDefinitionTreeItem extends ISCResourceTreeItem {
+export class IdentityTreeItem extends ISCResourceTreeItem {
 	contextValue = "identity";
 
 	constructor(tenantId: string,
