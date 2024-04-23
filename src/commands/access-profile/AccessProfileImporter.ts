@@ -183,8 +183,8 @@ export class AccessProfileImporter {
             const accessProfilePayload: AccessProfile = {
                 "name": data.name,
                 "description": data.description?.replaceAll("\\r", "\r").replaceAll("\\n", "\n"),
-                "enabled": data.enabled ?? false,
-                "requestable": data.requestable ?? false,
+                "enabled": truethy(data.enabled),
+                "requestable": truethy(data.requestable),
                 "owner": {
                     "id": ownerId,
                     "type": "IDENTITY",

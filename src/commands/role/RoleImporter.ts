@@ -16,6 +16,7 @@ import { RoleMembershipSelectorConverter } from '../../parser/RoleMembershipSele
 import { Parser } from '../../parser/parser';
 import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService';
 import { EntitlementCacheService, KEY_SEPARATOR } from '../../services/cache/EntitlementCacheService';
+import { truethy } from '../../utils/booleanUtils';
 
 interface RolesImportResult {
     success: number
@@ -215,21 +216,21 @@ export class RoleImporter {
             const rolePayload: Role = {
                 "name": roleName,
                 "description": data.description?.replaceAll('\\r', '\r').replaceAll('\\n', '\n'),
-                "enabled": data.enabled ?? false,
-                requestable: data.requestable ?? false,
+                "enabled": truethy(data.enabled),
+                requestable: truethy(data.requestable),
                 "owner": {
                     "id": ownerId,
                     "type": "IDENTITY",
                     "name": data.owner
                 },
                 "accessRequestConfig": {
-                    "commentsRequired": data.commentsRequired ?? false,
-                    "denialCommentsRequired": data.denialCommentsRequired ?? false,
+                    "commentsRequired": truethy(data.commentsRequired),
+                    "denialCommentsRequired": truethy(data.denialCommentsRequired),
                     "approvalSchemes": approvalSchemes
                 },
                 "revocationRequestConfig": {
-                    "commentsRequired": data.revokeCommentsRequired ?? false,
-                    "denialCommentsRequired": data.revokeDenialCommentsRequired ?? false,
+                    "commentsRequired": truethy(data.revokeCommentsRequired),
+                    "denialCommentsRequired": truethy(data.revokeDenialCommentsRequired),
                     "approvalSchemes": revokeApprovalSchemes
                 },
                 accessProfiles,
