@@ -830,7 +830,7 @@
       "view/item/context": [
         {
           "command": "vscode-sailpoint-identitynow.open-resource",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|source|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition)$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|source|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|identities)$/",
           "group": "_@0"
         },
         {
@@ -1352,7 +1352,7 @@
     "csv-parse": "^5.4.0",
     "fast-json-patch": "^3.1.1",
     "lodash": "^4.17.21",
-    "sailpoint-api-client": "^1.3.0",
+    "sailpoint-api-client": "^1.3.3",
     "tmp": "^0.2.1"
   }
 }
