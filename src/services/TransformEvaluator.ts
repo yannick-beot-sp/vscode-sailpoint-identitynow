@@ -6,6 +6,7 @@ import { COUNTRYCODES } from '../models/CountryCodes';
 import { ISCClient } from './ISCClient';
 import { VALID_OPERATORS } from '../constants';
 import { TenantService } from './TenantService';
+import { normalizeNames } from './transforms';
 
 export class TransformEvaluator {
     private input: any;
@@ -1325,73 +1326,7 @@ export class TransformEvaluator {
     }
 
     async normalizeNames(attributes: any) {
-        console.log("------------------------------------------------------------------------------------------");
-        console.log("Entering method normalizeNames");
-        let result: string = 'undefined';
-
-        let searchPattern = new RegExp('(\\w+)(-|\\s|\')?', 'g');
-        let items: string[] = this.input.split(searchPattern);
-
-        let camelCaseWord;
-        let ignoreNext = false;
-
-        for (let item of items) {
-            if ((ignoreNext) && (items.indexOf(item) !== 0)) {
-                ignoreNext = false;
-                continue;
-            }
-
-            if ((item !== '') && (item !== undefined)) {
-                if (item !== ' ') {
-                    camelCaseWord = item[0].toUpperCase() + item.substring(1).toLowerCase();
-                } else {
-                    camelCaseWord = ' ';
-                }
-
-                if (camelCaseWord.toUpperCase().startsWith('MC')) {
-                    if (camelCaseWord.length === 2) {
-                        ignoreNext = true;
-                    } else {
-                        ignoreNext = false;
-                        camelCaseWord = camelCaseWord.substring(0, 2) + camelCaseWord.substring(2, 3).toUpperCase() + camelCaseWord.substring(3);
-                    }
-                } else if (camelCaseWord.toUpperCase().startsWith('MAC')) {
-                    if (camelCaseWord.length === 3) {
-                        ignoreNext = true;
-                    } else {
-                        ignoreNext = false;
-                        camelCaseWord = camelCaseWord.substring(0, 3) + camelCaseWord.substring(3, 4).toUpperCase() + camelCaseWord.substring(4);
-                    }
-                } else {
-                    ignoreNext = false;
-                }
-
-                if (result === 'undefined') {
-                    result = camelCaseWord;
-                } else {
-                    result += camelCaseWord;
-                }
-            }
-        }
-
-        let toponymcOrGenerational: string[] = ['VON', 'DEL', 'OF', 'DE', 'LA', 'Y'];
-
-        for (let item of toponymcOrGenerational) {
-            searchPattern = new RegExp(`\\b(?=\\w)${item}\\b(?<=\\w)`, 'gi');
-
-            if (result.match(searchPattern)) {
-                result = result.replace(searchPattern, item.toLowerCase());
-            }
-        }
-
-        searchPattern = new RegExp('\\s(?=[MDCLXVI])M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})\\s', 'gi');
-
-        if (result.match(searchPattern)) {
-            result = result.replace(searchPattern, x => x.toUpperCase());
-        }
-
-        console.log("Exiting normalizeNames. result=" + result);
-        return result;
+        return normalizeNames(this.input);
     }
 
     async lower(attributes: any) {

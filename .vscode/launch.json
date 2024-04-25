@@ -52,6 +52,7 @@
       "name": "Run current mocha test",
       "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
       "args": [
+        "--ui", "tdd",
         "-r",
         "ts-node/register",
         "--no-timeouts",
