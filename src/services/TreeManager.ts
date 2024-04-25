@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as commands from '../commands/constants';
 import { SourceTreeItem, TenantTreeItem } from "../models/ISCTreeItem";
-import { delay } from "../utils";
+import { delay, formatString } from "../utils";
 import { ISCDataProvider } from "../views/ISCDataProvider";
 import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { AggregationJob, ISCClient } from "./ISCClient";
@@ -68,6 +68,26 @@ export class TreeManager {
         return task
     }
 
+    private formatTask(task: TaskStatusBeta, objectName: string,
+        successMessage: string,
+        warningMessage: string,
+        errorMessage: string
+    ) {
+        if (task !== null) {
+            // XXX toUpperCase() required because of https://github.com/sailpoint-oss/api-specs/issues/70
+            if (task.completionStatus.toUpperCase() === TaskStatusBetaCompletionStatusEnum.Success.toUpperCase()) {
+                vscode.window.showInformationMessage(
+                    formatString(successMessage, objectName))
+            } else if (task.completionStatus === TaskStatusBetaCompletionStatusEnum.Warning) {
+                vscode.window.showWarningMessage(
+                    formatString(warningMessage, objectName, task.messages[0]?.key))
+            } else {
+                vscode.window.showErrorMessage(
+                    formatString(errorMessage, objectName, task.completionStatus, task.messages[0]?.key))
+            }
+        };
+    }
+
     public async resetEntitlements(item: SourceTreeItem, doConfirm = true): Promise<TaskStatusBeta | undefined> {
         console.log("> resetEntitlements", item)
         if (doConfirm && !(await confirm(`Are you sure you want to reset entitlements for ${item.label}?`))) {
@@ -83,19 +103,12 @@ export class TreeManager {
         }, async (progress, token) => {
             const job = await client.startEntitlementReset(item.id);
             const task = await this.waifForJob(client, job.id, token)
-            if (task !== null) {
-                // XXX toUpperCase() required because of https://github.com/sailpoint-oss/api-specs/issues/70
-                if (task.completionStatus.toUpperCase() === TaskStatusBetaCompletionStatusEnum.Success.toUpperCase()) {
-                    vscode.window.showInformationMessage(`Entitlements for ${item.label} successfully resetted`);
-                } else if (task.completionStatus === TaskStatusBetaCompletionStatusEnum.Warning) {
-                    vscode.window.showWarningMessage(
-                        `Warning during reset of ${item.label}: ${task.messages[0]?.key}`);
-                } else {
-                    vscode.window.showErrorMessage(
-                        `Reset of entitlements for ${item.label} failed: ${task.completionStatus}: ${task.messages[0]?.key}`);
-                }
-                return task
-            };
+            this.formatTask(task,
+                item.label as string,
+                "Entitlements for {0} successfully resetted",
+                "Warning during entitlement reset of {0}: {1}",
+                "Reset of entitlements for {0} failed: {1}: {2}"
+            )
             return undefined;
         });
     }
@@ -115,19 +128,12 @@ export class TreeManager {
         }, async (progress, token) => {
             const job = await client.startAccountReset(item.id);
             const task = await this.waifForJob(client, job.id, token)
-            if (task !== null) {
-                // XXX toUpperCase() required because of https://github.com/sailpoint-oss/api-specs/issues/70
-                if (task.completionStatus.toUpperCase() === TaskStatusBetaCompletionStatusEnum.Success.toUpperCase()) {
-                    vscode.window.showInformationMessage(`Accounts for ${item.label} successfully resetted`);
-                } else if (task.completionStatus === TaskStatusBetaCompletionStatusEnum.Warning) {
-                    vscode.window.showWarningMessage(
-                        `Warning during account reset of ${item.label}: ${task.messages[0]?.key}`);
-                } else {
-                    vscode.window.showErrorMessage(
-                        `Reset of accounts for ${item.label} failed: ${task.completionStatus}: ${task.messages[0]?.key}`);
-                }
-                return task;
-            };
+            this.formatTask(task,
+                item.label as string,
+                "Accounts for {0} successfully resetted",
+                "Warning during account reset of {0}: {1}",
+                "Reset of accounts for {0} failed: {1}: {2}"
+            )
             return undefined;
         });
     }
@@ -142,18 +148,12 @@ export class TreeManager {
         }, async (progress, token) => {
             const job = await client.startEntitlementAggregation(item.id);
             const task = await this.waifForJob(client, job.id, token)
-            if (task !== null) {
-                if (task.completionStatus === TaskStatusBetaCompletionStatusEnum.Success) {
-                    vscode.window.showInformationMessage(`Source entitlements ${item.label} successfully aggregated`);
-                } else if (task.completionStatus === TaskStatusBetaCompletionStatusEnum.Warning) {
-                    vscode.window.showWarningMessage(
-                        `Warning during aggregation of ${item.label}: ${task.messages[0]?.key}`);
-                } else {
-                    vscode.window.showErrorMessage(
-                        `Aggregation of entitlements for ${item.label} failed: ${task.completionStatus}: ${task.messages[0]?.key}`);
-                }
-            };
-
+            this.formatTask(task,
+                item.label as string,
+                "Source entitlements {0} successfully aggregated",
+                "Warning during aggregation of {0}: {1}",
+                "Aggregation of entitlements for {0} failed: {1}: {2}"
+            )
         });
 
     }
