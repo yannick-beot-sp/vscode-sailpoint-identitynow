@@ -10,7 +10,7 @@ import { deleteResource } from './commands/deleteResource';
 import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './commands/source/exportAccounts';
 import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from './commands/source/exportEntitlementDetails';
 import { ExportScriptFromRuleCommand } from './commands/rule/exportScriptFromRuleCommand';
-import { AccessProfileFilterCommand, RoleFilterCommand } from './commands/filterCommand';
+import { AccessProfileFilterCommand, RoleFilterCommand, IdentityDefinitionFilterCommand } from './commands/filterCommand';
 import { AccountImportNodeCommand } from './commands/source/importAccount';
 import { EntitlementDetailsImportNodeCommand } from './commands/source/importEntitlementDetails';
 import { UncorrelatedAccountImportNodeCommand } from './commands/source/importUncorrelatedAccount';
@@ -61,6 +61,7 @@ import { GenerateDigitTokenCommand } from './commands/tenant/generateDigitTokenC
 import { onErrorResponse, onRequest, onResponse } from './services/AxiosHandlers';
 import axios from 'axios';
 import { OpenScriptCommand } from './commands/rule/openScriptCommand';
+import { IdentityTreeViewCommand } from './commands/identity/IdentityTreeViewCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -135,22 +136,22 @@ export function activate(context: vscode.ExtensionContext) {
 			(tenantTreeItem) => treeManager.removeTenant(tenantTreeItem)));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.AGGREGATE,
-			(tenantTreeItem) => treeManager.aggregateSource(tenantTreeItem)));
+			(sourceTreeItem) => treeManager.aggregateSource(sourceTreeItem)));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.AGGREGATE_DISABLE_OPTIMIZATION,
-			(tenantTreeItem) => treeManager.aggregateSource(tenantTreeItem, true)));
+			(sourceTreeItem) => treeManager.aggregateSource(sourceTreeItem, true)));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.AGGREGATE_ENTITLEMENTS,
-			(tenantTreeItem) => treeManager.aggregateSource(tenantTreeItem, false, "entitlements")));
+			(sourceTreeItem) => treeManager.aggregateEntitlements(sourceTreeItem)));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.RESET_SOURCE,
-			(tenantTreeItem) => treeManager.resetSource(tenantTreeItem)));
+			(sourceTreeItem) => treeManager.resetSource(sourceTreeItem)));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.RESET_SOURCE_ACCOUNTS,
-			(tenantTreeItem) => treeManager.resetSource(tenantTreeItem, "entitlements")));
+			(sourceTreeItem) => treeManager.resetAccounts(sourceTreeItem)));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.RESET_SOURCE_ENTITLEMENTS,
-			(tenantTreeItem) => treeManager.resetSource(tenantTreeItem, "accounts")));
+			(tenantTreeItem) => treeManager.resetEntitlements(tenantTreeItem)));
 	const testConnectionCommand = new TestConnectionCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.TEST_SOURCE,
@@ -326,7 +327,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.VALIDATE_CONNECTOR_RULE,
 			newConnectorRuleCommand.validateScript, newConnectorRuleCommand));
-	
+
 	const openScriptCommand = new OpenScriptCommand()
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EDIT_CONNECTOR_RULE,
@@ -452,7 +453,28 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.NEW_SEARCH_ATTRIBUTE,
 			newAttributeSearchConfigCommand.execute, newAttributeSearchConfigCommand));
 
+	// Identity Definition Config
+	const newIdentityCommand = new IdentityTreeViewCommand()
+	const identityFilterCommand = new IdentityDefinitionFilterCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IDENTITIES_SEARCH,
+			identityFilterCommand.execute, identityFilterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IDENTITIES_ICON_SEARCH,
+			identityFilterCommand.execute, identityFilterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IDENTITIES_ATT_SYNC,
+			newIdentityCommand.attSyncIdentity, newIdentityCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IDENTITIES_DELETE,
+			newIdentityCommand.deleteIdentity, newIdentityCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IDENTITIES_PROCESS,
+			newIdentityCommand.processIdentity, newIdentityCommand));
 
+
+	// Add global interceptor for axios, to applied with the sailpoint SDK
+	// Add a request interceptor
 	axios.interceptors.request.use(onRequest)
 
 	// Add a response interceptor

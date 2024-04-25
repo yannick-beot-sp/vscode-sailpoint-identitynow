@@ -129,3 +129,20 @@ export function sanitizePath(input: string, options: undefined | { replacement?:
     const output = path.format(parts);
     return output
 };
+
+
+interface String {
+    format(...replacements: string[]): string;
+}
+
+/**
+ * cf. https://stackoverflow.com/a/20070599
+ */
+export function formatString(str: string, ...args) {
+    return str.replace(/{(\d+)}/g, (match, number) => {
+        return typeof args[number] !== 'undefined'
+            ? args[number]
+            : match
+            ;
+    });
+};

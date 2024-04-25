@@ -1,17 +1,15 @@
 import * as vscode from "vscode";
 import { EndpointUtils } from "../utils/EndpointUtils";
 import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
-import { withQuery } from "../utils/UriUtils";
 import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, Transform, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, Entitlement, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, ImportSpConfigRequestBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, ConnectorsBetaApi, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SODPolicyApi, SodPolicy, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementApi, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SODPolicyApi, SodPolicy, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskManagementBetaApi, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, AccountsBetaApi, TaskResultDtoBeta } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
 import { basename } from 'path';
 import { createReadStream } from 'fs';
-import { onErrorResponse, onRequest, onResponse } from "./AxiosHandlers";
 import { DEFAULT_ACCESSPROFILES_QUERY_PARAMS } from "../models/AccessProfiles";
 import { DEFAULT_ROLES_QUERY_PARAMS } from "../models/Roles";
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -25,6 +23,7 @@ export const TOTAL_COUNT_HEADER = "x-total-count";
 // Content types
 const CONTENT_TYPE_JSON = "application/json";
 const CONTENT_TYPE_FORM_URLENCODED = "application/x-www-form-urlencoded";
+const CONTENT_TYPE_FORM_DATA = "multipart/form-data";
 const CONTENT_TYPE_FORM_JSON_PATCH = "application/json-patch+json";
 
 
@@ -107,12 +106,6 @@ export class ISCClient {
 			}
 
 		});
-		instance.interceptors.request.use(
-			onRequest);
-		instance.interceptors.response.use(
-			onResponse,
-			onErrorResponse
-		);
 		return instance;
 	}
 
@@ -216,51 +209,60 @@ export class ISCClient {
 
 
 	public async startEntitlementAggregation(
-		sourceID: number,
-		types: string[] | null = null
-	): Promise<any> {
+		sourceID: string
+	): Promise<LoadEntitlementTaskBeta> {
 		console.log("> ISCClient.startEntitlementAggregation");
-
-		const httpClient = await this.getAxios();
-		let endpoint =
-			EndpointUtils.getCCUrl(this.tenantName) + `/source/loadEntitlements/${sourceID}`;
-
-		if (types !== null && types.length > 0) {
-			const objectTypes = types.join(",");
-			endpoint = withQuery(endpoint, { objectType: objectTypes });
-		}
+		/* https://github.com/sailpoint-oss/typescript-sdk/issues/36
+		const apiConfig = await this.getApiConfiguration();
+		const api = new EntitlementsBetaApi(apiConfig);
+		const response = await api.importEntitlements({
+			id: sourceID,
+			csvFile: null
+		})
+		return response.data
+		*/
+		const endpoint = `beta/entitlements/aggregate/sources/${sourceID}`;
 		console.log("endpoint = " + endpoint);
-		const response = await httpClient.post(endpoint);
+
+		const formData = new FormData();
+
+		const httpClient = await this.getAxios(CONTENT_TYPE_FORM_DATA);
+		const response = await httpClient.post(endpoint, formData);
 		return response.data;
 	}
 
+	public async startEntitlementReset(
+		sourceID: string
+	): Promise<EntitlementSourceResetBaseReferenceDtoBeta> {
+		console.log("> ISCClient.startEntitlementReset");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new EntitlementsBetaApi(apiConfig);
+		const response = await api.resetSourceEntitlements({
+			id: sourceID
+		})
+		return response.data
+	}
+
+	public async startAccountReset(
+		sourceID: string
+	): Promise<TaskResultDtoBeta> {
+		console.log("> ISCClient.startAccountReset");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AccountsBetaApi(apiConfig);
+		const response = await api.deleteAccountsAsync({
+			id: sourceID
+		})
+		return response.data
+	}
+
 	public async startAccountAggregation(
-		sourceID: number,
+		sourceID: string,
 		disableOptimization = false,
-		deleteThreshold: number | undefined = undefined,
 		filePath: string | undefined = undefined
 	): Promise<any> {
 		console.log("> ISCClient.startAccountAggregation");
-		/*
-				const apiConfig = await this.getApiConfiguration();
-				const api = new SourcesAggregationCCApi(apiConfig);
-				let requestParameter: SourcesAggregationCCApiLoadAccountsRequest;
-				if (disableOptimization) {
-					requestParameter = {
-						id: sourceID.toString(),
-						disableOptimization: disableOptimization
-					};
-				} else {
-					requestParameter = {
-						id: sourceID.toString()
-					};
-				}
-				const response = await api.loadAccounts(requestParameter);
-		
-				return response.data;
-		*/
 
-		const endpoint = `cc/api/source/loadAccounts/${sourceID}`;
+		const endpoint = `beta/sources/${sourceID}/load-accounts`;
 		console.log("endpoint = " + endpoint);
 
 		const formData = new FormData();
@@ -269,58 +271,28 @@ export class ISCClient {
 			formData.append("disableOptimization", "true");
 		}
 
-		if (deleteThreshold !== undefined) {
-			formData.append("update-delete-threshold-combobox-inputEl", `${deleteThreshold}%`);
-		}
-
 		if (filePath !== undefined) {
 			const blob = createReadStream(filePath);
 			formData.append('file', blob, basename(filePath));
 		}
 
-		const httpClient = await this.getAxios(CONTENT_TYPE_FORM_URLENCODED);
+		const httpClient = await this.getAxios(CONTENT_TYPE_FORM_DATA);
 		const response = await httpClient.post(endpoint, formData);
 		return response.data;
+	
 	}
 
-	public async resetSource(sourceID: number, skip: string | null = null): Promise<any> {
-		console.log('> ISCClient.resetSource', sourceID);
-		let endpoint = EndpointUtils.getCCUrl(this.tenantName) + `/source/reset/${sourceID}`;
-		if (!!skip) {
-			endpoint += "?skip=" + skip;
-		}
-		console.log("resetSource: endpoint = " + endpoint);
-		const httpClient = await this.getAxios(CONTENT_TYPE_FORM_URLENCODED);
-		const response = await httpClient.post(endpoint);
+	public async getTaskStatus(
+		taskId: string,
+	): Promise<TaskStatusBeta> {
+		console.log("> getTaskStatus", taskId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new TaskManagementBetaApi(apiConfig);
+		const response = await api.getTaskStatus({
+			id: taskId
+		})
 		return response.data;
 	}
-
-	public async getAggregationJob(
-		sourceID: number,
-		taskId: string,
-		jobType = AggregationJob.CLOUD_ACCOUNT_AGGREGATION
-	): Promise<any> {
-		console.log("> getAggregationJob", sourceID, taskId, jobType);
-		const httpClient = await this.getAxios();
-		let endpoint = EndpointUtils.getCCUrl(this.tenantName) + "/event/list";
-		const queryParams = {
-			page: 1,
-			start: 0,
-			limit: 3,
-			sort: '[{"property":"timestamp","direction":"DESC"}]',
-			filter: `[{"property":"type","value":"${AggregationJob[jobType]}"},{"property":"objectType","value":"source"},{"property":"objectId","value":"${sourceID}"}]`,
-		};
-		endpoint = withQuery(endpoint, queryParams);
-		console.log("getAggregationJob: endpoint =", endpoint);
-		const response = await httpClient.get(endpoint);
-		const tasks: any = response.data;
-		if (tasks && tasks.items && tasks.items instanceof Array) {
-			return tasks.items.find(task => task.details.id === taskId);
-		}
-
-		return undefined;
-	}
-
 
 	////////////////////////
 	//#endregion Sources
@@ -575,6 +547,25 @@ export class ISCClient {
 			},
 			sort: ["name"],
 			includeNested: includeNested,
+			queryResultFilter: {
+				includes: fields
+			}
+		};
+
+		return await this.paginatedSearch(search, limit, offset, count);
+	}
+	public async paginatedSearchIdentities(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"], includeNested = false): Promise<AxiosResponse<IdentityDocument[]>> {
+		console.log("> paginatedSearchIdentities", query);
+
+		const search: Search = {
+			indices: [
+				"identities"
+			],
+			query: {
+				query: query
+			},
+			sort: ["name"],
+			includeNested,
 			queryResultFilter: {
 				includes: fields
 			}
@@ -1544,13 +1535,57 @@ export class ISCClient {
 	/////////////////////////
 	//#endregion Password Management
 	/////////////////////////
-}
 
-export enum AggregationJob {
-	// eslint-disable-next-line @typescript-eslint/naming-convention
-	CLOUD_ACCOUNT_AGGREGATION,
-	// eslint-disable-next-line @typescript-eslint/naming-convention
-	ENTITLEMENT_AGGREGATION,
-	// eslint-disable-next-line @typescript-eslint/naming-convention
-	SOURCE_RESET,
+	////////////////////////
+	//#region Identity Management
+	////////////////////////
+
+	public async listIdentities(identityFilter: IdentitiesBetaApiListIdentitiesRequest): Promise<AxiosResponse<IdentityBeta[]>> {
+		console.log("> listIdentities");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new IdentitiesBetaApi(apiConfig);
+		const result = await api.listIdentities(identityFilter);
+		return result;
+	}
+
+	public async processIdentity(identityId: string): Promise<AxiosResponse<TaskResultResponseBeta, any>> {
+		console.log("> processIdentity");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new IdentitiesBetaApi(apiConfig);
+		const requestParameters = {
+			processIdentitiesRequestBeta:
+			{
+				identityIds: [identityId]
+			}
+		};
+		return await api.startIdentityProcessing(requestParameters);
+	}
+
+	public async syncIdentityAttributes(identityId: string): Promise<AxiosResponse<IdentitySyncJobBeta, any>> {
+		console.log("> syncIdentityAttributes");
+
+		const apiConfig = await this.getApiConfiguration();
+		const api = new IdentitiesBetaApi(apiConfig);
+
+		//IdentitiesBetaApiSynchronizeAttributesForIdentityRequest
+		return await api.synchronizeAttributesForIdentity(
+			{
+				identityId: identityId
+			});
+	}
+
+	public async deleteIdentity(identityId: string): Promise<void> {
+		console.log("> deleteIdentity");
+
+		const apiConfig = await this.getApiConfiguration();
+		const api = new IdentitiesBetaApi(apiConfig);
+
+		await api.deleteIdentity({
+			id: identityId
+		});
+	}
+
+	////////////////////////
+	//#endregion Identity Management
+	////////////////////////
 }
