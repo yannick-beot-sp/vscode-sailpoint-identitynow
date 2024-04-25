@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
 import { EndpointUtils } from "../utils/EndpointUtils";
 import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
-import { withQuery } from "../utils/UriUtils";
 import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
@@ -11,7 +10,6 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
 import { basename } from 'path';
 import { createReadStream } from 'fs';
-import { onErrorResponse, onRequest, onResponse } from "./AxiosHandlers";
 import { DEFAULT_ACCESSPROFILES_QUERY_PARAMS } from "../models/AccessProfiles";
 import { DEFAULT_ROLES_QUERY_PARAMS } from "../models/Roles";
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -284,18 +282,6 @@ export class ISCClient {
 	
 	}
 
-	public async resetSource(sourceID: number, skip: string | null = null): Promise<any> {
-		console.log('> ISCClient.resetSource', sourceID);
-		let endpoint = EndpointUtils.getCCUrl(this.tenantName) + `/source/reset/${sourceID}`;
-		if (!!skip) {
-			endpoint += "?skip=" + skip;
-		}
-		console.log("resetSource: endpoint = " + endpoint);
-		const httpClient = await this.getAxios(CONTENT_TYPE_FORM_URLENCODED);
-		const response = await httpClient.post(endpoint);
-		return response.data;
-	}
-
 	public async getTaskStatus(
 		taskId: string,
 	): Promise<TaskStatusBeta> {
@@ -307,33 +293,6 @@ export class ISCClient {
 		})
 		return response.data;
 	}
-
-	public async getAggregationJob(
-		sourceID: number,
-		taskId: string,
-		jobType = AggregationJob.CLOUD_ACCOUNT_AGGREGATION
-	): Promise<any> {
-		console.log("> getAggregationJob", sourceID, taskId, jobType);
-		const httpClient = await this.getAxios();
-		let endpoint = EndpointUtils.getCCUrl(this.tenantName) + "/event/list";
-		const queryParams = {
-			page: 1,
-			start: 0,
-			limit: 3,
-			sort: '[{"property":"timestamp","direction":"DESC"}]',
-			filter: `[{"property":"type","value":"${AggregationJob[jobType]}"},{"property":"objectType","value":"source"},{"property":"objectId","value":"${sourceID}"}]`,
-		};
-		endpoint = withQuery(endpoint, queryParams);
-		console.log("getAggregationJob: endpoint =", endpoint);
-		const response = await httpClient.get(endpoint);
-		const tasks: any = response.data;
-		if (tasks && tasks.items && tasks.items instanceof Array) {
-			return tasks.items.find(task => task.details.id === taskId);
-		}
-
-		return undefined;
-	}
-
 
 	////////////////////////
 	//#endregion Sources
@@ -1629,13 +1588,4 @@ export class ISCClient {
 	////////////////////////
 	//#endregion Identity Management
 	////////////////////////
-}
-
-export enum AggregationJob {
-	// eslint-disable-next-line @typescript-eslint/naming-convention
-	CLOUD_ACCOUNT_AGGREGATION,
-	// eslint-disable-next-line @typescript-eslint/naming-convention
-	ENTITLEMENT_AGGREGATION,
-	// eslint-disable-next-line @typescript-eslint/naming-convention
-	SOURCE_RESET,
 }

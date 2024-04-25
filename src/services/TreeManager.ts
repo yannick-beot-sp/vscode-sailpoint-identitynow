@@ -1,14 +1,14 @@
 import * as vscode from 'vscode';
 import * as commands from '../commands/constants';
 import { SourceTreeItem, TenantTreeItem } from "../models/ISCTreeItem";
-import { delay, formatString } from "../utils";
 import { ISCDataProvider } from "../views/ISCDataProvider";
 import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
-import { AggregationJob, ISCClient } from "./ISCClient";
+import { ISCClient } from "./ISCClient";
 import { TenantService } from "./TenantService";
 import { TransformEvaluator } from './TransformEvaluator';
 import { TaskStatusBeta, TaskStatusBetaCompletionStatusEnum } from 'sailpoint-api-client';
 import { confirm } from '../utils/vsCodeHelpers';
+import { formatTask, waifForJob } from '../commands/source/sourceUtils';
 
 export class TreeManager {
 
@@ -49,45 +49,6 @@ export class TreeManager {
         vscode.window.showInformationMessage(`Successfully deleted tenant ${tenantName}`);
     }
 
-    private async waifForJob(client: ISCClient, taskId: string, token: vscode.CancellationToken): Promise<TaskStatusBeta | null> {
-        console.log("> waifForJob", taskId);
-        let task: TaskStatusBeta | null = null;
-        do {
-            if (token.isCancellationRequested) {
-                return null
-            }
-            await delay(1000);
-            if (token.isCancellationRequested) {
-                return null
-            }
-            task = await client.getTaskStatus(taskId);
-            console.log("task =", task);
-
-        } while (task.completionStatus === null)
-
-        return task
-    }
-
-    private formatTask(task: TaskStatusBeta, objectName: string,
-        successMessage: string,
-        warningMessage: string,
-        errorMessage: string
-    ) {
-        if (task !== null) {
-            // XXX toUpperCase() required because of https://github.com/sailpoint-oss/api-specs/issues/70
-            if (task.completionStatus.toUpperCase() === TaskStatusBetaCompletionStatusEnum.Success.toUpperCase()) {
-                vscode.window.showInformationMessage(
-                    formatString(successMessage, objectName))
-            } else if (task.completionStatus === TaskStatusBetaCompletionStatusEnum.Warning) {
-                vscode.window.showWarningMessage(
-                    formatString(warningMessage, objectName, task.messages[0]?.key))
-            } else {
-                vscode.window.showErrorMessage(
-                    formatString(errorMessage, objectName, task.completionStatus, task.messages[0]?.key))
-            }
-        };
-    }
-
     public async resetEntitlements(item: SourceTreeItem, doConfirm = true): Promise<TaskStatusBeta | undefined> {
         console.log("> resetEntitlements", item)
         if (doConfirm && !(await confirm(`Are you sure you want to reset entitlements for ${item.label}?`))) {
@@ -102,8 +63,8 @@ export class TreeManager {
             cancellable: true
         }, async (progress, token) => {
             const job = await client.startEntitlementReset(item.id);
-            const task = await this.waifForJob(client, job.id, token)
-            this.formatTask(task,
+            const task = await waifForJob(client, job.id, token)
+            formatTask(task,
                 item.label as string,
                 "Entitlements for {0} successfully resetted",
                 "Warning during entitlement reset of {0}: {1}",
@@ -127,8 +88,8 @@ export class TreeManager {
             cancellable: true
         }, async (progress, token) => {
             const job = await client.startAccountReset(item.id);
-            const task = await this.waifForJob(client, job.id, token)
-            this.formatTask(task,
+            const task = await waifForJob(client, job.id, token)
+            formatTask(task,
                 item.label as string,
                 "Accounts for {0} successfully resetted",
                 "Warning during account reset of {0}: {1}",
@@ -147,8 +108,8 @@ export class TreeManager {
             cancellable: true
         }, async (progress, token) => {
             const job = await client.startEntitlementAggregation(item.id);
-            const task = await this.waifForJob(client, job.id, token)
-            this.formatTask(task,
+            const task = await waifForJob(client, job.id, token)
+            formatTask(task,
                 item.label as string,
                 "Source entitlements {0} successfully aggregated",
                 "Warning during aggregation of {0}: {1}",
@@ -169,8 +130,8 @@ export class TreeManager {
 
 
             const job = await client.startAccountAggregation(item.id!, disableOptimization)
-            const task = await this.waifForJob(client, job.task.id, token)
-            this.formatTask(task,
+            const task = await waifForJob(client, job.task.id, token)
+            formatTask(task,
                 item.label as string,
                 "Source {0} successfully aggregated",
                 "Warning during aggregation of {0}: {1}",

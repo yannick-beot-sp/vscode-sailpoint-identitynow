@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
 import { SourceTreeItem } from "../../models/ISCTreeItem";
-import { AggregationJob, ISCClient } from '../../services/ISCClient';
+import { ISCClient } from '../../services/ISCClient';
 import { delay } from '../../utils';
 import { chooseFile } from '../../utils/vsCodeHelpers';
+import { formatTask, waifForJob } from './sourceUtils';
 
 class AccountImporter {
     readonly client: ISCClient;
@@ -12,7 +13,6 @@ class AccountImporter {
         private tenantDisplayName: string,
         private sourceName: string,
         private sourceId: string,
-        private sourceCCId: number,
         private fileUri: vscode.Uri
     ) {
         this.client = new ISCClient(this.tenantId, this.tenantName);
@@ -23,44 +23,28 @@ class AccountImporter {
             location: vscode.ProgressLocation.Notification,
             title: `Importing accounts to ${this.sourceName}...`,
             cancellable: false
-        }, async (task, token) =>
-            await this.importFile(task, token)
+        }, async (progress, token) =>
+            await this.importFile(progress, token)
         );
-        //     .then(async () => {
-        //         vscode.window.showInformationMessage(
-        //             `Successfully imported accounts to ${this.sourceName}`
-        //         );
-        //     });
     }
 
-    protected async importFile(task: any, token: vscode.CancellationToken): Promise<void> {
+    protected async importFile(progress: any, token: vscode.CancellationToken): Promise<void> {
         console.log("> AccountImporter.importFile");
 
-        let job = await this.client.startAccountAggregation(
+        const job = await this.client.startAccountAggregation(
             this.sourceId,
             false,
             this.fileUri.fsPath
         );
 
         console.log("job =", job);
-        
-        do {
-            await delay(5000);
-            job = await this.client.getAggregationJob(this.sourceCCId, job.task.id, AggregationJob.CLOUD_ACCOUNT_AGGREGATION);
-            console.log("job =", job);
-
-        } while (job !== undefined && job.status === "PENDING");
-        if (job !== undefined) {
-            if (job.status === "SUCCESS") {
-                vscode.window.showInformationMessage(`Source ${job.object.displayName} successfully aggregated`);
-            } else if (job.status === "WARNING") {
-                vscode.window.showWarningMessage(
-                    `Warning during aggregation of ${job.object.displayName}: ${job.details?.messages?.Warn}`);
-            } else {
-                vscode.window.showErrorMessage(
-                    `Aggregation of ${job.object.displayName} failed: ${job.status}: ${job.details?.messages?.Error}`);
-            }
-        };
+        const task = await waifForJob(this.client, job.task.id, token)
+        formatTask(task,
+            this.sourceName,
+            "Import successful to {0}",
+            "Warning during import of {0}: {1}",
+            "{1}: Import for {0} failed: {2}"
+        )
     }
 }
 
@@ -77,7 +61,7 @@ export class AccountImportNodeCommand {
         }
 
         const fileUri = await chooseFile('CSV files', 'csv');
-        if (fileUri === undefined ) { return; }
+        if (fileUri === undefined) { return; }
 
         const accountImporter = new AccountImporter(
             node.tenantId,
@@ -85,7 +69,6 @@ export class AccountImportNodeCommand {
             node.tenantDisplayName,
             node.label as string,
             node.id as string,
-            node.ccId,
             fileUri
         );
         await accountImporter.importFileWithProgression();

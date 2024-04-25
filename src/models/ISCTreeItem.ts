@@ -132,7 +132,6 @@ export class SourcesTreeItem extends FolderTreeItem {
 					this.tenantDisplayName,
 					source.name,
 					source.id,
-					source.connectorAttributes["cloudExternalId"],
 					source.type,
 					source.connectorAttributes["delimiter"],
 				));
@@ -159,7 +158,6 @@ export class IdentityProfilesTreeItem extends FolderTreeItem {
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
-		const results: BaseTreeItem[] = [];
 		const client = new ISCClient(this.tenantId, this.tenantName);
 		let identityProfiles = await client.getIdentityProfiles();
 		if (this.criteria === IdentityProfileSorting.name) {
@@ -266,7 +264,6 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 		tenantDisplayName: string,
 		label: string,
 		id: string,
-		public readonly ccId: number,
 		public readonly type: string,
 		public readonly delimiter: string,
 	) {

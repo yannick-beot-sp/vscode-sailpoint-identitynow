@@ -24,7 +24,6 @@ class UncorrelatedAccountImporter {
         private tenantDisplayName: string,
         private sourceName: string,
         private sourceId: string,
-        private sourceCCId: number,
         private fileUri: vscode.Uri
     ) {
         this.client = new ISCClient(this.tenantId, this.tenantName);
@@ -147,7 +146,6 @@ export class UncorrelatedAccountImportNodeCommand {
             node.tenantDisplayName,
             node.label as string,
             node.id as string,
-            node.ccId,
             fileUri
         );
         await accountImporter.importFileWithProgression();

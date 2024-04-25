@@ -27,9 +27,4 @@ export class EndpointUtils {
         const baseApiUrl = this.getBaseUrl(tenantName);
         return baseApiUrl + '/beta';
     }
-
-    public static getCCUrl(tenantName: string): string {
-        const baseApiUrl = this.getBaseUrl(tenantName);
-        return baseApiUrl + '/cc/api';
-    }
 }
