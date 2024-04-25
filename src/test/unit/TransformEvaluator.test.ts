@@ -10,11 +10,13 @@ suite('Transforms Test Suite', () => {
 			{ args: "o'sullivan", expected: "O'Sullivan" },
 			{ args: 'mac donalds', expected: 'Mac Donalds' },
 			{ args: 'macdonalds', expected: 'MacDonalds' },
-			{ args: 'mc-donalds', expected: 'Mc-donalds' }, 
-			{ args: 'mcdonalds', expected: 'McDonalds' }, 
+			{ args: 'mc-donalds', expected: 'Mc-donalds' },
+			{ args: 'mcdonalds', expected: 'McDonalds' },
+			{ args: 'jOHN VON SmITh', expected: 'John von Smith' },
+			{ args: "Dr. JOHN D. O'BRIEN", expected: "Dr. John D. O'Brien" },
 		];
 		tests.forEach(({ args, expected }) => {
-			it(`should correctly return ${args}`, () => {
+			it(`should correctly normalize ${args}`, () => {
 				const humanReadableString = normalizeNames(args);
 				assert.strictEqual(humanReadableString, expected);
 			});
