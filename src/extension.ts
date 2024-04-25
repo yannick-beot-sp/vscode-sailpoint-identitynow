@@ -327,7 +327,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.VALIDATE_CONNECTOR_RULE,
 			newConnectorRuleCommand.validateScript, newConnectorRuleCommand));
-	
+
 	const openScriptCommand = new OpenScriptCommand()
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EDIT_CONNECTOR_RULE,
@@ -464,15 +464,17 @@ export function activate(context: vscode.ExtensionContext) {
 			identityFilterCommand.execute, identityFilterCommand));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IDENTITIES_ATT_SYNC,
-			newIdentityCommand.attSyncIdentity, newIdentityCommand));	
+			newIdentityCommand.attSyncIdentity, newIdentityCommand));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IDENTITIES_DELETE,
-			newIdentityCommand.deleteIdentity, newIdentityCommand));	
+			newIdentityCommand.deleteIdentity, newIdentityCommand));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IDENTITIES_PROCESS,
-			newIdentityCommand.processIdentity, newIdentityCommand));	
+			newIdentityCommand.processIdentity, newIdentityCommand));
 
 
+	// Add global interceptor for axios, to applied with the sailpoint SDK
+	// Add a request interceptor
 	axios.interceptors.request.use(onRequest)
 
 	// Add a response interceptor

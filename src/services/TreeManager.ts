@@ -121,7 +121,7 @@ export class TreeManager {
 
         const client = new ISCClient(item.tenantId, item.tenantName);
 
-        await vscode.window.withProgress({
+        return await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Resetting accounts from ${item.label}`,
             cancellable: true
@@ -134,7 +134,7 @@ export class TreeManager {
                 "Warning during account reset of {0}: {1}",
                 "Reset of accounts for {0} failed: {1}: {2}"
             )
-            return undefined;
+            return task;
         });
     }
 
@@ -155,51 +155,27 @@ export class TreeManager {
                 "Aggregation of entitlements for {0} failed: {1}: {2}"
             )
         });
-
     }
 
-    public async aggregateSource(item: SourceTreeItem, disableOptimization = false, type = "accounts"): Promise<void> {
+    public async aggregateSource(item: SourceTreeItem, disableOptimization = false): Promise<void> {
         console.log("> aggregateSource", item, disableOptimization);
-        // assessing that item is a SourceTreeItem
-        if (item === undefined || !(item instanceof SourceTreeItem)) {
-            console.log("WARNING: aggregateSource: invalid item", item);
-            throw new Error("aggregateSource: invalid item");
-        }
+
         const client = new ISCClient(item.tenantId, item.tenantName);
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
-            title: `Aggregation of ${type} from ${item.label}`,
-            cancellable: false
+            title: `Aggregation accounts from ${item.label}`,
+            cancellable: true
         }, async (progress, token) => {
-            let job: any;
-            let jobType: AggregationJob;
-            if ("accounts" === type) {
 
-                job = await client.startAccountAggregation(item.ccId, disableOptimization)
-                    .catch(error => {
-                        console.error(error);
-                    });
-                jobType = AggregationJob.CLOUD_ACCOUNT_AGGREGATION;
-            }
-            console.log("job =", job);
-            let task: any | null = null;
-            do {
-                await delay(5000);
-                task = await client.getAggregationJob(item.ccId, job.task.id, jobType);
-                console.log("task =", task);
 
-            } while (task !== undefined && task.status === "PENDING");
-            if (task !== undefined) {
-                if (task.status === "SUCCESS") {
-                    vscode.window.showInformationMessage(`Source ${task.object.displayName} successfully aggregated`);
-                } else if (task.status === "WARNING") {
-                    vscode.window.showWarningMessage(
-                        `Warning during aggregation of ${task.object.displayName}: ${task.details?.messages?.Warn}`);
-                } else {
-                    vscode.window.showErrorMessage(
-                        `Aggregation of ${task.object.displayName} failed: ${task.status}: ${task.details?.messages?.Error}`);
-                }
-            };
+            const job = await client.startAccountAggregation(item.id!, disableOptimization)
+            const task = await this.waifForJob(client, job.task.id, token)
+            this.formatTask(task,
+                item.label as string,
+                "Source {0} successfully aggregated",
+                "Warning during aggregation of {0}: {1}",
+                "Aggregation of {0} failed: {1}: {2}"
+            )
         });
     }
 

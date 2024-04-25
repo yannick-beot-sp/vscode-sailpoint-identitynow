@@ -35,12 +35,10 @@ class AccountImporter {
 
     protected async importFile(task: any, token: vscode.CancellationToken): Promise<void> {
         console.log("> AccountImporter.importFile");
-        const source = await this.client.getSourceById(this.sourceId);
 
         let job = await this.client.startAccountAggregation(
-            this.sourceCCId,
+            this.sourceId,
             false,
-            source.connectorAttributes["deleteThresholdPercentage"],
             this.fileUri.fsPath
         );
 

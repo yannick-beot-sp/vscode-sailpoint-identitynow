@@ -25,6 +25,7 @@ export const TOTAL_COUNT_HEADER = "x-total-count";
 // Content types
 const CONTENT_TYPE_JSON = "application/json";
 const CONTENT_TYPE_FORM_URLENCODED = "application/x-www-form-urlencoded";
+const CONTENT_TYPE_FORM_DATA = "multipart/form-data";
 const CONTENT_TYPE_FORM_JSON_PATCH = "application/json-patch+json";
 
 
@@ -107,12 +108,6 @@ export class ISCClient {
 			}
 
 		});
-		instance.interceptors.request.use(
-			onRequest);
-		instance.interceptors.response.use(
-			onResponse,
-			onErrorResponse
-		);
 		return instance;
 	}
 
@@ -219,6 +214,7 @@ export class ISCClient {
 		sourceID: string
 	): Promise<LoadEntitlementTaskBeta> {
 		console.log("> ISCClient.startEntitlementAggregation");
+		/* https://github.com/sailpoint-oss/typescript-sdk/issues/36
 		const apiConfig = await this.getApiConfiguration();
 		const api = new EntitlementsBetaApi(apiConfig);
 		const response = await api.importEntitlements({
@@ -226,6 +222,15 @@ export class ISCClient {
 			csvFile: null
 		})
 		return response.data
+		*/
+		const endpoint = `beta/entitlements/aggregate/sources/${sourceID}`;
+		console.log("endpoint = " + endpoint);
+
+		const formData = new FormData();
+
+		const httpClient = await this.getAxios(CONTENT_TYPE_FORM_DATA);
+		const response = await httpClient.post(endpoint, formData);
+		return response.data;
 	}
 
 	public async startEntitlementReset(
@@ -253,32 +258,13 @@ export class ISCClient {
 	}
 
 	public async startAccountAggregation(
-		sourceID: number,
+		sourceID: string,
 		disableOptimization = false,
-		deleteThreshold: number | undefined = undefined,
 		filePath: string | undefined = undefined
 	): Promise<any> {
 		console.log("> ISCClient.startAccountAggregation");
-		/*
-				const apiConfig = await this.getApiConfiguration();
-				const api = new SourcesAggregationCCApi(apiConfig);
-				let requestParameter: SourcesAggregationCCApiLoadAccountsRequest;
-				if (disableOptimization) {
-					requestParameter = {
-						id: sourceID.toString(),
-						disableOptimization: disableOptimization
-					};
-				} else {
-					requestParameter = {
-						id: sourceID.toString()
-					};
-				}
-				const response = await api.loadAccounts(requestParameter);
-		
-				return response.data;
-		*/
 
-		const endpoint = `cc/api/source/loadAccounts/${sourceID}`;
+		const endpoint = `beta/sources/${sourceID}/load-accounts`;
 		console.log("endpoint = " + endpoint);
 
 		const formData = new FormData();
@@ -287,18 +273,15 @@ export class ISCClient {
 			formData.append("disableOptimization", "true");
 		}
 
-		if (deleteThreshold !== undefined) {
-			formData.append("update-delete-threshold-combobox-inputEl", `${deleteThreshold}%`);
-		}
-
 		if (filePath !== undefined) {
 			const blob = createReadStream(filePath);
 			formData.append('file', blob, basename(filePath));
 		}
 
-		const httpClient = await this.getAxios(CONTENT_TYPE_FORM_URLENCODED);
+		const httpClient = await this.getAxios(CONTENT_TYPE_FORM_DATA);
 		const response = await httpClient.post(endpoint, formData);
 		return response.data;
+	
 	}
 
 	public async resetSource(sourceID: number, skip: string | null = null): Promise<any> {
