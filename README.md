@@ -302,6 +302,7 @@ The patterns defined above use the following tokens:
 
 ## Release Notes
 
+- Update for source aggregation and reset to leverage beta endpoints instead of CC endpoints
 - Add searching and viewing identities by [@henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#74](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/74))
 - Add attribute sync, process and delete command on identities by [@henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#74](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/74))
 
