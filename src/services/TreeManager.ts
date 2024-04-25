@@ -7,6 +7,8 @@ import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { AggregationJob, ISCClient } from "./ISCClient";
 import { TenantService } from "./TenantService";
 import { TransformEvaluator } from './TransformEvaluator';
+import { TaskStatusBeta, TaskStatusBetaCompletionStatusEnum } from 'sailpoint-api-client';
+import { confirm } from '../utils/vsCodeHelpers';
 
 export class TreeManager {
 
@@ -47,6 +49,115 @@ export class TreeManager {
         vscode.window.showInformationMessage(`Successfully deleted tenant ${tenantName}`);
     }
 
+    private async waifForJob(client: ISCClient, taskId: string, token: vscode.CancellationToken): Promise<TaskStatusBeta | null> {
+        console.log("> waifForJob", taskId);
+        let task: TaskStatusBeta | null = null;
+        do {
+            if (token.isCancellationRequested) {
+                return null
+            }
+            await delay(1000);
+            if (token.isCancellationRequested) {
+                return null
+            }
+            task = await client.getTaskStatus(taskId);
+            console.log("task =", task);
+
+        } while (task.completionStatus === null)
+
+        return task
+    }
+
+    public async resetEntitlements(item: SourceTreeItem, doConfirm = true): Promise<TaskStatusBeta | undefined> {
+        console.log("> resetEntitlements", item)
+        if (doConfirm && !(await confirm(`Are you sure you want to reset entitlements for ${item.label}?`))) {
+            return
+        }
+
+        const client = new ISCClient(item.tenantId, item.tenantName);
+
+        await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: `Resetting entitlements from ${item.label}`,
+            cancellable: true
+        }, async (progress, token) => {
+            const job = await client.startEntitlementReset(item.id);
+            const task = await this.waifForJob(client, job.id, token)
+            if (task !== null) {
+                // XXX toUpperCase() required because of https://github.com/sailpoint-oss/api-specs/issues/70
+                if (task.completionStatus.toUpperCase() === TaskStatusBetaCompletionStatusEnum.Success.toUpperCase()) {
+                    vscode.window.showInformationMessage(`Entitlements for ${item.label} successfully resetted`);
+                } else if (task.completionStatus === TaskStatusBetaCompletionStatusEnum.Warning) {
+                    vscode.window.showWarningMessage(
+                        `Warning during reset of ${item.label}: ${task.messages[0]?.key}`);
+                } else {
+                    vscode.window.showErrorMessage(
+                        `Reset of entitlements for ${item.label} failed: ${task.completionStatus}: ${task.messages[0]?.key}`);
+                }
+                return task
+            };
+            return undefined;
+        });
+    }
+
+    public async resetAccounts(item: SourceTreeItem, doConfirm = true): Promise<TaskStatusBeta | undefined> {
+        console.log("> resetAccounts", item)
+        if (doConfirm && !(await confirm(`Are you sure you want to reset accounts for ${item.label}?`))) {
+            return
+        }
+
+        const client = new ISCClient(item.tenantId, item.tenantName);
+
+        await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: `Resetting accounts from ${item.label}`,
+            cancellable: true
+        }, async (progress, token) => {
+            const job = await client.startAccountReset(item.id);
+            const task = await this.waifForJob(client, job.id, token)
+            if (task !== null) {
+                // XXX toUpperCase() required because of https://github.com/sailpoint-oss/api-specs/issues/70
+                if (task.completionStatus.toUpperCase() === TaskStatusBetaCompletionStatusEnum.Success.toUpperCase()) {
+                    vscode.window.showInformationMessage(`Accounts for ${item.label} successfully resetted`);
+                } else if (task.completionStatus === TaskStatusBetaCompletionStatusEnum.Warning) {
+                    vscode.window.showWarningMessage(
+                        `Warning during account reset of ${item.label}: ${task.messages[0]?.key}`);
+                } else {
+                    vscode.window.showErrorMessage(
+                        `Reset of accounts for ${item.label} failed: ${task.completionStatus}: ${task.messages[0]?.key}`);
+                }
+                return task;
+            };
+            return undefined;
+        });
+    }
+
+    public async aggregateEntitlements(item: SourceTreeItem): Promise<void> {
+        console.log("> aggregateEntitlements", item)
+        const client = new ISCClient(item.tenantId, item.tenantName);
+        await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: `Aggregation entitlements from ${item.label}`,
+            cancellable: true
+        }, async (progress, token) => {
+            const job = await client.startEntitlementAggregation(item.id);
+            const task = await this.waifForJob(client, job.id, token)
+            if (task !== null) {
+                if (task.completionStatus === TaskStatusBetaCompletionStatusEnum.Success) {
+                    vscode.window.showInformationMessage(`Source entitlements ${item.label} successfully aggregated`);
+                } else if (task.completionStatus === TaskStatusBetaCompletionStatusEnum.Warning) {
+                    vscode.window.showWarningMessage(
+                        `Warning during aggregation of ${item.label}: ${task.messages[0]?.key}`);
+                } else {
+                    vscode.window.showErrorMessage(
+                        `Aggregation of entitlements for ${item.label} failed: ${task.completionStatus}: ${task.messages[0]?.key}`);
+                }
+            };
+
+        });
+
+    }
+
     public async aggregateSource(item: SourceTreeItem, disableOptimization = false, type = "accounts"): Promise<void> {
         console.log("> aggregateSource", item, disableOptimization);
         // assessing that item is a SourceTreeItem
@@ -55,23 +166,20 @@ export class TreeManager {
             throw new Error("aggregateSource: invalid item");
         }
         const client = new ISCClient(item.tenantId, item.tenantName);
-        vscode.window.withProgress({
+        await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Aggregation of ${type} from ${item.label}`,
             cancellable: false
         }, async (progress, token) => {
             let job: any;
             let jobType: AggregationJob;
-            if ("accounts"=== type) {
+            if ("accounts" === type) {
 
                 job = await client.startAccountAggregation(item.ccId, disableOptimization)
-                    .catch(error=>{
+                    .catch(error => {
                         console.error(error);
                     });
                 jobType = AggregationJob.CLOUD_ACCOUNT_AGGREGATION;
-            } else {
-                job = await client.startEntitlementAggregation(item.ccId);
-                jobType = AggregationJob.ENTITLEMENT_AGGREGATION;
             }
             console.log("job =", job);
             let task: any | null = null;
@@ -95,67 +203,20 @@ export class TreeManager {
         });
     }
 
-
-    public async resetSource(item: SourceTreeItem, skip: string | null = null): Promise<void> {
+    public async resetSource(item: SourceTreeItem): Promise<void> {
         console.log("> resetSource", item);
-        // assessing that item is a SourceTreeItem
-        if (item === undefined || !(item instanceof SourceTreeItem)) {
-            console.log("WARNING: resetSource: invalid item", item);
-            throw new Error("aggregateSource: invalid item");
+        if (!(await confirm(`Are you sure you want to reset the source ${item.label}?`))) {
+            return
         }
-        let skipping = "";
-        if (!!skip) {
-            skipping = ` skipping ${skip}`;
+        const task = await this.resetAccounts(item, false)
+        if (task?.completionStatus.toUpperCase() === TaskStatusBetaCompletionStatusEnum.Success.toUpperCase()) {
+            await this.resetEntitlements(item, false)
         }
-        const response = await vscode.window.showWarningMessage(
-            `Are you sure you want to reset ${item.label}${skipping}?`,
-            { modal: true },
-            ...["Yes", "No"]
-        );
-        if (response !== "Yes") {
-            console.log("< resetSource: no reset");
-            return;
-        }
-
-        const client = new ISCClient(item.tenantId, item.tenantName);
-        vscode.window.withProgress({
-            location: vscode.ProgressLocation.Notification,
-            title: `Reset of ${item.label}${skipping}`,
-            cancellable: false
-        }, async (progress, token) => {
-            let job = null;
-            try {
-                job = await client.resetSource(item.ccId, skip);
-            } catch (err) {
-                vscode.window.showErrorMessage('' + err);
-                return;
-            }
-            console.log("job =", job);
-
-            let task: any | null = null;
-            do {
-                await delay(5000);
-                task = await client.getAggregationJob(item.ccId, job.id, AggregationJob.SOURCE_RESET);
-                console.log("task =", task);
-
-            } while (task !== undefined && task.status === "PENDING");
-            if (task !== undefined) {
-                if (task.status === "SUCCESS") {
-                    vscode.window.showInformationMessage(`Source ${task.object.displayName} successfully reset${skipping}`);
-                } else if (task.status === "WARNING") {
-                    vscode.window.showWarningMessage(
-                        `Warning during reset of ${task.object.displayName}: ${task.details?.messages?.Warn}`);
-                } else {
-                    vscode.window.showErrorMessage(
-                        `Reset of ${task.object.displayName} failed: ${task.status}: ${task.details?.messages?.Error}`);
-                }
-            };
-        });
     }
 
     public async evaluateTransform(item: SourceTreeItem): Promise<void> {
         console.log("> NewTransformCommand.evaluate", item);
 
-        this.transformEvaluator.evaluate(item);
+        await this.transformEvaluator.evaluate(item);
     };
 }

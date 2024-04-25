@@ -72,6 +72,18 @@ export function getFullDocumentRange(editor: vscode.TextEditor): vscode.Selectio
 	return new vscode.Selection(0, 0, 0, 0);
 }
 
+export async function confirm(prompt: string): Promise<boolean> {
+	const answer = await vscode.window.showWarningMessage(
+		prompt,
+		{ modal: true },
+		...["Yes", "No"]
+	);
+	const value = (answer === "Yes")
+
+	console.log(`< confirmFileOverwrite: ${value}`);
+	return value;
+}
+
 /**
  * If the file already exists, request confirmation to overwrite the content of the file. It actually deletes it.
  * @returns true if user is OK for overwriting

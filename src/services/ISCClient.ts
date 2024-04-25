@@ -5,7 +5,7 @@ import { withQuery } from "../utils/UriUtils";
 import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SODPolicyApi, SodPolicy, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SODPolicyApi, SodPolicy, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskManagementBetaApi, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, AccountsBetaApi, TaskResultDtoBeta } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -216,22 +216,40 @@ export class ISCClient {
 
 
 	public async startEntitlementAggregation(
-		sourceID: number,
-		types: string[] | null = null
-	): Promise<any> {
+		sourceID: string
+	): Promise<LoadEntitlementTaskBeta> {
 		console.log("> ISCClient.startEntitlementAggregation");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new EntitlementsBetaApi(apiConfig);
+		const response = await api.importEntitlements({
+			id: sourceID,
+			csvFile: null
+		})
+		return response.data
+	}
 
-		const httpClient = await this.getAxios();
-		let endpoint =
-			EndpointUtils.getCCUrl(this.tenantName) + `/source/loadEntitlements/${sourceID}`;
+	public async startEntitlementReset(
+		sourceID: string
+	): Promise<EntitlementSourceResetBaseReferenceDtoBeta> {
+		console.log("> ISCClient.startEntitlementReset");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new EntitlementsBetaApi(apiConfig);
+		const response = await api.resetSourceEntitlements({
+			id: sourceID
+		})
+		return response.data
+	}
 
-		if (types !== null && types.length > 0) {
-			const objectTypes = types.join(",");
-			endpoint = withQuery(endpoint, { objectType: objectTypes });
-		}
-		console.log("endpoint = " + endpoint);
-		const response = await httpClient.post(endpoint);
-		return response.data;
+	public async startAccountReset(
+		sourceID: string
+	): Promise<TaskResultDtoBeta> {
+		console.log("> ISCClient.startAccountReset");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AccountsBetaApi(apiConfig);
+		const response = await api.deleteAccountsAsync({
+			id: sourceID
+		})
+		return response.data
 	}
 
 	public async startAccountAggregation(
@@ -292,6 +310,18 @@ export class ISCClient {
 		console.log("resetSource: endpoint = " + endpoint);
 		const httpClient = await this.getAxios(CONTENT_TYPE_FORM_URLENCODED);
 		const response = await httpClient.post(endpoint);
+		return response.data;
+	}
+
+	public async getTaskStatus(
+		taskId: string,
+	): Promise<TaskStatusBeta> {
+		console.log("> getTaskStatus", taskId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new TaskManagementBetaApi(apiConfig);
+		const response = await api.getTaskStatus({
+			id: taskId
+		})
 		return response.data;
 	}
 

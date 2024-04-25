@@ -136,22 +136,22 @@ export function activate(context: vscode.ExtensionContext) {
 			(tenantTreeItem) => treeManager.removeTenant(tenantTreeItem)));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.AGGREGATE,
-			(tenantTreeItem) => treeManager.aggregateSource(tenantTreeItem)));
+			(sourceTreeItem) => treeManager.aggregateSource(sourceTreeItem)));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.AGGREGATE_DISABLE_OPTIMIZATION,
-			(tenantTreeItem) => treeManager.aggregateSource(tenantTreeItem, true)));
+			(sourceTreeItem) => treeManager.aggregateSource(sourceTreeItem, true)));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.AGGREGATE_ENTITLEMENTS,
-			(tenantTreeItem) => treeManager.aggregateSource(tenantTreeItem, false, "entitlements")));
+			(sourceTreeItem) => treeManager.aggregateEntitlements(sourceTreeItem)));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.RESET_SOURCE,
-			(tenantTreeItem) => treeManager.resetSource(tenantTreeItem)));
+			(sourceTreeItem) => treeManager.resetSource(sourceTreeItem)));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.RESET_SOURCE_ACCOUNTS,
-			(tenantTreeItem) => treeManager.resetSource(tenantTreeItem, "entitlements")));
+			(sourceTreeItem) => treeManager.resetAccounts(sourceTreeItem)));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.RESET_SOURCE_ENTITLEMENTS,
-			(tenantTreeItem) => treeManager.resetSource(tenantTreeItem, "accounts")));
+			(tenantTreeItem) => treeManager.resetEntitlements(tenantTreeItem)));
 	const testConnectionCommand = new TestConnectionCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.TEST_SOURCE,

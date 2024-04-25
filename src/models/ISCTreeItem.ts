@@ -60,7 +60,7 @@ export class TenantTreeItem extends BaseTreeItem {
 	iconPath = new vscode.ThemeIcon("organization");
 	contextValue = "tenant";
 
-	getChildren(): Promise<BaseTreeItem[]> {
+	async getChildren(): Promise<BaseTreeItem[]> {
 		const results: BaseTreeItem[] = [];
 		results.push(new SourcesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new TransformsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
@@ -75,7 +75,7 @@ export class TenantTreeItem extends BaseTreeItem {
 		results.push(new IdentityAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new IdentitiesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 
-		return new Promise((resolve) => resolve(results));
+		return results
 	}
 }
 
