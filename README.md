@@ -306,6 +306,7 @@ The patterns defined above use the following tokens:
 - Add searching and viewing identities by [@henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#74](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/74))
 - Add attribute sync, process and delete command on identities by [@henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#74](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/74))
 - Fixed normalizeNames (cf. [#73](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/73))
+- Lock tenant as read-only to prevent any change (cf. [#75](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/75))
 
 ## 1.2.0
 

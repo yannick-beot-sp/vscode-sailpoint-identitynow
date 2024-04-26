@@ -73,6 +73,16 @@
         "icon": "$(add)"
       },
       {
+        "command": "vscode-sailpoint-identitynow.tenant.set-writable",
+        "title": "Read-only",
+        "icon": "$(lock)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.tenant.set-readonly",
+        "title": "writable",
+        "icon": "$(unlock)"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.remove-tenant",
         "title": "Remove tenant"
       },
@@ -125,6 +135,10 @@
         "command": "vscode-sailpoint-identitynow.import-config.menu",
         "title": "ISC: Import config...",
         "icon": "$(import)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.modified-resource",
+        "title": "Modified resource"
       },
       {
         "command": "vscode-sailpoint-identitynow.refresh-forced",
@@ -515,7 +529,19 @@
     "menus": {
       "commandPalette": [
         {
+          "command": "vscode-sailpoint-identitynow.modified-resource",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.refresh",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.tenant.set-readonly",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.tenant.set-writable",
           "when": "never"
         },
         {
@@ -850,38 +876,48 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.remove-tenant",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^tenant/"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.tenant.set-readonly",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenantWritable",
+          "group": "inline@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.tenant.set-writable",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenantReadOnly",
+          "group": "inline@1"
         },
         {
           "command": "vscode-sailpoint-identitynow.rename-tenant",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^tenant/"
         },
         {
           "command": "vscode-sailpoint-identitynow.tenant.edit.public-identities-config",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^tenant/"
         },
         {
           "command": "vscode-sailpoint-identitynow.tenant.edit.access-request-config",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^tenant/"
         },
         {
           "command": "vscode-sailpoint-identitynow.tenant.edit.password-org-config",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^tenant/",
           "group": "password"
         },
         {
           "command": "vscode-sailpoint-identitynow.tenant.generate-digit-token",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^tenant/",
           "group": "password"
         },
         {
           "command": "vscode-sailpoint-identitynow.export-config.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^tenant/",
           "group": "config"
         },
         {
           "command": "vscode-sailpoint-identitynow.import-config.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == tenant",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^tenant/",
           "group": "config"
         },
         {

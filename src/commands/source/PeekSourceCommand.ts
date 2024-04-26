@@ -31,7 +31,7 @@ export class PeekSourceCommand {
 
         // if the command is called from the Tree View
         if (node !== undefined && node instanceof SourceTreeItem) {
-            context["tenant"] = await this.tenantService.getTenant(node.tenantId);
+            context["tenant"] = this.tenantService.getTenant(node.tenantId);
             context["source"] = {
                 id: node.id!,
                 name: node.label!

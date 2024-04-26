@@ -44,7 +44,7 @@ export class NewRoleCommand {
 
         // if the command is called from the Tree View
         if (rolesTreeItem !== undefined && rolesTreeItem instanceof RolesTreeItem) {
-            context["tenant"] = await this.tenantService.getTenant(rolesTreeItem.tenantId);
+            context["tenant"] = this.tenantService.getTenant(rolesTreeItem.tenantId);
         }
 
         let client: ISCClient | undefined = undefined;

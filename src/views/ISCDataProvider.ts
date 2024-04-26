@@ -34,7 +34,8 @@ export class ISCDataProvider implements TreeDataProvider<BaseTreeItem> {
                 tenant.name,
                 tenant.id,
                 tenant.tenantName,
-                tenant.name)
+                tenant.name,
+                this.tenantService)
             );
             console.log("< getChildren", results);
             return results;
@@ -52,7 +53,7 @@ export class ISCDataProvider implements TreeDataProvider<BaseTreeItem> {
         console.log("> getTreeItem", item);
         item.updateIcon(this.context);
         console.log("after update", item);
-        
+
         if (item.contextValue !== item.computedContextValue) {
             const newItem = {
                 ...item,

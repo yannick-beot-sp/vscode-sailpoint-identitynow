@@ -23,7 +23,7 @@ export class RenameTenantCommand {
         if (isEmpty(displayName)) {
             return;
         }
-        const tenantInfo = await this.tenantService.getTenant(node.tenantId);
+        const tenantInfo = this.tenantService.getTenant(node.tenantId);
         if (tenantInfo) {
             tenantInfo.name = displayName;
             await this.tenantService.setTenant(tenantInfo);

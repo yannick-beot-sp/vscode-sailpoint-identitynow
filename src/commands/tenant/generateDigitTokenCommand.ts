@@ -18,7 +18,7 @@ export class GenerateDigitTokenCommand {
 
         // if the command is called from the Tree View
         if (node !== undefined && node instanceof TenantTreeItem) {
-            context["tenant"] = await this.tenantService.getTenant(node.tenantId);
+            context["tenant"] = this.tenantService.getTenant(node.tenantId);
         }
         let client: ISCClient | undefined = undefined;
 
