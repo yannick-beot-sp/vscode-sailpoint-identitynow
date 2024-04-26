@@ -141,7 +141,7 @@ export class SailPointISCAuthenticationProvider implements AuthenticationProvide
         console.log("> getSessionByTenant", tenantId);
         // Check if an access token already exists
         let token = await this.tenantService.getTenantAccessToken(tenantId);
-        const tenantInfo = await this.tenantService.getTenant(tenantId);
+        const tenantInfo = this.tenantService.getTenant(tenantId);
         if (token === undefined || token.expired()) {
             console.log("INFO: accessToken is expired. Updating Access Token");
             if (tenantInfo?.authenticationMethod === AuthenticationMethod.accessToken) {
@@ -202,7 +202,7 @@ export class SailPointISCAuthenticationProvider implements AuthenticationProvide
         }
         this.ensureInitialized();
         const tenantId = _scopes[0];
-        const tenantInfo = await this.tenantService.getTenant(tenantId);
+        const tenantInfo = this.tenantService.getTenant(tenantId);
 
         if (tenantInfo?.authenticationMethod === AuthenticationMethod.accessToken) {
             // Access Token

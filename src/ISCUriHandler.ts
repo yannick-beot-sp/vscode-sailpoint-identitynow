@@ -63,7 +63,8 @@ export class ISCUriHandler implements vscode.UriHandler {
                 id: tenantId,
                 name: q.displayName ?? q.tenantName,
                 tenantName: normalizedTenantName,
-                authenticationMethod: (q.authenticationMethod.toLowerCase() === "accesstoken" ? AuthenticationMethod.accessToken : AuthenticationMethod.personalAccessToken)
+                authenticationMethod: (q.authenticationMethod.toLowerCase() === "accesstoken" ? AuthenticationMethod.accessToken : AuthenticationMethod.personalAccessToken),
+                readOnly: true
             });
         }
         if (q.authenticationMethod.toLowerCase() === "accesstoken") {

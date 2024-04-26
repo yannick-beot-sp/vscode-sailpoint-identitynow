@@ -17,17 +17,17 @@ export class TenantService {
         if (tenants === undefined) {
             return [];
         }
-        let tenantInfoItems = await Promise.all(tenants
-            .map(key => this.getTenant(key)));
+        let tenantInfoItems = tenants.map(key => this.getTenant(key))
 
         tenantInfoItems = tenantInfoItems
             .filter(Boolean) // this line will remove any "undefined"
-            .sort(compareByName);
+            .sort(compareByName)
+
         return tenantInfoItems as TenantInfo[];
     }
 
 
-    public async getTenant(key: string): Promise<TenantInfo | undefined> {
+    public getTenant(key: string): TenantInfo | undefined {
         const tenantInfo = this.storage.get<TenantInfo>(TENANT_PREFIX + key);
         // As not all tenantInfo will have name and a tenantName, changing the tenantInfo
         if (tenantInfo && !tenantInfo?.tenantName) {
@@ -39,6 +39,11 @@ export class TenantService {
             tenantInfo.id = tenantInfo.tenantName;
             this.setTenant(tenantInfo);
         }
+
+        if (tenantInfo && tenantInfo.readOnly === undefined) {
+            tenantInfo.readOnly = false
+        }
+
         return tenantInfo;
     }
 

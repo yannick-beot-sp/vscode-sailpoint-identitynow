@@ -43,14 +43,16 @@ export class ISCResourceProvider implements FileSystemProvider {
 		const data = await this.lookupResource(uri);
 		const id = getIdByUri(uri);
 		const resourcePath = getPathByUri(uri);
-		// const isFile = this.isUUID(id);
+		const tenantName = uri.authority;
+		const tenantInfo = await this.tenantService.getTenantByTenantName(tenantName)
+		const isReadOnly = tenantInfo && tenantInfo.readOnly
 		const isFile = id !== "provisioning-policies" && id !== "schemas";
 		return {
 			type: (isFile ? FileType.File : FileType.Directory),
 			ctime: toTimestamp(data.created),
 			mtime: toTimestamp(data.modified),
 			size: convertToText(data).length,
-			permissions: resourcePath.match("identities") ? vscode.FilePermission.Readonly : null
+			permissions: isReadOnly || resourcePath.match("identities") ? vscode.FilePermission.Readonly : null
 		};
 	}
 	readDirectory(
@@ -102,7 +104,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 				null,
 				true
 			);
-			if (response.data.length ===1 ) {
+			if (response.data.length === 1) {
 				data = response.data[0]
 			}
 		} else {
@@ -132,6 +134,13 @@ export class ISCResourceProvider implements FileSystemProvider {
 		const tenantInfo = await this.tenantService.getTenantByTenantName(
 			tenantName
 		);
+
+		// Additional check just in case
+		if (tenantInfo.readOnly) {
+			throw new Error("Tenant is read-only");
+			
+		}
+
 		const client = new ISCClient(tenantInfo?.id ?? "", tenantName);
 		let data = uint8Array2Str(content);
 
@@ -274,11 +283,21 @@ export class ISCResourceProvider implements FileSystemProvider {
 	delete(uri: Uri, options: { recursive: boolean }): void | Thenable<void> {
 		throw new Error("Method delete not implemented.");
 	}
+
 	rename(
 		oldUri: Uri,
 		newUri: Uri,
 		options: { overwrite: boolean }
 	): void | Thenable<void> {
 		throw new Error("Method rename not implemented.");
+	}
+
+	public triggerModified(uris: vscode.Uri | vscode.Uri[]) {
+		if (uris === undefined) { return }
+
+		if (!Array.isArray(uris)) {
+			uris = [uris]
+		}
+		uris.forEach(uri => this._emitter.fire([{ type: vscode.FileChangeType.Changed, uri }]), this)
 	}
 }

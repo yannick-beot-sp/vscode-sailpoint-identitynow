@@ -8,6 +8,7 @@ export interface TenantInfo {
     name: string;
     tenantName: string;
     authenticationMethod: AuthenticationMethod;
+    readOnly: boolean;
 }
 
 export interface TenantCredentials {

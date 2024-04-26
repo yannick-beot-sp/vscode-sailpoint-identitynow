@@ -1,9 +1,12 @@
 const COMMAND_PREFIX = 'vscode-sailpoint-identitynow';
 export const OPEN_RESOURCE = `${COMMAND_PREFIX}.open-resource`;
 export const REMOVE_RESOURCE = `${COMMAND_PREFIX}.remove-resource`;
+export const MODIFIED_RESOURCE = `${COMMAND_PREFIX}.modified-resource`;
 export const REFRESH_FORCED = `${COMMAND_PREFIX}.refresh-forced`;
 export const REFRESH = `${COMMAND_PREFIX}.refresh`;
 export const ADD_TENANT = `${COMMAND_PREFIX}.add-tenant`;
+export const TENANT_SET_READONLY = `${COMMAND_PREFIX}.tenant.set-readonly`;
+export const TENANT_SET_WRITABLE = `${COMMAND_PREFIX}.tenant.set-writable`;
 export const RENAME_TENANT = `${COMMAND_PREFIX}.rename-tenant`;
 export const REMOVE_TENANT = `${COMMAND_PREFIX}.remove-tenant`;
 export const EXPORT_CONFIG_VIEW = `${COMMAND_PREFIX}.export-config.view`;

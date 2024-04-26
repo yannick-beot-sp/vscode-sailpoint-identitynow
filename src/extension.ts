@@ -62,6 +62,7 @@ import { onErrorResponse, onRequest, onResponse } from './services/AxiosHandlers
 import axios from 'axios';
 import { OpenScriptCommand } from './commands/rule/openScriptCommand';
 import { IdentityTreeViewCommand } from './commands/identity/IdentityTreeViewCommand';
+import { TenantReadOnlyConfigCommand } from './commands/tenant/tenantReadOnlyConfigCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -153,6 +154,15 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.RESET_SOURCE_ENTITLEMENTS,
 			(tenantTreeItem) => treeManager.resetEntitlements(tenantTreeItem)));
 	const testConnectionCommand = new TestConnectionCommand(tenantService);
+
+	const tenantReadOnlyConfigCommand = new TenantReadOnlyConfigCommand(tenantService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.TENANT_SET_READONLY,
+			tenantReadOnlyConfigCommand.setReadOnly, tenantReadOnlyConfigCommand))
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.TENANT_SET_WRITABLE,
+			tenantReadOnlyConfigCommand.setWritable, tenantReadOnlyConfigCommand))
+
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.TEST_SOURCE,
 			testConnectionCommand.execute, testConnectionCommand));
@@ -290,12 +300,15 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.IMPORT_CONFIG_VIEW,
 			treeviewImporterCommand.execute, treeviewImporterCommand));
 
+	const iscClientResourceProvider = new ISCResourceProvider(tenantService)
 	context.subscriptions.push(
 		vscode.workspace.registerFileSystemProvider(
 			URL_PREFIX,
-			new ISCResourceProvider(tenantService)
+			iscClientResourceProvider
 		));
-
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.MODIFIED_RESOURCE,
+			iscClientResourceProvider.triggerModified, iscClientResourceProvider));
 	const newTransformCommand = new NewTransformCommand();
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.NEW_TRANSFORM,

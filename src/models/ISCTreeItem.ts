@@ -8,6 +8,7 @@ import { getConfigNumber } from '../utils/configurationUtils';
 import * as commands from "../commands/constants";
 import * as configuration from '../configurationConstants';
 import { isEmpty, isNotEmpty } from "../utils/stringUtils";
+import { TenantService } from "../services/TenantService";
 
 
 /**
@@ -49,6 +50,7 @@ export class TenantTreeItem extends BaseTreeItem {
 		tenantId: string,
 		tenantName: string,
 		tenantDisplayName: string,
+		private readonly tenantService: TenantService
 	) {
 		super(tenantLabel,
 			tenantId,
@@ -77,6 +79,12 @@ export class TenantTreeItem extends BaseTreeItem {
 
 		return results
 	}
+
+	get computedContextValue() {
+		const tenantInfo = this.tenantService.getTenant(this.tenantId);
+		return tenantInfo && tenantInfo.readOnly ? "tenantReadOnly" : "tenantWritable";
+	}
+
 }
 
 /**

@@ -37,7 +37,7 @@ export class NewAccessProfileCommand {
         const context: WizardContext = {};
         // if the command is called from the Tree View
         if (accessProfilesTreeItem !== undefined && accessProfilesTreeItem instanceof AccessProfilesTreeItem) {
-            context["tenant"] = await this.tenantService.getTenant(accessProfilesTreeItem.tenantId);
+            context["tenant"] = this.tenantService.getTenant(accessProfilesTreeItem.tenantId);
         }
 
         let client: ISCClient | undefined = undefined;

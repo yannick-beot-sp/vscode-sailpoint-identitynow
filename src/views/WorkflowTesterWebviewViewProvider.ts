@@ -72,7 +72,7 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
                     }
                 case 'getWorkflowTriggers':
                     {
-                        const tenantInfo = await this._tenantService.getTenant(data.tenantId);
+                        const tenantInfo = this._tenantService.getTenant(data.tenantId);
                         const client = new ISCClient(data.tenantId, tenantInfo?.tenantName ?? "");
                         const workflowTriggers = await client.getWorflowTriggers();
 
@@ -89,7 +89,7 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
                     }
                 case 'testWorkflow':
                     {
-                        const tenantInfo = await this._tenantService.getTenant(data.tenantId);
+                        const tenantInfo = this._tenantService.getTenant(data.tenantId);
                         const client = new ISCClient(data.tenantId, tenantInfo?.tenantName ?? "");
                         await vscode.window.withProgress({
                             location: vscode.ProgressLocation.Notification,
@@ -126,7 +126,7 @@ export class WorkflowTesterWebviewViewProvider implements vscode.WebviewViewProv
 
         if (this._view) {
             this._view.show?.(true);
-            const tenantInfo = await this._tenantService.getTenant(tenantId);
+            const tenantInfo = this._tenantService.getTenant(tenantId);
             const client = new ISCClient(tenantId, tenantInfo?.tenantName ?? "");
 
             const workflows = await client.getWorflows();

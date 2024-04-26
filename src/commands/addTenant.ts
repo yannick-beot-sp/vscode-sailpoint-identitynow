@@ -80,7 +80,8 @@ export class AddTenantCommand {
             id: tenantId,
             name: displayName,
             tenantName: normalizedTenantName,
-            authenticationMethod: authMethod
+            authenticationMethod: authMethod,
+            readOnly: true
         });
         try {
             const session: vscode.AuthenticationSession = await vscode.authentication.getSession(
