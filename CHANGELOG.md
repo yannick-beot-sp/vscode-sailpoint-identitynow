@@ -9,6 +9,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 ### Changed 
 
 - Update for source aggregation and reset to leverage beta endpoints instead of CC endpoints
+- Automatically update workflow if its status is changed
 
 ### Added
 

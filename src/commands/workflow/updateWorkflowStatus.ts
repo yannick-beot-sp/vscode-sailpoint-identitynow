@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as commands from '../constants';
 import { WorkflowTreeItem } from '../../models/ISCTreeItem';
 import { ISCClient } from '../../services/ISCClient';
+import { getResourceUri } from '../../utils/UriUtils';
 
 export async function enableWorkflow(node: WorkflowTreeItem): Promise<void> {
 
@@ -34,7 +35,15 @@ async function updateWorkflowStatus(node: WorkflowTreeItem, enable: boolean): Pr
     }, async (task, token) => {
         await client.updateWorkflowStatus(node.id, enable);
         node.enabled = enable;
-        await vscode.commands.executeCommand(commands.REFRESH_FORCED, node);
+        vscode.commands.executeCommand(commands.REFRESH_FORCED, node);
+        const uri = getResourceUri(
+            node.tenantName,
+            "workflows",
+            node.id,
+            node.label as string,
+            true
+        )
+        await vscode.commands.executeCommand(commands.MODIFIED_RESOURCE, uri);
     });
     console.log("< updateWorkflowStatus");
 }

@@ -308,6 +308,7 @@ The patterns defined above use the following tokens:
 - Fixed normalizeNames (cf. [#73](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/73))
 - Lock tenant as read-only to prevent any change (cf. [#75](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/75))
 - Fixed with generate digit token to use the username and not the account name
+- Automatically update workflow if its status is changed
 
 ## 1.2.0
 
