@@ -55,7 +55,7 @@ export class GenerateDigitTokenCommand {
                 return undefined
             }
             const digitToken = await client.generateDigitToken(
-                identity.name,
+                identity.attributes.uid,
                 config.digitTokenDurationMinutes,
                 config.digitTokenLength
             )

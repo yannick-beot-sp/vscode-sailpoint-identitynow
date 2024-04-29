@@ -17,7 +17,7 @@ export class QuickPickIdentityStep extends QuickPickPromptStep<WizardContext, vs
             skipIfOne: true,
             items: async (context: WizardContext): Promise<vscode.QuickPickItem[]> => {
                 const client = getISCClient();
-                const results = (await client.searchIdentities(context[queryName], 100, ["id", "name", "displayName", "email"]))
+                const results = (await client.searchIdentities(context[queryName], 100, ["id", "name", "displayName", "email", "attributes.uid"]))
                     .map(x => {
                         const email = x.email ? `(${x.email})` : undefined;
                         const description = x.displayName ? [x.displayName, email].join(' ') : x.email;

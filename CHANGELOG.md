@@ -19,6 +19,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 ### Fixed
 
 - Fixed normalizeNames (cf. [#73](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/73))
+- Fixed with generate digit token to use the username and not the account name
 
 ## [1.2.0] - 2024-04-09
 
