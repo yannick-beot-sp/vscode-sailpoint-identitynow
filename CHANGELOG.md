@@ -21,6 +21,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 - Fixed normalizeNames (cf. [#73](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/73))
 - Fixed with generate digit token to use the username and not the account name
+- Fixed case where a single entitlement or single access profiles is returned during role creation
 
 ## [1.2.0] - 2024-04-09
 

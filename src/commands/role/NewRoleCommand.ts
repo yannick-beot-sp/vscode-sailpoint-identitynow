@@ -119,7 +119,7 @@ export class NewRoleCommand {
             location: vscode.ProgressLocation.Notification,
             title: 'Creating File...',
             cancellable: false
-        }, async (task, token) => {
+        }, async () => {
             const name = values["role"].trim();
             const tenantName = values["tenant"].tenantName;
             const newUri = getResourceUri(tenantName, 'roles', NEW_ID, name);
@@ -132,14 +132,24 @@ export class NewRoleCommand {
                 type: "IDENTITY"
             };
             if (values.hasOwnProperty("accessProfiles") && values["accessProfiles"] !== undefined) {
-                newRole.accessProfiles.push(...values["accessProfiles"].map(x => ({
+                // Wizard with skipIfOne=true does not always return an array
+                let accessProfiles = values["accessProfiles"]
+                if (!Array.isArray(accessProfiles)) {
+                    accessProfiles = [accessProfiles]
+                }
+                newRole.accessProfiles.push(...accessProfiles.map(x => ({
                     id: x.id,
                     name: x.name,
                     type: 'ACCESS_PROFILE'
                 })));
             }
             if (values.hasOwnProperty("entitlements") && values["entitlements"] !== undefined) {
-                newRole.entitlements.push(...values["entitlements"].map(x => ({
+                // Wizard with skipIfOne=true does not always return an array
+                let entitlements = values["entitlements"]
+                if (!Array.isArray(entitlements)) {
+                    entitlements = [entitlements]
+                }
+                newRole.entitlements.push(...entitlements.map(x => ({
                     id: x.id,
                     name: x.name,
                     type: 'ENTITLEMENT'

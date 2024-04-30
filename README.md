@@ -309,6 +309,7 @@ The patterns defined above use the following tokens:
 - Lock tenant as read-only to prevent any change (cf. [#75](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/75))
 - Fixed with generate digit token to use the username and not the account name
 - Automatically update workflow if its status is changed
+- Fixed case where a single entitlement or single access profiles is returned during role creation
 
 ## 1.2.0
 
