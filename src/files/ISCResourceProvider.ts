@@ -52,7 +52,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 			ctime: toTimestamp(data.created),
 			mtime: toTimestamp(data.modified),
 			size: convertToText(data).length,
-			permissions: isReadOnly || resourcePath.match("identities") ? vscode.FilePermission.Readonly : null
+			permissions: id !== NEW_ID && (isReadOnly || resourcePath.match("identities")) ? vscode.FilePermission.Readonly : null
 		};
 	}
 	readDirectory(
@@ -134,12 +134,6 @@ export class ISCResourceProvider implements FileSystemProvider {
 		const tenantInfo = await this.tenantService.getTenantByTenantName(
 			tenantName
 		);
-
-		// Additional check just in case
-		if (tenantInfo.readOnly) {
-			throw new Error("Tenant is read-only");
-			
-		}
 
 		const client = new ISCClient(tenantInfo?.id ?? "", tenantName);
 		let data = uint8Array2Str(content);

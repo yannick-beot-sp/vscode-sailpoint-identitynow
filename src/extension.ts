@@ -6,7 +6,7 @@ import { AccessProfileExporterCommand } from './commands/access-profile/ExportAc
 import { NewAccessProfileCommand } from './commands/access-profile/NewAccessProfileCommand';
 import { AddTenantCommand } from './commands/addTenant';
 import { ConnectorRuleCommand } from './commands/rule/connectorRuleCommand';
-import { deleteResource } from './commands/deleteResource';
+import { DeleteResourceCommand, deleteResource } from './commands/deleteResourceCommand';
 import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './commands/source/exportAccounts';
 import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from './commands/source/exportEntitlementDetails';
 import { ExportScriptFromRuleCommand } from './commands/rule/exportScriptFromRuleCommand';
@@ -228,9 +228,11 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.OPEN_RESOURCE,
 			openResourceCommand.execute));
 
+
+	const deleteResourceCommand	= new DeleteResourceCommand(tenantService)
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.REMOVE_RESOURCE,
-			deleteResource));
+			deleteResourceCommand.execute, deleteResourceCommand));
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.LOAD_MORE,
@@ -309,7 +311,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.MODIFIED_RESOURCE,
 			iscClientResourceProvider.triggerModified, iscClientResourceProvider));
-	const newTransformCommand = new NewTransformCommand();
+	const newTransformCommand = new NewTransformCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.NEW_TRANSFORM,
 			newTransformCommand.execute, newTransformCommand));
