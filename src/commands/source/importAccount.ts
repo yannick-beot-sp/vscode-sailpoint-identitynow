@@ -4,6 +4,8 @@ import { ISCClient } from '../../services/ISCClient';
 import { delay } from '../../utils';
 import { chooseFile } from '../../utils/vsCodeHelpers';
 import { formatTask, waifForJob } from './sourceUtils';
+import { TenantService } from '../../services/TenantService';
+import { validateTenantReadonly } from '../validateTenantReadonly';
 
 class AccountImporter {
     readonly client: ISCClient;
@@ -52,12 +54,13 @@ class AccountImporter {
  * Entrypoint for the command to import accounts from the tree view/from a node
  */
 export class AccountImportNodeCommand {
+    constructor(private readonly tenantService: TenantService) { }
 
     async execute(node?: SourceTreeItem): Promise<void> {
         console.log("> AccountImportNodeCommand.execute");
-        if (node === undefined) {
-            console.error("AccountImportNodeCommand: invalid item", node);
-            throw new Error("AccountImportNodeCommand: invalid item");
+        
+        if (!(await validateTenantReadonly(this.tenantService, node.tenantId, `import accounts in ${node.label}`))) {
+            return
         }
 
         const fileUri = await chooseFile('CSV files', 'csv');

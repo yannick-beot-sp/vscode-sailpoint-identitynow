@@ -196,16 +196,16 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM,
 			(tenantTreeItem) => treeManager.evaluateTransform(tenantTreeItem)));
 
-	const accountImportNodeCommand = new AccountImportNodeCommand();
+	const accountImportNodeCommand = new AccountImportNodeCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_ACCOUNTS_VIEW,
 			accountImportNodeCommand.execute, accountImportNodeCommand));
 
-	const uncorrelatedAccountImportNodeCommand = new UncorrelatedAccountImportNodeCommand();
+	const uncorrelatedAccountImportNodeCommand = new UncorrelatedAccountImportNodeCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_UNCORRELATED_ACCOUNTS_VIEW,
 			uncorrelatedAccountImportNodeCommand.execute, uncorrelatedAccountImportNodeCommand));
-	const entitlementDetailsImportNodeCommand = new EntitlementDetailsImportNodeCommand();
+	const entitlementDetailsImportNodeCommand = new EntitlementDetailsImportNodeCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_ENTITLEMENT_DETAILS_VIEW,
 			entitlementDetailsImportNodeCommand.execute, entitlementDetailsImportNodeCommand));

@@ -5,6 +5,8 @@ import { CSVReader } from '../../services/CSVReader';
 import { isNotEmpty } from '../../utils/stringUtils';
 import { chooseFile } from '../../utils/vsCodeHelpers';
 import { JsonPatchOperationBeta } from 'sailpoint-api-client';
+import { TenantService } from '../../services/TenantService';
+import { validateTenantReadonly } from '../validateTenantReadonly';
 
 // List of mandatory headers to update the description of entitlements
 const mandatoryHeadersDescription = ["attributeName", "attributeValue", "displayName", "description", "schema"];
@@ -225,11 +227,13 @@ class EntitlementDetailsImporter {
  */
 export class EntitlementDetailsImportNodeCommand {
 
+    constructor(private readonly tenantService: TenantService) { }
+
     async execute(node?: SourceTreeItem): Promise<void> {
         console.log("> EntitlementDetailsImportNodeCommand.execute");
-        if (node === undefined) {
-            console.error("EntitlementDetailsImportNodeCommand: invalid item", node);
-            throw new Error("EntitlementDetailsImportNodeCommand: invalid item");
+        
+        if (!(await validateTenantReadonly(this.tenantService, node.tenantId, `import entitlements details in ${node.label}`))) {
+            return
         }
 
         const fileUri = await chooseFile('CSV files', 'csv');
