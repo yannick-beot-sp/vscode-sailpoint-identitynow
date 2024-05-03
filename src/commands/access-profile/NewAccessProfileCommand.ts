@@ -51,7 +51,8 @@ export class NewAccessProfileCommand {
                     async (wizardContext) => {
                         client = new ISCClient(
                             wizardContext["tenant"].id, wizardContext["tenant"].tenantName);
-                    }),
+                    },
+                    "create an access profile"),
                 new InputPromptStep({
                     name: "accessProfileName",
                     displayName: "access profile",

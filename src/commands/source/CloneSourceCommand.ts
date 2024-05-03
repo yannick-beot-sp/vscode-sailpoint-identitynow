@@ -114,7 +114,9 @@ export class CloneSourceCommand {
                     async (wizardContext) => {
                         client = new ISCClient(
                             wizardContext["tenant"].id, wizardContext["tenant"].tenantName);
-                    }),
+                    },
+                    "clone source"),
+
                 new QuickPickSourceStep(() => { return client!; }),
                 new InputPromptStep({
                     name: "newSourceName",

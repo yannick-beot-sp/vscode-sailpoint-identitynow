@@ -47,7 +47,8 @@ export class NewAttributeSearchConfigCommand {
                     async (wizardContext) => {
                         client = new ISCClient(
                             wizardContext["tenant"].id, wizardContext["tenant"].tenantName);
-                    }),
+                    },
+                    "create a search attribute"),
                 new InputPromptStep({
                     name: "searchAttribute",
                     displayName: "search attribute",

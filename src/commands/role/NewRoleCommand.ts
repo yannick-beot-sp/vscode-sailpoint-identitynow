@@ -58,7 +58,8 @@ export class NewRoleCommand {
                     async (wizardContext) => {
                         client = new ISCClient(
                             wizardContext["tenant"].id, wizardContext["tenant"].tenantName);
-                    }),
+                    },
+                    "create a role"),
                 new InputPromptStep({
                     name: "role",
                     options: {
