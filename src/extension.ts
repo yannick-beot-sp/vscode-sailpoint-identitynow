@@ -6,7 +6,7 @@ import { AccessProfileExporterCommand } from './commands/access-profile/ExportAc
 import { NewAccessProfileCommand } from './commands/access-profile/NewAccessProfileCommand';
 import { AddTenantCommand } from './commands/addTenant';
 import { ConnectorRuleCommand } from './commands/rule/connectorRuleCommand';
-import { DeleteResourceCommand, deleteResource } from './commands/deleteResourceCommand';
+import { DeleteResourceCommand } from './commands/deleteResourceCommand';
 import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './commands/source/exportAccounts';
 import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from './commands/source/exportEntitlementDetails';
 import { ExportScriptFromRuleCommand } from './commands/rule/exportScriptFromRuleCommand';
@@ -33,7 +33,7 @@ import { ImportConfigPaletteCommand } from './commands/spconfig-import/ImportCon
 import { ImportConfigTreeViewCommand } from './commands/spconfig-import/ImportConfigTreeViewCommand';
 import { TestWorkflowCommand } from './commands/workflow/testWorkflow';
 import { viewWorkflowExecutionHistory } from './commands/workflow/viewWorkflowExecutionHistory';
-import { disableWorkflow, enableWorkflow } from './commands/workflow/updateWorkflowStatus';
+import { UpdateWorkflowStatusCommand } from './commands/workflow/updateWorkflowStatusCommand';
 import { URL_PREFIX } from './constants';
 import { FileHandler } from './files/FileHandler';
 import { ISCResourceProvider } from './files/ISCResourceProvider';
@@ -229,7 +229,7 @@ export function activate(context: vscode.ExtensionContext) {
 			openResourceCommand.execute));
 
 
-	const deleteResourceCommand	= new DeleteResourceCommand(tenantService)
+	const deleteResourceCommand = new DeleteResourceCommand(tenantService)
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.REMOVE_RESOURCE,
 			deleteResourceCommand.execute, deleteResourceCommand));
@@ -253,12 +253,13 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.ACCESS_PROFILE_UPDATE_FILTER_VIEW,
 			accessProfileFilterCommand.execute, accessProfileFilterCommand));
 
+	const updateWorkflowStatusCommand = new UpdateWorkflowStatusCommand(tenantService)
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.ENABLE_WORKFLOW,
-			enableWorkflow));
+			updateWorkflowStatusCommand.enableWorkflow, updateWorkflowStatusCommand));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.DISABLE_WORKFLOW,
-			disableWorkflow));
+			updateWorkflowStatusCommand.disableWorkflow, updateWorkflowStatusCommand));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.VIEW_WORKFLOW_EXECUTION_HISTORY,
 			viewWorkflowExecutionHistory));
@@ -266,7 +267,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_WORKFLOW,
 			workflowExportCommand.execute, workflowExportCommand))
-	const workflowImporterTreeViewCommand = new WorkflowImporterTreeViewCommand()
+	const workflowImporterTreeViewCommand = new WorkflowImporterTreeViewCommand(tenantService)
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_WORKFLOW,
 			workflowImporterTreeViewCommand.execute, workflowImporterTreeViewCommand))
