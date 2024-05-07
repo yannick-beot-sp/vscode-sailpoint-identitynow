@@ -9,6 +9,8 @@ import { UsageTypeBeta } from 'sailpoint-api-client';
 import { convertPascalCase2SpaceBased } from '../utils/stringUtils';
 import { ProvisioningPolicyTypeQuickPickItem } from '../models/ProvisioningPolicyTypeQuickPickItem';
 import { openPreview } from '../utils/vsCodeHelpers';
+import { TenantService } from '../services/TenantService';
+import { validateTenantReadonly } from './validateTenantReadonly';
 
 
 
@@ -63,55 +65,63 @@ async function askProvisioningPolicyName(): Promise<string | undefined> {
 /**
  * Command used to create a new provisionnig policy
  */
-export async function newProvisioningPolicy(treeItem: ProvisioningPoliciesTreeItem): Promise<void> {
+export class NewProvisioningPolicyCommand {
+    
+    constructor(private readonly tenantService: TenantService) { }
 
-    console.log("> newProvisioningPolicy", treeItem);
+    public async execute(node: ProvisioningPoliciesTreeItem): Promise<void> {
 
-    const usageType = await askProvisioningPolicyType();
-    if (usageType === undefined) {
-        return;
-    }
+        console.log("> newProvisioningPolicy", node);
+        if (!(await validateTenantReadonly(this.tenantService, node.tenantId, `create a new provisioning policy`))) {
+            return
+        }
 
-    const provisioningPolicyName = await askProvisioningPolicyName() || "";
-    if (isEmpty(provisioningPolicyName)) {
-        return;
-    }
+        const usageType = await askProvisioningPolicyType();
+        if (usageType === undefined) {
+            return;
+        }
 
-    await vscode.window.withProgress({
-        location: vscode.ProgressLocation.Notification,
-        title: 'Creating File...',
-        cancellable: false
-    }, async (task, token) => {
+        const provisioningPolicyName = await askProvisioningPolicyName() || "";
+        if (isEmpty(provisioningPolicyName)) {
+            return;
+        }
 
-        let newUri = treeItem.parentUri?.with({
-            path: path.posix.join(
-                getPathByUri(treeItem.parentUri) || "",
-                'provisioning-policies',
-                NEW_ID,
-                usageType
-            )
+        await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: 'Creating File...',
+            cancellable: false
+        }, async () => {
+
+            let newUri = node.parentUri?.with({
+                path: path.posix.join(
+                    getPathByUri(node.parentUri) || "",
+                    'provisioning-policies',
+                    NEW_ID,
+                    usageType
+                )
+            });
+            if (!newUri) { return; }
+            const data = {
+                "name": provisioningPolicyName,
+                "description": null,
+                "usageType": usageType,
+                "fields": []
+            };
+            await vscode.workspace.fs.writeFile(
+                newUri,
+                str2Uint8Array(JSON.stringify(data))
+            );
+            newUri = node.parentUri?.with({
+                path: path.posix.join(
+                    getPathByUri(node.parentUri) || "",
+                    'provisioning-policies',
+                    usageType,
+                    provisioningPolicyName
+                )
+            });
+            if (!newUri) { return; }
+
+            openPreview(newUri)
         });
-        if (!newUri) { return; }
-        const data = {
-            "name": provisioningPolicyName,
-            "description": null,
-            "usageType": usageType,
-            "fields": []
-        };
-        await vscode.workspace.fs.writeFile(
-            newUri,
-            str2Uint8Array(JSON.stringify(data))
-        );
-        newUri = treeItem.parentUri?.with({
-            path: path.posix.join(
-                getPathByUri(treeItem.parentUri) || "",
-                'provisioning-policies',
-                usageType,
-                provisioningPolicyName
-            )
-        });
-        if (!newUri) { return; }
-
-        openPreview(newUri)
-    });
+    }
 }

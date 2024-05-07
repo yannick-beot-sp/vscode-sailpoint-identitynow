@@ -1,13 +1,18 @@
 import { chooseFile } from '../../utils/vsCodeHelpers';
 import { AccessProfilesTreeItem } from '../../models/ISCTreeItem';
 import { AccessProfileImporter } from './AccessProfileImporter';
+import { validateTenantReadonly } from '../validateTenantReadonly';
+import { TenantService } from '../../services/TenantService';
 
 export class AccessProfileImporterTreeViewCommand {
 
-    async execute(node?: AccessProfilesTreeItem): Promise<void> {
+    constructor(private readonly tenantService: TenantService) { }
+
+    async execute(node: AccessProfilesTreeItem): Promise<void> {
         console.log("> AccessProfileImporterTreeViewCommand.execute");
-        if (node ===undefined) {
-            return;
+        
+        if (!(await validateTenantReadonly(this.tenantService, node.tenantId, `import access profiles`))) {
+            return
         }
 
         const fileUri = await chooseFile('CSV files', 'csv');

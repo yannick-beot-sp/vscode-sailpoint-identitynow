@@ -3,7 +3,7 @@ import { BaseCSVExporter } from "../BaseExporter";
 import { RolesTreeItem } from '../../models/ISCTreeItem';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
-import { EntitlementRef, RequestabilityForRole, Revocability, RevocabilityForRole, Role, RoleMembershipSelectorType, RolesApiListRolesRequest } from 'sailpoint-api-client';
+import { EntitlementRef, RequestabilityForRole, RevocabilityForRole, Role, RoleMembershipSelectorType, RolesApiListRolesRequest } from 'sailpoint-api-client';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { roleApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
@@ -15,18 +15,14 @@ import { CacheService } from '../../services/cache/CacheService';
 import { EntitlementIdToSourceNameCacheService } from '../../services/cache/EntitlementIdToSourceNameCacheService';
 
 export class RoleExporterCommand {
+    
     /**
      * Entry point 
      * @param node 
      * @returns 
      */
-    async execute(node?: RolesTreeItem) {
+    async execute(node: RolesTreeItem) {
         console.log("> RoleExporterCommand.execute");
-
-        if (node === undefined) {
-            console.error("WARNING: RoleExporterCommand: invalid item", node);
-            throw new Error("RoleExporterCommand: invalid item");
-        }
 
         const proposedPath = PathProposer.getRoleReportFilename(
             node.tenantName,
