@@ -1194,15 +1194,15 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.identities.delete",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity/"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/"
         },
         {
           "command": "vscode-sailpoint-identitynow.identities.att-sync",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity/"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/"
         },
         {
           "command": "vscode-sailpoint-identitynow.identities.process",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity/"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/"
         }
       ],
       "editor/context": [
