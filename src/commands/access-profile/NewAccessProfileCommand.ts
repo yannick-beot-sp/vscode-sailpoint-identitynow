@@ -54,8 +54,7 @@ export class NewAccessProfileCommand {
                     },
                     "create an access profile"),
                 new InputPromptStep({
-                    name: "accessProfileName",
-                    displayName: "access profile",
+                    name: "accessProfile",
                     options: {
                         validateInput: (s: string) => { return accessProfileNameValidator.validate(s); }
                     }
@@ -98,7 +97,7 @@ export class NewAccessProfileCommand {
             title: 'Creating File...',
             cancellable: false
         }, async (task, token) => {
-            const name = values["accessProfileName"].trim();
+            const name = values["accessProfile"].trim();
             const tenantName = values["tenant"].tenantName;
             const newUri = getResourceUri(tenantName, 'access-profiles', NEW_ID, name);
 

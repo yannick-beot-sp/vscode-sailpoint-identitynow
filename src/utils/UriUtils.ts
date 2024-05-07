@@ -1,6 +1,7 @@
 import { Uri } from "vscode";
 import { URL_PREFIX } from "../constants";
 import { posix } from "path";
+import { Interface } from "readline";
 
 export function withQuery(baseUrl: string, params: any): string {
 
@@ -15,6 +16,30 @@ export function withQuery(baseUrl: string, params: any): string {
     return url.toString();
 }
 
+
+export function buildResourceUri(params: {
+    tenantName: string;
+    resourceType: string; id: string;
+    name?: string | null;
+    subResourceType?: string; subId?: string;
+    beta?: boolean
+}) {
+    const beta = params.beta ?? false
+    const name = params.name?.replaceAll("/", "%2F")
+
+    const pathParts = [(beta ? 'beta' : 'v3'),
+        params.resourceType,
+        params.id,
+        params.subResourceType,
+        params.subId,
+        name].filter(x => !!x)
+
+    return Uri.from({
+        scheme: URL_PREFIX,
+        authority: params.tenantName,
+        path: "/" + pathParts?.join("/")
+    })
+}
 /**
  * Construct the Uri for an ISC resource
  * @param tenantName 

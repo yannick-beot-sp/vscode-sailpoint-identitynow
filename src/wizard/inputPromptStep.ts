@@ -1,5 +1,5 @@
 import { WizardPromptStep } from "./wizardPromptStep";
-import { capitalizeFirstLetter, isEmpty } from "../utils/stringUtils";
+import { capitalizeFirstLetter, convertPascalCase2SpaceBased, isEmpty } from "../utils/stringUtils";
 import { showInputBox } from "../utils/showInputBox";
 import { Wizard } from "./wizard";
 import { ExtInputBoxOptions } from "./ExtInputBoxOptions";
@@ -24,7 +24,7 @@ export class InputPromptStep<WizardContext> extends WizardPromptStep<WizardConte
         this._name = inputPromptStepOptions.name;
         this.id = this._name;
 
-        this._displayName = inputPromptStepOptions.displayName ?? this._name;
+        this._displayName = inputPromptStepOptions.displayName ?? convertPascalCase2SpaceBased(this._name);
 
 
         this._options = {
