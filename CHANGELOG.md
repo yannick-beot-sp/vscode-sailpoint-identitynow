@@ -6,6 +6,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [1.3.0] - 2024-05-09
+
 ### Changed 
 
 - Update for source aggregation and reset to leverage beta endpoints instead of CC endpoints
@@ -15,7 +17,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 - Add searching and viewing identities by [@henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#74](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/74))
 - Add attribute sync, process and delete command on identities by [@henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#74](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/74))
-- Lock tenant as read-only to prevent any change (cf. [#75](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/75))
+- Lock tenant as read-only to prevent any change (cf. [#75](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/75) and [#81](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/81)))
 
 ### Fixed
 
