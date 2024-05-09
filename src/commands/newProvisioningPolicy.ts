@@ -1,15 +1,28 @@
-import path = require('path');
 import * as vscode from 'vscode';
-import { NEW_ID } from '../constants';
+import * as commands from './constants';
 import { ProvisioningPoliciesTreeItem } from "../models/ISCTreeItem";
-import { compareByLabel, str2Uint8Array } from '../utils';
-import { isEmpty } from '../utils/stringUtils';
-import { getPathByUri } from '../utils/UriUtils';
+import { compareByLabel } from '../utils';
+import { buildResourceUri, getIdByUri } from '../utils/UriUtils';
 import { UsageTypeBeta } from 'sailpoint-api-client';
 import { convertPascalCase2SpaceBased } from '../utils/stringUtils';
 import { ProvisioningPolicyTypeQuickPickItem } from '../models/ProvisioningPolicyTypeQuickPickItem';
 import { openPreview } from '../utils/vsCodeHelpers';
+import { TenantService } from '../services/TenantService';
+import { WizardContext } from '../wizard/wizardContext';
+import { runWizard } from '../wizard/wizard';
+import { QuickPickTenantStep } from '../wizard/quickPickTenantStep';
+import { Validator } from '../validator/validator';
+import { InputPromptStep } from '../wizard/inputPromptStep';
+import { QuickPickPromptStep } from '../wizard/quickPickPromptStep';
+import { ISCClient } from '../services/ISCClient';
 
+
+
+const provisioningPolicyNameValidator = new Validator({
+    required: true,
+    maxLength: 50,
+    regexp: '^[A-Za-z0-9 _:;,={}@()#-|^%$!?.*]{1,50}$'
+});
 
 
 function prepareUsageTypePickItems(): Array<ProvisioningPolicyTypeQuickPickItem> {
@@ -24,94 +37,77 @@ function prepareUsageTypePickItems(): Array<ProvisioningPolicyTypeQuickPickItem>
         .sort((a, b) => a.value === FIRST ? -1 : b.value === FIRST ? 1 : 0);
 }
 
-
-async function askProvisioningPolicyType(): Promise<string | undefined> {
-
-    const typePickList = prepareUsageTypePickItems();
-    const result = await vscode.window.showQuickPick(typePickList, {
-        ignoreFocusOut: true,
-        title: "Type of provisioning policy",
-        canPickMany: false
-    });
-
-    return result?.value;
-}
-
-async function askProvisioningPolicyName(): Promise<string | undefined> {
-    const result = await vscode.window.showInputBox({
-        value: '',
-        ignoreFocusOut: true,
-        placeHolder: 'Provisioning Policy name',
-        prompt: "Enter the provisioning policy name",
-        title: 'Identity Security Cloud',
-        validateInput: text => {
-            if (text === '') {
-                return "You must provide a Provisioning Policy name.";
-            }
-
-            // '+' removed from allowed character as known issue during search/filter of transform 
-            // If search/filter is failing, the transform is not properly closed and reopened
-            const regex = new RegExp('^[a-z0-9 _:;,={}@()#-|^%$!?.*]{1,50}$', 'i');
-            if (regex.test(text)) {
-                return null;
-            }
-            return "Invalid Provisioning Policy name";
-        }
-    });
-    return result;
-}
 /**
  * Command used to create a new provisionnig policy
  */
-export async function newProvisioningPolicy(treeItem: ProvisioningPoliciesTreeItem): Promise<void> {
+export class NewProvisioningPolicyCommand {
 
-    console.log("> newProvisioningPolicy", treeItem);
+    constructor(private readonly tenantService: TenantService) { }
 
-    const usageType = await askProvisioningPolicyType();
-    if (usageType === undefined) {
-        return;
-    }
+    public async execute(node: ProvisioningPoliciesTreeItem): Promise<void> {
+        console.log("> newProvisioningPolicy", node);
 
-    const provisioningPolicyName = await askProvisioningPolicyName() || "";
-    if (isEmpty(provisioningPolicyName)) {
-        return;
-    }
+        const context: WizardContext = {};
 
-    await vscode.window.withProgress({
-        location: vscode.ProgressLocation.Notification,
-        title: 'Creating File...',
-        cancellable: false
-    }, async (task, token) => {
+        // if the command is called from the Tree View
+        if (node !== undefined && node instanceof ProvisioningPoliciesTreeItem) {
+            context["tenant"] = this.tenantService.getTenant(node.tenantId);
+        }
+        let client: ISCClient | undefined = undefined;
+        const values = await runWizard({
+            title: "Creation of a provisioning policy",
+            hideStepCount: false,
+            promptSteps: [
+                new QuickPickTenantStep(
+                    this.tenantService,
+                    async (wizardContext) => {
+                        client = new ISCClient(
+                            wizardContext["tenant"].id, wizardContext["tenant"].tenantName);
+                    },
+                    "create a provisioning policy"),
+                new QuickPickPromptStep({
+                    name: "provisioningPolicyType",
+                    items: prepareUsageTypePickItems
+                }),
+                new InputPromptStep({
+                    name: "provisioningPolicy",
+                    options: {
+                        validateInput: (s: string) => { return provisioningPolicyNameValidator.validate(s); }
+                    }
+                }),
 
-        let newUri = treeItem.parentUri?.with({
-            path: path.posix.join(
-                getPathByUri(treeItem.parentUri) || "",
-                'provisioning-policies',
-                NEW_ID,
-                usageType
-            )
+            ]
+        }, context);
+        console.log({ values });
+        if (values === undefined) { return; }
+        const usageType = values["provisioningPolicyType"]
+        const provisioningPolicyName = values["provisioningPolicy"]
+        await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: 'Creating File...',
+            cancellable: false
+        }, async () => {
+
+            const data = {
+                "name": provisioningPolicyName,
+                "description": null,
+                "usageType": usageType.value,
+                "fields": []
+            };
+
+            const sourceId = getIdByUri(node.parentUri)
+            const newUri = buildResourceUri({
+                tenantName: values["tenant"].tenantName,
+                resourceType: "sources",
+                id: sourceId,
+                subResourceType: "provisioning-policies",
+                subId: usageType.value,
+                name: provisioningPolicyName
+            })
+
+            await client.createProvisioningPolicy(sourceId, data)
+            vscode.commands.executeCommand(commands.REFRESH_FORCED);
+            openPreview(newUri)
         });
-        if (!newUri) { return; }
-        const data = {
-            "name": provisioningPolicyName,
-            "description": null,
-            "usageType": usageType,
-            "fields": []
-        };
-        await vscode.workspace.fs.writeFile(
-            newUri,
-            str2Uint8Array(JSON.stringify(data))
-        );
-        newUri = treeItem.parentUri?.with({
-            path: path.posix.join(
-                getPathByUri(treeItem.parentUri) || "",
-                'provisioning-policies',
-                usageType,
-                provisioningPolicyName
-            )
-        });
-        if (!newUri) { return; }
-
-        openPreview(newUri)
-    });
+    }
 }

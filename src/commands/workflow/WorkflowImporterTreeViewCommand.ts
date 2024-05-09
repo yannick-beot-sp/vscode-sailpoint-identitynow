@@ -7,6 +7,8 @@ import { WorkflowBeta } from 'sailpoint-api-client';
 import { cleanUpWorkflow } from './utils';
 import { isBlank } from '../../utils/stringUtils';
 import * as commands from '../constants';
+import { TenantService } from '../../services/TenantService';
+import { validateTenantReadonly } from '../validateTenantReadonly';
 
 
 
@@ -28,10 +30,15 @@ async function askWorkflowName(defaultWorkflowName: string): Promise<string | un
 }
 
 export class WorkflowImporterTreeViewCommand {
+    constructor(private readonly tenantService: TenantService) { }
 
     async execute(node: WorkflowsTreeItem): Promise<void> {
         console.log("> WorkflowImporterTreeViewCommand.execute");
-
+        
+        if (!(await validateTenantReadonly(this.tenantService, node.tenantId, `import workflow`))) {
+            return
+        }
+        
         const fileUri = await chooseFile('JSON', 'json');
         if (fileUri === undefined) { return; }
 

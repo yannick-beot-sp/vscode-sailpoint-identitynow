@@ -1,7 +1,7 @@
 import { QuickPickItem, QuickPickItemKind, QuickPickOptions } from "vscode";
 import { WizardPromptStep } from "./wizardPromptStep";
 import { Wizard } from "./wizard";
-import { isEmpty } from "../utils/stringUtils";
+import { convertPascalCase2SpaceBased, isEmpty } from "../utils/stringUtils";
 import { showQuickPick } from "../utils/showQuickPick";
 import { GoBackError } from "../errors";
 
@@ -40,7 +40,7 @@ export class QuickPickPromptStep<WizardContext, T extends QuickPickItem> extends
         this._name = quickPickPromptStepOptions.name;
         this.id = this._name;
 
-        this._displayName = quickPickPromptStepOptions.displayName ?? this._name.toLowerCase();
+        this._displayName = quickPickPromptStepOptions.displayName ?? convertPascalCase2SpaceBased(this._name).toLowerCase();
 
         this._options = {
             ...quickPickPromptStepOptions.options

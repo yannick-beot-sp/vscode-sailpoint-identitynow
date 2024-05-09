@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as commands from '../commands/constants';
 import { URL_PREFIX } from '../constants';
 import { ISCClient } from '../services/ISCClient';
 import { TenantService } from '../services/TenantService';
@@ -95,6 +96,7 @@ export class FileHandler {
 
             // Open document and then show document to force JSON
            openPreview(newUri, 'json', false)
+           vscode.commands.executeCommand(commands.REFRESH_FORCED)
         }
     }
 }

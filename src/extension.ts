@@ -6,7 +6,7 @@ import { AccessProfileExporterCommand } from './commands/access-profile/ExportAc
 import { NewAccessProfileCommand } from './commands/access-profile/NewAccessProfileCommand';
 import { AddTenantCommand } from './commands/addTenant';
 import { ConnectorRuleCommand } from './commands/rule/connectorRuleCommand';
-import { deleteResource } from './commands/deleteResource';
+import { DeleteResourceCommand } from './commands/deleteResourceCommand';
 import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './commands/source/exportAccounts';
 import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from './commands/source/exportEntitlementDetails';
 import { ExportScriptFromRuleCommand } from './commands/rule/exportScriptFromRuleCommand';
@@ -14,9 +14,9 @@ import { AccessProfileFilterCommand, RoleFilterCommand, IdentityDefinitionFilter
 import { AccountImportNodeCommand } from './commands/source/importAccount';
 import { EntitlementDetailsImportNodeCommand } from './commands/source/importEntitlementDetails';
 import { UncorrelatedAccountImportNodeCommand } from './commands/source/importUncorrelatedAccount';
-import { newProvisioningPolicy } from './commands/newProvisioningPolicy';
-import { newSchema } from './commands/newSchema';
-import { NewTransformCommand } from './commands/newTransform';
+import { NewProvisioningPolicyCommand } from './commands/newProvisioningPolicy';
+import { NewSchemaCommand } from './commands/newSchemaCommand';
+import { NewTransformCommand } from './commands/newTransformCommand';
 import { OpenResourceCommand } from './commands/openResource';
 import { refreshIdentityProfile } from './commands/refreshIdentityProfile';
 import { RenameTenantCommand } from './commands/renameTenant';
@@ -33,7 +33,7 @@ import { ImportConfigPaletteCommand } from './commands/spconfig-import/ImportCon
 import { ImportConfigTreeViewCommand } from './commands/spconfig-import/ImportConfigTreeViewCommand';
 import { TestWorkflowCommand } from './commands/workflow/testWorkflow';
 import { viewWorkflowExecutionHistory } from './commands/workflow/viewWorkflowExecutionHistory';
-import { disableWorkflow, enableWorkflow } from './commands/workflow/updateWorkflowStatus';
+import { UpdateWorkflowStatusCommand } from './commands/workflow/updateWorkflowStatusCommand';
 import { URL_PREFIX } from './constants';
 import { FileHandler } from './files/FileHandler';
 import { ISCResourceProvider } from './files/ISCResourceProvider';
@@ -196,16 +196,16 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM,
 			(tenantTreeItem) => treeManager.evaluateTransform(tenantTreeItem)));
 
-	const accountImportNodeCommand = new AccountImportNodeCommand();
+	const accountImportNodeCommand = new AccountImportNodeCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_ACCOUNTS_VIEW,
 			accountImportNodeCommand.execute, accountImportNodeCommand));
 
-	const uncorrelatedAccountImportNodeCommand = new UncorrelatedAccountImportNodeCommand();
+	const uncorrelatedAccountImportNodeCommand = new UncorrelatedAccountImportNodeCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_UNCORRELATED_ACCOUNTS_VIEW,
 			uncorrelatedAccountImportNodeCommand.execute, uncorrelatedAccountImportNodeCommand));
-	const entitlementDetailsImportNodeCommand = new EntitlementDetailsImportNodeCommand();
+	const entitlementDetailsImportNodeCommand = new EntitlementDetailsImportNodeCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_ENTITLEMENT_DETAILS_VIEW,
 			entitlementDetailsImportNodeCommand.execute, entitlementDetailsImportNodeCommand));
@@ -228,9 +228,11 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.OPEN_RESOURCE,
 			openResourceCommand.execute));
 
+
+	const deleteResourceCommand = new DeleteResourceCommand(tenantService)
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.REMOVE_RESOURCE,
-			deleteResource));
+			deleteResourceCommand.execute, deleteResourceCommand));
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.LOAD_MORE,
@@ -251,12 +253,13 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.ACCESS_PROFILE_UPDATE_FILTER_VIEW,
 			accessProfileFilterCommand.execute, accessProfileFilterCommand));
 
+	const updateWorkflowStatusCommand = new UpdateWorkflowStatusCommand(tenantService)
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.ENABLE_WORKFLOW,
-			enableWorkflow));
+			updateWorkflowStatusCommand.enableWorkflow, updateWorkflowStatusCommand));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.DISABLE_WORKFLOW,
-			disableWorkflow));
+			updateWorkflowStatusCommand.disableWorkflow, updateWorkflowStatusCommand));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.VIEW_WORKFLOW_EXECUTION_HISTORY,
 			viewWorkflowExecutionHistory));
@@ -264,7 +267,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_WORKFLOW,
 			workflowExportCommand.execute, workflowExportCommand))
-	const workflowImporterTreeViewCommand = new WorkflowImporterTreeViewCommand()
+	const workflowImporterTreeViewCommand = new WorkflowImporterTreeViewCommand(tenantService)
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_WORKFLOW,
 			workflowImporterTreeViewCommand.execute, workflowImporterTreeViewCommand))
@@ -309,17 +312,21 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.MODIFIED_RESOURCE,
 			iscClientResourceProvider.triggerModified, iscClientResourceProvider));
-	const newTransformCommand = new NewTransformCommand();
+
+	const newTransformCommand = new NewTransformCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.NEW_TRANSFORM,
 			newTransformCommand.execute, newTransformCommand));
+
+	const newProvisioningPolicyCommand = new NewProvisioningPolicyCommand(tenantService)
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.NEW_PROVISIONING_POLICY,
-			newProvisioningPolicy));
+			newProvisioningPolicyCommand.execute, newProvisioningPolicyCommand));
 
+	const newSchemaCommand = new NewSchemaCommand(tenantService)
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.NEW_SCHEMA,
-			newSchema));
+			newSchemaCommand.execute, newSchemaCommand));
 
 	const workflowTester = new WorkflowTesterWebviewViewProvider(context, tenantService);
 	workflowTester.activate();
@@ -383,7 +390,7 @@ export function activate(context: vscode.ExtensionContext) {
 			accessProfileExporterCommand.execute, accessProfileExporterCommand));
 
 	// Access Profile Importer
-	const accessProfileImporterCommand = new AccessProfileImporterTreeViewCommand();
+	const accessProfileImporterCommand = new AccessProfileImporterTreeViewCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_ACCESS_PROFILE_VIEW,
 			accessProfileImporterCommand.execute, accessProfileImporterCommand));
@@ -405,7 +412,7 @@ export function activate(context: vscode.ExtensionContext) {
 			roleExporterCommand.execute, roleExporterCommand));
 
 	// Role Importer
-	const roleImporterCommand = new RoleImporterTreeViewCommand();
+	const roleImporterCommand = new RoleImporterTreeViewCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_ROLE_VIEW,
 			roleImporterCommand.execute, roleImporterCommand));
@@ -452,7 +459,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.EXPORT_FORMS_ICON_VIEW,
 			formDefinitionExportCommand.execute, formDefinitionExportCommand));
 
-	const formDefinitionImporterTreeViewCommand = new FormDefinitionImporterTreeViewCommand()
+	const formDefinitionImporterTreeViewCommand = new FormDefinitionImporterTreeViewCommand(tenantService)
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_FORMS_VIEW,
 			formDefinitionImporterTreeViewCommand.execute, formDefinitionImporterTreeViewCommand));

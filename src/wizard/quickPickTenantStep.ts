@@ -1,3 +1,5 @@
+import { validateTenantReadonly } from "../commands/validateTenantReadonly";
+import { UserCancelledError } from "../errors";
 import { TenantInfoQuickPickItem } from "../models/TenantInfoQuickPickItem";
 import { TenantService } from "../services/TenantService";
 import { QuickPickPromptStep } from "./quickPickPromptStep";
@@ -5,8 +7,9 @@ import { WizardContext } from "./wizardContext";
 
 export class QuickPickTenantStep extends QuickPickPromptStep<WizardContext, TenantInfoQuickPickItem> {
     constructor(
-        private readonly tenantService: TenantService,
-        afterPrompt?: (wizardContext: WizardContext) => Promise<void>
+        tenantService: TenantService,
+        afterPrompt: (wizardContext: WizardContext) => Promise<void>,
+        actionName?: string
     ) {
         super({
             name: "tenant",
@@ -18,8 +21,16 @@ export class QuickPickTenantStep extends QuickPickPromptStep<WizardContext, Tena
                     .map(obj => ({ ...obj, label: obj?.name, detail: obj?.tenantName }));
                 return tenantQuickPickItems;
             },
-            
+
         });
-        this.afterPrompt = afterPrompt;
+        this.afterPrompt = async (wizardContext: WizardContext) => {
+            if (actionName !== undefined && !(await validateTenantReadonly(tenantService, wizardContext["tenant"].id, actionName))) {
+                throw new UserCancelledError()
+            }
+
+            if (afterPrompt) {
+                afterPrompt(wizardContext)
+            }
+        };
     }
 }

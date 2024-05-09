@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { AccessProfileImporter } from './AccessProfileImporter';
 import { TenantService } from '../../services/TenantService';
 import { chooseTenant } from '../../utils/vsCodeHelpers';
+import { validateTenantReadonly } from '../validateTenantReadonly';
 
 
 export class AccessProfileImporterExplorerCommand {
@@ -16,6 +17,10 @@ export class AccessProfileImporterExplorerCommand {
         console.log("AccessProfileImporterExplorerCommand.execute: tenant = ", tenantInfo);
         if (!tenantInfo) {
             return;
+        }
+
+        if (!(await validateTenantReadonly(this.tenantService, tenantInfo.id, `import access profiles`))) {
+            return
         }
 
         const accessProfileImporter = new AccessProfileImporter(

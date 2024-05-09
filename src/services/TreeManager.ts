@@ -9,6 +9,7 @@ import { TransformEvaluator } from './TransformEvaluator';
 import { TaskStatusBeta, TaskStatusBetaCompletionStatusEnum } from 'sailpoint-api-client';
 import { confirm } from '../utils/vsCodeHelpers';
 import { formatTask, waifForJob } from '../commands/source/sourceUtils';
+import { isTenantReadonly, validateTenantReadonly } from '../commands/validateTenantReadonly';
 
 export class TreeManager {
 
@@ -51,8 +52,14 @@ export class TreeManager {
 
     public async resetEntitlements(item: SourceTreeItem, doConfirm = true): Promise<TaskStatusBeta | undefined> {
         console.log("> resetEntitlements", item)
-        if (doConfirm && !(await confirm(`Are you sure you want to reset entitlements for ${item.label}?`))) {
-            return
+        if (doConfirm) {
+            if (isTenantReadonly(this.tenantService, item.tenantId)) {
+                if (!(await validateTenantReadonly(this.tenantService, item.tenantId, `reset entitlements for ${item.label}`))) {
+                    return
+                }
+            } else if (!(await confirm(`Are you sure you want to reset entitlements for ${item.label}?`))) {
+                return
+            }
         }
 
         const client = new ISCClient(item.tenantId, item.tenantName);
@@ -76,8 +83,14 @@ export class TreeManager {
 
     public async resetAccounts(item: SourceTreeItem, doConfirm = true): Promise<TaskStatusBeta | undefined> {
         console.log("> resetAccounts", item)
-        if (doConfirm && !(await confirm(`Are you sure you want to reset accounts for ${item.label}?`))) {
-            return
+        if (doConfirm) {
+            if (isTenantReadonly(this.tenantService, item.tenantId)) {
+                if (!(await validateTenantReadonly(this.tenantService, item.tenantId, `reset accounts for ${item.label}`))) {
+                    return
+                }
+            } else if (!(await confirm(`Are you sure you want to reset accounts for ${item.label}?`))) {
+                return
+            }
         }
 
         const client = new ISCClient(item.tenantId, item.tenantName);
@@ -101,6 +114,11 @@ export class TreeManager {
 
     public async aggregateEntitlements(item: SourceTreeItem): Promise<void> {
         console.log("> aggregateEntitlements", item)
+
+        if (!(await validateTenantReadonly(this.tenantService, item.tenantId, `aggregate entitlements for ${item.label}`))) {
+            return
+        }
+
         const client = new ISCClient(item.tenantId, item.tenantName);
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
@@ -120,6 +138,10 @@ export class TreeManager {
 
     public async aggregateSource(item: SourceTreeItem, disableOptimization = false): Promise<void> {
         console.log("> aggregateSource", item, disableOptimization);
+
+        if (!(await validateTenantReadonly(this.tenantService, item.tenantId, `aggregate source ${item.label}`))) {
+            return
+        }
 
         const client = new ISCClient(item.tenantId, item.tenantName);
         await vscode.window.withProgress({
@@ -142,9 +164,15 @@ export class TreeManager {
 
     public async resetSource(item: SourceTreeItem): Promise<void> {
         console.log("> resetSource", item);
-        if (!(await confirm(`Are you sure you want to reset the source ${item.label}?`))) {
+
+        if (isTenantReadonly(this.tenantService, item.tenantId)) {
+            if (!(await validateTenantReadonly(this.tenantService, item.tenantId, `reset the source ${item.label}`))) {
+                return
+            }
+        } else if (!(await confirm(`Are you sure you want to reset the source ${item.label}?`))) {
             return
         }
+
         const task = await this.resetAccounts(item, false)
         if (task?.completionStatus.toUpperCase() === TaskStatusBetaCompletionStatusEnum.Success.toUpperCase()) {
             await this.resetEntitlements(item, false)

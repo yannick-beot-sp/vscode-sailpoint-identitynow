@@ -5,6 +5,8 @@ import { CSVReader } from '../../services/CSVReader';
 import { UncorrelatedAccount } from '../../models/UncorrelatedAccount';
 import { chooseFile } from '../../utils/vsCodeHelpers';
 import { isEmpty } from '../../utils/stringUtils';
+import { TenantService } from '../../services/TenantService';
+import { validateTenantReadonly } from '../validateTenantReadonly';
 
 interface UncorrelatedAccountImportResult {
     correlated: number
@@ -130,15 +132,17 @@ class UncorrelatedAccountImporter {
  */
 export class UncorrelatedAccountImportNodeCommand {
 
+    constructor(private readonly tenantService: TenantService) { }
+
     async execute(node?: SourceTreeItem): Promise<void> {
         console.log("> UncorrelatedAccountImportNodeCommand.execute");
-        if (node === undefined) {
-            console.error("UncorrelatedAccountImportNodeCommand: invalid item", node);
-            throw new Error("UncorrelatedAccountImportNodeCommand: invalid item");
+
+        if (!(await validateTenantReadonly(this.tenantService, node.tenantId, `import uncorrelated accounts in ${node.label}`))) {
+            return
         }
 
         const fileUri = await chooseFile('CSV files', 'csv');
-        if (fileUri === undefined ) { return; }
+        if (fileUri === undefined) { return; }
 
         const accountImporter = new UncorrelatedAccountImporter(
             node.tenantId,

@@ -1,6 +1,5 @@
-import { InputBoxOptions } from "vscode";
 import { WizardPromptStep } from "./wizardPromptStep";
-import { isEmpty } from "../utils/stringUtils";
+import { capitalizeFirstLetter, convertPascalCase2SpaceBased, isEmpty } from "../utils/stringUtils";
 import { showInputBox } from "../utils/showInputBox";
 import { Wizard } from "./wizard";
 import { ExtInputBoxOptions } from "./ExtInputBoxOptions";
@@ -25,7 +24,7 @@ export class InputPromptStep<WizardContext> extends WizardPromptStep<WizardConte
         this._name = inputPromptStepOptions.name;
         this.id = this._name;
 
-        this._displayName = inputPromptStepOptions.displayName ?? this._name.toLowerCase();
+        this._displayName = inputPromptStepOptions.displayName ?? convertPascalCase2SpaceBased(this._name);
 
 
         this._options = {
@@ -33,11 +32,11 @@ export class InputPromptStep<WizardContext> extends WizardPromptStep<WizardConte
         };
 
         if (isEmpty(inputPromptStepOptions.options?.prompt)) {
-            this._options.prompt = `Enter the ${this._displayName} name`;
+            this._options.prompt = `Enter the ${this._displayName.toLowerCase()} name`;
         }
 
         if (isEmpty(inputPromptStepOptions.options?.placeHolder)) {
-            this._options.placeHolder = `${this._displayName} name`;
+            this._options.placeHolder = `${capitalizeFirstLetter(this._displayName)} name`;
         }
     }
 

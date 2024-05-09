@@ -1,21 +1,91 @@
 import * as vscode from 'vscode';
-import { NEW_ID } from '../../constants';
+import * as commands from '../constants';
+import { NEW_ID, RESOURCE_TYPES } from '../../constants';
 import { RulesTreeItem } from "../../models/ISCTreeItem";
 import { ISCClient } from '../../services/ISCClient';
 import { TenantService } from '../../services/TenantService';
 import { compareByName } from '../../utils';
-import { isEmpty } from '../../utils/stringUtils';
-import { getResourceUri } from '../../utils/UriUtils';
+import { buildResourceUri } from '../../utils/UriUtils';
 import { chooseTenant, createNewFile, getSelectionContent, openPreview } from '../../utils/vsCodeHelpers';
-import * as commands from '../constants';
 import { ConnectorRuleResponseBeta } from 'sailpoint-api-client';
-const rules: ConnectorRuleResponseBeta[] = require('../../../snippets/connector-rules.json');
+import { Validator } from '../../validator/validator';
+import { WizardContext } from '../../wizard/wizardContext';
+import { QuickPickPromptStep } from '../../wizard/quickPickPromptStep';
+import { runWizard } from '../../wizard/wizard';
+import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
+import { IWizardOptions } from '../../wizard/wizardOptions';
+import { WizardPromptStep } from '../../wizard/wizardPromptStep';
+import { InputPromptStep } from '../../wizard/inputPromptStep';
 
-/**
- * Internal constants
- */
-const UPDATE_RULE = "UPDATE";
-const NEW_RULE = "NEW";
+const ruleTypes: ConnectorRuleResponseBeta[] = require('../../../snippets/connector-rules.json')
+
+const ruleNameValidator = new Validator({
+    required: true,
+    maxLength: 128,
+    regexp: '^[A-Za-z0-9 _:;,={}@()#-|^%$!?.*]+$'
+});
+
+// QuickPickItem use label instead of name
+// Relying on "detail" instead of "description" as "detail" provides a longer view
+// therefore label and detail must be added and removed before returning the rule
+
+const mapRulesToPickItems = x => x.sort(compareByName)
+    .map(obj => ({ ...obj, label: obj.name, detail: obj.description }))
+    .filter(obj => {
+        delete obj.description
+        return true
+    })
+
+const mapPickItemToRule = rule => {
+    rule.description = rule.detail
+    // @ts-ignore
+    delete rule.label
+    delete rule.detail
+    return rule
+}
+
+const askRuleType = () => new QuickPickPromptStep({
+    name: "rule",
+    options: {
+        matchOnDetail: true
+    },
+    items: (context: WizardContext): vscode.QuickPickItem[] => mapRulesToPickItems(ruleTypes),
+    project: (value: vscode.QuickPickItem) => mapPickItemToRule(value)
+})
+
+const askRuleName = () => new InputPromptStep({
+    name: "ruleName",
+    displayName: "rule",
+    options: {
+        validateInput: (s: string) => { return ruleNameValidator.validate(s); }
+    }
+})
+
+class QuickPickUpdateExistingRuleStep extends QuickPickPromptStep<WizardContext, vscode.QuickPickItem> {
+    constructor(
+        private readonly yesSteps: WizardPromptStep<WizardContext>[],
+        private readonly noSteps: WizardPromptStep<WizardContext>[]
+    ) {
+        super({
+            name: "answer",
+            options: {
+                canPickMany: false,
+                placeHolder: "Do you want to update an existing rule?"
+            },
+            items: [
+                { label: "Yes", picked: false },
+                { label: "No", picked: false }
+            ]
+        });
+    }
+
+    public async getSubWizard(wizardContext: WizardContext): Promise<IWizardOptions<WizardContext> | undefined> {
+        return {
+            promptSteps: wizardContext["answer"].label === "Yes" ? this.yesSteps : this.noSteps
+        }
+    }
+}
+
 
 /**
  * Command used to open a source or a transform
@@ -35,48 +105,75 @@ export class ConnectorRuleCommand {
         if (!selection) {
             return;
         }
-        const answer = await this.askUpdateExistingRule();
-        if (!answer) {
-            return;
-        }
-        const tenantInfo = await chooseTenant(this.tenantService, 'Choose a tenant to update the rule');
-        console.log("upload: tenant = ", tenantInfo);
-        if (!tenantInfo) {
-            return;
-        }
-        const client = new ISCClient(tenantInfo.id, tenantInfo.tenantName);
+
+        const context: WizardContext = {};
+        let client: ISCClient | undefined = undefined;
+
+        const tenantStep = new QuickPickTenantStep(
+            this.tenantService,
+            async (wizardContext) => {
+                client = new ISCClient(
+                    wizardContext["tenant"].id, wizardContext["tenant"].tenantName);
+            },
+            "upload a connector rule")
+
+        const values = await runWizard({
+            title: "Upload a connector rule",
+            hideStepCount: false,
+            promptSteps: [
+                new QuickPickUpdateExistingRuleStep(
+                    [ // update existing rule
+                        tenantStep,
+                        new QuickPickPromptStep({
+                            name: "rule",
+                            options: {
+                                matchOnDetail: true
+                            },
+                            items: async (context: WizardContext): Promise<vscode.QuickPickItem[]> => mapRulesToPickItems(await client.getConnectorRules()),
+                            project: (value: vscode.QuickPickItem) => mapPickItemToRule(value)
+                        })
+                    ],
+                    [ // New rule
+                        tenantStep,
+                        askRuleName(),
+                        askRuleType()
+                    ]
+                )
+            ]
+        }, context);
+        console.log({ values });
+        if (values === undefined) { return; }
+
         let newUri: vscode.Uri;
+        const answer = values["answer"]
+        const rule = values["rule"]
+
+        rule.sourceCode.script = selection;
         try {
-            if (answer === UPDATE_RULE) {
-
-                const rule = await this.chooseExistingRule(client);
-                if (!rule) {
-                    return;
-                }
-
-                rule.sourceCode.script = selection;
+            if (answer.label === "Yes") {
+                // UPDATE_RULE
                 await client.updateConnectorRule(rule)
-                newUri = getResourceUri(tenantInfo.tenantName, 'connector-rules', rule.id, rule.name, true);
+                newUri = buildResourceUri({
+                    tenantName: values["tenant"].tenantName,
+                    resourceType: RESOURCE_TYPES.connectorRule,
+                    id: rule.id,
+                    name: rule.name
+                });
             } else {
                 // NEW_RULE
-                let ruleName = await this.askRuleName() || "";
-                if (isEmpty(ruleName)) {
-                    return;
-                }
-
-                const rule = await this.askRuleType();
-                if (!rule) {
-                    return;
-                }
-                rule.sourceCode.script = selection;
-                rule.name = ruleName;
+                rule.name = values["ruleName"];
                 const data = await client.createResource('/beta/connector-rules', JSON.stringify(rule));
-                newUri = getResourceUri(tenantInfo.tenantName, 'connector-rules', data.id, data.name, true);
+                newUri = buildResourceUri({
+                    tenantName: values["tenant"].tenantName,
+                    resourceType: RESOURCE_TYPES.connectorRule,
+                    id: data.id,
+                    name: data.name
+                });
             }
             openPreview(newUri)
             vscode.commands.executeCommand(commands.REFRESH_FORCED)
         } catch (error) {
-            const errorMessage = `Could not ${answer === UPDATE_RULE ? "update" : "create"} the rule: ${error}` 
+            const errorMessage = `Could not ${answer.label === "Yes" ? "update" : "create"} the rule: ${error}`
             vscode.window.showErrorMessage(errorMessage)
         }
 
@@ -110,111 +207,43 @@ export class ConnectorRuleCommand {
         }
     }
 
-    async newRule(tenant: RulesTreeItem): Promise<void> {
+    async newRule(node: RulesTreeItem): Promise<void> {
+        console.log("> NewConnectorRuleCommand.newRule", node);
+        const context: WizardContext = {};
+        context["tenant"] = this.tenantService.getTenant(node.tenantId);
+        const values = await runWizard({
+            title: "Creation of a new connector rule",
+            hideStepCount: false,
+            promptSteps: [
+                new QuickPickTenantStep(
+                    this.tenantService,
+                    async (wizardContext) => { },
+                    "create a new connector rule"),
+                askRuleName(),
+                askRuleType()
+            ]
+        }, context)
 
-        console.log("> NewConnectorRuleCommand.newRule", tenant);
+        console.log({ values });
+        if (values === undefined) { return; }
 
-        // assessing that item is a TenantTreeItem
-        if (tenant === undefined || !(tenant instanceof RulesTreeItem)) {
-            console.log("WARNING: NewConnectorRuleCommand.newRule: invalid node", tenant);
-            throw new Error("NewConnectorRuleCommand.newRule: invalid node");
-        }
-        const tenantName = tenant.tenantName || "";
-        if (isEmpty(tenantName)) {
-            return;
-        }
-        let ruleName = await this.askRuleName() || "";
-        if (isEmpty(ruleName)) {
-            return;
-        }
-
-        const rule = await this.askRuleType();
-        if (!rule) {
-            return;
-        }
+        const rule = values["rule"]
+        const tenantName = values["tenant"].tenantName
+        const ruleName = values["ruleName"]
 
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: 'Creating File...',
             cancellable: false
-        }, async (task, token) => {
-
-            const newUri = getResourceUri(tenantName, 'connector-rules', NEW_ID, ruleName, true);
+        }, async () => {
             rule.name = ruleName;
+            const newUri = buildResourceUri({
+                tenantName,
+                resourceType: RESOURCE_TYPES.connectorRule,
+                id: NEW_ID,
+                name: ruleName
+            })
             await createNewFile(newUri, rule);
         });
-    }
-
-    private async chooseExistingRule(client: ISCClient): Promise<ConnectorRuleResponseBeta | undefined> {
-        const rules = await client.getConnectorRules();
-        return await this.showPickRule(rules, 'Connector rule');
-    }
-
-    private async askUpdateExistingRule(): Promise<string | undefined> {
-        const answer = await vscode.window.showQuickPick(
-            ["No", "Yes"],
-            { placeHolder: 'Do you want to update an existing rule' });
-
-        if (answer === "Yes") { return UPDATE_RULE; }
-        else if (answer === "No") { return NEW_RULE; }
-        return undefined;
-
-    }
-
-    private async showPickRule(listRules: ConnectorRuleResponseBeta[], title: string): Promise<ConnectorRuleResponseBeta | undefined> {
-
-        // QuickPickItem use label instead of name
-        // Relying on "detail" instead of "description" as "detail" provides a longer view
-        // therefore label and detail must be added and removed before returning the rule
-        const rulePickList = listRules
-            .sort(compareByName)
-            .map(obj => ({ ...obj, label: obj.name, detail: obj.description }));
-
-        rulePickList.forEach(obj => delete obj.description);
-
-        const rule = await vscode.window.showQuickPick(rulePickList, {
-            ignoreFocusOut: false,
-            title: title,
-            canPickMany: false
-        });
-        if (rule?.label) {
-            rule.description = rule.detail;
-            // @ts-ignore
-            delete rule.label;
-            delete rule.detail;
-        }
-        return rule;
-    }
-
-    private async askRuleName(): Promise<string | undefined> {
-        const result = await vscode.window.showInputBox({
-            value: '',
-            ignoreFocusOut: true,
-            placeHolder: 'Connector Rule name',
-            prompt: "Enter the Connector Rule name",
-            title: 'Identity Security Cloud',
-            validateInput: text => {
-                if (text && text.length > 128) {
-                    return "Connector Rule name cannot exceed 128 characters.";
-                }
-
-                if (text === '') {
-                    return "You must provide a Connector Rule name.";
-                }
-
-                // '+' removed from allowed character as known issue during search/filter of transform 
-                // If search/filter is failing, the transform is not properly closed and reopened
-                const regex = new RegExp('^[a-z0-9 _:;,={}@()#-|^%$!?.*]{1,128}$', 'i');
-                if (regex.test(text)) {
-                    return null;
-                }
-                return "Invalid Connector Rule name";
-            }
-        });
-        return result?.trim();
-    }
-
-    private async askRuleType(): Promise<ConnectorRuleResponseBeta | undefined> {
-        return await this.showPickRule(rules, 'Connector rule type');
     }
 }

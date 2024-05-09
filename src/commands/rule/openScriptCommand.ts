@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { ISCResourceTreeItem, RuleTreeItem } from "../../models/ISCTreeItem";
+import { RuleTreeItem } from "../../models/ISCTreeItem";
 import { openPreview } from '../../utils/vsCodeHelpers';
 
 /**
@@ -16,7 +16,7 @@ export class OpenScriptCommand {
             location: vscode.ProgressLocation.Notification,
             title: 'Opening Rule...',
             cancellable: false
-        }, async (task, token) => {
+        }, async () => {
             await openPreview(newUri, 'java')
         });
     }
