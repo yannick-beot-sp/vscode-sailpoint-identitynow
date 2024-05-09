@@ -1,5 +1,5 @@
 import { Uri } from "vscode";
-import { URL_PREFIX } from "../constants";
+import { CONNECTOR_RULE, URL_PREFIX } from "../constants";
 import { posix } from "path";
 import { Interface } from "readline";
 
@@ -22,9 +22,14 @@ export function buildResourceUri(params: {
     resourceType: string; id: string;
     name?: string | null;
     subResourceType?: string; subId?: string;
-    beta?: boolean
 }) {
-    const beta = params.beta ?? false
+    let beta = false
+    switch (params.resourceType) {
+        case CONNECTOR_RULE:
+            beta = true
+            break;
+    }
+
     const name = params.name?.replaceAll("/", "%2F")
 
     const pathParts = [(beta ? 'beta' : 'v3'),
