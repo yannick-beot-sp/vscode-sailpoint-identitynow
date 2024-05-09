@@ -5,5 +5,6 @@ export const NEW_ID = '00000000000000000000000000000000';
 export const CSV_MULTIVALUE_SEPARATOR = ';';
 
 
-export const CONNECTOR_RULE = "connector-rules"
-
+export const RESOURCE_TYPES = {
+    connectorRule : "connector-rules"
+} as const

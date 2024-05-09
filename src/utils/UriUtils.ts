@@ -1,7 +1,6 @@
 import { Uri } from "vscode";
-import { CONNECTOR_RULE, URL_PREFIX } from "../constants";
+import { RESOURCE_TYPES, URL_PREFIX } from "../constants";
 import { posix } from "path";
-import { Interface } from "readline";
 
 export function withQuery(baseUrl: string, params: any): string {
 
@@ -25,7 +24,7 @@ export function buildResourceUri(params: {
 }) {
     let beta = false
     switch (params.resourceType) {
-        case CONNECTOR_RULE:
+        case RESOURCE_TYPES.connectorRule:
             beta = true
             break;
     }

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as commands from '../constants';
-import { CONNECTOR_RULE, NEW_ID } from '../../constants';
+import { NEW_ID, RESOURCE_TYPES } from '../../constants';
 import { RulesTreeItem } from "../../models/ISCTreeItem";
 import { ISCClient } from '../../services/ISCClient';
 import { TenantService } from '../../services/TenantService';
@@ -155,7 +155,7 @@ export class ConnectorRuleCommand {
                 await client.updateConnectorRule(rule)
                 newUri = buildResourceUri({
                     tenantName: values["tenant"].tenantName,
-                    resourceType: CONNECTOR_RULE,
+                    resourceType: RESOURCE_TYPES.connectorRule,
                     id: rule.id,
                     name: rule.name
                 });
@@ -165,7 +165,7 @@ export class ConnectorRuleCommand {
                 const data = await client.createResource('/beta/connector-rules', JSON.stringify(rule));
                 newUri = buildResourceUri({
                     tenantName: values["tenant"].tenantName,
-                    resourceType: CONNECTOR_RULE,
+                    resourceType: RESOURCE_TYPES.connectorRule,
                     id: data.id,
                     name: data.name
                 });
@@ -239,7 +239,7 @@ export class ConnectorRuleCommand {
             rule.name = ruleName;
             const newUri = buildResourceUri({
                 tenantName,
-                resourceType: CONNECTOR_RULE,
+                resourceType: RESOURCE_TYPES.connectorRule,
                 id: NEW_ID,
                 name: ruleName
             })
