@@ -17,6 +17,7 @@ import { Parser } from '../../parser/parser';
 import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService';
 import { EntitlementCacheService, KEY_SEPARATOR } from '../../services/cache/EntitlementCacheService';
 import { truethy } from '../../utils/booleanUtils';
+import { UserCancelledError } from '../../errors';
 
 interface RolesImportResult {
     success: number
@@ -70,7 +71,7 @@ export class RoleImporter {
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Importing roles to ${this.tenantDisplayName}...`,
-            cancellable: false
+            cancellable: true
         }, async (task, token) =>
             await this.importFile(task, token)
         );
@@ -98,159 +99,179 @@ export class RoleImporter {
         const sourceCacheService = new SourceNameToIdCacheService(this.client);
         const entitlementCacheService = new EntitlementCacheService(this.client);
         const parser = new Parser();
+        try {
+            await csvReader.processLine(async (data: RoleCSVRecord) => {
+                if (token.isCancellationRequested) {
+                    throw new UserCancelledError();
+                }
 
-        await csvReader.processLine(async (data: RoleCSVRecord) => {
-
-            processedLines++;
-
-            if (token.isCancellationRequested) {
-                // skip
-                return;
-            }
-            task.report({ increment: incr, message: data.name });
-            if (isEmpty(data.name)) {
-                result.error++;
-                const nameMessage = `Missing attribute 'name' in record`;
-                await this.writeLog(processedLines, 'role', CSVLogWriterLogType.ERROR, nameMessage);
-                vscode.window.showErrorMessage(nameMessage);
-                return;
-            }
-
-            const roleName = data.name.trim();
-
-            if (isEmpty(data.owner)) {
-                result.error++;
-                const owMessage = `Missing 'owner' in CSV`;
-                await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, owMessage);
-                vscode.window.showErrorMessage(owMessage);
-                return;
-            }
-
-            let ownerId: string;
-            try {
-                ownerId = await identityCacheService.get(data.owner);
-            } catch (error) {
-                result.error++;
-                const srcMessage = `Unable to find owner with name '${data.owner}' in IDN`;
-                await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, srcMessage);
-                vscode.window.showErrorMessage(srcMessage);
-                return;
-            }
-
-            let accessProfiles: AccessProfileRef[] = [];
-            if (isNotBlank(data.accessProfiles)) {
-                try {
-                    accessProfiles = await Promise.all(data.accessProfiles.split(CSV_MULTIVALUE_SEPARATOR).map(async (apName) => ({
-                        name: apName,
-                        "id": (await accessProfileNameToIdCacheService.get(apName)),
-                        "type": "ACCESS_PROFILE"
-                    })));
-                } catch (error) {
+                task.report({ increment: incr, message: data.name });
+                if (isEmpty(data.name)) {
                     result.error++;
-                    const etMessage = `Unable to find access an access profile: ${error}`;
-                    await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, etMessage);
-                    vscode.window.showErrorMessage(etMessage);
+                    const nameMessage = `Missing attribute 'name' in record`;
+                    await this.writeLog(processedLines, 'role', CSVLogWriterLogType.ERROR, nameMessage);
+                    vscode.window.showErrorMessage(nameMessage);
                     return;
                 }
-            }
-            let entitlements: EntitlementRef[] = []
-            if (isNotBlank(data.entitlements)) {
-                try {
-                    entitlements = await Promise.all(data.entitlements
-                        .split(CSV_MULTIVALUE_SEPARATOR)
-                        .map(async (sourceAndEntitlementNames) => {
-                            const [sourceName, entitlementName] = sourceAndEntitlementNames.split(KEY_SEPARATOR)
-                            const sourceId = await sourceCacheService.get(sourceName)
-                            const entitlementId = await entitlementCacheService.get([sourceId, entitlementName].join(KEY_SEPARATOR))
-                            return {
-                                name: entitlementName,
-                                "id": entitlementId,
-                                "type": "ENTITLEMENT"
-                            }
-                        }));
-                } catch (error) {
+
+                const roleName = data.name.trim();
+
+                if (isEmpty(data.owner)) {
                     result.error++;
-                    const etMessage = `Unable to find access an entitlement: ${error}`;
-                    await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, etMessage);
-                    vscode.window.showErrorMessage(etMessage);
+                    const owMessage = `Missing 'owner' in CSV`;
+                    await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, owMessage);
+                    vscode.window.showErrorMessage(owMessage);
                     return;
                 }
-            }
 
-            let approvalSchemes: ApprovalSchemeForRole[] | undefined = undefined,
-                revokeApprovalSchemes: ApprovalSchemeForRole[] | undefined = undefined;
-            try {
-                approvalSchemes = await stringToRoleApprovalSchemeConverter(
-                    data.approvalSchemes, governanceGroupCache);
-                revokeApprovalSchemes = await stringToRoleApprovalSchemeConverter(
-                    data.revokeApprovalSchemes, governanceGroupCache);
-            } catch (error) {
-                result.error++;
-                const srcMessage = `Unable to build approval scheme: ${error}`;
-                await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, srcMessage);
-                vscode.window.showErrorMessage(srcMessage);
-                return;
-            }
-
-            let membership: RoleMembershipSelector | undefined = undefined;
-            if (isNotBlank(data.membershipCriteria)) {
+                let ownerId: string;
                 try {
-                    const expression = parser.parse(data.membershipCriteria);
-
-                    const converter = new RoleMembershipSelectorConverter(sourceCacheService);
-                    await converter.visitExpression(expression, undefined);
-
-                    membership = {
-                        type: RoleMembershipSelectorType.Standard,
-                        criteria: converter.root
-                    };
+                    ownerId = await identityCacheService.get(data.owner);
                 } catch (error) {
                     result.error++;
-                    const srcMessage = `Unable to build membership criteria: ${error}`;
+                    const srcMessage = `Unable to find owner with name '${data.owner}' in ISC`;
                     await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, srcMessage);
                     vscode.window.showErrorMessage(srcMessage);
                     return;
                 }
-            }
 
-            const rolePayload: Role = {
-                "name": roleName,
-                "description": data.description?.replaceAll('\\r', '\r').replaceAll('\\n', '\n'),
-                "enabled": truethy(data.enabled),
-                requestable: truethy(data.requestable),
-                "owner": {
-                    "id": ownerId,
-                    "type": "IDENTITY",
-                    "name": data.owner
-                },
-                "accessRequestConfig": {
-                    "commentsRequired": truethy(data.commentsRequired),
-                    "denialCommentsRequired": truethy(data.denialCommentsRequired),
-                    "approvalSchemes": approvalSchemes
-                },
-                "revocationRequestConfig": {
-                    "commentsRequired": truethy(data.revokeCommentsRequired),
-                    "denialCommentsRequired": truethy(data.revokeDenialCommentsRequired),
-                    "approvalSchemes": revokeApprovalSchemes
-                },
-                accessProfiles,
-                entitlements,
-                membership
-            };
+                if (token.isCancellationRequested) {
+                    throw new UserCancelledError();
+                }
 
-            try {
-                await this.client.createRole(rolePayload);
-                await this.writeLog(processedLines, roleName, CSVLogWriterLogType.SUCCESS, `Successfully imported role '${data.name}'`);
-                result.success++;
-            } catch (error: any) {
-                result.error++;
-                await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, `Cannot create role: '${error.message}' in IDN`);
-            }
-        });
+                let accessProfiles: AccessProfileRef[] = [];
+                if (isNotBlank(data.accessProfiles)) {
+                    try {
+                        accessProfiles = await Promise.all(data.accessProfiles.split(CSV_MULTIVALUE_SEPARATOR).map(async (apName) => ({
+                            name: apName,
+                            "id": (await accessProfileNameToIdCacheService.get(apName)),
+                            "type": "ACCESS_PROFILE"
+                        })));
+                    } catch (error) {
+                        result.error++;
+                        const etMessage = `Unable to find access an access profile: ${error}`;
+                        await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, etMessage);
+                        vscode.window.showErrorMessage(etMessage);
+                        return;
+                    }
+                }
 
-        const message = `${nbLines} line(s) processed. ${result.success} sucessfully import. ${result.error} error(s).`;
+                if (token.isCancellationRequested) {
+                    throw new UserCancelledError();
+                }
 
-        if (result.error === nbLines) {
+                let entitlements: EntitlementRef[] = []
+                if (isNotBlank(data.entitlements)) {
+                    try {
+                        entitlements = await Promise.all(data.entitlements
+                            .split(CSV_MULTIVALUE_SEPARATOR)
+                            .map(async (sourceAndEntitlementNames) => {
+                                const [sourceName, entitlementName] = sourceAndEntitlementNames.split(KEY_SEPARATOR)
+                                const sourceId = await sourceCacheService.get(sourceName)
+                                const entitlementId = await entitlementCacheService.get([sourceId, entitlementName].join(KEY_SEPARATOR))
+                                return {
+                                    name: entitlementName,
+                                    "id": entitlementId,
+                                    "type": "ENTITLEMENT"
+                                }
+                            }));
+                    } catch (error) {
+                        result.error++;
+                        const etMessage = `Unable to find access an entitlement: ${error}`;
+                        await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, etMessage);
+                        vscode.window.showErrorMessage(etMessage);
+                        return;
+                    }
+                }
+
+                if (token.isCancellationRequested) {
+                    throw new UserCancelledError();
+                }
+
+                let approvalSchemes: ApprovalSchemeForRole[] | undefined = undefined,
+                    revokeApprovalSchemes: ApprovalSchemeForRole[] | undefined = undefined;
+                try {
+                    approvalSchemes = await stringToRoleApprovalSchemeConverter(
+                        data.approvalSchemes, governanceGroupCache);
+                    revokeApprovalSchemes = await stringToRoleApprovalSchemeConverter(
+                        data.revokeApprovalSchemes, governanceGroupCache);
+                } catch (error) {
+                    result.error++;
+                    const srcMessage = `Unable to build approval scheme: ${error}`;
+                    await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, srcMessage);
+                    vscode.window.showErrorMessage(srcMessage);
+                    return;
+                }
+
+                if (token.isCancellationRequested) {
+                    throw new UserCancelledError();
+                }
+
+                let membership: RoleMembershipSelector | undefined = undefined;
+                if (isNotBlank(data.membershipCriteria)) {
+                    try {
+                        const expression = parser.parse(data.membershipCriteria);
+
+                        const converter = new RoleMembershipSelectorConverter(sourceCacheService);
+                        await converter.visitExpression(expression, undefined);
+
+                        membership = {
+                            type: RoleMembershipSelectorType.Standard,
+                            criteria: converter.root
+                        };
+                    } catch (error) {
+                        result.error++;
+                        const srcMessage = `Unable to build membership criteria: ${error}`;
+                        await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, srcMessage);
+                        vscode.window.showErrorMessage(srcMessage);
+                        return;
+                    }
+                }
+
+                const rolePayload: Role = {
+                    "name": roleName,
+                    "description": data.description?.replaceAll('\\r', '\r').replaceAll('\\n', '\n'),
+                    "enabled": truethy(data.enabled),
+                    requestable: truethy(data.requestable),
+                    "owner": {
+                        "id": ownerId,
+                        "type": "IDENTITY",
+                        "name": data.owner
+                    },
+                    "accessRequestConfig": {
+                        "commentsRequired": truethy(data.commentsRequired),
+                        "denialCommentsRequired": truethy(data.denialCommentsRequired),
+                        "approvalSchemes": approvalSchemes
+                    },
+                    "revocationRequestConfig": {
+                        "commentsRequired": truethy(data.revokeCommentsRequired),
+                        "denialCommentsRequired": truethy(data.revokeDenialCommentsRequired),
+                        "approvalSchemes": revokeApprovalSchemes
+                    },
+                    accessProfiles,
+                    entitlements,
+                    membership
+                };
+
+                
+                if (token.isCancellationRequested) {
+                    throw new UserCancelledError();
+                }
+                processedLines++
+
+                try {
+                    await this.client.createRole(rolePayload);
+                    await this.writeLog(processedLines, roleName, CSVLogWriterLogType.SUCCESS, `Successfully imported role '${data.name}'`);
+                    result.success++;
+                } catch (error: any) {
+                    result.error++;
+                    await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, `Cannot create role: '${error.message}' in ISC`);
+                }
+            });
+        } catch { }
+        const message = `${processedLines} line(s) processed. ${result.success} sucessfully import. ${result.error} error(s).`;
+
+        if (result.error === processedLines) {
             vscode.window.showErrorMessage(message);
         } else if (result.error > 0) {
             vscode.window.showWarningMessage(message);
@@ -274,7 +295,7 @@ export class RoleImporter {
         sourceCacheService.flushAll();
         console.log("Entitlement Cache stats", entitlementCacheService.getStats());
         entitlementCacheService.flushAll();
-        await openPreview(this.logFilePath, "csv");
+        await openPreview(this.logFilePath, "log");
     }
 
     private async writeLog(csvLine: number | string | null, objectName: string, type: CSVLogWriterLogType, message: string) {

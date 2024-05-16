@@ -43,7 +43,7 @@ export function convertToText(data: any): string {
 }
 
 /**
- * Function used to compare 2 objects by the property 'name'. Useful for sorting most IDN objects
+ * Function used to compare 2 objects by the property 'name'. Useful for sorting most ISC objects
  */
 export const compareByName = (a: any, b: any) => compareCaseInsensitive(a, b, "name");
 

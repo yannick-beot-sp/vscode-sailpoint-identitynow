@@ -13,6 +13,7 @@ import { stringToAccessProfileApprovalSchemeConverter } from '../../utils/approv
 import { openPreview } from '../../utils/vsCodeHelpers';
 import { isEmpty, isNotBlank } from "../../utils/stringUtils";
 import { truethy } from "../../utils/booleanUtils";
+import { UserCancelledError } from "../../errors";
 
 
 interface AccessProfileImportResult {
@@ -65,7 +66,7 @@ export class AccessProfileImporter {
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Importing access profiles...`,
-            cancellable: false
+            cancellable: true
         }, async (task, token) =>
             await this.importFile(task, token)
         );
@@ -91,134 +92,148 @@ export class AccessProfileImporter {
         const entitlementCacheService = new EntitlementCacheService(this.client);
 
         let processedLines = 0;
+        try {
+            await csvReader.processLine(async (data: AccessProfileCSVRecord) => {
+                if (token.isCancellationRequested) {
+                    throw new UserCancelledError();
+                }
 
-        await csvReader.processLine(async (data: AccessProfileCSVRecord) => {
-
-            processedLines++;
-
-            if (token.isCancellationRequested) {
-                // skip
-                return;
-            }
-            task.report({ increment: incr, message: data.name });
-            if (isEmpty(data.name)) {
-                result.error++;
-                const nameMessage = `Missing attribute 'name' in record`;
-                await this.writeLog(processedLines, 'Access Profile', CSVLogWriterLogType.ERROR, nameMessage);
-                vscode.window.showErrorMessage(nameMessage);
-                return;
-            }
-
-            const apName = data.name.trim();
-
-            if (isEmpty(data.source)) {
-                result.error++;
-                const srcMessage = `Missing 'source' in CSV`;
-                await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, srcMessage);
-                vscode.window.showErrorMessage(srcMessage);
-                return;
-            }
-
-            if (isEmpty(data.owner)) {
-                result.error++;
-                const owMessage = `Missing 'owner' in CSV`;
-                await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, owMessage);
-                vscode.window.showErrorMessage(owMessage);
-                return;
-            }
-
-            let sourceId: string;
-            try {
-                sourceId = await sourceCacheService.get(data.source);
-            } catch (error) {
-                result.error++;
-                const srcMessage = `Unable to find source with name '${data.source}' in IDN`;
-                await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, srcMessage);
-                vscode.window.showErrorMessage(srcMessage);
-                return;
-            }
-
-            let ownerId: string;
-            try {
-                ownerId = await identityCacheService.get(data.owner);
-            } catch (error) {
-                result.error++;
-                const srcMessage = `Unable to find owner with name '${data.owner}' in IDN`;
-                await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, srcMessage);
-                vscode.window.showErrorMessage(srcMessage);
-                return;
-            }
-
-            let entitlements: EntitlementBeta[] = [];
-            if (isNotBlank(data.entitlements)) {
-                try {
-                    entitlements = await Promise.all(data.entitlements?.split(CSV_MULTIVALUE_SEPARATOR).map(async (entitlementName) => ({
-                        name: entitlementName,
-                        "id": (await entitlementCacheService.get([sourceId, entitlementName].join(KEY_SEPARATOR))),
-                        "type": "ENTITLEMENT"
-                    })));
-                } catch (error) {
+                task.report({ increment: incr, message: data.name });
+                if (isEmpty(data.name)) {
                     result.error++;
-                    const srcMessage = `Unable to find entitlement: ${error}`;
+                    const nameMessage = `Missing attribute 'name' in record`;
+                    await this.writeLog(processedLines, 'Access Profile', CSVLogWriterLogType.ERROR, nameMessage);
+                    vscode.window.showErrorMessage(nameMessage);
+                    return;
+                }
+
+                const apName = data.name.trim();
+
+                if (isEmpty(data.source)) {
+                    result.error++;
+                    const srcMessage = `Missing 'source' in CSV`;
                     await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, srcMessage);
                     vscode.window.showErrorMessage(srcMessage);
                     return;
                 }
-            }
 
-            let approvalSchemes, revokeApprovalSchemes;
-            try {
-                approvalSchemes = await stringToAccessProfileApprovalSchemeConverter(
-                    data.approvalSchemes, governanceGroupCache);
-                revokeApprovalSchemes = await stringToAccessProfileApprovalSchemeConverter(
-                    data.revokeApprovalSchemes, governanceGroupCache);
-            } catch (error) {
-                result.error++;
-                const srcMessage = `Unable to build approval scheme: ${error}`;
-                await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, srcMessage);
-                vscode.window.showErrorMessage(srcMessage);
-                return;
-            }
+                if (isEmpty(data.owner)) {
+                    result.error++;
+                    const owMessage = `Missing 'owner' in CSV`;
+                    await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, owMessage);
+                    vscode.window.showErrorMessage(owMessage);
+                    return;
+                }
 
-            const accessProfilePayload: AccessProfile = {
-                "name": data.name,
-                "description": data.description?.replaceAll("\\r", "\r").replaceAll("\\n", "\n"),
-                "enabled": truethy(data.enabled),
-                "requestable": truethy(data.requestable),
-                "owner": {
-                    "id": ownerId,
-                    "type": "IDENTITY",
-                    "name": data.owner
-                },
-                "source": {
-                    "id": sourceId,
-                    "type": "SOURCE",
-                    "name": data.source
-                },
-                "accessRequestConfig": {
-                    "commentsRequired": truethy(data.commentsRequired),
-                    "denialCommentsRequired": truethy(data.denialCommentsRequired),
-                    "approvalSchemes": approvalSchemes
-                },
-                "revocationRequestConfig": {
-                    "approvalSchemes": revokeApprovalSchemes
-                },
-                "entitlements": entitlements
-            };
+                let sourceId: string;
+                try {
+                    sourceId = await sourceCacheService.get(data.source);
+                } catch (error) {
+                    result.error++;
+                    const srcMessage = `Unable to find source with name '${data.source}' in ISC`;
+                    await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, srcMessage);
+                    vscode.window.showErrorMessage(srcMessage);
+                    return;
+                }
 
-            try {
-                await this.client.createResource('/v3/access-profiles', JSON.stringify(accessProfilePayload));
-                await this.writeLog(processedLines, apName, CSVLogWriterLogType.SUCCESS, `Successfully imported access profile '${data.name}'`);
-                result.success++;
-            } catch (error: any) {
-                result.error++;
-                await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, `Cannot create access profile: '${error.message}'`);
-            }
-        });
+                if (token.isCancellationRequested) {
+                    throw new UserCancelledError();
+                }
 
-        const message = `${nbLines} line(s) processed. ${result.success} sucessfully imported. ${result.error} error(s).`;
+                let ownerId: string;
+                try {
+                    ownerId = await identityCacheService.get(data.owner);
+                } catch (error) {
+                    result.error++;
+                    const srcMessage = `Unable to find owner with name '${data.owner}' in ISC`;
+                    await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, srcMessage);
+                    vscode.window.showErrorMessage(srcMessage);
+                    return;
+                }
 
-        if (result.error === nbLines) {
+                if (token.isCancellationRequested) {
+                    throw new UserCancelledError();
+                }
+
+                let entitlements: EntitlementBeta[] = [];
+                if (isNotBlank(data.entitlements)) {
+                    try {
+                        entitlements = await Promise.all(data.entitlements?.split(CSV_MULTIVALUE_SEPARATOR).map(async (entitlementName) => ({
+                            name: entitlementName,
+                            "id": (await entitlementCacheService.get([sourceId, entitlementName].join(KEY_SEPARATOR))),
+                            "type": "ENTITLEMENT"
+                        })));
+                    } catch (error) {
+                        result.error++;
+                        const srcMessage = `Unable to find entitlement: ${error}`;
+                        await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, srcMessage);
+                        vscode.window.showErrorMessage(srcMessage);
+                        return;
+                    }
+                }
+
+                if (token.isCancellationRequested) {
+                    throw new UserCancelledError();
+                }
+
+                let approvalSchemes, revokeApprovalSchemes;
+                try {
+                    approvalSchemes = await stringToAccessProfileApprovalSchemeConverter(
+                        data.approvalSchemes, governanceGroupCache);
+                    revokeApprovalSchemes = await stringToAccessProfileApprovalSchemeConverter(
+                        data.revokeApprovalSchemes, governanceGroupCache);
+                } catch (error) {
+                    result.error++;
+                    const srcMessage = `Unable to build approval scheme: ${error}`;
+                    await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, srcMessage);
+                    vscode.window.showErrorMessage(srcMessage);
+                    return;
+                }
+
+                const accessProfilePayload: AccessProfile = {
+                    "name": data.name,
+                    "description": data.description?.replaceAll("\\r", "\r").replaceAll("\\n", "\n"),
+                    "enabled": truethy(data.enabled),
+                    "requestable": truethy(data.requestable),
+                    "owner": {
+                        "id": ownerId,
+                        "type": "IDENTITY",
+                        "name": data.owner
+                    },
+                    "source": {
+                        "id": sourceId,
+                        "type": "SOURCE",
+                        "name": data.source
+                    },
+                    "accessRequestConfig": {
+                        "commentsRequired": truethy(data.commentsRequired),
+                        "denialCommentsRequired": truethy(data.denialCommentsRequired),
+                        "approvalSchemes": approvalSchemes
+                    },
+                    "revocationRequestConfig": {
+                        "approvalSchemes": revokeApprovalSchemes
+                    },
+                    "entitlements": entitlements
+                }
+
+                if (token.isCancellationRequested) {
+                    throw new UserCancelledError();
+                }
+                processedLines++;
+                try {
+                    await this.client.createResource('/v3/access-profiles', JSON.stringify(accessProfilePayload));
+                    await this.writeLog(processedLines, apName, CSVLogWriterLogType.SUCCESS, `Successfully imported access profile '${data.name}'`);
+                    result.success++;
+                } catch (error: any) {
+                    result.error++;
+                    await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, `Cannot create access profile: '${error.message}'`);
+                }
+            })
+        } catch { }
+
+        const message = `${processedLines} line(s) processed. ${result.success} sucessfully imported. ${result.error} error(s).`;
+
+        if (result.error === processedLines) {
             vscode.window.showErrorMessage(message);
         } else if (result.error > 0) {
             vscode.window.showWarningMessage(message);
@@ -239,7 +254,7 @@ export class AccessProfileImporter {
         sourceCacheService.flushAll();
         console.log("Entitlement Cache stats", entitlementCacheService.getStats());
         entitlementCacheService.flushAll();
-        await openPreview(this.logFilePath, "csv");
+        await openPreview(this.logFilePath, "log");
     }
 
 

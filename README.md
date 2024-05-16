@@ -302,6 +302,9 @@ The patterns defined above use the following tokens:
 
 ## Release Notes
 
+- 429 Too Many Requests error during export or import of roles and access profiles  (cf. [#82](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/82))
+- Role and Access Profile imports are now cancellable
+
 ## 1.3.0
 
 - Update for source aggregation and reset to leverage beta endpoints instead of CC endpoints

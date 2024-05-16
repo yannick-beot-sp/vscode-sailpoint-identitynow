@@ -4,6 +4,104 @@ export interface CacheStats {
     hits: number,
     misses: number,
 }
+interface IQueue<T> {
+    enqueue(item: T): void;
+    dequeue(): T | undefined;
+    size: number;
+}
+
+class Queue<T> implements IQueue<T> {
+    private storage: T[] = [];
+
+    constructor(private capacity: number = Infinity) { }
+
+    enqueue(item: T): void {
+        if (this.size === this.capacity) {
+            throw Error("Queue has reached max capacity, you cannot add more items");
+        }
+        this.storage.push(item);
+    }
+    dequeue(): T | undefined {
+        return this.storage.shift();
+    }
+    get size(): number {
+        return this.storage.length;
+    }
+}
+
+function makeTriggerablePromise<T>(): [
+    Promise<T>,
+    (inp: T) => void,
+    (error: any) => void
+] {
+    let triggerResolveWith!: (inp: T) => void;
+    let triggerRejectWith!: (error: any) => void;
+    const promToReturn: Promise<T> = new Promise((resolve, reject) => {
+        const funcThatResolvesProm = (inp: T) => resolve(inp);
+        triggerResolveWith = funcThatResolvesProm;
+        triggerRejectWith = reject;
+    });
+    return [promToReturn, triggerResolveWith, triggerRejectWith];
+}
+
+/**
+ * cf. https://github.com/Arrow7000/qew/blob/master/qew.ts
+ */
+export class TaskPool {
+    private queue = new Queue<() => void>();
+    private executing = 0;
+
+    /**
+     *
+     * @param maxConcurrent how many functions can be run simultaneously
+     */
+    constructor(
+        private readonly maxConcurrent = 1,
+
+    ) {
+        if (maxConcurrent < 1) {
+            throw new Error("maxConcurrent has to be 1 or higher");
+        }
+    }
+
+    /**
+     * Push another async function onto the queue
+     * @param asyncFunc the async function to push onto this queue
+     * @returns a Promise that resolves with `asyncFunc`'s resolved value –
+     * whenever `asyncFunc` has been run and resolved. Or the Promise will reject
+     * if `asyncFunc`'s Promise rejects
+     */
+    public push<T>(asyncFunc: () => Promise<T>) {
+        const [prom, resolveProm, rejectProm] = makeTriggerablePromise<T>();
+
+        const funcToRun = () => {
+            asyncFunc()
+                .then((result) => {
+                    resolveProm(result);
+                    this.executing--
+                    setImmediate(() => this.tryMove());
+                })
+                .catch(rejectProm);
+        };
+
+        this.queue.enqueue(funcToRun);
+
+        this.tryMove();
+
+        return prom;
+    }
+
+
+    private tryMove() {
+
+
+        if (this.executing < this.maxConcurrent && this.queue.size > 0) {
+            const first = this.queue.dequeue();
+            this.executing++
+            first();
+        }
+    }
+}
 
 export interface Cache<T> {
     [key: string]: T
@@ -22,7 +120,6 @@ class LockFactory<T> {
      */
     constructor() {
         this.ee.setMaxListeners(0);
-
     }
 
     public async acquire(key: string): Promise<T | undefined> {
@@ -58,10 +155,12 @@ export class CacheService<T> {
     private _data: Cache<T>;
     private _stats: CacheStats;
     private _lock: LockFactory<T>;
+    private taskPool: TaskPool
 
     constructor(private readonly fetcher: (key: string) => T | Promise<T>) {
         this.flushAll();
         this._lock = new LockFactory();
+        this.taskPool = new TaskPool(3);
     }
 
     /**
@@ -88,7 +187,7 @@ export class CacheService<T> {
         try {
             if (val === undefined) {
                 this._stats.misses++;
-                val = await this.fetcher(key);
+                val = await this.taskPool.push(async () => { return await this.fetcher(key) })
                 this._data[key] = val;
             } else {
                 this._stats.hits++;

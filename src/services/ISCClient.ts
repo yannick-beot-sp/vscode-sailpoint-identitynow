@@ -12,6 +12,7 @@ import { basename } from 'path';
 import { createReadStream } from 'fs';
 import { DEFAULT_ACCESSPROFILES_QUERY_PARAMS } from "../models/AccessProfiles";
 import { DEFAULT_ROLES_QUERY_PARAMS } from "../models/Roles";
+import axiosRetry = require("axios-retry");
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const FormData = require('form-data');
 
@@ -56,7 +57,7 @@ export class ISCClient {
 		};
 	}
 
-	private ensureOne<T>(response: AxiosResponse<T[]>, type: string, value: string): T {
+	private ensureOneBasedOnHeader<T>(response: AxiosResponse<T[]>, type: string, value: string): T {
 		const nb = Number(response.headers[TOTAL_COUNT_HEADER]);
 		if (nb !== 1) {
 			const message = `Could not find ${type} ${value}. Found ${nb}`;
@@ -64,6 +65,17 @@ export class ISCClient {
 			throw new Error(message);
 		}
 		return response.data[0] as T;
+	}
+
+	private ensureOneElement<T>(input: T[], type: string, value: string) : T{
+		
+		if (input === undefined || input === null || input.length !==1) {
+			const nb = input?.length ?? 0
+			const message = `Could not find ${type} ${value}. Found ${nb}`;
+			console.error(message);
+			throw new Error(message);
+		}
+		return input[0]
 	}
 
 	/**
@@ -82,6 +94,14 @@ export class ISCClient {
 			clientId: "",
 			clientSecret: ""
 		});
+
+		apiConfig.retriesConfig = {
+			retries: 10,
+			retryDelay: axiosRetry.exponentialDelay,
+			onRetry(retryCount, error, requestConfig) {
+				console.log(`retrying due to request error, try number ${retryCount}`);
+			},
+		};
 
 		return apiConfig;
 	}
@@ -199,7 +219,7 @@ export class ISCClient {
 			filters: `name eq "${sourceName}" or id eq "${sourceName}"`,
 			count: true
 		});
-		const source = this.ensureOne(response, "source", sourceName);
+		const source = this.ensureOneBasedOnHeader(response, "source", sourceName);
 		return source.id!;
 	}
 
@@ -341,7 +361,7 @@ export class ISCClient {
 			count: true
 		});
 
-		const transform = this.ensureOne(response, "transform", name);
+		const transform = this.ensureOneBasedOnHeader(response, "transform", name);
 		return transform;
 	}
 	////////////////////////
@@ -1112,11 +1132,11 @@ export class ISCClient {
 		const filters = `source.id eq "${sourceId}" and name eq "${entitlementName}"`;
 		const response = await this.getEntitlements({
 			filters,
-			limit: 1,
-			count: true
+			limit: 2,
+			count: false
 		});
 
-		const entitlement = this.ensureOne(response, "entitlement", entitlementName);
+		const entitlement = this.ensureOneElement(response.data, "entitlement", entitlementName);
 		return entitlement;
 	}
 
@@ -1210,7 +1230,7 @@ export class ISCClient {
 			limit: 1,
 			count: true
 		});
-		const identity = this.ensureOne(response, "identity", alias);
+		const identity = this.ensureOneBasedOnHeader(response, "identity", alias);
 
 		return identity;
 	}
@@ -1231,7 +1251,7 @@ export class ISCClient {
 			count: true
 		});
 
-		const identity = this.ensureOne(response, "identity", id);
+		const identity = this.ensureOneBasedOnHeader(response, "identity", id);
 		console.log("< getPublicIdentityById", identity);
 		return identity;
 	}
@@ -1267,7 +1287,7 @@ export class ISCClient {
 			limit: 1,
 			count: true
 		});
-		const workgroup = this.ensureOne(response, "workgroup", name);
+		const workgroup = this.ensureOneBasedOnHeader(response, "workgroup", name);
 
 		return workgroup;
 	}
@@ -1303,7 +1323,7 @@ export class ISCClient {
 			count: true
 		});
 
-		const accessProfile = this.ensureOne(response, "access profile", name);
+		const accessProfile = this.ensureOneBasedOnHeader(response, "access profile", name);
 		return accessProfile;
 	}
 
@@ -1322,7 +1342,7 @@ export class ISCClient {
 			limit: 1,
 			count: true
 		});
-		const role = this.ensureOne(result, "role", name);
+		const role = this.ensureOneBasedOnHeader(result, "role", name);
 		console.log("< getRoleByName", role);
 		return role;
 	}

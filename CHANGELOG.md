@@ -6,9 +6,17 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+### Fixed
+
+- 429 Too Many Requests error during export or import of roles and access profiles  (cf. [#82](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/82))
+
+### Changed
+
+- Role and Access Profile imports are now cancellable
+
 ## [1.3.0] - 2024-05-09
 
-### Changed 
+### Changed
 
 - Update for source aggregation and reset to leverage beta endpoints instead of CC endpoints
 - Automatically update workflow if its status is changed
