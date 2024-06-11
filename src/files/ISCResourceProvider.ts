@@ -52,7 +52,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 			ctime: toTimestamp(data.created),
 			mtime: toTimestamp(data.modified),
 			size: convertToText(data).length,
-			permissions: id !== NEW_ID && (isReadOnly || resourcePath.match("identities")) ? vscode.FilePermission.Readonly : null
+			permissions: id !== NEW_ID && (isReadOnly || resourcePath.match("\/identities\/")) ? vscode.FilePermission.Readonly : null
 		};
 	}
 	readDirectory(
