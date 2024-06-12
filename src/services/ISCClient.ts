@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import * as os from 'os';
 import { EndpointUtils } from "../utils/EndpointUtils";
 import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { compareByName, convertToText } from "../utils";
@@ -6,7 +7,7 @@ import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
 import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SODPolicyApi, SodPolicy, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskManagementBetaApi, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, AccountsBetaApi, TaskResultDtoBeta, ProvisioningPolicyDto } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
 import { basename } from 'path';
 import { createReadStream } from 'fs';
@@ -19,6 +20,14 @@ const FormData = require('form-data');
 // cf. https://axios-http.com/docs/res_schema
 // All header names are lower cased.
 const CONTENT_TYPE_HEADER = "Content-Type";
+const USER_AGENT_HEADER = "User-Agent";
+const EXTENSION_VERSION = vscode.extensions.getExtension("yannick-beot-sp.vscode-sailpoint-identitynow").packageJSON.version
+const USER_AGENT = `VSCode/${EXTENSION_VERSION}/${vscode.version} (${os.type()} ${os.arch()} ${os.release()})`
+const DEFAULT_AXIOS_OPTIONS: AxiosRequestConfig = {
+	headers: {
+		[USER_AGENT_HEADER]: USER_AGENT
+	}
+}
 export const TOTAL_COUNT_HEADER = "x-total-count";
 
 // Content types
@@ -42,6 +51,7 @@ export class ISCClient {
 	private async prepareHeaders(contentType = CONTENT_TYPE_JSON): Promise<any> {
 		const headers = await this.prepareAuthenticationHeader();
 		headers[CONTENT_TYPE_HEADER] = contentType;
+		headers[USER_AGENT_HEADER] = USER_AGENT
 		return headers;
 	}
 
@@ -67,9 +77,9 @@ export class ISCClient {
 		return response.data[0] as T;
 	}
 
-	private ensureOneElement<T>(input: T[], type: string, value: string) : T{
-		
-		if (input === undefined || input === null || input.length !==1) {
+	private ensureOneElement<T>(input: T[], type: string, value: string): T {
+
+		if (input === undefined || input === null || input.length !== 1) {
 			const nb = input?.length ?? 0
 			const message = `Could not find ${type} ${value}. Found ${nb}`;
 			console.error(message);
@@ -137,7 +147,7 @@ export class ISCClient {
 		const apiConfig = await this.getApiConfiguration()
 		const api = new SourcesBetaApi(apiConfig)
 
-		const response = await api.pingCluster({ sourceId })
+		const response = await api.pingCluster({ sourceId }, DEFAULT_AXIOS_OPTIONS)
 		return response.data;
 	}
 
@@ -145,7 +155,7 @@ export class ISCClient {
 		console.log("> testSourceConnection")
 		const apiConfig = await this.getApiConfiguration()
 		const api = new SourcesBetaApi(apiConfig)
-		const response = await api.testSourceConnection({ sourceId })
+		const response = await api.testSourceConnection({ sourceId }, DEFAULT_AXIOS_OPTIONS)
 		return response.data;
 	}
 
