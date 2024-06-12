@@ -173,11 +173,6 @@ export abstract class WizardBasedExporterCommand {
                     case ExportPayloadBetaIncludeTypesEnum.Segment:
                         items = await client.getSegments()
                         break;
-                    // Cf. SAASTRIAGE-2179
-                    // cannot filter sod policies
-                    // case ExportPayloadBetaIncludeTypesEnum.SodPolicy:
-                    //     items = await client.getSoDPolicies()
-                    //     break;
                     case ExportPayloadBetaIncludeTypesEnum.ServiceDeskIntegration:
                         items = await client.getServiceDesks()
                         break;

@@ -237,7 +237,7 @@ export class ISCClient {
 		console.log("> getSchemas", sourceId);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SourcesApi(apiConfig);
-		const response = await api.listSourceSchemas({ sourceId });
+		const response = await api.getSourceSchemas({ sourceId });
 
 		return response.data;
 	}
@@ -292,7 +292,7 @@ export class ISCClient {
 		console.log("> ISCClient.startAccountReset");
 		const apiConfig = await this.getApiConfiguration();
 		const api = new AccountsBetaApi(apiConfig);
-		const response = await api.deleteAccountsAsync({
+		const response = await api.deleteAccountAsync({
 			id: sourceID
 		})
 		return response.data
@@ -836,7 +836,7 @@ export class ISCClient {
 		console.log("> getWorkflowExecutionHistory", id);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new WorkflowsBetaApi(apiConfig);
-		const resp = await api.listWorkflowExecutions({ id });
+		const resp = await api.getWorkflowExecutions({ id });
 		return resp.data;
 	}
 	/**
@@ -960,7 +960,7 @@ export class ISCClient {
 	): Promise<LifecycleState[]> {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new LifecycleStatesApi(apiConfig);
-		const resp = await api.listLifecycleStates({ identityProfileId });
+		const resp = await api.getLifecycleStates({ identityProfileId });
 		return resp.data;
 	}
 
@@ -1489,21 +1489,6 @@ export class ISCClient {
 	}
 	/////////////////////////
 	//#endregion Segments
-	/////////////////////////
-
-	/////////////////////////
-	//#region SoD policies
-	/////////////////////////
-
-	public async getSoDPolicies(): Promise<SodPolicy[]> {
-		console.log("> getSoDPolicies");
-		const apiConfig = await this.getApiConfiguration();
-		const api = new SODPolicyApi(apiConfig);
-		const result = await Paginator.paginate(api, api.listSodPolicies);
-		return result.data;
-	}
-	/////////////////////////
-	//#endregion SoD policies
 	/////////////////////////
 
 	/////////////////////////
