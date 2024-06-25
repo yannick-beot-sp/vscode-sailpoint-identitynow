@@ -19,9 +19,7 @@ export default class AccountPaginator implements AsyncIterable<Account[]> {
         const limit = 250;
         do {
             let data = await this.client.getAccountsBySource(this.sourceId, this.exportUncorrelatedAccountOnly, offset, limit);
-            if (this.exportUncorrelatedAccountOnly) {
-                data = data.filter(x => x.manuallyCorrelated === false);
-            }
+       
             // skip empty data set
             if (data.length > 0) {
                 yield data;

@@ -1013,7 +1013,7 @@ export class ISCClient {
 	public async getAccountCountBySource(sourceId: string, exportUncorrelatedAccountOnly = false): Promise<number> {
 		let filters = `sourceId eq "${sourceId}"`;
 		if (exportUncorrelatedAccountOnly) {
-			filters += " and uncorrelated eq true";
+			filters += " and uncorrelated eq true and manuallyCorrelated eq false";
 		}
 		const resp = await this.getAccounts({
 			filters,
@@ -1027,7 +1027,7 @@ export class ISCClient {
 	public async getAccountsBySource(sourceId: string, exportUncorrelatedAccountOnly = false, offset = 0, limit = DEFAULT_PAGINATION): Promise<Account[]> {
 		let filters = `sourceId eq "${sourceId}"`;
 		if (exportUncorrelatedAccountOnly) {
-			filters += " and uncorrelated eq true";
+			filters += " and uncorrelated eq true and manuallyCorrelated eq false";
 		}
 		const resp = await this.getAccounts({
 			filters,
