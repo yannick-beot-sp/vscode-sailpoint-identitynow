@@ -9,6 +9,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 ### Changed
 
 - Updated schema for lifefycle state (`identityState`)
+- Filtering server-side for uncorrelated accounts
 
 ## [1.3.1] - 2024-05-16
 

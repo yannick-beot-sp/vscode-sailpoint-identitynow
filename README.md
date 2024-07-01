@@ -303,6 +303,7 @@ The patterns defined above use the following tokens:
 ## Release Notes
 
 - Updated schema for lifefycle state (`identityState`)
+- Filtering server-side for uncorrelated accounts
 
 ## 1.3.1 
 
