@@ -302,6 +302,8 @@ The patterns defined above use the following tokens:
 
 ## Release Notes
 
+- Updated schema for lifefycle state (`identityState`)
+
 ## 1.3.1 
 
 - 429 Too Many Requests error during export or import of roles and access profiles  (cf. [#82](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/82))

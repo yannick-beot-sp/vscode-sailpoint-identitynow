@@ -6,6 +6,10 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+### Changed
+
+- Updated schema for lifefycle state (`identityState`)
+
 ## [1.3.1] - 2024-05-16
 
 ### Fixed

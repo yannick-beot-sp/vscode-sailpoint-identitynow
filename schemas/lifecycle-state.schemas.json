@@ -42,7 +42,20 @@
       "description": "The technical name for lifecycle state. This is for internal use."
     },
     "identityState":{
-      "type": "null"
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "ACTIVE",
+            "INACTIVE_SHORT_TERM",
+            "INACTIVE_LONG_TERM"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The lifecycle state's associated identity state."
     },
     "description": {
       "anyOf": [
