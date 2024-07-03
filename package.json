@@ -505,6 +505,11 @@
         "icon": "$(add)"
       },
       {
+        "command": "vscode-sailpoint-identitynow.new-identity-attribute.view",
+        "title": "New Identity Attribute",
+        "icon": "$(add)"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.identities.icon-search",
         "title": "Search Identity",
         "icon": "$(search)"
@@ -813,6 +818,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.new-identity-attribute.view",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.identities.search",
           "when": "never"
         },
@@ -866,12 +875,12 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.remove-resource",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|search-attribute)$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|search-attribute|identity-attribute)$/",
           "group": "zzzremove@100"
         },
         {
           "command": "vscode-sailpoint-identitynow.refresh-forced",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|transforms|provisioning-policies|roles|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions|search-attributes/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|transforms|provisioning-policies|roles|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions|search-attributes|identity-attributes/",
           "group": "inline@50"
         },
         {
@@ -1179,8 +1188,8 @@
           "group": "inline@2"
         },
         {
-          "command": "vscode-sailpoint-identitynow.new-attribute-search.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == search-attributes",
+          "command": "vscode-sailpoint-identitynow.new-identity-attribute.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-attributes",
           "group": "inline@2"
         },
         {

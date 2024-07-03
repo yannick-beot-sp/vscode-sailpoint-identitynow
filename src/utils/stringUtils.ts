@@ -31,3 +31,21 @@ export function capitalizeFirstLetter(input: string) {
     return input.charAt(0).toUpperCase()
         + input.slice(1).toLowerCase()
 }
+
+export function toCamelCase(input: string): string {
+    // Split the input string into words
+    const words = input.split(/[\s-_]+/);
+    
+    // Process each word
+    return words.map((word, index) => {
+        // Convert the word to lowercase
+        word = word.toLowerCase();
+        
+        // If it's not the first word, capitalize the first letter
+        if (index !== 0) {
+            word = word.charAt(0).toUpperCase() + word.slice(1);
+        }
+        
+        return word;
+    }).join('');
+}

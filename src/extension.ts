@@ -63,6 +63,7 @@ import axios from 'axios';
 import { OpenScriptCommand } from './commands/rule/openScriptCommand';
 import { IdentityTreeViewCommand } from './commands/identity/IdentityTreeViewCommand';
 import { TenantReadOnlyConfigCommand } from './commands/tenant/tenantReadOnlyConfigCommand';
+import { NewIdentityAttributeCommand } from './commands/newIdentityAttributeCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -472,6 +473,11 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.NEW_SEARCH_ATTRIBUTE,
 			newAttributeSearchConfigCommand.execute, newAttributeSearchConfigCommand));
+	// Identity Attribute 
+	const newIdentityAttributeCommand = new NewIdentityAttributeCommand(tenantService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_IDENTITY_ATTRIBUTE,
+			newIdentityAttributeCommand.execute, newIdentityAttributeCommand));
 
 	// Identity Definition Config
 	const newIdentityCommand = new IdentityTreeViewCommand()

@@ -18,13 +18,16 @@ export function withQuery(baseUrl: string, params: any): string {
 
 export function buildResourceUri(params: {
     tenantName: string;
-    resourceType: string; id: string;
+    resourceType: string;
+    id: string;
     name?: string | null;
-    subResourceType?: string; subId?: string;
+    subResourceType?: string;
+    subId?: string;
 }) {
     let beta = false
     switch (params.resourceType) {
         case RESOURCE_TYPES.connectorRule:
+        case RESOURCE_TYPES.identityAttribute:
             beta = true
             break;
     }

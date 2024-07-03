@@ -105,6 +105,9 @@ export const GENERATE_DIGIT_TOKEN = `${COMMAND_PREFIX}.tenant.generate-digit-tok
 //Search Attribute
 export const NEW_SEARCH_ATTRIBUTE = `${COMMAND_PREFIX}.new-attribute-search.view`;
 
+//Identity Attribute
+export const NEW_IDENTITY_ATTRIBUTE = `${COMMAND_PREFIX}.new-identity-attribute.view`;
+
 //Identities
 export const IDENTITIES_SEARCH = `${COMMAND_PREFIX}.identities.search`;
 export const IDENTITIES_ICON_SEARCH = `${COMMAND_PREFIX}.identities.icon-search`;

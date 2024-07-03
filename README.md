@@ -19,7 +19,8 @@ The SailPoint Identity Security Cloud extension makes it easy to:
 - View, edit, create, delete, export, import access profiles
 - View, edit, create, delete, export, import roles
 - View, edit, create, delete, export, import forms
-- View, edit, create search attribute config
+- View, edit, create, delete search attribute config
+- View, edit, create, delete identity attribute
 - View, trigger attribute sync or process, delete identities
 
 ## Installation
@@ -306,6 +307,7 @@ The patterns defined above use the following tokens:
 - Filtering server-side for uncorrelated accounts
 - Added transforms "RFC5646" and "Display Name" (cf. [#87](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/87))
 - Add validation of read-only during SP-Config import
+- Can create or delete an identity attribute (cf. [#83](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/83))
 
 ## 1.3.1 
 

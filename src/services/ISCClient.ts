@@ -1526,6 +1526,14 @@ export class ISCClient {
 		return result.data
 	}
 
+	public async createIdentityAttribute(identityAttribute: IdentityAttributeBeta): Promise<IdentityAttributeBeta> {
+		console.log("> createIdentityAttribute");
+		const apiConfig = await this.getApiConfiguration()
+		const api = new IdentityAttributesBetaApi(apiConfig)
+		const result = await api.createIdentityAttribute({identityAttributeBeta: identityAttribute}, DEFAULT_AXIOS_OPTIONS)
+		return result.data
+	}
+
 	/////////////////////////
 	//#endregion Identity attributes
 	/////////////////////////
