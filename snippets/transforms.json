@@ -89,6 +89,16 @@
         "newtemplate": "{\n    \"type\": \"decomposeDiacriticalMarks\",\n    \"attributes\": {\n        \"input\": \n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The decompose diacritical marks transform allows you to clean or standardize symbols that are used within language to inform the reader how to say or pronounce a letter."
     },
+    "Display Name": {
+        "prefix": [
+            "tr-displayname"
+        ],
+        "body": [
+            "{\n  \"type\": \"displayName\",\n  \"attributes\": {\n    \"input\": $0\n  }\n}"
+        ],
+        "newtemplate": "{\n    \"type\": \"displayName\",\n    \"attributes\": {\n        \"input\": \n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
+        "description": "This transform forms an identity’s Display Name value using the Preferred Name value when it exists over the Given Name value. The Family Name value is then appended to form the complete Display Name, e.g., (\"Preferred Name\" or \"Given Name\") + \"Family Name\""
+    },
     "E164 Phone": {
         "prefix": [
             "tr-phone"
@@ -268,6 +278,16 @@
         ],
         "newtemplate": "{\n    \"type\": \"replace\",\n    \"attributes\": {\n        \"regex\": \"\",\n        \"replacement\": \"\",\n        \"input\": $0\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "The replace transform can be used to find a given pattern of characters within incoming data and replace all instances of those characters with alternate values."
+    },
+    "RFC 5646": {
+        "prefix": [
+            "tr-rfc5646"
+        ],
+        "body": [
+            "{\n  \"type\": \"rfc5646\",\n  \"attributes\": {\n    \"input\": $0\n  }\n}"
+        ],
+        "newtemplate": "{\n    \"type\": \"rfc5646\",\n    \"attributes\": {\n        \"input\": \n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
+        "description": "Use this transform to convert an incoming string into an RFC 5646 language tag value. The incoming data must be either a recognized language name or a three-letter abbreviation of locale’s language."
     },
     "Right Pad": {
         "prefix": [
