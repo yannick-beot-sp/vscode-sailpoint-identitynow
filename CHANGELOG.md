@@ -6,6 +6,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [1.3.2] - 2024-07-03
+
 ### Added
 
 - Added transforms "RFC5646" and "Display Name" (cf. [#87](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/87))
@@ -19,6 +21,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 ### Fixed
 
 - Add validation of read-only during SP-Config import
+- Fixed issue during the account reset (cf. [#85](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/85))
 
 ## [1.3.1] - 2024-05-16
 

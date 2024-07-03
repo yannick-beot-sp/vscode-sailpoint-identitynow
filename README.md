@@ -303,6 +303,8 @@ The patterns defined above use the following tokens:
 
 ## Release Notes
 
+## 1.3.2
+
 - Updated schema for lifefycle state (`identityState`)
 - Filtering server-side for uncorrelated accounts
 - Added transforms "RFC5646" and "Display Name" (cf. [#87](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/87))
