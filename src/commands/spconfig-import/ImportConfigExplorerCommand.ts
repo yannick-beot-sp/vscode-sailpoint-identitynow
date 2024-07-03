@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import { TenantService } from "../../services/TenantService";
-import { chooseTenant } from "../../utils/vsCodeHelpers";
 import { WizardBasedImporterCommand } from './WizardBasedImporterCommand';
 
 /**
@@ -10,8 +9,8 @@ import { WizardBasedImporterCommand } from './WizardBasedImporterCommand';
  */
 export class ImportConfigExplorerCommand extends WizardBasedImporterCommand {
     constructor(
-        private readonly tenantService: TenantService
-    ) { super(); }
+        tenantService: TenantService
+    ) { super(tenantService); }
 
     /**
      * 1. choose the tenant
@@ -19,12 +18,13 @@ export class ImportConfigExplorerCommand extends WizardBasedImporterCommand {
      * 3. Start the import steps
      */
     async execute(fileUri: vscode.Uri, selectedFiles: vscode.Uri[]): Promise<void> {
-        console.log("> ImportConfigExplorerCommand.execute");
-        const tenantInfo = await chooseTenant(this.tenantService, 'To which tenant do you want to import the config?');
-        console.log("ImportConfigExplorerCommand.execute: tenant = ", tenantInfo);
-        if (!tenantInfo) {
+        console.log("> ImportConfigExplorerCommand.execute")
+        
+        const tenantInfo = await this.chooseTenant()
+        if (tenantInfo === undefined) {
             return;
         }
+
         const data = fs.readFileSync(fileUri.fsPath).toString();
         await this.selectAndImport(
             tenantInfo.id,

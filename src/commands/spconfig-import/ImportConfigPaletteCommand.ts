@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { TenantService } from '../../services/TenantService';
-import { chooseTenant, getFullContent } from '../../utils/vsCodeHelpers';
+import { getFullContent } from '../../utils/vsCodeHelpers';
 import { WizardBasedImporterCommand } from './WizardBasedImporterCommand';
 
 /**
@@ -9,8 +9,8 @@ import { WizardBasedImporterCommand } from './WizardBasedImporterCommand';
  */
 export class ImportConfigPaletteCommand extends WizardBasedImporterCommand {
     constructor(
-        private readonly tenantService: TenantService
-    ) { super(); }
+        tenantService: TenantService
+    ) { super(tenantService) }
 
     /**
      * 1. choose the tenant
@@ -24,11 +24,12 @@ export class ImportConfigPaletteCommand extends WizardBasedImporterCommand {
             console.error('No editor');
             throw new Error("No editor");
         }
-        const tenantInfo = await chooseTenant(this.tenantService, 'To which tenant do you want to import the config?');
-        console.log("ImportConfigPaletteCommand.execute: tenant = ", tenantInfo);
-        if (!tenantInfo) {
+        
+        const tenantInfo = await this.chooseTenant()
+        if (tenantInfo === undefined) {
             return;
         }
+
         const data = getFullContent(editor);
         await this.selectAndImport(
             tenantInfo.id,

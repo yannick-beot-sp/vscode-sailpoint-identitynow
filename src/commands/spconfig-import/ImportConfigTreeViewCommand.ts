@@ -10,8 +10,8 @@ import { chooseFile } from '../../utils/vsCodeHelpers';
  */
 export class ImportConfigTreeViewCommand extends WizardBasedImporterCommand {
     constructor(
-        private readonly tenantService: TenantService
-    ) { super(); }
+        tenantService: TenantService
+    ) { super(tenantService) }
 
     /**
    * 1. Choose the file
@@ -26,8 +26,12 @@ export class ImportConfigTreeViewCommand extends WizardBasedImporterCommand {
             throw new Error("ImportConfigTreeViewCommand.execute: invalid item");
         }
 
+        if (!(await this.validateTenant(node.tenantId, node.label as string))) {
+            return
+        }
+
         const fileUri = await chooseFile('JSON files', 'json');
-        if (fileUri === undefined ) { return; }
+        if (fileUri === undefined) { return; }
         const data = fs.readFileSync(fileUri.fsPath).toString();
         await this.selectAndImport(
             node.tenantId,

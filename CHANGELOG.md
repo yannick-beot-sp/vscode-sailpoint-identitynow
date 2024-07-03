@@ -15,6 +15,10 @@ This changelog is following the recommended format by [keepachangelog](https://k
 - Updated schema for lifefycle state (`identityState`)
 - Filtering server-side for uncorrelated accounts
 
+### Fixed
+
+- Add validation of read-only during SP-Config import
+
 ## [1.3.1] - 2024-05-16
 
 ### Fixed

@@ -1,8 +1,11 @@
 import * as vscode from 'vscode';
 import { IMPORTABLE_OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
 import { SPConfigImporter } from './SPConfigImporter';
-import { askChosenItems, askSelectObjectTypes } from '../../utils/vsCodeHelpers';
+import { askChosenItems, askSelectObjectTypes, chooseTenant } from '../../utils/vsCodeHelpers';
 import { ImportOptionsBeta, ImportOptionsBetaIncludeTypesEnum } from 'sailpoint-api-client';
+import { TenantInfo } from '../../models/TenantInfo';
+import { TenantService } from '../../services/TenantService';
+import { validateTenantReadonly } from '../validateTenantReadonly';
 
 const ALL: vscode.QuickPickItem = {
     label: "Import everything",
@@ -17,6 +20,26 @@ const PICK_AND_CHOOSE: vscode.QuickPickItem = {
  * Base class for all importer command
  */
 export abstract class WizardBasedImporterCommand {
+    constructor(protected readonly tenantService: TenantService) {
+
+    }
+
+    async chooseTenant(): Promise<TenantInfo|undefined> {
+        const tenantInfo = await chooseTenant(this.tenantService, 'To which tenant do you want to import the config?');
+        console.log("WizardBasedImporterCommand.chooseTenant: tenant = ", tenantInfo);
+        if (!tenantInfo) {
+            return undefined;
+        }
+
+        if (!(await this.validateTenant(tenantInfo.id, tenantInfo.name))) {
+            return undefined
+        }
+        return tenantInfo;
+    }
+
+    async validateTenant(tenantId: string, tenantName: string): Promise<boolean> {
+        return await validateTenantReadonly(this.tenantService, tenantId, `import SP-Config in ${tenantName}`) 
+    }
 
     /**
      * Asks the user if he/she wants to import everything or not
