@@ -308,6 +308,7 @@ The patterns defined above use the following tokens:
 - Added transforms "RFC5646" and "Display Name" (cf. [#87](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/87))
 - Add validation of read-only during SP-Config import
 - Can create or delete an identity attribute (cf. [#83](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/83))
+- Fixed issue during the account reset (cf. [#85](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/85))
 
 ## 1.3.1 
 
