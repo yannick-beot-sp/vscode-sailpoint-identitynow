@@ -6,6 +6,23 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+### Security
+
+- Fixed dependency (axios, micromatch)
+
+### Added
+
+- Added User Agent
+
+### Changed
+
+- Refactored code due to [#36](https://github.com/sailpoint-oss/typescript-sdk/issues/36)
+
+### Fixed
+
+### Removed
+
+
 ## [1.3.2] - 2024-07-03
 
 ### Added

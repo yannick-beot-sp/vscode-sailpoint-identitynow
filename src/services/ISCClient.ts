@@ -256,23 +256,10 @@ export class ISCClient {
 		sourceID: string
 	): Promise<LoadEntitlementTaskBeta> {
 		console.log("> ISCClient.startEntitlementAggregation");
-		/* https://github.com/sailpoint-oss/typescript-sdk/issues/36
 		const apiConfig = await this.getApiConfiguration();
-		const api = new EntitlementsBetaApi(apiConfig);
-		const response = await api.importEntitlements({
-			id: sourceID,
-			csvFile: null
-		})
+		const api = new SourcesBetaApi(apiConfig);
+		const response = await api.importEntitlements({ id: sourceID }, DEFAULT_AXIOS_OPTIONS)
 		return response.data
-		*/
-		const endpoint = `beta/entitlements/aggregate/sources/${sourceID}`;
-		console.log("endpoint = " + endpoint);
-
-		const formData = new FormData();
-
-		const httpClient = await this.getAxios(CONTENT_TYPE_FORM_DATA);
-		const response = await httpClient.post(endpoint, formData);
-		return response.data;
 	}
 
 	public async startEntitlementReset(
