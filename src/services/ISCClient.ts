@@ -132,7 +132,8 @@ export class ISCClient {
 				// eslint-disable-next-line @typescript-eslint/naming-convention
 				"Content-Type": contentType,
 				// eslint-disable-next-line @typescript-eslint/naming-convention
-				"Authorization": `Bearer ${session?.accessToken}`
+				"Authorization": `Bearer ${session?.accessToken}`,
+				[USER_AGENT_HEADER]: USER_AGENT
 			}
 
 		});
@@ -169,7 +170,7 @@ export class ISCClient {
 				objectType,
 				maxCount
 			}
-		})
+		}, DEFAULT_AXIOS_OPTIONS)
 		return response.data;
 	}
 
@@ -186,7 +187,7 @@ export class ISCClient {
 		console.log("> getSourceById", id);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SourcesApi(apiConfig);
-		const result = await api.getSource({ id });
+		const result = await api.getSource({ id }, DEFAULT_AXIOS_OPTIONS);
 		return result.data;
 	}
 
@@ -197,7 +198,7 @@ export class ISCClient {
 		const result = await api.listSources({
 			filters: `name eq "${name}"`,
 			limit: 2
-		})
+		}, DEFAULT_AXIOS_OPTIONS)
 
 		if (result === undefined || (result instanceof Array && result.length !== 1)) {
 			throw new Error(`Could not find source ${name}`);
@@ -214,7 +215,7 @@ export class ISCClient {
 		const result = await api.createProvisioningPolicy({
 			sourceId,
 			provisioningPolicyDto
-		})
+		}, DEFAULT_AXIOS_OPTIONS)
 		return result.data;
 	}
 
@@ -228,7 +229,7 @@ export class ISCClient {
 		const response = await api.listSources({
 			filters: `name eq "${sourceName}" or id eq "${sourceName}"`,
 			count: true
-		});
+		}, DEFAULT_AXIOS_OPTIONS);
 		const source = this.ensureOneBasedOnHeader(response, "source", sourceName);
 		return source.id!;
 	}
@@ -237,7 +238,7 @@ export class ISCClient {
 		console.log("> getSchemas", sourceId);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SourcesApi(apiConfig);
-		const response = await api.getSourceSchemas({ sourceId });
+		const response = await api.getSourceSchemas({ sourceId }, DEFAULT_AXIOS_OPTIONS);
 
 		return response.data;
 	}
@@ -246,7 +247,7 @@ export class ISCClient {
 		console.log("> createSchema", sourceId);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SourcesApi(apiConfig);
-		const response = await api.createSourceSchema({ sourceId, schema });
+		const response = await api.createSourceSchema({ sourceId, schema }, DEFAULT_AXIOS_OPTIONS);
 		return response.data;
 	}
 
@@ -282,7 +283,7 @@ export class ISCClient {
 		const api = new EntitlementsBetaApi(apiConfig);
 		const response = await api.resetSourceEntitlements({
 			id: sourceID
-		})
+		}, DEFAULT_AXIOS_OPTIONS)
 		return response.data
 	}
 
@@ -294,7 +295,7 @@ export class ISCClient {
 		const api = new SourcesBetaApi(apiConfig);
 		const response = await api.deleteAccountsAsync({
 			id: sourceID
-		})
+		}, DEFAULT_AXIOS_OPTIONS)
 		return response.data
 	}
 
@@ -333,7 +334,7 @@ export class ISCClient {
 		const api = new TaskManagementBetaApi(apiConfig);
 		const response = await api.getTaskStatus({
 			id: taskId
-		})
+		}, DEFAULT_AXIOS_OPTIONS)
 		return response.data;
 	}
 
@@ -353,7 +354,7 @@ export class ISCClient {
 		console.log("> getTransforms");
 		const apiConfig = await this.getApiConfiguration();
 		const api = new TransformsApi(apiConfig);
-		const result = await api.listTransforms();
+		const result = await api.listTransforms({}, DEFAULT_AXIOS_OPTIONS);
 		const transforms = result.data;
 		if (transforms !== undefined && transforms instanceof Array) {
 			transforms.sort(compareByName);
@@ -369,7 +370,7 @@ export class ISCClient {
 			filters: `name eq "${name}"`,
 			limit: 1,
 			count: true
-		});
+		}, DEFAULT_AXIOS_OPTIONS);
 
 		const transform = this.ensureOneBasedOnHeader(response, "transform", name);
 		return transform;
@@ -629,7 +630,7 @@ export class ISCClient {
 			limit,
 			offset,
 			count
-		});
+		}, DEFAULT_AXIOS_OPTIONS);
 		return resp;
 	}
 
@@ -661,7 +662,7 @@ export class ISCClient {
 				includeTypes: objectTypes,
 				objectOptions: objectOptions
 			}
-		});
+		}, DEFAULT_AXIOS_OPTIONS);
 		const jobId = response.data.jobId;
 		console.log("< startExportJob. jobId =", jobId);
 		return jobId;
@@ -676,7 +677,7 @@ export class ISCClient {
 		console.log("> getExportJobStatus", jobId);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SPConfigBetaApi(apiConfig);
-		const response = await api.getSpConfigExportStatus({ id: jobId });
+		const response = await api.getSpConfigExportStatus({ id: jobId }, DEFAULT_AXIOS_OPTIONS);
 		return response.data;
 	}
 
@@ -689,7 +690,7 @@ export class ISCClient {
 		console.log("> getExportJobResult", jobId);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SPConfigBetaApi(apiConfig);
-		const response = await api.getSpConfigExport({ id: jobId });
+		const response = await api.getSpConfigExport({ id: jobId }, DEFAULT_AXIOS_OPTIONS);
 		return response.data;
 	}
 
@@ -751,7 +752,7 @@ export class ISCClient {
 		console.log("> getImportJobStatus", jobId);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SPConfigBetaApi(apiConfig);
-		const response = await api.getSpConfigImportStatus({ id: jobId });
+		const response = await api.getSpConfigImportStatus({ id: jobId }, DEFAULT_AXIOS_OPTIONS);
 		return response.data;
 	}
 
@@ -765,7 +766,7 @@ export class ISCClient {
 
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SPConfigBetaApi(apiConfig);
-		const response = await api.getSpConfigImport({ id: jobId });
+		const response = await api.getSpConfigImport({ id: jobId }, DEFAULT_AXIOS_OPTIONS);
 		return response.data;
 	}
 	/////////////////////////////
@@ -782,7 +783,7 @@ export class ISCClient {
 		const resp = await api.createWorkflow({
 			// @ts-ignore
 			createWorkflowRequestBeta: workflow
-		})
+		}, DEFAULT_AXIOS_OPTIONS)
 		return resp.data;
 	}
 
@@ -790,14 +791,14 @@ export class ISCClient {
 	public async getWorflow(id: string): Promise<WorkflowBeta> {
 		const apiConfig = await this.getApiConfiguration()
 		const api = new WorkflowsBetaApi(apiConfig)
-		const resp = await api.getWorkflow({ id })
+		const resp = await api.getWorkflow({ id }, DEFAULT_AXIOS_OPTIONS)
 		return resp.data;
 	}
 
 	public async getWorflows(): Promise<WorkflowBeta[]> {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new WorkflowsBetaApi(apiConfig);
-		const resp = await api.listWorkflows();
+		const resp = await api.listWorkflows(DEFAULT_AXIOS_OPTIONS);
 		return resp.data.sort(compareByName);
 	}
 
@@ -821,7 +822,7 @@ export class ISCClient {
 					value: status,
 				},
 			]
-		});
+		}, DEFAULT_AXIOS_OPTIONS);
 		console.log("< updateWorkflowStatus");
 	}
 
@@ -836,7 +837,7 @@ export class ISCClient {
 		console.log("> getWorkflowExecutionHistory", id);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new WorkflowsBetaApi(apiConfig);
-		const resp = await api.getWorkflowExecutions({ id });
+		const resp = await api.getWorkflowExecutions({ id }, DEFAULT_AXIOS_OPTIONS);
 		return resp.data;
 	}
 	/**
@@ -848,14 +849,14 @@ export class ISCClient {
 		console.log("> getWorkflowExecution", workflowExecutionId);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new WorkflowsBetaApi(apiConfig);
-		const resp = await api.getWorkflowExecution({ id: workflowExecutionId });
+		const resp = await api.getWorkflowExecution({ id: workflowExecutionId }, DEFAULT_AXIOS_OPTIONS);
 		return resp.data;
 	}
 
 	public async getWorflowTriggers(): Promise<WorkflowLibraryTriggerBeta[]> {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new WorkflowsBetaApi(apiConfig);
-		const resp = await api.listWorkflowLibraryTriggers();
+		const resp = await api.listWorkflowLibraryTriggers({}, DEFAULT_AXIOS_OPTIONS);
 		return resp.data;
 	}
 
@@ -868,7 +869,7 @@ export class ISCClient {
 			testWorkflowRequestBeta: {
 				input: payload
 			}
-		});
+		}, DEFAULT_AXIOS_OPTIONS);
 		return resp.data.workflowExecutionId;
 	}
 
@@ -883,7 +884,7 @@ export class ISCClient {
 	public async getConnectorRules(): Promise<ConnectorRuleResponseBeta[]> {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new ConnectorRuleManagementBetaApi(apiConfig);
-		const resp = await api.getConnectorRuleList();
+		const resp = await api.getConnectorRuleList(DEFAULT_AXIOS_OPTIONS);
 		const rules = resp.data;
 		rules.sort(compareByName);
 		return rules;
@@ -892,7 +893,7 @@ export class ISCClient {
 	public async getConnectorRuleById(id: string): Promise<ConnectorRuleResponseBeta> {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new ConnectorRuleManagementBetaApi(apiConfig);
-		const resp = await api.getConnectorRule({ id });
+		const resp = await api.getConnectorRule({ id }, DEFAULT_AXIOS_OPTIONS);
 		return resp.data;
 	}
 
@@ -924,7 +925,7 @@ export class ISCClient {
 		const api = new ConnectorRuleManagementBetaApi(apiConfig);
 		const resp = await api.validateConnectorRule({
 			sourceCodeBeta: payload
-		});
+		}, DEFAULT_AXIOS_OPTIONS);
 		const jsonBody = resp.data;
 		console.log("< validateConnectorRule", jsonBody);
 		return jsonBody;
@@ -936,7 +937,7 @@ export class ISCClient {
 		const resp = await api.updateConnectorRule({
 			id: rule.id,
 			connectorRuleUpdateRequestBeta: rule
-		});
+		}, DEFAULT_AXIOS_OPTIONS);
 		return resp.data;
 	}
 
@@ -951,7 +952,7 @@ export class ISCClient {
 	public async getIdentityProfiles(): Promise<IdentityProfile[]> {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new IdentityProfilesApi(apiConfig);
-		const resp = await api.listIdentityProfiles();
+		const resp = await api.listIdentityProfiles({}, DEFAULT_AXIOS_OPTIONS);
 		return resp.data;
 	}
 
@@ -960,7 +961,7 @@ export class ISCClient {
 	): Promise<LifecycleState[]> {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new LifecycleStatesApi(apiConfig);
-		const resp = await api.getLifecycleStates({ identityProfileId });
+		const resp = await api.getLifecycleStates({ identityProfileId }, DEFAULT_AXIOS_OPTIONS);
 		return resp.data;
 	}
 
@@ -969,7 +970,7 @@ export class ISCClient {
 		const apiConfig = await this.getApiConfiguration();
 		const httpClient = await this.getAxios();
 		const api = new IdentityProfilesApi(apiConfig, "", httpClient);
-		const resp = await api.syncIdentityProfile({ identityProfileId });
+		const resp = await api.syncIdentityProfile({ identityProfileId }, DEFAULT_AXIOS_OPTIONS);
 	}
 
 	/////////////////////////////
@@ -984,7 +985,7 @@ export class ISCClient {
 		console.log("> getServiceDesks");
 		const apiConfig = await this.getApiConfiguration();
 		const api = new ServiceDeskIntegrationApi(apiConfig);
-		const response = await api.getServiceDeskIntegrations({ sorters: "name" });
+		const response = await api.getServiceDeskIntegrations({ sorters: "name" }, DEFAULT_AXIOS_OPTIONS);
 		return response.data;
 	}
 
@@ -1006,7 +1007,7 @@ export class ISCClient {
 		};
 		const apiConfig = await this.getApiConfiguration();
 		const api = new AccountsApi(apiConfig);
-		const response = await api.listAccounts(queryValues);
+		const response = await api.listAccounts(queryValues, DEFAULT_AXIOS_OPTIONS);
 		return response;
 	}
 
@@ -1075,7 +1076,7 @@ export class ISCClient {
 					value: identityId,
 				},
 			]
-		});
+		}, DEFAULT_AXIOS_OPTIONS);
 		console.log("< patchAccount");
 	}
 
@@ -1091,7 +1092,7 @@ export class ISCClient {
 		console.log("> getEntitlement");
 		const apiConfig = await this.getApiConfiguration();
 		const api = new EntitlementsBetaApi(apiConfig);
-		const response = await api.getEntitlement({ id })
+		const response = await api.getEntitlement({ id }, DEFAULT_AXIOS_OPTIONS)
 		return response.data
 	}
 	public async getAllEntitlements(query: string): Promise<EntitlementBeta[]> {
@@ -1120,7 +1121,7 @@ export class ISCClient {
 		};
 		const apiConfig = await this.getApiConfiguration();
 		const api = new EntitlementsBetaApi(apiConfig);
-		const response = await api.listEntitlements(queryValues);
+		const response = await api.listEntitlements(queryValues, DEFAULT_AXIOS_OPTIONS);
 		return response;
 	}
 
@@ -1188,7 +1189,7 @@ export class ISCClient {
 		const response = await api.patchEntitlement({
 			id,
 			jsonPatchOperationBeta: payload
-		});
+		}, DEFAULT_AXIOS_OPTIONS);
 		console.log("< updateEntitlement");
 	}
 
@@ -1229,7 +1230,7 @@ export class ISCClient {
 
 		const apiConfig = await this.getApiConfiguration();
 		const api = new PublicIdentitiesApi(apiConfig);
-		const response = await api.getPublicIdentities(queryValues);
+		const response = await api.getPublicIdentities(queryValues, DEFAULT_AXIOS_OPTIONS);
 		return response;
 	}
 
@@ -1285,7 +1286,7 @@ export class ISCClient {
 		console.log("> getGovernanceGroupById", id);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new GovernanceGroupsBetaApi(apiConfig);
-		const result = await api.getWorkgroup({ id });
+		const result = await api.getWorkgroup({ id }, DEFAULT_AXIOS_OPTIONS);
 		return result.data;
 	}
 	public async getGovernanceGroupByName(name: string): Promise<WorkgroupDtoBeta> {
@@ -1296,7 +1297,7 @@ export class ISCClient {
 			filters: `name eq "${name}"`,
 			limit: 1,
 			count: true
-		});
+		}, DEFAULT_AXIOS_OPTIONS);
 		const workgroup = this.ensureOneBasedOnHeader(response, "workgroup", name);
 
 		return workgroup;
@@ -1320,7 +1321,7 @@ export class ISCClient {
 		};
 		const apiConfig = await this.getApiConfiguration();
 		const api = new AccessProfilesApi(apiConfig);
-		const response = await api.listAccessProfiles(queryValues);
+		const response = await api.listAccessProfiles(queryValues, DEFAULT_AXIOS_OPTIONS);
 		return response;
 	}
 
@@ -1367,7 +1368,7 @@ export class ISCClient {
 		};
 		const apiConfig = await this.getApiConfiguration();
 		const api = new RolesApi(apiConfig);
-		const response = await api.listRoles(queryValues);
+		const response = await api.listRoles(queryValues, DEFAULT_AXIOS_OPTIONS);
 		return response;
 	}
 
@@ -1375,7 +1376,7 @@ export class ISCClient {
 		console.log("> createRole", role);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new RolesApi(apiConfig);
-		const response = await api.createRole({ role });
+		const response = await api.createRole({ role }, DEFAULT_AXIOS_OPTIONS);
 		return response.data;
 	}
 
@@ -1399,7 +1400,7 @@ export class ISCClient {
 		}
 		let count = -1
 		do {
-			const response = await api.searchFormDefinitionsByTenant(args)
+			const response = await api.searchFormDefinitionsByTenant(args, DEFAULT_AXIOS_OPTIONS)
 			count = response.data.count
 			if (response.data.results) {
 				for (const f of response.data.results) {
@@ -1436,7 +1437,7 @@ export class ISCClient {
 		let count = -1
 		const result: ExportFormDefinitionsByTenant200ResponseInnerBeta[] = []
 		do {
-			const response = await api.exportFormDefinitionsByTenant(args)
+			const response = await api.exportFormDefinitionsByTenant(args, DEFAULT_AXIOS_OPTIONS)
 			count = response.data.length
 			if (response.data && response.data.length > 0) {
 				result.push(...response.data)
@@ -1453,7 +1454,7 @@ export class ISCClient {
 		const api = new CustomFormsBetaApi(apiConfig);
 		const response = await api.importFormDefinitions({
 			body: forms
-		})
+		}, DEFAULT_AXIOS_OPTIONS)
 		return response.data
 	}
 
@@ -1499,7 +1500,7 @@ export class ISCClient {
 		console.log("> getSearchAttributes");
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SearchAttributeConfigurationBetaApi(apiConfig)
-		const result = await api.getSearchAttributeConfig()
+		const result = await api.getSearchAttributeConfig(DEFAULT_AXIOS_OPTIONS)
 		return result.data.sort(compareByName)
 	}
 
@@ -1507,7 +1508,7 @@ export class ISCClient {
 		console.log("> createSearchAttribute");
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SearchAttributeConfigurationBetaApi(apiConfig);
-		await api.createSearchAttributeConfig({ searchAttributeConfigBeta })
+		await api.createSearchAttributeConfig({ searchAttributeConfigBeta }, DEFAULT_AXIOS_OPTIONS)
 	}
 
 	/////////////////////////
@@ -1522,7 +1523,7 @@ export class ISCClient {
 		console.log("> getIdentityAttributes");
 		const apiConfig = await this.getApiConfiguration()
 		const api = new IdentityAttributesBetaApi(apiConfig)
-		const result = await api.listIdentityAttributes()
+		const result = await api.listIdentityAttributes({}, DEFAULT_AXIOS_OPTIONS)
 		return result.data
 	}
 
@@ -1530,7 +1531,7 @@ export class ISCClient {
 		console.log("> createIdentityAttribute");
 		const apiConfig = await this.getApiConfiguration()
 		const api = new IdentityAttributesBetaApi(apiConfig)
-		const result = await api.createIdentityAttribute({identityAttributeBeta: identityAttribute}, DEFAULT_AXIOS_OPTIONS)
+		const result = await api.createIdentityAttribute({ identityAttributeBeta: identityAttribute }, DEFAULT_AXIOS_OPTIONS)
 		return result.data
 	}
 
@@ -1547,7 +1548,7 @@ export class ISCClient {
 		console.log("> getPasswordOrgConfig");
 		const apiConfig = await this.getApiConfiguration()
 		const api = new PasswordConfigurationApi(apiConfig)
-		const result = await api.getPasswordOrgConfig()
+		const result = await api.getPasswordOrgConfig(DEFAULT_AXIOS_OPTIONS)
 		return result.data
 	}
 
@@ -1562,7 +1563,7 @@ export class ISCClient {
 				length
 			}
 
-		})
+		}, DEFAULT_AXIOS_OPTIONS)
 		console.log(`generateDigitToken: Request Id = ${result.data.requestId}`);
 
 		return result.data.digitToken
@@ -1580,7 +1581,7 @@ export class ISCClient {
 		console.log("> listIdentities");
 		const apiConfig = await this.getApiConfiguration();
 		const api = new IdentitiesBetaApi(apiConfig);
-		const result = await api.listIdentities(identityFilter);
+		const result = await api.listIdentities(identityFilter, DEFAULT_AXIOS_OPTIONS);
 		return result;
 	}
 
@@ -1594,7 +1595,7 @@ export class ISCClient {
 				identityIds: [identityId]
 			}
 		};
-		return await api.startIdentityProcessing(requestParameters);
+		return await api.startIdentityProcessing(requestParameters, DEFAULT_AXIOS_OPTIONS);
 	}
 
 	public async syncIdentityAttributes(identityId: string): Promise<AxiosResponse<IdentitySyncJobBeta, any>> {
@@ -1605,9 +1606,7 @@ export class ISCClient {
 
 		//IdentitiesBetaApiSynchronizeAttributesForIdentityRequest
 		return await api.synchronizeAttributesForIdentity(
-			{
-				identityId: identityId
-			});
+			{ identityId: identityId }, DEFAULT_AXIOS_OPTIONS);
 	}
 
 	public async deleteIdentity(identityId: string): Promise<void> {
@@ -1616,9 +1615,7 @@ export class ISCClient {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new IdentitiesBetaApi(apiConfig);
 
-		await api.deleteIdentity({
-			id: identityId
-		});
+		await api.deleteIdentity({ id: identityId }, DEFAULT_AXIOS_OPTIONS);
 	}
 
 	////////////////////////
