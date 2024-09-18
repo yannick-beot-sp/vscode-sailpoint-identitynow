@@ -276,6 +276,9 @@ export class TransformEvaluator {
             case 'dateFormat':
                 result = await this.dateFormat(attributes);
                 break;
+            case 'decomposeDiacriticalMarks':
+                result = await this.decomposeDiacriticalMarks(attributes);
+                break;
             case 'e164phone':
                 result = await this.e164phone(attributes);
                 break;
@@ -898,6 +901,32 @@ export class TransformEvaluator {
         }
 
         console.log("Exiting dateFormat. result=" + result);
+        return result;
+    }
+
+    async decomposeDiacriticalMarks(attributes: any) {
+        console.log("Entering method decomposeDiacriticalMarks");
+        let result = undefined;
+
+        let input = this.input;
+
+        if (input === undefined) {
+            if (attributes.input !== undefined) {
+                input = attributes.input;
+
+                if (typeof input === 'object') {
+                    input = await this.evaluateChildTransform(input);
+                }
+
+                if (input === undefined) {
+                    return;
+                }
+            }
+        }
+
+        result = input.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+
+        console.log("Exiting decomposeDiacriticalMarks. result=" + result);
         return result;
     }
 
