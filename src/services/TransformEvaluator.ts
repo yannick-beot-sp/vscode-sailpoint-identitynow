@@ -924,7 +924,7 @@ export class TransformEvaluator {
             }
         }
 
-        result = input.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+        result = input.normalize('NFKD').replace(/[\u0300-\u036f]/g, "");
 
         console.log("Exiting decomposeDiacriticalMarks. result=" + result);
         return result;
