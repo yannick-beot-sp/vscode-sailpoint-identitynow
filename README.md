@@ -305,7 +305,7 @@ The patterns defined above use the following tokens:
 
 ## 1.3.3
 
-- Added support for `decomposeDiacriticalMarks` transform evaluation (cf. [#90](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/90)
+- Added support for `decomposeDiacriticalMarks` transform evaluation (cf. [#90](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/90)) by [@Semperverus](https://github.com/Semperverus)
 
 ## 1.3.2
 
