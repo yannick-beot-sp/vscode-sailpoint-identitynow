@@ -49,3 +49,11 @@ export function toCamelCase(input: string): string {
         return word;
     }).join('');
 }
+
+export function decomposeDiacriticalMarks(input: string): string {
+    return input
+        // Decompose the string into separate unicode symbols for diacritical marks in compatibility mode, 
+        .normalize('NFKD')
+        // Remove the unicode diacritical marks.
+        .replace(/[\u0300-\u036f]/g, "");
+}
