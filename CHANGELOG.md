@@ -10,7 +10,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
-- Added transform evaluation support for `decomposeDiacriticalMarks` (cf. [#90](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/90)
+- Added transform evaluation support for `decomposeDiacriticalMarks` (cf. [#90](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/90)) by [@Semperverus](https://github.com/Semperverus) 
 
 ## [1.3.2] - 2024-07-03
 
