@@ -60,7 +60,6 @@ export const SORT_IDENTITY_PROFILES_BY_NAME = `${COMMAND_PREFIX}.identity-profil
 export const SORT_IDENTITY_PROFILES_BY_PRIORITY = `${COMMAND_PREFIX}.identity-profiles.sort.priority`;
 export const REFRESH_IDENTITY_PROFILE = `${COMMAND_PREFIX}.identity-profile.refresh`;
 export const TREE_VIEW = `${COMMAND_PREFIX}.view`;
-export const WORKFLOW_TESTER_VIEW = `${COMMAND_PREFIX}.workflow.test-view`;
 
 export const LOAD_MORE = `${COMMAND_PREFIX}.load-more`;
 

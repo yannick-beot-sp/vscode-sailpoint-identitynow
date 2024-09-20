@@ -24,6 +24,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Removed
 
+- Removed Workflow Tester view due to webview-ui-toolkit deprecation (cf. https://github.com/microsoft/vscode-webview-ui-toolkit/issues/561)
+
 ## [1.3.2] - 2024-07-03
 
 ### Added

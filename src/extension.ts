@@ -44,7 +44,6 @@ import { TransformEvaluator } from './services/TransformEvaluator';
 import { TreeManager } from './services/TreeManager';
 import { ISCUriHandler } from './ISCUriHandler';
 import { ISCDataProvider } from './views/ISCDataProvider';
-import { WorkflowTesterWebviewViewProvider } from './views/WorkflowTesterWebviewViewProvider';
 import { TestConnectionCommand } from './commands/source/TestConnectionCommand';
 import { PeekSourceCommand } from './commands/source/PeekSourceCommand';
 import { PingClusterCommand } from './commands/source/PingClusterCommand';
@@ -337,14 +336,6 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.NEW_SCHEMA,
 			newSchemaCommand.execute, newSchemaCommand));
-
-	const workflowTester = new WorkflowTesterWebviewViewProvider(context, tenantService);
-	workflowTester.activate();
-
-	const testWorkflowCommand = new TestWorkflowCommand(workflowTester);
-	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.TEST_WORKFLOW,
-			testWorkflowCommand.execute, testWorkflowCommand));
 
 	const newConnectorRuleCommand = new ConnectorRuleCommand(tenantService);
 

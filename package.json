@@ -52,11 +52,6 @@
           "id": "vscode-sailpoint-identitynow.view",
           "name": "Identity Security Cloud Tenants",
           "icon": "resources/isc.svg"
-        },
-        {
-          "id": "vscode-sailpoint-identitynow.workflow.test-view",
-          "type": "webview",
-          "name": "Workflow tester"
         }
       ]
     },
