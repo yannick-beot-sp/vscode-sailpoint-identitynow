@@ -12,7 +12,9 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
-- Added User Agent
+- Add User Agent
+- Add transform evaluation support for `decomposeDiacriticalMarks` (cf. [#90](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/90)) by [@Semperverus](https://github.com/Semperverus)
+- Add new command to enable logging
 
 ### Changed
 
@@ -21,7 +23,6 @@ This changelog is following the recommended format by [keepachangelog](https://k
 ### Fixed
 
 ### Removed
-
 
 ## [1.3.2] - 2024-07-03
 

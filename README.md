@@ -303,6 +303,12 @@ The patterns defined above use the following tokens:
 
 ## Release Notes
 
+- Add User Agent
+- Add transform evaluation support for `decomposeDiacriticalMarks` (cf. [#90](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/90)) by [@Semperverus](https://github.com/Semperverus)
+- Add new command to enable logging
+- Fixed dependency (axios, micromatch)
+- Refactored code due to [#36](https://github.com/sailpoint-oss/typescript-sdk/issues/36)
+
 ## 1.3.2
 
 - Updated schema for lifefycle state (`identityState`)
