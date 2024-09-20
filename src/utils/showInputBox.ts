@@ -105,5 +105,6 @@ function createInputBox<T>(wizard: Wizard<T>, options: ExtInputBoxOptions): Inpu
     inputBox.placeholder = options.placeHolder;
     inputBox.prompt = options.prompt;
     inputBox.title ??= options.title;
+    inputBox.value = options.default
     return inputBox;
 }

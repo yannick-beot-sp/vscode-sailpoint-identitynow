@@ -3,6 +3,8 @@ export interface ValidatorOptions {
     required?: boolean;
     maxLength?: number;
     regexp?: string;
+    min?: number
+    max?: number
     custom?(input: string): string | undefined
     errorMessages?: ValidatorErrorMessages;
 
@@ -11,6 +13,8 @@ export interface ValidatorErrorMessages {
     required?: string;
     maxLength?: string;
     regexp?: string;
+    min?: string
+    max?: string
 }
 
 export class Validator {
@@ -33,7 +37,14 @@ export class Validator {
             && !Rules.regexp(input, this.options.regexp)) {
             return this.options.errorMessages?.regexp ?? ErrorMessages.regexp;
         }
+        
+        if (this.options.min && !isNaN(+input) && +input < this.options.min) {
+            return format(this.options.errorMessages?.min ?? ErrorMessages.min, this.options.min);
+        }
 
+        if (this.options.max && !isNaN(+input) && +input > this.options.max) {
+            return format(this.options.errorMessages?.max ?? ErrorMessages.max, this.options.max);
+        }
 
         return undefined;
     }
@@ -73,6 +84,8 @@ class ErrorMessages {
     public static readonly required = "You must provide a value";
     public static readonly maxLength = "The length must not exceed {0} characters";
     public static readonly regexp = "Format is invalid";
+    public static readonly min = "The value must be at least {0}";
+    public static readonly max = "The value must not exceed {0}";
 }
 
 function format(format, ...args) {

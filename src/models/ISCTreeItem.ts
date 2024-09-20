@@ -284,7 +284,7 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 			id,
 			collapsible: vscode.TreeItemCollapsibleState.Collapsed
 		})
-		this.contextValue = type.replace(" ", "") + "source";
+		this.contextValue = type.replaceAll(" ", "") + "source";
 	}
 
 
@@ -703,7 +703,9 @@ export class ServiceDesksTreeItem extends FolderTreeItem {
 				this.tenantName,
 				this.tenantDisplayName,
 				w.name,
-				w.id)
+				w.id,
+				w.type
+			)
 		);
 		return serviceDeskItems;
 	}
@@ -716,7 +718,8 @@ export class ServiceDeskTreeItem extends ISCResourceTreeItem {
 		tenantName: string,
 		tenantDisplayName: string,
 		label: string,
-		id: string) {
+		id: string,
+		public readonly type: string) {
 		super({
 			tenantId,
 			tenantName,

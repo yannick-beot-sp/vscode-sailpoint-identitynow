@@ -64,6 +64,7 @@ import { OpenScriptCommand } from './commands/rule/openScriptCommand';
 import { IdentityTreeViewCommand } from './commands/identity/IdentityTreeViewCommand';
 import { TenantReadOnlyConfigCommand } from './commands/tenant/tenantReadOnlyConfigCommand';
 import { NewIdentityAttributeCommand } from './commands/newIdentityAttributeCommand';
+import { EnableLoggingCommand } from './commands/source/enableLoggingCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -192,6 +193,14 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.CLONE_SOURCE_PALETTE,
 			cloneSourceCommand.execute, cloneSourceCommand));
+
+	const enableLoggingCommand = new EnableLoggingCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.ENABLE_LOGGING,
+			enableLoggingCommand.execute, enableLoggingCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.ENABLE_LOGGING_PALETTE,
+			enableLoggingCommand.execute, enableLoggingCommand));
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM,

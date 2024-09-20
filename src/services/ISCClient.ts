@@ -5,7 +5,7 @@ import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskManagementBetaApi, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, AccountsBetaApi, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskManagementBetaApi, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, AccountsBetaApi, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, ManagedClustersApi, StandardLevelBeta } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -323,6 +323,25 @@ export class ISCClient {
 			id: taskId
 		}, DEFAULT_AXIOS_OPTIONS)
 		return response.data;
+	}
+
+	public async updateLogConfiguration(
+		clusterId: string, duration: number, logLevels: {
+			[key: string]: StandardLevelBeta;
+		}
+	): Promise<void> {
+		console.log("> updateLogConfiguration", clusterId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new ManagedClustersBetaApi(apiConfig);
+		const response = await api.putClientLogConfiguration({
+			id: clusterId,
+			clientLogConfigurationBeta: {
+				durationMinutes: duration,
+				clientId: "VSCode",
+				logLevels,
+				rootLevel: "INFO"
+			}
+		}, DEFAULT_AXIOS_OPTIONS)
 	}
 
 	////////////////////////
@@ -1056,7 +1075,7 @@ export class ISCClient {
 		const api = new AccountsApi(apiConfig);
 		const response = await api.updateAccount({
 			id: accountId,
-			jsonPatchOperation: [
+			requestBody: [
 				{
 					op: "replace",
 					path: "/identityId",

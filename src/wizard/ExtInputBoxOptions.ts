@@ -8,4 +8,9 @@ export interface ExtInputBoxOptions extends InputBoxOptions {
      * Optional property that will display a ? button in the input window that opens a url when clicked
      */
     learnMoreLink?: string;
+
+    /**
+     * Optional default value
+     */
+    default?: string;
 }

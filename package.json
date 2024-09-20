@@ -216,6 +216,16 @@
         "icon": "$(eye)"
       },
       {
+        "command": "vscode-sailpoint-identitynow.enable-logging",
+        "title": "Enable logging...",
+        "icon": "$(debug)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.enable-logging.palette",
+        "title": "ISC: Enable logging for a source...",
+        "icon": "$(debug)"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.ping-source",
         "title": "Ping cluster",
         "icon": "$(eye)"
@@ -642,6 +652,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.enable-logging",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.clone-source",
           "when": "never"
         },
@@ -958,6 +972,11 @@
           "command": "vscode-sailpoint-identitynow.ping-source",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^((?!DelimitedFilesource).)*$/ && viewItem =~ /source$/",
           "group": "test"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.enable-logging",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^(service-desk-integration|ACF2-Fullsource|ADAM-Directsource|AIX-Directsource|AWSsource|AWSSecretsManagersource|ActiveDirectory-Directsource|Atlassian-DataCentersource|AtlassianSuite-Cloudsource|AzureActiveDirectorysource|BMCRemedysource|BeyondTrustPasswordSafe-Cloudsource|BeyondTrustPasswordSafe-Cloudsource|BeyondTrustPasswordSafe-Onpremsource|BeyondTrustPasswordSafe-Onpremsource|Boxsource|Coupasource|CyberArkConjurCloudsource|CyberArkPAMSelfHostedsource|CyberArkPrivilegeCloudSharedServicessource|DelineaSecretServerCloudsource|DelineaSecretServerOn-Premisesource|Dropboxsource|Duosource|Dynamics365BusinessCentralOnlinesource|Dynamics365BusinessCentralOnlinesource|Dynamics365CRMsource|Dynamics365CRMsource|Dynamics365FOsource|Epicsource|GSuitesource|Genericsource|GoToMeetingsource|GuidewireBillingCentersource|GuidewireClaimCentersource|GuidewireContactManagersource|GuidewirePolicyCentersource|HashiCorpVault(Cloud)source|HashiCorpVault(On-Premise)source|IBMDB2source|IBMLotusDomino-Directsource|IBMTivoliAccessManagersource|IBMTivoliDS-Directsource|IBMisource|IvantiCherwellsource|JDBCsource|JackHenrysource|LDAPsource|Linux-Directsource|MEDITECHsource|MicrosoftAzureSQLDatabasesource|MicrosoftSQLServer-Directsource|MicrosoftSharePointOnlinesource|MicrosoftSharePointServersource|MongoDBCloud-Atlassource|MongoDBCloud-Databasesource|Multi-Host-MicrosoftSQLServersource|Multi-Host-OracleDatabasesource|Non-Employeesource|NovelleDirectory-Directsource|Oktasource|OpenLDAP-Directsource|OracleDatabase-Directsource|OracleE-Businesssource|OracleEPMCloud-ARsource|OracleEPMCloud-FCCSsource|OracleEPMCloud-NRsource|OracleEPMCloud-Planningsource|OracleERPCloudsource|OracleFusionHCMAccountssource|OracleHCMCloudsource|OracleHRMSsource|OracleInternetDirectory-Directsource|OracleNetSuitesource|PeopleSoft-Directsource|PeopleSoftHCMDatabasesource|RACF-Fullsource|RACFLDAPsource|RSAAuthenticationManager-Directsource|RemedyForcesource|SAML-JITsource|SAP-Directsource|SAPAnalyticsCloudsource|SAPConcursource|SAPFieldglasssource|SAPGRCsource|SAPHANADatabasesource|SAPHR\\/HCMsource|SAPPortal-UMWebServicesource|SAPS\\/4HANACloudsource|SCIM1.1source|SCIM2.0source|SQLLoadersource|Salesforcesource|ServiceNowsource|ServiceNowServiceDesksource|Siebelsource|Slacksource|Snowflakesource|Solaris-Directsource|SuccessFactorssource|SuccessFactorsLMSsource|Sybase-Directsource|TopSecretLDAPsource|TopSecret-Fullsource|UKGProCoreHCMsource|WebServicessource|Webexsource|WindowsLocal-Directsource|Workdaysource|WorkdayAccountssource|Zendesksource|ZendeskSDIMsource|Zoomsource)$/",
+          "group": "logging"
         },
         {
           "command": "vscode-sailpoint-identitynow.clone-source",
@@ -1398,7 +1417,7 @@
     "csv-parse": "^5.4.0",
     "fast-json-patch": "^3.1.1",
     "lodash": "^4.17.21",
-    "sailpoint-api-client": "^1.3.6",
+    "sailpoint-api-client": "^1.4.8",
     "tmp": "^0.2.1",
     "vscode-sailpoint-identitynow": "file:"
   }
