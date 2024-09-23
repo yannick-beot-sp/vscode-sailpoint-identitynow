@@ -35,17 +35,17 @@ export function capitalizeFirstLetter(input: string) {
 export function toCamelCase(input: string): string {
     // Split the input string into words
     const words = input.split(/[\s-_]+/);
-    
+
     // Process each word
     return words.map((word, index) => {
         // Convert the word to lowercase
         word = word.toLowerCase();
-        
+
         // If it's not the first word, capitalize the first letter
         if (index !== 0) {
             word = word.charAt(0).toUpperCase() + word.slice(1);
         }
-        
+
         return word;
     }).join('');
 }
@@ -56,4 +56,16 @@ export function decomposeDiacriticalMarks(input: string): string {
         .normalize('NFKD')
         // Remove the unicode diacritical marks.
         .replace(/[\u0300-\u036f]/g, "");
+}
+
+
+/**
+ * cf. https://developer.sailpoint.com/docs/api/standard-collection-parameters/#escaping-special-characters-in-a-filter
+ */
+export function escapeFilter(input: string | undefined) {
+    return input?.replaceAll("%", "%25")
+        .replaceAll("#", "%23")
+        .replaceAll("&", "%26")
+        .replaceAll("\\", "\\\\")
+        .replaceAll("\"", "\\\"")
 }

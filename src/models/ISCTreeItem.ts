@@ -7,7 +7,7 @@ import { AxiosHeaders, AxiosResponse } from "axios";
 import { getConfigNumber } from '../utils/configurationUtils';
 import * as commands from "../commands/constants";
 import * as configuration from '../configurationConstants';
-import { isEmpty, isNotEmpty } from "../utils/stringUtils";
+import { escapeFilter, isEmpty, isNotEmpty } from "../utils/stringUtils";
 import { TenantService } from "../services/TenantService";
 
 
@@ -1267,33 +1267,52 @@ export class IdentityTreeItem extends ISCResourceTreeItem {
 }
 
 /**
- * Contains the Forms in tree view
+ * Contains the Applications in tree view
  */
-export class ApplicationsTreeItem extends FolderTreeItem {
+// XXX TODO used type data
+export class ApplicationsTreeItem extends PageableFolderTreeItem<any> {
+	sourceId: string | undefined = undefined
+
 	constructor(
 		tenantId: string,
 		tenantName: string,
 		tenantDisplayName: string,
 	) {
-		super("Applications", "source-apps", tenantId, tenantName, tenantDisplayName);
-	}
-
-	async getChildren(): Promise<BaseTreeItem[]> {
-		const client = new ISCClient(this.tenantId, this.tenantName);
-		const apps: ApplicationTreeItem[] = []
-		for await (const app of client.getApplications()) {
-			apps.push(new ApplicationTreeItem(
-				this.tenantId,
-				this.tenantName,
-				this.tenantDisplayName,
+		super("Applications", "source-apps", tenantId, tenantName, tenantDisplayName, 'No application found',
+			(app => new ApplicationTreeItem(
+				tenantId,
+				tenantName,
+				tenantDisplayName,
 				`${app.name} (${app?.accountSource?.name ?? ""})`,
 				app.id
 			))
-		}
+		);
+	}
 
-		return apps;
+	protected async loadNext(): Promise<AxiosResponse<Document[]>> {
+		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
+		const nameFilter = isNotEmpty(this.filters) ? `name co "${escapeFilter(this.filters)}"` : undefined
+		const sourceFilter = isNotEmpty(this.sourceId) ? `accountSource.id eq "${this.sourceId}"` : undefined
+
+		const filters = [nameFilter, sourceFilter]
+			.filter(Boolean) // this line will remove any "undefined"
+			.join(" and ")
+
+		
+		return await this.client.getPaginatedApplications(
+			filters,
+			limit,
+			this.currentOffset,
+			(this._total === 0)
+		) as AxiosResponse<Document[]>;
+	}
+
+	
+	get isFiltered(): boolean {
+		return isNotEmpty(this.sourceId);
 	}
 }
+
 export class ApplicationTreeItem extends ISCResourceTreeItem {
 	contextValue = "source-app";
 
@@ -1313,5 +1332,5 @@ export class ApplicationTreeItem extends ISCResourceTreeItem {
 		})
 	}
 
-	iconPath = new vscode.ThemeIcon("preview");
+	iconPath = new vscode.ThemeIcon("layers");
 }

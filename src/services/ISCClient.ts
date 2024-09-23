@@ -1468,8 +1468,8 @@ export class ISCClient {
 	//////////////////////////////
 	//#endregion Forms
 	//////////////////////////////
+
 	//////////////////////////////
-	
 	//region Applications
 	//////////////////////////////
 	public async *getApplications(filters: string | undefined = undefined): AsyncGenerator<any> {
@@ -1477,11 +1477,11 @@ export class ISCClient {
 		const httpClient = await this.getAxios();
 		const baseUrl = '/beta/source-apps/all'
 
-		let args: Record<string,any> = {
+		let args: Record<string, any> = {
 			offset: 0,
 			limit: DEFAULT_PAGINATION,
 			filters,
-			sorters:"name"
+			sorters: "name"
 		}
 		let count = -1
 		do {
@@ -1495,6 +1495,25 @@ export class ISCClient {
 			}
 			args.offset += DEFAULT_PAGINATION
 		} while (count === DEFAULT_PAGINATION)
+	}
+
+	public async getPaginatedApplications(filters: string, limit?: number, offset?: number, count?: boolean): Promise<AxiosResponse<any[]>> {
+		console.log("> getPaginatedApplications", filters, limit, offset);
+
+		limit = limit ? Math.min(DEFAULT_PAGINATION, limit) : DEFAULT_PAGINATION;
+
+		const httpClient = await this.getAxios();
+		const baseUrl = '/beta/source-apps/all'
+		const args: Record<string, any> = {
+			offset,
+			limit,
+			filters,
+			sorters: "name",
+			count
+		}
+		const path = addQueryParams(baseUrl, args)
+		const response = await httpClient.get(path);
+		return response;
 	}
 	//////////////////////////////
 	//#endregion Applications

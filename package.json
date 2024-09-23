@@ -534,6 +534,21 @@
       {
         "command": "vscode-sailpoint-identitynow.identities.process",
         "title": "Process"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.applications.filter.source",
+        "title": "Filter applications by source...",
+        "icon": "$(filter)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.applications.update-filter.source",
+        "title": "Filter applications by source...",
+        "icon": "$(filter-filled)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.applications.filter.name",
+        "title": "Search applications by name...",
+        "icon": "$(search)"
       }
     ],
     "menus": {
@@ -857,6 +872,18 @@
         {
           "command": "vscode-sailpoint-identitynow.connector-rule.edit",
           "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.filter.source",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.update-filter.source",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.filter.name",
+          "when": "never"
         }
       ],
       "view/title": [
@@ -884,7 +911,7 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.remove-resource",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|search-attribute|identity-attribute)$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|search-attribute|identity-attribute|source-app)$/",
           "group": "zzzremove@100"
         },
         {
@@ -1226,6 +1253,21 @@
         {
           "command": "vscode-sailpoint-identitynow.identities.process",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.filter.source",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source-appsUnfiltered",
+          "group": "inline@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.update-filter.source",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source-appsFiltered",
+          "group": "inline@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.filter.name",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^source-apps/",
+          "group": "inline@0"
         }
       ],
       "editor/context": [

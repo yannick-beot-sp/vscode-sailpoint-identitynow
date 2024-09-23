@@ -63,6 +63,8 @@ import { IdentityTreeViewCommand } from './commands/identity/IdentityTreeViewCom
 import { TenantReadOnlyConfigCommand } from './commands/tenant/tenantReadOnlyConfigCommand';
 import { NewIdentityAttributeCommand } from './commands/newIdentityAttributeCommand';
 import { EnableLoggingCommand } from './commands/source/enableLoggingCommand';
+import { ApplicationSourceFilterCommand } from './commands/applications/applicationSourceFilterCommand';
+import { ApplicationNameFilterCommand } from './commands/applications/applicationNameFilterCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -497,6 +499,18 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.IDENTITIES_PROCESS,
 			newIdentityCommand.processIdentity, newIdentityCommand));
 
+	// Applications
+	const applicationSourceFilterCommand =  new ApplicationSourceFilterCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.APPLICATIONS_FILTER_SOURCE_VIEW,
+			applicationSourceFilterCommand.execute, applicationSourceFilterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.APPLICATIONS_UPDATE_FILTER_SOURCE_VIEW,
+			applicationSourceFilterCommand.removeFilter, applicationSourceFilterCommand));
+	const applicationNameFilterCommand =  new ApplicationNameFilterCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.APPLICATIONS_FILTER_NAME_VIEW,
+			applicationNameFilterCommand.execute, applicationNameFilterCommand));
 
 	// Add global interceptor for axios, to applied with the sailpoint SDK
 	// Add a request interceptor
