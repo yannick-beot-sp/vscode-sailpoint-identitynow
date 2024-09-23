@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://developer.sailpoint.com/schemas/role.json",
+    "$id": "https://developer.sailpoint.com/schemas/access-profile.json",
     "title": "Access Profile",
     "description": "Schema of a Access Profile",
     "type": "object",

@@ -1,0 +1,208 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://developer.sailpoint.com/schemas/app.json",
+    "title": "Source App",
+    "description": "Schema of a source app",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "type": "string",
+            "description": "The source app id",
+            "example": "2c91808a7190d06e01719938fcd20792",
+            "readOnly": true
+        },
+        "cloudAppId": {
+            "type": "string",
+            "description": "The deprecated source app id",
+            "example": "2c91808a7190d06e01719938fcd20792",
+            "readOnly": true
+        },
+        "name": {
+            "type": "string",
+            "description": "The source app name",
+            "example": "my app"
+        },
+        "description": {
+            "type": "string",
+            "description": " The description of the source app",
+            "example": "the source app for engineers"
+        },
+        "created": {
+            "type": "string",
+            "description": "Date the source app was created",
+            "format": "date-time",
+            "example": "2021-03-01T22:32:58.104Z",
+            "readOnly": true
+        },
+        "modified": {
+            "type": "string",
+            "description": "Date the source app was last modified.",
+            "format": "date-time",
+            "example": "2021-03-02T20:22:28.104Z",
+            "readOnly": true
+        },
+        "enabled": {
+            "type": "boolean",
+            "description": "True if the source app is enabled",
+            "example": true
+        },
+        "provisionRequestEnabled": {
+            "type": "boolean",
+            "description": "True if the source app is provision request enabled",
+            "example": true
+        },
+        "matchAllAccounts": {
+            "type": "boolean",
+            "description": "True if the source app match all accounts",
+            "example": true
+        },
+        "appCenterEnabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "True if the source app is shown in the app center",
+            "example": true
+        },
+        "accountSource": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "The source ID",
+                    "example": "2c91809773dee3610173fdb0b6061ef4"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "SOURCE"
+                    ],
+                    "description": "The type of the Source, will always be SOURCE",
+                    "example": "SOURCE"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The source name",
+                    "example": "ODS-AD-SOURCE"
+                },
+                "useForPasswordManagement": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If the source is used for password management",
+                    "example": true
+                },
+                "passwordPolicies": {
+                    "anyOf": [
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "string",
+                                        "description": "ID of the object to which this reference applies",
+                                        "example": "2c91809773dee32014e13e122092014e"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "PASSWORD_POLICY"
+                                        ],
+                                        "description": "An enumeration of the types of DTOs supported within the IdentityNow infrastructure.",
+                                        "example": "PASSWORD_POLICY"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "description": "Human-readable display name of the object to which this reference applies",
+                                        "example": "William Wilson"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "The password policies for the source",
+                    "example": [
+                        {
+                            "type": "PASSWORD_POLICY",
+                            "id": "006a072ecc6647f68bba9f4a4ad34649",
+                            "name": "Password Policy 1"
+                        }
+                    ]
+                }
+            }
+        },
+        "owner": {
+            "description": "The owner of source app",
+            "type": "object",
+            "nullable": false,
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "IDENTITY"
+                    ],
+                    "description": "Owner type. This field must be either left null or set to 'IDENTITY' on input, otherwise a 400 Bad Request error will result.",
+                    "example": "IDENTITY"
+                },
+                "id": {
+                    "type": "string",
+                    "description": "Identity id",
+                    "example": "2c9180a46faadee4016fb4e018c20639"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Human-readable display name of the owner. It may be left null or omitted in a POST or PATCH. If set, it must match the current value of the owner's display name, otherwise a 400 Bad Request error will result.",
+                    "example": "support"
+                }
+            }
+        }
+    },
+    "definitions": {
+        "reference": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "description": "Refers to a specific Identity attribute, Account attibute, or Entitlement used in Role membership criteria",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "IDENTITY",
+                        "ACCOUNT",
+                        "ENTITLEMENT"
+                    ],
+                    "description": "Indicates whether the associated criteria represents an expression on identity attributes, account attributes, or entitlements, respectively.",
+                    "example": "ACCOUNT"
+                },
+                "property": {
+                    "type": "string",
+                    "description": "The name of the attribute or entitlement to which the associated criteria applies.",
+                    "example": "attribute.email"
+                },
+                "sourceId": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "ID of the Source from which an account attribute or entitlement is drawn. Required if type is ACCOUNT or ENTITLEMENT",
+                    "example": "2c9180867427f3a301745aec18211519"
+                }
+            },
+            "required": [
+                "type",
+                "property"
+            ]
+        }
+    },
+    "required": [
+        "name",
+        "owner"
+    ]
+}

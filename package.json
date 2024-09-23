@@ -874,7 +874,7 @@
       "view/item/context": [
         {
           "command": "vscode-sailpoint-identitynow.open-resource",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|source|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|identities)$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|source|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|identities|source-app)$/",
           "group": "_@0"
         },
         {
@@ -889,7 +889,7 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.refresh-forced",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|transforms|provisioning-policies|roles|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions|search-attributes|identity-attributes/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|transforms|provisioning-policies|roles|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions|search-attributes|identity-attributes|source-apps/",
           "group": "inline@50"
         },
         {
@@ -1312,6 +1312,10 @@
       {
         "fileMatch": "idn://**/identities/**/*",
         "url": "./schemas/identity.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/source-apps/**/*",
+        "url": "./schemas/app.schemas.json"
       }
     ],
     "configuration": {

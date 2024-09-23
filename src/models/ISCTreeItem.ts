@@ -76,6 +76,7 @@ export class TenantTreeItem extends BaseTreeItem {
 		results.push(new SearchAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new IdentityAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new IdentitiesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new ApplicationsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 
 		return results
 	}
@@ -1263,4 +1264,54 @@ export class IdentityTreeItem extends ISCResourceTreeItem {
 	}
 
 	iconPath = new vscode.ThemeIcon("person");
+}
+
+/**
+ * Contains the Forms in tree view
+ */
+export class ApplicationsTreeItem extends FolderTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {
+		super("Applications", "source-apps", tenantId, tenantName, tenantDisplayName);
+	}
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		const client = new ISCClient(this.tenantId, this.tenantName);
+		const apps: ApplicationTreeItem[] = []
+		for await (const app of client.getApplications()) {
+			apps.push(new ApplicationTreeItem(
+				this.tenantId,
+				this.tenantName,
+				this.tenantDisplayName,
+				`${app.name} (${app?.accountSource?.name ?? ""})`,
+				app.id
+			))
+		}
+
+		return apps;
+	}
+}
+export class ApplicationTreeItem extends ISCResourceTreeItem {
+	contextValue = "source-app";
+
+	constructor(tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			resourceType: "source-apps",
+			id,
+			beta: true
+		})
+	}
+
+	iconPath = new vscode.ThemeIcon("preview");
 }

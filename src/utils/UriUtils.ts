@@ -15,6 +15,21 @@ export function withQuery(baseUrl: string, params: any): string {
     return url.toString();
 }
 
+export function addQueryParams(path: string, params: Record<string, any>): string {
+    // Parse the existing URL
+    const [basePath, existingQuery] = path.split('?');
+    const searchParams = new URLSearchParams(existingQuery);
+
+    // Add new parameters
+    Object.entries(params)
+        .filter(k => params[k[0]] !== undefined)
+        .forEach(([key, value]) => searchParams.set(key, value));
+
+    // Reconstruct the URL
+    const newQuery = searchParams.toString();
+    return newQuery ? `${basePath}?${newQuery}` : basePath;
+}
+
 
 export function buildResourceUri(params: {
     tenantName: string;
@@ -35,10 +50,10 @@ export function buildResourceUri(params: {
     const name = params.name?.replaceAll("/", "%2F")
 
     const pathParts = [(beta ? 'beta' : 'v3'),
-        params.resourceType,
-        params.id,
-        params.subResourceType,
-        params.subId,
+    params.resourceType,
+    params.id,
+    params.subResourceType,
+    params.subId,
         name].filter(x => !!x)
 
     return Uri.from({

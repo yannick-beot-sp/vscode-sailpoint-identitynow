@@ -14,6 +14,7 @@ import { createReadStream } from 'fs';
 import { DEFAULT_ACCESSPROFILES_QUERY_PARAMS } from "../models/AccessProfiles";
 import { DEFAULT_ROLES_QUERY_PARAMS } from "../models/Roles";
 import axiosRetry = require("axios-retry");
+import { addQueryParams, withQuery } from "../utils/UriUtils";
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const FormData = require('form-data');
 
@@ -1467,6 +1468,37 @@ export class ISCClient {
 	//////////////////////////////
 	//#endregion Forms
 	//////////////////////////////
+	//////////////////////////////
+	
+	//region Applications
+	//////////////////////////////
+	public async *getApplications(filters: string | undefined = undefined): AsyncGenerator<any> {
+		console.log("> getApplications");
+		const httpClient = await this.getAxios();
+		const baseUrl = '/beta/source-apps/all'
+
+		let args: Record<string,any> = {
+			offset: 0,
+			limit: DEFAULT_PAGINATION,
+			filters,
+			sorters:"name"
+		}
+		let count = -1
+		do {
+			const path = addQueryParams(baseUrl, args)
+			const response = await httpClient.get(path);
+			if (response.data) {
+				count = response.data.length
+				for (const f of response.data) {
+					yield f
+				}
+			}
+			args.offset += DEFAULT_PAGINATION
+		} while (count === DEFAULT_PAGINATION)
+	}
+	//////////////////////////////
+	//#endregion Applications
+	//////////////////////////////
 
 	/////////////////////////
 	//#region Notification Templates
@@ -1628,3 +1660,4 @@ export class ISCClient {
 	//#endregion Identity Management
 	////////////////////////
 }
+

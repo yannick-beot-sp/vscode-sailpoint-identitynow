@@ -31,7 +31,6 @@ import { ExportConfigTreeViewCommand } from './commands/spconfig-export/ExportCo
 import { ImportConfigExplorerCommand } from './commands/spconfig-import/ImportConfigExplorerCommand';
 import { ImportConfigPaletteCommand } from './commands/spconfig-import/ImportConfigPaletteCommand';
 import { ImportConfigTreeViewCommand } from './commands/spconfig-import/ImportConfigTreeViewCommand';
-import { TestWorkflowCommand } from './commands/workflow/testWorkflow';
 import { viewWorkflowExecutionHistory } from './commands/workflow/viewWorkflowExecutionHistory';
 import { UpdateWorkflowStatusCommand } from './commands/workflow/updateWorkflowStatusCommand';
 import { URL_PREFIX } from './constants';
