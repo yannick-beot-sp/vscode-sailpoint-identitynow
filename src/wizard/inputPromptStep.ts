@@ -38,6 +38,10 @@ export class InputPromptStep<WizardContext> extends WizardPromptStep<WizardConte
         if (isEmpty(inputPromptStepOptions.options?.placeHolder)) {
             this._options.placeHolder = `${capitalizeFirstLetter(this._displayName)} name`;
         }
+
+        if (this._options.afterPrompt) {
+            this.afterPrompt = this._options.afterPrompt
+        }
     }
 
     public async prompt(wizard: Wizard<WizardContext>, wizardContext: WizardContext): Promise<void> {

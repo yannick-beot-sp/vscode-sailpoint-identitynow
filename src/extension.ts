@@ -66,6 +66,7 @@ import { EnableLoggingCommand } from './commands/source/enableLoggingCommand';
 import { ApplicationSourceFilterCommand } from './commands/applications/applicationSourceFilterCommand';
 import { ApplicationNameFilterCommand } from './commands/applications/applicationNameFilterCommand';
 import { RemoveAccessProfileFromAppCommand } from './commands/applications/removeAccessProfileFromAppCommand';
+import { AddAccessProfileToApplication } from './commands/applications/addAccessProfileToApplication';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -501,14 +502,14 @@ export function activate(context: vscode.ExtensionContext) {
 			newIdentityCommand.processIdentity, newIdentityCommand));
 
 	// Applications
-	const applicationSourceFilterCommand =  new ApplicationSourceFilterCommand()
+	const applicationSourceFilterCommand = new ApplicationSourceFilterCommand()
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.APPLICATIONS_FILTER_SOURCE_VIEW,
 			applicationSourceFilterCommand.execute, applicationSourceFilterCommand));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.APPLICATIONS_UPDATE_FILTER_SOURCE_VIEW,
 			applicationSourceFilterCommand.removeFilter, applicationSourceFilterCommand));
-	const applicationNameFilterCommand =  new ApplicationNameFilterCommand()
+	const applicationNameFilterCommand = new ApplicationNameFilterCommand()
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.APPLICATIONS_FILTER_NAME_VIEW,
 			applicationNameFilterCommand.execute, applicationNameFilterCommand));
@@ -518,6 +519,11 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.REMOVE_ACCESS_PROFILE_FROM_APPLICATION,
 			removeAccessProfileFromAppCommand.execute, removeAccessProfileFromAppCommand));
+
+	const addAccessProfileToApplication = new AddAccessProfileToApplication(tenantService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.ADD_ACCESS_PROFILE_FROM_APPLICATION,
+			addAccessProfileToApplication.execute, addAccessProfileToApplication));
 
 
 	// Add global interceptor for axios, to applied with the sailpoint SDK

@@ -1539,6 +1539,19 @@ export class ISCClient {
 		const response = await httpClient.post(path, [accessProfileId]);
 	}
 
+	public async addAccessProfileToApplication(appId: string, accessProfileId: string): Promise<void> {
+		console.log("> addAccessProfileToApplication", appId, accessProfileId);
+		const httpClient = await this.getAxios(CONTENT_TYPE_FORM_JSON_PATCH);
+		const path = `/beta/source-apps/${appId}`
+		const response = await httpClient.patch(path, [
+			{
+				"op": "add",
+				"path": "/accessProfiles/-",
+				"value": accessProfileId
+			}
+		]);
+	}
+
 	//////////////////////////////
 	//#endregion Applications
 	//////////////////////////////

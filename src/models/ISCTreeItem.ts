@@ -1287,7 +1287,8 @@ export class ApplicationsTreeItem extends PageableFolderTreeItem<any> {
 				tenantName,
 				tenantDisplayName,
 				`${app.name} (${app?.accountSource?.name ?? ""})`,
-				app.id
+				app.id,
+				app.accountSource.id
 			))
 		);
 	}
@@ -1334,7 +1335,8 @@ export class ApplicationTreeItem extends ISCResourceTreeItem implements Pageable
 		tenantName: string,
 		tenantDisplayName: string,
 		label: string,
-		id: string
+		id: string,
+		public readonly sourceId: string
 	) {
 		super({
 			tenantId,
@@ -1378,7 +1380,7 @@ export class ApplicationTreeItem extends ISCResourceTreeItem implements Pageable
 			const response = await this.loadNext();
 			const total = response.data?.length
 
-			if (total === 0) {
+			if (total === 0 && this.children.length === 0) {
 				this.children = [new MessageNode('No access profile found')];
 				return;
 			}

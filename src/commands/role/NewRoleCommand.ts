@@ -79,7 +79,7 @@ export class NewRoleCommand {
                         learnMoreLink: "https://documentation.sailpoint.com/saas/help/search/searchable-fields.html#searching-access-profile-data"
                     }
                 }),
-                new QuickPickAccessProfileStep(() => { return client; }),
+                new QuickPickAccessProfileStep({ getISCClient: () => { return client; } }),
                 new InputPromptStep({
                     name: "entitlementQuery",
                     options: {

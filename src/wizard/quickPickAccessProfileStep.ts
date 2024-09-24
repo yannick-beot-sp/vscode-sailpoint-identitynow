@@ -6,15 +6,22 @@ import { ISCClient } from "../services/ISCClient";
 import { isEmpty } from '../utils/stringUtils';
 
 export class QuickPickAccessProfileStep extends QuickPickPromptStep<WizardContext, vscode.QuickPickItem> {
-    constructor(
+    private readonly accessProfileQueryKey: string
+
+    constructor({
+        getISCClient,
+        canPickMany = true,
+        accessProfileQueryKey = "accessProfileQuery"
+    }: {
         getISCClient: () => ISCClient,
-        private readonly accessProfileQueryKey = "accessProfileQuery",
-    ) {
+        canPickMany?: boolean,
+        accessProfileQueryKey?: string
+    }) {
         super({
             name: "accessProfiles",
             displayName: "access profiles",
             options: {
-                canPickMany: true,
+                canPickMany,
                 matchOnDescription: true,
                 matchOnDetail: true
             },
@@ -33,6 +40,8 @@ export class QuickPickAccessProfileStep extends QuickPickPromptStep<WizardContex
                 return results;
             }
         })
+
+        this.accessProfileQueryKey = accessProfileQueryKey
     }
     public shouldPrompt(context: WizardContext): boolean {
         if (isEmpty(context[this.accessProfileQueryKey])) {

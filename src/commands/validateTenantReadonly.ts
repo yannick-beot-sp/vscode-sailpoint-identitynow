@@ -10,12 +10,11 @@ import { confirm } from "../utils/vsCodeHelpers";
  */
 export async function validateTenantReadonly(tenantService: TenantService, tenantId: string, actionName: string): Promise<boolean> {
     const tenantInfo = tenantService.getTenant(tenantId)
-    if (tenantInfo.readOnly === true) {
+    if (tenantInfo.readOnly) {
         const prompt = `The tenant ${tenantInfo.name} is read-only. Do you still want to ${actionName}?`
         return confirm(prompt)
-    } else {
-        return true
     }
+    return true
 }
 
 export function isTenantReadonly(tenantService: TenantService, tenantId: string): boolean {

@@ -31,7 +31,7 @@ export class RemoveAccessProfileFromAppCommand {
             title: 'Removing Access Profile from Application...',
             cancellable: false
         }, async () => {
-            client.removeAccessProfileFromApplication(node.appId, node.resourceId)
+            await client.removeAccessProfileFromApplication(node.appId, node.resourceId)
             vscode.commands.executeCommand(commands.REFRESH_FORCED, node.parentNode);
         });
     }

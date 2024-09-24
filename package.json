@@ -553,6 +553,11 @@
       {
         "command": "vscode-sailpoint-identitynow.applications.remove.access-profile",
         "title": "Remove access profile from application"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.applications.add.access-profile",
+        "title": "Add access profile to application...",
+        "icon": "$(add)"
       }
     ],
     "menus": {
@@ -891,6 +896,10 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.applications.remove.access-profile",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.add.access-profile",
           "when": "never"
         }
       ],
@@ -1280,6 +1289,11 @@
         {
           "command": "vscode-sailpoint-identitynow.applications.remove.access-profile",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profile-application"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.add.access-profile",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source-app",
+          "group": "inline@0"
         }
       ],
       "editor/context": [
