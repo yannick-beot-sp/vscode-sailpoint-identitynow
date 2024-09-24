@@ -206,7 +206,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 					JSON.stringify(jsonpatch)
 				);
 
-			} else if (resourcePath.match("identity-profiles|access-profiles|roles|search-attribute-config")) {
+			} else if (resourcePath.match("identity-profiles|access-profiles|roles|search-attribute-config|source-apps")) {
 				// special treatment to send patch as PUT is not supported
 				const oldData = await client.getResource(resourcePath);
 				const newData = JSON.parse(data);
@@ -242,6 +242,14 @@ export class ISCResourceProvider implements FileSystemProvider {
 						}
 					})
 
+				} else if (resourcePath.match("source-apps")) {
+					//The following fields are patchable: 
+					//name, description, enabled, owner, provisionRequestEnabled, appCenterEnabled, accountSource, matchAllAccounts and accessProfiles.
+					//Name, description and owner can't be empty or null.
+					const patchableProperties = ["/name", "/description", "/enabled", "/owner", "/owner/id", "/provisionRequestEnabled", "/appCenterEnabled", "/accountSource", "/matchAllAccounts", "/accessProfiles"]
+					const notEmptyProperties = ["/name", "/description", "/owner", "/owner/id"]
+					// @ts-ignore
+					jsonpatch = jsonpatch.filter(p => patchableProperties.includes(p.path) && (!notEmptyProperties.includes(p.path) || p.value))
 				}
 
 				await client.patchResource(

@@ -425,7 +425,7 @@ export class ISCClient {
 		return response.data;
 	}
 
-	public async patchResource(path: string, data: string): Promise<any> {
+	public async patchResource(path: string, data: string | object): Promise<any> {
 		console.log("> patchResource", path);
 		const httpClient = await this.getAxios(CONTENT_TYPE_FORM_JSON_PATCH);
 		const response = await httpClient.patch(path, data);
@@ -1541,9 +1541,8 @@ export class ISCClient {
 
 	public async addAccessProfileToApplication(appId: string, accessProfileId: string): Promise<void> {
 		console.log("> addAccessProfileToApplication", appId, accessProfileId);
-		const httpClient = await this.getAxios(CONTENT_TYPE_FORM_JSON_PATCH);
 		const path = `/beta/source-apps/${appId}`
-		const response = await httpClient.patch(path, [
+		const response = this.patchResource(path, [
 			{
 				"op": "add",
 				"path": "/accessProfiles/-",
