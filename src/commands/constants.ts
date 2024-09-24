@@ -120,3 +120,4 @@ export const IDENTITIES_PROCESS = `${COMMAND_PREFIX}.identities.process`;
 export const APPLICATIONS_FILTER_SOURCE_VIEW = `${COMMAND_PREFIX}.applications.filter.source`;
 export const APPLICATIONS_UPDATE_FILTER_SOURCE_VIEW = `${COMMAND_PREFIX}.applications.update-filter.source`;
 export const APPLICATIONS_FILTER_NAME_VIEW = `${COMMAND_PREFIX}.applications.filter.name`;
+export const REMOVE_ACCESS_PROFILE_FROM_APPLICATION = `${COMMAND_PREFIX}.applications.remove.access-profile`;

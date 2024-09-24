@@ -549,6 +549,10 @@
         "command": "vscode-sailpoint-identitynow.applications.filter.name",
         "title": "Search applications by name...",
         "icon": "$(search)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.applications.remove.access-profile",
+        "title": "Remove access profile from application"
       }
     ],
     "menus": {
@@ -884,6 +888,10 @@
         {
           "command": "vscode-sailpoint-identitynow.applications.filter.name",
           "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.remove.access-profile",
+          "when": "never"
         }
       ],
       "view/title": [
@@ -916,7 +924,7 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.refresh-forced",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|transforms|provisioning-policies|roles|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions|search-attributes|identity-attributes|source-apps/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|transforms|provisioning-policies|roles|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions|search-attributes|identity-attributes|source-apps|source-app/",
           "group": "inline@50"
         },
         {
@@ -1268,6 +1276,10 @@
           "command": "vscode-sailpoint-identitynow.applications.filter.name",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^source-apps/",
           "group": "inline@0"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.remove.access-profile",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profile-application"
         }
       ],
       "editor/context": [

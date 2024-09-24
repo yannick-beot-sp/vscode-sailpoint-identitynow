@@ -1515,6 +1515,30 @@ export class ISCClient {
 		const response = await httpClient.get(path);
 		return response;
 	}
+
+	public async getPaginatedApplicationAccessProfiles(appId: string, limit?: number, offset?: number): Promise<AxiosResponse<any[]>> {
+		console.log("> getPaginatedApplicationAccessProfile", limit, offset);
+
+		limit = limit ? Math.min(DEFAULT_PAGINATION, limit) : DEFAULT_PAGINATION;
+
+		const httpClient = await this.getAxios();
+		const baseUrl = `/beta/source-apps/${appId}/access-profiles`
+		const args: Record<string, any> = {
+			offset,
+			limit,
+		}
+		const path = addQueryParams(baseUrl, args)
+		const response = await httpClient.get(path);
+		return response;
+	}
+
+	public async removeAccessProfileFromApplication(appId: string, accessProfileId: string): Promise<void> {
+		console.log("> removeAccessProfileFromApplication", appId, accessProfileId);
+		const httpClient = await this.getAxios();
+		const path = `/beta/source-apps/${appId}/access-profiles/bulk-remove`
+		const response = await httpClient.post(path, [accessProfileId]);
+	}
+
 	//////////////////////////////
 	//#endregion Applications
 	//////////////////////////////

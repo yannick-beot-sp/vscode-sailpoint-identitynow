@@ -63,9 +63,9 @@ export function decomposeDiacriticalMarks(input: string): string {
  * cf. https://developer.sailpoint.com/docs/api/standard-collection-parameters/#escaping-special-characters-in-a-filter
  */
 export function escapeFilter(input: string | undefined) {
-    return input?.replaceAll("%", "%25")
-        .replaceAll("#", "%23")
-        .replaceAll("&", "%26")
-        .replaceAll("\\", "\\\\")
+    return input?.replaceAll("\\", "\\\\")
         .replaceAll("\"", "\\\"")
+    // .replaceAll("%", "%25")
+    // .replaceAll("#", "%23")
+    // .replaceAll("&", "%26")
 }
