@@ -47,7 +47,7 @@ export class TestConnectionCommand {
                 new QuickPickSourceStep(() => { return client!; }),
             ]
         }, context);
-        console.log({ values });
+        
         if (values === undefined) { return; }
 
         await vscode.window.withProgress({

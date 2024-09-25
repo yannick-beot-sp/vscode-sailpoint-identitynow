@@ -115,3 +115,12 @@ export const IDENTITIES_ICON_SEARCH = `${COMMAND_PREFIX}.identities.icon-search`
 export const IDENTITIES_DELETE = `${COMMAND_PREFIX}.identities.delete`;
 export const IDENTITIES_ATT_SYNC = `${COMMAND_PREFIX}.identities.att-sync`;
 export const IDENTITIES_PROCESS = `${COMMAND_PREFIX}.identities.process`;
+
+// Applications
+export const APPLICATIONS_FILTER_SOURCE_VIEW = `${COMMAND_PREFIX}.applications.filter.source`;
+export const APPLICATIONS_UPDATE_FILTER_SOURCE_VIEW = `${COMMAND_PREFIX}.applications.update-filter.source`;
+export const APPLICATIONS_FILTER_NAME_VIEW = `${COMMAND_PREFIX}.applications.filter.name`;
+export const REMOVE_ACCESS_PROFILE_FROM_APPLICATION = `${COMMAND_PREFIX}.applications.remove.access-profile`;
+export const ADD_ACCESS_PROFILE_FROM_APPLICATION = `${COMMAND_PREFIX}.applications.add.access-profile`;
+export const NEW_APPLICATION = `${COMMAND_PREFIX}.applications.new`;
+export const NEW_APPLICATION_PALETTE = `${COMMAND_PREFIX}.applications.new.palette`;

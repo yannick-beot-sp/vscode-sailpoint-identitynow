@@ -60,7 +60,7 @@ export class NewAttributeSearchConfigCommand {
                 new QuickPickAccountSchemaStep(() => { return client!; }),
             ]
         }, context);
-        console.log({ values });
+        
         if (values === undefined) { return; }
 
         const name = values["searchAttribute"].trim()

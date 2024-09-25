@@ -8,4 +8,5 @@ export const CSV_MULTIVALUE_SEPARATOR = ';';
 export const RESOURCE_TYPES = {
     connectorRule : "connector-rules",
     identityAttribute : "identity-attributes",
+    sourceApps : "source-apps",
 } as const

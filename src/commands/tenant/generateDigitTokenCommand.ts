@@ -41,7 +41,7 @@ export class GenerateDigitTokenCommand {
                 )
             ]
         }, context);
-        console.log({ values });
+        
         if (values === undefined) { return; }
         const identity = values["identity"]
 

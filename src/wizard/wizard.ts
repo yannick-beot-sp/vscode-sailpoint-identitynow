@@ -154,5 +154,6 @@ export async function runWizard<T extends WizardContext>(options: IWizardOptions
             throw err;
         }
     }
+    console.log("< runWizard",  { context });
     return context;
 }

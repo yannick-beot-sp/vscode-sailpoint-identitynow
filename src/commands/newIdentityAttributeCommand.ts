@@ -54,7 +54,7 @@ export class NewIdentityAttributeCommand {
 
             ]
         }, context);
-        console.log({ values });
+        
         if (values === undefined) { return; }
 
         const identityAttributeDisplayName = values["identityAttributeDisplayName"]

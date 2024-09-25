@@ -31,7 +31,6 @@ import { ExportConfigTreeViewCommand } from './commands/spconfig-export/ExportCo
 import { ImportConfigExplorerCommand } from './commands/spconfig-import/ImportConfigExplorerCommand';
 import { ImportConfigPaletteCommand } from './commands/spconfig-import/ImportConfigPaletteCommand';
 import { ImportConfigTreeViewCommand } from './commands/spconfig-import/ImportConfigTreeViewCommand';
-import { TestWorkflowCommand } from './commands/workflow/testWorkflow';
 import { viewWorkflowExecutionHistory } from './commands/workflow/viewWorkflowExecutionHistory';
 import { UpdateWorkflowStatusCommand } from './commands/workflow/updateWorkflowStatusCommand';
 import { URL_PREFIX } from './constants';
@@ -64,6 +63,11 @@ import { IdentityTreeViewCommand } from './commands/identity/IdentityTreeViewCom
 import { TenantReadOnlyConfigCommand } from './commands/tenant/tenantReadOnlyConfigCommand';
 import { NewIdentityAttributeCommand } from './commands/newIdentityAttributeCommand';
 import { EnableLoggingCommand } from './commands/source/enableLoggingCommand';
+import { ApplicationSourceFilterCommand } from './commands/applications/applicationSourceFilterCommand';
+import { ApplicationNameFilterCommand } from './commands/applications/applicationNameFilterCommand';
+import { RemoveAccessProfileFromAppCommand } from './commands/applications/removeAccessProfileFromAppCommand';
+import { AddAccessProfileToApplication } from './commands/applications/addAccessProfileToApplication';
+import { NewApplicationCommand } from './commands/applications/newApplicationCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -497,6 +501,38 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IDENTITIES_PROCESS,
 			newIdentityCommand.processIdentity, newIdentityCommand));
+
+	// Applications
+	const applicationSourceFilterCommand = new ApplicationSourceFilterCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.APPLICATIONS_FILTER_SOURCE_VIEW,
+			applicationSourceFilterCommand.execute, applicationSourceFilterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.APPLICATIONS_UPDATE_FILTER_SOURCE_VIEW,
+			applicationSourceFilterCommand.removeFilter, applicationSourceFilterCommand));
+	const applicationNameFilterCommand = new ApplicationNameFilterCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.APPLICATIONS_FILTER_NAME_VIEW,
+			applicationNameFilterCommand.execute, applicationNameFilterCommand));
+
+
+	const removeAccessProfileFromAppCommand = new RemoveAccessProfileFromAppCommand(tenantService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.REMOVE_ACCESS_PROFILE_FROM_APPLICATION,
+			removeAccessProfileFromAppCommand.execute, removeAccessProfileFromAppCommand));
+
+	const addAccessProfileToApplication = new AddAccessProfileToApplication(tenantService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.ADD_ACCESS_PROFILE_FROM_APPLICATION,
+			addAccessProfileToApplication.execute, addAccessProfileToApplication));
+
+	const newApplicationCommand = new NewApplicationCommand(tenantService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_APPLICATION,
+			newApplicationCommand.execute, newApplicationCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_APPLICATION_PALETTE,
+			newApplicationCommand.execute, newApplicationCommand));
 
 
 	// Add global interceptor for axios, to applied with the sailpoint SDK

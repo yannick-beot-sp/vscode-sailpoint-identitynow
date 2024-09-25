@@ -14,6 +14,7 @@ import { createReadStream } from 'fs';
 import { DEFAULT_ACCESSPROFILES_QUERY_PARAMS } from "../models/AccessProfiles";
 import { DEFAULT_ROLES_QUERY_PARAMS } from "../models/Roles";
 import axiosRetry = require("axios-retry");
+import { addQueryParams, withQuery } from "../utils/UriUtils";
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const FormData = require('form-data');
 
@@ -401,7 +402,7 @@ export class ISCClient {
 		return response.data;
 	}
 
-	public async createResource(path: string, data: string): Promise<any> {
+	public async createResource(path: string, data: string | object): Promise<any> {
 		console.log("> ISCClient.createResource", path);
 		const httpClient = await this.getAxios();
 		const response = await httpClient.post(path, data);
@@ -424,7 +425,7 @@ export class ISCClient {
 		return response.data;
 	}
 
-	public async patchResource(path: string, data: string): Promise<any> {
+	public async patchResource(path: string, data: string | object): Promise<any> {
 		console.log("> patchResource", path);
 		const httpClient = await this.getAxios(CONTENT_TYPE_FORM_JSON_PATCH);
 		const response = await httpClient.patch(path, data);
@@ -1468,6 +1469,105 @@ export class ISCClient {
 	//#endregion Forms
 	//////////////////////////////
 
+	//////////////////////////////
+	//region Applications
+	//////////////////////////////
+	public async createApplication({ name, description, sourceId }: { name: string; description: string; sourceId: string; }): Promise<any> {
+		return await this.createResource("/beta/source-apps", {
+			name,
+			description,
+			matchAllAccounts: false,
+			accountSource: {
+				id: sourceId,
+				type: "SOURCE"
+			}
+		})
+	}
+
+
+	public async *getApplications(filters: string | undefined = undefined): AsyncGenerator<any> {
+		console.log("> getApplications");
+		const httpClient = await this.getAxios();
+		const baseUrl = '/beta/source-apps/all'
+
+		let args: Record<string, any> = {
+			offset: 0,
+			limit: DEFAULT_PAGINATION,
+			filters,
+			sorters: "name"
+		}
+		let count = -1
+		do {
+			const path = addQueryParams(baseUrl, args)
+			const response = await httpClient.get(path);
+			if (response.data) {
+				count = response.data.length
+				for (const f of response.data) {
+					yield f
+				}
+			}
+			args.offset += DEFAULT_PAGINATION
+		} while (count === DEFAULT_PAGINATION)
+	}
+
+	public async getPaginatedApplications(filters: string, limit?: number, offset?: number, count?: boolean): Promise<AxiosResponse<any[]>> {
+		console.log("> getPaginatedApplications", filters, limit, offset);
+
+		limit = limit ? Math.min(DEFAULT_PAGINATION, limit) : DEFAULT_PAGINATION;
+
+		const httpClient = await this.getAxios();
+		const baseUrl = '/beta/source-apps/all'
+		const args: Record<string, any> = {
+			offset,
+			limit,
+			filters,
+			sorters: "name",
+			count
+		}
+		const path = addQueryParams(baseUrl, args)
+		const response = await httpClient.get(path);
+		return response;
+	}
+
+	public async getPaginatedApplicationAccessProfiles(appId: string, limit?: number, offset?: number): Promise<AxiosResponse<any[]>> {
+		console.log("> getPaginatedApplicationAccessProfile", limit, offset);
+
+		limit = limit ? Math.min(DEFAULT_PAGINATION, limit) : DEFAULT_PAGINATION;
+
+		const httpClient = await this.getAxios();
+		const baseUrl = `/beta/source-apps/${appId}/access-profiles`
+		const args: Record<string, any> = {
+			offset,
+			limit,
+		}
+		const path = addQueryParams(baseUrl, args)
+		const response = await httpClient.get(path);
+		return response;
+	}
+
+	public async removeAccessProfileFromApplication(appId: string, accessProfileId: string): Promise<void> {
+		console.log("> removeAccessProfileFromApplication", appId, accessProfileId);
+		const httpClient = await this.getAxios();
+		const path = `/beta/source-apps/${appId}/access-profiles/bulk-remove`
+		const response = await httpClient.post(path, [accessProfileId]);
+	}
+
+	public async addAccessProfileToApplication(appId: string, accessProfileId: string): Promise<void> {
+		console.log("> addAccessProfileToApplication", appId, accessProfileId);
+		const path = `/beta/source-apps/${appId}`
+		const response = this.patchResource(path, [
+			{
+				"op": "add",
+				"path": "/accessProfiles/-",
+				"value": accessProfileId
+			}
+		]);
+	}
+
+	//////////////////////////////
+	//#endregion Applications
+	//////////////////////////////
+
 	/////////////////////////
 	//#region Notification Templates
 	/////////////////////////
@@ -1628,3 +1728,4 @@ export class ISCClient {
 	//#endregion Identity Management
 	////////////////////////
 }
+

@@ -7,8 +7,9 @@ import { AxiosHeaders, AxiosResponse } from "axios";
 import { getConfigNumber } from '../utils/configurationUtils';
 import * as commands from "../commands/constants";
 import * as configuration from '../configurationConstants';
-import { isEmpty, isNotEmpty } from "../utils/stringUtils";
+import { escapeFilter, isEmpty, isNotEmpty } from "../utils/stringUtils";
 import { TenantService } from "../services/TenantService";
+import { AccessProfile } from "sailpoint-api-client";
 
 
 /**
@@ -76,6 +77,7 @@ export class TenantTreeItem extends BaseTreeItem {
 		results.push(new SearchAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new IdentityAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new IdentitiesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new ApplicationsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 
 		return results
 	}
@@ -192,6 +194,7 @@ export class IdentityProfilesTreeItem extends FolderTreeItem {
 
 export class ISCResourceTreeItem extends BaseTreeItem {
 	public readonly uri: vscode.Uri;
+	public readonly resourceId: string;
 	/**
 	 * Constructor
 	 * @param tenantId 
@@ -251,6 +254,7 @@ export class ISCResourceTreeItem extends BaseTreeItem {
 				options.resourceType,
 				options.resourceId ?? options.id,
 				options.label, options.beta);
+			this.resourceId = options.resourceId ?? options.id
 		}
 	}
 
@@ -902,7 +906,7 @@ export class AccessProfilesTreeItem extends PageableFolderTreeItem<Document> {
 }
 
 /**
- * Represents the single access profile.
+ * Represents a single access profile.
  */
 export class AccessProfileTreeItem extends ISCResourceTreeItem {
 	constructor(
@@ -1263,4 +1267,183 @@ export class IdentityTreeItem extends ISCResourceTreeItem {
 	}
 
 	iconPath = new vscode.ThemeIcon("person");
+}
+
+/**
+ * Contains the Applications in tree view
+ */
+// XXX TODO used type data
+export class ApplicationsTreeItem extends PageableFolderTreeItem<any> {
+	sourceId: string | undefined = undefined
+
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {
+		super("Applications", "source-apps", tenantId, tenantName, tenantDisplayName, 'No application found',
+			(app => new ApplicationTreeItem(
+				tenantId,
+				tenantName,
+				tenantDisplayName,
+				`${app.name} (${app?.accountSource?.name ?? ""})`,
+				app.id,
+				app.accountSource.id
+			))
+		);
+	}
+
+	protected async loadNext(): Promise<AxiosResponse<Document[]>> {
+		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
+		const nameFilter = isNotEmpty(this.filters) ? `name co "${escapeFilter(this.filters)}"` : undefined
+		const sourceFilter = isNotEmpty(this.sourceId) ? `accountSource.id eq "${this.sourceId}"` : undefined
+
+		const filters = [nameFilter, sourceFilter]
+			.filter(Boolean) // this line will remove any "undefined"
+			.join(" and ")
+
+		return await this.client.getPaginatedApplications(
+			filters,
+			limit,
+			this.currentOffset,
+			(this._total === 0)
+		) as AxiosResponse<Document[]>;
+	}
+
+
+	get isFiltered(): boolean {
+		return isNotEmpty(this.sourceId);
+	}
+}
+
+/**
+ * ApplicationTreeItem is different from other pageable folder (roles, access profiles, etc.)
+ * It has children and is clickable/can be opened itself
+ */
+export class ApplicationTreeItem extends ISCResourceTreeItem implements PageableNode {
+
+	contextValue = "source-app";
+	iconPath = new vscode.ThemeIcon("layers");
+
+	currentOffset = 0;
+	children: BaseTreeItem[] = [];
+	client: ISCClient;
+	filterType: FilterType; // unused
+
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string,
+		public readonly sourceId: string
+	) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			resourceType: "source-apps",
+			id,
+			beta: true,
+			collapsible: vscode.TreeItemCollapsibleState.Collapsed
+		})
+		this.client = new ISCClient(this.tenantId, this.tenantName);
+	}
+
+	reset(): void {
+		this.currentOffset = 0;
+		this.children = [];
+	}
+
+	protected async loadNext(): Promise<AxiosResponse<any[]>> {
+		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
+		return await this.client.getPaginatedApplicationAccessProfiles(
+			this.id,
+			limit,
+			this.currentOffset
+		) as AxiosResponse<any[]>;
+	}
+
+	async loadMore(): Promise<void> {
+		await vscode.window.withProgress({
+			location: {
+				viewId: commands.TREE_VIEW
+			}
+		}, async () => {
+			const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
+			if (this.children.length > 0) {
+				// remove "Load More" or Message node 
+				this.children.pop();
+			}
+
+			const response = await this.loadNext();
+			const total = response.data?.length
+
+			if (total === 0 && this.children.length === 0) {
+				this.children = [new MessageNode('No access profile found')];
+				return;
+			}
+
+			const results: BaseTreeItem[] = response.data.map(ap => new ApplicationAccessProfileTreeItem(
+				this.tenantId,
+				this.tenantName,
+				this.tenantDisplayName,
+				ap.name,
+				this.id,
+				ap.id,
+				this
+			));
+			this.children.push(...results);
+
+			if (total === limit) {
+				this.children.push(new LoadMoreNode(
+					this.tenantId,
+					this.tenantName,
+					this.tenantDisplayName,
+					this
+				));
+				this.currentOffset += limit;
+			}
+		})
+	}
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		if (this.children.length === 0) {
+			await this.loadMore();
+		}
+		return this.children;
+	}
+
+	get hasMore(): boolean {
+		throw new Error("Unimplemented");
+
+	}
+}
+
+/**
+ * Represents an access profile for an application
+ */
+export class ApplicationAccessProfileTreeItem extends ISCResourceTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		public readonly appId: string,
+		accessProfileId: string,
+		public readonly parentNode) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			resourceType: "access-profiles",
+			id: `${appId}-${accessProfileId}`,
+			resourceId: accessProfileId
+		})
+	}
+
+	contextValue = "access-profile-application";
+	iconPath = new vscode.ThemeIcon("archive");
 }

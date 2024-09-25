@@ -49,7 +49,7 @@ export abstract class FilterCommand {
         const wizardContext: WizardContext = {};
         wizardContext["filter" + node.filterType] = node.filters;
         const values = await this.runWizard(node.filterType, wizardContext);
-        console.log({ values });
+        
         if (values === undefined) { return; }
 
         node.filterType = values["filterType"];

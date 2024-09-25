@@ -534,6 +534,40 @@
       {
         "command": "vscode-sailpoint-identitynow.identities.process",
         "title": "Process"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.applications.filter.source",
+        "title": "Filter applications by source...",
+        "icon": "$(filter)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.applications.update-filter.source",
+        "title": "Filter applications by source...",
+        "icon": "$(filter-filled)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.applications.filter.name",
+        "title": "Search applications by name...",
+        "icon": "$(search)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.applications.remove.access-profile",
+        "title": "Remove access profile from application"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.applications.add.access-profile",
+        "title": "Add access profile to application...",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.applications.new",
+        "title": "Add new application...",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.applications.new.palette",
+        "title": "ISC: Add new application...",
+        "icon": "$(add)"
       }
     ],
     "menus": {
@@ -857,6 +891,30 @@
         {
           "command": "vscode-sailpoint-identitynow.connector-rule.edit",
           "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.filter.source",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.update-filter.source",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.filter.name",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.remove.access-profile",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.add.access-profile",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.new",
+          "when": "never"
         }
       ],
       "view/title": [
@@ -874,7 +932,7 @@
       "view/item/context": [
         {
           "command": "vscode-sailpoint-identitynow.open-resource",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|source|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|identities)$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|source|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|identities|source-app)$/",
           "group": "_@0"
         },
         {
@@ -884,12 +942,12 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.remove-resource",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|search-attribute|identity-attribute)$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|search-attribute|identity-attribute|source-app)$/",
           "group": "zzzremove@100"
         },
         {
           "command": "vscode-sailpoint-identitynow.refresh-forced",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|transforms|provisioning-policies|roles|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions|search-attributes|identity-attributes/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|transforms|provisioning-policies|roles|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions|search-attributes|identity-attributes|source-apps|source-app/",
           "group": "inline@50"
         },
         {
@@ -1226,6 +1284,35 @@
         {
           "command": "vscode-sailpoint-identitynow.identities.process",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.filter.source",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source-appsUnfiltered",
+          "group": "inline@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.update-filter.source",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source-appsFiltered",
+          "group": "inline@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.filter.name",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^source-apps/",
+          "group": "inline@0"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.remove.access-profile",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profile-application"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.add.access-profile",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source-app",
+          "group": "inline@0"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.new",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^source-apps/",
+          "group": "inline@0"
         }
       ],
       "editor/context": [
@@ -1312,6 +1399,10 @@
       {
         "fileMatch": "idn://**/identities/**/*",
         "url": "./schemas/identity.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/source-apps/**/*",
+        "url": "./schemas/app.schemas.json"
       }
     ],
     "configuration": {
