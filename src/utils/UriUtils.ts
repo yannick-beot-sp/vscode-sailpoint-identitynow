@@ -43,6 +43,7 @@ export function buildResourceUri(params: {
     switch (params.resourceType) {
         case RESOURCE_TYPES.connectorRule:
         case RESOURCE_TYPES.identityAttribute:
+        case RESOURCE_TYPES.sourceApps:
             beta = true
             break;
     }

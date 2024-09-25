@@ -27,7 +27,6 @@ export class ApplicationSourceFilterCommand {
             ],
         }, wizardContext);
 
-        console.log({ values });
         if (values === undefined) { return; }
 
         node.sourceId = values["source"].id;

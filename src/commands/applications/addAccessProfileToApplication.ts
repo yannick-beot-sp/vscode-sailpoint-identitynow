@@ -51,7 +51,7 @@ export class AddAccessProfileToApplication {
                 })
             ]
         }, context);
-        console.log({ values });
+        
         if (values === undefined) { return; }
 
         await vscode.window.withProgress({

@@ -122,3 +122,5 @@ export const APPLICATIONS_UPDATE_FILTER_SOURCE_VIEW = `${COMMAND_PREFIX}.applica
 export const APPLICATIONS_FILTER_NAME_VIEW = `${COMMAND_PREFIX}.applications.filter.name`;
 export const REMOVE_ACCESS_PROFILE_FROM_APPLICATION = `${COMMAND_PREFIX}.applications.remove.access-profile`;
 export const ADD_ACCESS_PROFILE_FROM_APPLICATION = `${COMMAND_PREFIX}.applications.add.access-profile`;
+export const NEW_APPLICATION = `${COMMAND_PREFIX}.applications.new`;
+export const NEW_APPLICATION_PALETTE = `${COMMAND_PREFIX}.applications.new.palette`;

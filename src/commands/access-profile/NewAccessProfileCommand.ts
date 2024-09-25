@@ -85,7 +85,7 @@ export class NewAccessProfileCommand {
                 }),
             ]
         }, context);
-        console.log({ values });
+        
         if (values === undefined) { return; }
 
         // Deep copy of "accessProfileTemplate"

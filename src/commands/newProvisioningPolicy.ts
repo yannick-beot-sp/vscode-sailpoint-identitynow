@@ -78,8 +78,9 @@ export class NewProvisioningPolicyCommand {
 
             ]
         }, context);
-        console.log({ values });
+        
         if (values === undefined) { return; }
+        
         const usageType = values["provisioningPolicyType"]
         const provisioningPolicyName = values["provisioningPolicy"]
         await vscode.window.withProgress({

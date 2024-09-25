@@ -127,7 +127,7 @@ export class CloneSourceCommand {
                 }),
             ]
         }, context);
-        console.log({ values });
+        
         if (values === undefined) { return; }
 
         const oldSource = await client.getSourceById(values["source"].id)

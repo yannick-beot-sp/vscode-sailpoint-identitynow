@@ -44,8 +44,9 @@ export class NewSchemaCommand {
                 }),
             ]
         }, context)
-        console.log({ values });
+        
         if (values === undefined) { return; }
+        
         const schemaName = values["schema"]
         
         await vscode.window.withProgress({

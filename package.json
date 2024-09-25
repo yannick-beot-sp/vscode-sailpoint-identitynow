@@ -558,6 +558,16 @@
         "command": "vscode-sailpoint-identitynow.applications.add.access-profile",
         "title": "Add access profile to application...",
         "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.applications.new",
+        "title": "Add new application...",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.applications.new.palette",
+        "title": "ISC: Add new application...",
+        "icon": "$(add)"
       }
     ],
     "menus": {
@@ -900,6 +910,10 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.applications.add.access-profile",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.new",
           "when": "never"
         }
       ],
@@ -1293,6 +1307,11 @@
         {
           "command": "vscode-sailpoint-identitynow.applications.add.access-profile",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == source-app",
+          "group": "inline@0"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.applications.new",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^source-apps/",
           "group": "inline@0"
         }
       ],

@@ -27,8 +27,7 @@ export class ApplicationNameFilterCommand {
                 }),
             ],
         }, wizardContext);
-
-        console.log({ values });
+        
         if (values === undefined) { return; }
 
         node.filters = values["name"];

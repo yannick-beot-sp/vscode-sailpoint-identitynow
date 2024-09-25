@@ -80,7 +80,7 @@ export class EnableLoggingCommand {
                 }),
             ]
         }, context);
-        console.log({ values });
+        
         if (values === undefined) { return; }
 
         let loggers = LOGGING_CLASSES.find(x => x.connector === values["source"].type)

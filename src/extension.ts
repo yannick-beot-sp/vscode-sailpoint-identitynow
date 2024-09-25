@@ -67,6 +67,7 @@ import { ApplicationSourceFilterCommand } from './commands/applications/applicat
 import { ApplicationNameFilterCommand } from './commands/applications/applicationNameFilterCommand';
 import { RemoveAccessProfileFromAppCommand } from './commands/applications/removeAccessProfileFromAppCommand';
 import { AddAccessProfileToApplication } from './commands/applications/addAccessProfileToApplication';
+import { NewApplicationCommand } from './commands/applications/newApplicationCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -524,6 +525,14 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.ADD_ACCESS_PROFILE_FROM_APPLICATION,
 			addAccessProfileToApplication.execute, addAccessProfileToApplication));
+
+	const newApplicationCommand = new NewApplicationCommand(tenantService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_APPLICATION,
+			newApplicationCommand.execute, newApplicationCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_APPLICATION_PALETTE,
+			newApplicationCommand.execute, newApplicationCommand));
 
 
 	// Add global interceptor for axios, to applied with the sailpoint SDK

@@ -110,7 +110,7 @@ export class NewRoleCommand {
                 }),
             ]
         }, context);
-        console.log({ values });
+        
         if (values === undefined) { return; }
 
         // Deep copy of "role" template

@@ -141,7 +141,7 @@ export class ConnectorRuleCommand {
                 )
             ]
         }, context);
-        console.log({ values });
+        
         if (values === undefined) { return; }
 
         let newUri: vscode.Uri;
@@ -224,7 +224,6 @@ export class ConnectorRuleCommand {
             ]
         }, context)
 
-        console.log({ values });
         if (values === undefined) { return; }
 
         const rule = values["rule"]

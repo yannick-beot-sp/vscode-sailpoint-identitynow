@@ -65,7 +65,7 @@ export class NewTransformCommand {
                 }),
             ]
         }, context);
-        console.log({ values });
+        
         if (values === undefined) { return; }
 
         const tenantName = (values["tenant"] as TenantInfo).tenantName

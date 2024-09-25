@@ -69,7 +69,7 @@ export class PeekSourceCommand {
                 })
             ]
         }, context);
-        console.log({ values });
+        
         if (values === undefined) { return; }
 
 

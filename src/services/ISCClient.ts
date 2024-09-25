@@ -402,7 +402,7 @@ export class ISCClient {
 		return response.data;
 	}
 
-	public async createResource(path: string, data: string): Promise<any> {
+	public async createResource(path: string, data: string | object): Promise<any> {
 		console.log("> ISCClient.createResource", path);
 		const httpClient = await this.getAxios();
 		const response = await httpClient.post(path, data);
@@ -1472,6 +1472,19 @@ export class ISCClient {
 	//////////////////////////////
 	//region Applications
 	//////////////////////////////
+	public async createApplication({ name, description, sourceId }: { name: string; description: string; sourceId: string; }): Promise<any> {
+		return await this.createResource("/beta/source-apps", {
+			name,
+			description,
+			matchAllAccounts: false,
+			accountSource: {
+				id: sourceId,
+				type: "SOURCE"
+			}
+		})
+	}
+
+
 	public async *getApplications(filters: string | undefined = undefined): AsyncGenerator<any> {
 		console.log("> getApplications");
 		const httpClient = await this.getAxios();
