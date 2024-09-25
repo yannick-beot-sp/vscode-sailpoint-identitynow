@@ -22,6 +22,7 @@ The SailPoint Identity Security Cloud extension makes it easy to:
 - View, edit, create, delete search attribute config
 - View, edit, create, delete identity attribute
 - View, trigger attribute sync or process, delete identities
+- View, edit, create, delete applications
 
 ## Installation
 
@@ -308,6 +309,7 @@ The patterns defined above use the following tokens:
 - Add new command to enable logging
 - Fixed dependency (axios, micromatch)
 - Refactored code due to [#36](https://github.com/sailpoint-oss/typescript-sdk/issues/36)
+- Add support for Applications
 
 ## 1.3.2
 
