@@ -11,7 +11,7 @@ The SailPoint Identity Security Cloud extension makes it easy to:
 - View, create, edit, delete, and test transforms
 - View, create, edit, delete provisioning policies of a source
 - View, create, edit, delete schemas of a source
-- View, edit, enable, disable, export, import and test workflows and view execution history
+- View, edit, enable, disable, export, import workflows and view execution history
 - View, create, edit, delete connector rules and export/import the script of a rule
 - View, edit, delete service desk integrations
 - View, edit, delete identity profiles and lifecycle states, and refreshes all the identities under a profile

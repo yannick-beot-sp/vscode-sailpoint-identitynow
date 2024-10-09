@@ -8,6 +8,18 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Security
 
+### Added
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [1.3.3] - 2024-10-09
+
+### Security
+
 - Fixed dependency (axios, micromatch)
 
 ### Added
