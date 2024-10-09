@@ -1461,7 +1461,13 @@
           "default": 100
         }
       }
-    }
+    },
+    "authentication": [
+      {
+        "id": "SailPointIdentityNowPAT",
+        "label": "SailPoint Identity Now"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run esbuild-base -- --minify",

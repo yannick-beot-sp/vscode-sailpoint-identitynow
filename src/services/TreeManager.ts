@@ -38,7 +38,9 @@ export class TreeManager {
             return;
         }
         try {
-            const session = await vscode.authentication.getSession(SailPointISCAuthenticationProvider.id, [item.tenantId], { createIfNone: false });
+            const session = await vscode.authentication.getSession(
+                SailPointISCAuthenticationProvider.id,
+                [item.tenantId], { createIfNone: true });
             if (session !== undefined) {
                 this.authProvider.removeSession(session.id);
             }

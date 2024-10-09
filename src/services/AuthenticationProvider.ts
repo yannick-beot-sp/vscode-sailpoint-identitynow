@@ -18,7 +18,6 @@ import { OAuth2Client } from './OAuth2Client';
 
 class SailPointISCPatSession implements AuthenticationSession {
     readonly account: AuthenticationSessionAccountInformation;
-    // readonly id: string;
     // No scope management for now
     readonly scopes = [];
 
@@ -163,15 +162,21 @@ export class SailPointISCAuthenticationProvider implements AuthenticationProvide
                 const credentials = await this.tenantService.getTenantCredentials(tenantId);
                 if (credentials !== undefined) {
 
-                    token = await this.createAccessToken(tenantInfo?.tenantName ?? "", credentials.clientId, credentials.clientSecret);
-                    this.tenantService.setTenantAccessToken(tenantId, token);
-                    
-                    console.log("< getSessionByTenant for", tenantId);
-                    return new SailPointISCPatSession(tenantInfo?.tenantName ?? "",
-                        credentials.clientId,
-                        token.accessToken,
-                        this.getSessionId(tenantId)
-                    );
+                    try {
+
+                        token = await this.createAccessToken(tenantInfo?.tenantName ?? "", credentials.clientId, credentials.clientSecret);
+                        this.tenantService.setTenantAccessToken(tenantId, token);
+
+                        console.log("< getSessionByTenant for", tenantId);
+                        return new SailPointISCPatSession(tenantInfo?.tenantName ?? "",
+                            credentials.clientId,
+                            token.accessToken,
+                            this.getSessionId(tenantId)
+                        );
+                    } catch (error) {
+                        console.error(error);
+                    }
+                    return null;
                 } else {
                     console.log("WARNING: no credentials for tenant", tenantId);
                 }
@@ -252,7 +257,7 @@ export class SailPointISCAuthenticationProvider implements AuthenticationProvide
      * @param clientId 
      * @param clientSecret 
      */
-    async createAccessToken(tenantName: string, clientId: string, clientSecret: string): Promise<TenantToken> {
+    private async createAccessToken(tenantName: string, clientId: string, clientSecret: string): Promise<TenantToken> {
         console.log('> createAccessToken', tenantName, clientId);
         const iscAuth = new OAuth2Client(
             clientId,

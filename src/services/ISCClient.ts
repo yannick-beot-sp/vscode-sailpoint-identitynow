@@ -59,7 +59,7 @@ export class ISCClient {
 	private async prepareAuthenticationHeader(): Promise<any> {
 		const session = await vscode.authentication.getSession(
 			SailPointISCAuthenticationProvider.id,
-			[this.tenantId]
+			[this.tenantId], { createIfNone: true }
 		);
 		return {
 			// eslint-disable-next-line @typescript-eslint/naming-convention
@@ -95,7 +95,7 @@ export class ISCClient {
 	private async getApiConfiguration(): Promise<Configuration> {
 		const session = await vscode.authentication.getSession(
 			SailPointISCAuthenticationProvider.id,
-			[this.tenantId]
+			[this.tenantId], { createIfNone: true }
 		);
 		const apiConfig = new Configuration({
 			baseurl: EndpointUtils.getBaseUrl(this.tenantName),
@@ -125,7 +125,7 @@ export class ISCClient {
 	private async getAxios(contentType = CONTENT_TYPE_JSON): Promise<AxiosInstance> {
 		const session = await vscode.authentication.getSession(
 			SailPointISCAuthenticationProvider.id,
-			[this.tenantId]
+			[this.tenantId], { createIfNone: true }
 		);
 		const instance = axios.create({
 			baseURL: EndpointUtils.getBaseUrl(this.tenantName),

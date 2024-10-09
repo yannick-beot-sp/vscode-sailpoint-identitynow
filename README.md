@@ -309,7 +309,10 @@ The patterns defined above use the following tokens:
 - Add new command to enable logging
 - Fixed dependency (axios, micromatch)
 - Refactored code due to [#36](https://github.com/sailpoint-oss/typescript-sdk/issues/36)
+- Removed Workflow Tester view due to webview-ui-toolkit deprecation (cf. https://github.com/microsoft/vscode-webview-ui-toolkit/issues/561)
 - Add support for Applications
+- Error with session management (cf. [#93](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/93))
+
 
 ## 1.3.2
 
