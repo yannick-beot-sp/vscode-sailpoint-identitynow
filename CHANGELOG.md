@@ -16,6 +16,12 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Removed
 
+## [1.3.4] - 2024-10-12
+
+### Fixed
+
+- Fix authentication provider multi account support (as part of [VSCode September's release](https://code.visualstudio.com/updates/v1_94#_change-an-extensions-account-preference)) (cf. [#94](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/94))
+
 ## [1.3.3] - 2024-10-09
 
 ### Security

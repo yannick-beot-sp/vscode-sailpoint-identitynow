@@ -2,7 +2,7 @@
   "name": "vscode-sailpoint-identitynow",
   "displayName": "SailPoint Identity Security Cloud",
   "description": "Customize SailPoint Identity Security Cloud",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "publisher": "yannick-beot-sp",
   "icon": "resources/isc.png",
   "bugs": {
@@ -1461,13 +1461,7 @@
           "default": 100
         }
       }
-    },
-    "authentication": [
-      {
-        "id": "SailPointIdentityNowPAT",
-        "label": "SailPoint Identity Now"
-      }
-    ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run esbuild-base -- --minify",

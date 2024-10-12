@@ -304,6 +304,12 @@ The patterns defined above use the following tokens:
 
 ## Release Notes
 
+## 1.3.4
+
+- Fix authentication provider multi account support (as part of [VSCode September's release](https://code.visualstudio.com/updates/v1_94#_change-an-extensions-account-preference)) (cf. [#94](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/94))
+
+## 1.3.3
+
 - Add User Agent
 - Add transform evaluation support for `decomposeDiacriticalMarks` (cf. [#90](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/90)) by [@Semperverus](https://github.com/Semperverus)
 - Add new command to enable logging
@@ -312,7 +318,6 @@ The patterns defined above use the following tokens:
 - Removed Workflow Tester view due to webview-ui-toolkit deprecation (cf. https://github.com/microsoft/vscode-webview-ui-toolkit/issues/561)
 - Add support for Applications
 - Error with session management (cf. [#93](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/93))
-
 
 ## 1.3.2
 

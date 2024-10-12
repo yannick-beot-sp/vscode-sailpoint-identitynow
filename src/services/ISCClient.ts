@@ -15,6 +15,7 @@ import { DEFAULT_ACCESSPROFILES_QUERY_PARAMS } from "../models/AccessProfiles";
 import { DEFAULT_ROLES_QUERY_PARAMS } from "../models/Roles";
 import axiosRetry = require("axios-retry");
 import { addQueryParams, withQuery } from "../utils/UriUtils";
+import { onErrorResponse, onRequest, onResponse } from "./AxiosHandlers";
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const FormData = require('form-data');
 
@@ -57,10 +58,8 @@ export class ISCClient {
 	}
 
 	private async prepareAuthenticationHeader(): Promise<any> {
-		const session = await vscode.authentication.getSession(
-			SailPointISCAuthenticationProvider.id,
-			[this.tenantId], { createIfNone: true }
-		);
+		const session = await SailPointISCAuthenticationProvider.getInstance().getSessionByTenant(this.tenantId)
+
 		return {
 			// eslint-disable-next-line @typescript-eslint/naming-convention
 			Authorization: `Bearer ${session?.accessToken}`,
@@ -93,10 +92,8 @@ export class ISCClient {
 	 * Returns the Configuration needed by sailpoint typescript SDK 
 	 */
 	private async getApiConfiguration(): Promise<Configuration> {
-		const session = await vscode.authentication.getSession(
-			SailPointISCAuthenticationProvider.id,
-			[this.tenantId], { createIfNone: true }
-		);
+		
+		const session = await await SailPointISCAuthenticationProvider.getInstance().getSessionByTenant(this.tenantId)
 		const apiConfig = new Configuration({
 			baseurl: EndpointUtils.getBaseUrl(this.tenantName),
 			tokenUrl: EndpointUtils.getAccessTokenUrl(this.tenantName),
@@ -123,10 +120,8 @@ export class ISCClient {
 	 * @returns Create an Axios Instance
 	 */
 	private async getAxios(contentType = CONTENT_TYPE_JSON): Promise<AxiosInstance> {
-		const session = await vscode.authentication.getSession(
-			SailPointISCAuthenticationProvider.id,
-			[this.tenantId], { createIfNone: true }
-		);
+		const session = await SailPointISCAuthenticationProvider.getInstance().getSessionByTenant(this.tenantId)
+
 		const instance = axios.create({
 			baseURL: EndpointUtils.getBaseUrl(this.tenantName),
 			headers: {
@@ -138,6 +133,12 @@ export class ISCClient {
 			}
 
 		});
+		instance.interceptors.request.use(
+			onRequest);
+		instance.interceptors.response.use(
+			onResponse,
+			onErrorResponse
+		);
 		return instance;
 	}
 
