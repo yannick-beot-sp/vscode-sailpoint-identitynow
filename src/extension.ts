@@ -75,22 +75,19 @@ export function activate(context: vscode.ExtensionContext) {
 
 	console.log('Congratulations, your extension "vscode-sailpoint-identitynow" is now active!');
 
+	// Add global interceptor for axios, to applied with the sailpoint SDK
+	// Add a request interceptor
+	axios.interceptors.request.use(onRequest)
+
+	// Add a response interceptor
+	axios.interceptors.response.use(
+		onResponse,
+		onErrorResponse)
+
+
 	const tenantService = new TenantService(context.globalState, context.secrets);
 
-	// Register our authentication provider. NOTE: this will register the provider globally which means that
-	// any other extension can use this provider via the `getSession` API.
-	// NOTE: when implementing an auth provider, don't forget to register an activation event for that provider
-	// in your package.json file: "onAuthenticationRequest:AzureDevOpsPAT"
-	const authProvider = new SailPointISCAuthenticationProvider(tenantService);
-
-	context.subscriptions.push(vscode.authentication.registerAuthenticationProvider(
-		SailPointISCAuthenticationProvider.id,
-		'SailPoint Identity Now',
-		authProvider,
-		{
-			supportsMultipleAccounts: true
-		}
-	));
+	SailPointISCAuthenticationProvider.initialize(tenantService)
 
 	const addTenantCommand = new AddTenantCommand(tenantService);
 	context.subscriptions.push(
@@ -132,7 +129,7 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand(commands.REFRESH, identityNowDataProvider.refresh, identityNowDataProvider);
 
 	const transformEvaluator = new TransformEvaluator(tenantService);
-	const treeManager = new TreeManager(identityNowDataProvider, tenantService, authProvider, transformEvaluator);
+	const treeManager = new TreeManager(tenantService, transformEvaluator);
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM_EDITOR, transformEvaluator.evaluate, transformEvaluator));
@@ -534,15 +531,6 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.NEW_APPLICATION_PALETTE,
 			newApplicationCommand.execute, newApplicationCommand));
 
-
-	// Add global interceptor for axios, to applied with the sailpoint SDK
-	// Add a request interceptor
-	axios.interceptors.request.use(onRequest)
-
-	// Add a response interceptor
-	axios.interceptors.response.use(
-		onResponse,
-		onErrorResponse)
 }
 
 // this method is called when your extension is deactivated

@@ -14,9 +14,7 @@ import { isTenantReadonly, validateTenantReadonly } from '../commands/validateTe
 export class TreeManager {
 
     constructor(
-        private readonly dataProvider: ISCDataProvider,
         private readonly tenantService: TenantService,
-        private readonly authProvider: SailPointISCAuthenticationProvider,
         private readonly transformEvaluator: TransformEvaluator,
     ) { }
 
@@ -38,12 +36,7 @@ export class TreeManager {
             return;
         }
         try {
-            const session = await vscode.authentication.getSession(
-                SailPointISCAuthenticationProvider.id,
-                [item.tenantId], { createIfNone: true });
-            if (session !== undefined) {
-                this.authProvider.removeSession(session.id);
-            }
+            SailPointISCAuthenticationProvider.getInstance().removeSession(item.tenantId)
         } catch (err) {
             console.error("Session for ", tenantName, "does not exist:", err);
         }
