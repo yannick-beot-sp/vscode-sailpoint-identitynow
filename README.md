@@ -304,11 +304,15 @@ The patterns defined above use the following tokens:
 
 ## Release Notes
 
-## 1.3.4
+### 1.3.5
+
+- Changed axios interceptor for better error management (cf. [#92](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/92))
+
+### 1.3.4
 
 - Fix authentication provider multi account support (as part of [VSCode September's release](https://code.visualstudio.com/updates/v1_94#_change-an-extensions-account-preference)) (cf. [#94](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/94))
 
-## 1.3.3
+### 1.3.3
 
 - Add User Agent
 - Add transform evaluation support for `decomposeDiacriticalMarks` (cf. [#90](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/90)) by [@Semperverus](https://github.com/Semperverus)
@@ -319,7 +323,7 @@ The patterns defined above use the following tokens:
 - Add support for Applications
 - Error with session management (cf. [#93](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/93))
 
-## 1.3.2
+### 1.3.2
 
 - Updated schema for lifefycle state (`identityState`)
 - Filtering server-side for uncorrelated accounts
@@ -328,12 +332,12 @@ The patterns defined above use the following tokens:
 - Can create or delete an identity attribute (cf. [#83](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/83))
 - Fixed issue during the account reset (cf. [#85](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/85))
 
-## 1.3.1 
+### 1.3.1 
 
 - 429 Too Many Requests error during export or import of roles and access profiles  (cf. [#82](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/82))
 - Role and Access Profile imports are now cancellable
 
-## 1.3.0
+### 1.3.0
 
 - Update for source aggregation and reset to leverage beta endpoints instead of CC endpoints
 - Add searching and viewing identities by [@henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#74](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/74))
@@ -344,34 +348,34 @@ The patterns defined above use the following tokens:
 - Automatically update workflow if its status is changed
 - Fixed case where a single entitlement or single access profiles is returned during role creation
 
-## 1.2.0
+### 1.2.0
 
 - Add new command to edit connector rule (Edit script)
 - Changing IdentityNow to Identity Security Cloud/ISC
 - Logging every call to ISC
 - Catch error message if peek objects fails
 
-## 1.1.0
+### 1.1.0
 
 - Edit Password Org Config
 - Generate a digit token for password reset
 - 404 error when sources had '/' in their name (cf. [#71](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/71))
 
-## 1.0.4
+### 1.0.4
 
 - New attempt to publish extension
 - Refactoring of IdentityNowTreeItem.ts and fixed refreshing issue with Workflows
 - Non-matching schema for lifecycle states
 
-## 1.0.3
+### 1.0.3
 
 - Publication issue
 
-## 1.0.2
+### 1.0.2
 
 - Could not open Identity Attributes from several tenants (cf. [#69](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/69))
 
-## 1.0.1
+### 1.0.1
 
 - Transform not correctly saved (cf. [#68](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/68))
 

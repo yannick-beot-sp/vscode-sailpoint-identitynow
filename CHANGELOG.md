@@ -16,6 +16,12 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Removed
 
+## [1.3.5] - 2024-10-15
+
+### Fixed
+
+- Changed axios interceptor for better error management (cf. [#92](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/92))
+
 ## [1.3.4] - 2024-10-12
 
 ### Fixed
