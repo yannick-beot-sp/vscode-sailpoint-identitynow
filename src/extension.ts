@@ -57,7 +57,7 @@ import { NewAttributeSearchConfigCommand } from './commands/NewAttributeSearchCo
 import { EditPasswordConfigCommand } from './commands/tenant/editPasswordConfigCommand';
 import { GenerateDigitTokenCommand } from './commands/tenant/generateDigitTokenCommand';
 import { onErrorResponse, onRequest, onResponse } from './services/AxiosHandlers';
-import axios from 'axios';
+import globalAxios from 'axios';
 import { OpenScriptCommand } from './commands/rule/openScriptCommand';
 import { IdentityTreeViewCommand } from './commands/identity/IdentityTreeViewCommand';
 import { TenantReadOnlyConfigCommand } from './commands/tenant/tenantReadOnlyConfigCommand';
@@ -77,10 +77,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Add global interceptor for axios, to applied with the sailpoint SDK
 	// Add a request interceptor
-	axios.interceptors.request.use(onRequest)
+	globalAxios.interceptors.request.use(onRequest)
 
 	// Add a response interceptor
-	axios.interceptors.response.use(
+	globalAxios.interceptors.response.use(
 		onResponse,
 		onErrorResponse)
 

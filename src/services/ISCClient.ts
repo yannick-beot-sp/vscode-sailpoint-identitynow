@@ -14,7 +14,7 @@ import { createReadStream } from 'fs';
 import { DEFAULT_ACCESSPROFILES_QUERY_PARAMS } from "../models/AccessProfiles";
 import { DEFAULT_ROLES_QUERY_PARAMS } from "../models/Roles";
 import axiosRetry = require("axios-retry");
-import { addQueryParams, withQuery } from "../utils/UriUtils";
+import { addQueryParams } from "../utils/UriUtils";
 import { onErrorResponse, onRequest, onResponse } from "./AxiosHandlers";
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const FormData = require('form-data');
@@ -30,6 +30,15 @@ const DEFAULT_AXIOS_OPTIONS: AxiosRequestConfig = {
 		[USER_AGENT_HEADER]: USER_AGENT
 	}
 }
+
+const DEFAULT_RETRY_CONFIG = {
+	retries: 10,
+	retryDelay: axiosRetry.exponentialDelay,
+	onRetry(retryCount, error, requestConfig) {
+		console.log(`retrying due to request error, try number ${retryCount}`);
+	},
+}
+
 export const TOTAL_COUNT_HEADER = "x-total-count";
 
 // Content types
@@ -92,8 +101,8 @@ export class ISCClient {
 	 * Returns the Configuration needed by sailpoint typescript SDK 
 	 */
 	private async getApiConfiguration(): Promise<Configuration> {
-		
-		const session = await await SailPointISCAuthenticationProvider.getInstance().getSessionByTenant(this.tenantId)
+
+		const session = await SailPointISCAuthenticationProvider.getInstance().getSessionByTenant(this.tenantId)
 		const apiConfig = new Configuration({
 			baseurl: EndpointUtils.getBaseUrl(this.tenantName),
 			tokenUrl: EndpointUtils.getAccessTokenUrl(this.tenantName),
@@ -103,13 +112,7 @@ export class ISCClient {
 			clientSecret: ""
 		});
 
-		apiConfig.retriesConfig = {
-			retries: 10,
-			retryDelay: axiosRetry.exponentialDelay,
-			onRetry(retryCount, error, requestConfig) {
-				console.log(`retrying due to request error, try number ${retryCount}`);
-			},
-		};
+		apiConfig.retriesConfig = DEFAULT_RETRY_CONFIG
 
 		return apiConfig;
 	}
@@ -118,6 +121,23 @@ export class ISCClient {
 	 * 
 	 * @param contentType 
 	 * @returns Create an Axios Instance
+	 */
+	private getAxiosWithInterceptors(): AxiosInstance {
+		const instance = axios.create();
+		instance.interceptors.request.use(
+			onRequest);
+		instance.interceptors.response.use(
+			onResponse,
+			onErrorResponse
+		);
+		axiosRetry(instance, DEFAULT_RETRY_CONFIG)
+		return instance;
+	}
+
+	/**
+	 * Create an Axios Instance with default headers for content type, user agent and authorization
+	 * @param contentType 
+	 * @returns an Axios Instance
 	 */
 	private async getAxios(contentType = CONTENT_TYPE_JSON): Promise<AxiosInstance> {
 		const session = await SailPointISCAuthenticationProvider.getInstance().getSessionByTenant(this.tenantId)
@@ -148,8 +168,7 @@ export class ISCClient {
 	public async pingCluster(sourceId: string): Promise<StatusResponseBeta> {
 		console.log("> pingClusterConnection")
 		const apiConfig = await this.getApiConfiguration()
-		const api = new SourcesBetaApi(apiConfig)
-
+		const api = new SourcesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors())
 		const response = await api.pingCluster({ sourceId }, DEFAULT_AXIOS_OPTIONS)
 		return response.data;
 	}
@@ -157,7 +176,7 @@ export class ISCClient {
 	public async testSourceConnection(sourceId: string): Promise<StatusResponseBeta> {
 		console.log("> testSourceConnection")
 		const apiConfig = await this.getApiConfiguration()
-		const api = new SourcesBetaApi(apiConfig)
+		const api = new SourcesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors())
 		const response = await api.testSourceConnection({ sourceId }, DEFAULT_AXIOS_OPTIONS)
 		return response.data;
 	}
@@ -165,7 +184,7 @@ export class ISCClient {
 	public async peekSourceConnection(sourceId: string, objectType: string, maxCount: number): Promise<StatusResponseBeta> {
 		console.log("> peekSourceConnection")
 		const apiConfig = await this.getApiConfiguration()
-		const api = new SourcesBetaApi(apiConfig)
+		const api = new SourcesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors())
 		const response = await api.peekResourceObjects({
 			sourceId,
 			resourceObjectsRequestBeta: {
@@ -180,7 +199,7 @@ export class ISCClient {
 	public async getSources(): Promise<Source[]> {
 		console.log("> getSources");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesApi(apiConfig);
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const result = await Paginator.paginate(api, api.listSources, { sorters: "name" });
 		return result.data;
 	}
@@ -188,7 +207,7 @@ export class ISCClient {
 	public async getSourceById(id: string): Promise<Source> {
 		console.log("> getSourceById", id);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesApi(apiConfig);
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const result = await api.getSource({ id }, DEFAULT_AXIOS_OPTIONS);
 		return result.data;
 	}
@@ -196,7 +215,7 @@ export class ISCClient {
 	public async getSourceByName(name: string): Promise<Source> {
 		console.log("> getSourceByName", name);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesApi(apiConfig);
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const result = await api.listSources({
 			filters: `name eq "${name}"`,
 			limit: 2
@@ -213,7 +232,7 @@ export class ISCClient {
 
 		console.log("> createProvisioningPolicy", sourceId, provisioningPolicyDto);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesApi(apiConfig);
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const result = await api.createProvisioningPolicy({
 			sourceId,
 			provisioningPolicyDto
@@ -227,7 +246,7 @@ export class ISCClient {
 	public async getSourceId(sourceName: string): Promise<string> {
 		console.log("> getSourceId", sourceName);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesApi(apiConfig);
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.listSources({
 			filters: `name eq "${sourceName}" or id eq "${sourceName}"`,
 			count: true
@@ -239,7 +258,7 @@ export class ISCClient {
 	public async getSchemas(sourceId: string): Promise<Schema[]> {
 		console.log("> getSchemas", sourceId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesApi(apiConfig);
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.getSourceSchemas({ sourceId }, DEFAULT_AXIOS_OPTIONS);
 
 		return response.data;
@@ -248,7 +267,7 @@ export class ISCClient {
 	public async createSchema(sourceId: string, schema: Schema): Promise<Schema> {
 		console.log("> createSchema", sourceId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesApi(apiConfig);
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.createSourceSchema({ sourceId, schema }, DEFAULT_AXIOS_OPTIONS);
 		return response.data;
 	}
@@ -259,7 +278,7 @@ export class ISCClient {
 	): Promise<LoadEntitlementTaskBeta> {
 		console.log("> ISCClient.startEntitlementAggregation");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesBetaApi(apiConfig);
+		const api = new SourcesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.importEntitlements({ id: sourceID }, DEFAULT_AXIOS_OPTIONS)
 		return response.data
 	}
@@ -269,7 +288,7 @@ export class ISCClient {
 	): Promise<EntitlementSourceResetBaseReferenceDtoBeta> {
 		console.log("> ISCClient.startEntitlementReset");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new EntitlementsBetaApi(apiConfig);
+		const api = new EntitlementsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.resetSourceEntitlements({
 			id: sourceID
 		}, DEFAULT_AXIOS_OPTIONS)
@@ -281,7 +300,7 @@ export class ISCClient {
 	): Promise<TaskResultDtoBeta> {
 		console.log("> ISCClient.startAccountReset");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesBetaApi(apiConfig);
+		const api = new SourcesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.deleteAccountsAsync({
 			id: sourceID
 		}, DEFAULT_AXIOS_OPTIONS)
@@ -320,7 +339,7 @@ export class ISCClient {
 	): Promise<TaskStatusBeta> {
 		console.log("> getTaskStatus", taskId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new TaskManagementBetaApi(apiConfig);
+		const api = new TaskManagementBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.getTaskStatus({
 			id: taskId
 		}, DEFAULT_AXIOS_OPTIONS)
@@ -334,7 +353,7 @@ export class ISCClient {
 	): Promise<void> {
 		console.log("> updateLogConfiguration", clusterId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new ManagedClustersBetaApi(apiConfig);
+		const api = new ManagedClustersBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.putClientLogConfiguration({
 			id: clusterId,
 			clientLogConfigurationBeta: {
@@ -361,7 +380,7 @@ export class ISCClient {
 	public async getTransforms(): Promise<TransformRead[]> {
 		console.log("> getTransforms");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new TransformsApi(apiConfig);
+		const api = new TransformsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const result = await api.listTransforms({}, DEFAULT_AXIOS_OPTIONS);
 		const transforms = result.data;
 		if (transforms !== undefined && transforms instanceof Array) {
@@ -373,7 +392,7 @@ export class ISCClient {
 	public async getTransformByName(name: string): Promise<TransformRead> {
 		console.log("> getTransformByName", name);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new TransformsApi(apiConfig);
+		const api = new TransformsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.listTransforms({
 			filters: `name eq "${name}"`,
 			limit: 1,
@@ -562,7 +581,7 @@ export class ISCClient {
 		const increment = limit ? Math.min(DEFAULT_PAGINATION, limit) : DEFAULT_PAGINATION;
 
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SearchApi(apiConfig);
+		const api = new SearchApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await Paginator.paginateSearchApi(api, query, increment, limit);
 		return resp.data;
 	}
@@ -632,7 +651,7 @@ export class ISCClient {
 		limit = limit ? Math.min(DEFAULT_PAGINATION, limit) : DEFAULT_PAGINATION;
 
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SearchApi(apiConfig);
+		const api = new SearchApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await api.searchPost({
 			search: query,
 			limit,
@@ -663,7 +682,7 @@ export class ISCClient {
 		console.log("> startExportJob", objectTypes, objectOptions);
 
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SPConfigBetaApi(apiConfig);
+		const api = new SPConfigBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.exportSpConfig({
 			exportPayloadBeta: {
 				description: `Export Job vscode ${new Date().toISOString()}`,
@@ -684,7 +703,7 @@ export class ISCClient {
 	public async getExportJobStatus(jobId: string): Promise<SpConfigJobBeta> {
 		console.log("> getExportJobStatus", jobId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SPConfigBetaApi(apiConfig);
+		const api = new SPConfigBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.getSpConfigExportStatus({ id: jobId }, DEFAULT_AXIOS_OPTIONS);
 		return response.data;
 	}
@@ -697,7 +716,7 @@ export class ISCClient {
 	public async getExportJobResult(jobId: string): Promise<SpConfigExportResultsBeta> {
 		console.log("> getExportJobResult", jobId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SPConfigBetaApi(apiConfig);
+		const api = new SPConfigBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.getSpConfigExport({ id: jobId }, DEFAULT_AXIOS_OPTIONS);
 		return response.data;
 	}
@@ -714,7 +733,7 @@ export class ISCClient {
 		console.log("> startImportJob", options);
 		/*
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SPConfigBetaApi(apiConfig);
+		const api = new SPConfigBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		// const readable = Readable.from([data]);
 		// const file = await blob(readable);
 		// const buffer = Buffer.from(data);
@@ -759,7 +778,7 @@ export class ISCClient {
 	public async getImportJobStatus(jobId: string): Promise<SpConfigJobBeta> {
 		console.log("> getImportJobStatus", jobId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SPConfigBetaApi(apiConfig);
+		const api = new SPConfigBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.getSpConfigImportStatus({ id: jobId }, DEFAULT_AXIOS_OPTIONS);
 		return response.data;
 	}
@@ -773,7 +792,7 @@ export class ISCClient {
 		console.log("> getImportJobResult", jobId);
 
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SPConfigBetaApi(apiConfig);
+		const api = new SPConfigBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.getSpConfigImport({ id: jobId }, DEFAULT_AXIOS_OPTIONS);
 		return response.data;
 	}
@@ -787,7 +806,7 @@ export class ISCClient {
 
 	public async createWorflow(workflow: WorkflowBeta): Promise<WorkflowBeta> {
 		const apiConfig = await this.getApiConfiguration()
-		const api = new WorkflowsBetaApi(apiConfig)
+		const api = new WorkflowsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors())
 		const resp = await api.createWorkflow({
 			// @ts-ignore
 			createWorkflowRequestBeta: workflow
@@ -798,14 +817,14 @@ export class ISCClient {
 
 	public async getWorflow(id: string): Promise<WorkflowBeta> {
 		const apiConfig = await this.getApiConfiguration()
-		const api = new WorkflowsBetaApi(apiConfig)
+		const api = new WorkflowsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors())
 		const resp = await api.getWorkflow({ id }, DEFAULT_AXIOS_OPTIONS)
 		return resp.data;
 	}
 
 	public async getWorflows(): Promise<WorkflowBeta[]> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new WorkflowsBetaApi(apiConfig);
+		const api = new WorkflowsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await api.listWorkflows(DEFAULT_AXIOS_OPTIONS);
 		return resp.data.sort(compareByName);
 	}
@@ -820,7 +839,7 @@ export class ISCClient {
 	): Promise<void> {
 		console.log("> updateWorkflowStatus", id, status);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new WorkflowsBetaApi(apiConfig);
+		const api = new WorkflowsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await api.patchWorkflow({
 			id, jsonPatchOperationBeta: [
 				{
@@ -844,7 +863,7 @@ export class ISCClient {
 	): Promise<WorkflowExecutionBeta[]> {
 		console.log("> getWorkflowExecutionHistory", id);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new WorkflowsBetaApi(apiConfig);
+		const api = new WorkflowsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await api.getWorkflowExecutions({ id }, DEFAULT_AXIOS_OPTIONS);
 		return resp.data;
 	}
@@ -856,14 +875,14 @@ export class ISCClient {
 	public async getWorkflowExecution(workflowExecutionId: string): Promise<WorkflowExecutionBeta> {
 		console.log("> getWorkflowExecution", workflowExecutionId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new WorkflowsBetaApi(apiConfig);
+		const api = new WorkflowsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await api.getWorkflowExecution({ id: workflowExecutionId }, DEFAULT_AXIOS_OPTIONS);
 		return resp.data;
 	}
 
 	public async getWorflowTriggers(): Promise<WorkflowLibraryTriggerBeta[]> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new WorkflowsBetaApi(apiConfig);
+		const api = new WorkflowsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await api.listWorkflowLibraryTriggers({}, DEFAULT_AXIOS_OPTIONS);
 		return resp.data;
 	}
@@ -871,7 +890,7 @@ export class ISCClient {
 	public async testWorkflow(id: string, payload: any): Promise<string> {
 		console.log("> testWorkflow", id, payload);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new WorkflowsBetaApi(apiConfig);
+		const api = new WorkflowsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await api.testWorkflow({
 			id,
 			testWorkflowRequestBeta: {
@@ -891,7 +910,7 @@ export class ISCClient {
 
 	public async getConnectorRules(): Promise<ConnectorRuleResponseBeta[]> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new ConnectorRuleManagementBetaApi(apiConfig);
+		const api = new ConnectorRuleManagementBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await api.getConnectorRuleList(DEFAULT_AXIOS_OPTIONS);
 		const rules = resp.data;
 		rules.sort(compareByName);
@@ -900,7 +919,7 @@ export class ISCClient {
 
 	public async getConnectorRuleById(id: string): Promise<ConnectorRuleResponseBeta> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new ConnectorRuleManagementBetaApi(apiConfig);
+		const api = new ConnectorRuleManagementBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await api.getConnectorRule({ id }, DEFAULT_AXIOS_OPTIONS);
 		return resp.data;
 	}
@@ -930,7 +949,7 @@ export class ISCClient {
 		};
 
 		const apiConfig = await this.getApiConfiguration();
-		const api = new ConnectorRuleManagementBetaApi(apiConfig);
+		const api = new ConnectorRuleManagementBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await api.validateConnectorRule({
 			sourceCodeBeta: payload
 		}, DEFAULT_AXIOS_OPTIONS);
@@ -941,7 +960,7 @@ export class ISCClient {
 
 	public async updateConnectorRule(rule: ConnectorRuleUpdateRequestBeta): Promise<ConnectorRuleResponseBeta> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new ConnectorRuleManagementBetaApi(apiConfig);
+		const api = new ConnectorRuleManagementBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await api.updateConnectorRule({
 			id: rule.id,
 			connectorRuleUpdateRequestBeta: rule
@@ -959,7 +978,7 @@ export class ISCClient {
 
 	public async getIdentityProfiles(): Promise<IdentityProfile[]> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new IdentityProfilesApi(apiConfig);
+		const api = new IdentityProfilesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await api.listIdentityProfiles({}, DEFAULT_AXIOS_OPTIONS);
 		return resp.data;
 	}
@@ -968,7 +987,7 @@ export class ISCClient {
 		identityProfileId: string
 	): Promise<LifecycleState[]> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new LifecycleStatesApi(apiConfig);
+		const api = new LifecycleStatesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await api.getLifecycleStates({ identityProfileId }, DEFAULT_AXIOS_OPTIONS);
 		return resp.data;
 	}
@@ -976,8 +995,7 @@ export class ISCClient {
 	public async refreshIdentityProfile(identityProfileId: string): Promise<void> {
 		console.log("> refreshIdentityProfile", identityProfileId);
 		const apiConfig = await this.getApiConfiguration();
-		const httpClient = await this.getAxios();
-		const api = new IdentityProfilesApi(apiConfig, "", httpClient);
+		const api = new IdentityProfilesApi(apiConfig, undefined, (await this.getAxios()));
 		const resp = await api.syncIdentityProfile({ identityProfileId }, DEFAULT_AXIOS_OPTIONS);
 	}
 
@@ -992,7 +1010,7 @@ export class ISCClient {
 	public async getServiceDesks(): Promise<ServiceDeskIntegrationDto[]> {
 		console.log("> getServiceDesks");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new ServiceDeskIntegrationApi(apiConfig);
+		const api = new ServiceDeskIntegrationApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.getServiceDeskIntegrations({ sorters: "name" }, DEFAULT_AXIOS_OPTIONS);
 		return response.data;
 	}
@@ -1014,7 +1032,7 @@ export class ISCClient {
 			...query
 		};
 		const apiConfig = await this.getApiConfiguration();
-		const api = new AccountsApi(apiConfig);
+		const api = new AccountsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.listAccounts(queryValues, DEFAULT_AXIOS_OPTIONS);
 		return response;
 	}
@@ -1074,7 +1092,7 @@ export class ISCClient {
 	): Promise<void> {
 		console.log("> patchAccount", accountId, identityId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new AccountsApi(apiConfig);
+		const api = new AccountsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.updateAccount({
 			id: accountId,
 			requestBody: [
@@ -1099,14 +1117,14 @@ export class ISCClient {
 	public async getEntitlement(id: string): Promise<EntitlementBeta> {
 		console.log("> getEntitlement");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new EntitlementsBetaApi(apiConfig);
+		const api = new EntitlementsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.getEntitlement({ id }, DEFAULT_AXIOS_OPTIONS)
 		return response.data
 	}
 	public async getAllEntitlements(query: string): Promise<EntitlementBeta[]> {
 		console.log("> getAllEntitlements");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new EntitlementsBetaApi(apiConfig);
+		const api = new EntitlementsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const result = await Paginator.paginate(api,
 			api.listEntitlements,
 			{ filters: query, sorters: "name" });
@@ -1128,7 +1146,7 @@ export class ISCClient {
 			...query
 		};
 		const apiConfig = await this.getApiConfiguration();
-		const api = new EntitlementsBetaApi(apiConfig);
+		const api = new EntitlementsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.listEntitlements(queryValues, DEFAULT_AXIOS_OPTIONS);
 		return response;
 	}
@@ -1193,7 +1211,7 @@ export class ISCClient {
 	): Promise<void> {
 		console.log("> updateEntitlement", id, payload);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new EntitlementsBetaApi(apiConfig);
+		const api = new EntitlementsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.patchEntitlement({
 			id,
 			jsonPatchOperationBeta: payload
@@ -1237,7 +1255,7 @@ export class ISCClient {
 		};
 
 		const apiConfig = await this.getApiConfiguration();
-		const api = new PublicIdentitiesApi(apiConfig);
+		const api = new PublicIdentitiesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.getPublicIdentities(queryValues, DEFAULT_AXIOS_OPTIONS);
 		return response;
 	}
@@ -1285,7 +1303,7 @@ export class ISCClient {
 	public async getGovernanceGroups(): Promise<WorkgroupDtoBeta[]> {
 		console.log("> getGovernanceGroups");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new GovernanceGroupsBetaApi(apiConfig);
+		const api = new GovernanceGroupsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const result = await Paginator.paginate(api, api.listWorkgroups, { sorters: "name" }, 50);
 		return result.data;
 	}
@@ -1293,14 +1311,14 @@ export class ISCClient {
 	public async getGovernanceGroupById(id: string): Promise<WorkgroupDtoBeta> {
 		console.log("> getGovernanceGroupById", id);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new GovernanceGroupsBetaApi(apiConfig);
+		const api = new GovernanceGroupsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const result = await api.getWorkgroup({ id }, DEFAULT_AXIOS_OPTIONS);
 		return result.data;
 	}
 	public async getGovernanceGroupByName(name: string): Promise<WorkgroupDtoBeta> {
 		console.log("> getGovernanceGroupByName", name);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new GovernanceGroupsBetaApi(apiConfig);
+		const api = new GovernanceGroupsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.listWorkgroups({
 			filters: `name eq "${name}"`,
 			limit: 1,
@@ -1328,7 +1346,7 @@ export class ISCClient {
 			...query
 		};
 		const apiConfig = await this.getApiConfiguration();
-		const api = new AccessProfilesApi(apiConfig);
+		const api = new AccessProfilesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.listAccessProfiles(queryValues, DEFAULT_AXIOS_OPTIONS);
 		return response;
 	}
@@ -1375,7 +1393,7 @@ export class ISCClient {
 			...query
 		};
 		const apiConfig = await this.getApiConfiguration();
-		const api = new RolesApi(apiConfig);
+		const api = new RolesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.listRoles(queryValues, DEFAULT_AXIOS_OPTIONS);
 		return response;
 	}
@@ -1383,7 +1401,7 @@ export class ISCClient {
 	public async createRole(role: Role): Promise<Role> {
 		console.log("> createRole", role);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new RolesApi(apiConfig);
+		const api = new RolesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.createRole({ role }, DEFAULT_AXIOS_OPTIONS);
 		return response.data;
 	}
@@ -1400,7 +1418,7 @@ export class ISCClient {
 	public async *getForms(filters: string | undefined = undefined): AsyncGenerator<FormBeta> {
 		console.log("> getForms");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CustomFormsBetaApi(apiConfig);
+		const api = new CustomFormsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		let args = {
 			offset: 0,
 			limit: DEFAULT_PAGINATION,
@@ -1436,7 +1454,7 @@ export class ISCClient {
 	public async exportForms(filters: string | undefined = undefined): Promise<ExportFormDefinitionsByTenant200ResponseInnerBeta[]> {
 		console.log("> exportForms");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CustomFormsBetaApi(apiConfig);
+		const api = new CustomFormsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		let args = {
 			offset: 0,
 			limit: DEFAULT_PAGINATION,
@@ -1459,7 +1477,7 @@ export class ISCClient {
 	public async importForms(forms: ImportFormDefinitionsRequestInnerBeta[]) {
 		console.log("> importForms");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CustomFormsBetaApi(apiConfig);
+		const api = new CustomFormsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.importFormDefinitions({
 			body: forms
 		}, DEFAULT_AXIOS_OPTIONS)
@@ -1576,7 +1594,7 @@ export class ISCClient {
 	public async getNotificationTemplates(): Promise<TemplateDtoBeta[]> {
 		console.log("> getNotificationTemplates");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new NotificationsBetaApi(apiConfig);
+		const api = new NotificationsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const result = await Paginator.paginate(api, api.listNotificationTemplates);
 		return result.data;
 	}
@@ -1591,7 +1609,7 @@ export class ISCClient {
 	public async getSegments(): Promise<Segment[]> {
 		console.log("> getSegments");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SegmentsApi(apiConfig);
+		const api = new SegmentsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const result = await Paginator.paginate(api, api.listSegments);
 		return result.data;
 	}
@@ -1606,7 +1624,7 @@ export class ISCClient {
 	public async getSearchAttributes(): Promise<SearchAttributeConfigBeta[]> {
 		console.log("> getSearchAttributes");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SearchAttributeConfigurationBetaApi(apiConfig)
+		const api = new SearchAttributeConfigurationBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors())
 		const result = await api.getSearchAttributeConfig(DEFAULT_AXIOS_OPTIONS)
 		return result.data.sort(compareByName)
 	}
@@ -1614,7 +1632,7 @@ export class ISCClient {
 	public async createSearchAttribute(searchAttributeConfigBeta: SearchAttributeConfigBeta): Promise<void> {
 		console.log("> createSearchAttribute");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SearchAttributeConfigurationBetaApi(apiConfig);
+		const api = new SearchAttributeConfigurationBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		await api.createSearchAttributeConfig({ searchAttributeConfigBeta }, DEFAULT_AXIOS_OPTIONS)
 	}
 
@@ -1629,7 +1647,7 @@ export class ISCClient {
 	public async getIdentityAttributes(): Promise<IdentityAttributeBeta[]> {
 		console.log("> getIdentityAttributes");
 		const apiConfig = await this.getApiConfiguration()
-		const api = new IdentityAttributesBetaApi(apiConfig)
+		const api = new IdentityAttributesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors())
 		const result = await api.listIdentityAttributes({}, DEFAULT_AXIOS_OPTIONS)
 		return result.data
 	}
@@ -1637,7 +1655,7 @@ export class ISCClient {
 	public async createIdentityAttribute(identityAttribute: IdentityAttributeBeta): Promise<IdentityAttributeBeta> {
 		console.log("> createIdentityAttribute");
 		const apiConfig = await this.getApiConfiguration()
-		const api = new IdentityAttributesBetaApi(apiConfig)
+		const api = new IdentityAttributesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors())
 		const result = await api.createIdentityAttribute({ identityAttributeBeta: identityAttribute }, DEFAULT_AXIOS_OPTIONS)
 		return result.data
 	}
@@ -1654,7 +1672,7 @@ export class ISCClient {
 	public async getPasswordOrgConfig(): Promise<PasswordOrgConfig> {
 		console.log("> getPasswordOrgConfig");
 		const apiConfig = await this.getApiConfiguration()
-		const api = new PasswordConfigurationApi(apiConfig)
+		const api = new PasswordConfigurationApi(apiConfig, undefined, this.getAxiosWithInterceptors())
 		const result = await api.getPasswordOrgConfig(DEFAULT_AXIOS_OPTIONS)
 		return result.data
 	}
@@ -1662,7 +1680,7 @@ export class ISCClient {
 	public async generateDigitToken(identityId: string, durationMinutes: number, length: number): Promise<string> {
 		console.log("> generateDigitToken");
 		const apiConfig = await this.getApiConfiguration()
-		const api = new PasswordManagementBetaApi(apiConfig)
+		const api = new PasswordManagementBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors())
 		const result = await api.generateDigitToken({
 			passwordDigitTokenResetBeta: {
 				userId: identityId,
@@ -1687,7 +1705,7 @@ export class ISCClient {
 	public async listIdentities(identityFilter: IdentitiesBetaApiListIdentitiesRequest): Promise<AxiosResponse<IdentityBeta[]>> {
 		console.log("> listIdentities");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new IdentitiesBetaApi(apiConfig);
+		const api = new IdentitiesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const result = await api.listIdentities(identityFilter, DEFAULT_AXIOS_OPTIONS);
 		return result;
 	}
@@ -1695,7 +1713,7 @@ export class ISCClient {
 	public async processIdentity(identityId: string): Promise<AxiosResponse<TaskResultResponseBeta, any>> {
 		console.log("> processIdentity");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new IdentitiesBetaApi(apiConfig);
+		const api = new IdentitiesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const requestParameters = {
 			processIdentitiesRequestBeta:
 			{
@@ -1709,7 +1727,7 @@ export class ISCClient {
 		console.log("> syncIdentityAttributes");
 
 		const apiConfig = await this.getApiConfiguration();
-		const api = new IdentitiesBetaApi(apiConfig);
+		const api = new IdentitiesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 
 		//IdentitiesBetaApiSynchronizeAttributesForIdentityRequest
 		return await api.synchronizeAttributesForIdentity(
@@ -1720,7 +1738,7 @@ export class ISCClient {
 		console.log("> deleteIdentity");
 
 		const apiConfig = await this.getApiConfiguration();
-		const api = new IdentitiesBetaApi(apiConfig);
+		const api = new IdentitiesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 
 		await api.deleteIdentity({ id: identityId }, DEFAULT_AXIOS_OPTIONS);
 	}
