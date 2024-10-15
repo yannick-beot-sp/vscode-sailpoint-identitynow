@@ -16,6 +16,12 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Removed
 
+## [1.3.6] - 2024-10-15
+
+### Fixed
+
+- Restore command to add new Search Attribute Configuration
+
 ## [1.3.5] - 2024-10-15
 
 ### Fixed

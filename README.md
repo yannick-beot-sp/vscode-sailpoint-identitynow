@@ -304,6 +304,10 @@ The patterns defined above use the following tokens:
 
 ## Release Notes
 
+### 1.3.6 
+
+- Restore command to add new Search Attribute Configuration
+
 ### 1.3.5
 
 - Changed axios interceptor for better error management (cf. [#92](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/92))
