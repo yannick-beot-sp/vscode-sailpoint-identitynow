@@ -135,7 +135,7 @@ export class SourcesTreeItem extends FolderTreeItem {
 		const sources = await client.getSources();
 		if (sources !== undefined && sources instanceof Array) {
 			results = sources
-				.filter(source => source.name && source.id && source.connectorAttributes?.["cloudExternalId"] && source.type) // filter any source that does not have name or id
+				.filter(source => source.name && source.id && source.type) // filter any source that does not have name or id
 				.map(source => new SourceTreeItem(
 					this.tenantId,
 					this.tenantName,
