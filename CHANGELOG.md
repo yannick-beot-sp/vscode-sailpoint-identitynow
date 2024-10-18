@@ -16,6 +16,12 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Removed
 
+## [1.3.7] - 2024-10-18
+
+### Fixed
+
+- Removed filtering on sources since CC API is decommissioned
+
 ## [1.3.6] - 2024-10-15
 
 ### Fixed
@@ -68,7 +74,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Changed
 
-- Updated schema for lifefycle state (`identityState`)
+- Updated schema for lifecycle state (`identityState`)
 - Filtering server-side for uncorrelated accounts
 
 ### Fixed

@@ -304,7 +304,11 @@ The patterns defined above use the following tokens:
 
 ## Release Notes
 
-### 1.3.6 
+### 1.3.7
+
+- Removed filtering on sources since CC API is decommissioned
+
+### 1.3.6
 
 - Restore command to add new Search Attribute Configuration
 
@@ -329,7 +333,7 @@ The patterns defined above use the following tokens:
 
 ### 1.3.2
 
-- Updated schema for lifefycle state (`identityState`)
+- Updated schema for lifecycle state (`identityState`)
 - Filtering server-side for uncorrelated accounts
 - Added transforms "RFC5646" and "Display Name" (cf. [#87](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/87))
 - Add validation of read-only during SP-Config import
