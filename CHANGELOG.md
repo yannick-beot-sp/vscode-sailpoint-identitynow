@@ -12,6 +12,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Changed
 
+- Viewing a workflow does not bring statistics as this can cause timeouts.
+
 ### Fixed
 
 ### Removed

@@ -304,6 +304,8 @@ The patterns defined above use the following tokens:
 
 ## Release Notes
 
+- Viewing a workflow does not bring statistics as this can cause timeouts.
+
 ### 1.3.7
 
 - Removed filtering on sources since CC API is decommissioned

@@ -73,7 +73,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 		console.log("> ISCResourceProvider.lookupResource", uri);
 		const tenantName = uri.authority;
 		console.log("tenantName =", tenantName);
-		const resourcePath = getPathByUri(uri);
+		let resourcePath = getPathByUri(uri);
 		console.log("path =", resourcePath);
 		if (!resourcePath) {
 			throw Error("Invalid uri:" + uri);
@@ -108,6 +108,14 @@ export class ISCResourceProvider implements FileSystemProvider {
 				data = response.data[0]
 			}
 		} else {
+			if (/\/workflows\//.test(resourcePath)) {
+				/* 
+				Special case for workflows
+				For workflows that launch a few thousand times a day, the workflow metrics is really large and that count causes the API to time out.
+				Using an undocumented parameter, discovered in the UI
+				*/
+				resourcePath += "?workflowMetrics=false"
+			}
 			data = await client.getResource(resourcePath);
 		}
 
