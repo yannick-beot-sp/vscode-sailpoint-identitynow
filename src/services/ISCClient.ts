@@ -1587,6 +1587,31 @@ export class ISCClient {
 	//#endregion Applications
 	//////////////////////////////
 
+	//////////////////////////////
+	//#region Certification Campaigns
+	//////////////////////////////
+	public async getPaginatedCampaigns(filters: string, limit?: number, offset?: number, count?: boolean): Promise<AxiosResponse<any[]>> {
+		console.log("> getPaginatedCampaigns", filters, limit, offset);
+
+		limit = limit ? Math.min(DEFAULT_PAGINATION, limit) : DEFAULT_PAGINATION;
+
+		const httpClient = await this.getAxios();
+		const baseUrl = '/v3/campaigns'
+		const args: Record<string, any> = {
+			offset,
+			limit,
+			filters,
+			sorters: "-created",
+			count
+		}
+		const path = addQueryParams(baseUrl, args)
+		const response = await httpClient.get(path);
+		return response;
+	}
+	//////////////////////////////
+	//#endregion Applications
+	//////////////////////////////
+
 	/////////////////////////
 	//#region Notification Templates
 	/////////////////////////

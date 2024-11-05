@@ -78,6 +78,7 @@ export class TenantTreeItem extends BaseTreeItem {
 		results.push(new IdentityAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new IdentitiesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new ApplicationsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new CampaignsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 
 		return results
 	}
@@ -1445,4 +1446,71 @@ export class ApplicationAccessProfileTreeItem extends ISCResourceTreeItem {
 
 	contextValue = "access-profile-application";
 	iconPath = new vscode.ThemeIcon("archive");
+}
+
+export class CampaignsTreeItem extends PageableFolderTreeItem<any> {
+	sourceId: string | undefined = undefined
+
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {
+		super("Campaigns", "campaigns", tenantId, tenantName, tenantDisplayName, 'No campaign found',
+			(x => new CampaignTreeItem(
+				tenantId,
+				tenantName,
+				tenantDisplayName,
+				x.name,
+				x.id
+			))
+		);
+	}
+
+	protected async loadNext(): Promise<AxiosResponse<Document[]>> {
+		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
+
+		const filters = undefined // TODO
+
+		return await this.client.getPaginatedCampaigns(
+			filters,
+			limit,
+			this.currentOffset,
+			(this._total === 0)
+		) as AxiosResponse<Document[]>;
+	}
+
+
+	get isFiltered(): boolean {
+		return false // TODO
+	}
+}
+
+/**
+ * Certification Campaign
+ */
+export class CampaignTreeItem extends ISCResourceTreeItem {
+
+	contextValue = "campaigns";
+	iconPath = new vscode.ThemeIcon("checklist");
+	client: ISCClient;
+
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string
+	) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			resourceType: "campaigns",
+			id,
+			collapsible: vscode.TreeItemCollapsibleState.None
+		})
+		this.client = new ISCClient(this.tenantId, this.tenantName);
+	}
 }
