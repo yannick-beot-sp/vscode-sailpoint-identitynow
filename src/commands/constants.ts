@@ -124,3 +124,6 @@ export const REMOVE_ACCESS_PROFILE_FROM_APPLICATION = `${COMMAND_PREFIX}.applica
 export const ADD_ACCESS_PROFILE_FROM_APPLICATION = `${COMMAND_PREFIX}.applications.add.access-profile`;
 export const NEW_APPLICATION = `${COMMAND_PREFIX}.applications.new`;
 export const NEW_APPLICATION_PALETTE = `${COMMAND_PREFIX}.applications.new.palette`;
+
+// Certification Campaigns
+export const VIEW_CAMPAIGN_PANEL = `${COMMAND_PREFIX}.campaigns.panel`;

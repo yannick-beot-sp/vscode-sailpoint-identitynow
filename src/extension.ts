@@ -68,6 +68,8 @@ import { ApplicationNameFilterCommand } from './commands/applications/applicatio
 import { RemoveAccessProfileFromAppCommand } from './commands/applications/removeAccessProfileFromAppCommand';
 import { AddAccessProfileToApplication } from './commands/applications/addAccessProfileToApplication';
 import { NewApplicationCommand } from './commands/applications/newApplicationCommand';
+import { CampaignPanel } from './campaign-webview/CampaignPanel';
+import { OpenCampaignPanel } from './campaign-webview/openCampaignPanel';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -530,6 +532,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.NEW_APPLICATION_PALETTE,
 			newApplicationCommand.execute, newApplicationCommand));
+
+	const openCampaignPanel = new OpenCampaignPanel(context.extensionUri)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.VIEW_CAMPAIGN_PANEL, openCampaignPanel.execute, openCampaignPanel))
 
 }
 

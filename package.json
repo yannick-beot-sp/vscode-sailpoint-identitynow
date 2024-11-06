@@ -32,6 +32,7 @@
   "preview": true,
   "activationEvents": [
     "onFileSystem:idn",
+    "onWebviewPanel:campaignView",
     "onUri"
   ],
   "license": "MIT",
@@ -568,6 +569,10 @@
         "command": "vscode-sailpoint-identitynow.applications.new.palette",
         "title": "ISC: Add new application...",
         "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.campaigns.panel",
+        "title": "View dashboard..."
       }
     ],
     "menus": {
@@ -914,6 +919,10 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.applications.new",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.campaigns.panel",
           "when": "never"
         }
       ],
@@ -1318,6 +1327,10 @@
           "command": "vscode-sailpoint-identitynow.applications.new",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^source-apps/",
           "group": "inline@0"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.campaigns.panel",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign"
         }
       ],
       "editor/context": [
@@ -1502,6 +1515,7 @@
   "dependencies": {
     "@json2csv/node": "^6.1.2",
     "@json2csv/transforms": "^7.0.1",
+    "@types/uuid": "^10.0.0",
     "@vscode/webview-ui-toolkit": "^1.0.0",
     "axios": "^1.7.7",
     "axios-retry": "^3.4.0",

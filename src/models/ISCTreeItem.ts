@@ -1491,7 +1491,7 @@ export class CampaignsTreeItem extends PageableFolderTreeItem<any> {
  */
 export class CampaignTreeItem extends ISCResourceTreeItem {
 
-	contextValue = "campaigns";
+	contextValue = "campaign";
 	iconPath = new vscode.ThemeIcon("checklist");
 	client: ISCClient;
 
