@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-
+import * as commands from './app/src/services/Commands';
+import { ISCClient } from '../services/ISCClient';
 function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
     return {
         // Enable javascript in the webview
@@ -30,7 +31,7 @@ export class CampaignPanel {
     private _disposables: vscode.Disposable[] = [];
 
 
-    public static createOrShow(extensionUri: vscode.Uri, campaignId: string, campaignName: string) {
+    public static createOrShow(extensionUri: vscode.Uri, tenantId: string, tenantName: string, campaignId: string, campaignName: string) {
         const column = vscode.window.activeTextEditor
             ? vscode.window.activeTextEditor.viewColumn
             : undefined;
@@ -49,7 +50,7 @@ export class CampaignPanel {
             getWebviewOptions(extensionUri),
         );
 
-        CampaignPanel.currentPanels[campaignId] = new CampaignPanel(panel, extensionUri, campaignId, campaignName);
+        CampaignPanel.currentPanels[campaignId] = new CampaignPanel(panel, extensionUri, tenantId, tenantName, campaignId, campaignName);
     }
 
     public dispose() {
@@ -76,7 +77,12 @@ export class CampaignPanel {
     public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
         CatCodingPanel.currentPanel = new CatCodingPanel(panel, extensionUri);
     }*/
-    private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, private campaignId: string, private campaignName: string) {
+    private constructor(panel: vscode.WebviewPanel,
+        extensionUri: vscode.Uri,
+        private tenantId: string,
+        private tenantName: string,
+        private campaignId: string,
+        private campaignName: string) {
         this._panel = panel;
         this._extensionUri = extensionUri;
 
@@ -96,13 +102,15 @@ export class CampaignPanel {
             null,
             this._disposables
         );
-
+        const client = new ISCClient(this.tenantId, this.tenantName)
         // Handle messages from the webview
-        this._panel.webview.onDidReceiveMessage(message => {
+        this._panel.webview.onDidReceiveMessage(async message => {
             const { command, requestId, payload } = message;
             switch (command) {
-                case 'alert':
-                    vscode.window.showErrorMessage(message.text);
+                case commands.GET_KPI_ACCESS_REVIEW:
+                    const total = await client.getCertificationAccessReviewCount(this.campaignId)
+                    const current = await client.getCertificationAccessReviewCount(this.campaignId, true)
+                    this._panel.webview.postMessage({ command, requestId, payload: { total, current } });
                     return;
             }
         },

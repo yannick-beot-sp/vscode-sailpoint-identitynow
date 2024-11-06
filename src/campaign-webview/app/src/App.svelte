@@ -1,6 +1,9 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import * as commands from './services/Commands';
+
   import ProgressIndicator from "./lib/ProgressIndicator.svelte";
+  import { messageHandler } from "./services/MessageHandler";
 
   function getRandomInt(min: number, max: number): number {
     min = Math.ceil(min);
@@ -19,7 +22,7 @@
     return { current, total };
   }
 
-  let accessReviewCompleted = generateKPI();
+  let accessReviewCompleted = messageHandler.request(commands.GET_KPI_ACCESS_REVIEW);
   let identitiesCompleted = generateKPI();
   let itemsCompleted = generateKPI();
 </script>

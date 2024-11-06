@@ -11,6 +11,6 @@ export class OpenCampaignPanel {
 
     async execute(node: CampaignTreeItem): Promise<void> {
         console.log("> OpenCampaignPanel.execute", node);
-        CampaignPanel.createOrShow(this.extensionUri, node.id, node.label as string);
+        CampaignPanel.createOrShow(this.extensionUri, node.tenantId, node.tenantName, node.id, node.label as string);
     }
 }

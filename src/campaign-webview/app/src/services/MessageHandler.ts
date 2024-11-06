@@ -1,4 +1,3 @@
-import { v4 } from 'uuid';
 import { Messenger } from './Messenger';
 import type { MessageHandlerData } from './MessageHandlerData';
 
@@ -44,7 +43,7 @@ class MessageHandler {
    * @returns 
    */
   public request<T>(message: string, payload?: any): Promise<T> {
-    const requestId = v4();
+    const requestId = crypto.randomUUID();
 
     return new Promise((resolve, reject) => {
       MessageHandler.listeners[requestId] = (payload: T, error: any) => {
