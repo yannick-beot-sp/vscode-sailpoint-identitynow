@@ -3,6 +3,7 @@
   import * as commands from './services/Commands';
 
   import ProgressIndicator from "./lib/ProgressIndicator.svelte";
+  import PieCharts from "./lib/PieCharts.svelte";
   import { messageHandler } from "./services/MessageHandler";
 
   function getRandomInt(min: number, max: number): number {
@@ -22,7 +23,7 @@
     return { current, total };
   }
 
-  let accessReviewCompleted = messageHandler.request(commands.GET_KPI_ACCESS_REVIEW);
+  let accessReviewCompleted = generateKPI();//messageHandler.request(commands.GET_KPI_ACCESS_REVIEW);
   let identitiesCompleted = generateKPI();
   let itemsCompleted = generateKPI();
 </script>
@@ -40,5 +41,8 @@
     <div class="item">
       <ProgressIndicator name="Items Completed" bind:promiseResult={itemsCompleted} />
     </div>
+  </section>
+  <section id="accessitems">
+    <PieCharts campaignId="{window.data.campaignId}"/>
   </section>
 </main>

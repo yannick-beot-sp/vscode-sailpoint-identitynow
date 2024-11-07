@@ -1,34 +1,49 @@
-#kpi {
+#kpi,
+#accessitems {
   display: flex;
   flex-wrap: wrap;
   /* background-color: #bbdefb; */
   height: 100%;
   padding: 1em;
-  gap: 5px;
+  gap: 15px;
 }
 
-#kpi .item {
+#kpi .item, #accessitems .card {
   /* flex:1 1 auto; */
   flex: 1 0;
   box-sizing: border-box;
-  margin: 1rem .25em;
+  /* margin: 1rem .25em; */
   /* background: #ffecb3;
   border: 3px solid #ffcc80; */
   /* border-radius: 5px; */
 }
-
+.card {
+  min-height: 6em;
+  text-align: left;
+  padding: 1rem;
+  box-shadow:
+    rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+    rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+    rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
+  border-style: solid;
+  border-radius: 0.5rem;
+  border-color: var(--vscode-disabledForeground);
+  border-width: 1px;
+  background-color: var(--vscode-editorWidget-background);
+}
+/*
 @media screen and (min-width: 40em) {
   .card {
-     max-width: calc(50% -  1em);
+    max-width: calc(50% - 1em);
   }
 }
 
 @media screen and (min-width: 60em) {
   .card {
-      max-width: calc(25% - 1em);
+    max-width: calc(25% - 1em);
   }
 }
-
+*/
 
 
 body {

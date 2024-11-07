@@ -5,7 +5,7 @@
 </script>
 
 <!-- Component template -->
-<div class="kpi-card">
+<div class="card">
   <h3 class="kpi-name">{name}</h3>
   <div class="kpi-values">
     {#await promiseResult}
@@ -63,20 +63,7 @@
     font-size: 11px;
     font-weight: 700;
   }
-  .kpi-card {
-    min-height: 6em;
-    text-align: left;
-    padding: 1rem;
-    box-shadow:
-      rgba(0, 0, 0, 0) 0px 0px 0px 0px,
-      rgba(0, 0, 0, 0) 0px 0px 0px 0px,
-      rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
-    border-style: solid;
-    border-radius: 0.5rem;
-    border-color: var(--vscode-disabledForeground);
-    border-width: 1px;
-    background-color: var(--vscode-editorWidget-background);
-  }
+  
   .kpi-name {
     line-height: 1.625;
     font-weight: 700;
