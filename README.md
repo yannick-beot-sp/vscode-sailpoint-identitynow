@@ -285,7 +285,8 @@ The extension supports the following settings:
   - Default value: `%x/Workflows/Workflow-%t-%S-%y%M%d-%h%m%s.json`
 - `vscode-sailpoint-identitynow.treeView.pagination`: Define the number of roles and access profiles that are displayed in the tree view
   - Default value: 100
-
+- `vscode-sailpoint-identitynow.report.campaigns.filename`: Define the pattern for the folder to export access profiles.
+  - Default value: `%x/reports/%T-Campaign-%S-%y%M%d-%h%m%s.csv`
 The patterns defined above use the following tokens:
 
 - `%u`: User Home Dir

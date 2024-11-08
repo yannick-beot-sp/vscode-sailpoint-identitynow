@@ -573,6 +573,23 @@
       {
         "command": "vscode-sailpoint-identitynow.campaigns.panel",
         "title": "View dashboard..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.campaigns.export.report`",
+        "title": "Export report..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.campaigns.escalate",
+        "title": "Escalate remaining reviews..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.campaigns.reminder.send",
+        "title": "Send reminder..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.campaigns.reminder.configure",
+        "title": "Configure reminder...",
+        "icon": "$(gear)"
       }
     ],
     "menus": {
@@ -924,6 +941,22 @@
         {
           "command": "vscode-sailpoint-identitynow.campaigns.panel",
           "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.campaigns.export.report`",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.campaigns.escalate",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.campaigns.reminder.send",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.campaigns.reminder.configure",
+          "when": "never"
         }
       ],
       "view/title": [
@@ -956,7 +989,7 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.refresh-forced",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|transforms|provisioning-policies|roles|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions|search-attributes|identity-attributes|source-apps|source-app/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|transforms|provisioning-policies|roles|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions|search-attributes|identity-attributes|source-apps|source-app|campaigns/",
           "group": "inline@50"
         },
         {
@@ -1331,6 +1364,23 @@
         {
           "command": "vscode-sailpoint-identitynow.campaigns.panel",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.campaigns.export.report`",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.campaigns.escalate",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.campaigns.reminder.send",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.campaigns.reminder.configure",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^campaigns/",
+          "group": "inline@1"
         }
       ],
       "editor/context": [
@@ -1477,6 +1527,10 @@
         "vscode-sailpoint-identitynow.treeView.pagination": {
           "type": "number",
           "default": 100
+        },
+        "vscode-sailpoint-identitynow.report.campaigns.filenamee": {
+          "type": "string",
+          "default": "%x/reports/%T-Campaign-%S-%y%M%d-%h%m%s.csv"
         }
       }
     }

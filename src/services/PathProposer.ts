@@ -140,6 +140,17 @@ export class PathProposer {
             sourceName);
     }
 
+    public static getCampaignReportFilename(
+        tenantName: string,
+        tenantDisplayName: string,
+        campaignName: string,
+    ): string {
+        return this.getSourceBasedReportFilename(configuration.CAMPAIGN_REPORT_FILENAME_CONF,
+            tenantName,
+            tenantDisplayName,
+            campaignName);
+    }
+
     public static getUncorrelatedAccountReportFilename(
         tenantName: string,
         tenantDisplayName: string,

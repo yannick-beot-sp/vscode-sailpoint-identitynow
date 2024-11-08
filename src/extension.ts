@@ -69,7 +69,12 @@ import { RemoveAccessProfileFromAppCommand } from './commands/applications/remov
 import { AddAccessProfileToApplication } from './commands/applications/addAccessProfileToApplication';
 import { NewApplicationCommand } from './commands/applications/newApplicationCommand';
 import { CampaignPanel } from './campaign-webview/CampaignPanel';
-import { OpenCampaignPanel } from './campaign-webview/openCampaignPanel';
+import { OpenCampaignPanelCommand } from './campaign-webview/openCampaignPanelCommand';
+import { ConfigureReminderWorkflowCommand } from './campaign-webview/configureReminderWorkflow';
+import { ExportCampaignReportCommand } from './campaign-webview/exportCampaignReportCommand';
+import { SendReminderCommand } from './campaign-webview/sendReminderCommand';
+import { EscalateCertificationCommand } from './campaign-webview/escalateCertificationCommand';
+import { CampaignConfigurationService } from './services/CampaignConfigurationService';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -533,10 +538,34 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.NEW_APPLICATION_PALETTE,
 			newApplicationCommand.execute, newApplicationCommand));
 
-	const openCampaignPanel = new OpenCampaignPanel(context.extensionUri)
+	// Certification Campaigns
+	const openCampaignPanel = new OpenCampaignPanelCommand(context.extensionUri)
 	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.VIEW_CAMPAIGN_PANEL, openCampaignPanel.execute, openCampaignPanel))
+		vscode.commands.registerCommand(commands.VIEW_CAMPAIGN_PANEL,
+			openCampaignPanel.execute, openCampaignPanel))
 
+	const exportCampaignReportCommand = new ExportCampaignReportCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_CAMPAIGN_REPORT,
+			exportCampaignReportCommand.execute, exportCampaignReportCommand))
+
+	const escalateCertificationCommand = new EscalateCertificationCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.ESCALATE_CERTIFICATION,
+			escalateCertificationCommand.execute, escalateCertificationCommand))
+
+
+
+	const campaignService = new CampaignConfigurationService(context.secrets, tenantService,)
+	const configureReminderWorkflow = new ConfigureReminderWorkflowCommand(tenantService, campaignService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.CAMPAIGN_CONFIGURE_REMINDER,
+			configureReminderWorkflow.execute, configureReminderWorkflow))
+
+	const sendReminderCommand = new SendReminderCommand(tenantService, campaignService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.CAMPAIGN_SEND_REMINDER,
+			sendReminderCommand.execute, sendReminderCommand))
 }
 
 // this method is called when your extension is deactivated

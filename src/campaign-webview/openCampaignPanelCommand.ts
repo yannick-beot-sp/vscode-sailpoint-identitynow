@@ -5,7 +5,7 @@ import { CampaignPanel } from './CampaignPanel';
 /**
  * Command used to open the campaign panel
  */
-export class OpenCampaignPanel {
+export class OpenCampaignPanelCommand {
     constructor(readonly extensionUri: vscode.Uri) {
     }
 

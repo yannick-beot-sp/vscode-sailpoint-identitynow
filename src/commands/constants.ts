@@ -127,3 +127,7 @@ export const NEW_APPLICATION_PALETTE = `${COMMAND_PREFIX}.applications.new.palet
 
 // Certification Campaigns
 export const VIEW_CAMPAIGN_PANEL = `${COMMAND_PREFIX}.campaigns.panel`;
+export const EXPORT_CAMPAIGN_REPORT = `${COMMAND_PREFIX}.campaigns.export.report`;
+export const ESCALATE_CERTIFICATION = `${COMMAND_PREFIX}.campaigns.escalate`;
+export const CAMPAIGN_SEND_REMINDER = `${COMMAND_PREFIX}.campaigns.reminder.send`;
+export const CAMPAIGN_CONFIGURE_REMINDER = `${COMMAND_PREFIX}.campaigns.reminder.configure`;
