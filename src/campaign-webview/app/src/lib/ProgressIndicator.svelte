@@ -1,29 +1,27 @@
 <script lang="ts">
   // Define the props with TypeScript types
-  export let name: string;
-  export let promiseResult: Promise<any>;
+
+  interface Props {
+    name: string;
+    current: number;
+    total: number;
+  }
+
+  let { name, current, total }: Props = $props();
 </script>
 
 <!-- Component template -->
 <div class="card">
   <h3 class="kpi-name">{name}</h3>
   <div class="kpi-values">
-    {#await promiseResult}
-      <!-- promise is pending -->
-      <div class="loading"></div>
-    {:then value}
-      <div class="kpi-value-summary">
-        <p class="kpi-value-outof">{value.current} / {value.total}</p>
+    <div class="kpi-value-summary">
+      <p class="kpi-value-outof">{current} / {total}</p>
+    </div>
+    <div class="kpi-bar">
+      <div class="kpi-bar-completed" style:width="{Math.round((current / total) * 100) || 0}%">
+        {Math.round((current / total) * 100) || 0}%
       </div>
-      <div class="kpi-bar">
-        <div
-          class="kpi-bar-completed"
-          style:width="{Math.round((value.current / value.total) * 100) || 0}%"
-        >
-          {Math.round((value.current / value.total) * 100) || 0}%
-        </div>
-      </div>
-    {/await}
+    </div>
   </div>
 </div>
 
@@ -63,7 +61,7 @@
     font-size: 11px;
     font-weight: 700;
   }
-  
+
   .kpi-name {
     line-height: 1.625;
     font-weight: 700;

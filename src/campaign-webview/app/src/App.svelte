@@ -1,48 +1,79 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import * as commands from './services/Commands';
 
   import ProgressIndicator from "./lib/ProgressIndicator.svelte";
   import PieCharts from "./lib/PieCharts.svelte";
-  import { messageHandler } from "./services/MessageHandler";
+  import DataTable from "./lib/datatable/DataTable.svelte";
+  import type { Column, FetchDataCallback, FetchOptions, PaginatedData } from "./lib/datatable/Model";
+  import { ClientFactory } from "./services/ClientFactory";
+  import type { KPIs } from "./services/Client";
 
-  function getRandomInt(min: number, max: number): number {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-  async function stall() {
-    const stallTime = getRandomInt(500, 3000);
-    await new Promise((resolve) => setTimeout(resolve, stallTime));
-  }
+  let promiseResult = $state<Promise<KPIs>>();
+  let client = ClientFactory.getClient();
 
-  async function generateKPI(): Promise<{ current: number; total: number }> {
-    await stall();
-    const total = getRandomInt(50, 200);
-    const current = getRandomInt(10, total);
-    return { current, total };
-  }
+  onMount(async () => {
+    promiseResult = client.getKPIs();
+  });
 
-  let accessReviewCompleted = generateKPI();//messageHandler.request(commands.GET_KPI_ACCESS_REVIEW);
-  let identitiesCompleted = generateKPI();
-  let itemsCompleted = generateKPI();
+  const reviewerColumns: Column[] = [
+    {
+      field: "id",
+      label: "Id",
+    },
+    {
+      field: "name",
+      label: "Name",
+    },
+    {
+      field: "status",
+      label: "Status",
+    },
+  ];
+
+  const fetchData: FetchDataCallback = async (fetchOptions: FetchOptions) => {
+    console.log(">fetchData");
+    console.log({ fetchOptions });
+    return [] as PaginatedData<any>[]
+    // throw new Error("Unimplemented");
+
+    /*
+    const offset = fetchOptions.currentPage * fetchOptions.pageSize;
+    const end = Math.min(((fetchOptions.currentPage + 1) * fetchOptions.pageSize), reviewers.length);
+    const result = reviewers.slice(offset, end);
+    console.log({ offset, result });
+
+    return {
+      data: reviewers.slice(offset, end),
+      count: reviewers.length,
+    };*/
+  };
 </script>
 
 <main>
-  <h1>{window.data.campaignName}</h1>
-
-  <section id="kpi">
-    <div class="item">
-      <ProgressIndicator name="Access Review Completed" bind:promiseResult={accessReviewCompleted} />
-    </div>
-    <div class="item">
-      <ProgressIndicator name="Identities Completed" bind:promiseResult={identitiesCompleted} />
-    </div>
-    <div class="item">
-      <ProgressIndicator name="Items Completed" bind:promiseResult={itemsCompleted} />
-    </div>
+  <section id="headerSection">
+    <h1>{window.data.campaignName}</h1>
   </section>
-  <section id="accessitems">
-    <PieCharts campaignId="{window.data.campaignId}"/>
-  </section>
+  {#await promiseResult}
+    <!-- promise is pending -->
+    <div class="loading"></div>
+  {:then data}
+    <section id="kpi">
+      <div class="item">
+        <ProgressIndicator name="Access Review Completed" current={data!.totals.totalAccessReviewsCompleted} total={data!.totals.totalAccessReviews}/>
+      </div>
+      <div class="item">
+        <ProgressIndicator name="Identities Completed"  current={data!.totals.totalIdentitiesCompleted} total={data!.totals.totalIdentities}/>
+      </div>
+      <div class="item">
+        <ProgressIndicator name="Items Completed"  current={data!.totals.totalAccessItemsCompleted} total={data!.totals.totalAccessItems} />
+      </div>
+    </section>
+    <section id="accessitems">
+      <PieCharts data={data!.totalAccessItems} />
+    </section>
+    <section id="reviewers">
+      <h2>Campaign Reviewers</h2>
+      <DataTable columns={reviewerColumns} {fetchData} />
+    </section>
+  {/await}
 </main>

@@ -1,5 +1,4 @@
-#kpi,
-#accessitems {
+section {
   display: flex;
   flex-wrap: wrap;
   /* background-color: #bbdefb; */
