@@ -80,7 +80,7 @@ export async function confirm(prompt: string): Promise<boolean> {
 	);
 	const value = (answer === "Yes")
 
-	console.log(`< confirmFileOverwrite: ${value}`);
+	console.log(`< confirm: ${value}`);
 	return value;
 }
 

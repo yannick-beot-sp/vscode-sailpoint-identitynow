@@ -575,7 +575,7 @@
         "title": "View dashboard..."
       },
       {
-        "command": "vscode-sailpoint-identitynow.campaigns.export.report`",
+        "command": "vscode-sailpoint-identitynow.campaigns.export.report",
         "title": "Export report..."
       },
       {
@@ -951,7 +951,7 @@
           "when": "never"
         },
         {
-          "command": "vscode-sailpoint-identitynow.campaigns.export.report`",
+          "command": "vscode-sailpoint-identitynow.campaigns.export.report",
           "when": "never"
         },
         {
@@ -1382,7 +1382,7 @@
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign"
         },
         {
-          "command": "vscode-sailpoint-identitynow.campaigns.export.report`",
+          "command": "vscode-sailpoint-identitynow.campaigns.export.report",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign"
         },
         {
@@ -1552,7 +1552,7 @@
           "type": "number",
           "default": 100
         },
-        "vscode-sailpoint-identitynow.report.campaigns.filenamee": {
+        "vscode-sailpoint-identitynow.report.campaigns.filename": {
           "type": "string",
           "default": "%x/reports/%T-Campaign-%S-%y%M%d-%h%m%s.csv"
         }

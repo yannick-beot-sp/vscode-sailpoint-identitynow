@@ -556,8 +556,6 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.ESCALATE_CERTIFICATION,
 			escalateCertificationCommand.execute, escalateCertificationCommand))
 
-
-
 	const campaignService = new CampaignConfigurationService(context.secrets, tenantService,)
 	const configureReminderWorkflow = new ConfigureReminderWorkflowCommand(tenantService, campaignService)
 	context.subscriptions.push(
