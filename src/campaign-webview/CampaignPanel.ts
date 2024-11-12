@@ -3,6 +3,8 @@ import * as commands from './app/src/services/Commands';
 import { ISCClient } from '../services/ISCClient';
 import { reverse } from 'lodash';
 import { IdentityCertDecisionSummary } from 'sailpoint-api-client';
+import { FetchOptions, PaginatedData } from './app/src/lib/datatable/Model';
+import { Reviewer } from './app/src/services/Client';
 function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
     return {
         // Enable javascript in the webview
@@ -110,15 +112,15 @@ export class CampaignPanel {
             const { command, requestId, payload } = message;
             switch (command) {
                 case commands.GET_KPIS_AND_REVIEWERS:
-                    const reviews = await client.getCertificationAccessReview(this.campaignId)
 
-                    const totals = reviews.reduce(
+                    const allreviews = await client.getCertificationAccessReview(this.campaignId)
+                    const totals = allreviews.reduce(
                         (accumulator, currentValue) => {
                             return {
                                 totalAccessReviews: accumulator.totalAccessReviews + 1,
-                                totalAccessReviewsCompleted: accumulator.totalAccessReviews + (currentValue.completed ? 1 : 0),
+                                totalAccessReviewsCompleted: accumulator.totalAccessReviewsCompleted + (currentValue.completed ? 1 : 0),
                                 totalIdentities: accumulator.totalIdentities + currentValue.identitiesTotal,
-                                totalIdentitiesCompleted: accumulator.totalIdentities + currentValue.identitiesCompleted,
+                                totalIdentitiesCompleted: accumulator.totalIdentitiesCompleted + currentValue.identitiesCompleted,
                                 totalAccessItems: accumulator.totalAccessItems + currentValue.decisionsTotal,
                                 totalAccessItemsCompleted: accumulator.totalAccessItemsCompleted + currentValue.decisionsMade,
                             }
@@ -135,11 +137,11 @@ export class CampaignPanel {
                     );
 
                     const summaryCertificationDecisions = await Promise.all(
-                        reviews.map(async (cert): Promise<IdentityCertDecisionSummary> => {
+                        allreviews.map(async (cert): Promise<IdentityCertDecisionSummary> => {
                             return await client.getSummaryCertificationDecisions(cert.id)
                         })
                     )
-                    
+
                     const totalAccessItems = summaryCertificationDecisions.reduce(
                         (accumulator, currentValue) => {
                             return {
@@ -163,16 +165,23 @@ export class CampaignPanel {
                         }
                     );
 
-                    const reviewers = reviews.map(r => {
+
+                    this._panel.webview.postMessage({ command, requestId, payload: { totals, totalAccessItems } });
+                    return;
+
+                case commands.GET_PAGINATED_REVIEWERS:
+                    const { currentPage, pageSize } = payload as FetchOptions
+                    const response = await client.getPaginatedCertificationAccessReview(this.campaignId, currentPage * pageSize, pageSize)
+                    const reviewers = response.data.map(r => {
                         return {
                             id: r.id,
                             name: r.reviewer.name,
                             phase: r.phase,
-                            email: r.reviewer.email    
+                            email: r.reviewer.email
                         }
                     })
 
-                    this._panel.webview.postMessage({ command, requestId, payload: { totals, totalAccessItems,reviewers } });
+                    this._panel.webview.postMessage({ command, requestId, payload: { data: reviewers, count: response.count } as PaginatedData<Reviewer> });
                     return;
             }
         },
@@ -215,7 +224,7 @@ export class CampaignPanel {
         Use a content security policy to only allow loading images from https or from our extension directory,
         and only allow scripts that have a specific nonce.
     -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; img-src ${webview.cspSource} https:; script-src 'nonce-${nonce}';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; img-src 'self' data: ${webview.cspSource} https:; script-src 'nonce-${nonce}';">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Certification Campaign</title>

@@ -1,3 +1,4 @@
+import type { FetchOptions, PaginatedData } from "../lib/datatable/Model";
 import type { Client, KPIs, Reviewer, TotalAccessItems, Totals } from "./Client";
 
 function getRandomInt(min: number, max: number): number {
@@ -55,6 +56,26 @@ function generateDummyReviewers(count: number): Reviewer[] {
 
 export class MockupClient implements Client {
 
+    private readonly reviewers: Reviewer[]
+    private readonly count = 35
+    /**
+     *
+     */
+    constructor() {
+        this.reviewers = generateDummyReviewers(this.count);
+    }
+
+    async getReviewers(fetchOptions: FetchOptions): Promise<PaginatedData<Reviewer>> {
+        const offset = fetchOptions.currentPage * fetchOptions.pageSize;
+        const end = Math.min(((fetchOptions.currentPage + 1) * fetchOptions.pageSize), this.count);
+        const result = this.reviewers.slice(offset, end);
+        // console.log({ offset, result });
+        return {
+            data: result,
+            count: this.count,
+        };
+    }
+
     async getKPIs(): Promise<KPIs> {
         await stall()
         let totalsTmp = {
@@ -92,9 +113,7 @@ export class MockupClient implements Client {
             accountsRevoked: getRandomInt(0, 30),
         }
 
-        const reviewers = generateDummyReviewers(35);
-
-        return { totals, totalAccessItems, reviewers };
+        return { totals, totalAccessItems };
     }
 
 }

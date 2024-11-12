@@ -1,3 +1,5 @@
+import type { FetchOptions, PaginatedData } from "../lib/datatable/Model";
+
 export interface Totals {
     totalAccessReviews: number;
     totalAccessReviewsCompleted: number;
@@ -36,12 +38,11 @@ export interface Reviewer {
 export interface KPIs {
     totals: Totals;
     totalAccessItems: TotalAccessItems;
-    reviewers: Reviewer[];
 }
-
 
 export interface Client {
 
     getKPIs(): Promise<KPIs>
+    getReviewers(fetchOptions: FetchOptions): Promise<PaginatedData<Reviewer>>
 
 }

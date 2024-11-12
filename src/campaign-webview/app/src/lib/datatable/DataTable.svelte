@@ -27,6 +27,9 @@
 
   async function updateData() {
     console.log({ currentPage, pageSize, fetchOptions });
+    if (currentPage * pageSize > totalResults) {
+      currentPage = 0;
+    }
 
     const response = await fetchData(fetchOptions);
     data = response.data;
@@ -71,15 +74,33 @@
     </tbody>
   </table>
   <div class="footer">
-    <RowsPerPage bind:pageSize={pageSize} onUpdatePage={updateData} />
-    <Pagination  bind:currentPage={currentPage} bind:pageSize={pageSize} bind:totalResults={totalResults} onUpdatePage={updateData} />
+    <div class="page-size">
+      <RowsPerPage bind:pageSize onUpdatePage={updateData} />
+    </div>
+    <div class="pagination">
+      <Pagination bind:currentPage bind:pageSize bind:totalResults onUpdatePage={updateData} />
+    </div>
   </div>
 </div>
 
 <style>
+  .footer {
+    padding-top: 1rem;
+    display: flex;
+    align-items: center;
+  }
+  .footer .page-size{
+    font-weight: 700;
+  }
+  .footer .pagination{
+    margin-left: auto;
+  }
   .datatable {
     width: 100%;
-    font-family: Arial, sans-serif;
+    font-family: var(--vscode-font-family);
+    font-weight: var(--vscode-font-weight);
+    font-size: var(--vscode-font-size);
+    color: var(--vscode-foreground);
   }
 
   .header {
@@ -98,11 +119,11 @@
   td {
     padding: 0.5rem;
     text-align: left;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--vscode-textSeparator-foreground);
   }
 
   th {
-    background-color: #f2f2f2;
+    border-color: rgba(255, 255, 255, 0.69);
   }
 
   .selected {

@@ -50,6 +50,14 @@ const CONTENT_TYPE_FORM_JSON_PATCH = "application/json-patch+json";
 
 const DEFAULT_PAGINATION = 250;
 
+
+export interface PaginatedData<T> {
+	data: T[],
+	count: number;
+	limit: number;
+	offset: number;
+}
+
 export class ISCClient {
 
 	constructor(
@@ -1609,21 +1617,41 @@ export class ISCClient {
 		return response;
 	}
 
-	public async getCertificationAccessReview(campaignId: string, completed?: boolean): Promise<IdentityCertificationDto[]> {
+	public async getCertificationAccessReview(campaignId: string): Promise<IdentityCertificationDto[]> {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		let filters = `campaign.id eq "${campaignId}"`
-		if (completed !== undefined) {
-			filters += ` and completed eq ${completed}`
-		}
 
 		const val = await Paginator.paginate(
 			api,
 			api.listIdentityCertifications,
-			{ filters }
+			{
+				filters,
+				sorters: "name"
+			}
 		);
 
 		return val.data
+	}
+
+	public async getPaginatedCertificationAccessReview(campaignId: string, offset: number, limit = 250): Promise<PaginatedData<IdentityCertificationDto>> {
+		const apiConfig = await this.getApiConfiguration();
+		const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		let filters = `campaign.id eq "${campaignId}"`
+		const resp = await api.listIdentityCertifications({
+			filters,
+			offset,
+			limit,
+			count: true,
+			sorters: "name"
+		})
+
+		return {
+			data: resp.data,
+			count: parseInt(resp.headers[TOTAL_COUNT_HEADER]),
+			limit,
+			offset
+		}
 	}
 
 	public async getSummaryCertificationDecisions(certificationId: string): Promise<IdentityCertDecisionSummary> {

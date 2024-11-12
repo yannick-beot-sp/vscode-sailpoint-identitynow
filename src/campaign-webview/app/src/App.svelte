@@ -25,27 +25,19 @@
       label: "Name",
     },
     {
-      field: "status",
-      label: "Status",
+      field: "phase",
+      label: "Phase",
+    },
+    {
+      field: "email",
+      label: "Email",
     },
   ];
 
   const fetchData: FetchDataCallback = async (fetchOptions: FetchOptions) => {
     console.log(">fetchData");
     console.log({ fetchOptions });
-    return [] as PaginatedData<any>[]
-    // throw new Error("Unimplemented");
-
-    /*
-    const offset = fetchOptions.currentPage * fetchOptions.pageSize;
-    const end = Math.min(((fetchOptions.currentPage + 1) * fetchOptions.pageSize), reviewers.length);
-    const result = reviewers.slice(offset, end);
-    console.log({ offset, result });
-
-    return {
-      data: reviewers.slice(offset, end),
-      count: reviewers.length,
-    };*/
+    return client.getReviewers(fetchOptions)
   };
 </script>
 
