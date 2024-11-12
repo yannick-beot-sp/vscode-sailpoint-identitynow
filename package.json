@@ -590,6 +590,14 @@
         "command": "vscode-sailpoint-identitynow.campaigns.reminder.configure",
         "title": "Configure reminder...",
         "icon": "$(gear)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.campaigns.reassign.owners",
+        "title": "Reassign to access owners..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.campaigns.reassign.custom",
+        "title": "Reassign based on queries..."
       }
     ],
     "menus": {
@@ -956,6 +964,14 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.campaigns.reminder.configure",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.campaigns.reassign.owners",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.campaigns.reassign.custom",
           "when": "never"
         }
       ],
@@ -1375,6 +1391,14 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.campaigns.reminder.send",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.campaigns.reassign.owners",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.campaigns.reassign.custom",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign"
         },
         {

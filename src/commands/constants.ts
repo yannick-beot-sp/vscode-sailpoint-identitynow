@@ -131,3 +131,5 @@ export const EXPORT_CAMPAIGN_REPORT = `${COMMAND_PREFIX}.campaigns.export.report
 export const ESCALATE_CERTIFICATION = `${COMMAND_PREFIX}.campaigns.escalate`;
 export const CAMPAIGN_SEND_REMINDER = `${COMMAND_PREFIX}.campaigns.reminder.send`;
 export const CAMPAIGN_CONFIGURE_REMINDER = `${COMMAND_PREFIX}.campaigns.reminder.configure`;
+export const REASSIGN_CAMPAIGN_OWNERS = `${COMMAND_PREFIX}.campaigns.reassign.owners`;
+export const REASSIGN_CAMPAIGN_CUSTOM = `${COMMAND_PREFIX}.campaigns.reassign.custom`;

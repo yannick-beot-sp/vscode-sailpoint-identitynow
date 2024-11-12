@@ -75,6 +75,8 @@ import { ExportCampaignReportCommand } from './campaign-webview/exportCampaignRe
 import { SendReminderCommand } from './campaign-webview/sendReminderCommand';
 import { EscalateCertificationCommand } from './campaign-webview/escalateCertificationCommand';
 import { CampaignConfigurationService } from './services/CampaignConfigurationService';
+import { ReassignOwnersCommand } from './campaign-webview/reassignOwnersCommand';
+import { CustomReassignCommand } from './campaign-webview/customReassignCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -566,6 +568,16 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.CAMPAIGN_SEND_REMINDER,
 			sendReminderCommand.execute, sendReminderCommand))
+	const reassignOwnersCommand = new ReassignOwnersCommand(tenantService, campaignService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.REASSIGN_CAMPAIGN_OWNERS,
+			reassignOwnersCommand.execute, reassignOwnersCommand))
+
+	const customReassignCommand = new CustomReassignCommand(tenantService, campaignService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.REASSIGN_CAMPAIGN_CUSTOM,
+			customReassignCommand.execute, customReassignCommand))
+
 }
 
 // this method is called when your extension is deactivated
