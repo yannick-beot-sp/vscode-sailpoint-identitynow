@@ -16,6 +16,6 @@
     "isolatedModules": true,
     "moduleDetection": "force"
   },
-  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],
+  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte", "src/lib/datatable/svgs/chevron-right.svg", "src/lib/datatable/svgs/chevron-left.svg", "src/lib/datatable/svgs/chevron-double-right.svg", "src/lib/datatable/svgs/chevron-double-left.svg"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

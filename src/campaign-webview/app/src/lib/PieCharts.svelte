@@ -1,6 +1,13 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { Chart } from "chart.js/auto";
+  import { Chart, type ChartType } from "chart.js/auto";
+  import type { TotalAccessItems } from "../services/Client";
+
+  interface Props {
+    data: TotalAccessItems;
+  }
+
+  let { data }: Props = $props();
 
   const COLOR_OPENED = "#1c64f2",
     COLOR_APPROVED = "#16bdca",
@@ -11,37 +18,67 @@
     fontweight = style.getPropertyValue("--vscode-font-weight"),
     fontsize = parseInt(style.getPropertyValue("--vscode-font-size")),
     fontcolor = style.getPropertyValue("--vscode-foreground");
+  const labels = ["Approved", "Revoked", "Opened"];
+  const backgroundColor = [COLOR_APPROVED, COLOR_REVOKED, COLOR_OPENED];
 
-  console.log({ fontcolor });
-
-  const data: Chart.ChartData = {
-    labels: ["Approved", "Revoked", "Opened"],
+  const dataRoles: Chart.ChartData = {
+    labels,
     datasets: [
       {
         label: "Roles",
-        data: [10, 50, 30],
-        backgroundColor: [COLOR_APPROVED, COLOR_REVOKED, COLOR_OPENED],
+        data: [data.rolesApproved, data.rolesRevoked, data.roleDecisionsTotal - data.roleDecisionsMade],
+        backgroundColor,
       },
     ],
   };
+  const dataAccessProfiles: Chart.ChartData = {
+    labels,
+    datasets: [
+      {
+        label: "Access Profiles",
+        data: [
+          data.accessProfilesRevoked,
+          data.accessProfilesRevoked,
+          data.accessProfileDecisionsTotal - data.accessProfileDecisionsMade,
+        ],
+        backgroundColor,
+      },
+    ],
+  };
+  const dataEntitlements: Chart.ChartData = {
+    labels,
+    datasets: [
+      {
+        label: "Entitlements",
+        data: [
+          data.entitlementsRevoked,
+          data.entitlementsRevoked,
+          data.entitlementDecisionsTotal - data.entitlementDecisionsMade,
+        ],
+        backgroundColor,
+      },
+    ],
+  };
+  const type: ChartType = "pie";
+  const legend = {
+    position: "right",
+    labels: {
+      usePointStyle: true,
+      color: fontcolor,
+      font: {
+        size: fontsize,
+        family: fontfamily,
+      },
+    },
+  };
 
   const rolesOptions: Chart.ChartConfiguration = {
-    type: "pie",
-    data: data,
+    type,
+    data: dataRoles,
     options: {
       responsive: true,
       plugins: {
-        legend: {
-          position: "right",
-          labels: {
-            usePointStyle: true,
-            color: fontcolor,
-            font: {
-              size: fontsize,
-              family: fontfamily,
-            },
-          },
-        },
+        legend,
         title: {
           display: false,
           text: "Roles",
@@ -49,13 +86,46 @@
       },
     },
   };
+  const accessProfilesOptions: Chart.ChartConfiguration = {
+    type,
+    data: dataAccessProfiles,
+    options: {
+      responsive: true,
+      plugins: {
+        legend,
+        title: {
+          display: false,
+          text: "Access Profiles",
+        },
+      },
+    },
+  };
+  const entitlementsOptions: Chart.ChartConfiguration = {
+    type,
+    data: dataEntitlements,
+    options: {
+      responsive: true,
+      plugins: {
+        legend,
+        title: {
+          display: false,
+          text: "Entitlements",
+        },
+      },
+    },
+  };
 
   onMount(async () => {
-    const ctx = document.getElementById("rolesChart");
+    let ctx = document.getElementById("rolesChart") as HTMLCanvasElement;
+    // @ts-ignore
     new Chart(ctx, rolesOptions);
+    ctx = document.getElementById("accessProfilesChart") as HTMLCanvasElement;
+    // @ts-ignore
+    new Chart(ctx, accessProfilesOptions);
+    ctx = document.getElementById("entitlementsChart") as HTMLCanvasElement;
+    // @ts-ignore
+    new Chart(ctx, entitlementsOptions);
   });
-
-  export let campaignId: string;
 </script>
 
 <div class="card card-chart">
