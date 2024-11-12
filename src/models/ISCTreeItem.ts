@@ -9,7 +9,6 @@ import * as commands from "../commands/constants";
 import * as configuration from '../configurationConstants';
 import { escapeFilter, isEmpty, isNotEmpty } from "../utils/stringUtils";
 import { TenantService } from "../services/TenantService";
-import { AccessProfile } from "sailpoint-api-client";
 
 
 /**
@@ -1517,4 +1516,11 @@ export class CampaignTreeItem extends ISCResourceTreeItem {
 		})
 		this.client = new ISCClient(this.tenantId, this.tenantName);
 	}
+
+	command = {
+		title: "Dashboard",
+		command: commands.VIEW_CAMPAIGN_PANEL,
+		arguments: [this],
+	};
+
 }
