@@ -1656,16 +1656,16 @@ export class ISCClient {
 	}
 
 	public async getCampaignCertifications(campaignId: string, completed?: boolean): Promise<IdentityCertificationDto[]> {
-		return this.getCampaignCertificationsByFilter(`campaign.id eq "${campaignId}"`);
+		let filters = `campaign.id eq "${campaignId}"`
+		if (completed !== undefined) {
+			filters += ` and completed eq ${completed}`
+		}
+		return this.getCampaignCertificationsByFilter(filters);
 	}
 
 	public async getCampaignCertificationsByFilter(filters: string): Promise<IdentityCertificationDto[]> {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-
-		if (completed !== undefined) {
-			filters += ` and completed eq ${completed}`
-		}
 
 		const val = await Paginator.paginate(
 			api,
