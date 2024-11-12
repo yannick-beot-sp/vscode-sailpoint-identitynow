@@ -35,7 +35,7 @@ export class CampaignPanel {
     private _disposables: vscode.Disposable[] = [];
 
 
-    public static createOrShow(extensionUri: vscode.Uri, tenantId: string, tenantName: string, campaignId: string, campaignName: string) {
+    public static createOrShow(extensionUri: vscode.Uri, tenantId: string, tenantName: string, campaignId: string, campaignName: string, campaignStatus: string) {
         const column = vscode.window.activeTextEditor
             ? vscode.window.activeTextEditor.viewColumn
             : undefined;
@@ -54,7 +54,7 @@ export class CampaignPanel {
             getWebviewOptions(extensionUri),
         );
 
-        CampaignPanel.currentPanels[campaignId] = new CampaignPanel(panel, extensionUri, tenantId, tenantName, campaignId, campaignName);
+        CampaignPanel.currentPanels[campaignId] = new CampaignPanel(panel, extensionUri, tenantId, tenantName, campaignId, campaignName, campaignStatus);
     }
 
     public dispose() {
@@ -86,7 +86,8 @@ export class CampaignPanel {
         private tenantId: string,
         private tenantName: string,
         private campaignId: string,
-        private campaignName: string) {
+        private campaignName: string,
+        private campaignStatus: string) {
         this._panel = panel;
         this._extensionUri = extensionUri;
 
@@ -234,7 +235,11 @@ export class CampaignPanel {
   <body>
     <div id="app"></div>
     <script nonce="${nonce}">
-      window.data=${JSON.stringify({ campaignId: this.campaignId, campaignName: this.campaignName })};
+      window.data=${JSON.stringify({
+            campaignId: this.campaignId,
+            campaignName: this.campaignName,
+            campaignStatus: this.campaignStatus
+        })};
     </script>
   </body>
 </html>`;

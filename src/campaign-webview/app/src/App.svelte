@@ -43,7 +43,7 @@
 
 <main>
   <section id="headerSection">
-    <h1>{window.data.campaignName}</h1>
+    <h1>{window.data.campaignName}</h1><h2><span class="badge">{window.data.campaignStatus}</span></h2>
   </section>
   {#await promiseResult}
     <!-- promise is pending -->

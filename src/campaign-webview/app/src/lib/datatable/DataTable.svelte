@@ -120,6 +120,8 @@
     padding: 0.5rem;
     text-align: left;
     border-bottom: 1px solid var(--vscode-textSeparator-foreground);
+    resize: horizontal; 
+    overflow: auto; 
   }
 
   th {

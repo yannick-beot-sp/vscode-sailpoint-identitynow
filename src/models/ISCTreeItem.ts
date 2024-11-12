@@ -1462,7 +1462,8 @@ export class CampaignsTreeItem extends PageableFolderTreeItem<any> {
 				tenantName,
 				tenantDisplayName,
 				x.name,
-				x.id
+				x.id,
+				x.status
 			))
 		);
 	}
@@ -1500,7 +1501,8 @@ export class CampaignTreeItem extends ISCResourceTreeItem {
 		tenantName: string,
 		tenantDisplayName: string,
 		label: string,
-		id: string
+		id: string,
+		public readonly status: string
 	) {
 		super({
 			tenantId,
