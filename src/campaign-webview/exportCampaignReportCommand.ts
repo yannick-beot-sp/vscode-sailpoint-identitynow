@@ -94,7 +94,9 @@ export class ExportCampaignReportCommand {
                     "Entitlement Privileged": accessSummary?.entitlement?.privileged || '',
                     "Entitlement Attribute Value": accessSummary?.entitlement?.attributeValue || '',
                     "Entitlement Source Schema Object Type": accessSummary?.entitlement?.sourceSchemaObjectType || '',
-                    "Entitlement Source Name": accessSummary?.entitlement?.sourceName || ''
+                    "Entitlement Source Name": accessSummary?.entitlement?.sourceName || '',
+                    "Entitlement Account Native ID": accessSummary?.entitlement?.account?.nativeIdentity || '',
+                    "Entitlement Account Name": accessSummary?.entitlement?.account?.name || ''
                 };
 
                 if (accessType === 'ROLE') {
@@ -127,6 +129,8 @@ export class ExportCampaignReportCommand {
                                 entitlementRow['Entitlement Attribute Value'] = entitlement.attributeValue || '';
                                 entitlementRow['Entitlement Source Schema Object Type'] = entitlement.sourceSchemaObjectType || '';
                                 entitlementRow['Entitlement Source Name'] = entitlement.sourceName || '';
+                                entitlementRow['Entitlement Account Native ID'] = entitlement.account?.nativeIdentity || '';
+                                entitlementRow['Entitlement Account Name'] = entitlement.account?.name || ''
                                 rows.push(entitlementRow);
                             });
 
@@ -143,6 +147,8 @@ export class ExportCampaignReportCommand {
                             entitlementRow['Entitlement Attribute Value'] = entitlement.attributeValue || '';
                             entitlementRow['Entitlement Source Schema Object Type'] = entitlement.sourceSchemaObjectType || '';
                             entitlementRow['Entitlement Source Name'] = entitlement.sourceName || '';
+                            entitlementRow['Entitlement Account Native ID'] = entitlement.account?.nativeIdentity || '';
+                            entitlementRow['Entitlement Account Name'] = entitlement.account?.name || ''
                             rows.push(entitlementRow);
                         });
                     }
@@ -165,6 +171,8 @@ export class ExportCampaignReportCommand {
                             entitlementRow['Entitlement Attribute Value'] = entitlement.attributeValue || '';
                             entitlementRow['Entitlement Source Schema Object Type'] = entitlement.sourceSchemaObjectType || '';
                             entitlementRow['Entitlement Source Name'] = entitlement.sourceName || '';
+                            entitlementRow['Entitlement Account Native ID'] = entitlement.account?.nativeIdentity || '';
+                            entitlementRow['Entitlement Account Name'] = entitlement.account?.name || ''
                             rows.push(entitlementRow);
                         });
 
@@ -181,6 +189,8 @@ export class ExportCampaignReportCommand {
                         entitlementRow['Entitlement Attribute Value'] = entitlement.attributeValue || '';
                         entitlementRow['Entitlement Source Schema Object Type'] = entitlement.sourceSchemaObjectType || '';
                         entitlementRow['Entitlement Source Name'] = entitlement.sourceName || '';
+                        entitlementRow['Entitlement Account Native ID'] = entitlement.account?.nativeIdentity || ''
+                        entitlementRow['Entitlement Account Name'] = entitlement.account?.name || '' 
                         rows.push(entitlementRow);
                     }
                 }
