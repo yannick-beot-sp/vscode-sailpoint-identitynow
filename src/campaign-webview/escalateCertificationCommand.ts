@@ -17,6 +17,6 @@ export class EscalateCertificationCommand {
         const campaignId = node.id as string;
         const client = new ISCClient(node.tenantId, node.tenantName)
         const getPendingCertifications =  client.processCampaignPendingCertifications(campaignId)
-        const escalatePendingCertification= client.processPendingCertificationsReassignments(await getPendingCertifications,campaignId)
+        const escalatePendingCertification= client.processPendingCertificationsReassignmentsToManagers(await getPendingCertifications,campaignId)
     }
 }

@@ -1719,7 +1719,7 @@ export class ISCClient {
 	}
 
 
-	public async  processPendingCertificationsReassignments(certifications: any[], campaignId: string) {
+	public async  processPendingCertificationsReassignmentsToManagers(certifications: any[], campaignId: string) {
 		const certificationReviewerManager: { [key: string]: string[] } = {};
 		const apiConfig = await this.getApiConfiguration();
 		const identitiesApi = new PublicIdentitiesApi(apiConfig, undefined, this.getAxiosWithInterceptors())
