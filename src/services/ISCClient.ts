@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from "vscode";
 import * as os from 'os';
 import { EndpointUtils } from "../utils/EndpointUtils";
@@ -5,7 +6,7 @@ import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskManagementBetaApi, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, AccountsBetaApi, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, ManagedClustersApi, StandardLevelBeta, CertificationCampaignsApi, CertificationsApi } from 'sailpoint-api-client';
+import { AccessReviewItem, CertificationCampaignFiltersApiFp,Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskManagementBetaApi, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, AccountsBetaApi, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, ManagedClustersApi, StandardLevelBeta, CertificationCampaignsApi, CertificationsApi, CertificationCampaignsApiMoveRequest, AdminReviewReassignReassignTo, AdminReviewReassignReassignToV2024TypeEnum } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -16,6 +17,9 @@ import { DEFAULT_ROLES_QUERY_PARAMS } from "../models/Roles";
 import axiosRetry = require("axios-retry");
 import { addQueryParams } from "../utils/UriUtils";
 import { onErrorResponse, onRequest, onResponse } from "./AxiosHandlers";
+import * as fs from 'fs';
+import { parse } from 'json2csv';
+
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const FormData = require('form-data');
 
@@ -51,6 +55,8 @@ const CONTENT_TYPE_FORM_JSON_PATCH = "application/json-patch+json";
 const DEFAULT_PAGINATION = 250;
 
 export class ISCClient {
+    
+    
 
 	constructor(
 		private readonly tenantId: string,
@@ -1190,7 +1196,7 @@ export class ISCClient {
 			limit,
 			offset
 		});
-		return await resp.data;
+		return resp.data;
 	}
 
 	public async getAllEntitlementsBySource(sourceId: string): Promise<EntitlementBeta[]> {
@@ -1625,6 +1631,285 @@ export class ISCClient {
 		return parseInt(response.headers[TOTAL_COUNT_HEADER])
 
 	}
+	public async  submitManagerReassignWithRetry(requestParameters: CertificationCampaignsApiMoveRequest) {
+		const REASSIGN_LIMIT = 250;
+        const MAX_RETRIES = 10;
+        const INITIAL_WAIT_TIME = 5; // seconds
+		let attempts = 0;
+		let waitTime = INITIAL_WAIT_TIME;
+		const apiConfig = await this.getApiConfiguration();
+		const campaignApi = new CertificationCampaignsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		
+		while (attempts < MAX_RETRIES) {
+			try {
+				await campaignApi.move(requestParameters);
+				return; // Success, exit the loop
+			} catch (error: any) {
+				if (error.response?.status === 429) { // Rate limit error
+					const retryAfter = parseInt(error.response.headers['retry-after'] || String(waitTime), 10);
+					sleep(retryAfter);
+					waitTime *= 2; // Exponential backoff
+				} else {
+					const errorMessage = (error instanceof Error) ? error.message : 'Unknown error occurred';
+					break;
+				}
+			}
+			attempts += 1;
+		}
+	}
+	public async processCampaignPendingCertifications(campaignId: string) {
+		try {
+			const apiConfig = await this.getApiConfiguration();
+			const campaignApi = new CertificationCampaignsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+			const certificationsApi= new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+			const campaign = await campaignApi.getCampaign({ id:campaignId });
+			if (campaign.data.status === "COMPLETED") {
+				console.log(`Campaign ${campaignId} is completed. Exiting script.`);
+				return;
+			}
+			const certifications = await Paginator.paginate(certificationsApi, certificationsApi.listIdentityCertifications, { filters: `campaign.id eq "${campaignId}" and completed eq false` }, 249);
+			if (!certifications?.data) {
+				console.log(`No certifications found for Campaign ID: ${campaignId}`);
+				return;
+			}
+	
+			return(certifications.data);	
+
+		}
+		catch (error) {
+			const errorMessage = (error instanceof Error) ? error.message : 'Unknown error occurred';
+			console.log(`Error processing campaign with ID ${campaignId}: ${errorMessage}`);
+		}
+	}
+
+
+	public async  processPendingCertificationsReassignments(certifications: any[], campaignId: string) {
+		const certificationReviewerManager: { [key: string]: string[] } = {};
+		const apiConfig = await this.getApiConfiguration();
+		const identitiesApi = new PublicIdentitiesApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		const REASSIGN_LIMIT = 250;
+		const MAX_RETRIES = 10;
+		const INITIAL_WAIT_TIME = 5; // seconds
+		let attempts = 0;
+		let waitTime = INITIAL_WAIT_TIME;
+		for (const pendingCertification of certifications) {
+			const reviewerId = pendingCertification.reviewer?.id;
+			if (reviewerId) {
+				const reviewerData = await identitiesApi.getPublicIdentities({ filters: `id eq "${reviewerId}"` });
+				const reviewerManagerId = reviewerData?.data[0].manager?.id
+				if (reviewerManagerId) {
+					if (!certificationReviewerManager[reviewerManagerId]) {
+						certificationReviewerManager[reviewerManagerId] = [];
+					}
+					certificationReviewerManager[reviewerManagerId].push(pendingCertification.id);
+				}
+			}
+		}
+
+		for (const [managerId, pendingCertificationIds] of Object.entries(certificationReviewerManager)) {
+
+			while (pendingCertificationIds.length > 0) {
+				const certificationList = pendingCertificationIds.splice(0, REASSIGN_LIMIT);
+				const reassignTo: AdminReviewReassignReassignTo = { id: managerId, type: AdminReviewReassignReassignToV2024TypeEnum.Identity };
+
+				const requestParameters: CertificationCampaignsApiMoveRequest = {
+					id: campaignId,
+					adminReviewReassign: {
+						certificationIds: certificationList,
+						reassignTo,
+						reason: "Escalated to Reviewer's Manager",
+					}
+				};
+
+				this.submitManagerReassignWithRetry(requestParameters);
+				sleep(INITIAL_WAIT_TIME);
+			}
+		}
+	}
+
+
+	public async getCertificationItems(campaignId: string) {	
+		try {
+			// Initialize configuration
+			const apiConfig = await this.getApiConfiguration();
+	
+			// Initialize CertificationsApi
+			const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+	
+			// Call API to get certification IDs and reviewer names for the campaign
+			const certificationsResponse = await Paginator.paginate(api,api.listIdentityCertifications,{ filters: `campaign.id eq "${campaignId}"` },249)
+	
+			if (certificationsResponse.status !== 200) {
+				throw new Error(`Failed to fetch certifications for campaign with ID ${campaignId}. Status: ${certificationsResponse.status}`);
+			}
+	
+			const certificationsData = certificationsResponse.data;
+			let allCertificationsData: any[] = [];
+	
+			for (const certification of certificationsData) {
+				const certificationId = certification.id as string
+				const reviewerName = certification.reviewer?.name || 'N/A'
+				const campaignName = certification.campaign?.name as string
+	
+				// Call API to get access review items for the certification
+				const accessReviewResponse = await Paginator.paginate(api,api.listIdentityAccessReviewItems,{ id: certificationId },249)
+	
+				if (accessReviewResponse.status !== 200) {
+					throw new Error(`Failed to fetch access review items for certification with ID ${certificationId}. Status: ${accessReviewResponse.status}`);
+				}
+	
+				const accessReviewData = accessReviewResponse.data;
+	
+				// Process access review items data
+				const certificationData = this.processCertificationData(accessReviewData, reviewerName, campaignName);
+				allCertificationsData = [...allCertificationsData, ...certificationData];
+			}
+			
+			return (allCertificationsData)
+		} catch (error) {
+			console.error('Error:', error);
+		}
+	}
+
+	public  exportToCSV = (data: any[], filePath: string) =>{
+		try {
+			const csv = parse(data); // Convert JSON array to CSV format
+			fs.writeFileSync(`${filePath}.csv`, csv, 'utf8'); // Write CSV to file
+			console.log(`The report for '${filePath}' has been created successfully.`);
+		} catch (error) {
+			console.error('Error exporting data to CSV:', error);
+		}
+	};
+
+	public processCertificationData = (data: AccessReviewItem[], reviewerName: string, campaignName: string) =>{
+		const csvData = data.flatMap(item => {
+			const accessSummary = item.accessSummary;
+			const identitySummary = item.identitySummary;
+			let rows = [];
+	 
+			if (accessSummary && accessSummary.access) {
+				const accessType = accessSummary.access.type;
+	 
+				// Base row with common properties
+				const baseRow: any = {
+					"Campaign Name": campaignName,
+					"Reviewer Name": reviewerName,
+					"Identity Name": identitySummary?.name || '',
+					"Review Completed": identitySummary?.completed || '',
+					"Review Item ID": item.id || '',
+					"Item Review Completed": item.completed || '',
+					"New Access": item.newAccess || '',
+					"Reviewer Decision": item.decision || '',
+					"Reviewer Comments": item.comments || '',
+					"Access Type": accessType || '',
+					"Role Name": accessSummary?.role?.name || '',
+					"Role Description": accessSummary?.role?.description || '',
+					"Access Profile Name": accessSummary?.accessProfile?.name || '',
+					"Access Profile Description": accessSummary?.accessProfile?.description || '',
+					"Access Profile Privileged": accessSummary?.accessProfile?.privileged || '',
+					"Entitlement Name": accessSummary?.entitlement?.name || '',
+					"Entitlement Description": accessSummary?.entitlement?.description || '',
+					"Entitlement Privileged": accessSummary?.entitlement?.privileged || '',
+					"Entitlement Attribute Value": accessSummary?.entitlement?.attributeValue || '',
+					"Entitlement Source Schema Object Type": accessSummary?.entitlement?.sourceSchemaObjectType || '',
+					"Entitlement Source Name": accessSummary?.entitlement?.sourceName || ''
+				};
+	 
+				if (accessType === 'ROLE') {
+					const role = accessSummary.role;
+					if (role) {
+						const roleName = role.name || '';
+						const roleDescription = role.description || '';
+	 
+						// Row for ROLE type
+						const roleRow: any = { ...baseRow };
+						roleRow['Role Name'] = roleName;
+						roleRow['Role Description'] = roleDescription;
+						rows.push(roleRow);
+	 
+						// Process access profiles
+						const accessProfiles = role.accessProfiles || [];
+						accessProfiles.forEach((accessProfile: any) => {
+							const profileRow: any = { ...roleRow };
+							profileRow['Access Profile Name'] = accessProfile.name || '';
+							profileRow['Access Profile Description'] = accessProfile.description || '';
+							profileRow['Access Profile Privileged'] = accessProfile.privileged || '';
+	 
+							// Process entitlements within access profile
+							const entitlements = accessProfile.entitlements || [];
+							entitlements.forEach((entitlement: any) => {
+								const entitlementRow: any = { ...profileRow };
+								entitlementRow['Entitlement Name'] = entitlement.name || '';
+								entitlementRow['Entitlement Description'] = entitlement.description || '';
+								entitlementRow['Entitlement Privileged'] = entitlement.privileged || '';
+								entitlementRow['Entitlement Attribute Value'] = entitlement.attributeValue || '';
+								entitlementRow['Entitlement Source Schema Object Type'] = entitlement.sourceSchemaObjectType || '';
+								entitlementRow['Entitlement Source Name'] = entitlement.sourceName || '';
+								rows.push(entitlementRow);
+							});
+	 
+							rows.push(profileRow);
+						});
+	 
+						// Process role entitlements
+						const roleEntitlements = role.entitlements || [];
+						roleEntitlements.forEach((entitlement: any) => {
+							const entitlementRow: any = { ...roleRow };
+							entitlementRow['Entitlement Name'] = entitlement.name || '';
+							entitlementRow['Entitlement Description'] = entitlement.description || '';
+							entitlementRow['Entitlement Privileged'] = entitlement.privileged || '';
+							entitlementRow['Entitlement Attribute Value'] = entitlement.attributeValue || '';
+							entitlementRow['Entitlement Source Schema Object Type'] = entitlement.sourceSchemaObjectType || '';
+							entitlementRow['Entitlement Source Name'] = entitlement.sourceName || '';
+							rows.push(entitlementRow);
+						});
+					}
+				} else if (accessType === 'ACCESS_PROFILE') {
+					const accessProfile = accessSummary.accessProfile;
+					if (accessProfile) {
+						// Row for ACCESS_PROFILE type
+						const profileRow: any = { ...baseRow };
+						profileRow['Access Profile Name'] = accessProfile.name || '';
+						profileRow['Access Profile Description'] = accessProfile.description || '';
+						profileRow['Access Profile Privileged'] = accessProfile.privileged || '';
+	 
+						// Process entitlements within access profile
+						const entitlements = accessProfile.entitlements || [];
+						entitlements.forEach((entitlement: any) => {
+							const entitlementRow: any = { ...profileRow };
+							entitlementRow['Entitlement Name'] = entitlement.name || '';
+							entitlementRow['Entitlement Description'] = entitlement.description || '';
+							entitlementRow['Entitlement Privileged'] = entitlement.privileged || '';
+							entitlementRow['Entitlement Attribute Value'] = entitlement.attributeValue || '';
+							entitlementRow['Entitlement Source Schema Object Type'] = entitlement.sourceSchemaObjectType || '';
+							entitlementRow['Entitlement Source Name'] = entitlement.sourceName || '';
+							rows.push(entitlementRow);
+						});
+	 
+						rows.push(profileRow);
+					}
+				} else if (accessType === 'ENTITLEMENT') {
+					const entitlement = accessSummary.entitlement;
+					if (entitlement && entitlement.name) { // Check if entitlement name exists
+						// Row for ENTITLEMENT type
+						const entitlementRow: any = { ...baseRow };
+						entitlementRow['Entitlement Name'] = entitlement.name || '';
+						entitlementRow['Entitlement Description'] = entitlement.description || '';
+						entitlementRow['Entitlement Privileged'] = entitlement.privileged || '';
+						entitlementRow['Entitlement Attribute Value'] = entitlement.attributeValue || '';
+						entitlementRow['Entitlement Source Schema Object Type'] = entitlement.sourceSchemaObjectType || '';
+						entitlementRow['Entitlement Source Name'] = entitlement.sourceName || '';
+						rows.push(entitlementRow);
+					}
+				}
+			}
+	 
+			return rows;
+		}).filter(row => row['Entitlement Name']); // Filter out rows where 'Entitlement Name' is empty
+	 
+		return csvData;
+	};
+ 
 
 	//////////////////////////////
 	//#endregion Applications
@@ -1790,4 +2075,13 @@ export class ISCClient {
 	//#endregion Identity Management
 	////////////////////////
 }
+
+export { CertificationsApi, AccessReviewItem, CertificationCampaignFiltersApiFp, Paginator };
+
+	function sleep(seconds: number) {
+		return new Promise(resolve => setTimeout(resolve, seconds * 1000));
+	}
+
+
+
 

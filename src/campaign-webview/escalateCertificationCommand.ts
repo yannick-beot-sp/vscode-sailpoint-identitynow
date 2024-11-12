@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 
 import { CampaignTreeItem } from "../models/ISCTreeItem";
 import { ISCClient } from '../services/ISCClient';
+import { AdminReviewReassignReassignTo, AdminReviewReassignReassignToV2024TypeEnum, CertificationCampaignsApiMoveRequest, Paginator } from 'sailpoint-api-client';
 
 /**
  * Command used to open the campaign panel
@@ -15,9 +16,7 @@ export class EscalateCertificationCommand {
         
         const campaignId = node.id as string;
         const client = new ISCClient(node.tenantId, node.tenantName)
-
-        //TODO 
-        // 1. get identities with remaining access review
-        // 2. forward to manager
+        const getPendingCertifications =  client.processCampaignPendingCertifications(campaignId)
+        const escalatePendingCertification= client.processPendingCertificationsReassignments(await getPendingCertifications,campaignId)
     }
 }
