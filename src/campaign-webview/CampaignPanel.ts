@@ -163,6 +163,24 @@ export class CampaignPanel {
                                 accountsApproved: accumulator.accountsApproved + currentValue.accountsApproved,
                                 accountsRevoked: accumulator.accountsRevoked + currentValue.accountsRevoked,
                             }
+                        },
+                        {
+                            entitlementDecisionsMade: 0,
+                            entitlementsApproved: 0,
+                            entitlementsRevoked: 0,
+                            entitlementDecisionsTotal: 0,
+                            accessProfileDecisionsTotal: 0,
+                            accessProfileDecisionsMade: 0,
+                            accessProfilesApproved: 0,
+                            accessProfilesRevoked: 0,
+                            roleDecisionsMade: 0,
+                            roleDecisionsTotal: 0,
+                            rolesApproved: 0,
+                            rolesRevoked: 0,
+                            accountDecisionsTotal: 0,
+                            accountDecisionsMade: 0,
+                            accountsApproved: 0,
+                            accountsRevoked: 0,
                         }
                     );
 
