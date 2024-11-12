@@ -45,13 +45,14 @@ export class ExportCampaignReportCommand {
             for (const certification of certificationsData) {
                 const certificationId = certification.id as string
                 const reviewerName = certification.reviewer?.name || 'N/A'
+                const reviewerEmail = certification.reviewer.email || 'N/A'
                 const campaignName = certification.campaign?.name as string
 
                 // Call API to get access review items for the certification
                 const accessReviewData = await client.getCertificationsReviewItems(certificationId)
 
                 // Process access review items data
-                const certificationData = this.processAccessReviewItemData(accessReviewData, reviewerName, campaignName);
+                const certificationData = this.processAccessReviewItemData(accessReviewData, reviewerName, reviewerEmail, campaignName);
                 allCertificationsData = [...allCertificationsData, ...certificationData];
             }
 
@@ -61,7 +62,7 @@ export class ExportCampaignReportCommand {
         }
     }
 
-    processAccessReviewItemData = (data: AccessReviewItem[], reviewerName: string, campaignName: string) => {
+    processAccessReviewItemData = (data: AccessReviewItem[], reviewerName: string, reviewerEmail: string ,campaignName: string) => {
         const csvData = data.flatMap(item => {
             const accessSummary = item.accessSummary;
             const identitySummary = item.identitySummary;
@@ -74,6 +75,7 @@ export class ExportCampaignReportCommand {
                 const baseRow: any = {
                     "Campaign Name": campaignName,
                     "Reviewer Name": reviewerName,
+                    "Reviewer Email": reviewerEmail,
                     "Identity Name": identitySummary?.name || '',
                     "Review Completed": identitySummary?.completed || '',
                     "Review Item ID": item.id || '',
