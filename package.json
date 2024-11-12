@@ -572,19 +572,19 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.campaigns.panel",
-        "title": "View dashboard..."
+        "title": "View dashboard"
       },
       {
         "command": "vscode-sailpoint-identitynow.campaigns.export.report",
-        "title": "Export report..."
+        "title": "Export detailed campaign status report"
       },
       {
-        "command": "vscode-sailpoint-identitynow.campaigns.escalate",
-        "title": "Escalate remaining reviews..."
+        "command": "vscode-sailpoint-identitynow.campaigns.reassign.owners",
+        "title": "Reassign to access owners"
       },
       {
-        "command": "vscode-sailpoint-identitynow.campaigns.reminder.send",
-        "title": "Send reminder..."
+        "command": "vscode-sailpoint-identitynow.campaigns.reassign.custom",
+        "title": "Custom reassignment file..."
       },
       {
         "command": "vscode-sailpoint-identitynow.campaigns.reminder.configure",
@@ -592,12 +592,12 @@
         "icon": "$(gear)"
       },
       {
-        "command": "vscode-sailpoint-identitynow.campaigns.reassign.owners",
-        "title": "Reassign to access owners..."
+        "command": "vscode-sailpoint-identitynow.campaigns.reminder.send",
+        "title": "Send reminders"
       },
       {
-        "command": "vscode-sailpoint-identitynow.campaigns.reassign.custom",
-        "title": "Reassign based on queries..."
+        "command": "vscode-sailpoint-identitynow.campaigns.escalate",
+        "title": "Escalate to managers"
       }
     ],
     "menus": {
@@ -955,11 +955,11 @@
           "when": "never"
         },
         {
-          "command": "vscode-sailpoint-identitynow.campaigns.escalate",
+          "command": "vscode-sailpoint-identitynow.campaigns.reassign.owners",
           "when": "never"
         },
         {
-          "command": "vscode-sailpoint-identitynow.campaigns.reminder.send",
+          "command": "vscode-sailpoint-identitynow.campaigns.reassign.custom",
           "when": "never"
         },
         {
@@ -967,11 +967,11 @@
           "when": "never"
         },
         {
-          "command": "vscode-sailpoint-identitynow.campaigns.reassign.owners",
+          "command": "vscode-sailpoint-identitynow.campaigns.reminder.send",
           "when": "never"
         },
         {
-          "command": "vscode-sailpoint-identitynow.campaigns.reassign.custom",
+          "command": "vscode-sailpoint-identitynow.campaigns.escalate",
           "when": "never"
         }
       ],
@@ -1369,42 +1369,46 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.applications.add.access-profile",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source-app",
-          "group": "inline@0"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source-app"
         },
         {
           "command": "vscode-sailpoint-identitynow.applications.new",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^source-apps/",
-          "group": "inline@0"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^source-apps/"
         },
         {
           "command": "vscode-sailpoint-identitynow.campaigns.panel",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign",
+          "group": "0-campaigns@0"
         },
         {
           "command": "vscode-sailpoint-identitynow.campaigns.export.report",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign"
-        },
-        {
-          "command": "vscode-sailpoint-identitynow.campaigns.escalate",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign"
-        },
-        {
-          "command": "vscode-sailpoint-identitynow.campaigns.reminder.send",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign",
+          "group": "0-campaigns@1"
         },
         {
           "command": "vscode-sailpoint-identitynow.campaigns.reassign.owners",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign",
+          "group": "1-reviewerLogic@0"
         },
         {
           "command": "vscode-sailpoint-identitynow.campaigns.reassign.custom",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign",
+          "group": "1-reviewerLogic@2"
         },
         {
           "command": "vscode-sailpoint-identitynow.campaigns.reminder.configure",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^campaigns/",
-          "group": "inline@1"
+          "group": "2-escalations@0"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.campaigns.reminder.send",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign",
+          "group": "2-escalations@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.campaigns.escalate",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign",
+          "group": "2-escalations@2"
         }
       ],
       "editor/context": [
