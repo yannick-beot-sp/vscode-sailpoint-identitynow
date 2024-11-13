@@ -6,7 +6,7 @@ import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskManagementBetaApi, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, AccountsBetaApi, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, ManagedClustersApi, StandardLevelBeta, CertificationCampaignsApi, CertificationsApi, AdminReviewReassignReassignTo, CertificationCampaignsApiMoveRequest, AdminReviewReassignReassignToV2024TypeEnum, CertificationSummariesApi, IdentityCertDecisionSummary, AccessReviewItem, CertificationCampaignFiltersApiFp, IdentityCertificationDto, WorkflowsApi } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskManagementBetaApi, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, AccountsBetaApi, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, ManagedClustersApi, StandardLevelBeta, CertificationCampaignsApi, CertificationsApi, AdminReviewReassignReassignTo, CertificationCampaignsApiMoveRequest, AdminReviewReassignReassignToV2024TypeEnum, CertificationSummariesApi, IdentityCertDecisionSummary, AccessReviewItem, CertificationCampaignFiltersApiFp, IdentityCertificationDto, GetActiveCampaigns200ResponseInner, ReassignReference, CertificationsApiSubmitReassignCertsAsyncRequest, AdminReviewReassignReassignToTypeEnum, WorkflowsApi } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -17,8 +17,6 @@ import { DEFAULT_ROLES_QUERY_PARAMS } from "../models/Roles";
 import axiosRetry = require("axios-retry");
 import { addQueryParams } from "../utils/UriUtils";
 import { onErrorResponse, onRequest, onResponse } from "./AxiosHandlers";
-import * as fs from 'fs';
-import { parse } from 'json2csv';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const FormData = require('form-data');
@@ -51,9 +49,9 @@ const CONTENT_TYPE_FORM_URLENCODED = "application/x-www-form-urlencoded";
 const CONTENT_TYPE_FORM_DATA = "multipart/form-data";
 const CONTENT_TYPE_FORM_JSON_PATCH = "application/json-patch+json";
 
-
 const DEFAULT_PAGINATION = 250;
-
+const CERTIFICATIONS_REASSIGN_LIMIT = 250;
+const REVIEW_ITEM_REASSIGN_LIMIT = 500;
 
 export interface PaginatedData<T> {
 	data: T[],
@@ -63,8 +61,6 @@ export interface PaginatedData<T> {
 }
 
 export class ISCClient {
-    
-    
 
 	constructor(
 		private readonly tenantId: string,
@@ -183,6 +179,7 @@ export class ISCClient {
 	/////////////////////
 	//#region Sources
 	/////////////////////
+
 	public async pingCluster(sourceId: string): Promise<StatusResponseBeta> {
 		console.log("> pingClusterConnection")
 		const apiConfig = await this.getApiConfiguration()
@@ -395,6 +392,7 @@ export class ISCClient {
 	 * It will return sorted by name list by name
 	 * @returns all transforms of the tenant
 	 */
+
 	public async getTransforms(): Promise<TransformRead[]> {
 		console.log("> getTransforms");
 		const apiConfig = await this.getApiConfiguration();
@@ -433,6 +431,7 @@ export class ISCClient {
 	 * @param path Generic method to get resource
 	 * @returns
 	 */
+
 	public async getResource(path: string): Promise<any> {
 		console.log("> ISCClient.getResource", path);
 		const httpClient = await this.getAxios();
@@ -691,6 +690,7 @@ export class ISCClient {
 	 * cf. https://developer.sailpoint.com/idn/api/beta/sp-config-export
 	 * @returns jobId
 	 */
+
 	public async startExportJob(
 		objectTypes: ExportPayloadBetaIncludeTypesEnum[],
 		objectOptions: {
@@ -1384,6 +1384,12 @@ export class ISCClient {
 		return response;
 	}
 
+	public async getAccessProfileById(id: string): Promise<AccessProfile> {
+		console.log("> getAccessProfileById", id);
+		const accessProfile = await this.getAccessProfileById(id)
+		return accessProfile;
+	}
+
 	public async getAccessProfileByName(name: string): Promise<AccessProfile> {
 		console.log("> getAccessProfileByName", name);
 		let filters = `name eq "${name}"`;
@@ -1404,6 +1410,13 @@ export class ISCClient {
 	//////////////////////////////
 	//#region Roles
 	//////////////////////////////
+
+	public async getRoleById(id: string): Promise<Role> {
+		console.log("> getRoleById", id);
+		const role = await this.getRoleById(id)
+		console.log("< getRoleById", role);
+		return role;
+	}
 
 	public async getRoleByName(name: string): Promise<Role> {
 		console.log("> getRoleByName", name);
@@ -1524,6 +1537,7 @@ export class ISCClient {
 	//////////////////////////////
 	//region Applications
 	//////////////////////////////
+
 	public async createApplication({ name, description, sourceId }: { name: string; description: string; sourceId: string; }): Promise<any> {
 		return await this.createResource("/beta/source-apps", {
 			name,
@@ -1535,7 +1549,6 @@ export class ISCClient {
 			}
 		})
 	}
-
 
 	public async *getApplications(filters: string | undefined = undefined): AsyncGenerator<any> {
 		console.log("> getApplications");
@@ -1623,6 +1636,7 @@ export class ISCClient {
 	//////////////////////////////
 	//#region Certification Campaigns
 	//////////////////////////////
+
 	public async getPaginatedCampaigns(filters: string, limit?: number, offset?: number, count?: boolean): Promise<AxiosResponse<any[]>> {
 		console.log("> getPaginatedCampaigns", filters, limit, offset);
 
@@ -1642,14 +1656,30 @@ export class ISCClient {
 		return response;
 	}
 
-	public async getCertificationAccessReview(campaignId: string, completed?: boolean): Promise<IdentityCertificationDto[]> {
+	public async getCampaign(campaignId: string): Promise<GetActiveCampaigns200ResponseInner> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new CertificationCampaignsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 
+		const val = await api.getCampaign({ id: campaignId });
+
+		if (val.status !== 200) {
+			throw new Error(`Failed to fetch campaign with ID [${campaignId}]. Status: ${val.status}.`);
+		}
+
+		return val.data;
+	}
+
+	public async getCampaignCertifications(campaignId: string, completed?: boolean): Promise<IdentityCertificationDto[]> {
 		let filters = `campaign.id eq "${campaignId}"`
 		if (completed !== undefined) {
 			filters += ` and completed eq ${completed}`
 		}
+		return this.getCampaignCertificationsByFilter(filters);
+	}
+
+	public async getCampaignCertificationsByFilter(filters: string): Promise<IdentityCertificationDto[]> {
+		const apiConfig = await this.getApiConfiguration();
+		const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 
 		const val = await Paginator.paginate(
 			api,
@@ -1660,10 +1690,49 @@ export class ISCClient {
 			}
 		);
 
-		return val.data
+		if (val.status !== 200) {
+			throw new Error(`Failed to fetch certifications for campaign with filter [${filters}]. Status: ${val.status}.`);
+		}
+
+		return val.data;
 	}
 
-	public async getPaginatedCertificationAccessReview(campaignId: string, offset: number, limit = 250): Promise<PaginatedData<IdentityCertificationDto>> {
+	public async getCertificationReviewItems(certificationId: string, completed?: boolean): Promise<AccessReviewItem[]> {
+		const apiConfig = await this.getApiConfiguration();
+		const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+
+		let filters
+		if (completed !== undefined) {
+			filters = `completed eq ${completed}`
+		}
+
+		const val = await Paginator.paginate(
+			api,
+			api.listIdentityAccessReviewItems,
+			{
+				id: certificationId,
+				filters: filters
+			}
+		);
+
+		if (val.status !== 200) {
+			throw new Error(`Failed to fetch access review items for certification with ID [${certificationId}]. Status: ${val.status}.`);
+		}
+
+		return val.data;
+	}
+
+	public async getCampaignReviewItems(campaignId: string): Promise<AccessReviewItem[]> {
+		let allAccessReviewItems: AccessReviewItem[] = []
+		const certifications = await this.getCampaignCertifications(campaignId, false)
+		for (const certification of certifications) {
+			const accessReviewItems = await this.getCertificationReviewItems(certification.id)
+			allAccessReviewItems = [...allAccessReviewItems, ...accessReviewItems]
+		}
+		return allAccessReviewItems
+	}
+
+	public async getPaginatedCampaignCertifications(campaignId: string, offset: number, limit = 250): Promise<PaginatedData<IdentityCertificationDto>> {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		let filters = `campaign.id eq "${campaignId}"`
@@ -1673,7 +1742,7 @@ export class ISCClient {
 			limit,
 			count: true,
 			sorters: "name"
-			
+
 		})
 
 		return {
@@ -1690,18 +1759,46 @@ export class ISCClient {
 		const resp = await api.getIdentityDecisionSummary({ id: certificationId })
 		return resp.data
 	}
-	public async  submitManagerReassignWithRetry(requestParameters: CertificationCampaignsApiMoveRequest) {
-		const REASSIGN_LIMIT = 250;
-        const MAX_RETRIES = 10;
-        const INITIAL_WAIT_TIME = 5; // seconds
+
+	public async processCampaignReviewerReassignments(campaignId: string, campaignReassignments: Map<string, string[]>, reassignReason: string) {
+		const reviewerIds = campaignReassignments.keys()
+		for (const reviewerId of reviewerIds) {
+			await this.processReviewerReassignments(campaignId, reviewerId, campaignReassignments.get(reviewerId), reassignReason)
+		}
+	}
+
+	public async processReviewerReassignments(campaignId: string, reviewerId: string, allCertificationIds: string[], reassignReason: string) {
+		const newReviewer: AdminReviewReassignReassignTo = {
+			id: reviewerId,
+			type: AdminReviewReassignReassignToTypeEnum.Identity
+		}
+
+		while (allCertificationIds.length > 0) {
+			// Split the reassign references to not exceed the API limit
+			const certificationIds = allCertificationIds.splice(0, CERTIFICATIONS_REASSIGN_LIMIT);
+			const certificationMoveRequest: CertificationCampaignsApiMoveRequest = {
+				id: campaignId,
+				adminReviewReassign: {
+					certificationIds: certificationIds,
+					reassignTo: newReviewer,
+					reason: reassignReason
+				}
+			}
+			await this.processReviewerReassignmentWithRetry(certificationMoveRequest)
+		}
+	}
+
+	public async processReviewerReassignmentWithRetry(certificationMoveRequest: CertificationCampaignsApiMoveRequest) {
+		const MAX_RETRIES = 10;
+		const INITIAL_WAIT_TIME = 5; // seconds
 		let attempts = 0;
 		let waitTime = INITIAL_WAIT_TIME;
 		const apiConfig = await this.getApiConfiguration();
 		const campaignApi = new CertificationCampaignsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
-		
+
 		while (attempts < MAX_RETRIES) {
 			try {
-				await campaignApi.move(requestParameters);
+				await campaignApi.move(certificationMoveRequest);
 				return; // Success, exit the loop
 			} catch (error: any) {
 				if (error.response?.status === 429) { // Rate limit error
@@ -1709,269 +1806,67 @@ export class ISCClient {
 					sleep(retryAfter);
 					waitTime *= 2; // Exponential backoff
 				} else {
-					const errorMessage = (error instanceof Error) ? error.message : 'Unknown error occurred';
+					const errorMessage = (error instanceof Error) ? error.message : error.toString();
+					console.error(errorMessage);
 					break;
 				}
 			}
 			attempts += 1;
 		}
 	}
-	public async processCampaignPendingCertifications(campaignId: string) {
-		try {
-			const apiConfig = await this.getApiConfiguration();
-			const campaignApi = new CertificationCampaignsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
-			const certificationsApi= new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
-			const campaign = await campaignApi.getCampaign({ id:campaignId });
-			if (campaign.data.status === "COMPLETED") {
-				console.log(`Campaign ${campaignId} is completed. Exiting script.`);
-				return;
-			}
-			const certifications = await Paginator.paginate(certificationsApi, certificationsApi.listIdentityCertifications, { filters: `campaign.id eq "${campaignId}" and completed eq false` }, 249);
-			if (!certifications?.data) {
-				console.log(`No certifications found for Campaign ID: ${campaignId}`);
-				return;
-			}
-	
-			return(certifications.data);	
 
-		}
-		catch (error) {
-			const errorMessage = (error instanceof Error) ? error.message : 'Unknown error occurred';
-			console.log(`Error processing campaign with ID ${campaignId}: ${errorMessage}`);
+	public async processCampaignReviewItemReassignments(certificationId: string, certificationReassignments: Map<string, ReassignReference[]>, reassignReason: string) {
+		const reviewerIds = certificationReassignments.keys()
+		for (const reviewerId of reviewerIds) {
+			await this.processReviewItemReassignments(certificationId, reviewerId, certificationReassignments.get(reviewerId), reassignReason)
 		}
 	}
 
+	public async processReviewItemReassignments(certificationId: string, reviewerId: string, allReassignReferences: ReassignReference[], reassignReason: string) {
+		while (allReassignReferences.length > 0) {
+			// Split the reassign references to not exceed the API limit
+			const reassignReferences = allReassignReferences.splice(0, REVIEW_ITEM_REASSIGN_LIMIT);
+			const certificationReassignRequest: CertificationsApiSubmitReassignCertsAsyncRequest = {
+				id: certificationId,
+				reviewReassign: {
+					reassign: reassignReferences,
+					reassignTo: reviewerId,
+					reason: reassignReason
+				}
+			}
+			await this.processReviewItemReassignmentWithRetry(certificationReassignRequest)
+		}
+	}
 
-	public async  processPendingCertificationsReassignmentsToManagers(certifications: any[], campaignId: string) {
-		const certificationReviewerManager: { [key: string]: string[] } = {};
-		const apiConfig = await this.getApiConfiguration();
-		const identitiesApi = new PublicIdentitiesApi(apiConfig, undefined, this.getAxiosWithInterceptors())
-		const REASSIGN_LIMIT = 250;
+	public async processReviewItemReassignmentWithRetry(certificationReassignRequest: CertificationsApiSubmitReassignCertsAsyncRequest) {
 		const MAX_RETRIES = 10;
 		const INITIAL_WAIT_TIME = 5; // seconds
 		let attempts = 0;
 		let waitTime = INITIAL_WAIT_TIME;
-		for (const pendingCertification of certifications) {
-			const reviewerId = pendingCertification.reviewer?.id;
-			if (reviewerId) {
-				const reviewerData = await identitiesApi.getPublicIdentities({ filters: `id eq "${reviewerId}"` });
-				const reviewerManagerId = reviewerData?.data[0].manager?.id
-				if (reviewerManagerId) {
-					if (!certificationReviewerManager[reviewerManagerId]) {
-						certificationReviewerManager[reviewerManagerId] = [];
-					}
-					certificationReviewerManager[reviewerManagerId].push(pendingCertification.id);
+		const apiConfig = await this.getApiConfiguration();
+		const certificationsApi = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+
+		while (attempts < MAX_RETRIES) {
+			try {
+				await certificationsApi.submitReassignCertsAsync(certificationReassignRequest)
+				return // Success, exit the loop
+			} catch (error: any) {
+				if (error.response?.status === 429) { // Rate limit error
+					const retryAfter = parseInt(error.response.headers['retry-after'] || String(waitTime), 10);
+					sleep(retryAfter);
+					waitTime *= 2; // Exponential backoff
+				} else {
+					const errorMessage = (error instanceof Error) ? error.message : error.toString();
+					console.error(errorMessage);
+					break;
 				}
 			}
-		}
-
-		for (const [managerId, pendingCertificationIds] of Object.entries(certificationReviewerManager)) {
-
-			while (pendingCertificationIds.length > 0) {
-				const certificationList = pendingCertificationIds.splice(0, REASSIGN_LIMIT);
-				const reassignTo: AdminReviewReassignReassignTo = { id: managerId, type: AdminReviewReassignReassignToV2024TypeEnum.Identity };
-
-				const requestParameters: CertificationCampaignsApiMoveRequest = {
-					id: campaignId,
-					adminReviewReassign: {
-						certificationIds: certificationList,
-						reassignTo,
-						reason: "Escalated to Reviewer's Manager",
-					}
-				};
-
-				this.submitManagerReassignWithRetry(requestParameters);
-				sleep(INITIAL_WAIT_TIME);
-			}
+			attempts += 1;
 		}
 	}
-
-
-	public async getCertificationItems(campaignId: string) {	
-		try {
-			// Initialize configuration
-			const apiConfig = await this.getApiConfiguration();
-	
-			// Initialize CertificationsApi
-			const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-	
-			// Call API to get certification IDs and reviewer names for the campaign
-			const certificationsResponse = await Paginator.paginate(api,api.listIdentityCertifications,{ filters: `campaign.id eq "${campaignId}"` },249)
-	
-			if (certificationsResponse.status !== 200) {
-				throw new Error(`Failed to fetch certifications for campaign with ID ${campaignId}. Status: ${certificationsResponse.status}`);
-			}
-	
-			const certificationsData = certificationsResponse.data;
-			let allCertificationsData: any[] = [];
-	
-			for (const certification of certificationsData) {
-				const certificationId = certification.id as string
-				const reviewerName = certification.reviewer?.name || 'N/A'
-				const campaignName = certification.campaign?.name as string
-	
-				// Call API to get access review items for the certification
-				const accessReviewResponse = await Paginator.paginate(api,api.listIdentityAccessReviewItems,{ id: certificationId },249)
-	
-				if (accessReviewResponse.status !== 200) {
-					throw new Error(`Failed to fetch access review items for certification with ID ${certificationId}. Status: ${accessReviewResponse.status}`);
-				}
-	
-				const accessReviewData = accessReviewResponse.data;
-	
-				// Process access review items data
-				const certificationData = this.processCertificationData(accessReviewData, reviewerName, campaignName);
-				allCertificationsData = [...allCertificationsData, ...certificationData];
-			}
-			
-			return (allCertificationsData)
-		} catch (error) {
-			console.error('Error:', error);
-		}
-	}
-
-	public  exportToCSV = (data: any[], filePath: string) =>{
-		try {
-			const csv = parse(data); // Convert JSON array to CSV format
-			fs.writeFileSync(`${filePath}.csv`, csv, 'utf8'); // Write CSV to file
-			console.log(`The report for '${filePath}' has been created successfully.`);
-		} catch (error) {
-			console.error('Error exporting data to CSV:', error);
-		}
-	};
-
-	public processCertificationData = (data: AccessReviewItem[], reviewerName: string, campaignName: string) =>{
-		const csvData = data.flatMap(item => {
-			const accessSummary = item.accessSummary;
-			const identitySummary = item.identitySummary;
-			let rows = [];
-	 
-			if (accessSummary && accessSummary.access) {
-				const accessType = accessSummary.access.type;
-	 
-				// Base row with common properties
-				const baseRow: any = {
-					"Campaign Name": campaignName,
-					"Reviewer Name": reviewerName,
-					"Identity Name": identitySummary?.name || '',
-					"Review Completed": identitySummary?.completed || '',
-					"Review Item ID": item.id || '',
-					"Item Review Completed": item.completed || '',
-					"New Access": item.newAccess || '',
-					"Reviewer Decision": item.decision || '',
-					"Reviewer Comments": item.comments || '',
-					"Access Type": accessType || '',
-					"Role Name": accessSummary?.role?.name || '',
-					"Role Description": accessSummary?.role?.description || '',
-					"Access Profile Name": accessSummary?.accessProfile?.name || '',
-					"Access Profile Description": accessSummary?.accessProfile?.description || '',
-					"Access Profile Privileged": accessSummary?.accessProfile?.privileged || '',
-					"Entitlement Name": accessSummary?.entitlement?.name || '',
-					"Entitlement Description": accessSummary?.entitlement?.description || '',
-					"Entitlement Privileged": accessSummary?.entitlement?.privileged || '',
-					"Entitlement Attribute Value": accessSummary?.entitlement?.attributeValue || '',
-					"Entitlement Source Schema Object Type": accessSummary?.entitlement?.sourceSchemaObjectType || '',
-					"Entitlement Source Name": accessSummary?.entitlement?.sourceName || ''
-				};
-	 
-				if (accessType === 'ROLE') {
-					const role = accessSummary.role;
-					if (role) {
-						const roleName = role.name || '';
-						const roleDescription = role.description || '';
-	 
-						// Row for ROLE type
-						const roleRow: any = { ...baseRow };
-						roleRow['Role Name'] = roleName;
-						roleRow['Role Description'] = roleDescription;
-						rows.push(roleRow);
-	 
-						// Process access profiles
-						const accessProfiles = role.accessProfiles || [];
-						accessProfiles.forEach((accessProfile: any) => {
-							const profileRow: any = { ...roleRow };
-							profileRow['Access Profile Name'] = accessProfile.name || '';
-							profileRow['Access Profile Description'] = accessProfile.description || '';
-							profileRow['Access Profile Privileged'] = accessProfile.privileged || '';
-	 
-							// Process entitlements within access profile
-							const entitlements = accessProfile.entitlements || [];
-							entitlements.forEach((entitlement: any) => {
-								const entitlementRow: any = { ...profileRow };
-								entitlementRow['Entitlement Name'] = entitlement.name || '';
-								entitlementRow['Entitlement Description'] = entitlement.description || '';
-								entitlementRow['Entitlement Privileged'] = entitlement.privileged || '';
-								entitlementRow['Entitlement Attribute Value'] = entitlement.attributeValue || '';
-								entitlementRow['Entitlement Source Schema Object Type'] = entitlement.sourceSchemaObjectType || '';
-								entitlementRow['Entitlement Source Name'] = entitlement.sourceName || '';
-								rows.push(entitlementRow);
-							});
-	 
-							rows.push(profileRow);
-						});
-	 
-						// Process role entitlements
-						const roleEntitlements = role.entitlements || [];
-						roleEntitlements.forEach((entitlement: any) => {
-							const entitlementRow: any = { ...roleRow };
-							entitlementRow['Entitlement Name'] = entitlement.name || '';
-							entitlementRow['Entitlement Description'] = entitlement.description || '';
-							entitlementRow['Entitlement Privileged'] = entitlement.privileged || '';
-							entitlementRow['Entitlement Attribute Value'] = entitlement.attributeValue || '';
-							entitlementRow['Entitlement Source Schema Object Type'] = entitlement.sourceSchemaObjectType || '';
-							entitlementRow['Entitlement Source Name'] = entitlement.sourceName || '';
-							rows.push(entitlementRow);
-						});
-					}
-				} else if (accessType === 'ACCESS_PROFILE') {
-					const accessProfile = accessSummary.accessProfile;
-					if (accessProfile) {
-						// Row for ACCESS_PROFILE type
-						const profileRow: any = { ...baseRow };
-						profileRow['Access Profile Name'] = accessProfile.name || '';
-						profileRow['Access Profile Description'] = accessProfile.description || '';
-						profileRow['Access Profile Privileged'] = accessProfile.privileged || '';
-	 
-						// Process entitlements within access profile
-						const entitlements = accessProfile.entitlements || [];
-						entitlements.forEach((entitlement: any) => {
-							const entitlementRow: any = { ...profileRow };
-							entitlementRow['Entitlement Name'] = entitlement.name || '';
-							entitlementRow['Entitlement Description'] = entitlement.description || '';
-							entitlementRow['Entitlement Privileged'] = entitlement.privileged || '';
-							entitlementRow['Entitlement Attribute Value'] = entitlement.attributeValue || '';
-							entitlementRow['Entitlement Source Schema Object Type'] = entitlement.sourceSchemaObjectType || '';
-							entitlementRow['Entitlement Source Name'] = entitlement.sourceName || '';
-							rows.push(entitlementRow);
-						});
-	 
-						rows.push(profileRow);
-					}
-				} else if (accessType === 'ENTITLEMENT') {
-					const entitlement = accessSummary.entitlement;
-					if (entitlement && entitlement.name) { // Check if entitlement name exists
-						// Row for ENTITLEMENT type
-						const entitlementRow: any = { ...baseRow };
-						entitlementRow['Entitlement Name'] = entitlement.name || '';
-						entitlementRow['Entitlement Description'] = entitlement.description || '';
-						entitlementRow['Entitlement Privileged'] = entitlement.privileged || '';
-						entitlementRow['Entitlement Attribute Value'] = entitlement.attributeValue || '';
-						entitlementRow['Entitlement Source Schema Object Type'] = entitlement.sourceSchemaObjectType || '';
-						entitlementRow['Entitlement Source Name'] = entitlement.sourceName || '';
-						rows.push(entitlementRow);
-					}
-				}
-			}
-	 
-			return rows;
-		}).filter(row => row['Entitlement Name']); // Filter out rows where 'Entitlement Name' is empty
-	 
-		return csvData;
-	};
- 
 
 	//////////////////////////////
-	//#endregion Applications
+	//#endregion Certification Campaigns
 	//////////////////////////////
 
 	/////////////////////////
@@ -2000,6 +1895,7 @@ export class ISCClient {
 		const result = await Paginator.paginate(api, api.listSegments);
 		return result.data;
 	}
+
 	/////////////////////////
 	//#endregion Segments
 	/////////////////////////
@@ -2137,9 +2033,9 @@ export class ISCClient {
 
 export { CertificationsApi, AccessReviewItem, CertificationCampaignFiltersApiFp, Paginator };
 
-	function sleep(seconds: number) {
-		return new Promise(resolve => setTimeout(resolve, seconds * 1000));
-	}
+function sleep(seconds: number) {
+	return new Promise(resolve => setTimeout(resolve, seconds * 1000));
+}
 
 
 

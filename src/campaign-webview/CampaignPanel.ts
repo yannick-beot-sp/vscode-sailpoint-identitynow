@@ -114,7 +114,7 @@ export class CampaignPanel {
             switch (command) {
                 case commands.GET_KPIS_AND_REVIEWERS:
 
-                    const allreviews = await client.getCertificationAccessReview(this.campaignId)
+                    const allreviews = await client.getCampaignCertifications(this.campaignId)
                     const totals = allreviews.reduce(
                         (accumulator, currentValue) => {
                             return {
@@ -190,7 +190,7 @@ export class CampaignPanel {
 
                 case commands.GET_PAGINATED_REVIEWERS:
                     const { currentPage, pageSize } = payload as FetchOptions
-                    const response = await client.getPaginatedCertificationAccessReview(this.campaignId, currentPage * pageSize, pageSize)
+                    const response = await client.getPaginatedCampaignCertifications(this.campaignId, currentPage * pageSize, pageSize)
                     const reviewers = response.data.map(r => {
                         return {
                             id: r.id,

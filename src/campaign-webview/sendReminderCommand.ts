@@ -33,7 +33,7 @@ export class SendReminderCommand {
         const client = new ISCClient(node.tenantId, node.tenantName)
 
         // 1. get identities with remaining access review
-        const reviewers = await client.getCertificationAccessReview(campaignId, false)
+        const reviewers = await client.getCampaignCertifications(campaignId, false)
 
         // 2. call workflow to send mail
         const sender = new BulkSendReminder(
