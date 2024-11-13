@@ -1,10 +1,15 @@
 import * as vscode from 'vscode';
 import * as commands from './app/src/services/Commands';
+import * as extensionCommands from "../commands/constants";
 import { ISCClient } from '../services/ISCClient';
-import { reverse } from 'lodash';
-import { IdentityCertDecisionSummary } from 'sailpoint-api-client';
 import { FetchOptions, PaginatedData } from './app/src/lib/datatable/Model';
 import { Reviewer } from './app/src/services/Client';
+import { KPIsAndReviewersQuery } from './KPIsAndReviewersQuery';
+import { BulkSendReminder } from './BulkSendReminder';
+import { CampaignConfigurationService } from '../services/CampaignConfigurationService';
+import { CampaignsTreeItem } from '../models/ISCTreeItem';
+import { BulkCampaignReassignment } from './BulkCampaignReassignment';
+
 function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
     return {
         // Enable javascript in the webview
@@ -35,7 +40,13 @@ export class CampaignPanel {
     private _disposables: vscode.Disposable[] = [];
 
 
-    public static createOrShow(extensionUri: vscode.Uri, tenantId: string, tenantName: string, campaignId: string, campaignName: string, campaignStatus: string) {
+    public static createOrShow(extensionUri: vscode.Uri,
+        tenantId: string,
+        tenantName: string,
+        campaignId: string,
+        campaignName: string,
+        campaignStatus: string,
+        campaignService: CampaignConfigurationService) {
         const column = vscode.window.activeTextEditor
             ? vscode.window.activeTextEditor.viewColumn
             : undefined;
@@ -51,10 +62,18 @@ export class CampaignPanel {
             CampaignPanel.viewType,
             campaignName,
             column || vscode.ViewColumn.One,
-            getWebviewOptions(extensionUri),
+            getWebviewOptions(extensionUri)
         );
 
-        CampaignPanel.currentPanels[campaignId] = new CampaignPanel(panel, extensionUri, tenantId, tenantName, campaignId, campaignName, campaignStatus);
+        CampaignPanel.currentPanels[campaignId] = new CampaignPanel(
+            panel,
+            extensionUri,
+            tenantId,
+            tenantName,
+            campaignId,
+            campaignName,
+            campaignStatus,
+            campaignService);
     }
 
     public dispose() {
@@ -81,13 +100,16 @@ export class CampaignPanel {
     public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
         CatCodingPanel.currentPanel = new CatCodingPanel(panel, extensionUri);
     }*/
+
+
     private constructor(panel: vscode.WebviewPanel,
         extensionUri: vscode.Uri,
         private tenantId: string,
         private tenantName: string,
         private campaignId: string,
         private campaignName: string,
-        private campaignStatus: string) {
+        private campaignStatus: string,
+        private campaignService: CampaignConfigurationService) {
         this._panel = panel;
         this._extensionUri = extensionUri;
 
@@ -113,79 +135,9 @@ export class CampaignPanel {
             const { command, requestId, payload } = message;
             switch (command) {
                 case commands.GET_KPIS_AND_REVIEWERS:
-
-                    const allreviews = await client.getCampaignCertifications(this.campaignId)
-                    const totals = allreviews.reduce(
-                        (accumulator, currentValue) => {
-                            return {
-                                totalAccessReviews: accumulator.totalAccessReviews + 1,
-                                totalAccessReviewsCompleted: accumulator.totalAccessReviewsCompleted + (currentValue.completed ? 1 : 0),
-                                totalIdentities: accumulator.totalIdentities + currentValue.identitiesTotal,
-                                totalIdentitiesCompleted: accumulator.totalIdentitiesCompleted + currentValue.identitiesCompleted,
-                                totalAccessItems: accumulator.totalAccessItems + currentValue.decisionsTotal,
-                                totalAccessItemsCompleted: accumulator.totalAccessItemsCompleted + currentValue.decisionsMade,
-                            }
-                        },
-                        {
-                            totalAccessReviews: 0,
-                            totalAccessReviewsCompleted: 0,
-                            totalIdentities: 0,
-                            totalIdentitiesCompleted: 0,
-                            totalAccessItems: 0,
-                            totalAccessItemsCompleted: 0,
-
-                        },
-                    );
-
-                    const summaryCertificationDecisions = await Promise.all(
-                        allreviews.map(async (cert): Promise<IdentityCertDecisionSummary> => {
-                            return await client.getSummaryCertificationDecisions(cert.id)
-                        })
-                    )
-
-                    const totalAccessItems = summaryCertificationDecisions.reduce(
-                        (accumulator, currentValue) => {
-                            return {
-                                entitlementDecisionsMade: accumulator.entitlementDecisionsMade + currentValue.entitlementDecisionsMade,
-                                entitlementsApproved: accumulator.entitlementsApproved + currentValue.entitlementsApproved,
-                                entitlementsRevoked: accumulator.entitlementsRevoked + currentValue.entitlementsRevoked,
-                                entitlementDecisionsTotal: accumulator.entitlementDecisionsTotal + currentValue.entitlementDecisionsTotal,
-                                accessProfileDecisionsTotal: accumulator.accessProfileDecisionsTotal + currentValue.accessProfileDecisionsTotal,
-                                accessProfileDecisionsMade: accumulator.accessProfileDecisionsMade + currentValue.accessProfileDecisionsMade,
-                                accessProfilesApproved: accumulator.accessProfilesApproved + currentValue.accessProfilesApproved,
-                                accessProfilesRevoked: accumulator.accessProfilesRevoked + currentValue.accessProfilesRevoked,
-                                roleDecisionsMade: accumulator.roleDecisionsMade + currentValue.roleDecisionsMade,
-                                roleDecisionsTotal: accumulator.roleDecisionsTotal + currentValue.roleDecisionsTotal,
-                                rolesApproved: accumulator.rolesApproved + currentValue.rolesApproved,
-                                rolesRevoked: accumulator.rolesRevoked + currentValue.rolesRevoked,
-                                accountDecisionsTotal: accumulator.accountDecisionsTotal + currentValue.accountDecisionsTotal,
-                                accountDecisionsMade: accumulator.accountDecisionsMade + currentValue.accountDecisionsMade,
-                                accountsApproved: accumulator.accountsApproved + currentValue.accountsApproved,
-                                accountsRevoked: accumulator.accountsRevoked + currentValue.accountsRevoked,
-                            }
-                        },
-                        {
-                            entitlementDecisionsMade: 0,
-                            entitlementsApproved: 0,
-                            entitlementsRevoked: 0,
-                            entitlementDecisionsTotal: 0,
-                            accessProfileDecisionsTotal: 0,
-                            accessProfileDecisionsMade: 0,
-                            accessProfilesApproved: 0,
-                            accessProfilesRevoked: 0,
-                            roleDecisionsMade: 0,
-                            roleDecisionsTotal: 0,
-                            rolesApproved: 0,
-                            rolesRevoked: 0,
-                            accountDecisionsTotal: 0,
-                            accountDecisionsMade: 0,
-                            accountsApproved: 0,
-                            accountsRevoked: 0,
-                        }
-                    );
-
-
-                    this._panel.webview.postMessage({ command, requestId, payload: { totals, totalAccessItems } });
+                    const kpIsAndReviewersQuery = new KPIsAndReviewersQuery(client)
+                    const kpIsAndReviewersQueryResult = await kpIsAndReviewersQuery.execute(this.campaignId)
+                    this._panel.webview.postMessage({ command, requestId, payload: kpIsAndReviewersQueryResult });
                     return;
 
                 case commands.GET_PAGINATED_REVIEWERS:
@@ -193,14 +145,30 @@ export class CampaignPanel {
                     const response = await client.getPaginatedCampaignCertifications(this.campaignId, currentPage * pageSize, pageSize)
                     const reviewers = response.data.map(r => {
                         return {
-                            id: r.id,
+                            ...r,
                             name: r.reviewer.name,
-                            phase: r.phase,
                             email: r.reviewer.email
                         }
                     })
 
                     this._panel.webview.postMessage({ command, requestId, payload: { data: reviewers, count: response.count } as PaginatedData<Reviewer> });
+                    return;
+                case commands.SEND_REMINDERS:
+                    const info = await campaignService.getCertificationCampaignInfo(this.tenantName)
+                    if (info === undefined) {
+                        vscode.window.showWarningMessage("You must configure the workflow to send mails.")
+                        vscode.commands.executeCommand(extensionCommands.CAMPAIGN_CONFIGURE_REMINDER, new CampaignsTreeItem(this.tenantId, this.tenantName, ""));
+                        return
+                    }
+                    const sender = new BulkSendReminder(
+                        info.workflowSendingReminderId,
+                        (await this.campaignService.getWorkflowAccessToken(this.tenantName)),
+                        client)
+                    await sender.call(payload)
+                    return;
+                case commands.ESCALATE_REVIEWERS:
+                    const bulkReassigner = new BulkCampaignReassignment(client)
+                    await bulkReassigner.execute(this.campaignId)
                     return;
             }
         },

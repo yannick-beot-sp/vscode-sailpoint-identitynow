@@ -68,7 +68,6 @@ import { ApplicationNameFilterCommand } from './commands/applications/applicatio
 import { RemoveAccessProfileFromAppCommand } from './commands/applications/removeAccessProfileFromAppCommand';
 import { AddAccessProfileToApplication } from './commands/applications/addAccessProfileToApplication';
 import { NewApplicationCommand } from './commands/applications/newApplicationCommand';
-import { CampaignPanel } from './campaign-webview/CampaignPanel';
 import { OpenCampaignPanelCommand } from './campaign-webview/openCampaignPanelCommand';
 import { ConfigureReminderWorkflowCommand } from './campaign-webview/configureReminderWorkflow';
 import { ExportCampaignReportCommand } from './campaign-webview/exportCampaignReportCommand';
@@ -541,10 +540,7 @@ export function activate(context: vscode.ExtensionContext) {
 			newApplicationCommand.execute, newApplicationCommand));
 
 	// Certification Campaigns
-	const openCampaignPanel = new OpenCampaignPanelCommand(context.extensionUri)
-	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.VIEW_CAMPAIGN_PANEL,
-			openCampaignPanel.execute, openCampaignPanel))
+
 
 	const exportCampaignReportCommand = new ExportCampaignReportCommand()
 	context.subscriptions.push(
@@ -556,7 +552,13 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.ESCALATE_CERTIFICATION,
 			escalateCertificationCommand.execute, escalateCertificationCommand))
 
-	const campaignService = new CampaignConfigurationService(context.secrets, tenantService,)
+	const campaignService = new CampaignConfigurationService(context.secrets, tenantService)
+	const openCampaignPanel = new OpenCampaignPanelCommand(context.extensionUri, campaignService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.VIEW_CAMPAIGN_PANEL,
+			openCampaignPanel.execute, openCampaignPanel))
+
+
 	const configureReminderWorkflow = new ConfigureReminderWorkflowCommand(tenantService, campaignService)
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.CAMPAIGN_CONFIGURE_REMINDER,

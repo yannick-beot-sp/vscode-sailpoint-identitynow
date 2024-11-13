@@ -39,6 +39,7 @@
       onUpdatePage();
     }
   };
+
   const first = (event: Event) => {
     // Prevent default navigation
     event.preventDefault();
@@ -47,12 +48,14 @@
       onUpdatePage();
     }
   };
+
   const last = (event: Event) => {
     // Prevent default navigation
     event.preventDefault();
     currentPage = numberPages - 1;
     onUpdatePage();
   };
+  
   const goto = (page: number, event: Event) => {
     // Prevent default navigation
     event.preventDefault();
@@ -127,6 +130,7 @@
     box-sizing: border-box;
     display: flex;
   }
+
   ul.pagination {
     align-items: center;
     display: flex;
@@ -137,14 +141,6 @@
     align-items: center;
     height: 2rem;
   }
-
-  /* ul.pagination li:first-child {
-    border-top-left-radius: var;
- 
-}
-  ul.pagination li:last-child {
- 
-} */
 
   ul.pagination span.active {
     background-color: var(--vscode-button-background);
@@ -157,6 +153,7 @@
   ul.pagination a:hover {
     background-color: var(--vscode-button-hoverBackground);
   }
+
   ul.pagination a,
   ul.pagination span {
     text-decoration: none;

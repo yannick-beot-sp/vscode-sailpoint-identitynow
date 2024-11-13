@@ -1,6 +1,6 @@
 import type { Client } from "./Client";
 import { MockupClient } from "./MockupClient";
-import { VsCodeClient } from "./VsCodeClient";
+import { VsCodeClient } from "./VsCodeClient.svelte";
 
 export class ClientFactory {
 

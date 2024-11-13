@@ -41,8 +41,8 @@ export interface KPIs {
 }
 
 export interface Client {
-
     getKPIs(): Promise<KPIs>
     getReviewers(fetchOptions: FetchOptions): Promise<PaginatedData<Reviewer>>
-
+    escalateReviewers(r:Reviewer[]): Promise<void>
+    sendReminders(r:Reviewer[]): Promise<void>
 }

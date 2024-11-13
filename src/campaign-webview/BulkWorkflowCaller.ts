@@ -1,5 +1,5 @@
-import { isEmpty } from "lodash";
 import { ISCClient } from "../services/ISCClient";
+import { isEmpty } from "../utils/stringUtils";
 
 export interface BulkResult {
     success: number;
