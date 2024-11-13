@@ -20,6 +20,7 @@
   const actions: Action<Reviewer>[] = [];
   const multiSelectActions: MultiSelectAction<Reviewer>[] = [];
 
+  const onlyActive = (row: Reviewer) => row.phase !== "SIGNED" || (row.identitiesRemaining !== undefined && row.identitiesRemaining > 0);
   if (window.data.campaignStatus !== "COMPLETED") {
     multiSelectActions.push(
       {
@@ -42,12 +43,14 @@
         callback: async (row: Reviewer) => {
           await client.escalateReviewers([row]);
         },
+        condition: onlyActive
       },
       {
         label: "Send Reminder",
         callback: async (row: Reviewer) => {
           await client.sendReminders([row]);
         },
+        condition: onlyActive
       }
     );
   }
@@ -72,6 +75,10 @@
     {
       field: "email",
       label: "Email",
+    },
+    {
+      field: "identitiesRemaining",
+      label: "Reviewers Remaining",
     },
   ];
 

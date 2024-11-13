@@ -15,15 +15,17 @@ export interface Column {
     label: string
 }
 
-export interface Action<T> {
+
+export interface BaseAction<T> {
     label: string,
     id?: string,
-    class?:string,
-    callback: (row: T) => Promise<void>
+    class?: string,
 }
-export interface MultiSelectAction<T> {
-    label: string,
-    id?: string,
-    class?:string,
+export interface Action<T> extends BaseAction<T> {
+    callback: (row: T) => Promise<void>
+    condition?: (row: T) => boolean
+}
+export interface MultiSelectAction<T> extends BaseAction<T> {
+
     callback: (rows: T[]) => Promise<void>
 }
