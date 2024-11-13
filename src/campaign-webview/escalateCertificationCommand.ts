@@ -45,7 +45,7 @@ export class EscalateCertificationCommand {
                 if (reviewerId) {
                     const reviewerData = await client.getPublicIdentityById(reviewerId);
                     const reviewerManagerId = reviewerData.manager?.id
-                    if (reviewerManagerId) {
+                    if (reviewerManagerId && reviewerManagerId !== pendingCertification.reviewer?.id) {
                         let managerCertifications = campaignReassignments.get(reviewerManagerId)
                         if (!managerCertifications) {
                             managerCertifications = [];

@@ -51,7 +51,7 @@ export class ReassignOwnersCommand {
                 for (const pendingReviewItem of pendingReviewItems) {
                     let reviewerId = await this.getAccessItemOwner(client, pendingReviewItem)
                     // There should always be an owner but checking to be sure
-                    if (reviewerId) {
+                    if (reviewerId && reviewerId !== pendingCertification.reviewer?.id) {
                         let ownerReviewItems = campaignReassignments.get(reviewerId)
                         if (!ownerReviewItems) {
                             ownerReviewItems = []
