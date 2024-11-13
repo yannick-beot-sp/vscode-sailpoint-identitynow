@@ -572,11 +572,11 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.campaigns.panel",
-        "title": "View dashboard"
+        "title": "View campaign dashboard"
       },
       {
         "command": "vscode-sailpoint-identitynow.campaigns.export.report",
-        "title": "Export detailed campaign status report"
+        "title": "Export campaign status report"
       },
       {
         "command": "vscode-sailpoint-identitynow.campaigns.reassign.owners",
@@ -584,7 +584,7 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.campaigns.reassign.custom",
-        "title": "Custom reassignment file..."
+        "title": "Reassign using custom logic..."
       },
       {
         "command": "vscode-sailpoint-identitynow.campaigns.reminder.configure",
