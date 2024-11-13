@@ -6,6 +6,9 @@ import { TenantService } from "../services/TenantService";
 import { ISCClient } from '../services/ISCClient';
 import { confirm } from '../utils/vsCodeHelpers';
 import { AccessReviewItem, CampaignStatusEnum, DtoType, ReassignReference, ReassignReferenceTypeEnum } from 'sailpoint-api-client';
+import { BulkReviewItemReassignment } from './BulkReviewItemReassignment';
+
+const OWNER_REVIEW_DEFAULT_COMMENT = "Reassigning to the Access Item Owner"
 
 /**
  * Command used to open the campaign panel
@@ -23,22 +26,16 @@ export class ReassignOwnersCommand {
             return
         }
 
-        const campaignId = node.id as string;
+        const campaignId = node.id as string
         const client = new ISCClient(node.tenantId, node.tenantName)
 
         try {
-            // Ensure the campaign is not completed
-            const campaign = await client.getCampaign(campaignId);
-            if (campaign.status === CampaignStatusEnum.Completed) {
-                console.log(`< ReassignOwnersCommand.execute: Campaign ${campaignId} is completed. Exiting script.`);
-                return;
-            }
+            const bulkManagerEscalator = new BulkReviewItemReassignment(client)
+            const pendingCertifications = await bulkManagerEscalator.getPendingCampaignItems(campaignId)
 
-            // Get all pending campaign certifications (which would be 1:1 with reviewers)
-            const pendingCertifications = await client.getCampaignCertifications(campaignId, false)
             if (!pendingCertifications) {
-                console.log(`< ReassignOwnersCommand.execute: No pending certifications found for Campaign ID: ${campaignId}`);
-                return;
+                vscode.window.showErrorMessage(`No pending certification found for ${node.label}.`)
+                return
             }
 
             // Reassign Review Items API can only be called per Certification
@@ -51,6 +48,7 @@ export class ReassignOwnersCommand {
                 for (const pendingReviewItem of pendingReviewItems) {
                     let reviewerId = await this.getAccessItemOwner(client, pendingReviewItem)
                     // There should always be an owner but checking to be sure
+                    // Skip if owner is already the current reviewer
                     if (reviewerId && reviewerId !== pendingCertification.reviewer?.id) {
                         let ownerReviewItems = campaignReassignments.get(reviewerId)
                         if (!ownerReviewItems) {
@@ -62,7 +60,7 @@ export class ReassignOwnersCommand {
                 }
 
                 // Process reassignments for this Certification
-                await client.processCampaignReviewItemReassignments(pendingCertification.id, campaignReassignments, "Reassigning to the Access Item Owner")
+                await bulkManagerEscalator.execute(pendingCertification, campaignReassignments, OWNER_REVIEW_DEFAULT_COMMENT)
             }
             console.log(`< ReassignOwnersCommand.execute: Finished reassigning access review items to the access owners for campaign ${campaignId}`);
         }

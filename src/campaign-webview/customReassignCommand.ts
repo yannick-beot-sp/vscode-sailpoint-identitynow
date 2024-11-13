@@ -6,15 +6,18 @@ import { TenantService } from "../services/TenantService";
 import { ISCClient } from '../services/ISCClient';
 import { DtoType } from 'sailpoint-api-client';
 import { chooseFile } from '../utils/vsCodeHelpers';
-import { CSVReader } from '../services/CSVReader';
 import { CustomReviewerImporter } from './CustomReviewerImporter';
+
+interface CustomReviewerCoverage {
+    reviewerId: string,
+    itemType: DtoType,
+    itemIds: string[]
+}
 
 /**
  * Command used to open the campaign panel
  */
 export class CustomReassignCommand {
-
-
 
     constructor(private tenantService: TenantService,
         private campaignService: CampaignConfigurationService) {
@@ -35,7 +38,7 @@ export class CustomReassignCommand {
             node.label,
             fileUri
         );
-        await roleImporter.importFileWithProgression();
+        const customReviewerCSVRecords = await roleImporter.readFileWithProgression();
 
         const client = new ISCClient(node.tenantId, node.tenantName)
     }

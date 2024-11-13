@@ -11,12 +11,12 @@ interface CustomReviewerImportResult {
     error: number
 }
 
-interface CustomReviewerRecord {
+interface CustomReviewerCSVRecord {
     reviewerAttribute: string,
     reviewerValue: string,
-    accessType: string,
-    accessSelectorType: string,
-    accessSelector: string
+    itemType: string,
+    itemSelectorType: string,
+    itemSelectorValue: string
 }
 
 export class CustomReviewerImporter {
@@ -45,19 +45,20 @@ export class CustomReviewerImporter {
         }
     }
 
-    async importFileWithProgression(): Promise<void> {
-        await vscode.window.withProgress({
+    async readFileWithProgression(): Promise<CustomReviewerCSVRecord[]> {
+        return await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Importing custom reviewer configuration for campaign ${this.campaignName}...`,
             cancellable: true
-        }, async (task, token) =>
-            await this.importFile(task, token)
+        }, async (task, token): Promise<CustomReviewerCSVRecord[]> => {
+            return await this.readFile(task, token)
+        }
         );
     }
 
-    protected async importFile(task: any, token: vscode.CancellationToken): Promise<void> {
+    protected async readFile(task: any, token: vscode.CancellationToken): Promise<CustomReviewerCSVRecord[]> {
         console.log("> CustomReviewerImporter.importFile");
-        const csvReader = new CSVReader<CustomReviewerRecord>(this.fileUri.fsPath);
+        const csvReader = new CSVReader<CustomReviewerCSVRecord>(this.fileUri.fsPath);
         console.log(`> CustomReviewerImporter.importFile: Importing file from ${this.fileUri.fsPath} for campaign ${this.campaignName}`);
 
         const nbLines = await csvReader.getLines();
@@ -69,10 +70,12 @@ export class CustomReviewerImporter {
         const result: CustomReviewerImportResult = {
             success: 0,
             error: 0
-        };
+        }
+
+        const customReviewerCSVRecords: CustomReviewerCSVRecord[] = []
 
         try {
-            await csvReader.processLine(async (data: CustomReviewerRecord) => {
+            await csvReader.processLine(async (data: CustomReviewerCSVRecord) => {
                 if (token.isCancellationRequested) {
                     throw new UserCancelledError();
                 }
@@ -81,9 +84,10 @@ export class CustomReviewerImporter {
 
                 try {
                     result.success++;
+                    customReviewerCSVRecords.push(data)
                 } catch (error: any) {
                     result.error++;
-                    console.log(`> CustomReviewerImporter.importFile: Unable to process Custom Reviewer line: '${error.message}' in ISC`);
+                    console.log(`> CustomReviewerImporter.importFile: Unable to process Custom Reviewer line: '${error.message}'`);
                 }
             });
         } catch { }
@@ -97,11 +101,7 @@ export class CustomReviewerImporter {
             vscode.window.showInformationMessage(message);
         }
 
-        try {
-            this.logWriter?.end();
-        } catch (_exc) {
-            // do nothing hopefully
-        }
+        return customReviewerCSVRecords
     }
 
     private async writeLog(csvLine: number | string | null, objectName: string, type: CSVLogWriterLogType, message: string) {

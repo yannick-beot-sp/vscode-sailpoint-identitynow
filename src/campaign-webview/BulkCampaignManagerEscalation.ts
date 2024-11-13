@@ -6,7 +6,7 @@ import { ISCClient } from "../services/ISCClient";
 const CERTIFICATIONS_REASSIGN_LIMIT = 250;
 const COMMENT = "Escalating to the Reviewer's Manager"
 
-export class BulkCampaignReassignment {
+export class BulkCampaignManagerEscalation {
     constructor(private readonly client: ISCClient) { }
 
     async execute(campaignId: string) {
@@ -75,7 +75,7 @@ export class BulkCampaignReassignment {
                     reason: reassignReason
                 }
             }
-            await this.client.reassignReviewerCertification(certificationMoveRequest)
+            await this.client.reassignCampaignCertifications(certificationMoveRequest)
         }
     }
 }
