@@ -62,7 +62,7 @@ export class ExportCampaignReportCommand {
         }
     }
 
-    processAccessReviewItemData = (data: AccessReviewItem[], reviewerName: string, reviewerEmail: string ,campaignName: string) => {
+    processAccessReviewItemData(data: AccessReviewItem[], reviewerName: string, reviewerEmail: string, campaignName: string): any[] {
         const csvData = data.flatMap(item => {
             const accessSummary = item.accessSummary;
             const identitySummary = item.identitySummary;
@@ -190,7 +190,7 @@ export class ExportCampaignReportCommand {
                         entitlementRow['Entitlement Source Schema Object Type'] = entitlement.sourceSchemaObjectType || '';
                         entitlementRow['Entitlement Source Name'] = entitlement.sourceName || '';
                         entitlementRow['Entitlement Account Native ID'] = entitlement.account?.nativeIdentity || ''
-                        entitlementRow['Entitlement Account Name'] = entitlement.account?.name || '' 
+                        entitlementRow['Entitlement Account Name'] = entitlement.account?.name || ''
                         rows.push(entitlementRow);
                     }
                 }

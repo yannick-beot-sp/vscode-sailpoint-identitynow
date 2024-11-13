@@ -50,7 +50,8 @@ const CONTENT_TYPE_FORM_DATA = "multipart/form-data";
 const CONTENT_TYPE_FORM_JSON_PATCH = "application/json-patch+json";
 
 const DEFAULT_PAGINATION = 250;
-const CERTIFICATIONS_REASSIGN_LIMIT = 500;
+const CERTIFICATIONS_REASSIGN_LIMIT = 250;
+const REVIEW_ITEM_REASSIGN_LIMIT = 500;
 
 export interface PaginatedData<T> {
 	data: T[],
@@ -1383,6 +1384,12 @@ export class ISCClient {
 		return response;
 	}
 
+	public async getAccessProfileById(id: string): Promise<AccessProfile> {
+		console.log("> getAccessProfileById", id);
+		const accessProfile = await this.getAccessProfileById(id)
+		return accessProfile;
+	}
+
 	public async getAccessProfileByName(name: string): Promise<AccessProfile> {
 		console.log("> getAccessProfileByName", name);
 		let filters = `name eq "${name}"`;
@@ -1403,6 +1410,13 @@ export class ISCClient {
 	//////////////////////////////
 	//#region Roles
 	//////////////////////////////
+
+	public async getRoleById(id: string): Promise<Role> {
+		console.log("> getRoleById", id);
+		const role = await this.getRoleById(id)
+		console.log("< getRoleById", role);
+		return role;
+	}
 
 	public async getRoleByName(name: string): Promise<Role> {
 		console.log("> getRoleByName", name);
@@ -1683,15 +1697,21 @@ export class ISCClient {
 		return val.data;
 	}
 
-	public async getCertificationReviewItems(certificationId: string): Promise<AccessReviewItem[]> {
+	public async getCertificationReviewItems(certificationId: string, completed?: boolean): Promise<AccessReviewItem[]> {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+
+		let filters
+		if (completed !== undefined) {
+			filters = `completed eq ${completed}`
+		}
 
 		const val = await Paginator.paginate(
 			api,
 			api.listIdentityAccessReviewItems,
 			{
-				id: certificationId
+				id: certificationId,
+				filters: filters
 			}
 		);
 
@@ -1768,7 +1788,7 @@ export class ISCClient {
 		}
 	}
 
-	public async processReviewerReassignmentWithRetry(requestParameters: CertificationCampaignsApiMoveRequest) {
+	public async processReviewerReassignmentWithRetry(certificationMoveRequest: CertificationCampaignsApiMoveRequest) {
 		const MAX_RETRIES = 10;
 		const INITIAL_WAIT_TIME = 5; // seconds
 		let attempts = 0;
@@ -1778,7 +1798,7 @@ export class ISCClient {
 
 		while (attempts < MAX_RETRIES) {
 			try {
-				await campaignApi.move(requestParameters);
+				await campaignApi.move(certificationMoveRequest);
 				return; // Success, exit the loop
 			} catch (error: any) {
 				if (error.response?.status === 429) { // Rate limit error
@@ -1786,7 +1806,58 @@ export class ISCClient {
 					sleep(retryAfter);
 					waitTime *= 2; // Exponential backoff
 				} else {
-					const errorMessage = (error instanceof Error) ? error.message : 'Unknown error occurred';
+					const errorMessage = (error instanceof Error) ? error.message : error.toString();
+					console.error(errorMessage);
+					break;
+				}
+			}
+			attempts += 1;
+		}
+	}
+
+	public async processCampaignReviewItemReassignments(certificationId: string, certificationReassignments: Map<string, ReassignReference[]>, reassignReason: string) {
+		const reviewerIds = certificationReassignments.keys()
+		for (const reviewerId of reviewerIds) {
+			await this.processReviewItemReassignments(certificationId, reviewerId, certificationReassignments.get(reviewerId), reassignReason)
+		}
+	}
+
+	public async processReviewItemReassignments(certificationId: string, reviewerId: string, allReassignReferences: ReassignReference[], reassignReason: string) {
+		while (allReassignReferences.length > 0) {
+			// Split the reassign references to not exceed the API limit
+			const reassignReferences = allReassignReferences.splice(0, REVIEW_ITEM_REASSIGN_LIMIT);
+			const certificationReassignRequest: CertificationsApiSubmitReassignCertsAsyncRequest = {
+				id: certificationId,
+				reviewReassign: {
+					reassign: reassignReferences,
+					reassignTo: reviewerId,
+					reason: reassignReason
+				}
+			}
+			await this.processReviewItemReassignmentWithRetry(certificationReassignRequest)
+		}
+	}
+
+	public async processReviewItemReassignmentWithRetry(certificationReassignRequest: CertificationsApiSubmitReassignCertsAsyncRequest) {
+		const MAX_RETRIES = 10;
+		const INITIAL_WAIT_TIME = 5; // seconds
+		let attempts = 0;
+		let waitTime = INITIAL_WAIT_TIME;
+		const apiConfig = await this.getApiConfiguration();
+		const certificationsApi = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+
+		while (attempts < MAX_RETRIES) {
+			try {
+				await certificationsApi.submitReassignCertsAsync(certificationReassignRequest)
+				return // Success, exit the loop
+			} catch (error: any) {
+				if (error.response?.status === 429) { // Rate limit error
+					const retryAfter = parseInt(error.response.headers['retry-after'] || String(waitTime), 10);
+					sleep(retryAfter);
+					waitTime *= 2; // Exponential backoff
+				} else {
+					const errorMessage = (error instanceof Error) ? error.message : error.toString();
+					console.error(errorMessage);
 					break;
 				}
 			}
