@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import RowsPerPage from "./RowsPerPage.svelte";
   import Pagination from "./Pagination.svelte";
+  import Refresh from "./svgs/refresh.svelte";
   import type { FetchOptions, FetchDataCallback, Column, Action, MultiSelectAction } from "./Model";
 
   interface Props {
@@ -74,6 +75,13 @@
         <span>Results: {totalResults}</span>
       </div>
     {/if}
+    <div>
+      <button class="btn" onclick={updateData}
+        ><span>
+          <Refresh />
+        </span>
+      </button>
+    </div>
   </div>
   <table>
     <thead>
@@ -133,16 +141,23 @@
 </div>
 
 <style>
+  .actions {
+    margin-left: auto;
+  }
   tbody button,
-  .actions button {
+  .actions button,
+  .btn {
     color: var(--vscode-button-foreground);
     background-color: var(--vscode-button-background);
     border-radius: 0;
     margin-left: 5px;
+    line-height: 1.5;
+    padding: 4px 10px;
   }
 
   tbody button:hover,
-  .actions button:hover {
+  .actions button:hover,
+  .btn:hover {
     background-color: var(--vscode-button-hoverBackground);
   }
   .footer {
