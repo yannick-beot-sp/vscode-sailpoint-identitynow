@@ -14,3 +14,16 @@ export interface Column {
     field: string,
     label: string
 }
+
+export interface Action<T> {
+    label: string,
+    id?: string,
+    class?:string,
+    callback: (row: T) => Promise<void>
+}
+export interface MultiSelectAction<T> {
+    label: string,
+    id?: string,
+    class?:string,
+    callback: (rows: T[]) => Promise<void>
+}

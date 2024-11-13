@@ -2,20 +2,24 @@
   import { onMount } from "svelte";
   import RowsPerPage from "./RowsPerPage.svelte";
   import Pagination from "./Pagination.svelte";
-  import type { FetchOptions, FetchDataCallback, Column } from "./Model";
+  import type { FetchOptions, FetchDataCallback, Column, Action, MultiSelectAction } from "./Model";
+
+  interface Props {
+    columns: Column[];
+    fetchData: FetchDataCallback;
+    multiSelectActions: MultiSelectAction<any>[];
+    actions: Action<any>[];
+  }
+  let { columns, fetchData, multiSelectActions = [], actions = [] }: Props = $props();
+
   let data: any = $state([]);
   let currentPage = $state(0);
   let pageSize = $state(10);
   let totalResults = $state(0);
   let fetchOptions: FetchOptions = $derived({ currentPage, pageSize });
-
-  interface Props {
-    columns: Column[];
-    fetchData: FetchDataCallback;
-  }
-  let { columns, fetchData }: Props = $props();
-
-  let selectedRows: any[] = [];
+  let selectedRows: any[] = $state([]);
+  let hasSelection: boolean = $derived(selectedRows.length > 0);
+  let selectAll: boolean = $derived(selectedRows.length === data.length);
 
   const handleRowSelect = (row: any) => {
     if (selectedRows.includes(row)) {
@@ -36,6 +40,16 @@
     totalResults = response.count;
   }
 
+  function handleSelectAll() {
+    if (selectAll) {
+      // All rows were selected. Need to unselect all
+      selectedRows = [];
+    } else {
+      // Not all rows selected. Selecting all rows
+      selectedRows = [...data];
+    }
+  }
+
   onMount(async () => {
     await updateData();
   });
@@ -43,17 +57,34 @@
 
 <div class="datatable">
   <div class="header">
-    <div>
-      <span>Results: {totalResults}</span>
-    </div>
+    {#if hasSelection}
+      <div>
+        <span>{selectedRows.length} of {data.length} selected</span>
+      </div>
+      <div class="actions">
+        {#each multiSelectActions as action}
+          <button id={action.id} class={action.class} onclick={() => action.callback(selectedRows)}>
+            {action.label}
+          </button>
+        {/each}
+      </div>
+    {:else}
+      <div>
+        <span>Results: {totalResults}</span>
+      </div>
+    {/if}
   </div>
   <table>
     <thead>
       <tr>
-        <th> <input type="checkbox" /></th>
+        <th> <input type="checkbox" checked={selectAll} onclick={handleSelectAll} /></th>
         {#each columns as column}
           <th>{column.label}</th>
         {/each}
+
+        {#if actions.length > 0}
+          <th>Actions</th>
+        {/if}
       </tr>
     </thead>
     <tbody>
@@ -69,6 +100,15 @@
           {#each columns as column}
             <td>{row[column.field]}</td>
           {/each}
+          {#if actions.length > 0}
+            <td>
+              {#each actions as action}
+                <button id={action.id} class={action.class} onclick={() => action.callback(row)}>
+                  {action.label}
+                </button>
+              {/each}
+            </td>
+          {/if}
         </tr>
       {/each}
     </tbody>
@@ -84,15 +124,26 @@
 </div>
 
 <style>
+
+  tbody button,.actions button {
+    color: var(--vscode-button-foreground);
+    background-color: var(--vscode-button-background);
+    border-radius:0;
+    margin-left: 5px;
+  }
+
+  tbody button:hover,.actions button:hover {
+    background-color: var(--vscode-button-hoverBackground);
+  }
   .footer {
     padding-top: 1rem;
     display: flex;
     align-items: center;
   }
-  .footer .page-size{
+  .footer .page-size {
     font-weight: 700;
   }
-  .footer .pagination{
+  .footer .pagination {
     margin-left: auto;
   }
   .datatable {
@@ -120,8 +171,15 @@
     padding: 0.5rem;
     text-align: left;
     border-bottom: 1px solid var(--vscode-textSeparator-foreground);
-    resize: horizontal; 
-    overflow: auto; 
+    resize: horizontal;
+    overflow: auto;
+  }
+
+  tr:nth-child(odd) td {
+    background-color: var(--vscode-scrollbarSlider-background);
+  }
+  tr:hover td {
+    background-color: var(--vscode-scrollbarSlider-hoverBackground);
   }
 
   th {
@@ -129,6 +187,6 @@
   }
 
   .selected {
-    background-color: #e6f7ff;
+    background-color: var(--vscode-scrollbarSlider-activeBackground);
   }
 </style>

@@ -4,12 +4,33 @@
   import ProgressIndicator from "./lib/ProgressIndicator.svelte";
   import PieCharts from "./lib/PieCharts.svelte";
   import DataTable from "./lib/datatable/DataTable.svelte";
-  import type { Column, FetchDataCallback, FetchOptions, PaginatedData } from "./lib/datatable/Model";
+  import type { Action, Column, FetchDataCallback, FetchOptions, MultiSelectAction, PaginatedData } from "./lib/datatable/Model";
   import { ClientFactory } from "./services/ClientFactory";
   import type { KPIs } from "./services/Client";
+  import type { Reviewer } from "sailpoint-api-client";
 
   let promiseResult = $state<Promise<KPIs>>();
   let client = ClientFactory.getClient();
+
+
+  const actions:Action<Reviewer>[] = [{
+    label: "Test 1",
+    callback: async (row:Reviewer)=>{console.log("[Test 1]",row)}
+  },
+  {
+    label: "Test 2",
+    callback: async (row:Reviewer)=>{console.log("[Test 2]",row)}
+    }
+  ]
+  const multiSelectActions:MultiSelectAction<Reviewer>[] = [{
+    label: "Test 1",
+    callback: async (rows:Reviewer[])=>{console.log("[Test 1]",rows)}
+  },
+  {
+    label: "Test 2",
+    callback: async (rows:Reviewer[])=>{console.log("[Test 2]",rows)}
+    }
+  ]
 
   onMount(async () => {
     promiseResult = client.getKPIs();
@@ -65,7 +86,7 @@
     </section>
     <section id="reviewers">
       <h2>Campaign Reviewers</h2>
-      <DataTable columns={reviewerColumns} {fetchData} />
+      <DataTable columns={reviewerColumns} {fetchData} {actions} {multiSelectActions}/>
     </section>
   {/await}
 </main>
