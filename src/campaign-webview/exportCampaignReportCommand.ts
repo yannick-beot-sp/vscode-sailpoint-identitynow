@@ -49,7 +49,7 @@ export class ExportCampaignReportCommand {
                 const campaignName = certification.campaign?.name as string
 
                 // Call API to get access review items for the certification
-                const accessReviewData = await client.getCertificationsReviewItems(certificationId)
+                const accessReviewData = await client.getCertificationReviewItems(certificationId)
 
                 // Process access review items data
                 const certificationData = this.processAccessReviewItemData(accessReviewData, reviewerName, reviewerEmail, campaignName);

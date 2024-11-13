@@ -25,7 +25,7 @@ export class EscalateCertificationCommand {
             }
 
             // Get all pending campaign certifications (which would be 1:1 with reviewers)
-            const pendingCertifications = await client.getCampaignCertificationsByFilter(`campaign.id eq "${campaignId}" and completed eq false`)
+            const pendingCertifications = await client.getCampaignCertifications(campaignId, false)
             if (!pendingCertifications) {
                 console.log(`No pending certifications found for Campaign ID: ${campaignId}`);
                 return;

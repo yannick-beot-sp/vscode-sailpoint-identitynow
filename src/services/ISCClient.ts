@@ -1683,7 +1683,7 @@ export class ISCClient {
 		return val.data;
 	}
 
-	public async getCertificationsReviewItems(certificationId: string): Promise<AccessReviewItem[]> {
+	public async getCertificationReviewItems(certificationId: string): Promise<AccessReviewItem[]> {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 
@@ -1700,6 +1700,16 @@ export class ISCClient {
 		}
 
 		return val.data;
+	}
+
+	public async getCampaignReviewItems(campaignId: string): Promise<AccessReviewItem[]> {
+		let allAccessReviewItems: AccessReviewItem[] = []
+		const certifications = await this.getCampaignCertifications(campaignId, false)
+		for (const certification of certifications) {
+			const accessReviewItems = await this.getCertificationReviewItems(certification.id)
+			allAccessReviewItems = [...allAccessReviewItems, ...accessReviewItems]
+		}
+		return allAccessReviewItems
 	}
 
 	public async getPaginatedCampaignCertifications(campaignId: string, offset: number, limit = 250): Promise<PaginatedData<IdentityCertificationDto>> {

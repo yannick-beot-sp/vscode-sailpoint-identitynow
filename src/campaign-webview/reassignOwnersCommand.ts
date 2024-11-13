@@ -23,9 +23,8 @@ export class ReassignOwnersCommand {
         }
         const campaignId = node.id as string;
         const client = new ISCClient(node.tenantId, node.tenantName)
-        //TODO 
-        // 1. get all open access items
-        // 2. get owners for each
-        // 3. reassign item (Bulk?)
+
+        // Get all access review items
+        const allAccessReviewItems = await client.getCampaignReviewItems(campaignId)
     }
 }
