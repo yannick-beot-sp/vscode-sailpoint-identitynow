@@ -8,7 +8,7 @@ import { KPIsAndReviewersQuery } from './KPIsAndReviewersQuery';
 import { BulkSendReminder } from './BulkSendReminder';
 import { CampaignConfigurationService } from '../services/CampaignConfigurationService';
 import { CampaignsTreeItem } from '../models/ISCTreeItem';
-import { BulkCampaignReassignment } from './BulkCampaignReassignment';
+import { BulkCampaignManagerEscalation } from './BulkCampaignManagerEscalation';
 
 function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
     return {
@@ -168,8 +168,8 @@ export class CampaignPanel {
                     await sender.call(payload)
                     return;
                 case commands.ESCALATE_REVIEWERS:
-                    const bulkReassigner = new BulkCampaignReassignment(client)
-                    await bulkReassigner.execute(this.campaignId)
+                    const bulkManagerEscalator = new BulkCampaignManagerEscalation(client)
+                    await bulkManagerEscalator.execute(this.campaignId)
                     return;
             }
         },

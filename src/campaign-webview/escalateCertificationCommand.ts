@@ -2,9 +2,8 @@ import * as vscode from 'vscode';
 
 import { CampaignTreeItem } from "../models/ISCTreeItem";
 import { ISCClient } from '../services/ISCClient';
-import { CampaignStatusEnum } from 'sailpoint-api-client';
 import { confirm } from '../utils/vsCodeHelpers';
-import { BulkCampaignReassignment } from './BulkCampaignReassignment';
+import { BulkCampaignManagerEscalation } from './BulkCampaignManagerEscalation';
 
 /**
  * Command used to open the campaign panel
@@ -25,8 +24,8 @@ export class EscalateCertificationCommand {
         const client = new ISCClient(node.tenantId, node.tenantName)
 
         try {
-            const bulkReassigner = new BulkCampaignReassignment(client)
-            bulkReassigner.execute(campaignId)
+            const bulkManagerEscalator = new BulkCampaignManagerEscalation(client)
+            bulkManagerEscalator.execute(campaignId)
         }
         catch (error) {
             const errorMessage = (error instanceof Error) ? error.message : error.toString();

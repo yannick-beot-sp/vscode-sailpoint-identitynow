@@ -6,7 +6,7 @@ import { ISCClient } from "../services/ISCClient";
 const CERTIFICATIONS_REASSIGN_LIMIT = 250;
 const COMMENT = "Escalating to the Reviewer's Manager"
 
-export class BulkCampaignReassignment {
+export class BulkCampaignManagerEscalation {
     constructor(private readonly client: ISCClient) { }
 
     async execute(campaignId: string) {
@@ -14,7 +14,7 @@ export class BulkCampaignReassignment {
 
         // Ensure the campaign is not completed
         if (campaign.status === CampaignStatusEnum.Completed) {
-            console.log(`< EscalateCertificationCommand.execute: Campaign ${campaignId} is completed. Exiting script.`);
+            console.log(`< BulkCampaignManagerEscalation.execute: Campaign ${campaignId} is completed. Exiting script.`);
             vscode.window.showWarningMessage(`Campaign ${campaign.name} is already completed. Cannot reassign certifications.`)
             return;
         }
@@ -22,7 +22,7 @@ export class BulkCampaignReassignment {
         // Get all pending campaign certifications (which would be 1:1 with reviewers)
         const pendingCertifications = await this.client.getCampaignCertifications(campaignId, false)
         if (!pendingCertifications) {
-            console.log(`< EscalateCertificationCommand.execute: No pending certifications found for Campaign ID: ${campaignId}`);
+            console.log(`< BulkCampaignManagerEscalation.execute: No pending certifications found for Campaign ID: ${campaignId}`);
             vscode.window.showWarningMessage(`No pending certifications found for campaign ${campaign.name}.`)
             return;
         }
@@ -75,7 +75,7 @@ export class BulkCampaignReassignment {
                     reason: reassignReason
                 }
             }
-            await this.client.reassignReviewerCertification(certificationMoveRequest)
+            await this.client.reassignCampaignCertifications(certificationMoveRequest)
         }
     }
 }

@@ -51,8 +51,6 @@ const CONTENT_TYPE_FORM_JSON_PATCH = "application/json-patch+json";
 
 const DEFAULT_PAGINATION = 250;
 
-const REVIEW_ITEM_REASSIGN_LIMIT = 500;
-
 export interface PaginatedData<T> {
 	data: T[],
 	count: number;
@@ -1760,62 +1758,16 @@ export class ISCClient {
 		return resp.data
 	}
 
-
-
-	public async reassignReviewerCertification(certificationMoveRequest: CertificationCampaignsApiMoveRequest):Promise<void> {
+	public async reassignCampaignCertifications(certificationMoveRequest: CertificationCampaignsApiMoveRequest): Promise<void> {
 		const apiConfig = await this.getApiConfiguration();
 		const campaignApi = new CertificationCampaignsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
 		await campaignApi.move(certificationMoveRequest);
 	}
 
-	public async processCampaignReviewItemReassignments(certificationId: string, certificationReassignments: Map<string, ReassignReference[]>, reassignReason: string) {
-		const reviewerIds = certificationReassignments.keys()
-		for (const reviewerId of reviewerIds) {
-			await this.processReviewItemReassignments(certificationId, reviewerId, certificationReassignments.get(reviewerId), reassignReason)
-		}
-	}
-
-	public async processReviewItemReassignments(certificationId: string, reviewerId: string, allReassignReferences: ReassignReference[], reassignReason: string) {
-		while (allReassignReferences.length > 0) {
-			// Split the reassign references to not exceed the API limit
-			const reassignReferences = allReassignReferences.splice(0, REVIEW_ITEM_REASSIGN_LIMIT);
-			const certificationReassignRequest: CertificationsApiSubmitReassignCertsAsyncRequest = {
-				id: certificationId,
-				reviewReassign: {
-					reassign: reassignReferences,
-					reassignTo: reviewerId,
-					reason: reassignReason
-				}
-			}
-			await this.processReviewItemReassignmentWithRetry(certificationReassignRequest)
-		}
-	}
-
-	public async processReviewItemReassignmentWithRetry(certificationReassignRequest: CertificationsApiSubmitReassignCertsAsyncRequest) {
-		const MAX_RETRIES = 10;
-		const INITIAL_WAIT_TIME = 5; // seconds
-		let attempts = 0;
-		let waitTime = INITIAL_WAIT_TIME;
+	public async reassignCertificationReviewItems(certificationReassignRequest: CertificationsApiSubmitReassignCertsAsyncRequest) {
 		const apiConfig = await this.getApiConfiguration();
 		const certificationsApi = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
-
-		while (attempts < MAX_RETRIES) {
-			try {
-				await certificationsApi.submitReassignCertsAsync(certificationReassignRequest)
-				return // Success, exit the loop
-			} catch (error: any) {
-				if (error.response?.status === 429) { // Rate limit error
-					const retryAfter = parseInt(error.response.headers['retry-after'] || String(waitTime), 10);
-					sleep(retryAfter);
-					waitTime *= 2; // Exponential backoff
-				} else {
-					const errorMessage = (error instanceof Error) ? error.message : error.toString();
-					console.error(errorMessage);
-					break;
-				}
-			}
-			attempts += 1;
-		}
+		await certificationsApi.submitReassignCertsAsync(certificationReassignRequest)
 	}
 
 	//////////////////////////////
