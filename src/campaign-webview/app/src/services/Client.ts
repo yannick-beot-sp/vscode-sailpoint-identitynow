@@ -29,10 +29,22 @@ export interface TotalAccessItems {
 }
 
 export interface Reviewer {
+    completed?: boolean;
+    created?: string;
+    decisionsMade?: number;
+    decisionsTotal?: number;
+    due?: string;
+    email: string;
+    errorMessage?: string;
+    hasErrors?: boolean;
     id: string;
+    identitiesCompleted?: number;
+    identitiesRemaining?: number;
+    identitiesTotal?: number;
+    modified?: string;
     name: string;
     phase: string;
-    email: string;
+    signed?: string ;
 }
 
 export interface KPIs {
@@ -43,6 +55,6 @@ export interface KPIs {
 export interface Client {
     getKPIs(): Promise<KPIs>
     getReviewers(fetchOptions: FetchOptions): Promise<PaginatedData<Reviewer>>
-    escalateReviewers(r:Reviewer[]): Promise<void>
-    sendReminders(r:Reviewer[]): Promise<void>
+    escalateReviewers(r: Reviewer[]): Promise<void>
+    sendReminders(r: Reviewer[]): Promise<void>
 }

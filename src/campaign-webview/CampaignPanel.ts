@@ -147,7 +147,8 @@ export class CampaignPanel {
                         return {
                             ...r,
                             name: r.reviewer.name,
-                            email: r.reviewer.email
+                            email: r.reviewer.email,
+                            identitiesRemaining: r.identitiesTotal - r.identitiesCompleted
                         }
                     })
 

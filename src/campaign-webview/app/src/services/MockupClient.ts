@@ -35,7 +35,7 @@ const lastNames = [
     "Rodriguez",
     "Martinez",
 ];
-const statuses = ["Active", "Inactive"];
+const statuses = ["ACTIVE", "SIGNED"];
 function generateDummyReviewers(count: number): Reviewer[] {
     let i = 0;
     return Array(count)

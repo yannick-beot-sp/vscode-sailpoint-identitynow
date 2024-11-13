@@ -110,9 +110,11 @@
           {#if actions.length > 0}
             <td>
               {#each actions as action}
-                <button id={action.id} class={action.class} onclick={() => action.callback(row)}>
-                  {action.label}
-                </button>
+                {#if action.condition === undefined || action.condition(row)}
+                  <button id={action.id} class={action.class} onclick={() => action.callback(row)}>
+                    {action.label}
+                  </button>
+                {/if}
               {/each}
             </td>
           {/if}

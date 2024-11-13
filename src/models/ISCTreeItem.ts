@@ -1494,8 +1494,8 @@ export class CampaignTreeItem extends ISCResourceTreeItem {
 
 	iconPath = new vscode.ThemeIcon("checklist");
 	client: ISCClient;
-    label: string;
-    id: string;
+	label: string;
+	id: string;
 
 
 	constructor(
@@ -1517,7 +1517,7 @@ export class CampaignTreeItem extends ISCResourceTreeItem {
 			collapsible: vscode.TreeItemCollapsibleState.None
 		})
 		this.client = new ISCClient(this.tenantId, this.tenantName);
-		this.contextValue = type + "campaign";
+		this.contextValue = status + type + "campaign";
 	}
 
 	command = {
