@@ -1,11 +1,9 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from 'vscode';
 import { CampaignTreeItem } from "../models/ISCTreeItem";
 import { PathProposer } from '../services/PathProposer';
 import { askFile } from '../utils/vsCodeHelpers';
 import { ISCClient } from '../services/ISCClient';
-import * as fs from 'fs'; // install required package
-import { parse } from 'json2csv'; // npm install 
+
 
 
 
