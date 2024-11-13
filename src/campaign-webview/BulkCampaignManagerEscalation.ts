@@ -14,7 +14,7 @@ export class BulkCampaignManagerEscalation {
 
         // Ensure the campaign is not completed
         if (campaign.status === CampaignStatusEnum.Completed) {
-            console.log(`< EscalateCertificationCommand.execute: Campaign ${campaignId} is completed. Exiting script.`);
+            console.log(`< BulkCampaignManagerEscalation.execute: Campaign ${campaignId} is completed. Exiting script.`);
             vscode.window.showWarningMessage(`Campaign ${campaign.name} is already completed. Cannot reassign certifications.`)
             return;
         }
@@ -22,7 +22,7 @@ export class BulkCampaignManagerEscalation {
         // Get all pending campaign certifications (which would be 1:1 with reviewers)
         const pendingCertifications = await this.client.getCampaignCertifications(campaignId, false)
         if (!pendingCertifications) {
-            console.log(`< EscalateCertificationCommand.execute: No pending certifications found for Campaign ID: ${campaignId}`);
+            console.log(`< BulkCampaignManagerEscalation.execute: No pending certifications found for Campaign ID: ${campaignId}`);
             vscode.window.showWarningMessage(`No pending certifications found for campaign ${campaign.name}.`)
             return;
         }

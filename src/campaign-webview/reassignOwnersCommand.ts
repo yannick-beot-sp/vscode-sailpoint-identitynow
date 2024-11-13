@@ -83,8 +83,13 @@ export class ReassignOwnersCommand {
                 if (entitlementOwnerId) {
                     return entitlementOwnerId
                 }
-                const source = await client.getSourceById(pendingReviewItem.accessSummary?.entitlement?.sourceId)
-                return source.owner.id
+                let sourceId = pendingReviewItem.accessSummary?.entitlement?.sourceId
+                // Skip entitlements from deleted sources with no source id
+                if (sourceId) {
+                    const source = await client.getSourceById(pendingReviewItem.accessSummary?.entitlement?.sourceId)
+                    return source.owner.id
+                }
+                return
             default:
                 return
         }
