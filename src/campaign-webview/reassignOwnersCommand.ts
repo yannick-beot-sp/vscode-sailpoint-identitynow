@@ -5,10 +5,10 @@ import { CampaignConfigurationService } from "../services/CampaignConfigurationS
 import { TenantService } from "../services/TenantService";
 import { ISCClient } from '../services/ISCClient';
 import { confirm } from '../utils/vsCodeHelpers';
-import { AccessReviewItem, CampaignStatusEnum, DtoType, ReassignReference, ReassignReferenceTypeEnum } from 'sailpoint-api-client';
+import { AccessReviewItem, DtoType, ReassignReference, ReassignReferenceTypeEnum } from 'sailpoint-api-client';
 import { BulkReviewItemReassignment } from './BulkReviewItemReassignment';
 
-const OWNER_REVIEW_DEFAULT_COMMENT = "Reassigning to the Access Item Owner"
+const OWNER_REVIEW_DEFAULT_COMMENT = "Reassigned to the Access Item Owner"
 
 /**
  * Command used to open the campaign panel
@@ -30,8 +30,8 @@ export class ReassignOwnersCommand {
         const client = new ISCClient(node.tenantId, node.tenantName)
 
         try {
-            const bulkManagerEscalator = new BulkReviewItemReassignment(client)
-            const pendingCertifications = await bulkManagerEscalator.getPendingCampaignItems(campaignId)
+            const bulkReviewItemReassigner = new BulkReviewItemReassignment(client)
+            const pendingCertifications = await bulkReviewItemReassigner.getPendingCampaignItems(campaignId)
 
             if (!pendingCertifications) {
                 vscode.window.showErrorMessage(`No pending certification found for ${node.label}.`)
@@ -60,13 +60,15 @@ export class ReassignOwnersCommand {
                 }
 
                 // Process reassignments for this Certification
-                await bulkManagerEscalator.execute(pendingCertification, campaignReassignments, OWNER_REVIEW_DEFAULT_COMMENT)
+                await bulkReviewItemReassigner.execute(pendingCertification, campaignReassignments, OWNER_REVIEW_DEFAULT_COMMENT)
             }
-            console.log(`< ReassignOwnersCommand.execute: Finished reassigning access review items to the access owners for campaign ${campaignId}`);
+            console.log(`< ReassignOwnersCommand.execute: Finished reassigning access review items to the access owners for campaign ${node.label}`);
+            vscode.window.showInformationMessage(`Finished reassigning access review items to the access owners for campaign ${node.label}.`)
         }
         catch (error) {
             const errorMessage = (error instanceof Error) ? error.message : error.toString();
-            console.log(`< ReassignOwnersCommand.execute: Error processing campaign with ID ${campaignId}: ${errorMessage}`);
+            console.log(`< ReassignOwnersCommand.execute: Error processing access owner reassignment for campaign ${node.label}: ${errorMessage}`);
+            vscode.window.showErrorMessage(`Error processing access owner reassignment for campaign ${node.label}: ${errorMessage}`)
         }
     }
 
