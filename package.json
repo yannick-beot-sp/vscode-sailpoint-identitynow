@@ -990,7 +990,7 @@
       "view/item/context": [
         {
           "command": "vscode-sailpoint-identitynow.open-resource",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|source|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|identities|source-app)$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|source|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|identities|source-app|campaign)$/",
           "group": "_@0"
         },
         {
@@ -1377,22 +1377,22 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.campaigns.panel",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^campaign$/",
           "group": "0-campaigns@0"
         },
         {
           "command": "vscode-sailpoint-identitynow.campaigns.export.report",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^(?!ROLE_COMPOSITIONcampaign$).*campaign$/",
           "group": "0-campaigns@1"
         },
         {
           "command": "vscode-sailpoint-identitynow.campaigns.reassign.owners",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^(?!ROLE_COMPOSITIONcampaign$).*campaign$/",
           "group": "1-reviewerLogic@0"
         },
         {
           "command": "vscode-sailpoint-identitynow.campaigns.reassign.custom",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^(?!ROLE_COMPOSITIONcampaign$).*campaign$/",
           "group": "1-reviewerLogic@2"
         },
         {
@@ -1402,12 +1402,12 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.campaigns.reminder.send",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^(?!ROLE_COMPOSITIONcampaign$).*campaign$/",
           "group": "2-escalations@1"
         },
         {
           "command": "vscode-sailpoint-identitynow.campaigns.escalate",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == campaign",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^(?!ROLE_COMPOSITIONcampaign$).*campaign$/",
           "group": "2-escalations@2"
         }
       ],

@@ -1462,7 +1462,8 @@ export class CampaignsTreeItem extends PageableFolderTreeItem<any> {
 				tenantDisplayName,
 				x.name,
 				x.id,
-				x.status
+				x.status,
+				x.type
 			))
 		);
 	}
@@ -1491,11 +1492,11 @@ export class CampaignsTreeItem extends PageableFolderTreeItem<any> {
  */
 export class CampaignTreeItem extends ISCResourceTreeItem {
 
-	contextValue = "campaign";
 	iconPath = new vscode.ThemeIcon("checklist");
 	client: ISCClient;
     label: string;
     id: string;
+
 
 	constructor(
 		tenantId: string,
@@ -1503,7 +1504,8 @@ export class CampaignTreeItem extends ISCResourceTreeItem {
 		tenantDisplayName: string,
 		label: string,
 		id: string,
-		public readonly status: string
+		public readonly status: string,
+		public readonly type: string
 	) {
 		super({
 			tenantId,
@@ -1515,6 +1517,7 @@ export class CampaignTreeItem extends ISCResourceTreeItem {
 			collapsible: vscode.TreeItemCollapsibleState.None
 		})
 		this.client = new ISCClient(this.tenantId, this.tenantName);
+		this.contextValue = type + "campaign";
 	}
 
 	command = {
