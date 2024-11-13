@@ -64,6 +64,17 @@ export class MockupClient implements Client {
     constructor() {
         this.reviewers = generateDummyReviewers(this.count);
     }
+    async escalateReviewers(r: Reviewer[]): Promise<void> {
+        console.log(">escalateReviewers");
+        console.log(r);
+        alert(`Escalation for ${r.length} identities`)
+    }
+    async sendReminders(r: Reviewer[]): Promise<void> {
+        console.log(">sendReminders");
+        console.log(r);
+        alert(`Reminders sent for ${r.length} identities`)
+
+    }
 
     async getReviewers(fetchOptions: FetchOptions): Promise<PaginatedData<Reviewer>> {
         const offset = fetchOptions.currentPage * fetchOptions.pageSize;

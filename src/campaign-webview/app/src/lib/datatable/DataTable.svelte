@@ -19,6 +19,7 @@
   let fetchOptions: FetchOptions = $derived({ currentPage, pageSize });
   let selectedRows: any[] = $state([]);
   let hasSelection: boolean = $derived(selectedRows.length > 0);
+  let hasMultiSelectActions: boolean = $derived(multiSelectActions.length > 0);
   let selectAll: boolean = $derived(selectedRows.length === data.length);
 
   const handleRowSelect = (row: any) => {
@@ -77,7 +78,10 @@
   <table>
     <thead>
       <tr>
-        <th> <input type="checkbox" checked={selectAll} onclick={handleSelectAll} /></th>
+        {#if hasMultiSelectActions}
+          <!-- Needs checkbox only if there are actions for multi sections-->
+          <th> <input type="checkbox" checked={selectAll} onclick={handleSelectAll} /></th>
+        {/if}
         {#each columns as column}
           <th>{column.label}</th>
         {/each}
@@ -90,13 +94,16 @@
     <tbody>
       {#each data as row, i}
         <tr class:selected={selectedRows.includes(row)}>
-          <td>
-            <input
-              type="checkbox"
-              checked={selectedRows.includes(row)}
-              onchange={() => handleRowSelect(row)}
-            />
-          </td>
+          {#if hasMultiSelectActions}
+            <!-- Needs checkbox only if there are actions for multi sections-->
+            <td>
+              <input
+                type="checkbox"
+                checked={selectedRows.includes(row)}
+                onchange={() => handleRowSelect(row)}
+              />
+            </td>
+          {/if}
           {#each columns as column}
             <td>{row[column.field]}</td>
           {/each}
@@ -124,15 +131,16 @@
 </div>
 
 <style>
-
-  tbody button,.actions button {
+  tbody button,
+  .actions button {
     color: var(--vscode-button-foreground);
     background-color: var(--vscode-button-background);
-    border-radius:0;
+    border-radius: 0;
     margin-left: 5px;
   }
 
-  tbody button:hover,.actions button:hover {
+  tbody button:hover,
+  .actions button:hover {
     background-color: var(--vscode-button-hoverBackground);
   }
   .footer {

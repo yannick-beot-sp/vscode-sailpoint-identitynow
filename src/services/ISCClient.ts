@@ -50,7 +50,7 @@ const CONTENT_TYPE_FORM_DATA = "multipart/form-data";
 const CONTENT_TYPE_FORM_JSON_PATCH = "application/json-patch+json";
 
 const DEFAULT_PAGINATION = 250;
-const CERTIFICATIONS_REASSIGN_LIMIT = 250;
+
 const REVIEW_ITEM_REASSIGN_LIMIT = 500;
 
 export interface PaginatedData<T> {
@@ -1760,59 +1760,12 @@ export class ISCClient {
 		return resp.data
 	}
 
-	public async processCampaignReviewerReassignments(campaignId: string, campaignReassignments: Map<string, string[]>, reassignReason: string) {
-		const reviewerIds = campaignReassignments.keys()
-		for (const reviewerId of reviewerIds) {
-			await this.processReviewerReassignments(campaignId, reviewerId, campaignReassignments.get(reviewerId), reassignReason)
-		}
-	}
 
-	public async processReviewerReassignments(campaignId: string, reviewerId: string, allCertificationIds: string[], reassignReason: string) {
-		const newReviewer: AdminReviewReassignReassignTo = {
-			id: reviewerId,
-			type: AdminReviewReassignReassignToTypeEnum.Identity
-		}
 
-		while (allCertificationIds.length > 0) {
-			// Split the reassign references to not exceed the API limit
-			const certificationIds = allCertificationIds.splice(0, CERTIFICATIONS_REASSIGN_LIMIT);
-			const certificationMoveRequest: CertificationCampaignsApiMoveRequest = {
-				id: campaignId,
-				adminReviewReassign: {
-					certificationIds: certificationIds,
-					reassignTo: newReviewer,
-					reason: reassignReason
-				}
-			}
-			await this.processReviewerReassignmentWithRetry(certificationMoveRequest)
-		}
-	}
-
-	public async processReviewerReassignmentWithRetry(certificationMoveRequest: CertificationCampaignsApiMoveRequest) {
-		const MAX_RETRIES = 10;
-		const INITIAL_WAIT_TIME = 5; // seconds
-		let attempts = 0;
-		let waitTime = INITIAL_WAIT_TIME;
+	public async reassignReviewerCertification(certificationMoveRequest: CertificationCampaignsApiMoveRequest):Promise<void> {
 		const apiConfig = await this.getApiConfiguration();
 		const campaignApi = new CertificationCampaignsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
-
-		while (attempts < MAX_RETRIES) {
-			try {
-				await campaignApi.move(certificationMoveRequest);
-				return; // Success, exit the loop
-			} catch (error: any) {
-				if (error.response?.status === 429) { // Rate limit error
-					const retryAfter = parseInt(error.response.headers['retry-after'] || String(waitTime), 10);
-					sleep(retryAfter);
-					waitTime *= 2; // Exponential backoff
-				} else {
-					const errorMessage = (error instanceof Error) ? error.message : error.toString();
-					console.error(errorMessage);
-					break;
-				}
-			}
-			attempts += 1;
-		}
+		await campaignApi.move(certificationMoveRequest);
 	}
 
 	public async processCampaignReviewItemReassignments(certificationId: string, certificationReassignments: Map<string, ReassignReference[]>, reassignReason: string) {

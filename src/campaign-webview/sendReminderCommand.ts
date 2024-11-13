@@ -20,7 +20,7 @@ export class SendReminderCommand {
 
         const info = await this.campaignService.getCertificationCampaignInfo(node.tenantName)
         if (info === undefined) {
-            vscode.window.showWarningMessage("Workflow is not configured.")
+            vscode.window.showWarningMessage("You must configure the workflow to send mails.")
             vscode.commands.executeCommand(commands.CAMPAIGN_CONFIGURE_REMINDER, node);
             return
         }
