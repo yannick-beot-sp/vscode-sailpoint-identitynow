@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { AccessReviewItem, CampaignStatusEnum, CertificationsApiSubmitReassignCertsAsyncRequest, DtoType, IdentityCertificationDto, ReassignReference } from "sailpoint-api-client";
+import { CampaignStatusEnum, CertificationsApiSubmitReassignCertsAsyncRequest, IdentityCertificationDto, ReassignReference } from "sailpoint-api-client";
 import { ISCClient } from "../services/ISCClient";
 
 const REVIEW_ITEM_REASSIGN_LIMIT = 500
