@@ -169,7 +169,7 @@ This extension includes the following snippets for the Public Identities Configu
 
 The following table provides the expected column for the CSV to import Access Profiles:
 
-| Header                   | M[^1] | Description                                                                                                                 | Default Value      |
+| Header                   | M[*] | Description                                                                                                                 | Default Value      |
 | ------------------------ | ----- | --------------------------------------------------------------------------------------------------------------------------- | ------------------ |
 | `name`                   | Yes   | Name of the access profile                                                                                                  |                    |
 | `owner`                  | Yes   | Owner of the access profile                                                                                                 |                    |
@@ -183,13 +183,13 @@ The following table provides the expected column for the CSV to import Access Pr
 | `revokeApprovalSchemes`  | No    | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
 | `entitlements`           | No    | Entitlements of the access profile                                                                                          | `[]`               |
 
-[^1]: Mandatory
+[*]: ## "Mandatory"
 
 ### Roles
 
 The following table provides the expected column for the CSV to import Roles:
 
-| Header                         | M[^1] | Description                                                                                    | Default Value      |
+| Header                         | M[*] | Description                                                                                    | Default Value      |
 | ------------------------------ | ----- | ---------------------------------------------------------------------------------------------- | ------------------ |
 | `name`                         | Yes   | Name of the role                                                                               |                    |
 | `owner`                        | Yes   | Owner of the role                                                                              |                    |
@@ -204,8 +204,6 @@ The following table provides the expected column for the CSV to import Roles:
 | `revokeApprovalSchemes`        | No    | List of reviewers among `OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
 | `accessProfiles`               | No    | List of access profiles                                                                        | `[]`               |
 | `membershipCriteria`           | No    | Membership criteria for automatic assignment                                                   |                    |
-
-[^1]: Mandatory
 
 #### Membership criteria
 
@@ -253,6 +251,33 @@ Here are a few examples extracted from the unit tests:
 identity.department eq 'Customer Service' and identity.cloudLifecycleState eq 'active'
 'Active Directory'.entitlement.memberOf eq 'CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com' and 'Active Directory'.attribute.departmentNumber eq '1234'
 (identity.department eq 'Customer Service' and identity.cloudLifecycleState eq 'active') or (identity.cloudLifecycleState eq 'active' and identity.jobTitle co 'Accounts Payable Analyst')
+```
+
+### Certification Campaign Custom Reviewers
+
+The following table provides the expected column for the CSV to import Custom Reviewer logic:
+
+| Header                         | M[*] | Description                                                                                    | Supported Values      |
+| ------------------------------ | ----- | ---------------------------------------------------------------------------------------------- | ------------------ |
+| `reviewerAttribute`                         | Yes   | Identity attribute used to identify the defined reviewer  | `id\|name\|email`                   |
+| `reviewerValue`                        | Yes   | The value of identity attribute for the defined reviewer (e.g. the email address of the reviewer) |                    |
+| `itemType`                  | Yes    |  The type of object to scope the reviewer's review items | `IDENTITY\|ENTITLEMENT\|ACCESS_PROFILE\|ROLE`             |
+| `itemSelectorType`                      | Yes    | The type of selector used to define the reviewer's scope | `id\|name\|query`[**]            |
+| `itemSelectorValue`                  | Yes    | The value of the selector used to define the reviewer's scope (e.g. a valid entitlement Search Query) |             |
+
+[**]: ## "Item selector type `name` is not supported with item type `ENTITLEMENT`"
+
+#### Examples
+
+Here are a few valid examples:
+
+```
+reviewerAttribute,reviewerValue,itemType,itemSelectorType,itemSelectorValue
+id,8e5c35894e124e81859f59030f3c4d56,IDENTITY,id,8e5c358d7a124e81859f59030f3c67ae
+name,Adam.Kennedy,IDENTITY,query,"attributes.department:""Asset Management"""
+email,Alan.Bandero@sailpointdemo.com,ENTITLEMENT,query,"source.name:""Active Directory"" AND privileged:true"
+name,Aaron.Nichols,ACCESS_PROFILE,name,"Accounts Payable Access"
+email,Anne.Arnold@sailpointdemo.com,ROLE,query,*
 ```
 
 ## Extension Settings
