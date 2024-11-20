@@ -279,6 +279,71 @@ email,Alan.Bandero@sailpointdemo.com,ENTITLEMENT,query,"source.name:""Active Dir
 name,Aaron.Nichols,ACCESS_PROFILE,name,"Accounts Payable Access"
 email,Anne.Arnold@sailpointdemo.com,ROLE,query,*
 ```
+### Certification Campaign Report
+
+The report provides a detailed overview of user access rights, including roles, access profiles, and entitlements. Auditors gain a comprehensive understanding of who has access to critical systems and data, enabling them to assess compliance with regulatory requirements and internal policies.
+
+below are the campaign report headers: 
+
+```
+"Campaign Name","Reviewer Name","Reviewer Email","Identity Name","Review Completed","Review Item ID","Item Review Completed","New Access","Reviewer Decision","Reviewer Comments","Access Type","Role Name","Role Description","Access Profile Name","Access Profile Description","Access Profile Privileged","Entitlement Name","Entitlement Description","Entitlement Privileged","Entitlement Attribute Value","Entitlement Source Schema Object Type","Entitlement Source Name","Entitlement Account Native ID","Entitlement Account Name"
+```
+
+You need to configure the path where the report will be extracted
+
+### Send Reminder Notification To Reviewers
+
+Copy this below Workflow Json to a file and save it as .json file like: SendReminderNotificationToReviewersWorkflow.json
+
+```
+{
+	"name": "Sends Reminder Notification To Reviewers",
+	"description": "Sends Reminder Notification To Reviewers With Pending Items",
+	"modified": "2024-11-20T13:05:27.631277905Z",
+	"definition": {
+		"start": "Send Email",
+		"steps": {
+			"End Step - Success": {
+				"displayName": "End",
+				"type": "success"
+			},
+			"Send Email": {
+				"actionId": "sp:send-email",
+				"attributes": {
+					"body": "<p>Dear {{$.trigger.input.reviewerName}},</p>\n<p>This is a reminder that you have pending certification items requiring your action in the <strong>{{$.trigger.input.campaignName}}</strong> certification campaign.</p>\n<p>Here are your current review progress details:</p>\n<ul>\n<li><strong>Pending Items: </strong>{{$.trigger.input.pendingItems<br>}}</li>\n<li><strong>Pending Identities</strong>: {{$.trigger.input.pendingIdentities}}</li>\n<li><strong>Completed Decisions</strong>: {{$.trigger.input.completedDecisions}}&nbsp;</li>\n<li><strong>Completed Identities</strong>: {{$.trigger.input.completedIdentities}}</li>\n</ul>\n<p>Please note that the due date for completing your reviews is <strong>{{$.trigger.input.dueDate}}</strong>.</p>\n<p>To avoid delays and escalations, Please&nbsp;complete your remaining reviews.</p>\n<p>If you have any questions or need assistance, feel free to contact us.</p>\n<p>Thank you,<br>The Certification Review Team</p>",
+					"context": null,
+					"from": "",
+					"fromEmail": "reviews@company.com",
+					"recipientEmailList.$": "$.trigger.input.reviewerEmail",
+					"recipientEmails": "$.trigger.reviewerEmail",
+					"subject": "Action Required: Pending Items in {{$.trigger.input.campaignName}} Certification"
+				},
+				"displayName": "Send Reminder Notification",
+				"nextStep": "End Step - Success",
+				"type": "action",
+				"versionNumber": 2
+			}
+		}
+	},
+	
+	"trigger": {
+		"type": "EXTERNAL",
+		"attributes": {
+			"clientId": "948fca73-4169-45c5-bbe1-06fc1f2b0a43",
+			"url": "/beta/workflows/execute/external/d2062dca-14ac-461d-94bc-daaf25af799c"
+		}
+	}
+}
+
+```
+
+- Login to your ISC tenant as an Admin 
+- Navigate to Admin -> Workflows -> New Workflow -> Upload File 
+- Upload the workflow json file then click on "Continue to Build"
+- In the builder click on External Trigger node  -> + New Access Token
+- Save the client ID, client secrete as you will need them to later in the SailPoint ISC extention
+- Click on the "Send Reminder Notification" node to modify or update the notification template.
+- Save the workfolw and enable it
 
 ## Extension Settings
 
