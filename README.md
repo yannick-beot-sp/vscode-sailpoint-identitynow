@@ -345,6 +345,25 @@ Copy this below Workflow Json to a file and save it as .json file like: SendRemi
 - Click on the "Send Reminder Notification" node to modify or update the notification template.
 - Save the workfolw and enable it
 
+The external json trigger is: 
+```
+{
+                    input: {
+                    reviewerName: reviewerName,
+                    reviewerId: reviewerId,
+                    reviewerEmail: reviewerEmail,
+                    campaignName: campaignName,
+                    completedDecisions: completedDecisions,
+                    totalDecisions: totalDecisions,
+                    pendingItems: pendingItems,
+                    completedIdentities: completedIdentities,
+                    totalIdentities: totalIdentities,
+                    pendingIdentities: pendingIdentities,
+                    dueDate: certificationDueDate
+                  }
+}
+```
+
 ## Extension Settings
 
 The extension supports the following settings:
