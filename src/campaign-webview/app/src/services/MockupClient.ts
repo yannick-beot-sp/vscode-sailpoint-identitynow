@@ -77,9 +77,17 @@ export class MockupClient implements Client {
     }
 
     async getReviewers(fetchOptions: FetchOptions): Promise<PaginatedData<Reviewer>> {
+        console.log(">getReviewers", fetchOptions);
+
         const offset = fetchOptions.currentPage * fetchOptions.pageSize;
         const end = Math.min(((fetchOptions.currentPage + 1) * fetchOptions.pageSize), this.count);
-        const result = this.reviewers.slice(offset, end);
+        let result = this.reviewers;
+        if (fetchOptions.sort !== undefined) {
+            const multiple = fetchOptions.sort.order === "asc" ? 1 : -1
+            //@ts-ignore
+            result.sort((a, b) => multiple * a[fetchOptions.sort.field].localeCompare(b[fetchOptions.sort.field]))
+        }
+        result = result.slice(offset, end);
         // console.log({ offset, result });
         return {
             data: result,

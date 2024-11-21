@@ -1,6 +1,11 @@
+export interface SortingOptions {
+    field: string,
+    order: "asc" | "desc"
+}
 export interface FetchOptions {
     currentPage: number,
     pageSize: number,
+    sort?: SortingOptions
 }
 
 export interface PaginatedData<T> {
@@ -12,7 +17,9 @@ export type FetchDataCallback = (fetchOptions: FetchOptions) => Promise<Paginate
 
 export interface Column {
     field: string,
-    label: string
+    label: string,
+    visible?: boolean,
+    sortable?: boolean
 }
 
 

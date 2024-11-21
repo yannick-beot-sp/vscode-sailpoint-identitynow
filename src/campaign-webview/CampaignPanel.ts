@@ -141,14 +141,30 @@ export class CampaignPanel {
                     return;
 
                 case commands.GET_PAGINATED_REVIEWERS:
-                    const { currentPage, pageSize } = payload as FetchOptions
-                    const response = await client.getPaginatedCampaignCertifications(this.campaignId, currentPage * pageSize, pageSize)
+                    const { currentPage, pageSize, sort } = payload as FetchOptions
+                    let sorters = sort?.field ?? "name"
+                    if (sort?.order === "desc") {
+                        sorters = "-" + sorters
+                    }
+
+                    const response = await client.getPaginatedCampaignCertifications({
+                        campaignId: this.campaignId,
+                        offset: currentPage * pageSize,
+                        limit: pageSize,
+                        sorters
+                    })
+                    
                     const reviewers = response.data.map(r => {
                         return {
                             ...r,
                             name: r.reviewer.name,
                             email: r.reviewer.email,
-                            identitiesRemaining: r.identitiesTotal - r.identitiesCompleted
+                            identitiesRemaining: r.identitiesTotal - r.identitiesCompleted,
+                            decisionsRemaining: r.decisionsTotal - r.decisionsMade,
+                            reassignmentName: r.reassignment?.from?.name,
+                            reassignmentComment: r.reassignment?.comment,
+                            reassignmentEmail: r.reassignment?.from?.reviewer?.email
+
                         }
                     })
 

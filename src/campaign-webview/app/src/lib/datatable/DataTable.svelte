@@ -3,7 +3,18 @@
   import RowsPerPage from "./RowsPerPage.svelte";
   import Pagination from "./Pagination.svelte";
   import Refresh from "./svgs/refresh.svelte";
-  import type { FetchOptions, FetchDataCallback, Column, Action, MultiSelectAction } from "./Model";
+  import UpDown from "./svgs/caret-up-down.svelte";
+  import Up from "./svgs/caret-up.svelte";
+  import Down from "./svgs/caret-down.svelte";
+  import SelectColumn from "./SelectColumn.svelte";
+  import type {
+    FetchOptions,
+    FetchDataCallback,
+    Column,
+    Action,
+    MultiSelectAction,
+    SortingOptions,
+  } from "./Model";
 
   interface Props {
     columns: Column[];
@@ -11,13 +22,14 @@
     multiSelectActions: MultiSelectAction<any>[];
     actions: Action<any>[];
   }
-  let { columns, fetchData, multiSelectActions = [], actions = [] }: Props = $props();
+  let { columns=$bindable(), fetchData, multiSelectActions = [], actions = [] }: Props = $props();
 
   let data: any = $state([]);
   let currentPage = $state(0);
   let pageSize = $state(10);
   let totalResults = $state(0);
-  let fetchOptions: FetchOptions = $derived({ currentPage, pageSize });
+  let sort: undefined | SortingOptions = $state();
+  let fetchOptions: FetchOptions = $derived({ currentPage, pageSize, sort });
   let selectedRows: any[] = $state([]);
   let hasSelection: boolean = $derived(selectedRows.length > 0);
   let hasMultiSelectActions: boolean = $derived(multiSelectActions.length > 0);
@@ -52,6 +64,31 @@
     }
   }
 
+  function handleSort(columnName: string) {
+    if (sort?.field === columnName) {
+      // same column. reverting order
+      if (sort.order === "asc") {
+        sort.order = "desc";
+      } else {
+        sort.order = "asc";
+      }
+      updateData();
+    } else {
+      const columnConfig = columns.find((x) => x.field === columnName);
+      if (columnConfig?.sortable) {
+        sort = {
+          field: columnName,
+          order: "asc",
+        };
+        updateData();
+      }
+    }
+  }
+  for (const element of columns) {
+    if (element.visible === undefined) {
+      element.visible = true;
+    }
+  }
   onMount(async () => {
     await updateData();
   });
@@ -75,12 +112,17 @@
         <span>Results: {totalResults}</span>
       </div>
     {/if}
-    <div>
-      <button class="btn" onclick={updateData}
-        ><span>
-          <Refresh />
-        </span>
-      </button>
+    <div class="permanentActions">
+      <div>
+        <SelectColumn bind:columns />
+      </div>
+      <div>
+        <button class="btn" onclick={updateData}
+          ><span>
+            <Refresh />
+          </span>
+        </button>
+      </div>
     </div>
   </div>
   <table>
@@ -91,7 +133,22 @@
           <th> <input type="checkbox" checked={selectAll} onclick={handleSelectAll} /></th>
         {/if}
         {#each columns as column}
-          <th>{column.label}</th>
+          {#if column.visible}
+            <th class:sortable={column.sortable} onclick={() => handleSort(column.field)}>
+              {column.label}
+              {#if column.sortable}
+                {#if column.field === sort?.field}
+                  {#if sort?.order === "asc"}
+                    <span class="down"><Down /></span>
+                  {:else}
+                    <span class="up"><Up /></span>
+                  {/if}
+                {:else}
+                  <span class="updown"><UpDown /></span>
+                {/if}
+              {/if}
+            </th>
+          {/if}
         {/each}
 
         {#if actions.length > 0}
@@ -113,7 +170,9 @@
             </td>
           {/if}
           {#each columns as column}
-            <td>{row[column.field]}</td>
+            {#if column.visible}
+              <td>{row[column.field]}</td>
+            {/if}
           {/each}
           {#if actions.length > 0}
             <td>
@@ -141,12 +200,24 @@
 </div>
 
 <style>
-  .actions {
+  .sortable {
+    cursor: pointer;
+  }
+  .updown {
+    color: var(--vscode-disabledForeground);
+  }
+  .up,
+  .down {
+    color: var(--vscode-foreground);
+  }
+  .actions,
+  .permanentActions {
     margin-left: auto;
+    display: flex;
   }
   tbody button,
   .actions button,
-  .btn {
+  .datatable :global(.btn) {
     color: var(--vscode-button-foreground);
     background-color: var(--vscode-button-background);
     border-radius: 0;
@@ -157,7 +228,7 @@
 
   tbody button:hover,
   .actions button:hover,
-  .btn:hover {
+  .datatable :global(.btn) {
     background-color: var(--vscode-button-hoverBackground);
   }
   .footer {

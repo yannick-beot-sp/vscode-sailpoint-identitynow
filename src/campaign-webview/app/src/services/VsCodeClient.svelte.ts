@@ -33,6 +33,6 @@ export class VsCodeClient implements Client {
      * @returns Promise
      */
     async getReviewers(fetchOptions: FetchOptions): Promise<PaginatedData<Reviewer>> {
-        return messageHandler.request(commands.GET_PAGINATED_REVIEWERS, fetchOptions);
+        return messageHandler.request(commands.GET_PAGINATED_REVIEWERS, $state.snapshot(fetchOptions));
     }
 }

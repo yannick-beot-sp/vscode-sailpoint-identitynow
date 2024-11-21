@@ -1730,7 +1730,12 @@ export class ISCClient {
 		return allAccessReviewItems
 	}
 
-	public async getPaginatedCampaignCertifications(campaignId: string, offset: number, limit = 250): Promise<PaginatedData<IdentityCertificationDto>> {
+	public async getPaginatedCampaignCertifications({ campaignId, offset, sorters = "name", limit = 250 }: {
+		campaignId: string,
+		offset: number,
+		sorters?: string,
+		limit?: number
+	}): Promise<PaginatedData<IdentityCertificationDto>> {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		let filters = `campaign.id eq "${campaignId}"`
@@ -1739,7 +1744,7 @@ export class ISCClient {
 			offset,
 			limit,
 			count: true,
-			sorters: "name"
+			sorters
 
 		})
 

@@ -20,7 +20,8 @@
   const actions: Action<Reviewer>[] = [];
   const multiSelectActions: MultiSelectAction<Reviewer>[] = [];
 
-  const onlyActive = (row: Reviewer) => row.phase !== "SIGNED" || (row.identitiesRemaining !== undefined && row.identitiesRemaining > 0);
+  const onlyActive = (row: Reviewer) =>
+    row.phase !== "SIGNED" || (row.identitiesRemaining !== undefined && row.identitiesRemaining > 0);
   if (window.data.campaignStatus !== "COMPLETED") {
     multiSelectActions.push(
       {
@@ -43,14 +44,14 @@
         callback: async (row: Reviewer) => {
           await client.escalateReviewers([row]);
         },
-        condition: onlyActive
+        condition: onlyActive,
       },
       {
         label: "Send Reminder",
         callback: async (row: Reviewer) => {
           await client.sendReminders([row]);
         },
-        condition: onlyActive
+        condition: onlyActive,
       }
     );
   }
@@ -59,14 +60,15 @@
     promiseResult = client.getKPIs();
   });
 
-  const reviewerColumns: Column[] = [
-    {
-      field: "id",
-      label: "Id",
-    },
+  let reviewerColumns: Column[] = $state([
+    // {
+    //   field: "id",
+    //   label: "Id",
+    // },
     {
       field: "name",
       label: "Name",
+      sortable: true,
     },
     {
       field: "phase",
@@ -78,9 +80,49 @@
     },
     {
       field: "identitiesRemaining",
-      label: "Reviewers Remaining",
+      label: "Identities Remaining",
     },
-  ];
+    {
+      field: "identitiesTotal",
+      label: "Total Identities",
+      visible: false
+    },
+    {
+      field: "identitiesCompleted",
+      label: "Completed Identities",
+      visible: false
+    },
+    {
+      field: "decisionsTotal",
+      label: "Total Decision",
+      visible: false
+    },
+    {
+      field: "decisionsMade",
+      label: "Decisions Made",
+      visible: false
+    },
+    {
+      field: "decisionsRemaining",
+      label: "Decisions Remaining",
+      visible: false
+    },
+    {
+      field: "reassignmentName",
+      label: "Reassigned From",
+      visible: false
+    },
+    {
+      field: "reassignmentComment",
+      label: "Reassignment Comment",
+      visible: false
+    },
+    {
+      field: "reassignmentEmail",
+      label: "Reassigned From (Email)",
+      visible: false
+    },
+  ]);
 
   const fetchData: FetchDataCallback = async (fetchOptions: FetchOptions) => {
     console.log(">fetchData");
@@ -126,7 +168,7 @@
     </section>
     <section id="reviewers">
       <h2>Campaign Reviewers</h2>
-      <DataTable columns={reviewerColumns} {fetchData} {actions} {multiSelectActions} />
+      <DataTable bind:columns={reviewerColumns} {fetchData} {actions} {multiSelectActions} />
     </section>
   {/await}
 </main>
