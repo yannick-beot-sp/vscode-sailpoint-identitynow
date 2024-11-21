@@ -76,6 +76,8 @@ import { EscalateCertificationCommand } from './campaign-webview/escalateCertifi
 import { CampaignConfigurationService } from './services/CampaignConfigurationService';
 import { ReassignOwnersCommand } from './campaign-webview/reassignOwnersCommand';
 import { CustomReassignCommand } from './campaign-webview/customReassignCommand';
+import { CertificationCampaignStatusFilterCommand } from './campaign-webview/CertificationCampaignStatusFilterCommand';
+import { CertificationCampaignNameFilterCommand } from './campaign-webview/CertificationCampaignNameFilterCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -577,6 +579,15 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.REASSIGN_CAMPAIGN_CUSTOM,
 			customReassignCommand.execute, customReassignCommand))
+
+	const certificationCampaignStatusFilterCommand = new CertificationCampaignStatusFilterCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.CAMPAIGN_FILTER_STATUS,
+			certificationCampaignStatusFilterCommand.execute, certificationCampaignStatusFilterCommand))
+	const certificationCampaignNameFilterCommand = new CertificationCampaignNameFilterCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.CAMPAIGN_FILTER_NAME,
+			certificationCampaignNameFilterCommand.execute, certificationCampaignNameFilterCommand))
 
 }
 

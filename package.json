@@ -598,6 +598,16 @@
       {
         "command": "vscode-sailpoint-identitynow.campaigns.escalate",
         "title": "Escalate to managers"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.campaigns.filter.name",
+        "title": "Search certification campaign by name...",
+        "icon": "$(search)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.campaigns.filter.status",
+        "title": "Filter certification campaign by status...",
+        "icon": "$(filter-filled)"
       }
     ],
     "menus": {
@@ -972,6 +982,14 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.campaigns.escalate",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.campaigns.filter.name",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.campaigns.filter.status",
           "when": "never"
         }
       ],
@@ -1409,6 +1427,16 @@
           "command": "vscode-sailpoint-identitynow.campaigns.escalate",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^(?!.*ROLE_COMPOSITIONcampaign$).*campaign$/ && viewItem =~ /^(?!COMPLETED).*campaign$/",
           "group": "2-escalations@2"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.campaigns.filter.name",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^campaigns/",
+          "group": "inline@0"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.campaigns.filter.status",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^campaigns/",
+          "group": "inline@1"
         }
       ],
       "editor/context": [

@@ -9,6 +9,7 @@ import * as commands from "../commands/constants";
 import * as configuration from '../configurationConstants';
 import { escapeFilter, isEmpty, isNotEmpty } from "../utils/stringUtils";
 import { TenantService } from "../services/TenantService";
+import { CampaignStatusEnum } from "sailpoint-api-client";
 
 
 /**
@@ -1448,7 +1449,7 @@ export class ApplicationAccessProfileTreeItem extends ISCResourceTreeItem {
 }
 
 export class CampaignsTreeItem extends PageableFolderTreeItem<any> {
-	sourceId: string | undefined = undefined
+	status: string[]
 
 	constructor(
 		tenantId: string,
@@ -1466,12 +1467,17 @@ export class CampaignsTreeItem extends PageableFolderTreeItem<any> {
 				x.type
 			))
 		);
+		// all by default
+		this.status = Object.keys(CampaignStatusEnum).map(key => CampaignStatusEnum[key])
 	}
 
 	protected async loadNext(): Promise<AxiosResponse<Document[]>> {
 		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
 
-		const filters = undefined // TODO
+		let filters = `status in ("${this.status.join('","')}")`
+		if (this.filters) {
+			filters += `and name sw "${escapeFilter(this.filters)}"`
+		}
 
 		return await this.client.getPaginatedCampaigns(
 			filters,

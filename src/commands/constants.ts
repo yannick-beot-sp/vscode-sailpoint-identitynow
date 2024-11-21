@@ -133,3 +133,5 @@ export const CAMPAIGN_SEND_REMINDER = `${COMMAND_PREFIX}.campaigns.reminder.send
 export const CAMPAIGN_CONFIGURE_REMINDER = `${COMMAND_PREFIX}.campaigns.reminder.configure`;
 export const REASSIGN_CAMPAIGN_OWNERS = `${COMMAND_PREFIX}.campaigns.reassign.owners`;
 export const REASSIGN_CAMPAIGN_CUSTOM = `${COMMAND_PREFIX}.campaigns.reassign.custom`;
+export const CAMPAIGN_FILTER_NAME = `${COMMAND_PREFIX}.campaigns.filter.name`;
+export const CAMPAIGN_FILTER_STATUS = `${COMMAND_PREFIX}.campaigns.filter.status`;
