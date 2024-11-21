@@ -289,7 +289,7 @@ below are the campaign report headers:
 "Campaign Name","Reviewer Name","Reviewer Email","Identity Name","Review Completed","Review Item ID","Item Review Completed","New Access","Reviewer Decision","Reviewer Comments","Access Type","Role Name","Role Description","Access Profile Name","Access Profile Description","Access Profile Privileged","Entitlement Name","Entitlement Description","Entitlement Privileged","Entitlement Attribute Value","Entitlement Source Schema Object Type","Entitlement Source Name","Entitlement Account Native ID","Entitlement Account Name"
 ```
 
-You need to configure the path where the report will be extracted
+You need to configure the path where the report will be exported
 
 ### Send Reminder Notification To Reviewers
 
