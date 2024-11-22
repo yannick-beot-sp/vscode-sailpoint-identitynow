@@ -2,8 +2,10 @@
   import { onMount } from "svelte";
 
   import ProgressIndicator from "./lib/ProgressIndicator.svelte";
-  import PieCharts from "./lib/PieCharts.svelte";
+  import SearchCampaignPieCharts from "./lib/SearchCampaignPieCharts.svelte";
+  import SourceOwnerPieCharts from "./lib/SourceOwnerPieCharts.svelte";
   import DataTable from "./lib/datatable/DataTable.svelte";
+  import Refresh from "./lib/datatable/svgs/refresh.svelte";
   import type {
     Action,
     Column,
@@ -15,6 +17,7 @@
   import type { KPIs, Reviewer } from "./services/Client";
 
   let promiseResult = $state<Promise<KPIs>>();
+  let promiseStatus = $state<Promise<string>>();
   let client = ClientFactory.getClient();
 
   const actions: Action<Reviewer>[] = [];
@@ -56,8 +59,13 @@
     );
   }
 
-  onMount(async () => {
+  function updateKPIsAndStatus() {
     promiseResult = client.getKPIs();
+    promiseStatus = client.getStatus(window.data.campaignId);
+  }
+
+  onMount(async () => {
+    updateKPIsAndStatus();
   });
 
   let reviewerColumns: Column[] = $state([
@@ -85,42 +93,42 @@
     {
       field: "identitiesTotal",
       label: "Total Identities",
-      visible: false
+      visible: false,
     },
     {
       field: "identitiesCompleted",
       label: "Completed Identities",
-      visible: false
+      visible: false,
     },
     {
       field: "decisionsTotal",
       label: "Total Decision",
-      visible: false
+      visible: false,
     },
     {
       field: "decisionsMade",
       label: "Decisions Made",
-      visible: false
+      visible: false,
     },
     {
       field: "decisionsRemaining",
       label: "Decisions Remaining",
-      visible: false
+      visible: false,
     },
     {
       field: "reassignmentName",
       label: "Reassigned From",
-      visible: false
+      visible: false,
     },
     {
       field: "reassignmentComment",
       label: "Reassignment Comment",
-      visible: false
+      visible: false,
     },
     {
       field: "reassignmentEmail",
       label: "Reassigned From (Email)",
-      visible: false
+      visible: false,
     },
   ]);
 
@@ -133,8 +141,19 @@
 
 <main>
   <section id="headerSection">
-    <h1>{window.data.campaignName}</h1>
-    <h2><span class="badge">{window.data.campaignStatus}</span></h2>
+    <div>
+      <h1>{window.data.campaignName}</h1>
+      {#await promiseStatus then value}
+        <h2><span class="badge"> {value}</span></h2>
+      {/await}
+    </div>
+    <div class="headerSection--buttons">
+      <button class="btn" onclick={updateKPIsAndStatus}
+        ><span>
+          <Refresh />
+        </span>
+      </button>
+    </div>
   </section>
   {#await promiseResult}
     <!-- promise is pending -->
@@ -164,11 +183,15 @@
       </div>
     </section>
     <section id="accessitems">
-      <PieCharts data={data!.totalAccessItems} />
-    </section>
-    <section id="reviewers">
-      <h2>Campaign Reviewers</h2>
-      <DataTable bind:columns={reviewerColumns} {fetchData} {actions} {multiSelectActions} />
+      {#if window.data.campaignType == "SOURCE_OWNER" || window.data.campaignType == "MACHINE_ACCOUNT"}
+        <SourceOwnerPieCharts data={data!.totalAccessItems} />
+      {:else}
+        <SearchCampaignPieCharts data={data!.totalAccessItems} />
+      {/if}
     </section>
   {/await}
+  <section id="reviewers">
+    <h2>Campaign Reviewers</h2>
+    <DataTable bind:columns={reviewerColumns} {fetchData} {actions} {multiSelectActions} />
+  </section>
 </main>

@@ -1494,6 +1494,10 @@ export class CampaignsTreeItem extends PageableFolderTreeItem<any> {
 }
 
 /**
+ * List of supported campaign types for which the dashboard can be displayed
+ */
+const SUPPORTED_CAMPAIGN_TYPES = ["MACHINE_ACCOUNT", "SOURCE_OWNER", "SEARCH"]
+/**
  * Certification Campaign
  */
 export class CampaignTreeItem extends ISCResourceTreeItem {
@@ -1524,12 +1528,20 @@ export class CampaignTreeItem extends ISCResourceTreeItem {
 		})
 		this.client = new ISCClient(this.tenantId, this.tenantName);
 		this.contextValue = status + type + "campaign";
+
+		this.command = SUPPORTED_CAMPAIGN_TYPES.includes(type) ? {
+			title: "Dashboard",
+			command: commands.VIEW_CAMPAIGN_PANEL,
+			arguments: [this],
+		} : {
+			title: "open",
+			command: commands.OPEN_RESOURCE,
+			arguments: [this],
+		};
+
+
 	}
 
-	command = {
-		title: "Dashboard",
-		command: commands.VIEW_CAMPAIGN_PANEL,
-		arguments: [this],
-	};
+
 
 }

@@ -3,6 +3,11 @@ import type { Client, KPIs, Reviewer } from "./Client";
 import * as commands from "./Commands";
 import { messageHandler } from "./MessageHandler";
 export class VsCodeClient implements Client {
+    
+    async getStatus(id: string): Promise<string> {
+        console.log("> VsCodeClient.escalateReviewers");
+        return await messageHandler.request(commands.GET_STATUS, id);
+    }
 
     async escalateReviewers(r: Reviewer[]): Promise<void> {
         console.log("> VsCodeClient.escalateReviewers");

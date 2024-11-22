@@ -14,7 +14,7 @@
   let {
     currentPage = $bindable(),
     pageSize = $bindable(),
-    totalResults = $bindable(),
+    totalResults,
     onUpdatePage,
   }: Props = $props();
 

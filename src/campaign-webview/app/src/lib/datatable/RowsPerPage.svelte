@@ -1,6 +1,6 @@
 <script lang="ts">
   interface Props {
-    options: number[];
+    options?: number[];
     pageSize: number;
     onUpdatePage: () => void | Promise<void>;
   }

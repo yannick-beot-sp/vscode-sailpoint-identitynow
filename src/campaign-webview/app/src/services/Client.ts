@@ -44,7 +44,7 @@ export interface Reviewer {
     modified?: string;
     name: string;
     phase: string;
-    signed?: string ;
+    signed?: string;
 }
 
 export interface KPIs {
@@ -53,6 +53,7 @@ export interface KPIs {
 }
 
 export interface Client {
+    getStatus(id: string): Promise<string>
     getKPIs(): Promise<KPIs>
     getReviewers(fetchOptions: FetchOptions): Promise<PaginatedData<Reviewer>>
     escalateReviewers(r: Reviewer[]): Promise<void>

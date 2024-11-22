@@ -64,19 +64,26 @@ export class MockupClient implements Client {
     constructor() {
         this.reviewers = generateDummyReviewers(this.count);
     }
+
+    async getStatus(id: string): Promise<string> {
+        await stall()
+        return statuses[Math.floor(Math.random() * statuses.length)]
+    }
+
     async escalateReviewers(r: Reviewer[]): Promise<void> {
         console.log(">escalateReviewers");
         console.log(r);
         alert(`Escalation for ${r.length} identities`)
     }
+
     async sendReminders(r: Reviewer[]): Promise<void> {
         console.log(">sendReminders");
         console.log(r);
         alert(`Reminders sent for ${r.length} identities`)
-
     }
 
     async getReviewers(fetchOptions: FetchOptions): Promise<PaginatedData<Reviewer>> {
+        await stall()
         console.log(">getReviewers", fetchOptions);
 
         const offset = fetchOptions.currentPage * fetchOptions.pageSize;
@@ -93,6 +100,11 @@ export class MockupClient implements Client {
             data: result,
             count: this.count,
         };
+        // return {
+        //     data: [
+
+        //     ], count: 0
+        // }
     }
 
     async getKPIs(): Promise<KPIs> {

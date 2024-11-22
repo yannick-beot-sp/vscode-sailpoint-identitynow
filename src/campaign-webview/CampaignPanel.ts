@@ -45,7 +45,7 @@ export class CampaignPanel {
         tenantName: string,
         campaignId: string,
         campaignName: string,
-        campaignStatus: string,
+        campaignType: string,
         campaignService: CampaignConfigurationService) {
         const column = vscode.window.activeTextEditor
             ? vscode.window.activeTextEditor.viewColumn
@@ -72,7 +72,7 @@ export class CampaignPanel {
             tenantName,
             campaignId,
             campaignName,
-            campaignStatus,
+            campaignType,
             campaignService);
     }
 
@@ -108,7 +108,7 @@ export class CampaignPanel {
         private tenantName: string,
         private campaignId: string,
         private campaignName: string,
-        private campaignStatus: string,
+        private campaignType: string,
         private campaignService: CampaignConfigurationService) {
         this._panel = panel;
         this._extensionUri = extensionUri;
@@ -153,7 +153,7 @@ export class CampaignPanel {
                         limit: pageSize,
                         sorters
                     })
-                    
+
                     const reviewers = response.data.map(r => {
                         return {
                             ...r,
@@ -187,6 +187,11 @@ export class CampaignPanel {
                     const bulkManagerEscalator = new BulkCampaignManagerEscalation(client)
                     await bulkManagerEscalator.execute(this.campaignId)
                     return;
+                case commands.GET_STATUS:
+                    const campaign = await client.getCampaign(payload)
+                    this._panel.webview.postMessage({ command, requestId, payload: campaign.status });
+                    return;
+
             }
         },
             null,
@@ -241,7 +246,7 @@ export class CampaignPanel {
       window.data=${JSON.stringify({
             campaignId: this.campaignId,
             campaignName: this.campaignName,
-            campaignStatus: this.campaignStatus
+            campaignType: this.campaignType
         })};
     </script>
   </body>

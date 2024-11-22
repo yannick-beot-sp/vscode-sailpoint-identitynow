@@ -127,4 +127,22 @@ button:focus-visible {
 
 #headerSection {
   align-items: baseline;
+  justify-content: space-between;
+}
+#headerSection div{
+  align-items: baseline;
+  display: flex;
+}
+
+#headerSection h2 {
+  padding-left: 5px;
+}
+
+.btn {
+  color: var(--vscode-button-foreground);
+  background-color: var(--vscode-button-background);
+  border-radius: 0;
+  margin-left: 5px;
+  line-height: 1.5;
+  padding: 4px 10px;
 }

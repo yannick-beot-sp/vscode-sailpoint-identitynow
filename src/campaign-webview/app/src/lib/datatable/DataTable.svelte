@@ -21,9 +21,17 @@
     fetchData: FetchDataCallback;
     multiSelectActions: MultiSelectAction<any>[];
     actions: Action<any>[];
+    noDataLabel?: string;
   }
-  let { columns=$bindable(), fetchData, multiSelectActions = [], actions = [] }: Props = $props();
+  let {
+    columns = $bindable(),
+    fetchData,
+    multiSelectActions = [],
+    actions = [],
+    noDataLabel = "No Data",
+  }: Props = $props();
 
+  let loading = $state(true);
   let data: any = $state([]);
   let currentPage = $state(0);
   let pageSize = $state(10);
@@ -33,7 +41,8 @@
   let selectedRows: any[] = $state([]);
   let hasSelection: boolean = $derived(selectedRows.length > 0);
   let hasMultiSelectActions: boolean = $derived(multiSelectActions.length > 0);
-  let selectAll: boolean = $derived(selectedRows.length === data.length);
+  let isAllSelected: boolean = $derived(selectedRows.length === data.length);
+  let isEmpty: boolean = $derived(data.length === 0);
 
   const handleRowSelect = (row: any) => {
     if (selectedRows.includes(row)) {
@@ -44,6 +53,7 @@
   };
 
   async function updateData() {
+    loading = true;
     console.log({ currentPage, pageSize, fetchOptions });
     if (currentPage * pageSize > totalResults) {
       currentPage = 0;
@@ -52,10 +62,11 @@
     const response = await fetchData(fetchOptions);
     data = response.data;
     totalResults = response.count;
+    loading = false;
   }
 
   function handleSelectAll() {
-    if (selectAll) {
+    if (isAllSelected) {
       // All rows were selected. Need to unselect all
       selectedRows = [];
     } else {
@@ -95,108 +106,115 @@
 </script>
 
 <div class="datatable">
-  <div class="header">
-    {#if hasSelection}
-      <div>
-        <span>{selectedRows.length} of {data.length} selected</span>
-      </div>
-      <div class="actions">
-        {#each multiSelectActions as action}
-          <button id={action.id} class={action.class} onclick={() => action.callback(selectedRows)}>
-            {action.label}
+  {#if loading}
+    <!-- promise is pending -->
+    <div class="loading"></div>
+  {:else if isEmpty}
+    <div>{noDataLabel}</div>
+  {:else}
+    <div class="header">
+      {#if hasSelection}
+        <div>
+          <span>{selectedRows.length} of {data.length} selected</span>
+        </div>
+        <div class="actions">
+          {#each multiSelectActions as action}
+            <button id={action.id} class={action.class} onclick={() => action.callback(selectedRows)}>
+              {action.label}
+            </button>
+          {/each}
+        </div>
+      {:else}
+        <div>
+          <span>Results: {totalResults}</span>
+        </div>
+      {/if}
+      <div class="permanentActions">
+        <div>
+          <SelectColumn bind:columns />
+        </div>
+        <div>
+          <button class="btn" onclick={updateData}
+            ><span>
+              <Refresh />
+            </span>
           </button>
-        {/each}
-      </div>
-    {:else}
-      <div>
-        <span>Results: {totalResults}</span>
-      </div>
-    {/if}
-    <div class="permanentActions">
-      <div>
-        <SelectColumn bind:columns />
-      </div>
-      <div>
-        <button class="btn" onclick={updateData}
-          ><span>
-            <Refresh />
-          </span>
-        </button>
+        </div>
       </div>
     </div>
-  </div>
-  <table>
-    <thead>
-      <tr>
-        {#if hasMultiSelectActions}
-          <!-- Needs checkbox only if there are actions for multi sections-->
-          <th> <input type="checkbox" checked={selectAll} onclick={handleSelectAll} /></th>
-        {/if}
-        {#each columns as column}
-          {#if column.visible}
-            <th class:sortable={column.sortable} onclick={() => handleSort(column.field)}>
-              {column.label}
-              {#if column.sortable}
-                {#if column.field === sort?.field}
-                  {#if sort?.order === "asc"}
-                    <span class="down"><Down /></span>
-                  {:else}
-                    <span class="up"><Up /></span>
-                  {/if}
-                {:else}
-                  <span class="updown"><UpDown /></span>
-                {/if}
-              {/if}
-            </th>
-          {/if}
-        {/each}
-
-        {#if actions.length > 0}
-          <th>Actions</th>
-        {/if}
-      </tr>
-    </thead>
-    <tbody>
-      {#each data as row, i}
-        <tr class:selected={selectedRows.includes(row)}>
+    <table>
+      <thead>
+        <tr>
           {#if hasMultiSelectActions}
             <!-- Needs checkbox only if there are actions for multi sections-->
-            <td>
-              <input
-                type="checkbox"
-                checked={selectedRows.includes(row)}
-                onchange={() => handleRowSelect(row)}
-              />
-            </td>
+            <th> <input type="checkbox" checked={isAllSelected} onclick={handleSelectAll} /></th>
           {/if}
           {#each columns as column}
             {#if column.visible}
-              <td>{row[column.field]}</td>
+              <th class:sortable={column.sortable} onclick={() => handleSort(column.field)}>
+                {column.label}
+                {#if column.sortable}
+                  {#if column.field === sort?.field}
+                    {#if sort?.order === "asc"}
+                      <span class="down"><Down /></span>
+                    {:else}
+                      <span class="up"><Up /></span>
+                    {/if}
+                  {:else}
+                    <span class="updown"><UpDown /></span>
+                  {/if}
+                {/if}
+              </th>
             {/if}
           {/each}
+
           {#if actions.length > 0}
-            <td>
-              {#each actions as action}
-                {#if action.condition === undefined || action.condition(row)}
-                  <button id={action.id} class={action.class} onclick={() => action.callback(row)}>
-                    {action.label}
-                  </button>
-                {/if}
-              {/each}
-            </td>
+            <th>Actions</th>
           {/if}
         </tr>
-      {/each}
-    </tbody>
-  </table>
-  <div class="footer">
-    <div class="page-size">
-      <RowsPerPage bind:pageSize onUpdatePage={updateData} />
+      </thead>
+      <tbody>
+        {#each data as row, i}
+          <tr class:selected={selectedRows.includes(row)}>
+            {#if hasMultiSelectActions}
+              <!-- Needs checkbox only if there are actions for multi sections-->
+              <td>
+                <input
+                  type="checkbox"
+                  checked={selectedRows.includes(row)}
+                  onchange={() => handleRowSelect(row)}
+                />
+              </td>
+            {/if}
+            {#each columns as column}
+              {#if column.visible}
+                <td>{row[column.field]}</td>
+              {/if}
+            {/each}
+            {#if actions.length > 0}
+              <td>
+                {#each actions as action}
+                  {#if action.condition === undefined || action.condition(row)}
+                    <button id={action.id} class={action.class} onclick={() => action.callback(row)}>
+                      {action.label}
+                    </button>
+                  {/if}
+                {/each}
+              </td>
+            {/if}
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+    <div class="footer">
+      <div class="page-size">
+        <RowsPerPage bind:pageSize onUpdatePage={updateData} />
+      </div>
+      <div class="pagination">
+        <Pagination bind:currentPage bind:pageSize {totalResults} onUpdatePage={updateData} />
+      </div>
     </div>
-    <div class="pagination">
-      <Pagination bind:currentPage bind:pageSize bind:totalResults onUpdatePage={updateData} />
-    </div>
-  </div>
+  {/if}
 </div>
 
 <style>
