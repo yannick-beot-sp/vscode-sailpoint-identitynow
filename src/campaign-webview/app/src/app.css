@@ -28,7 +28,7 @@ section {
   border-radius: 0.5rem;
   border-color: var(--vscode-disabledForeground);
   border-width: 1px;
-  background-color: var(--vscode-editorWidget-background);
+  background-color: var(--vscode-welcomePage-tileBackground);
 }
 /*
 @media screen and (min-width: 40em) {
@@ -95,21 +95,6 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-
-  a:hover {
-    color: #747bff;
-  }
-
-  button {
-    background-color: #f9f9f9;
-  }
 }
 
 .loading {

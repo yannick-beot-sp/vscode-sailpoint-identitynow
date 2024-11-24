@@ -29,16 +29,14 @@
   .kpi-bar {
     line-height: 1rem;
     width: 100%;
-    background-color: var(--vscode-disabledForeground);
+    background-color: var(--vscode-input-background);
     display: flex;
     align-items: center;
+    color: var(--vscode-button-foreground);
   }
 
   .kpi-bar-completed {
     background-color: var(--vscode-progressBar-background);
-    /* justify-content: center;
-    display: flex;
-    flex-direction: column; */
     text-align: center;
   }
 
