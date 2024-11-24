@@ -53,9 +53,9 @@ export interface KPIs {
 }
 
 export interface Client {
-    getStatus(id: string): Promise<string>
-    getKPIs(): Promise<KPIs>
-    getReviewers(fetchOptions: FetchOptions): Promise<PaginatedData<Reviewer>>
-    escalateReviewers(r: Reviewer[]): Promise<void>
-    sendReminders(r: Reviewer[]): Promise<void>
+    getStatus(id: string, force: boolean): Promise<string>
+    getKPIs(force: boolean): Promise<KPIs>
+    getReviewers(fetchOptions: FetchOptions, force: boolean): Promise<PaginatedData<Reviewer>>
+    escalateReviewers(r: Reviewer[], force: boolean): Promise<void>
+    sendReminders(r: Reviewer[], force: boolean): Promise<void>
 }

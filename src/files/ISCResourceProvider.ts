@@ -175,7 +175,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 				await client.updateConnectorRule(rule)
 			} else if (resourcePath.match("form-definitions")) {
 				// UI is pushing all data as a Patch. Doing the same for form definitions
-				const newData = JSON.parse(data) as SlimCampaign
+				const newData = JSON.parse(data) as FormDefinitionResponseBeta
 				const jsonpatch: Operation[] = [
 					{
 						op: 'replace',

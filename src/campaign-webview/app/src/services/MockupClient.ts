@@ -65,24 +65,24 @@ export class MockupClient implements Client {
         this.reviewers = generateDummyReviewers(this.count);
     }
 
-    async getStatus(id: string): Promise<string> {
+    async getStatus(id: string, force: boolean): Promise<string> {
         await stall()
         return statuses[Math.floor(Math.random() * statuses.length)]
     }
 
-    async escalateReviewers(r: Reviewer[]): Promise<void> {
+    async escalateReviewers(r: Reviewer[], force: boolean): Promise<void> {
         console.log(">escalateReviewers");
         console.log(r);
         alert(`Escalation for ${r.length} identities`)
     }
 
-    async sendReminders(r: Reviewer[]): Promise<void> {
+    async sendReminders(r: Reviewer[], force: boolean): Promise<void> {
         console.log(">sendReminders");
         console.log(r);
         alert(`Reminders sent for ${r.length} identities`)
     }
 
-    async getReviewers(fetchOptions: FetchOptions): Promise<PaginatedData<Reviewer>> {
+    async getReviewers(fetchOptions: FetchOptions, force: boolean): Promise<PaginatedData<Reviewer>> {
         await stall()
         console.log(">getReviewers", fetchOptions);
 
@@ -107,7 +107,7 @@ export class MockupClient implements Client {
         // }
     }
 
-    async getKPIs(): Promise<KPIs> {
+    async getKPIs(force: boolean): Promise<KPIs> {
         await stall()
         let totalsTmp = {
             totalAccessReviews: getRandomInt(50, 200),

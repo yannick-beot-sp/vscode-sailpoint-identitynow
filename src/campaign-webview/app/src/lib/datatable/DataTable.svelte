@@ -52,13 +52,13 @@
     }
   };
 
-  async function updateData() {
+  async function updateData(force = false) {
     loading = true;
     console.log({ currentPage, pageSize, fetchOptions });
     if (currentPage * pageSize > totalResults) {
       currentPage = 0;
     }
-
+    fetchOptions.force = force;
     const response = await fetchData(fetchOptions);
     data = response.data;
     totalResults = response.count;
@@ -134,7 +134,7 @@
           <SelectColumn bind:columns />
         </div>
         <div>
-          <button class="btn" onclick={updateData}
+          <button class="btn" onclick={() => updateData(true)}
             ><span>
               <Refresh />
             </span>

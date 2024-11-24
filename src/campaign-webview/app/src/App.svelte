@@ -59,13 +59,13 @@
     );
   }
 
-  function updateKPIsAndStatus() {
-    promiseResult = client.getKPIs();
-    promiseStatus = client.getStatus(window.data.campaignId);
+  function updateKPIsAndStatus(force: boolean = true) {
+    promiseResult = client.getKPIs(force);
+    promiseStatus = client.getStatus(window.data.campaignId, force);
   }
 
   onMount(async () => {
-    updateKPIsAndStatus();
+    updateKPIsAndStatus(false);
   });
 
   let reviewerColumns: Column[] = $state([
@@ -135,7 +135,7 @@
   const fetchData: FetchDataCallback = async (fetchOptions: FetchOptions) => {
     console.log(">fetchData");
     console.log({ fetchOptions });
-    return client.getReviewers(fetchOptions);
+    return client.getReviewers(fetchOptions, fetchOptions.force ?? false);
   };
 </script>
 

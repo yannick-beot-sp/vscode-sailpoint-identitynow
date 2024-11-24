@@ -5,7 +5,8 @@ export interface SortingOptions {
 export interface FetchOptions {
     currentPage: number,
     pageSize: number,
-    sort?: SortingOptions
+    sort?: SortingOptions,
+    force?: boolean
 }
 
 export interface PaginatedData<T> {
