@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as commands from "../commands/constants";
 import { CampaignTreeItem } from "../models/ISCTreeItem";
 import { CampaignConfigurationService } from "../services/CampaignConfigurationService";
 import { TenantService } from "../services/TenantService";
@@ -8,6 +7,7 @@ import { AccessReviewItem, DtoType, ReassignReference, ReassignReferenceTypeEnum
 import { chooseFile, confirm } from '../utils/vsCodeHelpers';
 import { CustomReviewerCoverage, CustomReviewerImporter } from './CustomReviewerImporter';
 import { BulkReviewItemReassignment } from './BulkReviewItemReassignment';
+import { isTenantReadonly, validateTenantReadonly } from '../commands/validateTenantReadonly';
 
 const CUSTOM_REVIEWERS_DEFAULT_COMMENT = "Reassigned to the defined reviewer"
 
@@ -29,7 +29,10 @@ export class CustomReassignCommand {
             return;
         }
 
-        if (!(await confirm(`Are you sure you want to run a custom reviewer assignment for the campaign [${node.label}] using the custom reviewer file [${fileUri.fsPath}] ?`))) {
+        const isReadOnly = isTenantReadonly(this.tenantService, node.tenantId)
+
+        if ((isReadOnly && !(await validateTenantReadonly(this.tenantService, node.tenantId, `run a custom reviewer assignment for the campaign ${node.label}`)))
+            || (!isReadOnly && !(await confirm(`Are you sure you want to run a custom reviewer assignment for the campaign ${node.label}?`)))) {
             console.log("< CustomReassignCommand.execute: no reassignment");
             return
         }
