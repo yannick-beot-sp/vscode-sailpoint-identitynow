@@ -1409,13 +1409,6 @@ export class ISCClient {
 	//#region Roles
 	//////////////////////////////
 
-	public async getRoleById(id: string): Promise<Role> {
-		console.log("> getRoleById", id);
-		const role = await this.getRoleById(id)
-		console.log("< getRoleById", role);
-		return role;
-	}
-
 	public async getRoleByName(name: string): Promise<Role> {
 		console.log("> getRoleByName", name);
 		const result = await this.getRoles({
