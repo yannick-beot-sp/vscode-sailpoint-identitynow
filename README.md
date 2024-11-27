@@ -170,18 +170,18 @@ This extension includes the following snippets for the Public Identities Configu
 The following table provides the expected column for the CSV to import Access Profiles:
 
 | Header                   | M[*] | Description                                                                                                                 | Default Value      |
-| ------------------------ | ----- | --------------------------------------------------------------------------------------------------------------------------- | ------------------ |
-| `name`                   | Yes   | Name of the access profile                                                                                                  |                    |
-| `owner`                  | Yes   | Owner of the access profile                                                                                                 |                    |
-| `source`                 | Yes   | Source associated with the access profile                                                                                   |                    |
-| `description`            | No    | Description of the access profile                                                                                           | `null`             |
-| `enabled`                | No    | Is the access profile enabled?                                                                                              | `false`            |
-| `requestable`            | No    | Is the access profile requestable?                                                                                          | `false`            |
-| `commentsRequired`       | No    | Require comments when the user requests access                                                                              | `false`            |
-| `denialCommentsRequired` | No    | Require comments when a reviewer denies the request                                                                         | `false`            |
-| `approvalSchemes`        | No    | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
-| `revokeApprovalSchemes`  | No    | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
-| `entitlements`           | No    | Entitlements of the access profile                                                                                          | `[]`               |
+| ------------------------ | ---- | --------------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| `name`                   | Yes  | Name of the access profile                                                                                                  |                    |
+| `owner`                  | Yes  | Owner of the access profile                                                                                                 |                    |
+| `source`                 | Yes  | Source associated with the access profile                                                                                   |                    |
+| `description`            | No   | Description of the access profile                                                                                           | `null`             |
+| `enabled`                | No   | Is the access profile enabled?                                                                                              | `false`            |
+| `requestable`            | No   | Is the access profile requestable?                                                                                          | `false`            |
+| `commentsRequired`       | No   | Require comments when the user requests access                                                                              | `false`            |
+| `denialCommentsRequired` | No   | Require comments when a reviewer denies the request                                                                         | `false`            |
+| `approvalSchemes`        | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
+| `revokeApprovalSchemes`  | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
+| `entitlements`           | No   | Entitlements of the access profile                                                                                          | `[]`               |
 
 [*]: ## "Mandatory"
 
@@ -190,20 +190,20 @@ The following table provides the expected column for the CSV to import Access Pr
 The following table provides the expected column for the CSV to import Roles:
 
 | Header                         | M[*] | Description                                                                                    | Default Value      |
-| ------------------------------ | ----- | ---------------------------------------------------------------------------------------------- | ------------------ |
-| `name`                         | Yes   | Name of the role                                                                               |                    |
-| `owner`                        | Yes   | Owner of the role                                                                              |                    |
-| `description`                  | No    | Description of the role                                                                        | `null`             |
-| `enabled`                      | No    | Is the role enabled?                                                                           | `false`            |
-| `requestable`                  | No    | Is the role requestable?                                                                       | `false`            |
-| `commentsRequired`             | No    | Require comments when the user requests access                                                 | `false`            |
-| `denialCommentsRequired`       | No    | Require comments when a reviewer denies the request                                            | `false`            |
-| `approvalSchemes`              | No    | List of reviewers among `OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
-| `revokeCommentsRequired`       | No    | Require comments when the user requests revocation                                             | `false`            |
-| `revokeDenialCommentsRequired` | No    | Require comments when a reviewer denies the revocation request                                 | `false`            |
-| `revokeApprovalSchemes`        | No    | List of reviewers among `OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
-| `accessProfiles`               | No    | List of access profiles                                                                        | `[]`               |
-| `membershipCriteria`           | No    | Membership criteria for automatic assignment                                                   |                    |
+| ------------------------------ | ---- | ---------------------------------------------------------------------------------------------- | ------------------ |
+| `name`                         | Yes  | Name of the role                                                                               |                    |
+| `owner`                        | Yes  | Owner of the role                                                                              |                    |
+| `description`                  | No   | Description of the role                                                                        | `null`             |
+| `enabled`                      | No   | Is the role enabled?                                                                           | `false`            |
+| `requestable`                  | No   | Is the role requestable?                                                                       | `false`            |
+| `commentsRequired`             | No   | Require comments when the user requests access                                                 | `false`            |
+| `denialCommentsRequired`       | No   | Require comments when a reviewer denies the request                                            | `false`            |
+| `approvalSchemes`              | No   | List of reviewers among `OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
+| `revokeCommentsRequired`       | No   | Require comments when the user requests revocation                                             | `false`            |
+| `revokeDenialCommentsRequired` | No   | Require comments when a reviewer denies the revocation request                                 | `false`            |
+| `revokeApprovalSchemes`        | No   | List of reviewers among `OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
+| `accessProfiles`               | No   | List of access profiles                                                                        | `[]`               |
+| `membershipCriteria`           | No   | Membership criteria for automatic assignment                                                   |                    |
 
 #### Membership criteria
 
@@ -257,13 +257,13 @@ identity.department eq 'Customer Service' and identity.cloudLifecycleState eq 'a
 
 The following table provides the expected column for the CSV to import Custom Reviewer logic:
 
-| Header                         | M[*] | Description                                                                                    | Supported Values      |
-| ------------------------------ | ----- | ---------------------------------------------------------------------------------------------- | ------------------ |
-| `reviewerAttribute`                         | Yes   | Identity attribute used to identify the defined reviewer  | `id\|name\|email`                   |
-| `reviewerValue`                        | Yes   | The value of identity attribute for the defined reviewer (e.g. the email address of the reviewer) |                    |
-| `itemType`                  | Yes    |  The type of object to scope the reviewer's review items | `IDENTITY\|ENTITLEMENT\|ACCESS_PROFILE\|ROLE`             |
-| `itemSelectorType`                      | Yes    | The type of selector used to define the reviewer's scope | `id\|name\|query`[**]            |
-| `itemSelectorValue`                  | Yes    | The value of the selector used to define the reviewer's scope (e.g. a valid entitlement Search Query) |             |
+| Header              | M[*] | Description                                                                                           | Supported Values                              |
+| ------------------- | ---- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `reviewerAttribute` | Yes  | Identity attribute used to identify the defined reviewer                                              | `id\|name\|email`                             |
+| `reviewerValue`     | Yes  | The value of identity attribute for the defined reviewer (e.g. the email address of the reviewer)     |                                               |
+| `itemType`          | Yes  | The type of object to scope the reviewer's review items                                               | `IDENTITY\|ENTITLEMENT\|ACCESS_PROFILE\|ROLE` |
+| `itemSelectorType`  | Yes  | The type of selector used to define the reviewer's scope                                              | `id\|name\|query`[**]                         |
+| `itemSelectorValue` | Yes  | The value of the selector used to define the reviewer's scope (e.g. a valid entitlement Search Query) |                                               |
 
 [**]: ## "Item selector type `name` is not supported with item type `ENTITLEMENT`"
 
@@ -279,11 +279,12 @@ email,Alan.Bandero@sailpointdemo.com,ENTITLEMENT,query,"source.name:""Active Dir
 name,Aaron.Nichols,ACCESS_PROFILE,name,"Accounts Payable Access"
 email,Anne.Arnold@sailpointdemo.com,ROLE,query,*
 ```
+
 ### Certification Campaign Report
 
 The report provides a detailed overview of user access rights, including roles, access profiles, and entitlements. Auditors gain a comprehensive understanding of who has access to critical systems and data, enabling them to assess compliance with regulatory requirements and internal policies.
 
-below are the campaign report headers: 
+below are the campaign report headers:
 
 ```
 "Campaign Name","Reviewer Name","Reviewer Email","Identity Name","Review Completed","Review Item ID","Item Review Completed","New Access","Reviewer Decision","Reviewer Comments","Access Type","Role Name","Role Description","Access Profile Name","Access Profile Description","Access Profile Privileged","Entitlement Name","Entitlement Description","Entitlement Privileged","Entitlement Attribute Value","Entitlement Source Schema Object Type","Entitlement Source Name","Entitlement Account Native ID","Entitlement Account Name"
@@ -293,7 +294,7 @@ You need to configure the path where the report will be exported
 
 ### Send Reminder Notification To Reviewers
 
-Copy this below Workflow Json to a file and save it as .json file like: SendReminderNotificationToReviewersWorkflow.json
+Copy this below Workflow JSON to a file and save it as `.json` file like: `SendReminderNotificationToReviewersWorkflow.json`
 
 ```
 {
@@ -325,7 +326,6 @@ Copy this below Workflow Json to a file and save it as .json file like: SendRemi
 			}
 		}
 	},
-	
 	"trigger": {
 		"type": "EXTERNAL",
 		"attributes": {
@@ -334,33 +334,34 @@ Copy this below Workflow Json to a file and save it as .json file like: SendRemi
 		}
 	}
 }
-
 ```
 
-- Login to your ISC tenant as an Admin 
-- Navigate to Admin -> Workflows -> New Workflow -> Upload File 
-- Upload the workflow json file then click on "Continue to Build"
-- In the builder click on External Trigger node  -> + New Access Token
-- Save the client ID, client secrete as you will need them to later in the SailPoint ISC extention
-- Click on the "Send Reminder Notification" node to modify or update the notification template.
-- Save the workfolw and enable it
+- Login to your ISC tenant as an Admin
+- Navigate to Admin -> Workflows -> New Workflow -> Upload File
+- Upload the workflow JSON file, then click on "Continue to Build"
+- In the builder click on External Trigger node -> + New Access Token
+- Save the client ID, client secret as you will need them to later in the SailPoint ISC extension
+- Click on the "Send Reminder Notification" node to update the notification template.
+- Save the workflow and enable it
 
-The external json trigger is: 
+The external JSON trigger is:
+
 ```
 {
-                    input: {
-                    reviewerName: reviewerName,
-                    reviewerId: reviewerId,
-                    reviewerEmail: reviewerEmail,
-                    campaignName: campaignName,
-                    completedDecisions: completedDecisions,
-                    totalDecisions: totalDecisions,
-                    pendingItems: pendingItems,
-                    completedIdentities: completedIdentities,
-                    totalIdentities: totalIdentities,
-                    pendingIdentities: pendingIdentities,
-                    dueDate: certificationDueDate
-                  }
+  input:
+    {
+      reviewerName: reviewerName,
+      reviewerId: reviewerId,
+      reviewerEmail: reviewerEmail,
+      campaignName: campaignName,
+      completedDecisions: completedDecisions,
+      totalDecisions: totalDecisions,
+      pendingItems: pendingItems,
+      completedIdentities: completedIdentities,
+      totalIdentities: totalIdentities,
+      pendingIdentities: pendingIdentities,
+      dueDate: certificationDueDate
+    }
 }
 ```
 
@@ -395,8 +396,9 @@ The extension supports the following settings:
 - `vscode-sailpoint-identitynow.treeView.pagination`: Define the number of roles and access profiles that are displayed in the tree view
   - Default value: 100
 - `vscode-sailpoint-identitynow.report.campaigns.filename`: Define the pattern for the folder to export access profiles.
+
   - Default value: `%x/reports/%T-Campaign-%S-%y%M%d-%h%m%s.csv`
-The patterns defined above use the following tokens:
+    The patterns defined above use the following tokens:
 
 - `%u`: User Home Dir
 - `%w`: Workspace folder
@@ -452,9 +454,9 @@ The patterns defined above use the following tokens:
 - Can create or delete an identity attribute (cf. [#83](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/83))
 - Fixed issue during the account reset (cf. [#85](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/85))
 
-### 1.3.1 
+### 1.3.1
 
-- 429 Too Many Requests error during export or import of roles and access profiles  (cf. [#82](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/82))
+- 429 Too Many Requests error during export or import of roles and access profiles (cf. [#82](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/82))
 - Role and Access Profile imports are now cancellable
 
 ### 1.3.0
