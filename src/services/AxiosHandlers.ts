@@ -1,5 +1,8 @@
 import { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig, isAxiosError } from "axios";
 
+const MAX_429_RETRIES = 10
+const MAX_5XX_RETRIES = 5
+
 export const onRequest = (request: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
 
     const method = request.method?.toUpperCase();
@@ -18,15 +21,16 @@ export const onResponse = (response: AxiosResponse): AxiosResponse => {
 };
 
 export const onErrorResponse = async (error: AxiosError | Error, instance: AxiosInstance) => {
-    // Only retry for HTTP 429 rate limiting error
+    // Only retry for HTTP 429 rate limiting error or other errors when below the max retry cap
     if (error instanceof AxiosError && isRetryable(error)) {
         console.error(
             `[ISCClient] ${error.config.method?.toUpperCase()} ${error.config.url} | Error ${error.response.status} ${error.response.statusText}`, error
         );
         // Calculate the time to wait using the 'retry-after' header then wait
-        const timeToWait = await getTimeToWait(error);
-        
-        console.error(`[ISCClient] RETRY: waiting for ${timeToWait}ms`);
+        const timeToWait = getTimeToWait(error);
+        error.config.__retryCount = (error.config.__retryCount || 0) + 1;
+
+        console.error(`[ISCClient] RETRY {${error.config.__retryCount}}: waiting for ${timeToWait}ms`);
         await new Promise(resolve => setTimeout(resolve, timeToWait));
         // Retry the original request
         return instance(error.config);
@@ -67,13 +71,15 @@ export const onErrorResponse = async (error: AxiosError | Error, instance: Axios
 };
 
 function isRetryable(error: AxiosError) {
+    const currentRetryCount = error.config.__retryCount || 0
     return (
         error.code !== 'ECONNABORTED' &&
         (!error.response ||
             // rate limit error
-            error.response.status === 429 ||
+            (error.response.status === 429 && currentRetryCount < MAX_429_RETRIES) ||
             // server error
-            (error.response.status >= 500 && error.response.status <= 599))
+            (error.response.status >= 500 && error.response.status <= 599 && currentRetryCount < MAX_5XX_RETRIES)
+        )
     );
 }
 
