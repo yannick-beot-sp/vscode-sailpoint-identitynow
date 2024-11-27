@@ -14,7 +14,7 @@ import { basename } from 'path';
 import { createReadStream } from 'fs';
 import { DEFAULT_ACCESSPROFILES_QUERY_PARAMS } from "../models/AccessProfiles";
 import { DEFAULT_ROLES_QUERY_PARAMS } from "../models/Roles";
-import axiosRetry = require("axios-retry");
+// import axiosRetry = require("axios-retry");
 import { addQueryParams } from "../utils/UriUtils";
 import { onErrorResponse, onRequest, onResponse } from "./AxiosHandlers";
 
@@ -31,14 +31,6 @@ const DEFAULT_AXIOS_OPTIONS: AxiosRequestConfig = {
 	headers: {
 		[USER_AGENT_HEADER]: USER_AGENT
 	}
-}
-
-const DEFAULT_RETRY_CONFIG = {
-	retries: 10,
-	retryDelay: axiosRetry.exponentialDelay,
-	onRetry(retryCount, error, requestConfig) {
-		console.log(`retrying due to request error, try number ${retryCount}`);
-	},
 }
 
 export const TOTAL_COUNT_HEADER = "x-total-count";
@@ -124,8 +116,6 @@ export class ISCClient {
 			clientSecret: ""
 		});
 
-		apiConfig.retriesConfig = DEFAULT_RETRY_CONFIG
-
 		return apiConfig;
 	}
 
@@ -140,9 +130,10 @@ export class ISCClient {
 			onRequest);
 		instance.interceptors.response.use(
 			onResponse,
-			onErrorResponse
+			(error) => {
+				return onErrorResponse(error, instance)
+			}
 		);
-		axiosRetry(instance, DEFAULT_RETRY_CONFIG)
 		return instance;
 	}
 
@@ -169,7 +160,9 @@ export class ISCClient {
 			onRequest);
 		instance.interceptors.response.use(
 			onResponse,
-			onErrorResponse
+			(error) => {
+				return onErrorResponse(error, instance)
+			}
 		);
 		return instance;
 	}

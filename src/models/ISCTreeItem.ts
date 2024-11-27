@@ -1496,7 +1496,7 @@ export class CampaignsTreeItem extends PageableFolderTreeItem<any> {
 /**
  * List of supported campaign types for which the dashboard can be displayed
  */
-const SUPPORTED_CAMPAIGN_TYPES = ["MACHINE_ACCOUNT", "SOURCE_OWNER", "SEARCH"]
+const SUPPORTED_CAMPAIGN_TYPES = ["MACHINE_ACCOUNT", "SOURCE_OWNER", "SEARCH", "MANAGER"]
 /**
  * Certification Campaign
  */
