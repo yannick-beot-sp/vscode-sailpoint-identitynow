@@ -20,9 +20,13 @@ export const onResponse = (response: AxiosResponse): AxiosResponse => {
 export const onErrorResponse = async (error: AxiosError | Error, instance: AxiosInstance) => {
     // Only retry for HTTP 429 rate limiting error
     if (error instanceof AxiosError && isRetryable(error)) {
+        console.error(
+            `[ISCClient] ${error.config.method?.toUpperCase()} ${error.config.url} | Error ${error.response.status} ${error.response.statusText}`, error
+        );
         // Calculate the time to wait using the 'retry-after' header then wait
         const timeToWait = await getTimeToWait(error);
-        console.log(`RETRY: Rate limit retry waiting for ${timeToWait}ms`);
+        
+        console.error(`[ISCClient] RETRY: waiting for ${timeToWait}ms`);
         await new Promise(resolve => setTimeout(resolve, timeToWait));
         // Retry the original request
         return instance(error.config);
@@ -58,26 +62,34 @@ export const onErrorResponse = async (error: AxiosError | Error, instance: Axios
             console.error(`[ISCClient] ${caller?.toUpperCase()} ${error.message}`, error);
             errorMessage = error.message;
         }
-
         return Promise.reject(new Error(errorMessage));
     }
 };
 
 function isRetryable(error: AxiosError) {
-    return !!(
-        // must be a response error
-        error.response &&
-        // must be a rate limit error
-        error.response.status === 429 &&
-        // must have a Retry-After header
-        error.response.headers['retry-after']
-    )
+    return (
+        error.code !== 'ECONNABORTED' &&
+        (!error.response ||
+            // rate limit error
+            error.response.status === 429 ||
+            // server error
+            (error.response.status >= 500 && error.response.status <= 599))
+    );
 }
 
 function getTimeToWait(error: AxiosError): number {
     const retryAfter = error.response.headers['retry-after']
-    const parsedRetryAfter = parseInt(retryAfter)
-    return Number.isNaN(parsedRetryAfter)
-        ? Date.parse(retryAfter) - Date.now()
-        : parsedRetryAfter * 1000
+    if (retryAfter) {
+
+        const parsedRetryAfter = parseInt(retryAfter)
+        return Number.isNaN(parsedRetryAfter)
+            ? Date.parse(retryAfter) - Date.now()
+            : parsedRetryAfter * 1000
+    }
+
+    return getRandomInteger()
+}
+
+function getRandomInteger(min: number = 1000, max: number = 5000): number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
