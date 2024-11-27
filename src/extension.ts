@@ -85,16 +85,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	console.log('Congratulations, your extension "vscode-sailpoint-identitynow" is now active!');
 
-	// Add global interceptor for axios, to applied with the sailpoint SDK
-	// Add a request interceptor
-	globalAxios.interceptors.request.use(onRequest)
-
-	// Add a response interceptor
-	globalAxios.interceptors.response.use(
-		onResponse,
-		onErrorResponse)
-
-
 	const tenantService = new TenantService(context.globalState, context.secrets);
 
 	SailPointISCAuthenticationProvider.initialize(tenantService)
