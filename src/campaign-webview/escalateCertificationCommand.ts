@@ -25,7 +25,7 @@ export class EscalateCertificationCommand {
 
         try {
             const bulkManagerEscalator = new BulkCampaignManagerEscalation(client)
-            bulkManagerEscalator.execute(campaignId)
+            bulkManagerEscalator.escalateCampaign(campaignId)
         }
         catch (error) {
             const errorMessage = (error instanceof Error) ? error.message : error.toString();

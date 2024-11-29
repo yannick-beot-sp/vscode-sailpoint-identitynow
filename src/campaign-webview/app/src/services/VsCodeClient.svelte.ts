@@ -29,14 +29,14 @@ export class VsCodeClient implements Client {
         return this.state.status
     }
 
-    async escalateReviewers(r: Reviewer[], force: boolean): Promise<void> {
+    async escalateReviewers(r: Reviewer[]): Promise<any> {
         console.log("> VsCodeClient.escalateReviewers");
         const snapshot = $state.snapshot(r)
         console.log(snapshot);
-        await messageHandler.request(commands.ESCALATE_REVIEWERS, snapshot);
+        return await messageHandler.request(commands.ESCALATE_REVIEWERS, snapshot);
     }
 
-    async sendReminders(r: Reviewer[], force: boolean): Promise<void> {
+    async sendReminders(r: Reviewer[]): Promise<void> {
         console.log("> VsCodeClient.sendReminders");
         // Reviewer is a proxy, as reactive svelte object.
         // Create a snapshot for cloning

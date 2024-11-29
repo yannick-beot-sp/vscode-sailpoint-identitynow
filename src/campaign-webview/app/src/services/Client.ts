@@ -56,6 +56,10 @@ export interface Client {
     getStatus(id: string, force: boolean): Promise<string>
     getKPIs(force: boolean): Promise<KPIs>
     getReviewers(fetchOptions: FetchOptions, force: boolean): Promise<PaginatedData<Reviewer>>
-    escalateReviewers(r: Reviewer[], force: boolean): Promise<void>
-    sendReminders(r: Reviewer[], force: boolean): Promise<void>
+    /**
+     * Expect a "dummy" response to trigger a refresh
+     * @param r 
+     */
+    escalateReviewers(r: Reviewer[]): Promise<any>
+    sendReminders(r: Reviewer[]): Promise<void>
 }

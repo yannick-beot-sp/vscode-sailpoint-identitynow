@@ -70,13 +70,13 @@ export class MockupClient implements Client {
         return statuses[Math.floor(Math.random() * statuses.length)]
     }
 
-    async escalateReviewers(r: Reviewer[], force: boolean): Promise<void> {
+    async escalateReviewers(r: Reviewer[]): Promise<void> {
         console.log(">escalateReviewers");
         console.log(r);
         alert(`Escalation for ${r.length} identities`)
     }
 
-    async sendReminders(r: Reviewer[], force: boolean): Promise<void> {
+    async sendReminders(r: Reviewer[]): Promise<void> {
         console.log(">sendReminders");
         console.log(r);
         alert(`Reminders sent for ${r.length} identities`)

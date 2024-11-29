@@ -22,7 +22,7 @@
 
   const actions: Action<Reviewer>[] = [];
   const multiSelectActions: MultiSelectAction<Reviewer>[] = [];
-
+  let reviewersTable: DataTable;
   const onlyActive = (row: Reviewer) =>
     row.phase !== "SIGNED" || (row.identitiesRemaining !== undefined && row.identitiesRemaining > 0);
   if (window.data.campaignStatus !== "COMPLETED") {
@@ -31,6 +31,8 @@
         label: "Escalate",
         callback: async (rows: Reviewer[]) => {
           await client.escalateReviewers(rows);
+          // force refresh
+          reviewersTable.updateData(true);
         },
       },
       {
@@ -46,6 +48,8 @@
         label: "Escalate",
         callback: async (row: Reviewer) => {
           await client.escalateReviewers([row]);
+          // force refresh
+          reviewersTable.updateData(true);
         },
         condition: onlyActive,
       },
@@ -148,7 +152,7 @@
       {/await}
     </div>
     <div class="headerSection--buttons">
-      <button class="btn" onclick={updateKPIsAndStatus}
+      <button class="btn" onclick={() => updateKPIsAndStatus()}
         ><span>
           <Refresh />
         </span>
@@ -192,6 +196,12 @@
   {/await}
   <section id="reviewers">
     <h2>Campaign Reviewers</h2>
-    <DataTable bind:columns={reviewerColumns} {fetchData} {actions} {multiSelectActions} />
+    <DataTable
+      bind:this={reviewersTable}
+      bind:columns={reviewerColumns}
+      {fetchData}
+      {actions}
+      {multiSelectActions}
+    />
   </section>
 </main>

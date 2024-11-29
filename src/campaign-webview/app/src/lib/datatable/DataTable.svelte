@@ -52,7 +52,7 @@
     }
   };
 
-  async function updateData(force = false) {
+  export async function updateData(force = false) {
     loading = true;
     console.log({ currentPage, pageSize, fetchOptions });
     if (currentPage * pageSize > totalResults) {

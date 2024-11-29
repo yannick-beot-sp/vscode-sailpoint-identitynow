@@ -9,6 +9,7 @@ import { BulkSendReminder } from './BulkSendReminder';
 import { CampaignConfigurationService } from '../services/CampaignConfigurationService';
 import { CampaignsTreeItem } from '../models/ISCTreeItem';
 import { BulkCampaignManagerEscalation } from './BulkCampaignManagerEscalation';
+import { IdentityCertificationDto } from 'sailpoint-api-client';
 
 function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
     return {
@@ -185,7 +186,10 @@ export class CampaignPanel {
                     return;
                 case commands.ESCALATE_REVIEWERS:
                     const bulkManagerEscalator = new BulkCampaignManagerEscalation(client)
-                    await bulkManagerEscalator.execute(this.campaignId)
+                    await bulkManagerEscalator.escalateCertifications(this.campaignId,
+                        this.campaignName,
+                        payload as IdentityCertificationDto[])
+                    this._panel.webview.postMessage({ command, requestId, payload: { data: "OK" } });
                     return;
                 case commands.GET_STATUS:
                     const campaign = await client.getCampaign(payload)

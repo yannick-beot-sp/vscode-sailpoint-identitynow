@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { AdminReviewReassignReassignTo, AdminReviewReassignReassignToTypeEnum, CampaignStatusEnum, CertificationCampaignsApiMoveRequest } from "sailpoint-api-client";
+import { AdminReviewReassignReassignTo, AdminReviewReassignReassignToTypeEnum, CampaignStatusEnum, CertificationCampaignsApiMoveRequest, IdentityCertificationDto } from "sailpoint-api-client";
 import { ISCClient } from "../services/ISCClient";
 
 const CERTIFICATIONS_REASSIGN_LIMIT = 250;
@@ -9,7 +9,7 @@ const COMMENT = "Escalating to the Reviewer's Manager"
 export class BulkCampaignManagerEscalation {
     constructor(private readonly client: ISCClient) { }
 
-    async execute(campaignId: string) {
+    async escalateCampaign(campaignId: string) {
         const campaign = await this.client.getCampaign(campaignId);
 
         // Ensure the campaign is not completed
@@ -26,7 +26,10 @@ export class BulkCampaignManagerEscalation {
             vscode.window.showWarningMessage(`No pending certifications found for campaign ${campaign.name}.`)
             return;
         }
+        await this.escalateCertifications(campaignId, campaign.name, pendingCertifications)
+    }
 
+    async escalateCertifications(campaignId: string, campaignName: string, pendingCertifications:IdentityCertificationDto[]) {
         let nbRreassignment = 0
         // Build campaign reassignments map (based on the current reviewer's manager)
         const campaignReassignments = new Map<string, string[]>();
@@ -53,7 +56,7 @@ export class BulkCampaignManagerEscalation {
             await this.processReviewerReassignments(campaignId, reviewerId, allCertificationIds, COMMENT)
         }
 
-        vscode.window.showInformationMessage(`${nbRreassignment} certification(s) reassigned for ${campaign.name}.`)
+        vscode.window.showInformationMessage(`${nbRreassignment} certification(s) reassigned for ${campaignName}.`)
 
     }
 
