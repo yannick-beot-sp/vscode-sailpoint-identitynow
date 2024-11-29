@@ -44,7 +44,7 @@ export class CampaignAccessReviewPaginator implements AsyncIterable<CampaignAcce
                                 accessSummary: {
                                     access: x.accessSummary.access,
                                     role: x.accessSummary.role,
-                                    accessProfile: x.accessSummary.accessProfile,
+                                    accessProfile,
                                     entitlement
                                 }
                             }));

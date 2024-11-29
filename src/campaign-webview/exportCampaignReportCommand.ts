@@ -47,17 +47,17 @@ export class ExportCampaignReportCommand {
             "Access Type": "accessSummary.access.type",
             "Role Name": "accessSummary.role.name",
             "Role Description": "accessSummary.role.description",
-            "Access Profile Name": "accessSummary.accessProfiles.name",
-            "Access Profile Description": "accessSummary.accessProfiles.description",
-            "Access Profile Privileged": "accessSummary.accessProfiles.privileged",
-            "Entitlement Name": "accessSummary.entitlements.name",
-            "Entitlement Description": "accessSummary.entitlements.description",
-            "Entitlement Privileged": "accessSummary.entitlements.privileged",
-            "Entitlement Attribute Value": "accessSummary.entitlements.attributeValue",
-            "Entitlement Source Schema Object Type": "accessSummary.entitlements.sourceSchemaObjectType",
-            "Entitlement Source Name": "accessSummary.entitlements.sourceName",
-            "Entitlement Account Native ID": "accessSummary.entitlements.account.nativeIdentity",
-            "Entitlement Account Name": "accessSummary.entitlements.account.name"
+            "Access Profile Name": "accessSummary.accessProfile.name",
+            "Access Profile Description": "accessSummary.accessProfile.description",
+            "Access Profile Privileged": "accessSummary.accessProfile.privileged",
+            "Entitlement Name": "accessSummary.entitlement.name",
+            "Entitlement Description": "accessSummary.entitlement.description",
+            "Entitlement Privileged": "accessSummary.entitlement.privileged",
+            "Entitlement Attribute Value": "accessSummary.entitlement.attributeValue",
+            "Entitlement Source Schema Object Type": "accessSummary.entitlement.sourceSchemaObjectType",
+            "Entitlement Source Name": "accessSummary.entitlement.sourceName",
+            "Entitlement Account Native ID": "accessSummary.entitlement.account.nativeIdentity",
+            "Entitlement Account Name": "accessSummary.entitlement.account.name"
         })
 
             .setPaginator(new CampaignAccessReviewPaginator(client, campaignId))
