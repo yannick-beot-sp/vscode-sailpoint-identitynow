@@ -10,17 +10,17 @@ export class BulkReviewItemReassignment {
 
     async execute(pendingCertification: IdentityCertificationDto, campaignReassignments: Map<string, ReassignReference[]>, comment: string) {
 
-        let nbRreassignment = 0
+        let reassignments = 0
+        vscode.window.showInformationMessage(`Initiating review item(s) reassignment for ${pendingCertification.campaign?.name}.`)
 
         // Process campaign reassignments
         // Using a for-loop instead of forEach + async code to prevent hammering API resulting in 429
         for (const [reviewerId, allReassignReferences] of campaignReassignments.entries()) {
+            reassignments += allReassignReferences.length
             await this.processReviewItemReassignments(pendingCertification.id, reviewerId, allReassignReferences, comment)
-            nbRreassignment += allReassignReferences.length
         }
 
-        vscode.window.showInformationMessage(`${nbRreassignment} review item(s) reassigned for ${pendingCertification.campaign?.name}.`)
-
+        vscode.window.showInformationMessage(`${reassignments} review item(s) reassigned for ${pendingCertification.campaign?.name}.`)
     }
 
     public async processReviewItemReassignments(certificationId: string, reviewerId: string, allReassignReferences: ReassignReference[], reassignReason: string) {

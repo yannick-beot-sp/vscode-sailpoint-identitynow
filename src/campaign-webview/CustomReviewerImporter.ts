@@ -1,16 +1,14 @@
 import * as vscode from 'vscode';
-import * as tmp from "tmp";
 
 import { ISCClient } from '../services/ISCClient';
-import { CSVLogWriter, CSVLogWriterLogType } from '../services/CSVLogWriter';
 import { CSVReader } from '../services/CSVReader';
 import { UserCancelledError } from '../errors';
 import { error } from 'console';
-import { DtoType, Index, Search } from 'sailpoint-api-client';
+import { Index, Search } from 'sailpoint-api-client';
 
 const VALID_REVIEWER_ATTRIBUTES = ["id", "name", "email"]
-const VALID_ITEM_TYPES = [DtoType.Identity.toString(), DtoType.Entitlement.toString(), DtoType.AccessProfile.toString(), DtoType.Role.toString()]
-const VALID_ITEM_SELECTOR_TYPES = ["id", "name", "query"]
+const VALID_ITEM_TYPES = ["IDENTITY", "ENTITLEMENT", "ACCESS_PROFILE", "ROLE", "ALL"]
+const VALID_ITEM_SELECTOR_TYPES = ["id", "name", "query", "all"]
 
 interface CustomReviewerImportResult {
     success: number
@@ -29,12 +27,11 @@ export interface CustomReviewerCoverage {
     reviewerId: string,
     itemType: string,
     itemIds: string[]
+    isAllItems: boolean
 }
 
 export class CustomReviewerImporter {
     readonly client: ISCClient;
-    readonly logFilePath: string;
-    readonly logWriter: CSVLogWriter;
 
     constructor(
         private tenantId: string,
@@ -43,18 +40,6 @@ export class CustomReviewerImporter {
         private fileUri: vscode.Uri
     ) {
         this.client = new ISCClient(this.tenantId, this.tenantName);
-
-        this.logFilePath = tmp.tmpNameSync({
-            prefix: 'import-roles',
-            postfix: ".log",
-        });
-
-        try {
-            this.logWriter = new CSVLogWriter(this.logFilePath);
-        } catch (_exc: any) {
-            console.error(_exc);
-            throw _exc;
-        }
     }
 
     async readFileWithProgression(): Promise<CustomReviewerCoverage[]> {
@@ -93,37 +78,43 @@ export class CustomReviewerImporter {
                 }
 
                 processedLines++
-                task.report({ increment: incr, message: `Line ${processedLines}` });
+                task.report({ increment: incr, message: `Processing line ${processedLines}` });
                 try {
-                    // Confirm we have required values
+                    // Confirm reviewer values
                     if (!data.reviewerValue) {
-                        throw new error(`Missing reviewer value in line ${processedLines}`)
-                    }
-                    if (!data.itemSelectorValue) {
-                        throw new error(`Missing item selector value in line ${processedLines}`)
+                        throw new error(`reviewerValue is empty`)
                     }
                     if (!data.reviewerAttribute || VALID_REVIEWER_ATTRIBUTES.indexOf(data.reviewerAttribute) === -1) {
-                        throw new error(`Invalid reviewer attribute in line ${processedLines}. Accepted values: ${JSON.stringify(VALID_REVIEWER_ATTRIBUTES)}`)
+                        throw new error(`Invalid reviewerAttribute. Accepted values: ${JSON.stringify(VALID_REVIEWER_ATTRIBUTES)}`)
                     }
-                    if (!data.itemSelectorType || VALID_ITEM_SELECTOR_TYPES.indexOf(data.itemSelectorType) === -1) {
-                        throw new error(`Invalid item selector type in line ${processedLines}. Accepted values: ${JSON.stringify(VALID_ITEM_SELECTOR_TYPES)}`)
-                    }
+                    // Confirm itemType value
                     if (!data.itemType || VALID_ITEM_TYPES.indexOf(data.itemType) === -1) {
-                        throw new error(`Invalid item type in line ${processedLines}. Accepted values: ${JSON.stringify(VALID_ITEM_TYPES)}`)
+                        throw new error(`Invalid itemType. Accepted values: ${JSON.stringify(VALID_ITEM_TYPES)}`)
                     }
-
-                    // Name match for Entitlements is not unique
-                    if (data.itemType === DtoType.Entitlement.toString() && data.itemSelectorType === "name") {
-                        throw new error(`Selector type name is not supported with item type ${DtoType.Entitlement}`)
+                    // Confirm itemSelector values unless using itemType:ALL
+                    if (data.itemType !== "ALL") {
+                        if (!data.itemSelectorType || VALID_ITEM_SELECTOR_TYPES.indexOf(data.itemSelectorType) === -1) {
+                            throw new error(`Invalid itemSelectorType. Accepted values: ${JSON.stringify(VALID_ITEM_SELECTOR_TYPES)}`)
+                        }
+                        // Confirm itemSelectorValue unless using itemSelectorType:all
+                        if (data.itemSelectorType !== "all") {
+                            if (!data.itemSelectorValue) {
+                                throw new error(`itemSelectorValue is empty`)
+                            }
+                            // Confirm not using itemSelectorType name with itemType ENTITLEMENT
+                            if (data.itemType === "ENTITLEMENT" && data.itemSelectorType === "name") {
+                                throw new error(`'itemSelectorType:${data.itemSelectorType}' is not supported with 'itemType:${data.itemType}'`)
+                            }
+                        }
                     }
 
                     // Find an active reviewer using the supplied attribute/value
                     const identityFilter = `${data.reviewerAttribute === "name" ? "alias" : data.reviewerAttribute} eq "${data.reviewerValue}"`
                     const findReviewerResult = await this.client.listIdentities({ filters: identityFilter })
                     let reviewerId: string
+                    // only expecting one result but just in case fetching the first active identity
                     for (const reviewer of findReviewerResult.data) {
                         if (reviewer.attributes['identityState'] === "ACTIVE") {
-                            // only expecting one result but just in case fetching the first active identity
                             reviewerId = reviewer.id
                             break
                         }
@@ -132,44 +123,48 @@ export class CustomReviewerImporter {
                         throw new error(`Unable to find an active reviewer using the Identities API filter: ${identityFilter}`)
                     }
 
-                    // Get Item IDs
                     let itemIds = []
-                    switch (data.itemSelectorType) {
-                        case "id":
-                            itemIds.push(data.itemSelectorValue)
-                            break
-                        case "name":
-                            let itemId = await this.findItemIdByName(data.itemType, data.itemSelectorValue)
-                            if (itemId) {
-                                itemIds.push(itemId)
-                            }
-                            break
-                        case "query":
-                            itemIds = await this.findItemIdsByQuery(data.itemType, data.itemSelectorValue)
-                            break
-                        default:
-                            break
-                    }
-                    if (itemIds.length === 0) {
-                        throw new error(`No items found using item selector in line ${processedLines}`)
+                    const isAllItems = data.itemType === "ALL" || data.itemSelectorType === "all" || data.itemSelectorValue === "*"
+                    // Only get Item IDs if not using ANY/all/* selectors
+                    if (!isAllItems) {
+                        switch (data.itemSelectorType) {
+                            case "id":
+                                itemIds.push(data.itemSelectorValue)
+                                break
+                            case "name":
+                                let itemId = await this.findItemIdByName(data.itemType, data.itemSelectorValue)
+                                if (itemId) {
+                                    itemIds.push(itemId)
+                                }
+                                break
+                            case "query":
+                                itemIds = await this.findItemIdsByQuery(data.itemType, data.itemSelectorValue)
+                                break
+                            default:
+                                break
+                        }
+                        if (itemIds.length === 0) {
+                            throw new error(`No items found using 'itemType:${data.itemType}' and 'itemSelector:${data.itemSelectorType}'`)
+                        }
                     }
 
                     // Populate the custom coverage record and add to the return list
                     let customReviewerCoverageRecord: CustomReviewerCoverage = {
                         reviewerId: reviewerId,
                         itemType: data.itemType,
-                        itemIds: itemIds
+                        itemIds: itemIds,
+                        isAllItems: isAllItems
                     }
                     customReviewerCoverageRecords.push(customReviewerCoverageRecord)
                     result.success++;
                 } catch (error: any) {
                     result.error++;
                     const errorMessage = (error instanceof Error) ? error.message : error.toString();
-                    console.log(`> CustomReviewerImporter.importFile: Unable to process Custom Reviewer line: '${errorMessage}'`);
+                    console.log(`> CustomReviewerImporter.importFile: Invalid configuration in Custom Reviewer line ${processedLines}: ${errorMessage}`);
                 }
             });
         } catch { }
-        const message = `${processedLines} line(s) processed. ${result.success} sucessfully processed. ${result.error} error(s).`;
+        const message = `${processedLines} line(s) imported. ${result.success} sucessfully imported. ${result.error} invalid line(s).`;
 
         if (result.error === processedLines) {
             vscode.window.showErrorMessage(message);
@@ -184,19 +179,19 @@ export class CustomReviewerImporter {
 
     private async findItemIdByName(itemType: string, itemName: string): Promise<string> {
         switch (itemType) {
-            case DtoType.Identity.toString():
+            case "IDENTITY":
                 const identity = await this.client.getIdentityByName(itemName)
                 if (identity) {
                     return identity.id
                 }
                 break
-            case DtoType.AccessProfile.toString():
+            case "ACCESS_PROFILE":
                 const accessProfile = await this.client.getAccessProfileByName(itemName)
                 if (accessProfile) {
                     return accessProfile.id
                 }
                 break
-            case DtoType.Role.toString():
+            case "ENTITLEMENT":
                 const role = await this.client.getRoleByName(itemName)
                 if (role) {
                     return role.id
@@ -212,16 +207,16 @@ export class CustomReviewerImporter {
     private async findItemIdsByQuery(itemType: string, query: string): Promise<string[]> {
         const searchIndex: Index[] = []
         switch (itemType) {
-            case DtoType.Identity.toString():
+            case "IDENTITY":
                 searchIndex.push(Index.Identities)
                 break
-            case DtoType.Entitlement.toString():
+            case "ENTITLEMENT":
                 searchIndex.push(Index.Entitlements)
                 break
-            case DtoType.AccessProfile.toString():
+            case "ACCESS_PROFILE":
                 searchIndex.push(Index.Accessprofiles)
                 break
-            case DtoType.Role.toString():
+            case "ROLE":
                 searchIndex.push(Index.Roles)
                 break
             default:
@@ -244,18 +239,6 @@ export class CustomReviewerImporter {
         } else {
             // Return only list of IDs
             return searchResults.map(searchResult => searchResult.id)
-        }
-    }
-
-    private async writeLog(csvLine: number | string | null, objectName: string, type: CSVLogWriterLogType, message: string) {
-        let logMessage = '';
-        if (this.logWriter) {
-            if (!csvLine) {
-                csvLine = '0';
-            }
-            const lnStr = '' + csvLine; // Convert to string 'old skool casting ;-)' ;-)
-            logMessage = `[CSV${lnStr.padStart(8, '0')}][${objectName}] ${message}`;
-            await this.logWriter.writeLine(type, logMessage);
         }
     }
 }

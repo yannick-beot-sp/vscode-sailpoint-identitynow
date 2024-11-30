@@ -3,13 +3,18 @@ import { CampaignTreeItem } from "../models/ISCTreeItem";
 import { CampaignConfigurationService } from "../services/CampaignConfigurationService";
 import { TenantService } from "../services/TenantService";
 import { ISCClient } from '../services/ISCClient';
-import { AccessReviewItem, DtoType, ReassignReference, ReassignReferenceTypeEnum } from 'sailpoint-api-client';
+import { AccessReviewItem, ReassignReference, ReassignReferenceTypeEnum } from 'sailpoint-api-client';
 import { chooseFile, confirm } from '../utils/vsCodeHelpers';
 import { CustomReviewerCoverage, CustomReviewerImporter } from './CustomReviewerImporter';
 import { BulkReviewItemReassignment } from './BulkReviewItemReassignment';
 import { isTenantReadonly, validateTenantReadonly } from '../commands/validateTenantReadonly';
 
 const CUSTOM_REVIEWERS_DEFAULT_COMMENT = "Reassigned to the defined reviewer"
+
+interface CustomReassignResult {
+    success: number
+    error: number
+}
 
 /**
  * Command used to open the campaign panel
@@ -59,6 +64,9 @@ export class CustomReassignCommand {
                 return
             }
 
+            let totalReviewItems = 0
+            pendingCertifications.forEach(pendingCertification => totalReviewItems+= pendingCertification.identitiesTotal)
+
             // Reassign Review Items API can only be called per Certification
             for (const pendingCertification of pendingCertifications) {
 
@@ -69,8 +77,8 @@ export class CustomReassignCommand {
                 for (const pendingReviewItem of pendingReviewItems) {
                     // Check the current review item against each custom reviewer coverage record to see if it matches
                     const reviewerId = this.findReviewerId(pendingReviewItem, customReviewerCoverageRecords)
-                    // Skip if owner is already the current reviewer
-                    if (reviewerId && reviewerId !== pendingCertification.reviewer?.id) {
+                    // Skip if owner is already the current reviewer or reviewee
+                    if (reviewerId && reviewerId !== pendingCertification.reviewer?.id && reviewerId !== pendingReviewItem.identitySummary?.identityId) {
                         let ownerReviewItems = campaignReassignments.get(reviewerId)
                         if (!ownerReviewItems) {
                             ownerReviewItems = []
@@ -98,23 +106,28 @@ export class CustomReassignCommand {
         let currentItemId = ""
         for (const customReviewerCoverageRecord of customReviewerCoverageRecords) {
             switch (customReviewerCoverageRecord.itemType) {
-                case DtoType.Identity.toString():
+                case "ALL":
+                    return customReviewerCoverageRecord.reviewerId
+                case "IDENTITY":
                     currentItemId = pendingReviewItem.identitySummary?.identityId
                     break
-                case DtoType.Entitlement.toString():
+                case "ENTITLEMENT":
                     currentItemId = pendingReviewItem.accessSummary?.entitlement?.id
                     break
-                case DtoType.AccessProfile.toString():
+                case "ACCESS_PROFILE":
                     currentItemId = pendingReviewItem.accessSummary?.accessProfile?.id
                     break
-                case DtoType.Role.toString():
+                case "ROLE":
                     currentItemId = pendingReviewItem.accessSummary?.role?.id
                     break
                 default:
                     return
             }
-            // return the first matching reviewer id
-            if (customReviewerCoverageRecord.itemIds.indexOf(currentItemId) >= 0) {
+            // Check if self review
+            const selfReview = (pendingReviewItem.identitySummary?.identityId === customReviewerCoverageRecord.reviewerId)
+            // Set the current reviewer if the review item is of the correct type and
+            // either using a generic selector or the item matched the selector
+            if (currentItemId && !selfReview && (customReviewerCoverageRecord.isAllItems || customReviewerCoverageRecord.itemIds.indexOf(currentItemId) >= 0)) {
                 return customReviewerCoverageRecord.reviewerId
             }
         }

@@ -261,11 +261,11 @@ The following table provides the expected column for the CSV to import Custom Re
 | ------------------- | ---- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------- |
 | `reviewerAttribute` | Yes  | Identity attribute used to identify the defined reviewer                                              | `id\|name\|email`                             |
 | `reviewerValue`     | Yes  | The value of identity attribute for the defined reviewer (e.g. the email address of the reviewer)     |                                               |
-| `itemType`          | Yes  | The type of object to scope the reviewer's review items                                               | `IDENTITY\|ENTITLEMENT\|ACCESS_PROFILE\|ROLE` |
-| `itemSelectorType`  | Yes  | The type of selector used to define the reviewer's scope                                              | `id\|name\|query`[**]                         |
-| `itemSelectorValue` | Yes  | The value of the selector used to define the reviewer's scope (e.g. a valid entitlement Search Query) |                                               |
+| `itemType`          | Yes  | The type of object to scope the reviewer's review items                                               | `IDENTITY\|ENTITLEMENT\|ACCESS_PROFILE\|ROLE\|ALL` |
+| `itemSelectorType`  | Yes, unless itemType=ALL | The type of selector used to define the reviewer's scope                                              | `id\|name\|query\|all`[**]                         |
+| `itemSelectorValue` | Yes, unless itemType=ALL or itemSelectorType=all | The value of the selector used to define the reviewer's scope (e.g. a valid entitlement Search Query) |                                               |
 
-[**]: ## "Item selector type `name` is not supported with item type `ENTITLEMENT`"
+[**]: ## "`itemSelectorType=name` is not supported with `itemType=ENTITLEMENT`"
 
 #### Examples
 
@@ -278,6 +278,8 @@ name,Adam.Kennedy,IDENTITY,query,"attributes.department:""Asset Management"""
 email,Alan.Bandero@sailpointdemo.com,ENTITLEMENT,query,"source.name:""Active Directory"" AND privileged:true"
 name,Aaron.Nichols,ACCESS_PROFILE,name,"Accounts Payable Access"
 email,Anne.Arnold@sailpointdemo.com,ROLE,query,*
+email,Anne.Arnold@sailpointdemo.com,ENTITLEMENT,all,
+email,Anne.Arnold@sailpointdemo.com,ALL,,
 ```
 
 ### Certification Campaign Report
