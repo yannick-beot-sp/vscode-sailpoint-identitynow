@@ -23,6 +23,7 @@ The SailPoint Identity Security Cloud extension makes it easy to:
 - View, edit, create, delete identity attribute
 - View, trigger attribute sync or process, delete identities
 - View, edit, create, delete applications
+- View, report, esaclate, send reminders, reassign to access item owners or reassign based on a file certification campaigns
 
 ## Installation
 
@@ -419,6 +420,14 @@ The extension supports the following settings:
 ## Release Notes
 
 - Viewing a workflow does not bring statistics as this can cause timeouts.
+- Support of certifications with the help of [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp
+) and [@bassem-mohamed-sp](https://github.com/bassem-mohamed-sp):
+  - Dashboard
+  - Esclation
+  - Reminders
+  - Report
+  - Automatic reassignment to access item owners
+  - Custom reassignment
 
 ### 1.3.7
 
