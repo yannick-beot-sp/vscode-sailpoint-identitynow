@@ -20,7 +20,7 @@ import {
 } from "../utils";
 import { getIdByUri, getPathByUri } from "../utils/UriUtils";
 import { Operation, compare } from "fast-json-patch";
-import { FormDefinitionResponseBeta } from "sailpoint-api-client";
+import { FormDefinitionResponseBeta, SlimCampaign } from "sailpoint-api-client";
 
 export class ISCResourceProvider implements FileSystemProvider {
 	private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
@@ -214,7 +214,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 					JSON.stringify(jsonpatch)
 				);
 
-			} else if (resourcePath.match("identity-profiles|access-profiles|roles|search-attribute-config|source-apps")) {
+			} else if (resourcePath.match("identity-profiles|access-profiles|roles|search-attribute-config|source-apps|campaigns")) {
 				// special treatment to send patch as PUT is not supported
 				const oldData = await client.getResource(resourcePath);
 				const newData = JSON.parse(data);
@@ -258,6 +258,21 @@ export class ISCResourceProvider implements FileSystemProvider {
 					const notEmptyProperties = ["/name", "/description", "/owner", "/owner/id"]
 					// @ts-ignore
 					jsonpatch = jsonpatch.filter(p => patchableProperties.includes(p.path) && (!notEmptyProperties.includes(p.path) || p.value))
+				} else if (resourcePath.match("campaigns")) {
+					//The fields that can be patched differ based on the status of the campaign
+					// When the campaign is in the *STAGED* status, you can patch these fields: 
+					// * name
+					// * description
+					// * recommendationsEnabled
+					// * deadline
+					// * emailNotificationEnabled
+					// * autoRevokeAllowed 
+					// When the campaign is in the *ACTIVE* status, you can patch these fields:
+					// * deadline 
+					// TODO: manage the actual status of the campaign?
+					const campaignPatchableProperties = ["/name", "/description", "/recommendationsEnabled", "/deadline", "/emailNotificationEnabled", "/autoRevokeAllowed"]
+					// @ts-ignore
+					jsonpatch = jsonpatch.filter(p => campaignPatchableProperties.includes(p.path))
 				}
 
 				await client.patchResource(

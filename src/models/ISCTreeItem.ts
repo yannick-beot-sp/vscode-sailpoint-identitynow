@@ -9,7 +9,7 @@ import * as commands from "../commands/constants";
 import * as configuration from '../configurationConstants';
 import { escapeFilter, isEmpty, isNotEmpty } from "../utils/stringUtils";
 import { TenantService } from "../services/TenantService";
-import { AccessProfile } from "sailpoint-api-client";
+import { CampaignStatusEnum } from "sailpoint-api-client";
 
 
 /**
@@ -78,6 +78,7 @@ export class TenantTreeItem extends BaseTreeItem {
 		results.push(new IdentityAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new IdentitiesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new ApplicationsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new CampaignsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 
 		return results
 	}
@@ -1445,4 +1446,102 @@ export class ApplicationAccessProfileTreeItem extends ISCResourceTreeItem {
 
 	contextValue = "access-profile-application";
 	iconPath = new vscode.ThemeIcon("archive");
+}
+
+export class CampaignsTreeItem extends PageableFolderTreeItem<any> {
+	status: string[]
+
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {
+		super("Campaigns", "campaigns", tenantId, tenantName, tenantDisplayName, 'No campaign found',
+			(x => new CampaignTreeItem(
+				tenantId,
+				tenantName,
+				tenantDisplayName,
+				x.name,
+				x.id,
+				x.status,
+				x.type
+			))
+		);
+		// all by default
+		this.status = Object.keys(CampaignStatusEnum).map(key => CampaignStatusEnum[key])
+	}
+
+	protected async loadNext(): Promise<AxiosResponse<Document[]>> {
+		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
+
+		let filters = `status in ("${this.status.join('","')}")`
+		if (this.filters) {
+			filters += `and name sw "${escapeFilter(this.filters)}"`
+		}
+
+		return await this.client.getPaginatedCampaigns(
+			filters,
+			limit,
+			this.currentOffset,
+			(this._total === 0)
+		) as AxiosResponse<Document[]>;
+	}
+
+
+	get isFiltered(): boolean {
+		return false // TODO
+	}
+}
+
+/**
+ * List of supported campaign types for which the dashboard can be displayed
+ */
+const SUPPORTED_CAMPAIGN_TYPES = ["MACHINE_ACCOUNT", "SOURCE_OWNER", "SEARCH", "MANAGER"]
+/**
+ * Certification Campaign
+ */
+export class CampaignTreeItem extends ISCResourceTreeItem {
+
+	iconPath = new vscode.ThemeIcon("checklist");
+	client: ISCClient;
+	label: string;
+	id: string;
+
+
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string,
+		public readonly status: string,
+		public readonly type: string
+	) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			resourceType: "campaigns",
+			id,
+			collapsible: vscode.TreeItemCollapsibleState.None
+		})
+		this.client = new ISCClient(this.tenantId, this.tenantName);
+		this.contextValue = status + type + "campaign";
+
+		this.command = SUPPORTED_CAMPAIGN_TYPES.includes(type) ? {
+			title: "Dashboard",
+			command: commands.VIEW_CAMPAIGN_PANEL,
+			arguments: [this],
+		} : {
+			title: "open",
+			command: commands.OPEN_RESOURCE,
+			arguments: [this],
+		};
+
+
+	}
+
+
+
 }

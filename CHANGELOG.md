@@ -10,11 +10,22 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- Support of certifications with the help of [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp
+) and [@bassem-mohamed-sp](https://github.com/bassem-mohamed-sp):
+  - Dashboard
+  - Esclation
+  - Reminders
+  - Report
+  - Automatic reassignment to access item owners
+  - Custom reassignment
+
 ### Changed
 
 - Viewing a workflow does not bring statistics as this can cause timeouts.
 
 ### Fixed
+
+- Fix axios-retry not working
 
 ### Removed
 

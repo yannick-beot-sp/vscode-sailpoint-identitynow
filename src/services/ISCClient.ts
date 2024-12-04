@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from "vscode";
 import * as os from 'os';
 import { EndpointUtils } from "../utils/EndpointUtils";
@@ -5,7 +6,7 @@ import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskManagementBetaApi, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, AccountsBetaApi, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, ManagedClustersApi, StandardLevelBeta } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskManagementBetaApi, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsApi, CertificationsApi, CertificationCampaignsApiMoveRequest, CertificationSummariesApi, IdentityCertDecisionSummary, AccessReviewItem, CertificationCampaignFiltersApiFp, IdentityCertificationDto, GetActiveCampaigns200ResponseInner, CertificationsApiSubmitReassignCertsAsyncRequest, WorkflowsApi } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -13,9 +14,10 @@ import { basename } from 'path';
 import { createReadStream } from 'fs';
 import { DEFAULT_ACCESSPROFILES_QUERY_PARAMS } from "../models/AccessProfiles";
 import { DEFAULT_ROLES_QUERY_PARAMS } from "../models/Roles";
-import axiosRetry = require("axios-retry");
+// import axiosRetry = require("axios-retry");
 import { addQueryParams } from "../utils/UriUtils";
 import { onErrorResponse, onRequest, onResponse } from "./AxiosHandlers";
+
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const FormData = require('form-data');
 
@@ -31,14 +33,6 @@ const DEFAULT_AXIOS_OPTIONS: AxiosRequestConfig = {
 	}
 }
 
-const DEFAULT_RETRY_CONFIG = {
-	retries: 10,
-	retryDelay: axiosRetry.exponentialDelay,
-	onRetry(retryCount, error, requestConfig) {
-		console.log(`retrying due to request error, try number ${retryCount}`);
-	},
-}
-
 export const TOTAL_COUNT_HEADER = "x-total-count";
 
 // Content types
@@ -47,8 +41,14 @@ const CONTENT_TYPE_FORM_URLENCODED = "application/x-www-form-urlencoded";
 const CONTENT_TYPE_FORM_DATA = "multipart/form-data";
 const CONTENT_TYPE_FORM_JSON_PATCH = "application/json-patch+json";
 
-
 const DEFAULT_PAGINATION = 250;
+
+export interface PaginatedData<T> {
+	data: T[],
+	count: number;
+	limit: number;
+	offset: number;
+}
 
 export class ISCClient {
 
@@ -100,19 +100,21 @@ export class ISCClient {
 	/**
 	 * Returns the Configuration needed by sailpoint typescript SDK 
 	 */
-	private async getApiConfiguration(): Promise<Configuration> {
+	private async getApiConfiguration(accessToken?: string): Promise<Configuration> {
 
-		const session = await SailPointISCAuthenticationProvider.getInstance().getSessionByTenant(this.tenantId)
+		if (accessToken === undefined) {
+			const session = await SailPointISCAuthenticationProvider.getInstance().getSessionByTenant(this.tenantId)
+			accessToken = session?.accessToken
+		}
+
 		const apiConfig = new Configuration({
 			baseurl: EndpointUtils.getBaseUrl(this.tenantName),
 			tokenUrl: EndpointUtils.getAccessTokenUrl(this.tenantName),
-			accessToken: session?.accessToken,
+			accessToken: accessToken,
 			// TODO https://github.com/sailpoint-oss/typescript-sdk/issues/30
 			clientId: "",
 			clientSecret: ""
 		});
-
-		apiConfig.retriesConfig = DEFAULT_RETRY_CONFIG
 
 		return apiConfig;
 	}
@@ -128,9 +130,10 @@ export class ISCClient {
 			onRequest);
 		instance.interceptors.response.use(
 			onResponse,
-			onErrorResponse
+			(error) => {
+				return onErrorResponse(error, instance)
+			}
 		);
-		axiosRetry(instance, DEFAULT_RETRY_CONFIG)
 		return instance;
 	}
 
@@ -157,7 +160,9 @@ export class ISCClient {
 			onRequest);
 		instance.interceptors.response.use(
 			onResponse,
-			onErrorResponse
+			(error) => {
+				return onErrorResponse(error, instance)
+			}
 		);
 		return instance;
 	}
@@ -165,6 +170,7 @@ export class ISCClient {
 	/////////////////////
 	//#region Sources
 	/////////////////////
+
 	public async pingCluster(sourceId: string): Promise<StatusResponseBeta> {
 		console.log("> pingClusterConnection")
 		const apiConfig = await this.getApiConfiguration()
@@ -377,6 +383,7 @@ export class ISCClient {
 	 * It will return sorted by name list by name
 	 * @returns all transforms of the tenant
 	 */
+
 	public async getTransforms(): Promise<TransformRead[]> {
 		console.log("> getTransforms");
 		const apiConfig = await this.getApiConfiguration();
@@ -415,6 +422,7 @@ export class ISCClient {
 	 * @param path Generic method to get resource
 	 * @returns
 	 */
+
 	public async getResource(path: string): Promise<any> {
 		console.log("> ISCClient.getResource", path);
 		const httpClient = await this.getAxios();
@@ -673,6 +681,7 @@ export class ISCClient {
 	 * cf. https://developer.sailpoint.com/idn/api/beta/sp-config-export
 	 * @returns jobId
 	 */
+
 	public async startExportJob(
 		objectTypes: ExportPayloadBetaIncludeTypesEnum[],
 		objectOptions: {
@@ -899,6 +908,21 @@ export class ISCClient {
 		}, DEFAULT_AXIOS_OPTIONS);
 		return resp.data.workflowExecutionId;
 	}
+
+	public async callWorkflowExternalTrigger(id: string, accessToken: string, payload: any): Promise<string> {
+		console.log("> callWorkflowExternalTrigger", id, payload);
+		const apiConfig = await this.getApiConfiguration(accessToken);
+		const api = new WorkflowsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const resp = await api.createExternalExecuteWorkflow({
+			id,
+			createExternalExecuteWorkflowRequest: {
+				input: payload
+			}
+		}, DEFAULT_AXIOS_OPTIONS);
+		return resp.data.workflowExecutionId;
+	}
+
+
 
 	///////////////////////
 	//#endregion Workflows
@@ -1190,7 +1214,7 @@ export class ISCClient {
 			limit,
 			offset
 		});
-		return await resp.data;
+		return resp.data;
 	}
 
 	public async getAllEntitlementsBySource(sourceId: string): Promise<EntitlementBeta[]> {
@@ -1351,6 +1375,12 @@ export class ISCClient {
 		return response;
 	}
 
+	public async getAccessProfileById(id: string): Promise<AccessProfile> {
+		console.log("> getAccessProfileById", id);
+		const accessProfile = await this.getAccessProfileById(id)
+		return accessProfile;
+	}
+
 	public async getAccessProfileByName(name: string): Promise<AccessProfile> {
 		console.log("> getAccessProfileByName", name);
 		let filters = `name eq "${name}"`;
@@ -1491,6 +1521,7 @@ export class ISCClient {
 	//////////////////////////////
 	//region Applications
 	//////////////////////////////
+
 	public async createApplication({ name, description, sourceId }: { name: string; description: string; sourceId: string; }): Promise<any> {
 		return await this.createResource("/beta/source-apps", {
 			name,
@@ -1502,7 +1533,6 @@ export class ISCClient {
 			}
 		})
 	}
-
 
 	public async *getApplications(filters: string | undefined = undefined): AsyncGenerator<any> {
 		console.log("> getApplications");
@@ -1587,6 +1617,154 @@ export class ISCClient {
 	//#endregion Applications
 	//////////////////////////////
 
+	//////////////////////////////
+	//#region Certification Campaigns
+	//////////////////////////////
+
+	public async getPaginatedCampaigns(filters: string, limit?: number, offset?: number, count?: boolean): Promise<AxiosResponse<any[]>> {
+		console.log("> getPaginatedCampaigns", filters, limit, offset);
+
+		limit = limit ? Math.min(DEFAULT_PAGINATION, limit) : DEFAULT_PAGINATION;
+
+		const httpClient = await this.getAxios();
+		const baseUrl = '/v3/campaigns'
+		const args: Record<string, any> = {
+			offset,
+			limit,
+			filters,
+			sorters: "-created",
+			count
+		}
+		const path = addQueryParams(baseUrl, args)
+		const response = await httpClient.get(path);
+		return response;
+	}
+
+	public async getCampaign(campaignId: string): Promise<GetActiveCampaigns200ResponseInner> {
+		const apiConfig = await this.getApiConfiguration();
+		const api = new CertificationCampaignsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+
+		const val = await api.getCampaign({ id: campaignId });
+
+		if (val.status !== 200) {
+			throw new Error(`Failed to fetch campaign with ID [${campaignId}]. Status: ${val.status}.`);
+		}
+
+		return val.data;
+	}
+
+	public async getCampaignCertifications(campaignId: string, completed?: boolean): Promise<IdentityCertificationDto[]> {
+		let filters = `campaign.id eq "${campaignId}"`
+		if (completed !== undefined) {
+			filters += ` and completed eq ${completed}`
+		}
+		return this.getCampaignCertificationsByFilter(filters);
+	}
+
+	public async getCampaignCertificationsByFilter(filters: string): Promise<IdentityCertificationDto[]> {
+		const apiConfig = await this.getApiConfiguration();
+		const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+
+		const val = await Paginator.paginate(
+			api,
+			api.listIdentityCertifications,
+			{
+				filters,
+				sorters: "name"
+			}
+		);
+
+		if (val.status !== 200) {
+			throw new Error(`Failed to fetch certifications for campaign with filter [${filters}]. Status: ${val.status}.`);
+		}
+
+		return val.data;
+	}
+
+	public async getCertificationReviewItems(certificationId: string, completed?: boolean): Promise<AccessReviewItem[]> {
+		const apiConfig = await this.getApiConfiguration();
+		const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+
+		let filters
+		if (completed !== undefined) {
+			filters = `completed eq ${completed}`
+		}
+
+		const val = await Paginator.paginate(
+			api,
+			api.listIdentityAccessReviewItems,
+			{
+				id: certificationId,
+				filters: filters
+			}
+		);
+
+		if (val.status !== 200) {
+			throw new Error(`Failed to fetch access review items for certification with ID [${certificationId}]. Status: ${val.status}.`);
+		}
+
+		return val.data;
+	}
+
+	public async getCampaignReviewItems(campaignId: string): Promise<AccessReviewItem[]> {
+		let allAccessReviewItems: AccessReviewItem[] = []
+		const certifications = await this.getCampaignCertifications(campaignId, false)
+		for (const certification of certifications) {
+			const accessReviewItems = await this.getCertificationReviewItems(certification.id)
+			allAccessReviewItems = [...allAccessReviewItems, ...accessReviewItems]
+		}
+		return allAccessReviewItems
+	}
+
+	public async getPaginatedCampaignCertifications({ campaignId, offset, sorters = "name", limit = 250 }: {
+		campaignId: string,
+		offset: number,
+		sorters?: string,
+		limit?: number
+	}): Promise<PaginatedData<IdentityCertificationDto>> {
+		const apiConfig = await this.getApiConfiguration();
+		const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		let filters = `campaign.id eq "${campaignId}"`
+		const resp = await api.listIdentityCertifications({
+			filters,
+			offset,
+			limit,
+			count: true,
+			sorters
+
+		})
+
+		return {
+			data: resp.data,
+			count: parseInt(resp.headers[TOTAL_COUNT_HEADER]),
+			limit,
+			offset
+		}
+	}
+
+	public async getSummaryCertificationDecisions(certificationId: string): Promise<IdentityCertDecisionSummary> {
+		const apiConfig = await this.getApiConfiguration();
+		const api = new CertificationSummariesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const resp = await api.getIdentityDecisionSummary({ id: certificationId })
+		return resp.data
+	}
+
+	public async reassignCampaignCertifications(certificationMoveRequest: CertificationCampaignsApiMoveRequest): Promise<void> {
+		const apiConfig = await this.getApiConfiguration();
+		const campaignApi = new CertificationCampaignsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		await campaignApi.move(certificationMoveRequest);
+	}
+
+	public async reassignCertificationReviewItems(certificationReassignRequest: CertificationsApiSubmitReassignCertsAsyncRequest) {
+		const apiConfig = await this.getApiConfiguration();
+		const certificationsApi = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		await certificationsApi.submitReassignCertsAsync(certificationReassignRequest)
+	}
+
+	//////////////////////////////
+	//#endregion Certification Campaigns
+	//////////////////////////////
+
 	/////////////////////////
 	//#region Notification Templates
 	/////////////////////////
@@ -1613,6 +1791,7 @@ export class ISCClient {
 		const result = await Paginator.paginate(api, api.listSegments);
 		return result.data;
 	}
+
 	/////////////////////////
 	//#endregion Segments
 	/////////////////////////
@@ -1702,6 +1881,17 @@ export class ISCClient {
 	//#region Identity Management
 	////////////////////////
 
+	public async getIdentityByName(identityName: string): Promise<IdentityBeta> {
+		// Can only ever be one ID
+		const result = await this.listIdentities({ filters: `alias eq "${identityName}"` })
+		if (result && result.data) {
+			return result.data[0]
+		}
+		else {
+			return
+		}
+	}
+
 	public async listIdentities(identityFilter: IdentitiesBetaApiListIdentitiesRequest): Promise<AxiosResponse<IdentityBeta[]>> {
 		console.log("> listIdentities");
 		const apiConfig = await this.getApiConfiguration();
@@ -1747,4 +1937,13 @@ export class ISCClient {
 	//#endregion Identity Management
 	////////////////////////
 }
+
+export { CertificationsApi, AccessReviewItem, CertificationCampaignFiltersApiFp, Paginator };
+
+function sleep(seconds: number) {
+	return new Promise(resolve => setTimeout(resolve, seconds * 1000));
+}
+
+
+
 

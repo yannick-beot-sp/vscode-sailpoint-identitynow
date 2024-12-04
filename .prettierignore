@@ -20,3 +20,8 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Package Managers
+package-lock.json
+pnpm-lock.yaml
+yarn.lock

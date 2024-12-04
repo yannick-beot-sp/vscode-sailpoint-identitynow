@@ -25,7 +25,8 @@ export class CSVReader<T> {
                 skip_empty_lines: true,
                 columns: true,
                 comment: '#',
-                delimiter: [",", ";"]
+                delimiter: [",", ";"],
+                bom: true
             }));
 
         for await (const record of parser) {

@@ -68,22 +68,22 @@ import { ApplicationNameFilterCommand } from './commands/applications/applicatio
 import { RemoveAccessProfileFromAppCommand } from './commands/applications/removeAccessProfileFromAppCommand';
 import { AddAccessProfileToApplication } from './commands/applications/addAccessProfileToApplication';
 import { NewApplicationCommand } from './commands/applications/newApplicationCommand';
+import { OpenCampaignPanelCommand } from './campaign-webview/openCampaignPanelCommand';
+import { ConfigureReminderWorkflowCommand } from './campaign-webview/configureReminderWorkflow';
+import { ExportCampaignReportCommand } from './campaign-webview/exportCampaignReportCommand';
+import { SendReminderCommand } from './campaign-webview/sendReminderCommand';
+import { EscalateCertificationCommand } from './campaign-webview/escalateCertificationCommand';
+import { CampaignConfigurationService } from './services/CampaignConfigurationService';
+import { ReassignOwnersCommand } from './campaign-webview/reassignOwnersCommand';
+import { CustomReassignCommand } from './campaign-webview/customReassignCommand';
+import { CertificationCampaignStatusFilterCommand } from './campaign-webview/CertificationCampaignStatusFilterCommand';
+import { CertificationCampaignNameFilterCommand } from './campaign-webview/CertificationCampaignNameFilterCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
 	console.log('Congratulations, your extension "vscode-sailpoint-identitynow" is now active!');
-
-	// Add global interceptor for axios, to applied with the sailpoint SDK
-	// Add a request interceptor
-	globalAxios.interceptors.request.use(onRequest)
-
-	// Add a response interceptor
-	globalAxios.interceptors.response.use(
-		onResponse,
-		onErrorResponse)
-
 
 	const tenantService = new TenantService(context.globalState, context.secrets);
 
@@ -530,6 +530,54 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.NEW_APPLICATION_PALETTE,
 			newApplicationCommand.execute, newApplicationCommand));
+
+	// Certification Campaigns
+
+
+	const exportCampaignReportCommand = new ExportCampaignReportCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_CAMPAIGN_REPORT,
+			exportCampaignReportCommand.execute, exportCampaignReportCommand))
+
+	const escalateCertificationCommand = new EscalateCertificationCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.ESCALATE_CERTIFICATION,
+			escalateCertificationCommand.execute, escalateCertificationCommand))
+
+	const campaignService = new CampaignConfigurationService(context.secrets, tenantService)
+	const openCampaignPanel = new OpenCampaignPanelCommand(context.extensionUri, campaignService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.VIEW_CAMPAIGN_PANEL,
+			openCampaignPanel.execute, openCampaignPanel))
+
+
+	const configureReminderWorkflow = new ConfigureReminderWorkflowCommand(tenantService, campaignService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.CAMPAIGN_CONFIGURE_REMINDER,
+			configureReminderWorkflow.execute, configureReminderWorkflow))
+
+	const sendReminderCommand = new SendReminderCommand(tenantService, campaignService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.CAMPAIGN_SEND_REMINDER,
+			sendReminderCommand.execute, sendReminderCommand))
+	const reassignOwnersCommand = new ReassignOwnersCommand(tenantService, campaignService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.REASSIGN_CAMPAIGN_OWNERS,
+			reassignOwnersCommand.execute, reassignOwnersCommand))
+
+	const customReassignCommand = new CustomReassignCommand(tenantService, campaignService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.REASSIGN_CAMPAIGN_CUSTOM,
+			customReassignCommand.execute, customReassignCommand))
+
+	const certificationCampaignStatusFilterCommand = new CertificationCampaignStatusFilterCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.CAMPAIGN_FILTER_STATUS,
+			certificationCampaignStatusFilterCommand.execute, certificationCampaignStatusFilterCommand))
+	const certificationCampaignNameFilterCommand = new CertificationCampaignNameFilterCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.CAMPAIGN_FILTER_NAME,
+			certificationCampaignNameFilterCommand.execute, certificationCampaignNameFilterCommand))
 
 }
 

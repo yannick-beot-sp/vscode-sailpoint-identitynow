@@ -23,6 +23,7 @@ The SailPoint Identity Security Cloud extension makes it easy to:
 - View, edit, create, delete identity attribute
 - View, trigger attribute sync or process, delete identities
 - View, edit, create, delete applications
+- View, report, esaclate, send reminders, reassign to access item owners or reassign based on a file certification campaigns
 
 ## Installation
 
@@ -169,43 +170,41 @@ This extension includes the following snippets for the Public Identities Configu
 
 The following table provides the expected column for the CSV to import Access Profiles:
 
-| Header                   | M[^1] | Description                                                                                                                 | Default Value      |
-| ------------------------ | ----- | --------------------------------------------------------------------------------------------------------------------------- | ------------------ |
-| `name`                   | Yes   | Name of the access profile                                                                                                  |                    |
-| `owner`                  | Yes   | Owner of the access profile                                                                                                 |                    |
-| `source`                 | Yes   | Source associated with the access profile                                                                                   |                    |
-| `description`            | No    | Description of the access profile                                                                                           | `null`             |
-| `enabled`                | No    | Is the access profile enabled?                                                                                              | `false`            |
-| `requestable`            | No    | Is the access profile requestable?                                                                                          | `false`            |
-| `commentsRequired`       | No    | Require comments when the user requests access                                                                              | `false`            |
-| `denialCommentsRequired` | No    | Require comments when a reviewer denies the request                                                                         | `false`            |
-| `approvalSchemes`        | No    | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
-| `revokeApprovalSchemes`  | No    | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
-| `entitlements`           | No    | Entitlements of the access profile                                                                                          | `[]`               |
+| Header                   | M[*] | Description                                                                                                                 | Default Value      |
+| ------------------------ | ---- | --------------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| `name`                   | Yes  | Name of the access profile                                                                                                  |                    |
+| `owner`                  | Yes  | Owner of the access profile                                                                                                 |                    |
+| `source`                 | Yes  | Source associated with the access profile                                                                                   |                    |
+| `description`            | No   | Description of the access profile                                                                                           | `null`             |
+| `enabled`                | No   | Is the access profile enabled?                                                                                              | `false`            |
+| `requestable`            | No   | Is the access profile requestable?                                                                                          | `false`            |
+| `commentsRequired`       | No   | Require comments when the user requests access                                                                              | `false`            |
+| `denialCommentsRequired` | No   | Require comments when a reviewer denies the request                                                                         | `false`            |
+| `approvalSchemes`        | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
+| `revokeApprovalSchemes`  | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
+| `entitlements`           | No   | Entitlements of the access profile                                                                                          | `[]`               |
 
-[^1]: Mandatory
+[*]: ## "Mandatory"
 
 ### Roles
 
 The following table provides the expected column for the CSV to import Roles:
 
-| Header                         | M[^1] | Description                                                                                    | Default Value      |
-| ------------------------------ | ----- | ---------------------------------------------------------------------------------------------- | ------------------ |
-| `name`                         | Yes   | Name of the role                                                                               |                    |
-| `owner`                        | Yes   | Owner of the role                                                                              |                    |
-| `description`                  | No    | Description of the role                                                                        | `null`             |
-| `enabled`                      | No    | Is the role enabled?                                                                           | `false`            |
-| `requestable`                  | No    | Is the role requestable?                                                                       | `false`            |
-| `commentsRequired`             | No    | Require comments when the user requests access                                                 | `false`            |
-| `denialCommentsRequired`       | No    | Require comments when a reviewer denies the request                                            | `false`            |
-| `approvalSchemes`              | No    | List of reviewers among `OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
-| `revokeCommentsRequired`       | No    | Require comments when the user requests revocation                                             | `false`            |
-| `revokeDenialCommentsRequired` | No    | Require comments when a reviewer denies the revocation request                                 | `false`            |
-| `revokeApprovalSchemes`        | No    | List of reviewers among `OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
-| `accessProfiles`               | No    | List of access profiles                                                                        | `[]`               |
-| `membershipCriteria`           | No    | Membership criteria for automatic assignment                                                   |                    |
-
-[^1]: Mandatory
+| Header                         | M[*] | Description                                                                                    | Default Value      |
+| ------------------------------ | ---- | ---------------------------------------------------------------------------------------------- | ------------------ |
+| `name`                         | Yes  | Name of the role                                                                               |                    |
+| `owner`                        | Yes  | Owner of the role                                                                              |                    |
+| `description`                  | No   | Description of the role                                                                        | `null`             |
+| `enabled`                      | No   | Is the role enabled?                                                                           | `false`            |
+| `requestable`                  | No   | Is the role requestable?                                                                       | `false`            |
+| `commentsRequired`             | No   | Require comments when the user requests access                                                 | `false`            |
+| `denialCommentsRequired`       | No   | Require comments when a reviewer denies the request                                            | `false`            |
+| `approvalSchemes`              | No   | List of reviewers among `OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
+| `revokeCommentsRequired`       | No   | Require comments when the user requests revocation                                             | `false`            |
+| `revokeDenialCommentsRequired` | No   | Require comments when a reviewer denies the revocation request                                 | `false`            |
+| `revokeApprovalSchemes`        | No   | List of reviewers among `OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
+| `accessProfiles`               | No   | List of access profiles                                                                        | `[]`               |
+| `membershipCriteria`           | No   | Membership criteria for automatic assignment                                                   |                    |
 
 #### Membership criteria
 
@@ -255,6 +254,120 @@ identity.department eq 'Customer Service' and identity.cloudLifecycleState eq 'a
 (identity.department eq 'Customer Service' and identity.cloudLifecycleState eq 'active') or (identity.cloudLifecycleState eq 'active' and identity.jobTitle co 'Accounts Payable Analyst')
 ```
 
+### Certification Campaign Custom Reviewers
+
+The following table provides the expected column for the CSV to import Custom Reviewer logic:
+
+| Header              | M[*] | Description                                                                                           | Supported Values                              |
+| ------------------- | ---- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `reviewerAttribute` | Yes  | Identity attribute used to identify the defined reviewer                                              | `id\|name\|email`                             |
+| `reviewerValue`     | Yes  | The value of identity attribute for the defined reviewer (e.g. the email address of the reviewer)     |                                               |
+| `itemType`          | Yes  | The type of object to scope the reviewer's review items                                               | `IDENTITY\|ENTITLEMENT\|ACCESS_PROFILE\|ROLE\|ALL` |
+| `itemSelectorType`  | Yes, unless itemType=ALL | The type of selector used to define the reviewer's scope                                              | `id\|name\|query\|all`[**]                         |
+| `itemSelectorValue` | Yes, unless itemType=ALL or itemSelectorType=all | The value of the selector used to define the reviewer's scope (e.g. a valid entitlement Search Query) |                                               |
+
+[**]: ## "`itemSelectorType=name` is not supported with `itemType=ENTITLEMENT`"
+
+#### Examples
+
+Here are a few valid examples:
+
+```
+reviewerAttribute,reviewerValue,itemType,itemSelectorType,itemSelectorValue
+id,8e5c35894e124e81859f59030f3c4d56,IDENTITY,id,8e5c358d7a124e81859f59030f3c67ae
+name,Adam.Kennedy,IDENTITY,query,"attributes.department:""Asset Management"""
+email,Alan.Bandero@sailpointdemo.com,ENTITLEMENT,query,"source.name:""Active Directory"" AND privileged:true"
+name,Aaron.Nichols,ACCESS_PROFILE,name,"Accounts Payable Access"
+email,Anne.Arnold@sailpointdemo.com,ROLE,query,*
+email,Anne.Arnold@sailpointdemo.com,ENTITLEMENT,all,
+email,Anne.Arnold@sailpointdemo.com,ALL,,
+```
+
+### Certification Campaign Report
+
+The report provides a detailed overview of user access rights, including roles, access profiles, and entitlements. Auditors gain a comprehensive understanding of who has access to critical systems and data, enabling them to assess compliance with regulatory requirements and internal policies.
+
+below are the campaign report headers:
+
+```
+"Campaign Name","Reviewer Name","Reviewer Email","Identity Name","Review Completed","Review Item ID","Item Review Completed","New Access","Reviewer Decision","Reviewer Comments","Access Type","Role Name","Role Description","Access Profile Name","Access Profile Description","Access Profile Privileged","Entitlement Name","Entitlement Description","Entitlement Privileged","Entitlement Attribute Value","Entitlement Source Schema Object Type","Entitlement Source Name","Entitlement Account Native ID","Entitlement Account Name"
+```
+
+You need to configure the path where the report will be exported
+
+### Send Reminder Notification To Reviewers
+
+Copy this below Workflow JSON to a file and save it as `.json` file like: `SendReminderNotificationToReviewersWorkflow.json`
+
+```
+{
+	"name": "Sends Reminder Notification To Reviewers",
+	"description": "Sends Reminder Notification To Reviewers With Pending Items",
+	"modified": "2024-11-20T13:05:27.631277905Z",
+	"definition": {
+		"start": "Send Email",
+		"steps": {
+			"End Step - Success": {
+				"displayName": "End",
+				"type": "success"
+			},
+			"Send Email": {
+				"actionId": "sp:send-email",
+				"attributes": {
+					"body": "<p>Dear {{$.trigger.input.reviewerName}},</p>\n<p>This is a reminder that you have pending certification items requiring your action in the <strong>{{$.trigger.input.campaignName}}</strong> certification campaign.</p>\n<p>Here are your current review progress details:</p>\n<ul>\n<li><strong>Pending Items: </strong>{{$.trigger.input.pendingItems<br>}}</li>\n<li><strong>Pending Identities</strong>: {{$.trigger.input.pendingIdentities}}</li>\n<li><strong>Completed Decisions</strong>: {{$.trigger.input.completedDecisions}}&nbsp;</li>\n<li><strong>Completed Identities</strong>: {{$.trigger.input.completedIdentities}}</li>\n</ul>\n<p>Please note that the due date for completing your reviews is <strong>{{$.trigger.input.dueDate}}</strong>.</p>\n<p>To avoid delays and escalations, Please&nbsp;complete your remaining reviews.</p>\n<p>If you have any questions or need assistance, feel free to contact us.</p>\n<p>Thank you,<br>The Certification Review Team</p>",
+					"context": null,
+					"from": "",
+					"fromEmail": "reviews@company.com",
+					"recipientEmailList.$": "$.trigger.input.reviewerEmail",
+					"recipientEmails": "$.trigger.reviewerEmail",
+					"subject": "Action Required: Pending Items in {{$.trigger.input.campaignName}} Certification"
+				},
+				"displayName": "Send Reminder Notification",
+				"nextStep": "End Step - Success",
+				"type": "action",
+				"versionNumber": 2
+			}
+		}
+	},
+	"trigger": {
+		"type": "EXTERNAL",
+		"attributes": {
+			"clientId": "948fca73-4169-45c5-bbe1-06fc1f2b0a43",
+			"url": "/beta/workflows/execute/external/d2062dca-14ac-461d-94bc-daaf25af799c"
+		}
+	}
+}
+```
+
+- Login to your ISC tenant as an Admin
+- Navigate to Admin -> Workflows -> New Workflow -> Upload File
+- Upload the workflow JSON file, then click on "Continue to Build"
+- In the builder click on External Trigger node -> + New Access Token
+- Save the client ID, client secret as you will need them to later in the SailPoint ISC extension
+- Click on the "Send Reminder Notification" node to update the notification template.
+- Save the workflow and enable it
+
+The external JSON trigger is:
+
+```
+{
+  input:
+    {
+      reviewerName: reviewerName,
+      reviewerId: reviewerId,
+      reviewerEmail: reviewerEmail,
+      campaignName: campaignName,
+      completedDecisions: completedDecisions,
+      totalDecisions: totalDecisions,
+      pendingItems: pendingItems,
+      completedIdentities: completedIdentities,
+      totalIdentities: totalIdentities,
+      pendingIdentities: pendingIdentities,
+      dueDate: certificationDueDate
+    }
+}
+```
+
 ## Extension Settings
 
 The extension supports the following settings:
@@ -285,8 +398,10 @@ The extension supports the following settings:
   - Default value: `%x/Workflows/Workflow-%t-%S-%y%M%d-%h%m%s.json`
 - `vscode-sailpoint-identitynow.treeView.pagination`: Define the number of roles and access profiles that are displayed in the tree view
   - Default value: 100
+- `vscode-sailpoint-identitynow.report.campaigns.filename`: Define the pattern for the folder to export access profiles.
 
-The patterns defined above use the following tokens:
+  - Default value: `%x/reports/%T-Campaign-%S-%y%M%d-%h%m%s.csv`
+    The patterns defined above use the following tokens:
 
 - `%u`: User Home Dir
 - `%w`: Workspace folder
@@ -305,6 +420,15 @@ The patterns defined above use the following tokens:
 ## Release Notes
 
 - Viewing a workflow does not bring statistics as this can cause timeouts.
+- Support of certifications with the help of [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp
+) and [@bassem-mohamed-sp](https://github.com/bassem-mohamed-sp):
+  - Dashboard
+  - Esclation
+  - Reminders
+  - Report
+  - Automatic reassignment to access item owners
+  - Custom reassignment
+- Fix axios-retry not working
 
 ### 1.3.7
 
@@ -342,9 +466,9 @@ The patterns defined above use the following tokens:
 - Can create or delete an identity attribute (cf. [#83](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/83))
 - Fixed issue during the account reset (cf. [#85](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/85))
 
-### 1.3.1 
+### 1.3.1
 
-- 429 Too Many Requests error during export or import of roles and access profiles  (cf. [#82](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/82))
+- 429 Too Many Requests error during export or import of roles and access profiles (cf. [#82](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/82))
 - Role and Access Profile imports are now cancellable
 
 ### 1.3.0
