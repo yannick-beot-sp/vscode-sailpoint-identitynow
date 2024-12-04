@@ -10,6 +10,18 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Removed
+
+## [1.3.8] - 2024-12-04
+
+### Security
+
+### Added
+
 - Support of certifications with the help of [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp
 ) and [@bassem-mohamed-sp](https://github.com/bassem-mohamed-sp):
   - Dashboard

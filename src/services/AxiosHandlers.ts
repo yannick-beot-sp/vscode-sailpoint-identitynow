@@ -44,20 +44,24 @@ export const onErrorResponse = async (error: AxiosError | Error, instance: Axios
             console.error(
                 `[ISCClient] ${method?.toUpperCase()} ${url} | Error ${status} ${message} | ${JSON.stringify(data)}`, error
             );
-            if (data !== undefined && 'error' in data) {
-                errorMessage = data.error;
-                if ("error_description" in data) {
-                    errorMessage += `: ${data.error_description}`;
+
+            if (typeof data !== 'undefined' && typeof data === 'object' && data !== null) {
+                if ('error' in data) {
+                    errorMessage = data.error;
+                    if ("error_description" in data) {
+                        errorMessage += `: ${data.error_description}`;
+                    }
+                } else if ('message' in data) {
+                    errorMessage = data.message;
+                } else if ('messages' in data) {
+                    errorMessage = data.messages[0].text;
+                } else if ('formatted_msg' in data) {
+                    errorMessage = data.formatted_msg;
+                } else if ('errorMessage' in data) {
+                    errorMessage = data.errorMessage;
                 }
-            } else if (data !== undefined && 'message' in data) {
-                errorMessage = data.message;
-            } else if (data !== undefined && 'messages' in data) {
-                errorMessage = data.messages[0].text;
-            } else if (data !== undefined && 'formatted_msg' in data) {
-                errorMessage = data.formatted_msg;
-            } else if (data !== undefined && 'errorMessage' in data) {
-                errorMessage = data.errorMessage;
-            } else {
+            }
+            if (!errorMessage) {
                 errorMessage = message;
             }
 

@@ -419,6 +419,8 @@ The extension supports the following settings:
 
 ## Release Notes
 
+### 1.3.8
+
 - Viewing a workflow does not bring statistics as this can cause timeouts.
 - Support of certifications with the help of [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp
 ) and [@bassem-mohamed-sp](https://github.com/bassem-mohamed-sp):
