@@ -30,7 +30,7 @@ export abstract class BaseCSVExporter<T> {
 
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
-            title: `Exporting ${this.objectType} from ${this.tenantName}...`,
+            title: `Exporting ${this.objectType} from ${this.tenantDisplayName}...`,
             cancellable: true
         }, async (task, token) =>
             await this.exportFile(task, token)
