@@ -428,6 +428,7 @@ The extension supports the following settings:
   - Report
   - Automatic reassignment to access item owners
   - Custom reassignment
+- Fix axios-retry not working
 
 ### 1.3.7
 

@@ -25,6 +25,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Fixed
 
+- Fix axios-retry not working
+
 ### Removed
 
 ## [1.3.7] - 2024-10-18
