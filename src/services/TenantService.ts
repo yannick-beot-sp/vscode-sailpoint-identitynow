@@ -2,15 +2,33 @@ import { Memento, SecretStorage } from "vscode";
 import { TenantCredentials, TenantInfo, TenantToken } from "../models/TenantInfo";
 import { compareByName } from "../utils";
 import { isEmpty } from '../utils/stringUtils';
+import { Subject } from "./Subject";
+import { Observer } from "./Observer";
+import { EventEmitter } from 'events';
 const SECRET_PAT_PREFIX = "IDENTITYNOW_SECRET_PAT_";
 const SECRET_AT_PREFIX = "IDENTITYNOW_SECRET_AT_";
 const TENANT_PREFIX = "IDENTITYNOW_TENANT_";
 const ALL_TENANTS_KEY = "IDENTITYNOW_TENANTS";
 
-export class TenantService {
+export enum TenantServiceEventType {
+    removeTenant = "REMOVE_TENANT"
+}
 
+export class TenantService implements Subject<TenantServiceEventType, any> {
 
+    private readonly eventEmitter = new EventEmitter();
     constructor(private storage: Memento, private readonly secretStorage: SecretStorage,) { }
+
+
+    public registerObserver(t: TenantServiceEventType, o: Observer<TenantServiceEventType,any>): void {
+        this.eventEmitter.on(t, o.update)
+    }
+    public removeObserver(t: TenantServiceEventType, o: Observer<TenantServiceEventType,any>): void {
+        this.eventEmitter.removeListener(t, o.update);
+    }
+    public notifyObservers(t: TenantServiceEventType, message: any): void | Promise<void> {
+        this.eventEmitter.emit(t, message)
+    }
 
     public async getTenants(): Promise<TenantInfo[]> {
         let tenants = this.storage.get<string[]>(ALL_TENANTS_KEY);

@@ -26,7 +26,6 @@ export class InputPromptStep<WizardContext> extends WizardPromptStep<WizardConte
 
         this._displayName = inputPromptStepOptions.displayName ?? convertPascalCase2SpaceBased(this._name);
 
-
         this._options = {
             ...inputPromptStepOptions.options
         };

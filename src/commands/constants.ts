@@ -124,3 +124,14 @@ export const REMOVE_ACCESS_PROFILE_FROM_APPLICATION = `${COMMAND_PREFIX}.applica
 export const ADD_ACCESS_PROFILE_FROM_APPLICATION = `${COMMAND_PREFIX}.applications.add.access-profile`;
 export const NEW_APPLICATION = `${COMMAND_PREFIX}.applications.new`;
 export const NEW_APPLICATION_PALETTE = `${COMMAND_PREFIX}.applications.new.palette`;
+
+// Certification Campaigns
+export const VIEW_CAMPAIGN_PANEL = `${COMMAND_PREFIX}.campaigns.panel`;
+export const EXPORT_CAMPAIGN_REPORT = `${COMMAND_PREFIX}.campaigns.export.report`;
+export const ESCALATE_CERTIFICATION = `${COMMAND_PREFIX}.campaigns.escalate`;
+export const CAMPAIGN_SEND_REMINDER = `${COMMAND_PREFIX}.campaigns.reminder.send`;
+export const CAMPAIGN_CONFIGURE_REMINDER = `${COMMAND_PREFIX}.campaigns.reminder.configure`;
+export const REASSIGN_CAMPAIGN_OWNERS = `${COMMAND_PREFIX}.campaigns.reassign.owners`;
+export const REASSIGN_CAMPAIGN_CUSTOM = `${COMMAND_PREFIX}.campaigns.reassign.custom`;
+export const CAMPAIGN_FILTER_NAME = `${COMMAND_PREFIX}.campaigns.filter.name`;
+export const CAMPAIGN_FILTER_STATUS = `${COMMAND_PREFIX}.campaigns.filter.status`;

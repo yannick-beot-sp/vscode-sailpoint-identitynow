@@ -5,7 +5,7 @@ import { compareByLabel } from '../utils';
 import { buildResourceUri, getIdByUri } from '../utils/UriUtils';
 import { UsageTypeBeta } from 'sailpoint-api-client';
 import { convertPascalCase2SpaceBased } from '../utils/stringUtils';
-import { ProvisioningPolicyTypeQuickPickItem } from '../models/ProvisioningPolicyTypeQuickPickItem';
+import { ExtendedQuickPickItem } from '../models/ExtendedQuickPickItem';
 import { openPreview } from '../utils/vsCodeHelpers';
 import { TenantService } from '../services/TenantService';
 import { WizardContext } from '../wizard/wizardContext';
@@ -25,7 +25,7 @@ const provisioningPolicyNameValidator = new Validator({
 });
 
 
-function prepareUsageTypePickItems(): Array<ProvisioningPolicyTypeQuickPickItem> {
+function prepareUsageTypePickItems(): Array<ExtendedQuickPickItem> {
     const FIRST = UsageTypeBeta.Create;
     return Object.keys(UsageTypeBeta).map(key => ({
         label: convertPascalCase2SpaceBased(key),

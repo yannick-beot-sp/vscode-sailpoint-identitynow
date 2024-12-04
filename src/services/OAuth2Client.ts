@@ -66,7 +66,7 @@ export class OAuth2Client {
                 onRequest);
             instance.interceptors.response.use(
                 onResponse,
-                onErrorResponse
+                (error) => onErrorResponse(error, instance)
             );
 
 

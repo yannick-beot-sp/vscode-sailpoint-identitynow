@@ -1,0 +1,4 @@
+# Not keeping in the repo the result of webview build
+*.js
+*.css
+*.html

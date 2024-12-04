@@ -19,3 +19,4 @@ export const FORM_EXPORT_FILENAME_CONF = "export.form.filename";
 
 export const WORKFLOW_EXPORT_FILENAME_CONF = "export.workflow.filename";
 
+export const CAMPAIGN_REPORT_FILENAME_CONF = "report.campaigns.filename";
