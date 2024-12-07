@@ -547,7 +547,8 @@ export class WorkflowTreeItem extends ISCResourceTreeItem {
 			tenantDisplayName,
 			label,
 			resourceType: "workflows",
-			id
+			resourceId: id,
+			id: `${tenantId}-${id}`
 		})
 	}
 

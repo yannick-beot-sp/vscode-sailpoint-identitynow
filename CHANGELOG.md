@@ -15,6 +15,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 ### Fixed
 
 - List all transforms instead of the first 250 (cf. [#96](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/96))
+- Error thrown when workflows have the same id in 2 different tenants (cf. [#101](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/101))
 
 ### Removed
 

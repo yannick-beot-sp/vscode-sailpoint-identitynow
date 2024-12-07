@@ -49,13 +49,13 @@ export class UpdateWorkflowStatusCommand {
             title: `${enable ? 'Enabling' : 'Disabling'} workflow...`,
             cancellable: false
         }, async () => {
-            await client.updateWorkflowStatus(node.id, enable);
+            await client.updateWorkflowStatus(node.resourceId, enable);
             node.enabled = enable;
             vscode.commands.executeCommand(commands.REFRESH_FORCED, node);
             const uri = getResourceUri(
                 node.tenantName,
                 "workflows",
-                node.id,
+                node.resourceId,
                 node.label as string,
                 true
             )

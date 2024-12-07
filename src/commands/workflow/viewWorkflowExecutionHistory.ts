@@ -19,7 +19,7 @@ export async function viewWorkflowExecutionHistory(node: WorkflowTreeItem): Prom
         title: 'Listing workflow executions...',
         cancellable: false
     }, async (task, token) => {
-        return await client.getWorkflowExecutionHistory(node.id as string);
+        return await client.getWorkflowExecutionHistory(node.resourceId);
     });
 
     if (history === undefined || !Array.isArray(history) || history.length < 1) {
