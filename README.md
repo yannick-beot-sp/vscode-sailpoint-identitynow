@@ -419,6 +419,8 @@ The extension supports the following settings:
 
 ## Release Notes
 
+### 1.3.9
+
 - List all transforms instead of the first 250 (cf. [#96](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/96))
 - Error thrown when workflows have the same id in 2 different tenants (cf. [#101](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/101))
 
