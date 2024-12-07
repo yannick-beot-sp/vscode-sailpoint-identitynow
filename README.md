@@ -419,6 +419,8 @@ The extension supports the following settings:
 
 ## Release Notes
 
+- List all transforms instead of the first 250 (cf. [#96](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/96))
+
 ### 1.3.8
 
 - Viewing a workflow does not bring statistics as this can cause timeouts.

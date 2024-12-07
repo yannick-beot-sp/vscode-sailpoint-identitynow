@@ -14,11 +14,11 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Fixed
 
+- List all transforms instead of the first 250 (cf. [#96](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/96))
+
 ### Removed
 
 ## [1.3.8] - 2024-12-04
-
-### Security
 
 ### Added
 
@@ -38,8 +38,6 @@ This changelog is following the recommended format by [keepachangelog](https://k
 ### Fixed
 
 - Fix axios-retry not working
-
-### Removed
 
 ## [1.3.7] - 2024-10-18
 
