@@ -419,6 +419,10 @@ The extension supports the following settings:
 
 ## Release Notes
 
+### 1.3.10
+
+- Fix issue when enabling log
+
 ### 1.3.9
 
 - List all transforms instead of the first 250 (cf. [#96](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/96))

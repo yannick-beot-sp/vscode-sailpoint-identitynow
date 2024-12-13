@@ -16,6 +16,12 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Removed
 
+## [1.3.10] - 2024-12-13
+
+### Fixed
+
+- Fix issue when enabling log
+
 ## [1.3.9] - 2024-12-07
 
 ### Fixed
