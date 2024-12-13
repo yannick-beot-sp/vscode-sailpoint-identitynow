@@ -48,7 +48,8 @@ export class EnableLoggingCommand {
             context["tenant"] = this.tenantService.getTenant(node.tenantId);
             context["source"] = {
                 id: node.id!,
-                name: node.label!
+                name: node.label!,
+                type: node.type!
             }
         }
 
