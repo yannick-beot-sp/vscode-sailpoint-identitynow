@@ -77,7 +77,8 @@ export class NewAccessProfileCommand {
                                 id: x.id!,
                                 label: x.name!,
                                 name: x.name!,
-                                detail: x.description
+                                detail: x.description,
+                                description: x.attribute
                             }));
 
                         return results;
