@@ -14,6 +14,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Fixed
 
+- During tenant creation, if the FQDN was not correctly entered, it generates an error. If the FQDN is not resolved, the error is not retryable. (cf. [#103](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/103))
+
 ### Removed
 
 ## [1.3.10] - 2024-12-13

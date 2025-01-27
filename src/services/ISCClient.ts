@@ -24,9 +24,9 @@ const FormData = require('form-data');
 // cf. https://axios-http.com/docs/res_schema
 // All header names are lower cased.
 const CONTENT_TYPE_HEADER = "Content-Type";
-const USER_AGENT_HEADER = "User-Agent";
+export const USER_AGENT_HEADER = "User-Agent";
 const EXTENSION_VERSION = vscode.extensions.getExtension("yannick-beot-sp.vscode-sailpoint-identitynow").packageJSON.version
-const USER_AGENT = `VSCode/${EXTENSION_VERSION}/${vscode.version} (${os.type()} ${os.arch()} ${os.release()})`
+export const USER_AGENT = `VSCode/${EXTENSION_VERSION}/${vscode.version} (${os.type()} ${os.arch()} ${os.release()})`
 
 export const TOTAL_COUNT_HEADER = "x-total-count";
 

@@ -23,7 +23,7 @@ The SailPoint Identity Security Cloud extension makes it easy to:
 - View, edit, create, delete identity attribute
 - View, trigger attribute sync or process, delete identities
 - View, edit, create, delete applications
-- View, report, esaclate, send reminders, reassign to access item owners or reassign based on a file certification campaigns
+- View, report, escalate, send reminders, reassign to access item owners or reassign based on a file certification campaigns
 
 ## Installation
 

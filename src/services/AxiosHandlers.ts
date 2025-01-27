@@ -24,7 +24,7 @@ export const onErrorResponse = async (error: AxiosError | Error, instance: Axios
     // Only retry for HTTP 429 rate limiting error or other errors when below the max retry cap
     if (error instanceof AxiosError && isRetryable(error)) {
         console.error(
-            `[ISCClient] ${error.config.method?.toUpperCase()} ${error.config.url} | Error ${error.response.status} ${error.response.statusText}`, error
+            `[ISCClient] ${error.config.method?.toUpperCase()} ${error.config.url} | Error ${error.response?.status} ${error.response?.statusText}`, error
         );
         // Calculate the time to wait using the 'retry-after' header then wait
         const timeToWait = getTimeToWait(error);
@@ -77,7 +77,7 @@ export const onErrorResponse = async (error: AxiosError | Error, instance: Axios
 function isRetryable(error: AxiosError) {
     const currentRetryCount = error.config.__retryCount || 0
     return (
-        error.code !== 'ECONNABORTED' &&
+        error.code !== 'ECONNABORTED' && error.code !== 'ENOTFOUND' &&
         (!error.response ||
             // rate limit error
             (error.response.status === 429 && currentRetryCount < MAX_429_RETRIES) ||
