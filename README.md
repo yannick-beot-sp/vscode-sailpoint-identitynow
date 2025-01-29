@@ -419,6 +419,8 @@ The extension supports the following settings:
 
 ## Release Notes
 
+- Typo in source reset information message (cf. [#105](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/105))
+
 ### 1.3.11
 
 - During tenant creation, if the FQDN was not correctly entered, it generates an error. If the FQDN is not resolved, the error is not retryable. (cf. [#103](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/103))

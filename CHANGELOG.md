@@ -14,6 +14,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Fixed
 
+- Typo in source reset information message (cf. [#105](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/105))
+
 ### Removed
 
 ## [1.3.11] - 2025-01-27

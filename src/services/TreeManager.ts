@@ -68,7 +68,7 @@ export class TreeManager {
             const task = await waifForJob(client, job.id, token)
             formatTask(task,
                 item.label as string,
-                "Entitlements for {0} successfully resetted",
+                "Entitlements for {0} successfully reset",
                 "Warning during entitlement reset of {0}: {1}",
                 "Reset of entitlements for {0} failed: {1}: {2}"
             )
@@ -99,7 +99,7 @@ export class TreeManager {
             const task = await waifForJob(client, job.id, token)
             formatTask(task,
                 item.label as string,
-                "Accounts for {0} successfully resetted",
+                "Accounts for {0} successfully reset",
                 "Warning during account reset of {0}: {1}",
                 "Reset of accounts for {0} failed: {1}: {2}"
             )
