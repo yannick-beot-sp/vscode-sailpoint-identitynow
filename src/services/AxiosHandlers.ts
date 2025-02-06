@@ -24,7 +24,7 @@ export const onErrorResponse = async (error: AxiosError | Error, instance: Axios
     // Only retry for HTTP 429 rate limiting error or other errors when below the max retry cap
     if (error instanceof AxiosError && isRetryable(error)) {
         console.error(
-            `[ISCClient] ${error.config.method?.toUpperCase()} ${error.config.url} | Error ${error.response?.status} ${error.response?.statusText}`, error
+            `[ISCClient] ${error.config.method?.toUpperCase()} ${error.config.url} | Error ${error.code} ${error.response?.status} ${error.response?.statusText}`, error
         );
         // Calculate the time to wait using the 'retry-after' header then wait
         const timeToWait = getTimeToWait(error);
@@ -42,7 +42,7 @@ export const onErrorResponse = async (error: AxiosError | Error, instance: Axios
             const { statusText, status, data } = error.response as AxiosResponse ?? {};
 
             console.error(
-                `[ISCClient] ${method?.toUpperCase()} ${url} | Error ${status} ${message} | ${JSON.stringify(data)}`, error
+                `[ISCClient] ${method?.toUpperCase()} ${url} | Error ${error.code} ${status} ${message} | ${JSON.stringify(data)}`, error
             );
 
             if (typeof data !== 'undefined' && typeof data === 'object' && data !== null) {
@@ -88,7 +88,7 @@ function isRetryable(error: AxiosError) {
 }
 
 function getTimeToWait(error: AxiosError): number {
-    const retryAfter = error.response.headers['retry-after']
+    const retryAfter = error.response?.headers?.['retry-after']
     if (retryAfter) {
 
         const parsedRetryAfter = parseInt(retryAfter)
