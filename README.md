@@ -419,7 +419,11 @@ The extension supports the following settings:
 
 ## Release Notes
 
+### 1.3.12
+
 - Typo in source reset information message (cf. [#105](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/105))
+- When exporting form definitions, the property usedBy is emptied
+- Forms with same id between tenant was causing an error
 
 ### 1.3.11
 

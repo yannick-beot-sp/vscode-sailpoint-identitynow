@@ -14,9 +14,18 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Fixed
 
-- Typo in source reset information message (cf. [#105](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/105))
-
 ### Removed
+
+## [1.3.12] - 2025-02-12
+
+### Changed
+
+- When exporting form definitions, the property usedBy is emptied
+
+### Fixed
+
+- Typo in source reset information message (cf. [#105](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/105))
+- Forms with same id between tenant was causing an error
 
 ## [1.3.11] - 2025-01-27
 
