@@ -1088,7 +1088,8 @@ export class FormTreeItem extends ISCResourceTreeItem {
 			tenantDisplayName,
 			label,
 			resourceType: "form-definitions",
-			id,
+			id: `${tenantId}-${id}`,
+			resourceId: id,
 			beta: true
 		})
 	}

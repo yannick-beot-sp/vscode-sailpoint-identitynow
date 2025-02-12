@@ -28,7 +28,16 @@ export class FormDefinitionImporter {
     protected async importFile(task: any, token: vscode.CancellationToken): Promise<void> {
         console.log("> FormDefinitionImporter.importFile");
         const data = fs.readFileSync(this.fileUri.fsPath).toString();
-        const result = await this.client.importForms(JSON.parse(data))
+        let json = JSON.parse(data)
+                // Cleaning "data" by removing usedBy
+                json = json.map(item => ({
+                    ...item,
+                    object: {
+                        ...item.object,
+                        usedBy: []
+                    }
+                }));
+        const result = await this.client.importForms(json)
 
         if (result.errors !== undefined && result.errors.length > 0) {
             const message = "Errors during form import: " +

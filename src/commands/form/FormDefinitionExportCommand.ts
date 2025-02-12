@@ -45,7 +45,15 @@ export class FormDefinitionExportCommand {
         }
 
         const client = new ISCClient(node.tenantId, node.tenantName);
-        const data = await client.exportForms(filters)
+        let data = await client.exportForms(filters)
+        // Cleaning "data" by removing usedBy
+        data = data.map(item => ({
+            ...item,
+            object: {
+                ...item.object,
+                usedBy: []
+            }
+        }));
 
         console.log('Writing to ', target);
         ensureFolderExists(target);
