@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://developer.sailpoint.com/schemas/service-desk-integrations/status-check-configuration.json",
+  "title": "Time check configuration of queued SDIM tickets",
+  "description": "QueuedCheckConfigDetails containing the configured values",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "provisioningStatusCheckIntervalMinutes": {
+      "nullable": false,
+      "type": "string",
+      "description": "Interval in minutes between status checks",
+      "example": "30"
+    },
+    "provisioningMaxStatusCheckDays": {
+      "nullable": false,
+      "type": "string",
+      "description": "Maximum number of days to check",
+      "example": "2"
+    }
+  },
+  "required": ["provisioningStatusCheckIntervalMinutes", "provisioningMaxStatusCheckDays"]
+}

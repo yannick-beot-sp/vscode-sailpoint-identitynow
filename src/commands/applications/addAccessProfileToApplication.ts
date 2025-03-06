@@ -46,24 +46,24 @@ export class AddAccessProfileToApplication {
                 }),
                 new QuickPickAccessProfileStep({
                     getISCClient: () => { return client; },
-                    canPickMany: false,
+                    canPickMany: true,
                     accessProfileQueryKey: "accessProfileQueryAfter"
                 })
             ]
         }, context);
-        
+
         if (values === undefined) { return; }
 
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
-            title: 'Adding Access Profile To Application...',
+            title: 'Adding Access Profile(s) To Application...',
             cancellable: false
         }, async () => {
-            let accessProfiles = values["accessProfiles"]
-            
-            await client.addAccessProfileToApplication(node.id, accessProfiles.id)
+            const accessProfiles = values["accessProfiles"]
+            const accessProfileIds = accessProfiles.map(x => x.id)
+            await client.addAccessProfilesToApplication(node.id, accessProfileIds)
 
-            vscode.commands.executeCommand(commands.REFRESH_FORCED, node);
+            await vscode.commands.executeCommand(commands.REFRESH_FORCED, node);
 
         });
     }

@@ -1,5 +1,5 @@
 import { ExportPayloadBetaIncludeTypesEnum } from 'sailpoint-api-client';
-import { FormTreeItem, ISCResourceTreeItem, IdentityProfileTreeItem, RuleTreeItem, SourceTreeItem, TransformTreeItem } from '../../models/ISCTreeItem';
+import { FormTreeItem, ISCResourceTreeItem, IdentityProfileTreeItem, RuleTreeItem, ServiceDeskTreeItem, SourceTreeItem, TransformTreeItem } from '../../models/ISCTreeItem';
 import { PathProposer } from '../../services/PathProposer';
 import { askFile, openPreview } from '../../utils/vsCodeHelpers';
 import { SPConfigExporter } from './SPConfigExporter';
@@ -24,6 +24,8 @@ export class ExportConfigNodeTreeViewCommand {
                 return ExportPayloadBetaIncludeTypesEnum.Rule;
             case FormTreeItem.name:
                 return ExportPayloadBetaIncludeTypesEnum.FormDefinition;
+            case ServiceDeskTreeItem.name:
+                return ExportPayloadBetaIncludeTypesEnum.ServiceDeskIntegration;
             default:
                 throw new Error("Invalid node type:" + node.label);
 

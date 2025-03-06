@@ -78,6 +78,7 @@ import { ReassignOwnersCommand } from './campaign-webview/reassignOwnersCommand'
 import { CustomReassignCommand } from './campaign-webview/customReassignCommand';
 import { CertificationCampaignStatusFilterCommand } from './campaign-webview/CertificationCampaignStatusFilterCommand';
 import { CertificationCampaignNameFilterCommand } from './campaign-webview/CertificationCampaignNameFilterCommand';
+import { EditServiceDeskTimeCheckConfiguration } from './commands/tenant/editServiceDeskTimeCheckConfiguration';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -528,6 +529,9 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.NEW_APPLICATION,
 			newApplicationCommand.execute, newApplicationCommand));
 	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NEW_APPLICATION_ICON,
+			newApplicationCommand.execute, newApplicationCommand));
+	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.NEW_APPLICATION_PALETTE,
 			newApplicationCommand.execute, newApplicationCommand));
 
@@ -578,6 +582,12 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.CAMPAIGN_FILTER_NAME,
 			certificationCampaignNameFilterCommand.execute, certificationCampaignNameFilterCommand))
+
+
+	const editServiceDeskTimeCheckConfiguration = new EditServiceDeskTimeCheckConfiguration()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EDIT_SERVICE_DESK_INTEGRATIONS_STATUS_CHECK_CONFIGURATION,
+			editServiceDeskTimeCheckConfiguration.execute, editServiceDeskTimeCheckConfiguration))
 
 }
 

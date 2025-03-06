@@ -1599,16 +1599,15 @@ export class ISCClient {
 		const response = await httpClient.post(path, [accessProfileId]);
 	}
 
-	public async addAccessProfileToApplication(appId: string, accessProfileId: string): Promise<void> {
-		console.log("> addAccessProfileToApplication", appId, accessProfileId);
+	public async addAccessProfilesToApplication(appId: string, accessProfileIds: string[]): Promise<void> {
+		console.log("> addAccessProfileToApplication", appId, accessProfileIds);
 		const path = `/beta/source-apps/${appId}`
-		const response = this.patchResource(path, [
-			{
-				"op": "add",
-				"path": "/accessProfiles/-",
-				"value": accessProfileId
-			}
-		]);
+		const payload = accessProfileIds.map(accessProfileId=>({
+			"op": "add",
+			"path": "/accessProfiles/-",
+			"value": accessProfileId
+		}))
+		const response = await this.patchResource(path, payload);
 	}
 
 	//////////////////////////////
@@ -1858,7 +1857,7 @@ export class ISCClient {
 		console.log("> generateDigitToken");
 		const apiConfig = await this.getApiConfiguration()
 		const api = new PasswordManagementBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors())
-		const result = await api.generateDigitToken({
+		const result = await api.createDigitToken({
 			passwordDigitTokenResetBeta: {
 				userId: identityId,
 				durationMinutes,

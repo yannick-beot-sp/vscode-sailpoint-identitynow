@@ -557,11 +557,15 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.applications.add.access-profile",
-        "title": "Add access profile to application...",
+        "title": "Add access profiles to application...",
         "icon": "$(add)"
       },
       {
         "command": "vscode-sailpoint-identitynow.applications.new",
+        "title": "Add new application..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.applications.new.view-icon",
         "title": "Add new application...",
         "icon": "$(add)"
       },
@@ -608,6 +612,10 @@
         "command": "vscode-sailpoint-identitynow.campaigns.filter.status",
         "title": "Filter certification campaign by status...",
         "icon": "$(filter-filled)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.service-desk-integrations.edit.status-check-configuration",
+        "title": "Edit time check configuration..."
       }
     ],
     "menus": {
@@ -957,6 +965,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.applications.new.view-icon",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.campaigns.panel",
           "when": "never"
         },
@@ -991,6 +1003,10 @@
         {
           "command": "vscode-sailpoint-identitynow.campaigns.filter.status",
           "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.service-desk-integrations.edit.status-check-configuration",
+          "when": "never"
         }
       ],
       "view/title": [
@@ -1013,7 +1029,7 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.export-node-config.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^(.*source|identity-profile|connector-rule|transform)$/i",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^(.*source|identity-profile|connector-rule|transform|service-desk-integration)$/i",
           "group": "zzspconfig"
         },
         {
@@ -1394,6 +1410,11 @@
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^source-apps/"
         },
         {
+          "command": "vscode-sailpoint-identitynow.applications.new.view-icon",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^source-apps/",
+          "group": "inline"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.campaigns.panel",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^campaign$/",
           "group": "0-campaigns@0"
@@ -1437,6 +1458,10 @@
           "command": "vscode-sailpoint-identitynow.campaigns.filter.status",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^campaigns/",
           "group": "inline@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.service-desk-integrations.edit.status-check-configuration",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == service-desk-integrations"
         }
       ],
       "editor/context": [
@@ -1527,6 +1552,10 @@
       {
         "fileMatch": "idn://**/source-apps/**/*",
         "url": "./schemas/app.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/service-desk-integrations/status-check-configuration/**/*",
+        "url": "./schemas/status-check-configuration.schemas.json"
       }
     ],
     "configuration": {

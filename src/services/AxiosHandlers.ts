@@ -59,6 +59,8 @@ export const onErrorResponse = async (error: AxiosError | Error, instance: Axios
                     errorMessage = data.formatted_msg;
                 } else if ('errorMessage' in data) {
                     errorMessage = data.errorMessage;
+                } else if ('detailMessage' in data) {
+                    errorMessage = data.detailMessage;
                 }
             }
             if (!errorMessage) {

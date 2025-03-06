@@ -123,6 +123,7 @@ export const APPLICATIONS_FILTER_NAME_VIEW = `${COMMAND_PREFIX}.applications.fil
 export const REMOVE_ACCESS_PROFILE_FROM_APPLICATION = `${COMMAND_PREFIX}.applications.remove.access-profile`;
 export const ADD_ACCESS_PROFILE_FROM_APPLICATION = `${COMMAND_PREFIX}.applications.add.access-profile`;
 export const NEW_APPLICATION = `${COMMAND_PREFIX}.applications.new`;
+export const NEW_APPLICATION_ICON = `${COMMAND_PREFIX}.applications.new.view-icon`;
 export const NEW_APPLICATION_PALETTE = `${COMMAND_PREFIX}.applications.new.palette`;
 
 // Certification Campaigns
@@ -135,3 +136,6 @@ export const REASSIGN_CAMPAIGN_OWNERS = `${COMMAND_PREFIX}.campaigns.reassign.ow
 export const REASSIGN_CAMPAIGN_CUSTOM = `${COMMAND_PREFIX}.campaigns.reassign.custom`;
 export const CAMPAIGN_FILTER_NAME = `${COMMAND_PREFIX}.campaigns.filter.name`;
 export const CAMPAIGN_FILTER_STATUS = `${COMMAND_PREFIX}.campaigns.filter.status`;
+
+// Service Desk
+export const EDIT_SERVICE_DESK_INTEGRATIONS_STATUS_CHECK_CONFIGURATION = `${COMMAND_PREFIX}.service-desk-integrations.edit.status-check-configuration`;

@@ -10,9 +10,16 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- Add a new command to update the Time Check Configuration for Service Desk Integrations on the "Service Desk" node
+
 ### Changed
 
+- Add New icon for applications
+- Can add several access profiles at once in an application
+
 ### Fixed
+
+- Refresh of Access Profiles after adding applications
 
 ### Removed
 
