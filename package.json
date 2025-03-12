@@ -1645,7 +1645,7 @@
     "@typescript-eslint/eslint-plugin": "^5.47.0",
     "@typescript-eslint/parser": "^5.47.0",
     "@vscode/test-electron": "^2.2.1",
-    "esbuild": "^0.16.17",
+    "esbuild": "^0.25.1",
     "eslint": "^8.30.0",
     "glob": "^8.0.3",
     "mocha": "^10.2.0",
@@ -1662,7 +1662,7 @@
     "csv-parse": "^5.4.0",
     "fast-json-patch": "^3.1.1",
     "lodash": "^4.17.21",
-    "sailpoint-api-client": "^1.4.8",
+    "sailpoint-api-client": "^1.4.15",
     "tmp": "^0.2.1",
     "vscode-sailpoint-identitynow": "file:"
   }
