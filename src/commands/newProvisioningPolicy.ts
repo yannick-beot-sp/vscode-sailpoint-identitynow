@@ -4,7 +4,7 @@ import { ProvisioningPoliciesTreeItem } from "../models/ISCTreeItem";
 import { compareByLabel } from '../utils';
 import { buildResourceUri, getIdByUri } from '../utils/UriUtils';
 import { UsageTypeBeta } from 'sailpoint-api-client';
-import { convertPascalCase2SpaceBased } from '../utils/stringUtils';
+import { convertConstantToTitleCase } from '../utils/stringUtils';
 import { ExtendedQuickPickItem } from '../models/ExtendedQuickPickItem';
 import { openPreview } from '../utils/vsCodeHelpers';
 import { TenantService } from '../services/TenantService';
@@ -27,10 +27,10 @@ const provisioningPolicyNameValidator = new Validator({
 
 function prepareUsageTypePickItems(): Array<ExtendedQuickPickItem> {
     const FIRST = UsageTypeBeta.Create;
-    return Object.keys(UsageTypeBeta).map(key => ({
-        label: convertPascalCase2SpaceBased(key),
-        description: (UsageTypeBeta[key] === FIRST ? "(default)" : ""),
-        value: UsageTypeBeta[key]
+    return Object.values(UsageTypeBeta).map(key => ({
+        label: convertConstantToTitleCase(key),
+        description: (key === FIRST ? "(default)" : ""),
+        value: key
     }))
         .sort(compareByLabel)
         // To move "Create" at the top. cf. https://stackoverflow.com/a/23921775
@@ -78,9 +78,9 @@ export class NewProvisioningPolicyCommand {
 
             ]
         }, context);
-        
+
         if (values === undefined) { return; }
-        
+
         const usageType = values["provisioningPolicyType"]
         const provisioningPolicyName = values["provisioningPolicy"]
         await vscode.window.withProgress({

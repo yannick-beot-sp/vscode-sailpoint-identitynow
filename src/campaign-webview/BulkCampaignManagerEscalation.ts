@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { AdminReviewReassignReassignTo, AdminReviewReassignReassignToTypeEnum, CampaignStatusEnum, CertificationCampaignsApiMoveRequest, IdentityCertificationDto } from "sailpoint-api-client";
+import { AdminReviewReassignReassignTo,AdminReviewReassignReassignToTypeV3,CampaignStatusV3,CertificationCampaignsApiMoveRequest, IdentityCertificationDto } from "sailpoint-api-client";
 import { ISCClient } from "../services/ISCClient";
 
 const CERTIFICATIONS_REASSIGN_LIMIT = 250;
@@ -13,7 +13,7 @@ export class BulkCampaignManagerEscalation {
         const campaign = await this.client.getCampaign(campaignId);
 
         // Ensure the campaign is not completed
-        if (campaign.status === CampaignStatusEnum.Completed) {
+        if (campaign.status === CampaignStatusV3.Completed) {
             console.log(`< BulkCampaignManagerEscalation.execute: Campaign ${campaignId} is completed. Exiting script.`);
             vscode.window.showWarningMessage(`Campaign ${campaign.name} is already completed. Cannot reassign certifications.`)
             return;
@@ -64,7 +64,7 @@ export class BulkCampaignManagerEscalation {
     private async processReviewerReassignments(campaignId: string, reviewerId: string, allCertificationIds: string[], reassignReason: string) {
         const newReviewer: AdminReviewReassignReassignTo = {
             id: reviewerId,
-            type: AdminReviewReassignReassignToTypeEnum.Identity
+            type: AdminReviewReassignReassignToTypeV3.Identity
         }
 
         while (allCertificationIds.length > 0) {

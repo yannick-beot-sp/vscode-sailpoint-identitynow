@@ -3,7 +3,7 @@ import { CampaignTreeItem } from "../models/ISCTreeItem";
 import { CampaignConfigurationService } from "../services/CampaignConfigurationService";
 import { TenantService } from "../services/TenantService";
 import { ISCClient } from '../services/ISCClient';
-import { AccessReviewItem, ReassignReference, ReassignReferenceTypeEnum } from 'sailpoint-api-client';
+import { AccessReviewItem, ReassignReference, ReassignReferenceTypeV3 } from 'sailpoint-api-client';
 import { chooseFile, confirm } from '../utils/vsCodeHelpers';
 import { CustomReviewerCoverage, CustomReviewerImporter } from './CustomReviewerImporter';
 import { BulkReviewItemReassignment } from './BulkReviewItemReassignment';
@@ -83,7 +83,7 @@ export class CustomReassignCommand {
                         if (!ownerReviewItems) {
                             ownerReviewItems = []
                         }
-                        ownerReviewItems.push({ id: pendingReviewItem.id, type: ReassignReferenceTypeEnum.Item })
+                        ownerReviewItems.push({ id: pendingReviewItem.id, type: ReassignReferenceTypeV3.Item })
                         campaignReassignments.set(reviewerId, ownerReviewItems)
                     }
                 }

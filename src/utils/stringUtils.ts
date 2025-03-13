@@ -26,6 +26,17 @@ export function convertPascalCase2SpaceBased(input: string) {
         // Remove any white space left around the word
         .trim();
 }
+/**
+ * CREATE_GROUP => Create Group
+ * @param constantString 
+ * @returns 
+ */
+export function convertConstantToTitleCase(constantString: string): string {
+    return constantString
+        .split('_') // Divise la chaîne en utilisant les underscores
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Met la première lettre en majuscule et le reste en minuscules
+        .join(' '); // Joint les mots avec des espaces
+}
 
 export function capitalizeFirstLetter(input: string) {
     return input.charAt(0).toUpperCase()

@@ -1,11 +1,10 @@
 import * as vscode from 'vscode';
-import * as commands from "../commands/constants";
 import { CampaignTreeItem } from "../models/ISCTreeItem";
 import { CampaignConfigurationService } from "../services/CampaignConfigurationService";
 import { TenantService } from "../services/TenantService";
 import { ISCClient } from '../services/ISCClient';
 import { confirm } from '../utils/vsCodeHelpers';
-import { AccessReviewItem, DtoType, ReassignReference, ReassignReferenceTypeEnum } from 'sailpoint-api-client';
+import { AccessReviewItem, DtoType, ReassignReference, ReassignReferenceTypeV3 } from 'sailpoint-api-client';
 import { BulkReviewItemReassignment } from './BulkReviewItemReassignment';
 
 const OWNER_REVIEW_DEFAULT_COMMENT = "Reassigned to the Access Item Owner"
@@ -54,7 +53,7 @@ export class ReassignOwnersCommand {
                         if (!ownerReviewItems) {
                             ownerReviewItems = []
                         }
-                        ownerReviewItems.push({ id: pendingReviewItem.id, type: ReassignReferenceTypeEnum.Item })
+                        ownerReviewItems.push({ id: pendingReviewItem.id, type: ReassignReferenceTypeV3.Item })
                         campaignReassignments.set(reviewerId, ownerReviewItems)
                     }
                 }

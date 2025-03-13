@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { CampaignStatusEnum, CertificationsApiSubmitReassignCertsAsyncRequest, IdentityCertificationDto, ReassignReference } from "sailpoint-api-client";
+import { CampaignStatusV3, CertificationsApiSubmitReassignCertsAsyncRequest, IdentityCertificationDto, ReassignReference } from "sailpoint-api-client";
 import { ISCClient } from "../services/ISCClient";
 
 const REVIEW_ITEM_REASSIGN_LIMIT = 500
@@ -42,7 +42,7 @@ export class BulkReviewItemReassignment {
     async getPendingCampaignItems(campaignId: string): Promise<IdentityCertificationDto[] | undefined> {
         // Ensure the campaign is not completed
         const campaign = await this.client.getCampaign(campaignId);
-        if (campaign.status === CampaignStatusEnum.Completed) {
+        if (campaign.status === CampaignStatusV3.Completed) {
             console.log(`< BulkReviewItemReassignment.execute: Campaign ${campaignId} is completed. Exiting script.`);
             return;
         }
