@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { ISCClient } from '../../services/ISCClient';
 import { delay } from '../../utils';
 import { IMPORTABLE_OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
-import { ImportOptionsBeta, SpConfigJobBetaStatusEnum } from 'sailpoint-api-client';
+import { ImportOptionsBeta, SpConfigJobBetaStatusBeta } from 'sailpoint-api-client';
 import { ImportJobResults } from '../../models/JobStatus';
 
 /**
@@ -37,7 +37,7 @@ export class SPConfigImporter {
                 await delay(1000);
                 jobStatus = await this.client.getImportJobStatus(jobId);
                 console.log({ jobStatus });
-            } while (jobStatus.status === SpConfigJobBetaStatusEnum.NotStarted || jobStatus.status === SpConfigJobBetaStatusEnum.InProgress);
+            } while (jobStatus.status === SpConfigJobBetaStatusBeta.NotStarted || jobStatus.status === SpConfigJobBetaStatusBeta.InProgress);
 
             const importJobresult = await this.client.getImportJobResult(jobId);
             const result = { ...importJobresult, ...jobStatus };

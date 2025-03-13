@@ -6,7 +6,7 @@ import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesEnum, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskManagementBetaApi, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsApi, CertificationsApi, CertificationCampaignsApiMoveRequest, CertificationSummariesApi, IdentityCertDecisionSummary, AccessReviewItem, CertificationCampaignFiltersApiFp, IdentityCertificationDto, GetActiveCampaigns200ResponseInner, CertificationsApiSubmitReassignCertsAsyncRequest, WorkflowsApi } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskManagementBetaApi, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsApi, CertificationsApi, CertificationCampaignsApiMoveRequest, CertificationSummariesApi, IdentityCertDecisionSummary, AccessReviewItem, CertificationCampaignFiltersApiFp, IdentityCertificationDto, GetActiveCampaigns200ResponseInner, CertificationsApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SodPolicy, SODPoliciesV2024ApiFactory, SODPoliciesV2024Api, SodPolicyV2024 } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -278,36 +278,32 @@ export class ISCClient {
 
 
 	public async startEntitlementAggregation(
-		sourceID: string
+		sourceId: string
 	): Promise<LoadEntitlementTaskBeta> {
 		console.log("> ISCClient.startEntitlementAggregation");
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SourcesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.importEntitlements({ id: sourceID })
+		const response = await api.importEntitlements({ sourceId })
 		return response.data
 	}
 
 	public async startEntitlementReset(
-		sourceID: string
+		sourceId: string
 	): Promise<EntitlementSourceResetBaseReferenceDtoBeta> {
 		console.log("> ISCClient.startEntitlementReset");
 		const apiConfig = await this.getApiConfiguration();
 		const api = new EntitlementsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.resetSourceEntitlements({
-			id: sourceID
-		})
+		const response = await api.resetSourceEntitlements({ sourceId })
 		return response.data
 	}
 
 	public async startAccountReset(
-		sourceID: string
+		sourceId: string
 	): Promise<TaskResultDtoBeta> {
 		console.log("> ISCClient.startAccountReset");
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SourcesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.deleteAccountsAsync({
-			id: sourceID
-		})
+		const response = await api.deleteAccountsAsync({ sourceId })
 		return response.data
 	}
 
@@ -610,7 +606,7 @@ export class ISCClient {
 			}
 		};
 
-		return await this.paginatedSearch(search, limit, offset, count);
+		return await this.paginatedSearch(search, limit, offset, count) as AxiosResponse<RoleDocument[]>;
 	}
 	public async paginatedSearchAccessProfiles(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"], includeNested = false): Promise<AxiosResponse<AccessProfileDocument[]>> {
 		console.log("> paginatedSearchAccessProfiles", query);
@@ -629,7 +625,7 @@ export class ISCClient {
 			}
 		};
 
-		return await this.paginatedSearch(search, limit, offset, count);
+		return await this.paginatedSearch(search, limit, offset, count) as AxiosResponse<AccessProfileDocument[]>;
 	}
 	public async paginatedSearchIdentities(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"], includeNested = false): Promise<AxiosResponse<IdentityDocument[]>> {
 		console.log("> paginatedSearchIdentities", query);
@@ -648,7 +644,7 @@ export class ISCClient {
 			}
 		};
 
-		return await this.paginatedSearch(search, limit, offset, count);
+		return await this.paginatedSearch(search, limit, offset, count) as AxiosResponse<IdentityDocument[]>
 	}
 
 	public async paginatedSearch(query: Search, limit?: number, offset?: number, count?: boolean): Promise<AxiosResponse<SearchDocument[]>> {
@@ -681,7 +677,7 @@ export class ISCClient {
 	 */
 
 	public async startExportJob(
-		objectTypes: ExportPayloadBetaIncludeTypesEnum[],
+		objectTypes: ExportPayloadBetaIncludeTypesBeta[],
 		objectOptions: {
 			[key: string]: ObjectExportImportOptionsBeta;
 		} = {}
@@ -1602,7 +1598,7 @@ export class ISCClient {
 	public async addAccessProfilesToApplication(appId: string, accessProfileIds: string[]): Promise<void> {
 		console.log("> addAccessProfileToApplication", appId, accessProfileIds);
 		const path = `/beta/source-apps/${appId}`
-		const payload = accessProfileIds.map(accessProfileId=>({
+		const payload = accessProfileIds.map(accessProfileId => ({
 			"op": "add",
 			"path": "/accessProfiles/-",
 			"value": accessProfileId
@@ -1791,6 +1787,22 @@ export class ISCClient {
 
 	/////////////////////////
 	//#endregion Segments
+	/////////////////////////
+
+	/////////////////////////
+	//#region SoD Policies
+	/////////////////////////
+
+	public async getSoDPolicies(): Promise<SodPolicyV2024[]> {
+		console.log("> getSoDPolicies");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SODPoliciesV2024Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await Paginator.paginate(api, api.listSodPolicies, { sorters: "name" });
+		return result.data;
+	}
+
+	/////////////////////////
+	//#endregion SoD Policies
 	/////////////////////////
 
 	/////////////////////////

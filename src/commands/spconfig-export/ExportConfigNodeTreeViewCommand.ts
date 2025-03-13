@@ -1,4 +1,4 @@
-import { ExportPayloadBetaIncludeTypesEnum } from 'sailpoint-api-client';
+import { ExportPayloadBetaIncludeTypesBeta } from 'sailpoint-api-client';
 import { FormTreeItem, ISCResourceTreeItem, IdentityProfileTreeItem, RuleTreeItem, ServiceDeskTreeItem, SourceTreeItem, TransformTreeItem } from '../../models/ISCTreeItem';
 import { PathProposer } from '../../services/PathProposer';
 import { askFile, openPreview } from '../../utils/vsCodeHelpers';
@@ -12,20 +12,20 @@ export class ExportConfigNodeTreeViewCommand {
     constructor() { }
 
 
-    private getObjectType(node: ISCResourceTreeItem): ExportPayloadBetaIncludeTypesEnum {
+    private getObjectType(node: ISCResourceTreeItem): ExportPayloadBetaIncludeTypesBeta {
         switch (node.constructor.name) {
             case SourceTreeItem.name:
-                return ExportPayloadBetaIncludeTypesEnum.Source;
+                return ExportPayloadBetaIncludeTypesBeta.Source;
             case TransformTreeItem.name:
-                return ExportPayloadBetaIncludeTypesEnum.Transform;
+                return ExportPayloadBetaIncludeTypesBeta.Transform;
             case IdentityProfileTreeItem.name:
-                return ExportPayloadBetaIncludeTypesEnum.IdentityProfile;
+                return ExportPayloadBetaIncludeTypesBeta.IdentityProfile;
             case RuleTreeItem.name:
-                return ExportPayloadBetaIncludeTypesEnum.Rule;
+                return ExportPayloadBetaIncludeTypesBeta.ConnectorRule;
             case FormTreeItem.name:
-                return ExportPayloadBetaIncludeTypesEnum.FormDefinition;
+                return ExportPayloadBetaIncludeTypesBeta.FormDefinition;
             case ServiceDeskTreeItem.name:
-                return ExportPayloadBetaIncludeTypesEnum.ServiceDeskIntegration;
+                return ExportPayloadBetaIncludeTypesBeta.ServiceDeskIntegration;
             default:
                 throw new Error("Invalid node type:" + node.label);
 
@@ -66,7 +66,7 @@ export class ExportConfigNodeTreeViewCommand {
         const options: any = {};
         // FIXME
         // Issue while exporting FORM_DEFINITION: needs to rely on names instead of ids
-        if (ExportPayloadBetaIncludeTypesEnum.FormDefinition === objectType) {
+        if (ExportPayloadBetaIncludeTypesBeta.FormDefinition === objectType || ExportPayloadBetaIncludeTypesBeta.ConnectorRule === objectType) {
             options[objectType] = {
                 "includedNames": [
                     node.label

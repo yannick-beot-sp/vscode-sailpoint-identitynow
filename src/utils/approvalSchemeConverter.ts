@@ -1,4 +1,4 @@
-import { AccessProfileApprovalScheme, AccessProfileApprovalSchemeApproverTypeEnum, ApprovalSchemeForRole, ApprovalSchemeForRoleApproverTypeEnum } from "sailpoint-api-client";
+import { AccessProfileApprovalScheme, AccessProfileApprovalSchemeApproverTypeV3, ApprovalSchemeForRole, ApprovalSchemeForRoleApproverTypeV3 } from "sailpoint-api-client";
 import { CacheService } from "../services/cache/CacheService";
 import { CSV_MULTIVALUE_SEPARATOR } from "../constants";
 import { isEmpty } from "./stringUtils";
@@ -14,7 +14,7 @@ export async function accessProfileApprovalSchemeToStringConverter(
     return await approvalSchemeToStringConverter(
         schemes,
         governanceId2Name,
-        AccessProfileApprovalSchemeApproverTypeEnum.GovernanceGroup);
+        AccessProfileApprovalSchemeApproverTypeV3.GovernanceGroup);
 }
 
 /**
@@ -28,7 +28,7 @@ export async function roleApprovalSchemeToStringConverter(
     return await approvalSchemeToStringConverter(
         schemes,
         governanceId2Name,
-        ApprovalSchemeForRoleApproverTypeEnum.GovernanceGroup);
+        ApprovalSchemeForRoleApproverTypeV3.GovernanceGroup);
 }
 
 export async function approvalSchemeToStringConverter<SchemeEnum>(
@@ -62,12 +62,12 @@ export async function stringToAccessProfileApprovalSchemeConverter(
 
     return await Promise.all(schemes.split(CSV_MULTIVALUE_SEPARATOR).map(async (approver) => {
 
-        let approverType: AccessProfileApprovalSchemeApproverTypeEnum;
+        let approverType: AccessProfileApprovalSchemeApproverTypeV3;
         let approverId: string | undefined = undefined;
-        if (Object.values(AccessProfileApprovalSchemeApproverTypeEnum).includes(approver as AccessProfileApprovalSchemeApproverTypeEnum)) {
-            approverType = approver as AccessProfileApprovalSchemeApproverTypeEnum;
+        if (Object.values(AccessProfileApprovalSchemeApproverTypeV3).includes(approver as AccessProfileApprovalSchemeApproverTypeV3)) {
+            approverType = approver as AccessProfileApprovalSchemeApproverTypeV3;
         } else {
-            approverType = AccessProfileApprovalSchemeApproverTypeEnum.GovernanceGroup;
+            approverType = AccessProfileApprovalSchemeApproverTypeV3.GovernanceGroup;
             approverId = await governanceId2Name.get(approver);
         }
 
@@ -91,12 +91,12 @@ export async function stringToRoleApprovalSchemeConverter(
 
     return await Promise.all(schemes.split(CSV_MULTIVALUE_SEPARATOR).map(async (approver) => {
 
-        let approverType: ApprovalSchemeForRoleApproverTypeEnum;
+        let approverType: ApprovalSchemeForRoleApproverTypeV3;
         let approverId: string | undefined = undefined;
-        if (Object.values(ApprovalSchemeForRoleApproverTypeEnum).includes(approver as ApprovalSchemeForRoleApproverTypeEnum)) {
-            approverType = approver as ApprovalSchemeForRoleApproverTypeEnum;
+        if (Object.values(ApprovalSchemeForRoleApproverTypeV3).includes(approver as ApprovalSchemeForRoleApproverTypeV3)) {
+            approverType = approver as ApprovalSchemeForRoleApproverTypeV3;
         } else {
-            approverType = ApprovalSchemeForRoleApproverTypeEnum.GovernanceGroup;
+            approverType = ApprovalSchemeForRoleApproverTypeV3.GovernanceGroup;
             approverId = await governanceId2Name.get(approver);
         }
 

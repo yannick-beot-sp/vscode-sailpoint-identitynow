@@ -6,7 +6,6 @@ import { TenantInfoQuickPickItem } from "../models/TenantInfoQuickPickItem";
 import { compareByLabel, compareByName } from "../utils";
 import { isBlank, isEmpty } from "./stringUtils";
 import { ObjectPickItem } from "../models/ObjectPickItem";
-import { IMPORTABLE_OBJECT_TYPE_ITEMS, ObjectTypeQuickPickItem } from "../models/ObjectTypeQuickPickItem";
 
 export async function chooseTenant(tenantService: TenantService, title: string): Promise<TenantInfo | undefined> {
 	console.log("> chooseTenant");
@@ -244,7 +243,7 @@ export async function askChosenItems(title: string,
 			canPickMany: true
 		});
 
-	if (result && result.length > 0) {
+	if (result !== undefined) {
 		return result.map(mapFn);
 	}
 	return undefined;
@@ -256,10 +255,10 @@ export async function askChosenItems(title: string,
  * @param objectTypes List of object types to choose from
  * @returns 
  */
-export async function askSelectObjectTypes(title: string, objectTypeItems: Array<ObjectTypeQuickPickItem> = IMPORTABLE_OBJECT_TYPE_ITEMS): Promise<Array<ObjectTypeQuickPickItem> | undefined> {
+export async function askSelectObjectTypes<T extends vscode.QuickPickItem>(title: string, objectTypeItems: Array<T>): Promise<Array<T> | undefined> {
 	const sortedObjectTypeItems = objectTypeItems.sort(compareByLabel);
 
-	const selectedObjectTypeItems = await vscode.window.showQuickPick<ObjectTypeQuickPickItem>(sortedObjectTypeItems, {
+	const selectedObjectTypeItems = await vscode.window.showQuickPick<T>(sortedObjectTypeItems, {
 		ignoreFocusOut: false,
 		title: title,
 		canPickMany: true

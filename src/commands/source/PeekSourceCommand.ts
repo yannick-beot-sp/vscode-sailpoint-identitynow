@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as tmp from "tmp";
-import { Schema, StatusResponseBeta, StatusResponseBetaStatusEnum } from 'sailpoint-api-client';
+import { Schema } from 'sailpoint-api-client';
 import { SourceTreeItem } from '../../models/ISCTreeItem';
 import { ISCClient } from '../../services/ISCClient';
 import { TenantService } from '../../services/TenantService';

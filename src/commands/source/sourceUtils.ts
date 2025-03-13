@@ -1,4 +1,4 @@
-import { TaskStatusBeta, TaskStatusBetaCompletionStatusEnum } from "sailpoint-api-client";
+import { TaskStatusBeta, TaskStatusBetaCompletionStatusBeta } from "sailpoint-api-client";
 import { ISCClient } from "../../services/ISCClient";
 import * as vscode from 'vscode';
 import { delay, formatString } from "../../utils";
@@ -28,11 +28,10 @@ export function formatTask(task: TaskStatusBeta, objectName: string,
     errorMessage: string
 ) {
     if (task !== null) {
-        // XXX toUpperCase() required because of https://github.com/sailpoint-oss/api-specs/issues/70
-        if (task.completionStatus.toUpperCase() === TaskStatusBetaCompletionStatusEnum.Success.toUpperCase()) {
+        if (task.completionStatus === TaskStatusBetaCompletionStatusBeta.Success) {
             vscode.window.showInformationMessage(
                 formatString(successMessage, objectName))
-        } else if (task.completionStatus === TaskStatusBetaCompletionStatusEnum.Warning) {
+        } else if (task.completionStatus === TaskStatusBetaCompletionStatusBeta.Warning) {
             vscode.window.showWarningMessage(
                 formatString(warningMessage, objectName, task.messages[0]?.key))
         } else {

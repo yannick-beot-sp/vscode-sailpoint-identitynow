@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
 
-import { EXPORTABLE_OBJECT_TYPE_ITEMS, ObjectTypeQuickPickItem } from '../../models/ObjectTypeQuickPickItem';
-import { askChosenItems, askFile, askFolder, openPreview } from '../../utils/vsCodeHelpers';
+import { EXPORTABLE_OBJECT_TYPE_ITEMS, ExportableObjectTypeQuickPickItem } from '../../models/ObjectTypeQuickPickItem';
+import { askChosenItems, askFile, askFolder, askSelectObjectTypes, openPreview } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
 import { ISCClient } from '../../services/ISCClient';
 import { SPConfigExporter } from './SPConfigExporter';
-import { ExportPayloadBetaIncludeTypesEnum, ObjectExportImportOptionsBeta } from 'sailpoint-api-client';
+import { ExportPayloadBetaIncludeTypesBeta, ObjectExportImportOptionsBeta } from 'sailpoint-api-client';
 import { SimpleSPConfigExporter } from '../source/CloneSourceCommand';
 
 const ALL: vscode.QuickPickItem = {
@@ -108,19 +108,10 @@ export abstract class WizardBasedExporterCommand {
         //
         // Which objects do we export?
         //
-        const sortedObjectTypeItems = EXPORTABLE_OBJECT_TYPE_ITEMS.sort(((a, b) => (a.label > b.label) ? 1 : -1));
+        const objectTypeToExport = await askSelectObjectTypes("Object type to export", EXPORTABLE_OBJECT_TYPE_ITEMS);
+        if (objectTypeToExport === undefined) { return; }
 
-        const objectTypeItemsToExport = await vscode.window.showQuickPick<ObjectTypeQuickPickItem>(sortedObjectTypeItems, {
-            ignoreFocusOut: false,
-            title: "Object type to export",
-            canPickMany: true
-        });
-
-        if (objectTypeItemsToExport === undefined || !Array.isArray(objectTypeItemsToExport) || objectTypeItemsToExport.length < 1) {
-            console.log("< chooseAndExport: no objectType");
-            return;
-        }
-        let objectTypes: ExportPayloadBetaIncludeTypesEnum[] = objectTypeItemsToExport.map(x => x.objectType);
+        let objectTypes: ExportPayloadBetaIncludeTypesBeta[] = objectTypeToExport.map(x => x.objectType);
         const options: { [key: string]: ObjectExportImportOptionsBeta } = {};
 
         //
@@ -138,30 +129,33 @@ export abstract class WizardBasedExporterCommand {
             //
             // At this point, tenantId and tenantName already defined
             const client = new ISCClient(tenantId, tenantName);
-            for (const objectTypeItem of objectTypeItemsToExport) {
+            for (const objectTypeItem of objectTypeToExport) {
                 let items: any[] = [];
                 switch (objectTypeItem.objectType) {
-                    case ExportPayloadBetaIncludeTypesEnum.FormDefinition:
+                    case ExportPayloadBetaIncludeTypesBeta.FormDefinition:
                         items = await client.listForms();
                         break;
-                    case ExportPayloadBetaIncludeTypesEnum.GovernanceGroup:
+                    case ExportPayloadBetaIncludeTypesBeta.GovernanceGroup:
                         items = await client.getGovernanceGroups()
                         break;
 
-                    case ExportPayloadBetaIncludeTypesEnum.IdentityProfile:
+                    case ExportPayloadBetaIncludeTypesBeta.IdentityProfile:
                         items = await client.getIdentityProfiles();
                         break;
-                    case ExportPayloadBetaIncludeTypesEnum.NotificationTemplate:
+                    case ExportPayloadBetaIncludeTypesBeta.NotificationTemplate:
                         items = await client.getNotificationTemplates();
                         break;
-                    case ExportPayloadBetaIncludeTypesEnum.Rule:
+                    case ExportPayloadBetaIncludeTypesBeta.ConnectorRule:
+                        items = await client.getConnectorRules();
+                        break;
+                    case ExportPayloadBetaIncludeTypesBeta.Rule:
                         // SP Config allows to export cloud rules
                         // Need to leverage SP Config API and not only "connector rules" endpoints
                         const exporter = new SimpleSPConfigExporter(
                             client,
                             tenantDisplayName,
                             {},
-                            [ExportPayloadBetaIncludeTypesEnum.Rule]
+                            [ExportPayloadBetaIncludeTypesBeta.Rule]
                         );
                         const data = await exporter.exportConfigWithProgression();
                         items = data.objects.map(x => ({
@@ -170,20 +164,23 @@ export abstract class WizardBasedExporterCommand {
                             id: x.self.id
                         }))
                         break;
-                    case ExportPayloadBetaIncludeTypesEnum.Segment:
+                    case ExportPayloadBetaIncludeTypesBeta.Segment:
                         items = await client.getSegments()
                         break;
-                    case ExportPayloadBetaIncludeTypesEnum.ServiceDeskIntegration:
+                    case ExportPayloadBetaIncludeTypesBeta.ServiceDeskIntegration:
                         items = await client.getServiceDesks()
                         break;
-                    case ExportPayloadBetaIncludeTypesEnum.Source:
+                    case ExportPayloadBetaIncludeTypesBeta.Source:
                         items = await client.getSources();
                         break;
-                    case ExportPayloadBetaIncludeTypesEnum.Transform:
+                    case ExportPayloadBetaIncludeTypesBeta.Transform:
                         items = await client.getTransforms();
                         break;
-                    case ExportPayloadBetaIncludeTypesEnum.Workflow:
+                    case ExportPayloadBetaIncludeTypesBeta.Workflow:
                         items = await client.getWorflows();
+                        break;
+                    case ExportPayloadBetaIncludeTypesBeta.SodPolicy:
+                        items = await client.getSoDPolicies();
                         break;
                     default:
                         // By default export everything
@@ -199,38 +196,44 @@ export abstract class WizardBasedExporterCommand {
                 }
                 const placeHolder = "What do you want to export?";
                 // cf. SAASTRIAGE-2178 & SAASTRIAGE-2076
-                if (objectTypeItem.objectType === ExportPayloadBetaIncludeTypesEnum.Segment
-                    // || objectTypeItem.objectType === ExportPayloadBetaIncludeTypesEnum.SodPolicy
-                    || objectTypeItem.objectType === ExportPayloadBetaIncludeTypesEnum.FormDefinition) {
-
-                    const includedNames = await askChosenItems(objectTypeItem.label, placeHolder, items, x => x.label);
-                    if (includedNames === undefined || !Array.isArray(items) || items.length === 0) { // No selection
-                        // removes the object type from the list so it is not exported
-                        objectTypes = objectTypes.slice(objectTypes.indexOf(objectTypeItem.objectType), 1)
-                        continue
-                    }
-                    if (items.length !== includedNames.length) {
-                        options[objectTypeItem.objectType] = {
-                            includedNames
-                        };
-                    }
+                let selectedItems: string[] | undefined = undefined;
+                let propertyName = "includedIds";
+                if (objectTypeItem.objectType === ExportPayloadBetaIncludeTypesBeta.Segment
+                    || objectTypeItem.objectType === ExportPayloadBetaIncludeTypesBeta.FormDefinition
+                    || objectTypeItem.objectType === ExportPayloadBetaIncludeTypesBeta.ConnectorRule) {
+                    // Need to select by name because it does not work by id
+                    propertyName = "includedNames";
+                    selectedItems = await askChosenItems(objectTypeItem.label, placeHolder, items, x => x.label);
                 } else {
-                    const includedIds = await askChosenItems(objectTypeItem.label, placeHolder, items);
-                    if (includedIds === undefined || !Array.isArray(items) || items.length === 0) {
-                        // No selection
-                        // removes the object type from the list so it is not exported
-                        objectTypes = objectTypes.slice(objectTypes.indexOf(objectTypeItem.objectType), 1)
-                        continue;
+                    selectedItems = await askChosenItems(objectTypeItem.label, placeHolder, items);
+                }
+                if (selectedItems === undefined) {
+                    // Leave the wizard
+                    return
+                }
+                if (!Array.isArray(selectedItems) || selectedItems.length === 0) { // No selection
+                    // removes the object type from the list so it is not exported
+                    const index = objectTypes.indexOf(objectTypeItem.objectType)
+                    if (index !== -1) {
+                        objectTypes.splice(index, 1)
                     }
-                    if (items.length !== includedIds.length) {
-                        options[objectTypeItem.objectType] = {
-                            includedIds
-                        };
-                    }
+                    continue
+                }
+                if (items.length !== selectedItems.length) {
+                    options[objectTypeItem.objectType] = {
+                        [propertyName]: selectedItems
+                    };
                 }
 
             }
         }
+
+        if (objectTypes.length===0) {
+            // Nothing to export
+            // Leave the wizard
+            return
+        }
+        
         const exporter = new SPConfigExporter(
             tenantId,
             tenantName,

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { StatusResponseBeta, StatusResponseBetaStatusEnum } from 'sailpoint-api-client';
+import { StatusResponseBeta, StatusResponseBetaStatusBeta } from 'sailpoint-api-client';
 import { SourceTreeItem } from '../../models/ISCTreeItem';
 import { ISCClient } from '../../services/ISCClient';
 import { TenantService } from '../../services/TenantService';
@@ -56,7 +56,7 @@ export class TestConnectionCommand {
             cancellable: false
         }, async (task, token) => { return await client.testSourceConnection(values["source"].id) })
             .then(async (result: StatusResponseBeta) => {
-                if (StatusResponseBetaStatusEnum.Success === result.status) {
+                if (StatusResponseBetaStatusBeta.Success === result.status) {
                     vscode.window.showInformationMessage(
                         `Connection test successfull for ${values["source"].name} from ${values["tenant"].name}`
                     );

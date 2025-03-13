@@ -9,7 +9,7 @@ import * as commands from "../commands/constants";
 import * as configuration from '../configurationConstants';
 import { escapeFilter, isEmpty, isNotEmpty } from "../utils/stringUtils";
 import { TenantService } from "../services/TenantService";
-import { CampaignStatusEnum } from "sailpoint-api-client";
+import { CampaignStatusV3 } from "sailpoint-api-client";
 
 
 /**
@@ -1470,7 +1470,7 @@ export class CampaignsTreeItem extends PageableFolderTreeItem<any> {
 			))
 		);
 		// all by default
-		this.status = Object.keys(CampaignStatusEnum).map(key => CampaignStatusEnum[key])
+		this.status = Object.values(CampaignStatusV3)
 	}
 
 	protected async loadNext(): Promise<AxiosResponse<Document[]>> {

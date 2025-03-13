@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { IMPORTABLE_OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
 import { SPConfigImporter } from './SPConfigImporter';
 import { askChosenItems, askSelectObjectTypes, chooseTenant } from '../../utils/vsCodeHelpers';
-import { ImportOptionsBeta, ImportOptionsBetaIncludeTypesEnum } from 'sailpoint-api-client';
+import { ImportOptionsBeta, ImportOptionsBetaIncludeTypesBeta } from 'sailpoint-api-client';
 import { TenantInfo } from '../../models/TenantInfo';
 import { TenantService } from '../../services/TenantService';
 import { validateTenantReadonly } from '../validateTenantReadonly';
@@ -129,7 +129,7 @@ export abstract class WizardBasedImporterCommand {
             const includeIds = await askChosenItems(requestedObjectType.label, "What do you want to import?", pickItems);
 
             if (includeIds === undefined) { continue; }
-            const includeType: ImportOptionsBetaIncludeTypesEnum = <ImportOptionsBetaIncludeTypesEnum>requestedObjectType.objectType;
+            const includeType: ImportOptionsBetaIncludeTypesBeta = requestedObjectType.objectType;
             options.includeTypes.push(includeType);
 
             if (pickItems.length !== includeIds.length) {

@@ -11,11 +11,13 @@ This changelog is following the recommended format by [keepachangelog](https://k
 ### Added
 
 - Add a new command to update the Time Check Configuration for Service Desk Integrations on the "Service Desk" node
+- Add support for Connector Rule and Cloud Rule support (cf. [#104](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/104))
 
 ### Changed
 
 - Add New icon for applications
 - Can add several access profiles at once in an application
+- Upgrade sailpoint-api-client dependency to 1.4.15
 
 ### Fixed
 

@@ -8,7 +8,7 @@ import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep';
 import { runWizard } from '../../wizard/wizard';
 import { Validator } from '../../validator/validator';
 import { InputPromptStep } from '../../wizard/inputPromptStep';
-import { ExportPayloadBetaIncludeTypesEnum, ObjectExportImportOptionsBeta, SpConfigExportResultsBeta } from 'sailpoint-api-client';
+import { ExportPayloadBetaIncludeTypesBeta, ObjectExportImportOptionsBeta, SpConfigExportResultsBeta } from 'sailpoint-api-client';
 import { delay } from '../../utils';
 import crypto = require('crypto');
 import { SPConfigImporter } from '../spconfig-import/SPConfigImporter';
@@ -31,7 +31,7 @@ export class SimpleSPConfigExporter {
         private readonly options: {
             [key: string]: ObjectExportImportOptionsBeta;
         },
-        private objectTypes: ExportPayloadBetaIncludeTypesEnum[] = []
+        private objectTypes: ExportPayloadBetaIncludeTypesBeta[] = []
     ) {
     }
 
@@ -133,7 +133,7 @@ export class CloneSourceCommand {
         const oldSource = await client.getSourceById(values["source"].id)
 
         const options: any = {};
-        options[ExportPayloadBetaIncludeTypesEnum.Source] = {
+        options[ExportPayloadBetaIncludeTypesBeta.Source] = {
             "includedIds": [
                 values["source"].id
             ]
@@ -142,13 +142,13 @@ export class CloneSourceCommand {
             client,
             values["tenant"].name,
             options,
-            [ExportPayloadBetaIncludeTypesEnum.Source]
+            [ExportPayloadBetaIncludeTypesBeta.Source]
         );
 
         const data = await exporter.exportConfigWithProgression();
         const newid = crypto.randomUUID().replaceAll("-", "")
 
-        data.options.objectOptions[ExportPayloadBetaIncludeTypesEnum.Source].includedIds = [newid];
+        data.options.objectOptions[ExportPayloadBetaIncludeTypesBeta.Source].includedIds = [newid];
 
         const newSourceName = values["newSourceName"];
         data.objects[0].self = {

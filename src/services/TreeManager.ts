@@ -1,12 +1,11 @@
 import * as vscode from 'vscode';
 import * as commands from '../commands/constants';
 import { SourceTreeItem, TenantTreeItem } from "../models/ISCTreeItem";
-import { ISCDataProvider } from "../views/ISCDataProvider";
 import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { ISCClient } from "./ISCClient";
 import { TenantService } from "./TenantService";
 import { TransformEvaluator } from './TransformEvaluator';
-import { TaskStatusBeta, TaskStatusBetaCompletionStatusEnum } from 'sailpoint-api-client';
+import { TaskStatusBeta, TaskStatusBetaCompletionStatusBeta } from 'sailpoint-api-client';
 import { confirm } from '../utils/vsCodeHelpers';
 import { formatTask, waifForJob } from '../commands/source/sourceUtils';
 import { isTenantReadonly, validateTenantReadonly } from '../commands/validateTenantReadonly';
@@ -169,7 +168,7 @@ export class TreeManager {
         }
 
         const task = await this.resetAccounts(item, false)
-        if (task?.completionStatus.toUpperCase() === TaskStatusBetaCompletionStatusEnum.Success.toUpperCase()) {
+        if (task?.completionStatus === TaskStatusBetaCompletionStatusBeta.Success) {
             await this.resetEntitlements(item, false)
         }
     }

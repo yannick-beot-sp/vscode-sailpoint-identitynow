@@ -6,7 +6,7 @@ import { ISCClient } from '../../services/ISCClient';
 import { delay } from '../../utils';
 import { ensureFolderExists } from '../../utils/fileutils';
 import { PathProposer } from '../../services/PathProposer';
-import { ExportPayloadBetaIncludeTypesEnum, ObjectExportImportOptionsBeta } from 'sailpoint-api-client';
+import { ExportPayloadBetaIncludeTypesBeta, ObjectExportImportOptionsBeta } from 'sailpoint-api-client';
 
 /**
  * Class use to export SP-Config
@@ -21,7 +21,7 @@ export class SPConfigExporter {
         private readonly options: {
             [key: string]: ObjectExportImportOptionsBeta;
         },
-        private objectTypes: ExportPayloadBetaIncludeTypesEnum[] = [],
+        private objectTypes: ExportPayloadBetaIncludeTypesBeta[] = [],
         private readonly exportSingle = true
     ) {
         this.client = new ISCClient(this.tenantId, this.tenantName);
