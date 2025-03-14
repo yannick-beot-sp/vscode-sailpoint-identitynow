@@ -10,6 +10,16 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Removed
+
+## [1.3.13] - 2025-03-14
+
+### Added
+
 - Add a new command to update the Time Check Configuration for Service Desk Integrations on the "Service Desk" node
 - Add support for Connector Rule and Cloud Rule support (cf. [#104](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/104))
 
@@ -24,8 +34,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 - Refresh of Access Profiles after adding applications
 - Reassignment of access review to access owner was failing in case of self-reassignment
-
-### Removed
+- Could not modify an app if an app was disabled in the request center
 
 ## [1.3.12] - 2025-02-12
 

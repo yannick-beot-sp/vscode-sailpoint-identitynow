@@ -419,6 +419,18 @@ The extension supports the following settings:
 
 ## Release Notes
 
+### 1.3.13
+
+- Add a new command to update the Time Check Configuration for Service Desk Integrations on the "Service Desk" node
+- Add support for Connector Rule and Cloud Rule support (cf. [#104](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/104))
+- Add new icon for applications
+- Can add several access profiles at once in an application
+- Upgrade sailpoint-api-client dependency to 1.4.15
+- Refactoring of access review reassignment
+- Refresh of Access Profiles after adding applications
+- Reassignment of access review to access owner was failing in case of self-reassignment
+- Could not modify an app if an app was disabled in the request center
+
 ### 1.3.12
 
 - Typo in source reset information message (cf. [#105](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/105))
