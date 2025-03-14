@@ -107,6 +107,8 @@ export class ISCResourceProvider implements FileSystemProvider {
 			if (response.data.length === 1) {
 				data = response.data[0]
 			}
+		} else if (/\/source-apps\//.test(resourcePath)) {
+			data = await client.getApplication(id)
 		} else {
 			if (/\/workflows\//.test(resourcePath)) {
 				/* 
@@ -216,7 +218,13 @@ export class ISCResourceProvider implements FileSystemProvider {
 
 			} else if (resourcePath.match("identity-profiles|access-profiles|roles|search-attribute-config|source-apps|campaigns")) {
 				// special treatment to send patch as PUT is not supported
-				const oldData = await client.getResource(resourcePath);
+				let oldData
+				// special case for applications
+				if (/\/source-apps\//.test(resourcePath)) {
+					oldData = await client.getApplication(id)
+				} else {
+					oldData = await client.getResource(resourcePath);
+				}
 				const newData = JSON.parse(data);
 				if (!oldData) {
 					throw vscode.FileSystemError.FileNotFound(uri);

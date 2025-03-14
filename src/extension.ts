@@ -564,12 +564,12 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.CAMPAIGN_SEND_REMINDER,
 			sendReminderCommand.execute, sendReminderCommand))
-	const reassignOwnersCommand = new ReassignOwnersCommand(tenantService, campaignService)
+	const reassignOwnersCommand = new ReassignOwnersCommand(tenantService)
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.REASSIGN_CAMPAIGN_OWNERS,
 			reassignOwnersCommand.execute, reassignOwnersCommand))
 
-	const customReassignCommand = new CustomReassignCommand(tenantService, campaignService)
+	const customReassignCommand = new CustomReassignCommand(tenantService)
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.REASSIGN_CAMPAIGN_CUSTOM,
 			customReassignCommand.execute, customReassignCommand))

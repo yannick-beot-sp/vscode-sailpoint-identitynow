@@ -6,9 +6,9 @@ import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskManagementBetaApi, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsApi, CertificationsApi, CertificationCampaignsApiMoveRequest, CertificationSummariesApi, IdentityCertDecisionSummary, AccessReviewItem, CertificationCampaignFiltersApiFp, IdentityCertificationDto, GetActiveCampaigns200ResponseInner, CertificationsApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SodPolicy, SODPoliciesV2024ApiFactory, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskManagementBetaApi, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsApi, CertificationsApi, CertificationCampaignsApiMoveRequest, CertificationSummariesApi, IdentityCertDecisionSummary, AccessReviewItem, CertificationCampaignFiltersApiFp, IdentityCertificationDto, GetActiveCampaigns200ResponseInner, CertificationsApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
 import { basename } from 'path';
 import { createReadStream } from 'fs';
@@ -1527,48 +1527,40 @@ export class ISCClient {
 			}
 		})
 	}
-
-	public async *getApplications(filters: string | undefined = undefined): AsyncGenerator<any> {
-		console.log("> getApplications");
-		const httpClient = await this.getAxios();
-		const baseUrl = '/beta/source-apps/all'
-
-		let args: Record<string, any> = {
-			offset: 0,
-			limit: DEFAULT_PAGINATION,
-			filters,
-			sorters: "name"
+	/**
+	 * cf. SAASTRIAGE-7051
+	 * @param filters 
+	 * @param limit 
+	 * @param offset 
+	 * @param count 
+	 * @returns 
+	 */
+	public async getApplication(applicationId: string): Promise<SourceAppBeta | undefined> {
+		console.log("> getApplication", applicationId);
+		const response = await this.getPaginatedApplications(
+			`id eq "${applicationId}"`,
+			2
+		);
+		if (response.data.length === 1) {
+			return response.data[0]
 		}
-		let count = -1
-		do {
-			const path = addQueryParams(baseUrl, args)
-			const response = await httpClient.get(path);
-			if (response.data) {
-				count = response.data.length
-				for (const f of response.data) {
-					yield f
-				}
-			}
-			args.offset += DEFAULT_PAGINATION
-		} while (count === DEFAULT_PAGINATION)
+		return undefined
 	}
 
-	public async getPaginatedApplications(filters: string, limit?: number, offset?: number, count?: boolean): Promise<AxiosResponse<any[]>> {
+
+	public async getPaginatedApplications(filters: string, limit?: number, offset?: number, count?: boolean): Promise<AxiosResponse<SourceAppBeta[]>> {
 		console.log("> getPaginatedApplications", filters, limit, offset);
 
 		limit = limit ? Math.min(DEFAULT_PAGINATION, limit) : DEFAULT_PAGINATION;
-
-		const httpClient = await this.getAxios();
-		const baseUrl = '/beta/source-apps/all'
-		const args: Record<string, any> = {
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AppsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.listAllSourceApp({
 			offset,
 			limit,
 			filters,
 			sorters: "name",
 			count
-		}
-		const path = addQueryParams(baseUrl, args)
-		const response = await httpClient.get(path);
+		})
 		return response;
 	}
 
@@ -1748,10 +1740,10 @@ export class ISCClient {
 		await campaignApi.move(certificationMoveRequest);
 	}
 
-	public async reassignCertificationReviewItems(certificationReassignRequest: CertificationsApiSubmitReassignCertsAsyncRequest):  Promise<CertificationTask> {
+	public async reassignCertificationReviewItems(certificationReassignRequest: CertificationsApiSubmitReassignCertsAsyncRequest): Promise<CertificationTask> {
 		const apiConfig = await this.getApiConfiguration();
 		const certificationsApi = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
-		const resp =  await certificationsApi.submitReassignCertsAsync(certificationReassignRequest)
+		const resp = await certificationsApi.submitReassignCertsAsync(certificationReassignRequest)
 		return resp.data
 	}
 
