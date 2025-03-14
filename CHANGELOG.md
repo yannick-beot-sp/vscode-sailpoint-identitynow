@@ -18,10 +18,12 @@ This changelog is following the recommended format by [keepachangelog](https://k
 - Add New icon for applications
 - Can add several access profiles at once in an application
 - Upgrade sailpoint-api-client dependency to 1.4.15
+- Refactoring of access review reassignment
 
 ### Fixed
 
 - Refresh of Access Profiles after adding applications
+- Reassignment of access review to access owner was failing in case of self-reassignment
 
 ### Removed
 
