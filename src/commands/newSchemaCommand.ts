@@ -14,7 +14,7 @@ import { InputPromptStep } from '../wizard/inputPromptStep';
 
 const schemaNameValidator = new Validator({
     required: true,
-    regexp: '^[A-Za-z]+$'
+    regexp: '^[A-Za-z0-9]+$'
 });
 
 /**

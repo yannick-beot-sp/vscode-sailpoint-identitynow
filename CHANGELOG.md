@@ -14,6 +14,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Fixed
 
+- Allow number in schema name
+
 ### Removed
 
 ## [1.3.13] - 2025-03-14
