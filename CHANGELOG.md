@@ -12,15 +12,20 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Changed
 
+### Fixed
+
+### Removed
+
+## [1.3.14] - 2025-03-26
+
+### Changed
+
 - When exporting roles through SP-Config, it's possible to choose which selectively.
 
 ### Fixed
 
 - Allow number in schema name
 - Issue with special characters when exporting config to multiple files (cf. [#108](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/108))
-
-
-### Removed
 
 ## [1.3.13] - 2025-03-14
 

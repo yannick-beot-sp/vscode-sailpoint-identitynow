@@ -419,6 +419,12 @@ The extension supports the following settings:
 
 ## Release Notes
 
+### 1.3.14
+
+- When exporting roles through SP-Config, it's possible to choose which selectively.
+- Allow number in schema name
+- Issue with special characters when exporting config to multiple files (cf. [#108](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/108))
+
 ### 1.3.13
 
 - Add a new command to update the Time Check Configuration for Service Desk Integrations on the "Service Desk" node
