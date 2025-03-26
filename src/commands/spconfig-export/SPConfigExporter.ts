@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import path = require('path');
 
 import { ISCClient } from '../../services/ISCClient';
-import { delay } from '../../utils';
+import { delay, sanitizeFilename } from '../../utils';
 import { ensureFolderExists } from '../../utils/fileutils';
 import { PathProposer } from '../../services/PathProposer';
 import { ExportPayloadBetaIncludeTypesBeta, ObjectExportImportOptionsBeta } from 'sailpoint-api-client';
@@ -78,7 +78,7 @@ export class SPConfigExporter {
                     this.tenantName as string,
                     this.tenantDisplayName as string,
                     obj.self.type,
-                    obj.self.name
+                    sanitizeFilename(obj.self.name,)
                 );
 
                 const targetFilepath = path.join(this.target, targetFilename);

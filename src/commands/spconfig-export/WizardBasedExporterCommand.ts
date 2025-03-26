@@ -179,6 +179,9 @@ export abstract class WizardBasedExporterCommand {
                     case ExportPayloadBetaIncludeTypesBeta.Workflow:
                         items = await client.getWorflows();
                         break;
+                    case ExportPayloadBetaIncludeTypesBeta.Role:
+                        items = await client.getAllRoles();
+                        break;
                     case ExportPayloadBetaIncludeTypesBeta.SodPolicy:
                         items = await client.getSoDPolicies();
                         break;
@@ -228,12 +231,12 @@ export abstract class WizardBasedExporterCommand {
             }
         }
 
-        if (objectTypes.length===0) {
+        if (objectTypes.length === 0) {
             // Nothing to export
             // Leave the wizard
             return
         }
-        
+
         const exporter = new SPConfigExporter(
             tenantId,
             tenantName,

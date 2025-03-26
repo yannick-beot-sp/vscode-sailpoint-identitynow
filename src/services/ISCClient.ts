@@ -1408,6 +1408,14 @@ export class ISCClient {
 		return role;
 	}
 
+	public async getAllRoles(): Promise<Role[]> {
+		console.log("> getAllRoles");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new RolesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await Paginator.paginate(api, api.listRoles, { sorters: "name" });
+		return result.data;
+	}
+
 	public async getRoles(
 		query: RolesApiListRolesRequest = DEFAULT_ROLES_QUERY_PARAMS
 	): Promise<AxiosResponse<Role[], any>> {

@@ -84,8 +84,10 @@ const illegalRe = /[\/\\\?<>:\*\|":]/g;
 const controlRe = /[\x00-\x1f\x80-\x9f]/g;
 const reservedRe = /^\.+$/;
 const windowsReservedRe = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
+const DEFAULT_REPLACEMENT = ''
+const DEFAULT_MAX_LENGTH = 255
 
-function sanitizeImpl(input: any, replacement: string, maxLength: number) {
+export function sanitizeFilename(input: any, replacement = DEFAULT_REPLACEMENT, maxLength = DEFAULT_MAX_LENGTH) {
     if (typeof input !== 'string') {
         throw new Error('Input must be string')
     }
@@ -115,14 +117,14 @@ function truncate(sanitized: string, length: number): string {
  * @returns sanitized path
  */
 export function sanitizePath(input: string, options: undefined | { replacement?: string, maxLength?: number } = undefined) {
-    const replacement: string = (options && options.replacement) || '';
-    let maxLength: number = (options && options.maxLength) || 255;
+    const replacement: string = (options && options.replacement) || DEFAULT_REPLACEMENT;
+    let maxLength: number = (options && options.maxLength) || DEFAULT_MAX_LENGTH;
 
     const parts = path.parse(input);
     maxLength = maxLength - (parts.ext ?? '').length
-    parts.name = sanitizeImpl(parts.name, replacement, maxLength)
+    parts.name = sanitizeFilename(parts.name, replacement, maxLength)
     if (replacement !== '') {
-        parts.name = sanitizeImpl(parts.name, '', maxLength);
+        parts.name = sanitizeFilename(parts.name, '', maxLength);
     }
     // Need to remove base otherwise it takes precedence
     parts.base = undefined;
