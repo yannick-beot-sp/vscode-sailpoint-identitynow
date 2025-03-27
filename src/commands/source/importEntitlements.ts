@@ -6,7 +6,7 @@ import { formatTask, waifForJob } from './sourceUtils';
 import { TenantService } from '../../services/TenantService';
 import { validateTenantReadonly } from '../validateTenantReadonly';
 
-class AccountImporter {
+class EntitlementImporter {
     readonly client: ISCClient;
     constructor(
         private tenantId: string,
@@ -22,7 +22,7 @@ class AccountImporter {
     async importFileWithProgression(): Promise<void> {
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
-            title: `Importing accounts to ${this.sourceName}...`,
+            title: `Importing entitlements to ${this.sourceName}...`,
             cancellable: false
         }, async (progress, token) =>
             await this.importFile(progress, token)
@@ -30,16 +30,15 @@ class AccountImporter {
     }
 
     protected async importFile(progress: any, token: vscode.CancellationToken): Promise<void> {
-        console.log("> AccountImporter.importFile");
+        console.log("> EntitlementImporter.importFile");
 
-        const job = await this.client.startAccountAggregation(
+        const job = await this.client.startEntitlementAggregation(
             this.sourceId,
-            false,
             this.fileUri.fsPath
         );
 
         console.log("job =", job);
-        const task = await waifForJob(this.client, job.task.id, token)
+        const task = await waifForJob(this.client, job.id, token)
         formatTask(task,
             this.sourceName,
             "Import successful to {0}",
@@ -50,22 +49,22 @@ class AccountImporter {
 }
 
 /**
- * Entrypoint for the command to import accounts from the tree view/from a node
+ * Entrypoint for the command to import entitlements from the tree view/from a node
  */
-export class AccountImportNodeCommand {
+export class EntitlementImportNodeCommand {
     constructor(private readonly tenantService: TenantService) { }
 
     async execute(node?: SourceTreeItem): Promise<void> {
-        console.log("> AccountImportNodeCommand.execute");
+        console.log("> EntitlementImportNodeCommand.execute");
         
-        if (!(await validateTenantReadonly(this.tenantService, node.tenantId, `import accounts in ${node.label}`))) {
+        if (!(await validateTenantReadonly(this.tenantService, node.tenantId, `import entitlements in ${node.label}`))) {
             return
         }
 
         const fileUri = await chooseFile('CSV files', 'csv');
         if (fileUri === undefined) { return; }
 
-        const accountImporter = new AccountImporter(
+        const entitlementImporter = new EntitlementImporter(
             node.tenantId,
             node.tenantName,
             node.tenantDisplayName,
@@ -73,6 +72,6 @@ export class AccountImportNodeCommand {
             node.id as string,
             fileUri
         );
-        await accountImporter.importFileWithProgression();
+        await entitlementImporter.importFileWithProgression();
     }
 }

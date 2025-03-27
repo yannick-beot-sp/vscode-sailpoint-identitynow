@@ -10,6 +10,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- Can upload entitlements for a Delimited file
+
 ### Changed
 
 ### Fixed

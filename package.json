@@ -261,6 +261,10 @@
         "title": "Import accounts..."
       },
       {
+        "command": "vscode-sailpoint-identitynow.source.import.entitlements.view",
+        "title": "Import entitlements..."
+      },
+      {
         "command": "vscode-sailpoint-identitynow.source.import.uncorrelated-accounts.view",
         "title": "Import uncorrelated accounts..."
       },
@@ -753,6 +757,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.source.import.entitlements.view",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.source.import.uncorrelated-accounts.view",
           "when": "never"
         },
@@ -1145,6 +1153,11 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.source.import.accounts.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == DelimitedFilesource",
+          "group": "import@0"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.source.import.entitlements.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == DelimitedFilesource",
           "group": "import@0"
         },

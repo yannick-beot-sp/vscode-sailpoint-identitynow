@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from "vscode";
 import * as os from 'os';
+import * as fs from 'fs';
+import { File } from 'node:buffer';
 import { EndpointUtils } from "../utils/EndpointUtils";
 import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { compareByName, convertToText } from "../utils";
@@ -278,12 +280,25 @@ export class ISCClient {
 
 
 	public async startEntitlementAggregation(
-		sourceId: string
+		sourceId: string,
+		filePath?: string
 	): Promise<LoadEntitlementTaskBeta> {
 		console.log("> ISCClient.startEntitlementAggregation");
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SourcesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.importEntitlements({ sourceId })
+
+		let file: File | undefined = undefined
+		if (filePath) {
+			const fileBuffer = await fs.readFileSync(filePath);
+
+			// Create a File object
+			file = new File([fileBuffer], basename(filePath), {
+				type: "text/csv"
+			})
+		}
+
+
+		const response = await api.importEntitlements({ sourceId, file })
 		return response.data
 	}
 

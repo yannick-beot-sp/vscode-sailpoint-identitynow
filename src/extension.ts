@@ -79,6 +79,7 @@ import { CustomReassignCommand } from './campaign-webview/customReassignCommand'
 import { CertificationCampaignStatusFilterCommand } from './campaign-webview/CertificationCampaignStatusFilterCommand';
 import { CertificationCampaignNameFilterCommand } from './campaign-webview/CertificationCampaignNameFilterCommand';
 import { EditServiceDeskTimeCheckConfiguration } from './commands/tenant/editServiceDeskTimeCheckConfiguration';
+import { EntitlementImportNodeCommand } from './commands/source/importEntitlements';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -211,6 +212,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_ACCOUNTS_VIEW,
 			accountImportNodeCommand.execute, accountImportNodeCommand));
+	const entitlementImportNodeCommand = new EntitlementImportNodeCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_ENTITLEMENTS_VIEW,
+			entitlementImportNodeCommand.execute, entitlementImportNodeCommand));
 
 	const uncorrelatedAccountImportNodeCommand = new UncorrelatedAccountImportNodeCommand(tenantService);
 	context.subscriptions.push(
