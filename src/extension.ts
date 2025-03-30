@@ -80,6 +80,7 @@ import { CertificationCampaignStatusFilterCommand } from './campaign-webview/Cer
 import { CertificationCampaignNameFilterCommand } from './campaign-webview/CertificationCampaignNameFilterCommand';
 import { EditServiceDeskTimeCheckConfiguration } from './commands/tenant/editServiceDeskTimeCheckConfiguration';
 import { EntitlementImportNodeCommand } from './commands/source/importEntitlements';
+import { UploadBackupTreeViewCommand } from './commands/spconfig-import/uploadBackupTreeViewCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -314,6 +315,11 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.IMPORT_CONFIG_MENU,
 			menuImporterCommand.execute, menuImporterCommand));
 
+	const uploadBackupTreeViewCommand = new UploadBackupTreeViewCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.UPLOAD_CONFIGURATION_VIEW,
+			uploadBackupTreeViewCommand.execute, uploadBackupTreeViewCommand));
+			
 	const treeviewImporterCommand = new ImportConfigTreeViewCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_CONFIG_VIEW,

@@ -8,7 +8,7 @@ import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskManagementBetaApi, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsApi, CertificationsApi, CertificationCampaignsApiMoveRequest, CertificationSummariesApi, IdentityCertDecisionSummary, AccessReviewItem, CertificationCampaignFiltersApiFp, IdentityCertificationDto, GetActiveCampaigns200ResponseInner, CertificationsApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskManagementBetaApi, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsApi, CertificationsApi, CertificationCampaignsApiMoveRequest, CertificationSummariesApi, IdentityCertDecisionSummary, AccessReviewItem, CertificationCampaignFiltersApiFp, IdentityCertificationDto, GetActiveCampaigns200ResponseInner, CertificationsApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024 } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -420,6 +420,52 @@ export class ISCClient {
 	}
 	////////////////////////
 	//#endregion Transforms
+	////////////////////////
+
+	/////////////////////
+	//#region Configuration Hub
+	/////////////////////
+	x
+
+	public async uploadBackup(data: string, fileName:string, name: string): Promise<BackupResponseV2024> {
+		console.log("> uploadBackup");
+
+
+		const fileBuffer = Buffer.from(data)
+
+		// Create a File object
+		const file = new File([fileBuffer], fileName, {
+			type: "application/json"
+		})
+
+
+		const apiConfig = await this.getApiConfiguration()
+		const api = new ConfigurationHubV2024Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+
+		const result = await api.createUploadedConfiguration({
+			data: file,
+			name
+		})
+		return result.data
+	}
+
+	
+	/**
+	 * cf. https://developer.sailpoint.com/docs/api/v2024/get-uploaded-configuration
+	 * @param jobId
+	 * @returns
+	 */
+	public async getUploadConfigurationJobStatus(jobId: string): Promise<BackupResponseV2024> {
+		console.log("> getUploadConfigurationJobStatus", jobId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new ConfigurationHubV2024Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getUploadedConfiguration({id:jobId})
+		return response.data;
+	}
+
+
+	////////////////////////
+	//#endregion Configuration Hub
 	////////////////////////
 
 	/////////////////////////////

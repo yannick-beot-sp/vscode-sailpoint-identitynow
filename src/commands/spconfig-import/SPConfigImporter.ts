@@ -1,15 +1,15 @@
 import * as vscode from 'vscode';
 import { ISCClient } from '../../services/ISCClient';
-import { delay } from '../../utils';
 import { IMPORTABLE_OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
-import { ImportOptionsBeta, SpConfigJobBetaStatusBeta } from 'sailpoint-api-client';
+import { ImportOptionsBeta } from 'sailpoint-api-client';
 import { ImportJobResults } from '../../models/JobStatus';
+import { waitForImportJob } from './utils';
 
 /**
  * Base class for all importer
  */
 export class SPConfigImporter {
-    private client!: ISCClient;
+    private client: ISCClient;
 
     constructor(
         private readonly tenantId: string,
@@ -32,13 +32,7 @@ export class SPConfigImporter {
             cancellable: false
         }, async (task, token) => {
             const jobId = await this.client.startImportJob(this.data, this.importOptions);
-            let jobStatus: any;
-            do {
-                await delay(1000);
-                jobStatus = await this.client.getImportJobStatus(jobId);
-                console.log({ jobStatus });
-            } while (jobStatus.status === SpConfigJobBetaStatusBeta.NotStarted || jobStatus.status === SpConfigJobBetaStatusBeta.InProgress);
-
+            const jobStatus =await waitForImportJob(this.client, jobId, token)
             const importJobresult = await this.client.getImportJobResult(jobId);
             const result = { ...importJobresult, ...jobStatus };
             return result;
@@ -50,7 +44,7 @@ export class SPConfigImporter {
             for (objectType in importJobresult.results) {
                 importJobresult.results[objectType]?.errors
                     .forEach((element) => {
-                        errors.push(element.detail.exceptionMessage ?? element.text);
+                        errors.push(element.details.exceptionMessage ?? element.text);
                     });
             }
 

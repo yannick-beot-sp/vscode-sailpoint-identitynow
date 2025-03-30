@@ -118,6 +118,11 @@
         "icon": "$(export)"
       },
       {
+        "command": "vscode-sailpoint-identitynow.upload-config.view",
+        "title": "Upload config to Configuration Hub...",
+        "icon": "$(import)"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.import-config.view",
         "title": "Import config...",
         "icon": "$(export)"
@@ -673,6 +678,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.upload-config.view",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.import-config.view",
           "when": "never"
         },
@@ -1088,6 +1097,11 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.export-config.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^tenant/",
+          "group": "config"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.upload-config.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^tenant/",
           "group": "config"
         },

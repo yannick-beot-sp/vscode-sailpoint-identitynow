@@ -202,7 +202,7 @@ export async function openPreview(uri: vscode.Uri | string, language = "json", p
  * @param extension the extension (e.g. 'json') 
  */
 export async function chooseFile(fileType: string, extension: string): Promise<undefined | vscode.Uri> {
-	const fileUri = await vscode.window.showOpenDialog({
+	const options = {
 		canSelectMany: false,
 		openLabel: 'Open',
 		filters: {
@@ -210,9 +210,22 @@ export async function chooseFile(fileType: string, extension: string): Promise<u
 			// eslint-disable-next-line @typescript-eslint/naming-convention
 			'All files': ['*']
 		}
-	});
+	}
 
-	return fileUri === undefined || fileUri.length === 0 ? undefined : fileUri[0];
+	return await chooseFileExtended(options) as undefined | vscode.Uri
+}
+
+
+export async function chooseFileExtended(options: vscode.OpenDialogOptions): Promise<undefined | vscode.Uri | vscode.Uri[]> {
+	const fileUri = await vscode.window.showOpenDialog(options);
+
+	if (fileUri === undefined || fileUri.length === 0) { return undefined }
+	if (options.canSelectMany) {
+		return fileUri
+	} else {
+		return fileUri[0];
+	}
+
 }
 
 

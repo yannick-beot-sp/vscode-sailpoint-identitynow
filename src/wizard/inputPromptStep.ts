@@ -5,7 +5,7 @@ import { Wizard } from "./wizard";
 import { ExtInputBoxOptions } from "./ExtInputBoxOptions";
 
 
-export interface InputPromptStepOptions {
+export interface InputPromptStepOptions<T> {
     name: string
     displayName?: string
     options?: ExtInputBoxOptions
@@ -18,7 +18,7 @@ export class InputPromptStep<WizardContext> extends WizardPromptStep<WizardConte
     private readonly _name: string;
     private readonly _displayName!: string;
     constructor(
-        inputPromptStepOptions: InputPromptStepOptions
+        inputPromptStepOptions: InputPromptStepOptions<WizardContext>
     ) {
         super();
         this._name = inputPromptStepOptions.name;
@@ -41,9 +41,18 @@ export class InputPromptStep<WizardContext> extends WizardPromptStep<WizardConte
         if (this._options.afterPrompt) {
             this.afterPrompt = this._options.afterPrompt
         }
+
+        if (this._options.shouldPrompt) {
+            this.shouldPrompt = this._options.shouldPrompt
+        }
+
     }
 
     public async prompt(wizard: Wizard<WizardContext>, wizardContext: WizardContext): Promise<void> {
-        wizardContext[this._name] = await showInputBox(wizard, this._options);
+        const options = {...this._options}
+        if (wizardContext[this.id]) {
+            options.default = wizardContext[this.id]
+        }
+        wizardContext[this._name] = await showInputBox(wizard, options);
     }
 }

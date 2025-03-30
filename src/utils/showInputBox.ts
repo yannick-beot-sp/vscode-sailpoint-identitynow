@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { Disposable, InputBox, InputBoxOptions, QuickInputButton, QuickInputButtons, Uri, env, window } from 'vscode';
+import { Disposable, InputBox, QuickInputButton, QuickInputButtons, Uri, env, window } from 'vscode';
 import { GoBackError, UserCancelledError } from '../errors';
 import { Wizard } from '../wizard/wizard';
 import { LearnMore } from '../wizard/LearnMoreButton';

@@ -22,4 +22,6 @@ export interface ExtInputBoxOptions extends InputBoxOptions {
      * @returns 
      */
     afterPrompt?: (wizardContext: WizardContext) => Promise<void>;
+
+    shouldPrompt?: (wizardContext: WizardContext) => boolean
 }

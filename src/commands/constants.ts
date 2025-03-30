@@ -12,9 +12,13 @@ export const REMOVE_TENANT = `${COMMAND_PREFIX}.remove-tenant`;
 export const EXPORT_CONFIG_VIEW = `${COMMAND_PREFIX}.export-config.view`;
 export const EXPORT_CONFIG_PALETTE = `${COMMAND_PREFIX}.export-config.palette`;
 export const EXPORT_NODE_CONFIG_VIEW = `${COMMAND_PREFIX}.export-node-config.view`;
+
 export const IMPORT_CONFIG_VIEW = `${COMMAND_PREFIX}.import-config.view`;
 export const IMPORT_CONFIG_PALETTE = `${COMMAND_PREFIX}.import-config.palette`;
 export const IMPORT_CONFIG_MENU = `${COMMAND_PREFIX}.import-config.menu`;
+
+export const UPLOAD_CONFIGURATION_VIEW = `${COMMAND_PREFIX}.upload-config.view`;
+
 export const AGGREGATE = `${COMMAND_PREFIX}.aggregate-source`;
 export const AGGREGATE_DISABLE_OPTIMIZATION = `${COMMAND_PREFIX}.aggregate-source-disable-optimization`;
 export const AGGREGATE_ENTITLEMENTS = `${COMMAND_PREFIX}.aggregate-entitlements`;

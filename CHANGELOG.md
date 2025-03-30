@@ -11,6 +11,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 ### Added
 
 - Can upload entitlements for a Delimited file
+- Can upload a configuration to Configuration Hub
 
 ### Changed
 
