@@ -32,7 +32,7 @@ export class SPConfigImporter {
             cancellable: false
         }, async (task, token) => {
             const jobId = await this.client.startImportJob(this.data, this.importOptions);
-            const jobStatus =await waitForImportJob(this.client, jobId, token)
+            const jobStatus = await waitForImportJob(this.client, jobId, token)
             const importJobresult = await this.client.getImportJobResult(jobId);
             const result = { ...importJobresult, ...jobStatus };
             return result;
@@ -44,6 +44,8 @@ export class SPConfigImporter {
             for (objectType in importJobresult.results) {
                 importJobresult.results[objectType]?.errors
                     .forEach((element) => {
+                        // cf. https://github.com/sailpoint-oss/developer.sailpoint.com/issues/785
+                        // @ts-ignore
                         errors.push(element.details.exceptionMessage ?? element.text);
                     });
             }
@@ -57,6 +59,8 @@ export class SPConfigImporter {
                 vscode.window.showErrorMessage(message);
             } else if (importJobresult.status === "FAILED") {
                 // If error but not details in the job result, takes the initial message
+                // cf. https://github.com/sailpoint-oss/developer.sailpoint.com/issues/785
+                // @ts-ignore
                 vscode.window.showErrorMessage(importJobresult.message);
             } else {
                 // It is a success

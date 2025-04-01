@@ -94,6 +94,8 @@ export class UploadBackupTreeViewCommand {
             if (jobStatus.status == BackupResponseV2024StatusV2024.Complete) {
                 vscode.window.showInformationMessage(`Configuration uploaded successfully to ${node.tenantDisplayName}`)
             } else {
+                // cf. https://github.com/sailpoint-oss/developer.sailpoint.com/issues/785
+                //@ts-ignore
                 vscode.window.showErrorMessage(`Could not upload configuration to ${node.tenantDisplayName}: ${jobStatus.message}`)
             }
 
