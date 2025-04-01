@@ -10,6 +10,7 @@ import * as configuration from '../configurationConstants';
 import { escapeFilter, isEmpty, isNotEmpty } from "../utils/stringUtils";
 import { TenantService } from "../services/TenantService";
 import { CampaignStatusV3 } from "sailpoint-api-client";
+import { convertToBaseTreeItem } from "../views/utils";
 
 
 /**
@@ -59,6 +60,7 @@ export class TenantTreeItem extends BaseTreeItem {
 			tenantDisplayName,
 			vscode.TreeItemCollapsibleState.Collapsed);
 		this.tooltip = tenantName;
+		this.id = tenantId
 	}
 	iconPath = new vscode.ThemeIcon("organization");
 	contextValue = "tenant";
@@ -91,6 +93,33 @@ export class TenantTreeItem extends BaseTreeItem {
 }
 
 /**
+ * Folder for tenants
+ */
+export class TenantFolderTreeItem extends BaseTreeItem {
+	constructor(
+		id: string,
+		label: string,
+		private readonly tenantService: TenantService
+	) {
+		super(label,
+			undefined,
+			undefined,
+			undefined,
+			vscode.TreeItemCollapsibleState.Collapsed);
+		this.id = id
+		this.resourceUri = vscode.Uri.parse(`${label}`)
+	}
+
+	contextValue = "folder"
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		const children = this.tenantService.getChildren(this.id)
+		let results: BaseTreeItem[] = children?.map(x => convertToBaseTreeItem(x, this.tenantService)) ?? []
+		return results
+	}
+}
+
+/**
  * Abstract class to implement a "folder" below the tenant node
  */
 export abstract class FolderTreeItem extends BaseTreeItem {
@@ -108,14 +137,10 @@ export abstract class FolderTreeItem extends BaseTreeItem {
 			tenantDisplayName,
 			vscode.TreeItemCollapsibleState.Collapsed);
 	}
+	// collapsibleState is not updated. It's only for initial state.
+	// Setting statically the icon
+	iconPath = new vscode.ThemeIcon("folder");
 
-	updateIcon(): void {
-		if (this.collapsibleState === vscode.TreeItemCollapsibleState.Expanded) {
-			this.iconPath = new vscode.ThemeIcon("folder-opened");
-		} else {
-			this.iconPath = new vscode.ThemeIcon("folder");
-		}
-	}
 }
 
 /**

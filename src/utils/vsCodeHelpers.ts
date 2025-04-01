@@ -9,7 +9,7 @@ import { ObjectPickItem } from "../models/ObjectPickItem";
 
 export async function chooseTenant(tenantService: TenantService, title: string): Promise<TenantInfo | undefined> {
 	console.log("> chooseTenant");
-	const tenants = await tenantService.getTenants();
+	const tenants = tenantService.getTenants();
 	let tenantInfo: TenantInfo | undefined;
 	if (tenants.length < 1) {
 		// Do nothting. tenantInfo = undefined

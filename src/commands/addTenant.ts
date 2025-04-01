@@ -76,12 +76,13 @@ export class AddTenantCommand {
         }
 
         const tenantId = randomUUID().replaceAll('-', '');
-        this.tenantService.setTenant({
+        this.tenantService.updateOrCreateNode({
             id: tenantId,
             name: displayName,
             tenantName: normalizedTenantName,
             authenticationMethod: authMethod,
-            readOnly: true
+            readOnly: true,
+            type: "TENANT"
         });
         try {
             const session = await SailPointISCAuthenticationProvider.getInstance().createSession(tenantId)
@@ -90,11 +91,11 @@ export class AddTenantCommand {
                 await vscode.commands.executeCommand(commands.REFRESH_FORCED);
                 await vscode.window.showInformationMessage(`Tenant ${displayName} added!`);
             } else {
-                this.tenantService.removeTenant(tenantId);
+                this.tenantService.removeNode(tenantId);
             }
         } catch (err: any) {
             console.error(err);
-            this.tenantService.removeTenant(tenantId);
+            this.tenantService.removeNode(tenantId);
             vscode.window.showErrorMessage(err.message);
         }
     }

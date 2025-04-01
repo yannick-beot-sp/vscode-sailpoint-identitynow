@@ -59,12 +59,13 @@ export class ISCUriHandler implements vscode.UriHandler {
         } else {
             tenantId = randomUUID().replaceAll('-', '');
             //Create the tenant
-            this.tenantService.setTenant({
+            this.tenantService.updateOrCreateNode({
                 id: tenantId,
                 name: q.displayName ?? q.tenantName,
                 tenantName: normalizedTenantName,
                 authenticationMethod: (q.authenticationMethod.toLowerCase() === "accesstoken" ? AuthenticationMethod.accessToken : AuthenticationMethod.personalAccessToken),
-                readOnly: true
+                readOnly: true,
+                type: "TENANT"
             });
         }
         if (q.authenticationMethod.toLowerCase() === "accesstoken") {

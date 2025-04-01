@@ -42,7 +42,7 @@ import { TenantService } from './services/TenantService';
 import { TransformEvaluator } from './services/TransformEvaluator';
 import { TreeManager } from './services/TreeManager';
 import { ISCUriHandler } from './ISCUriHandler';
-import { ISCDataProvider } from './views/ISCDataProvider';
+import { ISCTreeDataProvider } from './views/ISCTreeDataProvider';
 import { TestConnectionCommand } from './commands/source/TestConnectionCommand';
 import { PeekSourceCommand } from './commands/source/PeekSourceCommand';
 import { PingClusterCommand } from './commands/source/PingClusterCommand';
@@ -56,8 +56,6 @@ import { EditAccessRequestConfigCommand } from './commands/tenant/editAccessRequ
 import { NewAttributeSearchConfigCommand } from './commands/NewAttributeSearchConfigCommand';
 import { EditPasswordConfigCommand } from './commands/tenant/editPasswordConfigCommand';
 import { GenerateDigitTokenCommand } from './commands/tenant/generateDigitTokenCommand';
-import { onErrorResponse, onRequest, onResponse } from './services/AxiosHandlers';
-import globalAxios from 'axios';
 import { OpenScriptCommand } from './commands/rule/openScriptCommand';
 import { IdentityTreeViewCommand } from './commands/identity/IdentityTreeViewCommand';
 import { TenantReadOnlyConfigCommand } from './commands/tenant/tenantReadOnlyConfigCommand';
@@ -81,6 +79,9 @@ import { CertificationCampaignNameFilterCommand } from './campaign-webview/Certi
 import { EditServiceDeskTimeCheckConfiguration } from './commands/tenant/editServiceDeskTimeCheckConfiguration';
 import { EntitlementImportNodeCommand } from './commands/source/importEntitlements';
 import { UploadBackupTreeViewCommand } from './commands/spconfig-import/uploadBackupTreeViewCommand';
+import { RemoveFolderCommand } from './commands/folder/removeFolder';
+import { AddFolderCommand } from './commands/folder/addFolder';
+import { RenameFolderCommand } from './commands/folder/renameFolder';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -100,6 +101,21 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.RENAME_TENANT, renameTenantCommand.execute,
 			renameTenantCommand));
+
+	const addFolderCommand = new AddFolderCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.ADD_FOLDER_ROOT, () => addFolderCommand.execute())) // no argument for execute
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.ADD_FOLDER, addFolderCommand.execute,
+			addFolderCommand));
+	const removeFolderCommand = new RemoveFolderCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.REMOVE_FOLDER, removeFolderCommand.execute,
+			removeFolderCommand));
+	const renameFolderCommand = new RenameFolderCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.RENAME_FOLDER, renameFolderCommand.execute,
+			renameFolderCommand));
 
 	const editPublicIdentitiesConfigCommand = new EditPublicIdentitiesConfigCommand()
 	context.subscriptions.push(
@@ -125,11 +141,16 @@ export function activate(context: vscode.ExtensionContext) {
 			generateDigitTokenCommand.execute,
 			generateDigitTokenCommand));
 
-	const identityNowDataProvider = new ISCDataProvider(context, tenantService);
-	vscode.window.registerTreeDataProvider(commands.TREE_VIEW, identityNowDataProvider);
+	const iscTreeDataProvider = new ISCTreeDataProvider(context, tenantService);
+	context.subscriptions.push(
+		vscode.window.createTreeView(
+			commands.TREE_VIEW,
+			{ treeDataProvider: iscTreeDataProvider, showCollapseAll: true, canSelectMany: false, dragAndDropController: iscTreeDataProvider })
+	);
 
-	vscode.commands.registerCommand(commands.REFRESH_FORCED, identityNowDataProvider.forceRefresh, identityNowDataProvider);
-	vscode.commands.registerCommand(commands.REFRESH, identityNowDataProvider.refresh, identityNowDataProvider);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.REFRESH_FORCED, iscTreeDataProvider.forceRefresh, iscTreeDataProvider),
+		vscode.commands.registerCommand(commands.REFRESH, iscTreeDataProvider.refresh, iscTreeDataProvider))
 
 	const transformEvaluator = new TransformEvaluator(tenantService);
 	const treeManager = new TreeManager(tenantService, transformEvaluator);
@@ -319,7 +340,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.UPLOAD_CONFIGURATION_VIEW,
 			uploadBackupTreeViewCommand.execute, uploadBackupTreeViewCommand));
-			
+
 	const treeviewImporterCommand = new ImportConfigTreeViewCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_CONFIG_VIEW,

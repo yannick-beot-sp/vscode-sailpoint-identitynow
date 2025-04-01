@@ -26,7 +26,7 @@ export class RenameTenantCommand {
         const tenantInfo = this.tenantService.getTenant(node.tenantId);
         if (tenantInfo) {
             tenantInfo.name = displayName;
-            await this.tenantService.setTenant(tenantInfo);
+            await this.tenantService.updateOrCreateNode(tenantInfo);
             vscode.commands.executeCommand(commands.REFRESH_FORCED);
         }
     }

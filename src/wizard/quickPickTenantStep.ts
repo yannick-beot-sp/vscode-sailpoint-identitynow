@@ -15,7 +15,7 @@ export class QuickPickTenantStep extends QuickPickPromptStep<WizardContext, Tena
             name: "tenant",
             skipIfOne: true,
             items: async (context: WizardContext): Promise<TenantInfoQuickPickItem[]> => {
-                const tenants = await tenantService.getTenants();
+                const tenants = tenantService.getTenants();
                 // Compute properties for QuickPickItem
                 const tenantQuickPickItems = tenants
                     .map(obj => ({ ...obj, label: obj?.name, detail: obj?.tenantName }));

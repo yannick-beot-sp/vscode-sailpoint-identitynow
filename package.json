@@ -69,6 +69,24 @@
         "icon": "$(add)"
       },
       {
+        "command": "vscode-sailpoint-identitynow.folder.add-root",
+        "title": "ISC: Add folder",
+        "icon": "$(new-folder)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.folder.add",
+        "title": "Add folder",
+        "icon": "$(new-folder)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.folder.rename",
+        "title": "Rename"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.folder.remove",
+        "title": "Remove folder"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.tenant.set-writable",
         "title": "Read-only",
         "icon": "$(lock)"
@@ -1022,11 +1040,24 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.folder.rename",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.folder.remove",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.service-desk-integrations.edit.status-check-configuration",
           "when": "never"
         }
       ],
       "view/title": [
+        {
+          "command": "vscode-sailpoint-identitynow.folder.add-root",
+          "when": "view == vscode-sailpoint-identitynow.view",
+          "group": "navigation"
+        },
         {
           "command": "vscode-sailpoint-identitynow.add-tenant",
           "when": "view == vscode-sailpoint-identitynow.view",
@@ -1489,6 +1520,18 @@
         {
           "command": "vscode-sailpoint-identitynow.service-desk-integrations.edit.status-check-configuration",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == service-desk-integrations"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.folder.remove",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == folder"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.folder.rename",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == folder"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.folder.add",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == folder"
         }
       ],
       "editor/context": [

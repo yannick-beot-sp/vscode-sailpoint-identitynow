@@ -462,7 +462,7 @@ The extension supports the following settings:
 - Support of certifications with the help of [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp
 ) and [@bassem-mohamed-sp](https://github.com/bassem-mohamed-sp):
   - Dashboard
-  - Esclation
+  - Escalation
   - Reminders
   - Report
   - Automatic reassignment to access item owners

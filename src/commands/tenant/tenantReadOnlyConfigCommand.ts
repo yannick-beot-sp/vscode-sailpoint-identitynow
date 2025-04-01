@@ -22,7 +22,7 @@ export class TenantReadOnlyConfigCommand {
     private async updateReadonly(node: TenantTreeItem, readOnly: boolean): Promise<void> {
         const tenantInfo = this.tenantService.getTenant(node.tenantId)
         tenantInfo.readOnly = readOnly
-        this.tenantService.setTenant(tenantInfo)
+        this.tenantService.updateOrCreateNode(tenantInfo)
 
         // force refresh to update icon
         await vscode.commands.executeCommand(commands.REFRESH_FORCED);

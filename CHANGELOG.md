@@ -12,6 +12,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 - Can upload entitlements for a Delimited file
 - Can upload a configuration to Configuration Hub
+- Support for folders in the tree view
 
 ### Changed
 
@@ -88,7 +89,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 - Support of certifications with the help of [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp
 ) and [@bassem-mohamed-sp](https://github.com/bassem-mohamed-sp):
   - Dashboard
-  - Esclation
+  - Escalation
   - Reminders
   - Report
   - Automatic reassignment to access item owners
