@@ -38,7 +38,7 @@ import { FileHandler } from './files/FileHandler';
 import { ISCResourceProvider } from './files/ISCResourceProvider';
 import { LoadMoreNode } from './models/ISCTreeItem';
 import { SailPointISCAuthenticationProvider } from './services/AuthenticationProvider';
-import { TenantService } from './services/TenantService';
+import { TenantService, TenantServiceEventType } from './services/TenantService';
 import { TransformEvaluator } from './services/TransformEvaluator';
 import { TreeManager } from './services/TreeManager';
 import { ISCUriHandler } from './ISCUriHandler';
@@ -82,6 +82,9 @@ import { UploadBackupTreeViewCommand } from './commands/spconfig-import/uploadBa
 import { RemoveFolderCommand } from './commands/folder/removeFolder';
 import { AddFolderCommand } from './commands/folder/addFolder';
 import { RenameFolderCommand } from './commands/folder/renameFolder';
+import { Observer } from './services/Observer';
+import { TenantInfo } from './models/TenantInfo';
+import { FolderTreeNode } from './models/TreeNode';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -620,6 +623,21 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EDIT_SERVICE_DESK_INTEGRATIONS_STATUS_CHECK_CONFIGURATION,
 			editServiceDeskTimeCheckConfiguration.execute, editServiceDeskTimeCheckConfiguration))
+
+
+	let api = {
+		getRoots(): Array<TenantInfo | FolderTreeNode> {
+			return tenantService.getRoots()
+		},
+		registerTreeUpdate(o: Observer<TenantServiceEventType, any>): void {
+			tenantService.registerObserver(TenantServiceEventType.updateTree, o)
+		},
+		moveNode(nodeIdToMove: string, targetFolderId?: string): void {
+			tenantService.move(nodeIdToMove, targetFolderId)
+		}
+	};
+	// 'export' public api-surface
+	return api;
 
 }
 

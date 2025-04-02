@@ -93,7 +93,7 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.tenant.set-readonly",
-        "title": "writable",
+        "title": "Writable",
         "icon": "$(unlock)"
       },
       {

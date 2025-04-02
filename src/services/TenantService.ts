@@ -14,7 +14,8 @@ const ALL_TENANTS_KEY = "IDENTITYNOW_TENANTS";
 const TREE_KEY = "IDENTITYNOW_TREE";
 
 export enum TenantServiceEventType {
-    removeTenant = "REMOVE_TENANT"
+    removeTenant = "REMOVE_TENANT",
+    updateTree = "UPDATE_TREE", // When there is any change in the tree
 }
 
 
@@ -113,6 +114,7 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
         let tenantInfoItems = tenants.map(key => this.getTenantOld(key))
 
         this.storage.update(TREE_KEY, tenantInfoItems)
+        this.notifyObservers(TenantServiceEventType.updateTree, {})
         return tenantInfoItems
     }
 
@@ -145,6 +147,7 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
             const roots = this.getRoots()
             roots.push(item)
             this.storage.update(TREE_KEY, roots)
+            this.notifyObservers(TenantServiceEventType.updateTree, {})
         }
     }
 
@@ -288,11 +291,11 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
         }
 
         this.storage.update(TREE_KEY, items);
+        this.notifyObservers(TenantServiceEventType.updateTree, {})
     }
 
     public async removeNode(id: string, removeCredentials = true) {
         let roots = this.getRoots()
-
 
         // Recursive function to process folder nodes
         function processFolder(folder: FolderTreeNode): boolean {
@@ -333,6 +336,7 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
             }
         }
         this.storage.update(TREE_KEY, roots);
+        this.notifyObservers(TenantServiceEventType.updateTree, {})
 
         if (removeCredentials) {
             await this.removeTenantCredentials(id);
@@ -340,7 +344,7 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
         }
     }
 
-    public getChildren(id:string) {
+    public getChildren(id: string) {
         const node = this.getNode(id)
         if (isFolderTreeNode(node)) {
             return node.children
@@ -412,6 +416,7 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
         if (!targetFolderId) {
             items.push(nodeToMove);
             this.storage.update(TREE_KEY, items);
+            this.notifyObservers(TenantServiceEventType.updateTree, {})
             return;
         }
 
@@ -453,6 +458,7 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
             items.push(nodeToMove);
         }
         this.storage.update(TREE_KEY, items);
+        this.notifyObservers(TenantServiceEventType.updateTree, {})
     }
 
     public async removeFolderRecursively(id: string) {

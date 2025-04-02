@@ -72,7 +72,7 @@ export class ISCTreeDataProvider implements TreeDataProvider<BaseTreeItem>, Tree
     async getChildren(item?: BaseTreeItem): Promise<BaseTreeItem[]> {
         console.log("> getChildren", item);
         if (item === undefined) {
-            const roots = await this.tenantService.getRoots();
+            const roots = this.tenantService.getRoots();
             const results = roots.map(x => convertToBaseTreeItem(x, this.tenantService))
             console.log("< getChildren", results);
             return results;
