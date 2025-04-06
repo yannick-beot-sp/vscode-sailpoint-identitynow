@@ -419,6 +419,13 @@ The extension supports the following settings:
 
 ## Release Notes
 
+### 1.3.15
+
+- Can upload entitlements for a Delimited file
+- Can upload a configuration to Configuration Hub
+- Support for folders in the tree view
+- Add external API: other extension can call a predefined set of method
+
 ### 1.3.14
 
 - When exporting roles through SP-Config, it's possible to choose which selectively.

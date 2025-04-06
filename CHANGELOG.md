@@ -10,15 +10,21 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
-- Can upload entitlements for a Delimited file
-- Can upload a configuration to Configuration Hub
-- Support for folders in the tree view
-
 ### Changed
 
 ### Fixed
 
 ### Removed
+
+## [1.3.15] - 2025-04-06
+
+### Added
+
+- Can upload entitlements for a Delimited file
+- Can upload a configuration to Configuration Hub
+- Support for folders in the tree view
+- Add external API: other extension can call a predefined set of method
+
 
 ## [1.3.14] - 2025-03-26
 
