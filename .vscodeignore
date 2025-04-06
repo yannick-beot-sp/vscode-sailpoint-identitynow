@@ -17,3 +17,5 @@ RELEASE.md
 **/*.ts
 scripts/**
 CHANGELOG.md
+.prettierignore
+resources/readme/**

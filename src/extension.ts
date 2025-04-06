@@ -85,6 +85,7 @@ import { RenameFolderCommand } from './commands/folder/renameFolder';
 import { Observer } from './services/Observer';
 import { TenantInfo } from './models/TenantInfo';
 import { FolderTreeNode } from './models/TreeNode';
+import { isTenantReadonly } from './commands/validateTenantReadonly';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -629,12 +630,22 @@ export function activate(context: vscode.ExtensionContext) {
 		getRoots(): Array<TenantInfo | FolderTreeNode> {
 			return tenantService.getRoots()
 		},
+		getChildren(id: string | undefined): Array<TenantInfo | FolderTreeNode> {
+			return tenantService.getChildren(id)
+		},
 		registerTreeUpdate(o: Observer<TenantServiceEventType, any>): void {
 			tenantService.registerObserver(TenantServiceEventType.updateTree, o)
 		},
 		moveNode(nodeIdToMove: string, targetFolderId?: string): void {
 			tenantService.move(nodeIdToMove, targetFolderId)
-		}
+			iscTreeDataProvider.refresh()
+		},
+		async getAccessToken(tenantId: string): Promise<string> {
+			return (await SailPointISCAuthenticationProvider.getInstance().getSessionByTenant(tenantId)).accessToken
+		},
+		isTenantReadonly(tenantId: string): boolean {
+			return isTenantReadonly(tenantService, tenantId)
+		},
 	};
 	// 'export' public api-surface
 	return api;

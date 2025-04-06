@@ -2011,10 +2011,6 @@ export class ISCClient {
 
 export { CertificationsApi, AccessReviewItem, CertificationCampaignFiltersApiFp, Paginator };
 
-function sleep(seconds: number) {
-	return new Promise(resolve => setTimeout(resolve, seconds * 1000));
-}
-
 
 
 

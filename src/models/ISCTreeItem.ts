@@ -140,7 +140,6 @@ export abstract class FolderTreeItem extends BaseTreeItem {
 	// collapsibleState is not updated. It's only for initial state.
 	// Setting statically the icon
 	iconPath = new vscode.ThemeIcon("folder");
-
 }
 
 /**
