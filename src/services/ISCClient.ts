@@ -246,6 +246,14 @@ export class ISCClient {
 		return result.data;
 	}
 
+	public async getProvisioningPolicies(sourceId: string): Promise<ProvisioningPolicyDto[]> {
+		console.log("> listProvisioningPolicies", sourceId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await api.listProvisioningPolicies({ sourceId })
+		return result.data;
+	}
+
 	/**
 	 * @param sourceName - A reference to the source to search for accounts.
 	 */
@@ -427,7 +435,7 @@ export class ISCClient {
 	/////////////////////
 	x
 
-	public async uploadBackup(data: string, fileName:string, name: string): Promise<BackupResponseV2024> {
+	public async uploadBackup(data: string, fileName: string, name: string): Promise<BackupResponseV2024> {
 		console.log("> uploadBackup");
 
 
@@ -449,7 +457,7 @@ export class ISCClient {
 		return result.data
 	}
 
-	
+
 	/**
 	 * cf. https://developer.sailpoint.com/docs/api/v2024/get-uploaded-configuration
 	 * @param jobId
@@ -459,7 +467,7 @@ export class ISCClient {
 		console.log("> getUploadConfigurationJobStatus", jobId);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new ConfigurationHubV2024Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.getUploadedConfiguration({id:jobId})
+		const response = await api.getUploadedConfiguration({ id: jobId })
 		return response.data;
 	}
 

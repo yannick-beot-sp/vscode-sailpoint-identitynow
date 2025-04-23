@@ -2,14 +2,14 @@ import * as vscode from "vscode";
 import * as path from 'path';
 import { ISCClient, TOTAL_COUNT_HEADER } from "../services/ISCClient";
 import { getIdByUri, getPathByUri, getResourceUri } from "../utils/UriUtils";
-import { compareByLabel, compareByName, compareByPriority } from "../utils";
+import { compareByLabel, compareByName, compareByPriority, compareCaseInsensitive } from "../utils";
 import { AxiosHeaders, AxiosResponse } from "axios";
 import { getConfigNumber } from '../utils/configurationUtils';
 import * as commands from "../commands/constants";
 import * as configuration from '../configurationConstants';
-import { escapeFilter, isEmpty, isNotEmpty } from "../utils/stringUtils";
+import { convertConstantToTitleCase, escapeFilter, isEmpty, isNotEmpty } from "../utils/stringUtils";
 import { TenantService } from "../services/TenantService";
-import { CampaignStatusV3 } from "sailpoint-api-client";
+import { CampaignStatusV3, ProvisioningPolicyDto } from "sailpoint-api-client";
 import { convertToBaseTreeItem } from "../views/utils";
 
 
@@ -468,28 +468,19 @@ export class ProvisioningPoliciesTreeItem extends FolderTreeItem {
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
-		let results: BaseTreeItem[] = [];
 		const client = new ISCClient(this.tenantId, this.tenantName);
-		const provisioningPoliciesPath =
-			getPathByUri(this.parentUri) + "/provisioning-policies";
-		const provisioningPolicies = await client.getResource(
-			provisioningPoliciesPath
-		);
-		if (
-			provisioningPolicies !== undefined &&
-			provisioningPolicies instanceof Array
-		) {
-			results = provisioningPolicies
-				.sort(compareByName)
-				.map((provisioningPolicy) => new ProvisioningPolicyTreeItem(
-					this.tenantId,
-					this.tenantName,
-					this.tenantDisplayName,
-					provisioningPolicy.name,
-					getIdByUri(this.parentUri) || "",
-					provisioningPolicy.usageType
-				));
-		}
+		const sourceId = getIdByUri(this.parentUri)
+		const provisioningPolicies = await client.getProvisioningPolicies(sourceId)
+
+		const results = provisioningPolicies?.sort((a: ProvisioningPolicyDto, b: ProvisioningPolicyDto) => compareCaseInsensitive(a, b, "usageType"))
+			.map((provisioningPolicy) => new ProvisioningPolicyTreeItem(
+				{
+					tenantId: this.tenantId,
+					tenantName: this.tenantName,
+					tenantDisplayName: this.tenantDisplayName,
+					type: provisioningPolicy.usageType,
+					sourceId
+				}));
 		return results;
 	}
 }
@@ -497,24 +488,22 @@ export class ProvisioningPoliciesTreeItem extends FolderTreeItem {
 export class ProvisioningPolicyTreeItem extends ISCResourceTreeItem {
 	contextValue = "provisioning-policy";
 
-	constructor(
+	constructor(options: {
 		tenantId: string,
 		tenantName: string,
 		tenantDisplayName: string,
-		label: string,
-		parentId: string,
-		provisioningPolicyName: string
+		sourceId: string,
+		type: string
+	}
 	) {
 		super({
-			tenantId,
-			tenantName,
-			tenantDisplayName,
-			label,
+			...options,
+			parentId: options.sourceId,
+			label: convertConstantToTitleCase(options.type),
 			resourceType: "sources",
-			id: `${parentId}/provisioning-policies/${provisioningPolicyName}`,
-			parentId,
+			id: `${options.sourceId}/provisioning-policies/${options.type}`,
 			subResourceType: "provisioning-policies",
-			subId: provisioningPolicyName,
+			subId: options.type,
 		})
 	}
 

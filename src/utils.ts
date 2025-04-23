@@ -57,7 +57,7 @@ export const compareByPriority = (a: any, b: any) => (a.priority > b.priority) ?
  */
 export const compareByLabel = (a: any, b: any) => compareCaseInsensitive(a, b, "label");
 
-function compareCaseInsensitive(a: any, b: any, property: string) {
+export function compareCaseInsensitive(a: any, b: any, property: string) {
     return a[property].localeCompare(b[property], undefined, { sensitivity: 'base' })
 }
 

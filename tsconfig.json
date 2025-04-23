@@ -19,6 +19,6 @@
 	"exclude": [
 		"node_modules",
 		".vscode-test",
-		"src/campaign-webview/app/node_modules"
+		"src/campaign-webview/app"
 	]
 }
