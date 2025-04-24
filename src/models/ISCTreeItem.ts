@@ -2,14 +2,14 @@ import * as vscode from "vscode";
 import * as path from 'path';
 import { ISCClient, TOTAL_COUNT_HEADER } from "../services/ISCClient";
 import { getIdByUri, getPathByUri, getResourceUri } from "../utils/UriUtils";
-import { compareByLabel, compareByName, compareByPriority, compareCaseInsensitive } from "../utils";
+import { compareByLabel, compareByName, compareByPriority } from "../utils";
 import { AxiosHeaders, AxiosResponse } from "axios";
 import { getConfigNumber } from '../utils/configurationUtils';
 import * as commands from "../commands/constants";
 import * as configuration from '../configurationConstants';
 import { convertConstantToTitleCase, escapeFilter, isEmpty, isNotEmpty } from "../utils/stringUtils";
 import { TenantService } from "../services/TenantService";
-import { CampaignStatusV3, ProvisioningPolicyDto } from "sailpoint-api-client";
+import { CampaignStatusV3 } from "sailpoint-api-client";
 import { convertToBaseTreeItem } from "../views/utils";
 
 
@@ -472,15 +472,15 @@ export class ProvisioningPoliciesTreeItem extends FolderTreeItem {
 		const sourceId = getIdByUri(this.parentUri)
 		const provisioningPolicies = await client.getProvisioningPolicies(sourceId)
 
-		const results = provisioningPolicies?.sort((a: ProvisioningPolicyDto, b: ProvisioningPolicyDto) => compareCaseInsensitive(a, b, "usageType"))
-			.map((provisioningPolicy) => new ProvisioningPolicyTreeItem(
+		const results = provisioningPolicies?.map((provisioningPolicy) => new ProvisioningPolicyTreeItem(
 				{
 					tenantId: this.tenantId,
 					tenantName: this.tenantName,
 					tenantDisplayName: this.tenantDisplayName,
 					type: provisioningPolicy.usageType,
-					sourceId
-				}));
+					sourceId,
+					name: provisioningPolicy.name
+				})).sort(compareByLabel)
 		return results;
 	}
 }
@@ -493,13 +493,14 @@ export class ProvisioningPolicyTreeItem extends ISCResourceTreeItem {
 		tenantName: string,
 		tenantDisplayName: string,
 		sourceId: string,
-		type: string
+		type: string,
+		name: string
 	}
 	) {
 		super({
 			...options,
 			parentId: options.sourceId,
-			label: convertConstantToTitleCase(options.type),
+			label: isEmpty(options.name) ? convertConstantToTitleCase(options.type) : options.name,
 			resourceType: "sources",
 			id: `${options.sourceId}/provisioning-policies/${options.type}`,
 			subResourceType: "provisioning-policies",

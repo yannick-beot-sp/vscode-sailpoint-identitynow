@@ -4,7 +4,7 @@ import { ProvisioningPoliciesTreeItem } from "../models/ISCTreeItem";
 import { compareByLabel } from '../utils';
 import { buildResourceUri, getIdByUri } from '../utils/UriUtils';
 import { UsageTypeBeta } from 'sailpoint-api-client';
-import { convertConstantToTitleCase } from '../utils/stringUtils';
+import { convertConstantToTitleCase, isEmpty } from '../utils/stringUtils';
 import { ExtendedQuickPickItem } from '../models/ExtendedQuickPickItem';
 import { openPreview } from '../utils/vsCodeHelpers';
 import { TenantService } from '../services/TenantService';
@@ -19,9 +19,9 @@ import { ISCClient } from '../services/ISCClient';
 
 
 const provisioningPolicyNameValidator = new Validator({
-    required: true,
+    required: false,
     maxLength: 50,
-    regexp: '^[A-Za-z0-9 _:;,={}@()#-|^%$!?.*]{1,50}$'
+    regexp: '^$|^[A-Za-z0-9 _:;,={}@()#-|^%$!?.*]{1,50}$'
 });
 
 
@@ -82,7 +82,7 @@ export class NewProvisioningPolicyCommand {
         if (values === undefined) { return; }
 
         const usageType = values["provisioningPolicyType"]
-        const provisioningPolicyName = values["provisioningPolicy"]
+        const provisioningPolicyName = values["provisioningPolicy"] ?? ""
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: 'Creating File...',
@@ -103,7 +103,7 @@ export class NewProvisioningPolicyCommand {
                 id: sourceId,
                 subResourceType: "provisioning-policies",
                 subId: usageType.value,
-                name: provisioningPolicyName
+                name: isEmpty(provisioningPolicyName) ? usageType.value : provisioningPolicyName
             })
 
             await client.createProvisioningPolicy(sourceId, data)

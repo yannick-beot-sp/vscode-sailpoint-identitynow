@@ -419,6 +419,9 @@ The extension supports the following settings:
 
 ## Release Notes
 
+- Issue when policy provisioning name is empty (cf. [#113](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/113)).
+
+
 ### 1.3.15
 
 - Can upload entitlements for a Delimited file

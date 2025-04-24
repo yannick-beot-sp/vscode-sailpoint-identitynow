@@ -37,7 +37,7 @@ export class Validator {
             && !Rules.regexp(input, this.options.regexp)) {
             return this.options.errorMessages?.regexp ?? ErrorMessages.regexp;
         }
-        
+
         if (this.options.min && !isNaN(+input) && +input < this.options.min) {
             return format(this.options.errorMessages?.min ?? ErrorMessages.min, this.options.min);
         }
@@ -64,13 +64,14 @@ class Rules {
         }
 
         str = String(val).replace(/\s/g, "");
-        return str.length > 0 ? true : false;
+        return str.length > 0;
     }
 
 
-    public static maxLength(val: string, req: number): boolean {
-        var size = val.length;
-        return size <= req;
+    public static maxLength(val: string | undefined, req: number): boolean {
+        // an undefined value can only be under the max length
+        if (val === undefined) { return true }
+        return val.length <= req;
     }
 
     public static regexp(val: string, req: string): boolean {
