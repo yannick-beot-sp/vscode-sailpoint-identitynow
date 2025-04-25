@@ -1,299 +1,303 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://developer.sailpoint.com/schemas/form-definition.json",
-    "title": "Form Definition",
-    "description": "Schema of a form definition",
-    "type": "object",
-    "additionalProperties": false,
-    "properties": {
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://developer.sailpoint.com/schemas/form-definition.json",
+  "title": "Form Definition",
+  "description": "Schema of a form definition",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "description": "Unique guid identifying the form definition.",
+      "example": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    },
+    "name": {
+      "description": "Name of the form definition.",
+      "example": "My form",
+      "type": "string"
+    },
+    "description": {
+      "description": "Form definition's description.",
+      "example": "My form description",
+      "type": "string"
+    },
+    "owner": {
+      "properties": {
+        "type": {
+          "description": "FormOwnerType value.\nIDENTITY FormOwnerTypeIdentity",
+          "enum": ["IDENTITY"],
+          "example": "IDENTITY",
+          "type": "string"
+        },
         "id": {
-            "description": "Unique guid identifying the form definition.",
+          "description": "Unique identifier of the form's owner.",
+          "example": "00000000-0000-0000-0000-000000000000",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "usedBy": {
+      "description": "List of objects using the form definition. Whenever a system uses a form, the API reaches out to the form service to record that the system is currently using it.",
+      "items": {
+        "properties": {
+          "type": {
+            "description": "FormUsedByType value. \nWORKFLOW FormUsedByTypeWorkflow\nSOURCE FormUsedByTypeSource",
+            "enum": ["WORKFLOW", "SOURCE"],
+            "example": "WORKFLOW",
+            "type": "string"
+          },
+          "id": {
+            "description": "Unique identifier of the system using the form.",
             "example": "00000000-0000-0000-0000-000000000000",
             "type": "string"
+          }
         },
-        "name": {
-            "description": "Name of the form definition.",
-            "example": "My form",
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "formInput": {
+      "description": "List of form inputs required to create a form-instance object.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Unique identifier for the form input.",
+            "example": "00000000-0000-0000-0000-000000000000",
             "type": "string"
-        },
-        "description": {
-            "description": "Form definition's description.",
-            "example": "My form description",
+          },
+          "type": {
+            "description": "FormDefinitionInputType value.\nSTRING FormDefinitionInputTypeString",
+            "enum": ["STRING", "ARRAY"],
+            "example": "STRING",
             "type": "string"
+          },
+          "label": {
+            "description": "Name for the form input.",
+            "example": "input1",
+            "type": "string"
+          },
+          "description": {
+            "description": "Form input's description.",
+            "example": "A single dynamic scalar value (i.e. number, string, date, etc.) that can be passed into the form for use in conditional logic",
+            "type": "string"
+          }
         },
-        "owner": {
-            "properties": {
-                "type": {
-                    "description": "FormOwnerType value.\nIDENTITY FormOwnerTypeIdentity",
-                    "enum": [
-                        "IDENTITY"
-                    ],
-                    "example": "IDENTITY",
-                    "type": "string"
-                },
-                "id": {
-                    "description": "Unique identifier of the form's owner.",
-                    "example": "00000000-0000-0000-0000-000000000000",
-                    "type": "string"
-                }
+        "defaultSnippets": [
+          {
+            "label": "New Form Input",
+            "description": "Create a new form input",
+            "body": {
+              "id": "$1",
+              "label": "$2",
+              "description": "$3",
+              "type": "STRING"
+            }
+          }
+        ]
+      },
+      "type": "array"
+    },
+    "formElements": {
+      "description": "List of nested form elements.",
+      "items": {
+        "properties": {
+          "id": {
+            "description": "Form element identifier.",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "type": "string"
+          },
+          "elementType": {
+            "description": "FormElementType value. \nTEXT FormElementTypeText\nTOGGLE FormElementTypeToggle\nTEXTAREA FormElementTypeTextArea\nHIDDEN FormElementTypeHidden\nPHONE FormElementTypePhone\nEMAIL FormElementTypeEmail\nSELECT FormElementTypeSelect\nDATE FormElementTypeDate\nSECTION FormElementTypeSection\nCOLUMNS FormElementTypeColumns",
+            "enum": [
+              "TEXT",
+              "TOGGLE",
+              "TEXTAREA",
+              "HIDDEN",
+              "PHONE",
+              "EMAIL",
+              "SELECT",
+              "DATE",
+              "SECTION",
+              "COLUMN_SET",
+              "IMAGE",
+              "DESCRIPTION"
+            ],
+            "example": "TEXT",
+            "type": "string"
+          },
+          "config": {
+            "additionalProperties": {},
+            "description": "Config object.",
+            "example": {
+              "label": "Department"
             },
             "type": "object"
-        },
-        "usedBy": {
-            "description": "List of objects using the form definition. Whenever a system uses a form, the API reaches out to the form service to record that the system is currently using it.",
-            "items": {
-                "properties": {
-                    "type": {
-                        "description": "FormUsedByType value. \nWORKFLOW FormUsedByTypeWorkflow\nSOURCE FormUsedByTypeSource",
-                        "enum": [
-                            "WORKFLOW",
-                            "SOURCE"
-                        ],
-                        "example": "WORKFLOW",
-                        "type": "string"
-                    },
-                    "id": {
-                        "description": "Unique identifier of the system using the form.",
-                        "example": "00000000-0000-0000-0000-000000000000",
-                        "type": "string"
-                    }
-                },
-                "type": "object"
-            },
-            "type": "array"
-        },
-        "formInput": {
-            "description": "List of form inputs required to create a form-instance object.",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "description": "Unique identifier for the form input.",
-                        "example": "00000000-0000-0000-0000-000000000000",
-                        "type": "string"
-                    },
-                    "type": {
-                        "description": "FormDefinitionInputType value.\nSTRING FormDefinitionInputTypeString",
-                        "enum": [
-                            "STRING"
-                        ],
-                        "example": "STRING",
-                        "type": "string"
-                    },
-                    "label": {
-                        "description": "Name for the form input.",
-                        "example": "input1",
-                        "type": "string"
-                    },
-                    "description": {
-                        "description": "Form input's description.",
-                        "example": "A single dynamic scalar value (i.e. number, string, date, etc.) that can be passed into the form for use in conditional logic",
-                        "type": "string"
-                    }
-                },
-                "defaultSnippets": [
-                    {
-                        "label": "New Form Input",
-                        "description": "Create a new form input",
-                        "body": {
-                            "id": "$1",
-                            "label": "$2",
-                            "description": "$3",
-                            "type": "STRING"
-                        }
-                    }
-                ]
-            },
-            "type": "array"
-        },
-        "formElements": {
-            "description": "List of nested form elements.",
-            "items": {
-                "properties": {
-                    "id": {
-                        "description": "Form element identifier.",
-                        "example": "00000000-0000-0000-0000-000000000000",
-                        "type": "string"
-                    },
-                    "elementType": {
-                        "description": "FormElementType value. \nTEXT FormElementTypeText\nTOGGLE FormElementTypeToggle\nTEXTAREA FormElementTypeTextArea\nHIDDEN FormElementTypeHidden\nPHONE FormElementTypePhone\nEMAIL FormElementTypeEmail\nSELECT FormElementTypeSelect\nDATE FormElementTypeDate\nSECTION FormElementTypeSection\nCOLUMNS FormElementTypeColumns",
-                        "enum": [
-                            "TEXT",
-                            "TOGGLE",
-                            "TEXTAREA",
-                            "HIDDEN",
-                            "PHONE",
-                            "EMAIL",
-                            "SELECT",
-                            "DATE",
-                            "SECTION",
-                            "COLUMNS"
-                        ],
-                        "example": "TEXT",
-                        "type": "string"
-                    },
-                    "config": {
-                        "additionalProperties": {},
-                        "description": "Config object.",
-                        "example": {
-                            "label": "Department"
-                        },
-                        "type": "object"
-                    },
-                    "key": {
-                        "description": "Technical key.",
-                        "example": "department",
-                        "type": "string"
-                    },
-                    "validations": {
-                        "description": "Set of FormElementValidation items.",
-                        "example": [
-                            {
-                                "validationType": "REQUIRED"
-                            }
-                        ],
-                        "type": "object"
-                    }
-                },
-                "type": "object"
-            },
-            "type": "array"
-        },
-        "formConditions": {
-            "description": "Conditional logic that can dynamically modify the form as the recipient is interacting with it.",
-            "items": {
-                "description": "Represent a form conditional.",
-                "properties": {
-                    "ruleOperator": {
-                        "description": "ConditionRuleLogicalOperatorType value.\nAND ConditionRuleLogicalOperatorTypeAnd\nOR ConditionRuleLogicalOperatorTypeOr",
-                        "enum": [
-                            "AND",
-                            "OR"
-                        ],
-                        "example": "AND",
-                        "type": "string"
-                    },
-                    "rules": {
-                        "description": "List of rules.",
-                        "items": {
-                            "properties": {
-                                "sourceType": {
-                                    "description": "Defines the type of object being selected. It will be either a reference to a form input (by input name) or a form element (by technical key).\nINPUT ConditionRuleSourceTypeInput\nELEMENT ConditionRuleSourceTypeElement",
-                                    "enum": [
-                                        "INPUT",
-                                        "ELEMENT"
-                                    ],
-                                    "example": "ELEMENT",
-                                    "type": "string"
-                                },
-                                "source": {
-                                    "description": "Source - if the sourceType is ConditionRuleSourceTypeInput, the source type is the name of the form input to accept. However, if the sourceType is ConditionRuleSourceTypeElement,\nthe source is the name of a technical key of an element to retrieve its value.",
-                                    "example": "department",
-                                    "type": "string"
-                                },
-                                "operator": {
-                                    "description": "ConditionRuleComparisonOperatorType value.\nEQ ConditionRuleComparisonOperatorTypeEquals  This comparison operator compares the source and target for equality.\nNE ConditionRuleComparisonOperatorTypeNotEquals  This comparison operator compares the source and target for inequality.\nCO ConditionRuleComparisonOperatorTypeContains  This comparison operator searches the source to see whether it contains the value.\nNOT_CO ConditionRuleComparisonOperatorTypeNotContains\nIN ConditionRuleComparisonOperatorTypeIncludes  This comparison operator searches the source if it equals any of the values.\nNOT_IN ConditionRuleComparisonOperatorTypeNotIncludes\nEM ConditionRuleComparisonOperatorTypeEmpty\nNOT_EM ConditionRuleComparisonOperatorTypeNotEmpty\nSW ConditionRuleComparisonOperatorTypeStartsWith  Checks whether a string starts with another substring of the same string. This operator is case-sensitive.\nNOT_SW ConditionRuleComparisonOperatorTypeNotStartsWith\nEW ConditionRuleComparisonOperatorTypeEndsWith  Checks whether a string ends with another substring of the same string. This operator is case-sensitive.\nNOT_EW ConditionRuleComparisonOperatorTypeNotEndsWith",
-                                    "enum": [
-                                        "EQ",
-                                        "NE",
-                                        "CO",
-                                        "NOT_CO",
-                                        "IN",
-                                        "NOT_IN",
-                                        "EM",
-                                        "NOT_EM",
-                                        "SW",
-                                        "NOT_SW",
-                                        "EW",
-                                        "NOT_EW"
-                                    ],
-                                    "example": "EQ",
-                                    "type": "string"
-                                },
-                                "valueType": {
-                                    "description": "ConditionRuleValueType type.\nSTRING ConditionRuleValueTypeString  This value is a static string.\nSTRING_LIST ConditionRuleValueTypeStringList  This value is an array of string values.\nINPUT ConditionRuleValueTypeInput  This value is a reference to a form input.\nELEMENT ConditionRuleValueTypeElement  This value is a reference to a form element (by technical key).\nLIST ConditionRuleValueTypeList\nBOOLEAN ConditionRuleValueTypeBoolean",
-                                    "enum": [
-                                        "STRING",
-                                        "STRING_LIST",
-                                        "INPUT",
-                                        "ELEMENT",
-                                        "LIST",
-                                        "BOOLEAN"
-                                    ],
-                                    "example": "STRING",
-                                    "type": "string"
-                                },
-                                "value": {
-                                    "description": "Based on the ValueType.",
-                                    "example": "Engineering"
-                                }
-                            },
-                            "type": "object"
-                        },
-                        "type": "array"
-                    },
-                    "effects": {
-                        "description": "List of effects.",
-                        "items": {
-                            "description": "Effect produced by a condition.",
-                            "properties": {
-                                "effectType": {
-                                    "description": "Type of effect to perform when the conditions are evaluated for this logic block.\nHIDE ConditionEffectTypeHide  Disables validations.\nSHOW ConditionEffectTypeShow  Enables validations.\nDISABLE ConditionEffectTypeDisable  Disables validations.\nENABLE ConditionEffectTypeEnable  Enables validations.\nREQUIRE ConditionEffectTypeRequire\nOPTIONAL ConditionEffectTypeOptional\nSUBMIT_MESSAGE ConditionEffectTypeSubmitMessage\nSUBMIT_NOTIFICATION ConditionEffectTypeSubmitNotification\nSET_DEFAULT_VALUE ConditionEffectTypeSetDefaultValue  This value is ignored on purpose.",
-                                    "enum": [
-                                        "HIDE",
-                                        "SHOW",
-                                        "DISABLE",
-                                        "ENABLE",
-                                        "REQUIRE",
-                                        "OPTIONAL",
-                                        "SUBMIT_MESSAGE",
-                                        "SUBMIT_NOTIFICATION",
-                                        "SET_DEFAULT_VALUE"
-                                    ],
-                                    "example": "HIDE",
-                                    "type": "string"
-                                },
-                                "config": {
-                                    "description": "Arbitrary map containing a configuration based on the EffectType.",
-                                    "type": "object",
-                                    "properties": {
-                                        "defaultValueLabel": {
-                                            "type": "string",
-                                            "description": "Effect type's label.",
-                                            "example": "Access to Remove"
-                                        },
-                                        "element": {
-                                            "type": "string",
-                                            "description": "Element's identifier.",
-                                            "example": 8110662963316867
-                                        }
-                                    }
-                                }
-                            },
-                            "type": "object"
-                        },
-                        "type": "array"
-                    }
-                },
-                "type": "object"
-            },
-            "type": "array"
-        },
-        "created": {
-            "description": "Created is the date the form definition was created",
-            "example": "2023-07-12T20:14:57.74486Z",
-            "format": "date-time",
+          },
+          "key": {
+            "description": "Technical key.",
+            "example": "department",
             "type": "string"
+          },
+          "validations": {
+            "description": "Set of FormElementValidation items.",
+            "nullable": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "validationType": {
+                  "description": "The type of data validation that you wish to enforce, e.g., a required field, a minimum length, etc.",
+                  "enum": [
+                    "REQUIRED",
+                    "MIN_LENGTH",
+                    "MAX_LENGTH",
+                    "REGEX",
+                    "DATE",
+                    "MAX_DATE",
+                    "MIN_DATE",
+                    "LESS_THAN_DATE",
+                    "PHONE",
+                    "EMAIL",
+                    "DATA_SOURCE",
+                    "TEXTAREA"
+                  ],
+                  "example": "REQUIRED",
+                  "type": "string"
+                }
+              }
+            },
+            "example": [
+              {
+                "validationType": "REQUIRED"
+              }
+            ],
+            "type": "array"
+          }
         },
-        "modified": {
-            "description": "Modified is the last date the form definition was modified",
-            "example": "2023-07-12T20:14:57.74486Z",
-            "format": "date-time",
-            "type": "string"
-        }
+        "type": "object"
+      },
+      "type": "array"
     },
-    "required": [
-        "name",
-        "owner"
-    ]
+    "formConditions": {
+      "description": "Conditional logic that can dynamically modify the form as the recipient is interacting with it.",
+      "items": {
+        "description": "Represent a form conditional.",
+        "properties": {
+          "ruleOperator": {
+            "description": "ConditionRuleLogicalOperatorType value.\nAND ConditionRuleLogicalOperatorTypeAnd\nOR ConditionRuleLogicalOperatorTypeOr",
+            "enum": ["AND", "OR"],
+            "example": "AND",
+            "type": "string"
+          },
+          "rules": {
+            "description": "List of rules.",
+            "items": {
+              "properties": {
+                "sourceType": {
+                  "description": "Defines the type of object being selected. It will be either a reference to a form input (by input name) or a form element (by technical key).\nINPUT ConditionRuleSourceTypeInput\nELEMENT ConditionRuleSourceTypeElement",
+                  "enum": ["INPUT", "ELEMENT"],
+                  "example": "ELEMENT",
+                  "type": "string"
+                },
+                "source": {
+                  "description": "Source - if the sourceType is ConditionRuleSourceTypeInput, the source type is the name of the form input to accept. However, if the sourceType is ConditionRuleSourceTypeElement,\nthe source is the name of a technical key of an element to retrieve its value.",
+                  "example": "department",
+                  "type": "string"
+                },
+                "operator": {
+                  "description": "ConditionRuleComparisonOperatorType value.\nEQ ConditionRuleComparisonOperatorTypeEquals  This comparison operator compares the source and target for equality.\nNE ConditionRuleComparisonOperatorTypeNotEquals  This comparison operator compares the source and target for inequality.\nCO ConditionRuleComparisonOperatorTypeContains  This comparison operator searches the source to see whether it contains the value.\nNOT_CO ConditionRuleComparisonOperatorTypeNotContains\nIN ConditionRuleComparisonOperatorTypeIncludes  This comparison operator searches the source if it equals any of the values.\nNOT_IN ConditionRuleComparisonOperatorTypeNotIncludes\nEM ConditionRuleComparisonOperatorTypeEmpty\nNOT_EM ConditionRuleComparisonOperatorTypeNotEmpty\nSW ConditionRuleComparisonOperatorTypeStartsWith  Checks whether a string starts with another substring of the same string. This operator is case-sensitive.\nNOT_SW ConditionRuleComparisonOperatorTypeNotStartsWith\nEW ConditionRuleComparisonOperatorTypeEndsWith  Checks whether a string ends with another substring of the same string. This operator is case-sensitive.\nNOT_EW ConditionRuleComparisonOperatorTypeNotEndsWith",
+                  "enum": [
+                    "EQ",
+                    "NE",
+                    "CO",
+                    "NOT_CO",
+                    "IN",
+                    "NOT_IN",
+                    "EM",
+                    "NOT_EM",
+                    "SW",
+                    "NOT_SW",
+                    "EW",
+                    "NOT_EW"
+                  ],
+                  "example": "EQ",
+                  "type": "string"
+                },
+                "valueType": {
+                  "description": "ConditionRuleValueType type.\nSTRING ConditionRuleValueTypeString  This value is a static string.\nSTRING_LIST ConditionRuleValueTypeStringList  This value is an array of string values.\nINPUT ConditionRuleValueTypeInput  This value is a reference to a form input.\nELEMENT ConditionRuleValueTypeElement  This value is a reference to a form element (by technical key).\nLIST ConditionRuleValueTypeList\nBOOLEAN ConditionRuleValueTypeBoolean",
+                  "enum": ["STRING", "STRING_LIST", "INPUT", "ELEMENT", "LIST", "BOOLEAN"],
+                  "example": "STRING",
+                  "type": "string"
+                },
+                "value": {
+                  "description": "Based on the ValueType.",
+                  "example": "Engineering"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "effects": {
+            "description": "List of effects.",
+            "items": {
+              "description": "Effect produced by a condition.",
+              "properties": {
+                "effectType": {
+                  "description": "Type of effect to perform when the conditions are evaluated for this logic block.\nHIDE ConditionEffectTypeHide  Disables validations.\nSHOW ConditionEffectTypeShow  Enables validations.\nDISABLE ConditionEffectTypeDisable  Disables validations.\nENABLE ConditionEffectTypeEnable  Enables validations.\nREQUIRE ConditionEffectTypeRequire\nOPTIONAL ConditionEffectTypeOptional\nSUBMIT_MESSAGE ConditionEffectTypeSubmitMessage\nSUBMIT_NOTIFICATION ConditionEffectTypeSubmitNotification\nSET_DEFAULT_VALUE ConditionEffectTypeSetDefaultValue  This value is ignored on purpose.",
+                  "enum": [
+                    "HIDE",
+                    "SHOW",
+                    "DISABLE",
+                    "ENABLE",
+                    "REQUIRE",
+                    "OPTIONAL",
+                    "SUBMIT_MESSAGE",
+                    "SUBMIT_NOTIFICATION",
+                    "SET_DEFAULT_VALUE"
+                  ],
+                  "example": "HIDE",
+                  "type": "string"
+                },
+                "config": {
+                  "description": "Arbitrary map containing a configuration based on the EffectType.",
+                  "type": "object",
+                  "properties": {
+                    "defaultValueLabel": {
+                      "type": "string",
+                      "description": "Effect type's label.",
+                      "example": "Access to Remove"
+                    },
+                    "element": {
+                      "type": "string",
+                      "description": "Element's identifier.",
+                      "example": 8110662963316867
+                    }
+                  }
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "created": {
+      "description": "Created is the date the form definition was created",
+      "example": "2023-07-12T20:14:57.74486Z",
+      "format": "date-time",
+      "type": "string"
+    },
+    "modified": {
+      "description": "Modified is the last date the form definition was modified",
+      "example": "2023-07-12T20:14:57.74486Z",
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": ["name", "owner"]
 }
