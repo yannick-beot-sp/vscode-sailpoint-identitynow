@@ -228,23 +228,29 @@ export async function chooseFileExtended(options: vscode.OpenDialogOptions): Pro
 
 }
 
-
+/**
+ * This is the minimal properties we need to build the PickItem list for askChosenItems
+ */
+export interface BasicObject {
+	id?: string
+	name?: string
+	description?: string
+}
 /**
  * Asks the user to choose from a list of ObjectPickItem
  * @param items List of ObjectPickItem 
  * @returns List of ids
  */
-export async function askChosenItems(title: string,
+export async function askChosenItems<Tin extends BasicObject, Tout>(title: string,
 	placeHolder: string,
-	items: Array<any>,
-	mapFn: (item: any) => string = x => x.id): Promise<Array<string> | undefined> {
-	const pickItems: ObjectPickItem[] = items
+	items: Array<Tin>,
+	mapFn: (item: Tin) => Tout): Promise<Array<Tout> | undefined> {
+	const pickItems = items
 		.sort(compareByName)
-		.map((x: any) => ({
+		.map((x: Tin) => ({
+			...x,
 			label: x.name,
-			description: x.description,
-			id: x.id,
-			picked: true
+			picked: true // everything is selected by default
 		}));
 
 	const result = await vscode.window.showQuickPick(
@@ -256,10 +262,12 @@ export async function askChosenItems(title: string,
 			canPickMany: true
 		});
 
-	if (result !== undefined) {
-		return result.map(mapFn);
-	}
-	return undefined;
+		
+	return result?.map(obj => {
+		const { picked, label, ...rest } = obj;
+		return rest;
+		// @ts-ignore
+	  }).map(mapFn); // Compiler is not considering the input as Tin anymore
 };
 
 

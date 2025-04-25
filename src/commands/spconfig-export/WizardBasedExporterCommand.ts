@@ -208,7 +208,7 @@ export abstract class WizardBasedExporterCommand {
                     propertyName = "includedNames";
                     selectedItems = await askChosenItems(objectTypeItem.label, placeHolder, items, x => x.label);
                 } else {
-                    selectedItems = await askChosenItems(objectTypeItem.label, placeHolder, items);
+                    selectedItems = await askChosenItems(objectTypeItem.label, placeHolder, items, x => x.id);
                 }
                 if (selectedItems === undefined) {
                     // Leave the wizard

@@ -24,7 +24,7 @@ export abstract class WizardBasedImporterCommand {
 
     }
 
-    async chooseTenant(): Promise<TenantInfo|undefined> {
+    async chooseTenant(): Promise<TenantInfo | undefined> {
         const tenantInfo = await chooseTenant(this.tenantService, 'To which tenant do you want to import the config?');
         console.log("WizardBasedImporterCommand.chooseTenant: tenant = ", tenantInfo);
         if (!tenantInfo) {
@@ -38,7 +38,7 @@ export abstract class WizardBasedImporterCommand {
     }
 
     async validateTenant(tenantId: string, tenantName: string): Promise<boolean> {
-        return await validateTenantReadonly(this.tenantService, tenantId, `import SP-Config in ${tenantName}`) 
+        return await validateTenantReadonly(this.tenantService, tenantId, `import SP-Config in ${tenantName}`)
     }
 
     /**
@@ -126,7 +126,7 @@ export abstract class WizardBasedImporterCommand {
                     id: x.self.id,
                     picked: true
                 }));
-            const includeIds = await askChosenItems(requestedObjectType.label, "What do you want to import?", pickItems);
+            const includeIds = await askChosenItems(requestedObjectType.label, "What do you want to import?", pickItems, x => x.id);
 
             if (includeIds === undefined) { continue; }
             const includeType: ImportOptionsBetaIncludeTypesBeta = requestedObjectType.objectType;

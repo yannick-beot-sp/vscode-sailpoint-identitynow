@@ -24,7 +24,7 @@ export class FormDefinitionImporterTreeViewCommand {
             node.tenantDisplayName,
             fileUri
         )
-        await formImporter.importFileWithProgression();
+        await formImporter.chooseAndImport();
     }
 }
 
