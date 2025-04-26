@@ -12,6 +12,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Changed
 
+- Can choose forms to export or import
+
 ### Fixed
 
 - Issue when policy provisioning name is empty (cf. [#113](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/113)). If no name is provided, the usage type is used for the label
