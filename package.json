@@ -506,7 +506,7 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.forms.export.view",
-        "title": "Export all forms..."
+        "title": "Export forms..."
       },
       {
         "command": "vscode-sailpoint-identitynow.form.export.view",
@@ -514,7 +514,7 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.forms.export.icon-view",
-        "title": "Export all forms...",
+        "title": "Export forms...",
         "icon": {
           "light": "resources/light/export.svg",
           "dark": "resources/dark/export.svg"
