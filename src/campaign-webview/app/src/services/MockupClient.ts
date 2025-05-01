@@ -82,6 +82,12 @@ export class MockupClient implements Client {
         alert(`Reminders sent for ${r.length} identities`)
     }
 
+    async bulkDecide(r: Reviewer[]): Promise<void> {
+        console.log(">bulkDecide");
+        console.log(r);
+        alert(`Bulk decision for ${r.length} reviewers`)
+    }
+
     async getReviewers(fetchOptions: FetchOptions, force: boolean): Promise<PaginatedData<Reviewer>> {
         await stall()
         console.log(">getReviewers", fetchOptions);

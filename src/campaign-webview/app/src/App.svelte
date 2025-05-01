@@ -28,6 +28,14 @@
   if (window.data.campaignStatus !== "COMPLETED") {
     multiSelectActions.push(
       {
+        label: "Bulk Decide",
+        callback: async (rows: Reviewer[]) => {
+          await client.bulkDecide(rows);
+          // force refresh
+          reviewersTable.updateData(true);
+        },
+      },
+      {
         label: "Escalate",
         callback: async (rows: Reviewer[]) => {
           await client.escalateReviewers(rows);
@@ -44,6 +52,15 @@
     );
 
     actions.push(
+      {
+        label: "Bulk Decide",
+        callback: async (row: Reviewer) => {
+          await client.bulkDecide([row]);
+          // force refresh
+          reviewersTable.updateData(true);
+        },
+        condition: onlyActive,
+      },
       {
         label: "Escalate",
         callback: async (row: Reviewer) => {
