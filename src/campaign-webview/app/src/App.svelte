@@ -25,6 +25,8 @@
   let reviewersTable: DataTable;
   const onlyActive = (row: Reviewer) =>
     row.phase !== "SIGNED" || (row.identitiesRemaining !== undefined && row.identitiesRemaining > 0);
+  const hasRemainingItems = (row: Reviewer) =>
+    row.phase === "ACTIVE" && row.identitiesRemaining !== undefined && row.identitiesRemaining > 0;
   if (window.data.campaignStatus !== "COMPLETED") {
     multiSelectActions.push(
       {
@@ -59,7 +61,7 @@
           // force refresh
           reviewersTable.updateData(true);
         },
-        condition: onlyActive,
+        condition: hasRemainingItems,
       },
       {
         label: "Escalate",

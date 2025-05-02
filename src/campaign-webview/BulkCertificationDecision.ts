@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { CertificationsApiMakeIdentityDecisionRequest, IdentityCertificationDto, AccessReviewItem, ReviewDecision, CertificationDecision } from "sailpoint-api-client";
 import { ISCClient } from "../services/ISCClient";
 
-const DECIDE_CERTIFICATION_ITEM_LIMIT = 500;
+const DECIDE_CERTIFICATION_ITEM_LIMIT = 250;
 
 export interface DecisionReport {
     success: number;
@@ -68,49 +68,52 @@ export class BulkCertificationDecision {
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Processing ${certifications.length} certifications`,
-            cancellable: false
-        }, async (progress) => {
+            cancellable: true
+        }, async (progress, token) => {
             const totalCertifications = certifications.length;
-            let processedCertifications = 0;
+            let processedCertifications = 1;
 
             for (const certification of certifications) {
-                try {
-                    // Get all review items for this certification
-                    const reviewItems = await this.client.getCertificationReviewItems(certification.id, false);
-                    const totalBatches = Math.ceil(reviewItems.length / DECIDE_CERTIFICATION_ITEM_LIMIT);
-                    let processedBatches = 0;
+                if (token.isCancellationRequested) { return }
+                // Get all review items for this certification
+                const reviewItems = await this.client.getCertificationReviewItems(certification.id, false);
+                const totalBatches = Math.ceil(reviewItems.length / DECIDE_CERTIFICATION_ITEM_LIMIT);
+                let processedBatches = 1;
 
-                    // Process review items in batches
-                    while (reviewItems.length > 0) {
-                        const batch = reviewItems.splice(0, DECIDE_CERTIFICATION_ITEM_LIMIT);
+                // Process review items in batches
+                while (reviewItems.length > 0) {
+                    if (token.isCancellationRequested) { return }
+                    progress.report({
+                        message: `Processing certification ${processedCertifications}/${totalCertifications} - Batch ${processedBatches}/${totalBatches}`,
+                        increment: (100 / totalCertifications) / totalBatches
+                    });
+                    const batch = reviewItems.splice(0, DECIDE_CERTIFICATION_ITEM_LIMIT);
 
-                        try {
-                            await this.processBatch(certification.id, batch, certificaionDecision, comment);
-                            report.success += batch.length;
-                        } catch (error) {
-                            const errorMessage = error instanceof Error ? error.message : String(error);
-                            report.error += batch.length;
-                            report.errorMessages.push(
-                                `Error processing batch for certification ${certification.id}: ${errorMessage}`
-                            );
-                        }
-
-                        processedBatches++;
-                        progress.report({
-                            message: `Processing certification ${processedCertifications + 1}/${totalCertifications} - Batch ${processedBatches}/${totalBatches}`,
-                            increment: (100 / totalCertifications) / totalBatches
-                        });
+                    try {
+                        await this.processBatch(certification.id, batch, certificaionDecision, comment);
+                        report.success += batch.length;
+                    } catch (error) {
+                        const errorMessage = error instanceof Error ? error.message : String(error);
+                        report.error += batch.length;
+                        report.errorMessages.push(
+                            `Error processing batch for certification ${certification.id}: ${errorMessage}`
+                        );
                     }
 
-                    processedCertifications++;
-                } catch (error) {
-                    const errorMessage = error instanceof Error ? error.message : String(error);
-                    report.errorMessages.push(
-                        `Error fetching review items for certification ${certification.id}: ${errorMessage}`
-                    );
+                    processedBatches++;
                 }
+
+                processedCertifications++;
             }
         });
+
+        if (report.success === 0 && report.error > 0) {
+            vscode.window.showErrorMessage("No certification decisions made.")
+        } else if (report.success > 0 && report.error === 0) {
+            vscode.window.showInformationMessage(`${report.success} certification decisions made.`)
+        } else {
+            vscode.window.showWarningMessage(`${report.success} certification decisions made. Could not make ${report.error} certification decisions.`)
+        }
 
         return report;
     }

@@ -203,22 +203,8 @@ export class CampaignPanel {
 
                 case commands.BULK_DECISION:
                     const bulkDecision = new BulkCertificationDecision(client);
-                    try {
-                        const report = await bulkDecision.processBulkDecision(payload as IdentityCertificationDto[]);
-                        if (report.error > 0) {
-                            vscode.window.showErrorMessage(
-                                `Bulk decision completed with errors: ${report.success} successful, ${report.error} failed`
-                            );
-                            console.error('Bulk decision errors:', report.errorMessages);
-                        } else {
-                            vscode.window.showInformationMessage(
-                                `Successfully processed ${report.success} decisions`
-                            );
-                        }
-                    } catch (error) {
-                        const errorMessage = error instanceof Error ? error.message : String(error);
-                        vscode.window.showErrorMessage(`Failed to process bulk decisions: ${errorMessage}`);
-                    }
+                    const report = await bulkDecision.processBulkDecision(payload as IdentityCertificationDto[]);
+                    this._panel.webview.postMessage({ command, requestId, payload: report });
                     return;
             }
         },
