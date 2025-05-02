@@ -25,8 +25,18 @@
   let reviewersTable: DataTable;
   const onlyActive = (row: Reviewer) =>
     row.phase !== "SIGNED" || (row.identitiesRemaining !== undefined && row.identitiesRemaining > 0);
+  const hasRemainingItems = (row: Reviewer) =>
+    row.phase === "ACTIVE" && row.identitiesRemaining !== undefined && row.identitiesRemaining > 0;
   if (window.data.campaignStatus !== "COMPLETED") {
     multiSelectActions.push(
+      {
+        label: "Bulk Decide",
+        callback: async (rows: Reviewer[]) => {
+          await client.bulkDecide(rows);
+          // force refresh
+          reviewersTable.updateData(true);
+        },
+      },
       {
         label: "Escalate",
         callback: async (rows: Reviewer[]) => {
@@ -44,6 +54,15 @@
     );
 
     actions.push(
+      {
+        label: "Bulk Decide",
+        callback: async (row: Reviewer) => {
+          await client.bulkDecide([row]);
+          // force refresh
+          reviewersTable.updateData(true);
+        },
+        condition: hasRemainingItems,
+      },
       {
         label: "Escalate",
         callback: async (row: Reviewer) => {

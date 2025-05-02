@@ -62,4 +62,5 @@ export interface Client {
      */
     escalateReviewers(r: Reviewer[]): Promise<any>
     sendReminders(r: Reviewer[]): Promise<void>
+    bulkDecide(r: Reviewer[]): Promise<void>
 }
