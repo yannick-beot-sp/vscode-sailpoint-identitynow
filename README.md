@@ -23,7 +23,7 @@ The SailPoint Identity Security Cloud extension makes it easy to:
 - View, edit, create, delete identity attribute
 - View, trigger attribute sync or process, delete identities
 - View, edit, create, delete applications
-- View, report, escalate, send reminders, reassign to access item owners or reassign based on a file certification campaigns
+- View, report, escalate, send reminders, reassign to access item owners or reassign based on a file, approve in bulk certification campaigns
 
 ## Installation
 
@@ -419,8 +419,12 @@ The extension supports the following settings:
 
 ## Release Notes
 
-- Issue when policy provisioning name is empty (cf. [#113](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/113)).
+### 1.3.16
 
+- Issue when policy provisioning name is empty (cf. [#113](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/113)).
+- Can choose forms to export or import
+- Support bulk approval in certification campaign by [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp) (cf. [#115](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/115))
+- Enhance performance and progress report for certification reassignment (owner and custom) by [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp) (cf. [#115](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/115))
 
 ### 1.3.15
 

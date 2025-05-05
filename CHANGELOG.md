@@ -12,13 +12,24 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Changed
 
+### Fixed
+
+### Removed
+
+## [1.3.16] - 2025-05-05
+
+### Added
+
+- Support bulk approval in certification campaign by [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp) (cf. [#115](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/115))
+
+### Changed
+
 - Can choose forms to export or import
+- Enhance performance and progress report for certification reassignment (owner and custom) by [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp) (cf. [#115](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/115))
 
 ### Fixed
 
 - Issue when policy provisioning name is empty (cf. [#113](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/113)). If no name is provided, the usage type is used for the label
-
-### Removed
 
 ## [1.3.15] - 2025-04-06
 
