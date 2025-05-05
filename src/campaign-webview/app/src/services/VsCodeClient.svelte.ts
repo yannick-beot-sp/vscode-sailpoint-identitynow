@@ -45,6 +45,15 @@ export class VsCodeClient implements Client {
         await messageHandler.request(commands.SEND_REMINDERS, snapshot);
     }
 
+    async bulkDecide(r: Reviewer[]): Promise<void> {
+        console.log("> VsCodeClient.bulkDecide");
+        // Reviewer is a proxy, as reactive svelte object.
+        // Create a snapshot for cloning
+        const snapshot = $state.snapshot(r)
+        console.log(snapshot);
+        await messageHandler.request(commands.BULK_DECISION, snapshot);
+    }
+
     /**
      * explicitly returning a Promise because used by "await"
      * @returns Promise

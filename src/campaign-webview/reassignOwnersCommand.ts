@@ -6,6 +6,7 @@ import { AccessReviewItem, DtoType } from 'sailpoint-api-client';
 import { BulkReviewItemReassignment } from './BulkReviewItemReassignment';
 import { TenantService } from '../services/TenantService';
 import { isTenantReadonly, validateTenantReadonly } from '../commands/validateTenantReadonly';
+import { SourceIdToOwnerIdCacheService } from '../services/cache/SourceIdToOwnerIdCacheService';
 
 const OWNER_REVIEW_DEFAULT_COMMENT = "Reassigned to the Access Item Owner"
 
@@ -13,7 +14,8 @@ const OWNER_REVIEW_DEFAULT_COMMENT = "Reassigned to the Access Item Owner"
  * Command used to reassigned acccess review items to access owners
  */
 export class ReassignOwnersCommand {
-    constructor(private tenantService: TenantService) { }
+    constructor(private tenantService: TenantService) {
+    }
 
     async execute(node: CampaignTreeItem): Promise<void> {
         console.log("> ReassignOwnersCommand.execute", node);
@@ -29,6 +31,7 @@ export class ReassignOwnersCommand {
 
         const campaignId = node.id as string
         const client = new ISCClient(node.tenantId, node.tenantName)
+        const sourceOwnerCacheService = new SourceIdToOwnerIdCacheService(client)
 
         const bulkReviewItemReassigner = new BulkReviewItemReassignment(client)
         const report = await bulkReviewItemReassigner.reassignCampaign(
@@ -38,14 +41,15 @@ export class ReassignOwnersCommand {
             OWNER_REVIEW_DEFAULT_COMMENT,
             `Successfully reassigned items for campaign ${node.label} to access owners.`,
             async (pendingReviewItem: AccessReviewItem) => {
-                return await this.getAccessItemOwner(client, pendingReviewItem)
+                return await this.getAccessItemOwner(client, sourceOwnerCacheService, pendingReviewItem)
             }
         )
 
+        sourceOwnerCacheService.flushAll();
         console.log(`< ReassignOwnersCommand.execute: Finished reassigning access review items to the access owners for campaign ${node.label}`, report);
     }
 
-    async getAccessItemOwner(client: ISCClient, pendingReviewItem: AccessReviewItem): Promise<string | undefined> {
+    async getAccessItemOwner(client: ISCClient, sourceOwnerCacheService: SourceIdToOwnerIdCacheService, pendingReviewItem: AccessReviewItem): Promise<string | undefined> {
         // Get the Owner ID for Roles/Access Profiles
         // In case of Entitlements, find the Source Owner ID if the entitlement has no Owner
         switch (pendingReviewItem.accessSummary?.access?.type) {
@@ -61,8 +65,7 @@ export class ReassignOwnersCommand {
                 const sourceId = pendingReviewItem.accessSummary?.entitlement?.sourceId
                 // Skip entitlements from deleted sources with no source id
                 if (sourceId) {
-                    const source = await client.getSourceById(sourceId)
-                    return source.owner.id
+                    return await sourceOwnerCacheService.get(sourceId)
                 }
         }
         return undefined

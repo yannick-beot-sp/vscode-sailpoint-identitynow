@@ -11,7 +11,7 @@
     "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^4.0.0",
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@tsconfig/svelte": "^5.0.4",
     "@types/chart.js": "^2.9.41",
     "@types/vscode-webview": "^1.57.5",
@@ -20,7 +20,7 @@
     "svelte-check": "^4.0.5",
     "tslib": "^2.8.0",
     "typescript": "~5.6.2",
-    "vite": "^5.4.10"
+    "vite": "^6.3.4"
   },
   "dependencies": {
     "certification-campaign-webview": "file:"
