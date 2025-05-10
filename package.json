@@ -2,7 +2,7 @@
   "name": "vscode-sailpoint-identitynow",
   "displayName": "SailPoint Identity Security Cloud",
   "description": "Customize SailPoint Identity Security Cloud",
-  "version": "1.3.16",
+  "version": "1.3.17",
   "publisher": "yannick-beot-sp",
   "icon": "resources/isc.png",
   "bugs": {
@@ -282,6 +282,10 @@
       {
         "command": "vscode-sailpoint-identitynow.source.import.accounts.view",
         "title": "Import accounts..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.source.import.accounts.disable-optimization.view",
+        "title": "Import accounts without optimization..."
       },
       {
         "command": "vscode-sailpoint-identitynow.source.import.entitlements.view",
@@ -784,6 +788,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.source.import.accounts.disable-optimization.view",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.source.import.entitlements.view",
           "when": "never"
         },
@@ -1143,17 +1151,17 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.aggregate-source",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/ && viewItem != DelimitedFilesource",
           "group": "aggregate@0"
         },
         {
           "command": "vscode-sailpoint-identitynow.aggregate-source-disable-optimization",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/ && viewItem != DelimitedFilesource",
           "group": "aggregate@1"
         },
         {
           "command": "vscode-sailpoint-identitynow.aggregate-entitlements",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/ && viewItem != DelimitedFilesource",
           "group": "aggregate@2"
         },
         {
@@ -1198,6 +1206,11 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.source.import.accounts.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == DelimitedFilesource",
+          "group": "import@0"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.source.import.accounts.disable-optimization.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == DelimitedFilesource",
           "group": "import@0"
         },

@@ -419,6 +419,11 @@ The extension supports the following settings:
 
 ## Release Notes
 
+### 1.3.17
+
+- New command to import account without optimization
+- Remove aggregation commands from delimited files
+
 ### 1.3.16
 
 - Issue when policy provisioning name is empty (cf. [#113](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/113)).

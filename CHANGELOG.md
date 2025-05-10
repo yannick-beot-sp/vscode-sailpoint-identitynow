@@ -16,6 +16,16 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Removed
 
+## [1.3.17] - 2025-05-10
+
+### Added
+
+- New command to import account without optimization
+
+### Changed
+
+- Remove aggregation commands from delimited files
+
 ## [1.3.16] - 2025-05-05
 
 ### Added
