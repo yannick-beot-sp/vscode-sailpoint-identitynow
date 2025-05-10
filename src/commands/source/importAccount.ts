@@ -14,7 +14,8 @@ class AccountImporter {
         private tenantDisplayName: string,
         private sourceName: string,
         private sourceId: string,
-        private fileUri: vscode.Uri
+        private fileUri: vscode.Uri,
+        private disableOptimization: boolean
     ) {
         this.client = new ISCClient(this.tenantId, this.tenantName);
     }
@@ -34,7 +35,7 @@ class AccountImporter {
 
         const job = await this.client.startAccountAggregation(
             this.sourceId,
-            false,
+            this.disableOptimization,
             this.fileUri.fsPath
         );
 
@@ -53,11 +54,11 @@ class AccountImporter {
  * Entrypoint for the command to import accounts from the tree view/from a node
  */
 export class AccountImportNodeCommand {
-    constructor(private readonly tenantService: TenantService) { }
+    constructor(private readonly tenantService: TenantService, private disableOptimization = false) { }
 
     async execute(node?: SourceTreeItem): Promise<void> {
         console.log("> AccountImportNodeCommand.execute");
-        
+
         if (!(await validateTenantReadonly(this.tenantService, node.tenantId, `import accounts in ${node.label}`))) {
             return
         }
@@ -71,7 +72,8 @@ export class AccountImportNodeCommand {
             node.tenantDisplayName,
             node.label as string,
             node.id as string,
-            fileUri
+            fileUri,
+            this.disableOptimization
         );
         await accountImporter.importFileWithProgression();
     }

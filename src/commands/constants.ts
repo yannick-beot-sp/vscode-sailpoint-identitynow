@@ -28,6 +28,7 @@ export const AGGREGATE_DISABLE_OPTIMIZATION = `${COMMAND_PREFIX}.aggregate-sourc
 export const AGGREGATE_ENTITLEMENTS = `${COMMAND_PREFIX}.aggregate-entitlements`;
 export const UPLOAD_FILE = `${COMMAND_PREFIX}.source.upload-file`;
 export const IMPORT_ACCOUNTS_VIEW = `${COMMAND_PREFIX}.source.import.accounts.view`;
+export const IMPORT_ACCOUNTS_DISABLE_OPTIMIZATION_VIEW = `${COMMAND_PREFIX}.source.import.accounts.disable-optimization.view`;
 export const IMPORT_ENTITLEMENTS_VIEW = `${COMMAND_PREFIX}.source.import.entitlements.view`;
 export const EXPORT_ACCOUNTS_VIEW = `${COMMAND_PREFIX}.source.export.accounts.view`;
 export const IMPORT_UNCORRELATED_ACCOUNTS_VIEW = `${COMMAND_PREFIX}.source.import.uncorrelated-accounts.view`;

@@ -238,6 +238,11 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_ACCOUNTS_VIEW,
 			accountImportNodeCommand.execute, accountImportNodeCommand));
+	const accountImportDisableOptimizationNodeCommand = new AccountImportNodeCommand(tenantService, true);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_ACCOUNTS_DISABLE_OPTIMIZATION_VIEW,
+			accountImportDisableOptimizationNodeCommand.execute, accountImportDisableOptimizationNodeCommand));
+
 	const entitlementImportNodeCommand = new EntitlementImportNodeCommand(tenantService);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_ENTITLEMENTS_VIEW,
