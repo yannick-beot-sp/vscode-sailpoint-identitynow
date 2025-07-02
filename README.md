@@ -419,6 +419,12 @@ The extension supports the following settings:
 
 ## Release Notes
 
+### 1.3.18
+
+- Updated the SailPoint SDK (sailpoint-api-client) from v1.4.15 to v1.6.2 by [@mostafa-helmy-sp]
+- Updated certification campaign commands to use V2025 APIs by [@mostafa-helmy-sp]
+- Issue with duplicate review summaries when reassigning to access owners by [@mostafa-helmy-sp] (SAASTRIAGE-7886)
+
 ### 1.3.17
 
 - New command to import account without optimization

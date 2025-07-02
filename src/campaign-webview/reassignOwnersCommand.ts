@@ -20,7 +20,6 @@ export class ReassignOwnersCommand {
     async execute(node: CampaignTreeItem): Promise<void> {
         console.log("> ReassignOwnersCommand.execute", node);
 
-
         const isReadOnly = isTenantReadonly(this.tenantService, node.tenantId)
 
         if ((isReadOnly && !(await validateTenantReadonly(this.tenantService, node.tenantId, `reassign access item reviews to the access item owners for the campaign ${node.label}?`)))

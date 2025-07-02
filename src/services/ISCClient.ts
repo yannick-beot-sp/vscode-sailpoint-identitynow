@@ -8,7 +8,7 @@ import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskManagementBetaApi, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsApi, CertificationsApi, CertificationCampaignsApiMoveRequest, CertificationSummariesApi, IdentityCertDecisionSummary, AccessReviewItem, CertificationCampaignFiltersApiFp, IdentityCertificationDto, GetActiveCampaigns200ResponseInner, CertificationsApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, CertificationsApiMakeIdentityDecisionRequest, CertificationsApiReassignIdentityCertificationsRequest } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskManagementBetaApi, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024 } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -1702,9 +1702,9 @@ export class ISCClient {
 		return response;
 	}
 
-	public async getCampaign(campaignId: string): Promise<GetActiveCampaigns200ResponseInner> {
+	public async getCampaign(campaignId: string): Promise<GetActiveCampaigns200ResponseInnerV2025> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CertificationCampaignsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new CertificationCampaignsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 
 		const val = await api.getCampaign({ id: campaignId });
 
@@ -1715,7 +1715,7 @@ export class ISCClient {
 		return val.data;
 	}
 
-	public async getCampaignCertifications(campaignId: string, completed?: boolean): Promise<IdentityCertificationDto[]> {
+	public async getCampaignCertifications(campaignId: string, completed?: boolean): Promise<IdentityCertificationDtoV2025[]> {
 		let filters = `campaign.id eq "${campaignId}"`
 		if (completed !== undefined) {
 			filters += ` and completed eq ${completed}`
@@ -1723,9 +1723,9 @@ export class ISCClient {
 		return this.getCampaignCertificationsByFilter(filters);
 	}
 
-	public async getCampaignCertificationsByFilter(filters: string): Promise<IdentityCertificationDto[]> {
+	public async getCampaignCertificationsByFilter(filters: string): Promise<IdentityCertificationDtoV2025[]> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new CertificationsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 
 		const val = await Paginator.paginate(
 			api,
@@ -1743,9 +1743,9 @@ export class ISCClient {
 		return val.data;
 	}
 
-	public async getCertificationReviewItems(certificationId: string, completed?: boolean): Promise<AccessReviewItem[]> {
+	public async getCertificationReviewItems(certificationId: string, completed?: boolean): Promise<AccessReviewItemV2025[]> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new CertificationsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 
 		let filters
 		if (completed !== undefined) {
@@ -1768,8 +1768,8 @@ export class ISCClient {
 		return val.data;
 	}
 
-	public async getCampaignReviewItems(campaignId: string): Promise<AccessReviewItem[]> {
-		let allAccessReviewItems: AccessReviewItem[] = []
+	public async getCampaignReviewItems(campaignId: string): Promise<AccessReviewItemV2025[]> {
+		let allAccessReviewItems: AccessReviewItemV2025[] = []
 		const certifications = await this.getCampaignCertifications(campaignId, false)
 		for (const certification of certifications) {
 			const accessReviewItems = await this.getCertificationReviewItems(certification.id)
@@ -1783,9 +1783,9 @@ export class ISCClient {
 		offset: number,
 		sorters?: string,
 		limit?: number
-	}): Promise<PaginatedData<IdentityCertificationDto>> {
+	}): Promise<PaginatedData<IdentityCertificationDtoV2025>> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new CertificationsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		let filters = `campaign.id eq "${campaignId}"`
 		const resp = await api.listIdentityCertifications({
 			filters,
@@ -1804,36 +1804,36 @@ export class ISCClient {
 		}
 	}
 
-	public async getSummaryCertificationDecisions(certificationId: string): Promise<IdentityCertDecisionSummary> {
+	public async getSummaryCertificationDecisions(certificationId: string): Promise<IdentityCertDecisionSummaryV2025> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CertificationSummariesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new CertificationSummariesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await api.getIdentityDecisionSummary({ id: certificationId })
 		return resp.data
 	}
 
-	public async reassignCampaignCertifications(certificationMoveRequest: CertificationCampaignsApiMoveRequest): Promise<void> {
+	public async reassignCampaignCertifications(certificationMoveRequest: CertificationCampaignsV2025ApiMoveRequest): Promise<void> {
 		const apiConfig = await this.getApiConfiguration();
-		const campaignApi = new CertificationCampaignsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		const campaignApi = new CertificationCampaignsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors())
 		await campaignApi.move(certificationMoveRequest);
 	}
 
-	public async reassignCertificationReviewItemsSync(certificationReassignRequestSync: CertificationsApiReassignIdentityCertificationsRequest): Promise<CertificationTask> {
+	public async reassignCertificationReviewItemsSync(certificationReassignRequestSync: CertificationsV2025ApiReassignIdentityCertificationsRequest): Promise<CertificationTask> {
 		const apiConfig = await this.getApiConfiguration();
-		const certificationsApi = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		const certificationsApi = new CertificationsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors())
 		const resp = await certificationsApi.reassignIdentityCertifications(certificationReassignRequestSync)
 		return resp.data
 	}
 
-	public async reassignCertificationReviewItemsAsync(certificationReassignRequestAsync: CertificationsApiSubmitReassignCertsAsyncRequest): Promise<CertificationTask> {
+	public async reassignCertificationReviewItemsAsync(certificationReassignRequestAsync: CertificationsV2025ApiSubmitReassignCertsAsyncRequest): Promise<CertificationTask> {
 		const apiConfig = await this.getApiConfiguration();
-		const certificationsApi = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		const certificationsApi = new CertificationsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors())
 		const resp = await certificationsApi.submitReassignCertsAsync(certificationReassignRequestAsync)
 		return resp.data
 	}
 
-	public async decideCertificationItems(certificationsApiMakeIdentityDecisionRequest: CertificationsApiMakeIdentityDecisionRequest): Promise<{ IdentityCertificationDto: IdentityCertificationDto }> {
+	public async decideCertificationItems(certificationsApiMakeIdentityDecisionRequest: CertificationsV2025ApiMakeIdentityDecisionRequest): Promise<{ IdentityCertificationDto: IdentityCertificationDtoV2025 }> {
 		const apiConfig = await this.getApiConfiguration();
-		const certificationsApi = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		const certificationsApi = new CertificationsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors())
 		const resp = await certificationsApi.makeIdentityDecision(certificationsApiMakeIdentityDecisionRequest)
 		return {
 			IdentityCertificationDto: resp.data
@@ -2032,9 +2032,3 @@ export class ISCClient {
 	//#endregion Identity Management
 	////////////////////////
 }
-
-export { CertificationsApi, AccessReviewItem, CertificationCampaignFiltersApiFp, Paginator };
-
-
-
-
