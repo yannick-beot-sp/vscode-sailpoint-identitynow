@@ -16,6 +16,23 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Removed
 
+## [1.3.18] - 2025-07-03
+
+### Security
+
+### Added
+
+### Changed
+
+- Updated the SailPoint SDK (sailpoint-api-client) from v1.4.15 to v1.6.2 by [@mostafa-helmy-sp]
+- Updated certification campaign commands to use V2025 APIs by [@mostafa-helmy-sp]
+
+### Fixed
+
+- Issue with duplicate review summaries when reassigning to access owners by [@mostafa-helmy-sp] (SAASTRIAGE-7886)
+
+### Removed
+
 ## [1.3.17] - 2025-05-10
 
 ### Added
