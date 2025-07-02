@@ -43,7 +43,8 @@ export async function viewWorkflowExecutionHistory(node: WorkflowTreeItem): Prom
     }
     const items = history.map<vscode.QuickPickItem>(x => ({
         label: x.id!,
-        detail: x.startTime
+        detail: x.startTime,
+        description: x.status
     }));
 
     const item = await vscode.window.showQuickPick<vscode.QuickPickItem>(items);

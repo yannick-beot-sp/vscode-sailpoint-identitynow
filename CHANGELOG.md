@@ -10,6 +10,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- Add status in the list of workflow executions
+
 ### Changed
 
 ### Fixed
