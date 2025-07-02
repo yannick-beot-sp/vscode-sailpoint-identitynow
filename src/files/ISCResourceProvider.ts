@@ -287,7 +287,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 					patchResourcePath,
 					JSON.stringify(jsonpatch)
 				);
-			} else if (resourcePath.match("identities")) {
+			} else if (resourcePath.match(/identities\//)) {
 				console.log("save identities - cant do this folks");
 				vscode.window.showErrorMessage("Identities cannot be modified directly");
 			}

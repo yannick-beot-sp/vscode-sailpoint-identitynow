@@ -16,6 +16,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Fixed
 
+- Fix path matching for identities that prevented from saving public identities config
+
 ### Removed
 
 ## [1.3.17] - 2025-05-10
