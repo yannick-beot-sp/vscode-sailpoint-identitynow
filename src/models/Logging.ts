@@ -615,7 +615,8 @@ export const LOGGING_CLASSES = [
     {
         "connector": "SAP HR/HCM",
         "loggingClasses": [
-            "sailpoint.connector.SAPHRConnector"
+            "sailpoint.connector.SAPHRConnector",
+            "sailpoint.connector.SAPHRInternalConnector"
         ]
     },
     {

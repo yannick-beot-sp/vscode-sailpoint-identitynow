@@ -10,9 +10,11 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
-- Add status in the list of workflow executions
 
 ### Changed
+
+- Add status in the list of workflow executions
+- Add logger class for SAP HR
 
 ### Fixed
 
