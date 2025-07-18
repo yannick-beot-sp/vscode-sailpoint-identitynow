@@ -9,6 +9,7 @@
 		],
 		"sourceMap": true,
 		"rootDir": "src",
+		"skipLibCheck": true // exclude errors from sailpoint-api-client (cf. https://stackoverflow.com/a/57653497)
 		// "strict": false   /* enable all strict type-checking options */
 		// "strict": true   /* enable all strict type-checking options */
 		/* Additional Checks */
