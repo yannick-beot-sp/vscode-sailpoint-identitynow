@@ -27,8 +27,11 @@ jobs:
     #   if: runner.os == 'Linux'
     # - run: npm test
     #   if: runner.os != 'Linux'
+    # added --allow-package-secrets sendgrid to prevent false positive on the code SG.commands.executeCommand
+    # SendGrid is not used at all
+    # cf. https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/actions/runs/16379580167/job/46287795609#step:6:89
     - name: Compile and create vsix
-      run: vsce package
+      run: vsce package --allow-package-secrets sendgrid
     - name: Upload vsix as artifact
       uses: actions/upload-artifact@v4
       with:
