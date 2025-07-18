@@ -44,4 +44,4 @@ jobs:
         files: vscode-sailpoint-identitynow-*.vsix
     - name: Publish
       if: success() && startsWith( github.ref, 'refs/tags/releases/')
-      run: vsce publish -p ${{ secrets.VSCE_PAT }}
+      run: vsce publish -p ${{ secrets.VSCE_PAT }} --allow-package-secrets sendgrid
