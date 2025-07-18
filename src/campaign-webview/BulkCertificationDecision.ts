@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { CertificationsApiMakeIdentityDecisionRequest, IdentityCertificationDto, AccessReviewItem, ReviewDecision, CertificationDecision } from "sailpoint-api-client";
+import { IdentityCertificationDtoV2025, AccessReviewItemV2025, ReviewDecisionV2025, CertificationDecisionV2025, CertificationsV2025ApiMakeIdentityDecisionRequest } from "sailpoint-api-client";
 import { ISCClient } from "../services/ISCClient";
 
 const DECIDE_CERTIFICATION_ITEM_LIMIT = 250;
@@ -14,7 +14,7 @@ export class BulkCertificationDecision {
     constructor(private readonly client: ISCClient) { }
 
     async processBulkDecision(
-        certifications: IdentityCertificationDto[]
+        certifications: IdentityCertificationDtoV2025[]
     ): Promise<DecisionReport> {
         const report: DecisionReport = {
             success: 0,
@@ -23,9 +23,9 @@ export class BulkCertificationDecision {
         };
 
         // Prompt for the decision
-        const decisionOptions: { label: string; value: CertificationDecision }[] = [
-            { label: 'Approve', value: CertificationDecision.Approve },
-            { label: 'Revoke', value: CertificationDecision.Revoke },
+        const decisionOptions: { label: string; value: CertificationDecisionV2025 }[] = [
+            { label: 'Approve', value: CertificationDecisionV2025.Approve },
+            { label: 'Revoke', value: CertificationDecisionV2025.Revoke },
         ];
         const selectedValue = await vscode.window.showQuickPick(
             decisionOptions.map(option => option.label),
@@ -43,7 +43,7 @@ export class BulkCertificationDecision {
         }
 
         // Map decision label back to the CertificationDecision
-        const certificaionDecision: CertificationDecision | undefined = decisionOptions.find(o => o.label === selectedValue)?.value;
+        const certificaionDecision: CertificationDecisionV2025 | undefined = decisionOptions.find(o => o.label === selectedValue)?.value;
 
         // Prompt for a comment
         const comment = await vscode.window.showInputBox({
@@ -120,17 +120,17 @@ export class BulkCertificationDecision {
 
     private async processBatch(
         certificationId: string,
-        batch: AccessReviewItem[],
-        decision: CertificationDecision,
+        batch: AccessReviewItemV2025[],
+        decision: CertificationDecisionV2025,
         comment: string
     ): Promise<void> {
-        let decisions: ReviewDecision[] = [];
+        let decisions: ReviewDecisionV2025[] = [];
         batch.forEach(accessReviewItem => {
             decisions.push({ id: accessReviewItem.id, bulk: true, decision: decision, comments: comment })
         });
-        const apiDecisionRequest: CertificationsApiMakeIdentityDecisionRequest = {
+        const apiDecisionRequest: CertificationsV2025ApiMakeIdentityDecisionRequest = {
             id: certificationId,
-            reviewDecision: decisions
+            reviewDecisionV2025: decisions
         };
 
         await this.client.decideCertificationItems(apiDecisionRequest);
