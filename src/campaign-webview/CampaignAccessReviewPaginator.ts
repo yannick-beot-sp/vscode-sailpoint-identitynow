@@ -23,7 +23,7 @@ export class CampaignAccessReviewPaginator implements AsyncIterable<CampaignAcce
             // Call API to get access review items for the certification
             const accessReviewData = await this.client.getCertificationReviewItems(certificationId)
             // @ts-ignore
-            yield* accessReviewData.flatMap((x:AccessReviewItem) => {
+            yield* accessReviewData.flatMap((x: AccessReviewItem) => {
                 switch (x.accessSummary.access.type) {
                     case "ENTITLEMENT":
                         return x
@@ -37,8 +37,9 @@ export class CampaignAccessReviewPaginator implements AsyncIterable<CampaignAcce
                             }
                         }))
                     case "ROLE":
-                        return x.accessSummary.role.accessProfiles?.flatMap(accessProfile => {
-                            if (!accessProfile.entitlements?.length) {return [] as AccessReviewItem[]}
+                        // Get entitlements from nested access profiles within the role
+                        const accessProfiles = x.accessSummary.role.accessProfiles?.flatMap(accessProfile => {
+                            if (!accessProfile.entitlements?.length) { return [] as AccessReviewItem[] }
                             return accessProfile.entitlements.map(entitlement => ({
                                 ...x,
                                 accessSummary: {
@@ -48,17 +49,28 @@ export class CampaignAccessReviewPaginator implements AsyncIterable<CampaignAcce
                                     entitlement
                                 }
                             }));
-                        });
+                        }) || [];
+                        // Get direct entitlements from the role
+                        const entitlements = x.accessSummary.role.entitlements?.map(entitlement => ({
+                            ...x,
+                            accessSummary: {
+                                access: x.accessSummary.access,
+                                role: x.accessSummary.role,
+                                entitlement
+                            }
+                        })) || [];
+                        // Combine both arrays
+                        return [...accessProfiles, ...entitlements];
                     default:
                         throw new Error(`Unsupported access type:${x.accessSummary.access.type}`);
                 }
             })
-             // @ts-ignore
-            .map(z => ({
-                ...z,
-                reviewer: certification.reviewer,
-                campaign: certification.campaign
-            }))
+                // @ts-ignore
+                .map(z => ({
+                    ...z,
+                    reviewer: certification.reviewer,
+                    campaign: certification.campaign
+                }))
         }
     }
 }

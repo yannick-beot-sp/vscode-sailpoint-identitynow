@@ -419,17 +419,16 @@ The extension supports the following settings:
 
 ## Release Notes
 
+### Unreleased
+
+- Issue with missing role entitlements from campaign status report [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp) (cf. [#120](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/120))
+
 ### 1.3.18
 
 - Updated the SailPoint SDK (sailpoint-api-client) from v1.4.15 to v1.6.2 by [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp) (cf. [#118](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/118))
 - Updated certification campaign commands to use V2025 APIs by [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp) (cf. [#118](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/118))
 - Add status in the list of workflow executions
 - Add logger class for SAP HR
-- Issue with duplicate review summaries when reassigning to access owners by [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp) (cf. [#118](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/118)) (SAASTRIAGE-7886)
-- Fix path matching for identities that prevented from saving public identities config
-
-### Fixed
-
 - Issue with duplicate review summaries when reassigning to access owners by [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp) (cf. [#118](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/118)) (SAASTRIAGE-7886)
 - Fix path matching for identities that prevented from saving public identities config
 

@@ -14,6 +14,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Fixed
 
+- Issue with missing role entitlements from campaign status report [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp) (cf. [#120](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/120))
+
 ### Removed
 
 ## [1.3.18] - 2025-07-03
