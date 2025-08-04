@@ -90,7 +90,6 @@ export class SailPointISCAuthenticationProvider {
     }
 
     public async getSessionByTenant(tenantId: string): Promise<SailPointISCPatSession | null> {
-        console.log("> getSessionByTenant", tenantId);
         // Check if an access token already exists
         let token = await this.tenantService.getTenantAccessToken(tenantId);
         const tenantInfo = this.tenantService.getTenant(tenantId);
@@ -127,7 +126,6 @@ export class SailPointISCAuthenticationProvider {
                 }
             }
         } else {
-            console.log("< getSessionByTenant existing token");
             return new SailPointISCPatSession(token.accessToken)
         }
 
