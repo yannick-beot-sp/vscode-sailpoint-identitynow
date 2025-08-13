@@ -424,7 +424,7 @@ The extension supports the following settings:
 ### 1.3.19
 
 - Issue with missing role entitlements from campaign status report by [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp) (cf. [#120](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/120))
-- Support recent enhancements to role assignment criteria (cf. [#119](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/120119))
+- Support recent enhancements to role assignment criteria (cf. [#119](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/119))
 - Include `input` in the template for lookup transform
 
 ### 1.3.18

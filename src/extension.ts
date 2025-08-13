@@ -86,6 +86,7 @@ import { Observer } from './services/Observer';
 import { TenantInfo } from './models/TenantInfo';
 import { FolderTreeNode } from './models/TreeNode';
 import { isTenantReadonly } from './commands/validateTenantReadonly';
+import { OpenUrlCommand } from './commands/openUrlCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -274,6 +275,11 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.OPEN_RESOURCE,
 			openResourceCommand.execute));
+
+			const openUrlCommand = new OpenUrlCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.OPEN_URL,
+			openUrlCommand.execute));
 
 
 	const deleteResourceCommand = new DeleteResourceCommand(tenantService)

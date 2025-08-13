@@ -148,3 +148,25 @@ export function getPathByUri(uri?: Uri): string | null {
     }
     return null;
 }
+
+export function getUIUrl(tenantName: string, ...pathParts: string[]): Uri {
+
+    const baseUri = Uri.from({ scheme: "https", authority: tenantName });
+
+    let fragment: string | undefined;
+    // We assume there might be only 1 element with hash
+    // Useful for application URL
+    const hashIndex = pathParts.findIndex(part => part.startsWith('#'))
+    if (hashIndex !== -1) {
+        fragment = pathParts[hashIndex].substring(1) // remove '#' as added below
+        pathParts.splice(hashIndex, 1)
+    }
+
+    // You can pass an array to a rest parameter by using the spread operator
+    // cf. https://stackoverflow.com/a/43897911
+    const targetUrl =  Uri.joinPath(
+        baseUri,
+        ...pathParts
+    );
+    return targetUrl.with({fragment});
+}

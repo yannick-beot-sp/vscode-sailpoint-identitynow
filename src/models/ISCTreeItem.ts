@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import * as path from 'path';
 import { ISCClient, TOTAL_COUNT_HEADER } from "../services/ISCClient";
-import { getIdByUri, getPathByUri, getResourceUri } from "../utils/UriUtils";
+import { getIdByUri, getPathByUri, getResourceUri, getUIUrl } from "../utils/UriUtils";
 import { compareByLabel, compareByName, compareByPriority } from "../utils";
 import { AxiosHeaders, AxiosResponse } from "axios";
 import { getConfigNumber } from '../utils/configurationUtils';
@@ -11,6 +11,7 @@ import { convertConstantToTitleCase, escapeFilter, isEmpty, isNotEmpty } from ".
 import { TenantService } from "../services/TenantService";
 import { CampaignStatusV3 } from "sailpoint-api-client";
 import { convertToBaseTreeItem } from "../views/utils";
+import { EndpointUtils } from "../utils/EndpointUtils";
 
 
 /**
@@ -40,6 +41,10 @@ export abstract class BaseTreeItem extends vscode.TreeItem {
 
 	get computedContextValue(): string {
 		return this.contextValue;
+	}
+
+	getUrl(): vscode.Uri | undefined {
+		return undefined
 	}
 }
 
@@ -88,6 +93,10 @@ export class TenantTreeItem extends BaseTreeItem {
 	get computedContextValue() {
 		const tenantInfo = this.tenantService.getTenant(this.tenantId);
 		return tenantInfo && tenantInfo.readOnly ? "tenantReadOnly" : "tenantWritable";
+	}
+
+	getUrl(): vscode.Uri | undefined {
+		return getUIUrl(this.tenantName, "/ui/admin")
 	}
 
 }
@@ -220,6 +229,7 @@ export class IdentityProfilesTreeItem extends FolderTreeItem {
 export class ISCResourceTreeItem extends BaseTreeItem {
 	public readonly uri: vscode.Uri;
 	public readonly resourceId: string;
+	public readonly parentId: string;
 	/**
 	 * Constructor
 	 * @param tenantId 
@@ -259,7 +269,8 @@ export class ISCResourceTreeItem extends BaseTreeItem {
 			...options
 		}
 		super(options.label, options.tenantId, options.tenantName, options.tenantDisplayName, options.collapsible);
-		this.id = options.id;
+		this.id = options.id
+		this.parentId = options.parentId
 
 		if (options.subResourceType && options.subId) {
 			this.uri = getResourceUri(options.tenantName,
@@ -316,8 +327,6 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 		this.contextValue = type.replaceAll(" ", "") + "source";
 	}
 
-
-
 	getChildren(): Promise<BaseTreeItem[]> {
 		const results: BaseTreeItem[] = [];
 		results.push(new SchemasTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, this.uri));
@@ -332,6 +341,10 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 			light: context.asAbsolutePath("resources/light/source.svg"),
 			dark: context.asAbsolutePath("resources/dark/source.svg"),
 		};
+	}
+
+	getUrl(): vscode.Uri | undefined {
+		return getUIUrl(this.tenantName, "ui/a/admin/connections/sources", this.id)
 	}
 }
 
@@ -473,14 +486,14 @@ export class ProvisioningPoliciesTreeItem extends FolderTreeItem {
 		const provisioningPolicies = await client.getProvisioningPolicies(sourceId)
 
 		const results = provisioningPolicies?.map((provisioningPolicy) => new ProvisioningPolicyTreeItem(
-				{
-					tenantId: this.tenantId,
-					tenantName: this.tenantName,
-					tenantDisplayName: this.tenantDisplayName,
-					type: provisioningPolicy.usageType,
-					sourceId,
-					name: provisioningPolicy.name
-				})).sort(compareByLabel)
+			{
+				tenantId: this.tenantId,
+				tenantName: this.tenantName,
+				tenantDisplayName: this.tenantDisplayName,
+				type: provisioningPolicy.usageType,
+				sourceId,
+				name: provisioningPolicy.name
+			})).sort(compareByLabel)
 		return results;
 	}
 }
@@ -585,6 +598,10 @@ export class WorkflowTreeItem extends ISCResourceTreeItem {
 			};
 		}
 	}
+
+	getUrl(): vscode.Uri | undefined {
+		return getUIUrl(this.tenantName, "ui/wf/edit", this.resourceId)
+	}
 }
 
 /**
@@ -668,6 +685,10 @@ export class IdentityProfileTreeItem extends ISCResourceTreeItem {
 		))
 		return lifecycleStateItems;
 	}
+
+	getUrl(): vscode.Uri | undefined {
+		return getUIUrl(this.tenantName, "ui/ip/admin/identity-profiles", this.id)
+	}
 }
 
 export enum IdentityProfileSorting {
@@ -700,6 +721,10 @@ export class LifecycleStateTreeItem extends ISCResourceTreeItem {
 	iconPath = new vscode.ThemeIcon("activate-breakpoints");
 
 	contextValue = "lifecycle-state";
+
+	getUrl(): vscode.Uri | undefined {
+		return getUIUrl(this.tenantName, "ui/ip/admin/identity-profiles", this.parentId, "lifecycle-management", this.id)
+	}
 }
 
 /**
@@ -750,6 +775,10 @@ export class ServiceDeskTreeItem extends ISCResourceTreeItem {
 	}
 
 	iconPath = new vscode.ThemeIcon("gear");
+
+	getUrl(): vscode.Uri | undefined {
+		return getUIUrl(this.tenantName, "ui/h/admin/connections/servicedesk", this.id, "edit")
+	}
 }
 
 export interface PageableNode {
@@ -942,6 +971,10 @@ export class AccessProfileTreeItem extends ISCResourceTreeItem {
 
 	contextValue = "access-profile";
 	iconPath = new vscode.ThemeIcon("archive");
+
+	getUrl(): vscode.Uri | undefined {
+		return getUIUrl(this.tenantName, "ui/a/admin/access/access-profiles/manage", this.id)
+	}
 }
 
 /**
@@ -1008,6 +1041,10 @@ export class RoleTreeItem extends ISCResourceTreeItem {
 
 	contextValue = "role";
 	iconPath = new vscode.ThemeIcon("account");
+
+	getUrl(): vscode.Uri | undefined {
+		return getUIUrl(this.tenantName, "ui/a/admin/access/roles/manage", this.id)
+	}
 }
 
 export class LoadMoreNode extends BaseTreeItem {
@@ -1109,6 +1146,9 @@ export class FormTreeItem extends ISCResourceTreeItem {
 	}
 
 	iconPath = new vscode.ThemeIcon("preview");
+	getUrl(): vscode.Uri | undefined {
+		return getUIUrl(this.tenantName, "ui/a/admin/globals/forms/edit", this.resourceId)
+	}
 }
 
 /**
@@ -1283,6 +1323,10 @@ export class IdentityTreeItem extends ISCResourceTreeItem {
 	}
 
 	iconPath = new vscode.ThemeIcon("person");
+
+	getUrl(): vscode.Uri | undefined {
+		return getUIUrl(this.tenantName, "ui/a/admin/identities", this.id, "details/attributes")
+	}
 }
 
 /**
@@ -1433,7 +1477,10 @@ export class ApplicationTreeItem extends ISCResourceTreeItem implements Pageable
 
 	get hasMore(): boolean {
 		throw new Error("Unimplemented");
+	}
 
+	getUrl(): vscode.Uri | undefined {
+		return getUIUrl(this.tenantName, "ui/admin", `#admin:apps:${this.id}`)
 	}
 }
 
@@ -1554,10 +1601,9 @@ export class CampaignTreeItem extends ISCResourceTreeItem {
 			command: commands.OPEN_RESOURCE,
 			arguments: [this],
 		};
-
-
 	}
 
-
-
+	getUrl(): vscode.Uri | undefined {
+		return getUIUrl(this.tenantName, "ui/a/admin/certifications/campaigns-list/all-campaigns", this.id)
+	}
 }

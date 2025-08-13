@@ -10,20 +10,18 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- Add "Open in Web UI" command (cf. [#15](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/15))
+
 ### Changed
-- Support recent enhancements to role assignment criteria (cf. [#119](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/120119))
-- Include `input` in the template for lookup transform
 
 ### Fixed
-
-- Issue with missing role entitlements from campaign status report by [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp) (cf. [#120](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/120))
 
 ### Removed
 
 ## [1.3.19] - 2025-08-13
 
 ### Changed
-- Support recent enhancements to role assignment criteria (cf. [#119](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/120119))
+- Support recent enhancements to role assignment criteria (cf. [#119](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/119))
 - Include `input` in the template for lookup transform
 
 ### Fixed

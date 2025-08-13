@@ -1,4 +1,5 @@
 const COMMAND_PREFIX = 'vscode-sailpoint-identitynow';
+export const OPEN_URL = `${COMMAND_PREFIX}.open-url`;
 export const OPEN_RESOURCE = `${COMMAND_PREFIX}.open-resource`;
 export const REMOVE_RESOURCE = `${COMMAND_PREFIX}.remove-resource`;
 export const MODIFIED_RESOURCE = `${COMMAND_PREFIX}.modified-resource`;

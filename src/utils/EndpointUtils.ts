@@ -1,3 +1,4 @@
+import { Uri } from "vscode";
 export class EndpointUtils {
 
     public static getBaseUrl(tenantName: string): string {
@@ -21,10 +22,5 @@ export class EndpointUtils {
     public static getV3Url(tenantName: string): string {
         const baseApiUrl = this.getBaseUrl(tenantName);
         return baseApiUrl + '/v3';
-    }
-
-    public static getBetaUrl(tenantName: string): string {
-        const baseApiUrl = this.getBaseUrl(tenantName);
-        return baseApiUrl + '/beta';
     }
 }
