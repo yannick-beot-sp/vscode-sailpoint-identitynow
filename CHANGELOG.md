@@ -12,6 +12,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Changed
 - Support recent enhancements to role assignment criteria (cf. (cf. [#119](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/120119))
+- Include `input` in the template for lookup transform
 
 ### Fixed
 

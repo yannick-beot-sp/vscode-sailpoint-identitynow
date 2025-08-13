@@ -204,9 +204,9 @@
             "tr-lookup"
         ],
         "body": [
-            "{\n    \"type\": \"lookup\",\n    \"attributes\": {\n        \"table\": {\n            \"$1\": \"$2\",\n            \"default\": \"\"\n        }\n    }\n}"
+            "{\n    \"type\": \"lookup\",\n    \"attributes\": {\n        \"table\": {\n            \"$1\": \"$2\",\n            \"default\": \"\"\n        },\n        \"input\": $0\n    }\n}"
         ],
-        "newtemplate": "{\n    \"type\": \"lookup\",\n    \"attributes\": {\n        \"table\": {\n            \"\": \"\",\n            \"default\": \"\"\n        }\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
+        "newtemplate": "{\n    \"type\": \"lookup\",\n    \"attributes\": {\n        \"table\": {\n            \"\": \"\",\n            \"default\": \"\"\n        },\n        \"input\": \n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "A lookup transform takes in incoming string value and compares it to a list of key-value pairs to determine which output to return."
     },
     "Lower": {
