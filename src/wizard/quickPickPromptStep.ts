@@ -24,6 +24,8 @@ export interface QuickPickPromptStepOptions<WizardContext, T extends QuickPickIt
     storeString?: boolean;
 
     skipIfOne?: boolean;
+
+    shouldPrompt?: boolean | ((wizardContext: WizardContext) => boolean)
 }
 
 export class QuickPickPromptStep<WizardContext, T extends QuickPickItem> extends WizardPromptStep<WizardContext> {
@@ -59,6 +61,16 @@ export class QuickPickPromptStep<WizardContext, T extends QuickPickItem> extends
         this._skipIfOne = quickPickPromptStepOptions.skipIfOne ?? false;
         if (this._storeString && !this._project) {
             this._project = (x: T) => { return x.label; };
+        }
+
+        if (quickPickPromptStepOptions.shouldPrompt !== undefined) {
+            if (typeof quickPickPromptStepOptions.shouldPrompt === "boolean") {
+                // @ts-ignore
+                this.shouldPrompt = () => { return quickPickPromptStepOptions.shouldPrompt }
+            } else {
+
+                this.shouldPrompt = quickPickPromptStepOptions.shouldPrompt
+            }
         }
     }
 

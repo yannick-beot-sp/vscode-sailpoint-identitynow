@@ -121,6 +121,10 @@
         "title": "Generate a digit token for password reset..."
       },
       {
+        "command": "vscode-sailpoint-identitynow.tenant.email-settings",
+        "title": "Edit email settings..."
+      },
+      {
         "command": "vscode-sailpoint-identitynow.export-config.view",
         "title": "Export config...",
         "icon": "$(export)"
@@ -696,6 +700,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.tenant.email-settings",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.export-config.view",
           "when": "never"
         },
@@ -1146,6 +1154,10 @@
           "command": "vscode-sailpoint-identitynow.tenant.generate-digit-token",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^tenant/",
           "group": "password"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.tenant.email-settings",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^tenant/"
         },
         {
           "command": "vscode-sailpoint-identitynow.export-config.view",

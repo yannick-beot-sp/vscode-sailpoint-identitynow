@@ -113,6 +113,7 @@ export const EDIT_PUBLIC_IDENTITIES_CONFIG = `${COMMAND_PREFIX}.tenant.edit.publ
 export const EDIT_ACCESS_REQUEST_CONFIG = `${COMMAND_PREFIX}.tenant.edit.access-request-config`;
 export const EDIT_PASSWORD_ORG_CONFIG = `${COMMAND_PREFIX}.tenant.edit.password-org-config`;
 export const GENERATE_DIGIT_TOKEN = `${COMMAND_PREFIX}.tenant.generate-digit-token`;
+export const EMAIL_SETTINGS = `${COMMAND_PREFIX}.tenant.email-settings`;
 
 //Search Attribute
 export const NEW_SEARCH_ATTRIBUTE = `${COMMAND_PREFIX}.new-attribute-search.view`;

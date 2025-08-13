@@ -19,6 +19,7 @@ import { DEFAULT_ROLES_QUERY_PARAMS } from "../models/Roles";
 // import axiosRetry = require("axios-retry");
 import { addQueryParams } from "../utils/UriUtils";
 import { onErrorResponse, onRequest, onResponse } from "./AxiosHandlers";
+import { EmailTestMode } from "../models/EmailTestMode";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const FormData = require('form-data');
@@ -2031,4 +2032,19 @@ export class ISCClient {
 	////////////////////////
 	//#endregion Identity Management
 	////////////////////////
+	
+	public async getEmailTestMode(): Promise<EmailTestMode> {
+		console.log("> getEmailTestMode");
+		return await this.getResource("/beta/notification-preferences/email-test-mode")
+	}
+
+	public async updateEmailTestMode(emailTestMode: boolean, emailTestAddress?: string): Promise<EmailTestMode> {
+		console.log("> updateEmailTestMode");
+
+		return await this.updateResource("/beta/notification-preferences/email-test-mode",
+			JSON.stringify({
+				emailTestMode, emailTestAddress
+			})
+		)
+	}
 }

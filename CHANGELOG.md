@@ -11,6 +11,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 ### Added
 
 - Add "Open in Web UI" command (cf. [#15](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/15))
+- Add "Edit email settings" command for a tenant
 
 ### Changed
 

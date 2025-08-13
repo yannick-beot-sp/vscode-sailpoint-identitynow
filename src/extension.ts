@@ -87,6 +87,7 @@ import { TenantInfo } from './models/TenantInfo';
 import { FolderTreeNode } from './models/TreeNode';
 import { isTenantReadonly } from './commands/validateTenantReadonly';
 import { OpenUrlCommand } from './commands/openUrlCommand';
+import { EmailSettingsCommand } from './commands/EmailSettingsCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -145,6 +146,12 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.GENERATE_DIGIT_TOKEN,
 			generateDigitTokenCommand.execute,
 			generateDigitTokenCommand));
+
+	const emailSettingsCommand = new EmailSettingsCommand(tenantService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EMAIL_SETTINGS,
+			emailSettingsCommand.execute,
+			emailSettingsCommand));
 
 	const iscTreeDataProvider = new ISCTreeDataProvider(context, tenantService);
 	context.subscriptions.push(
@@ -276,7 +283,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.OPEN_RESOURCE,
 			openResourceCommand.execute));
 
-			const openUrlCommand = new OpenUrlCommand();
+	const openUrlCommand = new OpenUrlCommand();
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.OPEN_URL,
 			openUrlCommand.execute));

@@ -29,7 +29,7 @@ export class QuickPickTenantStep extends QuickPickPromptStep<WizardContext, Tena
             }
 
             if (afterPrompt) {
-                afterPrompt(wizardContext)
+                await afterPrompt(wizardContext)
             }
         };
     }
