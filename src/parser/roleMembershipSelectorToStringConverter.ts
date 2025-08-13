@@ -70,8 +70,16 @@ async function convertRoleCriteriaLevel3(
         const middle = RoleCriteriaKeyType.Entitlement === roleCriteriaLevel3.key.type ? "entitlement" : "attribute";
         left = `${EXPORT_QUOTE}${sourceName}${EXPORT_QUOTE}.${middle}.${attributeName}`;
     }
-
-    return `${left} ${comparisonOperationMapper(roleCriteriaLevel3.operation)} ${EXPORT_QUOTE}${roleCriteriaLevel3.stringValue}${EXPORT_QUOTE}`;
+    let operator = comparisonOperationMapper(roleCriteriaLevel3.operation);
+    /* Waiting for API update cf. https://github.com/sailpoint-oss/developer.sailpoint.com/issues/867
+    /* @ts-ignore */
+    if (operator === "eq" && roleCriteriaLevel3.values && roleCriteriaLevel3.values.length > 1) {
+        /* @ts-ignore */
+        return `${left} in (${roleCriteriaLevel3.values.map(v => `${EXPORT_QUOTE}${v}${EXPORT_QUOTE}`).join(",")})`
+    }
+    /* @ts-ignore */
+    const value = roleCriteriaLevel3.stringValue ?? roleCriteriaLevel3.values?.[0]
+    return `${left} ${operator} ${EXPORT_QUOTE}${value}${EXPORT_QUOTE}`;
 }
 
 function comparisonOperationMapper(op: RoleCriteriaOperation): ComparisonOperation {
@@ -86,6 +94,22 @@ function comparisonOperationMapper(op: RoleCriteriaOperation): ComparisonOperati
             return "sw";
         case "ENDS_WITH":
             return "ew";
+        /* Waiting for API update cf. https://github.com/sailpoint-oss/developer.sailpoint.com/issues/867
+        /* @ts-ignore */
+        case "DOES_NOT_CONTAIN":
+            return "nc";
+        /* @ts-ignore */
+        case "GREATER_THAN_EQUALS":
+            return "ge";
+        /* @ts-ignore */
+        case "GREATER_THAN":
+            return "gt";
+        /* @ts-ignore */
+        case "LESS_THAN":
+            return "lt";
+        /* @ts-ignore */
+        case "LESS_THAN_EQUALS":
+            return "le";
         default:
             throw new Error("Invalid operation");
     }

@@ -6,6 +6,7 @@ import { Attribute, ComparisonOperation, ComparisonOperator, Expression, Literal
 function comparisonOperationMapper(op: ComparisonOperation): RoleCriteriaOperation {
     switch (op) {
         case "eq":
+        case "in":
             return "EQUALS";
         case "ne":
             return "NOT_EQUALS";
@@ -15,6 +16,22 @@ function comparisonOperationMapper(op: ComparisonOperation): RoleCriteriaOperati
             return "STARTS_WITH";
         case "ew":
             return "ENDS_WITH";
+        case "nc":
+            /* Waiting for API update cf. https://github.com/sailpoint-oss/developer.sailpoint.com/issues/867
+            /* @ts-ignore */
+            return "DOES_NOT_CONTAIN";
+        case "ge":
+            /* @ts-ignore */
+            return "GREATER_THAN_EQUALS";
+        case "gt":
+            /* @ts-ignore */
+            return "GREATER_THAN";
+        case "lt":
+            /* @ts-ignore */
+            return "LESS_THAN";
+        case "le":
+            /* @ts-ignore */
+            return "LESS_THAN_EQUALS";
         default:
             throw new Error("Invalid operation");
     }
@@ -64,7 +81,9 @@ export class RoleMembershipSelectorConverter implements Visitor<RoleCriteriaLeve
     }
 
     visitLiteral(val: Literal, arg: RoleCriteriaLevel1): void | Promise<void> {
-        arg.stringValue = val.value;
+        // cf. https://github.com/sailpoint-oss/developer.sailpoint.com/issues/867
+        // @ts-ignore
+        arg.values = val.values;
     }
 
     async visitComparisonOperator(val: ComparisonOperator, arg: RoleCriteriaLevel1): Promise<void> {

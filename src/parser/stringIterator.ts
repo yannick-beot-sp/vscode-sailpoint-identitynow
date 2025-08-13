@@ -1,4 +1,5 @@
 import { ParseException } from "../errors";
+import { isEmpty } from "../utils/stringUtils";
 
 
 export const END_OF_STRING = '\0';
@@ -15,15 +16,15 @@ export function isQuote(char: string) {
 }
 
 export class StringIterator {
-    private currentIndex = 0;
+    private _currentIndex = 0;
 
     constructor(private readonly str) {
 
     }
 
     public advance(): string {
-        this.currentIndex++;
-        if (this.currentIndex >= this.str.length) {
+        this._currentIndex++;
+        if (this._currentIndex >= this.str.length) {
             return END_OF_STRING;
         }
         return this.current;
@@ -39,7 +40,7 @@ export class StringIterator {
         }
     }
 
-    public readToken() {
+    public readToken(): string {
         this.skipSpace();
         if (isQuote(this.current)) {
             this.advance(); // skipping quote
@@ -47,7 +48,7 @@ export class StringIterator {
             this.advance(); // skipping quote
             return token;
         } else {
-            return this.moveTo("[ \t.]", false);
+            return this.moveTo("[ \t.()]", false);
         }
     }
 
@@ -67,11 +68,38 @@ export class StringIterator {
         return result;
     }
 
+    public moveToClosingParenthesis(): string {
+        let parenthesisToClose = 1;
+        const startIndex = this._currentIndex
+        while (true) {
+            this.readToken()
+
+            if (this.current === '.' || isSpace(this.current)) {
+                this.advance()
+            } else if (this.current === ')') {
+                parenthesisToClose--
+                if (parenthesisToClose === 0) {
+                    // Don't add the latest parenthesis
+                    return this.str.substring(startIndex, this._currentIndex);
+                }
+                this.advance()
+            } else if (this.current === '(') {
+                parenthesisToClose++
+                this.advance()
+            } else if (this.current === END_OF_STRING) {
+                throw new ParseException("No matching parenthesis found");
+            }
+        }
+
+
+    }
+
     get current() {
-        if (this.currentIndex > this.str.length) {
+        if (this._currentIndex > this.str.length) {
             throw new ParseException("End of string reached");
         }
-        return this.str[this.currentIndex];
+        return this.str[this._currentIndex];
     }
-    get peep() { return this.str[this.currentIndex + 1]; }
+
+    get peep() { return this.str[this._currentIndex + 1]; }
 }

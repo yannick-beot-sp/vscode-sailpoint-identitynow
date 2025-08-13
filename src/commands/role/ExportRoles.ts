@@ -187,11 +187,27 @@ class RoleExporter extends BaseCSVExporter<Role> {
                 if (item.membership !== undefined && item.membership !== null
                     && RoleMembershipSelectorType.Standard === item.membership.type
                 ) {
-                    membershipCriteria = await roleMembershipSelectorToStringConverter(
-                        item.membership.criteria, sourceIdToNameCacheService);
+                    try {
+                        membershipCriteria = await roleMembershipSelectorToStringConverter(
+                            item.membership.criteria, sourceIdToNameCacheService);
+                    } catch (error) {
+                        console.warn(`Error converting membership criteria for role "${item.name}:"`, error);
+                    }
+                }
+                let owner: string | undefined = undefined;
+                try {
+                    owner =  item.owner ? (await identityCacheIdToName.get(item.owner.id!)) : null
+                } catch (error) {
+                    console.warn(`Error converting owner identity "${item.owner.id}" for role "${item.name}:"`, error);
                 }
 
-                const owner = item.owner ? (await identityCacheIdToName.get(item.owner.id!)) : null
+                let entitlements: string | undefined = undefined;
+                try {
+                    entitlements = (item.entitlements ? (await entitlementToStringConverter(item.entitlements, entitlementIdToSourceNameCacheService)) : null);
+                } catch (error) {
+                    console.warn(`Error converting entitlements for role "${item.name}:"`, error);
+                }
+
                 const itemDto: RoleDto = {
                     name: item.name,
                     // Escape carriage returns in description.
@@ -200,7 +216,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
                     requestable: item.requestable,
                     owner: owner,
                     accessProfiles: item.accessProfiles?.map(x => x.name).join(CSV_MULTIVALUE_SEPARATOR),
-                    entitlements: (item.entitlements ? (await entitlementToStringConverter(item.entitlements, entitlementIdToSourceNameCacheService)) : null),
+                    entitlements,
                     accessRequestConfig: {
                         commentsRequired: item.accessRequestConfig?.commentsRequired ?? false,
                         denialCommentsRequired: item.accessRequestConfig?.denialCommentsRequired ?? false,

@@ -11,6 +11,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 ### Added
 
 ### Changed
+- Support recent enhancements to role assignment criteria (cf. (cf. [#119](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/120119))
 
 ### Fixed
 

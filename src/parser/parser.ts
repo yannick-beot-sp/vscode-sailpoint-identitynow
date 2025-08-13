@@ -2,6 +2,8 @@ import { RoleCriteriaKeyType } from "sailpoint-api-client";
 import { ParseException } from "../errors";
 import { Attribute, ComparisonOperation, ComparisonOperator, Expression, Literal, LogicalOperation, LogicalOperator, isComparisonOperation, isLogicalOperation } from "./ast";
 import { END_OF_STRING, StringIterator, isSpace } from "./stringIterator";
+import { isNotEmpty } from "../utils/stringUtils";
+import { parse as parseSync } from 'csv-parse/sync';
 
 export class Parser {
 
@@ -15,14 +17,14 @@ export class Parser {
 
             if (current === '(') {
                 stringIterator.advance(); // skip '('
-                const expStr = stringIterator.moveTo('\\)');
+                const expStr = stringIterator.moveToClosingParenthesis();
                 children.push(this.parse(expStr.trim()));
             } else if (!isSpace(current)) {
                 const token = stringIterator.readToken();
 
                 if (isLogicalOperation(token)) {
                     const currentOperator = token.toLowerCase() === "and" ? "AND" : "OR";
-                    if (operator !== undefined && operator !== currentOperator){
+                    if (operator !== undefined && operator !== currentOperator) {
                         throw new ParseException("All operators should be either \"and\" or \"or\"");
                     }
                     operator = currentOperator;
@@ -74,7 +76,7 @@ export class Parser {
         const op = this.parseComparisonOperation(stringIterator);
 
         const value = this.parseLiteral(stringIterator);
-        
+
         return new ComparisonOperator(
             op,
             Attribute.fromSourceBased(sourceName, type, attributeName),
@@ -98,7 +100,7 @@ export class Parser {
         this.checkDot(stringIterator);
 
         const identityAttribute = stringIterator.readToken();
-        const op = this.parseComparisonOperation(stringIterator);
+        let op = this.parseComparisonOperation(stringIterator);
         const value = this.parseLiteral(stringIterator);
         return new ComparisonOperator(
             op,
@@ -117,7 +119,67 @@ export class Parser {
     }
 
     private parseLiteral(stringIterator: StringIterator): Literal {
-        const value = stringIterator.readToken();
-        return new Literal(value);
+        let value = stringIterator.readToken();
+        // Used with operation ("in")
+        if (isNotEmpty(value)) {
+            return new Literal(value);
+        }
+        if (stringIterator.current !== "(") {
+            throw new ParseException(`Invalid charater ${stringIterator.current}. Expecting '('`);
+        }
+        stringIterator.advance()
+        const valuesStr = stringIterator.moveToClosingParenthesis()
+        const values = this.parseCSVString(valuesStr);
+        return new Literal(values);
     }
+    private parseCSVString(input: string): string[] {
+        const result: string[] = [];
+        let current = '';
+        let inQuotes = false;
+        let quoteChar: string | null = null;
+
+        for (let i = 0; i < input.length; i++) {
+            const char = input[i];
+
+            if (!inQuotes) {
+                // Not inside quotes
+                if (char === '"' || char === "'") {
+                    // Start of quoted value
+                    inQuotes = true;
+                    quoteChar = char;
+                } else if (char === ',') {
+                    // End of current value
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    // Regular character
+                    current += char;
+                }
+            } else {
+                // Inside quotes
+                if (char === quoteChar) {
+                    // Check for escaped quote (double quote)
+                    if (i + 1 < input.length && input[i + 1] === quoteChar) {
+                        // Escaped quote - add one quote to current and skip next
+                        current += char;
+                        i++; // Skip the next quote
+                    } else {
+                        // End of quoted value
+                        inQuotes = false;
+                        quoteChar = null;
+                    }
+                } else {
+                    // Regular character inside quotes
+                    current += char;
+                }
+            }
+        }
+
+        // Add the last value
+        result.push(current.trim());
+
+        return result;
+    }
+
+
 }

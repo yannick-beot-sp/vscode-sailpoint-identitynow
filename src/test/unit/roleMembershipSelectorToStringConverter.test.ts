@@ -98,13 +98,17 @@ suite('await roleMembershipSelectorToStringConverter Test Suite', () => {
                                 "stringValue": "CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com",
                             },
                             {
-                                "operation": "EQUALS",
+                                //@ts-ignore
+                                "operation": "GREATER_THAN",
                                 "key": {
                                     "type": "ACCOUNT",
                                     "property": "attribute.departmentNumber",
                                     "sourceId": "6ba6925ebc1a4e5d98ca6fd3fc542ea4"
                                 },
-                                "stringValue": "1234",
+                                //@ts-ignore
+                                "values": [
+                                    "1234"
+                                ]
                             },
                         ]
                     }
@@ -113,7 +117,7 @@ suite('await roleMembershipSelectorToStringConverter Test Suite', () => {
 
             const result = await roleMembershipSelectorToStringConverter(roleCriteria3, cache);
 
-            const expected = "'Active Directory'.entitlement.memberOf eq 'CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com' and 'Active Directory'.attribute.departmentNumber eq '1234'";
+            const expected = "'Active Directory'.entitlement.memberOf eq 'CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com' and 'Active Directory'.attribute.departmentNumber gt '1234'";
 
             assert.deepEqual(result, expected);
 
@@ -231,6 +235,78 @@ suite('await roleMembershipSelectorToStringConverter Test Suite', () => {
             const result = await roleMembershipSelectorToStringConverter(roleCriteria4, cache);
 
             const expected = "('Active Directory'.entitlement.ProfileId eq '00e1i000000eM2qAAE') or (identity.cloudLifecycleState eq 'active' and identity.usertype eq 'External')";
+
+            assert.deepEqual(result, expected);
+        });
+
+    });
+
+    describe('conversion with new operators', async () => {
+        it("should parse an expression and convert it", async () => {
+            const roleCriteria5: RoleCriteriaLevel1 = {
+                "operation": "OR",
+                "children": [
+                    {
+                        "operation": "AND",
+                        "children": [
+                            {
+                                "operation": "EQUALS",
+                                "key": {
+                                    "type": "IDENTITY",
+                                    "property": "attribute.department",
+                                    sourceId: undefined
+                                },
+                                //@ts-ignore
+                                "values": [
+                                   "Customer Service",
+                                   "Accounting"
+                                ]
+                                
+                            },
+                            {
+                                "operation": "EQUALS",
+                                "key": {
+                                    "type": "IDENTITY",
+                                    "property": "attribute.cloudLifecycleState",
+                                    "sourceId": undefined
+                                },
+                                "stringValue": "active",
+                            },
+                        ]
+                    },
+                    {
+                        "operation": "AND",
+                        "children": [
+                            {
+                                "operation": "EQUALS",
+                                "key": {
+                                    "type": "IDENTITY",
+                                    "property": "attribute.cloudLifecycleState",
+                                    "sourceId": undefined
+                                },
+                                "stringValue": "active",
+                            },
+                            {
+                                //@ts-ignore
+                                "operation": "GREATER_THAN",
+                                "key": {
+                                    "type": "ACCOUNT",
+                                    "property": "attribute.departmentNumber",
+                                    "sourceId": "6ba6925ebc1a4e5d98ca6fd3fc542ea4"
+                                },
+                                //@ts-ignore
+                                "values": [
+                                    "1234"
+                                ]
+                            },
+                        ]
+                    }
+                ]
+            };
+
+            const result = await roleMembershipSelectorToStringConverter(roleCriteria5, cache);
+
+            const expected = "(identity.department in ('Customer Service','Accounting') and identity.cloudLifecycleState eq 'active') or (identity.cloudLifecycleState eq 'active' and 'Active Directory'.attribute.departmentNumber gt '1234')";
 
             assert.deepEqual(result, expected);
         });

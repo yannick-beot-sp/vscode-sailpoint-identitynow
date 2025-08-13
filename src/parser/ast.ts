@@ -41,7 +41,10 @@ export class Attribute implements Expression {
 }
 
 export class Literal implements Expression {
-    constructor(public readonly value: string) {
+    constructor(public readonly values: string|Array<string>) {
+        if (typeof values === 'string') {
+            this.values = [values]
+        }
     }
 
     public async accept<T>(v: Visitor<T>, arg: T): Promise<void> {
@@ -66,10 +69,10 @@ export class LogicalOperator implements Expression {
     }
 }
 
-export type ComparisonOperation = "eq" | "ne" | "co" | "sw" | "ew";
+export type ComparisonOperation = "eq" | "ne" | "co" | "sw" | "ew" | "nc" | "in" | "gt" | "ge" | "lt" | "le";
 
 export function isComparisonOperation(input: string) {
-    return /^(eq|ne|co|sw|ew)$/i.test(input);
+    return /^(eq|ne|co|sw|ew|nc|in|gt|ge|lt|le)$/i.test(input);
 }
 
 export class ComparisonOperator implements Expression {
