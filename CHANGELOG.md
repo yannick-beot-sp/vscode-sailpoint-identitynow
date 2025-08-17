@@ -12,6 +12,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 - Add "Open in Web UI" command (cf. [#15](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/15))
 - Add "Edit email settings" command for a tenant
+- New command to evaluate transform in the cloud (cf. [#32](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/32))
 
 ### Changed
 

@@ -7,6 +7,8 @@ import { QuickPickIdentityStep } from "../wizard/quickPickIdentityStep";
 import { runWizard } from "../wizard/wizard";
 import { WizardContext } from "../wizard/wizardContext";
 import * as commands from "./constants";
+import { TenantService } from '../services/TenantService';
+import { getIdByUri, getNameByUri } from '../utils/UriUtils';
 
 
 class CachedInputIdentityQueryStep extends InputPromptStep<WizardContext> {
@@ -30,19 +32,53 @@ const LBL_RETEST = "Test Again"
 export class EvaluateTransformCloudCommand {
     // Cache used so when we reevaluate, we have the possibility to reuse the previsous identity
     private _IdentityInputCache: Map<string, string>
-    constructor() {
+    constructor(private readonly tenantService: TenantService) {
         this._IdentityInputCache = new Map()
     }
 
-    async execute(node: TransformTreeItem): Promise<void> {
-        console.log("> EvaluateTransformCloudCommand.execute", node);
+    async executeFromTreeView(node: TransformTreeItem): Promise<void> {
+        console.log("> EvaluateTransformCloudCommand.executeFromTreeView", node);
+
+
+        await this.execute({
+            tenantId: node.tenantId,
+            tenantName: node.tenantName,
+            transformId: node.id,
+            transformName: node.label as string
+        })
+
+    }
+
+    async executeFromEditor(): Promise<void> {
+        console.log("> EvaluateTransformCloudCommand.executeFromEditor");
+
+
+        const editor = vscode.window.activeTextEditor;
+        if (editor) {
+
+            const tenantName = editor.document.uri.authority ?? "";
+            const tenantInfo = await this.tenantService.getTenantByTenantName(tenantName);
+            const tenantId = tenantInfo?.id ?? "";
+            const transformId = getIdByUri(editor?.document.uri)
+            const transformName = getNameByUri(editor?.document.uri)
+            await this.execute({
+                tenantId,
+                tenantName,
+                transformId,
+                transformName
+            })
+        }
+    }
+
+    private async execute(options: { tenantId: string; tenantName: string; transformId: string, transformName: string }): Promise<void> {
+
+        const { tenantId, tenantName, transformId, transformName } = options
+
         const context: WizardContext = {
-            identityQuery: this._IdentityInputCache.get(node.id)
+            identityQuery: this._IdentityInputCache.get(transformId)
         };
 
-        let client = new ISCClient(
-            node.tenantId, node.tenantName)
-
+        let client = new ISCClient(tenantId, tenantName)
 
         const values = await runWizard({
             title: "Evaluate transform",
@@ -58,19 +94,18 @@ export class EvaluateTransformCloudCommand {
                 )
             ]
         }, context);
-
-
         if (values === undefined) { return; }
+
         const targetIdentity = values["identity"]
-        this._IdentityInputCache.set(node.id, targetIdentity.name) // storing the identity for next time
+        // storing the identity for next time
+        this._IdentityInputCache.set(transformId, targetIdentity.name) 
 
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
-            title: `Evaluating ${node.label} for ${targetIdentity.name}...`,
+            title: `Evaluating ${transformName} for ${targetIdentity.name}...`,
             cancellable: false
         }, async () => {
             const identityId = targetIdentity.id
-            const transformName = node.label
 
             return await client.getIdentityPreview(
                 identityId,
@@ -88,19 +123,23 @@ export class EvaluateTransformCloudCommand {
         }).then(async (result) => {
             const attr = result?.previewAttributes?.find(x => x.name === IDENTITY_ATTRIBUTE)
             if (!attr?.errorMessages) {
-                return await vscode.window.showInformationMessage(`${node.label} = ${attr.value}`, LBL_RETEST);
+                return await vscode.window.showInformationMessage(`${transformName} = ${attr.value}`, LBL_RETEST);
             } else {
                 return await vscode.window.showErrorMessage(
-                    `Could not evaluate ${node.label}: ` + attr.errorMessages.map(x => x.text).join(", "),
+                    `Could not evaluate ${transformName}: ` + attr.errorMessages.map(x => x.text).join(", "),
                     LBL_RETEST)
             }
         }).then((label) => {
             if (LBL_RETEST === label) {
-                vscode.commands.executeCommand(commands.EVALUATE_TRANSFORM_CLOUD, node);
+                vscode.commands.executeCommand(commands.EVALUATE_TRANSFORM_CLOUD, new TransformTreeItem(
+                    tenantId, tenantName, "", transformName, transformId
+                ));
             }
         })
 
     }
+
+
 
 
 }

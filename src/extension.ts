@@ -170,9 +170,11 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM_EDITOR, transformEvaluator.evaluate, transformEvaluator));
 
-	const evaluateTransformCloudCommand = new EvaluateTransformCloudCommand();
+	const evaluateTransformCloudCommand = new EvaluateTransformCloudCommand(tenantService);
 	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM_CLOUD, evaluateTransformCloudCommand.execute, evaluateTransformCloudCommand));
+		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM_CLOUD, evaluateTransformCloudCommand.executeFromTreeView, evaluateTransformCloudCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM_CLOUD_EDITOR, evaluateTransformCloudCommand.executeFromEditor, evaluateTransformCloudCommand));
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.REMOVE_TENANT,

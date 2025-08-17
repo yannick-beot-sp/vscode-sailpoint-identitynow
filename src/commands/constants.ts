@@ -55,6 +55,7 @@ export const NEW_SCHEMA = `${COMMAND_PREFIX}.new-schema`;
 export const EVALUATE_TRANSFORM = `${COMMAND_PREFIX}.transform.evaluate`;
 export const EVALUATE_TRANSFORM_EDITOR = `${COMMAND_PREFIX}.transform.evaluate.editor`;
 export const EVALUATE_TRANSFORM_CLOUD = `${COMMAND_PREFIX}.transform.evaluate.cloud`;
+export const EVALUATE_TRANSFORM_CLOUD_EDITOR = `${COMMAND_PREFIX}.transform.evaluate.cloud.editor`;
 export const ENABLE_WORKFLOW = `${COMMAND_PREFIX}.workflow.enable`;
 export const DISABLE_WORKFLOW = `${COMMAND_PREFIX}.workflow.disable`;
 export const EXPORT_WORKFLOW = `${COMMAND_PREFIX}.workflow.export`;
