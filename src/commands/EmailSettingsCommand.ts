@@ -10,8 +10,7 @@ import { QuickPickTenantStep } from '../wizard/quickPickTenantStep';
 import { IWizardOptions } from '../wizard/wizardOptions';
 import { WizardPromptStep } from '../wizard/wizardPromptStep';
 import { InputPromptStep } from '../wizard/inputPromptStep';
-import { emailValidator } from '../validator/EmailValidator';
-
+import { emailValidator } from '../validator/emailValidator';
 
 type EmailSettingChoice = vscode.QuickPickItem & { emailTestMode: boolean }
 

@@ -88,6 +88,7 @@ import { FolderTreeNode } from './models/TreeNode';
 import { isTenantReadonly } from './commands/validateTenantReadonly';
 import { OpenUrlCommand } from './commands/openUrlCommand';
 import { EmailSettingsCommand } from './commands/EmailSettingsCommand';
+import { EvaluateTransformCloudCommand } from './commands/EvaluateTransformCloudCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -166,9 +167,12 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const transformEvaluator = new TransformEvaluator(tenantService);
 	const treeManager = new TreeManager(tenantService, transformEvaluator);
-
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM_EDITOR, transformEvaluator.evaluate, transformEvaluator));
+
+	const evaluateTransformCloudCommand = new EvaluateTransformCloudCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM_CLOUD, evaluateTransformCloudCommand.execute, evaluateTransformCloudCommand));
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.REMOVE_TENANT,

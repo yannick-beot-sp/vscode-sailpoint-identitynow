@@ -1,33 +1,33 @@
-export const ATTRIBUTES:any = {
-    'accountAttribute': { 
+export const ATTRIBUTES: any = {
+    'accountAttribute': {
         'required': ['sourceName', 'attributeName'],
         'optional': ['requiresPeriodicRefresh', 'accountSortAttribute', 'accountSortDescending', 'accountReturnFirstLink', 'accountFilter', 'accountPropertyFilter']
     },
-    'base64Decode': { 
+    'base64Decode': {
         'required': [],
         'optional': ['requiresPeriodicRefresh', 'input']
     },
-    'base64Encode': { 
+    'base64Encode': {
         'required': [],
         'optional': ['requiresPeriodicRefresh', 'input']
     },
-    'concat': { 
+    'concat': {
         'required': ['values'],
         'optional': ['requiresPeriodicRefresh']
     },
-    'conditional': { 
+    'conditional': {
         'required': ['expression', 'positiveCondition', 'negativeCondition'],
         'optional': ['requiresPeriodicRefresh']
     },
-    'dateCompare': { 
+    'dateCompare': {
         'required': ['firstDate', 'secondDate', 'operator', 'positiveCondition', 'negativeCondition'],
         'optional': ['requiresPeriodicRefresh']
     },
-    'dateFormat': { 
+    'dateFormat': {
         'required': [],
         'optional': ['requiresPeriodicRefresh', 'inputFormat', 'outputFormat', 'input']
     },
-    'dateMath': { 
+    'dateMath': {
         'required': ['expression'],
         'optional': ['requiresPeriodicRefresh', 'roundUp', 'input']
     },

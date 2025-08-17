@@ -379,11 +379,15 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.transform.evaluate",
-        "title": "Evaluate"
+        "title": "Evaluate locally..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.transform.evaluate.cloud",
+        "title": "Preview..."
       },
       {
         "command": "vscode-sailpoint-identitynow.transform.evaluate.editor",
-        "title": "Evaluate this transform..."
+        "title": "Evaluate this transform locally..."
       },
       {
         "command": "vscode-sailpoint-identitynow.new-connector-rule",
@@ -876,6 +880,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.transform.evaluate.cloud",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.identity-profile.refresh",
           "when": "never"
         },
@@ -1320,6 +1328,11 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.transform.evaluate",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == transform",
+          "group": "transform"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.transform.evaluate.cloud",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == transform",
           "group": "transform"
         },

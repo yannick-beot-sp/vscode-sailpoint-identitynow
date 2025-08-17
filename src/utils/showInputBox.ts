@@ -3,14 +3,20 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { Disposable, InputBox, QuickInputButton, QuickInputButtons, Uri, env, window } from 'vscode';
+import { Disposable, InputBox, InputBoxOptions, QuickInputButton, QuickInputButtons, Uri, env, window } from 'vscode';
 import { GoBackError, UserCancelledError } from '../errors';
 import { Wizard } from '../wizard/wizard';
 import { LearnMore } from '../wizard/LearnMoreButton';
 import { ExtInputBoxOptions } from '../wizard/ExtInputBoxOptions';
 import { isNotEmpty } from './stringUtils';
+import { Validator } from '../validator/validator';
 
-export type InputBoxValidationResult = Awaited<ReturnType<Required<ExtInputBoxOptions>['validateInput']>>;
+export type InputBoxValidationResult = Awaited<ReturnType<Required<InputBoxOptions>['validateInput']>>;
+
+
+type ValidateInputType = NonNullable<InputBoxOptions['validateInput']>;
+
+
 
 export async function showInputBox<T>(wizard: Wizard<T>, options: ExtInputBoxOptions): Promise<string> {
     const disposables: Disposable[] = [];
@@ -18,12 +24,22 @@ export async function showInputBox<T>(wizard: Wizard<T>, options: ExtInputBoxOpt
         const inputBox: InputBox = createInputBox(wizard, options);
         disposables.push(inputBox);
 
-        let latestValidation: Promise<InputBoxValidationResult> = options.validateInput ? Promise.resolve(options.validateInput(inputBox.value)) : Promise.resolve('');
+        const validateInput: ValidateInputType = (value: string) => {
+            if (options.validateInput === undefined) {
+                return ''
+            } else if (options.validateInput instanceof Validator) {
+                return options.validateInput.validate(value)
+            } else {
+                return options.validateInput(value)
+            }
+        }
+
+        let latestValidation: Promise<InputBoxValidationResult> = Promise.resolve(validateInput(inputBox.value))
         return await new Promise<string>((resolve, reject): void => {
             disposables.push(
                 inputBox.onDidChangeValue(async text => {
                     if (options.validateInput) {
-                        const validation: Promise<InputBoxValidationResult> = Promise.resolve(options.validateInput(text));
+                        const validation: Promise<InputBoxValidationResult> = Promise.resolve(validateInput(text));
                         latestValidation = validation;
                         const message: InputBoxValidationResult = await validation;
                         if (validation === latestValidation) {
@@ -90,10 +106,10 @@ function createInputBox<T>(wizard: Wizard<T>, options: ExtInputBoxOptions): Inpu
         options.ignoreFocusOut = true;
     }
 
-    const validateInput = options.validateInput;
-    if (validateInput) {
-        options.validateInput = async (v): Promise<InputBoxValidationResult> => await validateInput(v);
-    }
+    // const validateInput = options.validateInput;
+    // if (validateInput) {
+    //     options.validateInput = async (v): Promise<InputBoxValidationResult> => await validateInput(v);
+    // }
 
     if (!inputBox.password) {
         inputBox.value = wizard.getCachedInputBoxValue() || options.value || '';
