@@ -334,9 +334,9 @@
             "tr-sub"
         ],
         "body": [
-            "{\n    \"type\": \"substring\",\n    \"attributes\": {\n        \"begin\": {\n            \"type\": \"indexOf\",\n            \"attributes\": {\n                \"substring\": \"$1\"\n            }\n        },\n        \"beginOffset\": 1,\n        \"end\": {\n            \"type\": \"lastIndexOf\",\n            \"attributes\": {\n                \"substring\": \"$2\"\n            }\n        }\n    }\n}"
+            "{\n    \"type\": \"substring\",\n    \"attributes\": {\n        \"begin\": {\n            \"type\": \"indexOf\",\n            \"attributes\": {\n                \"substring\": \"$1\"\n            }\n        },\n        \"beginOffset\": 1,\n        \"end\": {\n            \"type\": \"lastIndexOf\",\n            \"attributes\": {\n                \"substring\": \"$2\"\n            }\n        },\n        \"input\": $0\n    }\n}"
         ],
-        "newtemplate": "{\n    \"type\": \"substring\",\n    \"attributes\": {\n        \"begin\": {\n            \"type\": \"indexOf\",\n            \"attributes\": {\n                \"substring\": \"\"\n            }\n        },\n        \"beginOffset\": 1,\n        \"end\": {\n            \"type\": \"lastIndexOf\",\n            \"attributes\": {\n                \"substring\": \"\"\n            }\n        }\n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
+        "newtemplate": "{\n    \"type\": \"substring\",\n    \"attributes\": {\n        \"begin\": {\n            \"type\": \"indexOf\",\n            \"attributes\": {\n                \"substring\": \"\"\n            }\n        },\n        \"beginOffset\": 1,\n        \"end\": {\n            \"type\": \"lastIndexOf\",\n            \"attributes\": {\n                \"substring\": \"\"\n            }\n        },\n        \"input\": \n    },\n    \"name\": \"{TRANSFORM_NAME}\"\n}",
         "description": "A substring transform can be used to get the inner portion of a string that is passed into the transform."
     },
     "Trim": {
