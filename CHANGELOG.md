@@ -10,19 +10,29 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
-- Add "Open in Web UI" command (cf. [#15](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/15))
-- Add "Edit email settings" command for a tenant
-- New command to evaluate transform in the cloud (cf. [#32](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/32))
-
 ### Changed
 
 ### Fixed
 
 ### Removed
 
+## [1.3.20] - 2025-08-17
+
+### Added
+
+- Add "Open in Web UI" command (cf. [#15](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/15))
+- Add "Edit email settings" command for a tenant
+- New command to evaluate transform in the cloud (cf. [#32](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/32))
+
+### Changed
+
+- Include `input` in the template for substring transform
+
+
 ## [1.3.19] - 2025-08-13
 
 ### Changed
+
 - Support recent enhancements to role assignment criteria (cf. [#119](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/119))
 - Include `input` in the template for lookup transform
 

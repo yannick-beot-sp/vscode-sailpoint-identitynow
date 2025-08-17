@@ -421,6 +421,13 @@ The extension supports the following settings:
 
 ### Unreleased
 
+### 1.3.20
+
+- Add "Open in Web UI" command (cf. [#15](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/15))
+- Add "Edit email settings" command for a tenant
+- New command to evaluate transform in the cloud (cf. [#32](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/32))
+- Include `input` in the template for substring transform
+
 ### 1.3.19
 
 - Issue with missing role entitlements from campaign status report by [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp) (cf. [#120](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/120))
