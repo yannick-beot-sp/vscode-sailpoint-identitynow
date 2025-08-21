@@ -12,6 +12,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Changed
 
+- Semantic errors do not display cause (cf. [#122](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/122))
+
 ### Fixed
 
 ### Removed

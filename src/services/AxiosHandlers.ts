@@ -53,6 +53,8 @@ export const onErrorResponse = async (error: AxiosError | Error, instance: Axios
                     }
                 } else if ('message' in data) {
                     errorMessage = data.message;
+                } else if ('causes' in data && data.causes.length > 0) {
+                    errorMessage = data.causes[0].text;
                 } else if ('messages' in data) {
                     errorMessage = data.messages[0].text;
                 } else if ('formatted_msg' in data) {
