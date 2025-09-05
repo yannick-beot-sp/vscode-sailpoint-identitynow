@@ -255,7 +255,8 @@ export const LOGGING_CLASSES = [
     {
         "connector": "Generic SDIM",
         "loggingClasses": [
-            "sailpoint.connector.OpenConnectorAdapter"
+            "openconnector.connector.servicedesk.ServiceDeskConnector",
+            "connector.sdk.webservices"
         ]
     },
     {
