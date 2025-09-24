@@ -12,12 +12,16 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Changed
 
-- Semantic errors do not display cause (cf. [#122](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/122))
-- When exporting lifecycle states in multiple files, the name of the lifecycle state is prefixed with the name of the identity profile
-
 ### Fixed
 
 ### Removed
+
+## [1.3.21] - 2025-09-24
+
+### Changed
+
+- Semantic errors do not display cause (cf. [#122](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/122))
+- When exporting lifecycle states in multiple files, the name of the lifecycle state is prefixed with the name of the identity profile
 
 ## [1.3.20] - 2025-08-17
 

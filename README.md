@@ -421,6 +421,11 @@ The extension supports the following settings:
 
 ### Unreleased
 
+### 1.3.21
+
+- Semantic errors do not display cause (cf. [#122](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/122))
+- When exporting lifecycle states in multiple files, the name of the lifecycle state is prefixed with the name of the identity profile
+
 ### 1.3.20
 
 - Add "Open in Web UI" command (cf. [#15](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/15))
