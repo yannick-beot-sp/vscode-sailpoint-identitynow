@@ -75,6 +75,11 @@ export class SPConfigExporter {
         } else {
             for (let obj of data.objects) {
                 let name = obj.self.name
+
+                if (!name) {
+                    continue
+                }
+
                 // names for lifecycle state are not unique. Need to prefix with identity profile name
                 if ("LIFECYCLE_STATE" === obj.self.type) {
                     name = `${obj.object.identityProfileRef.name}_${name}`

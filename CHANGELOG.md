@@ -16,6 +16,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Fixed
 
+- Issue Attribute Sync Config export in multiple files if the source have been deleted (cf. [#123](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/123))
+
 ### Removed
 
 ## [1.3.21] - 2025-09-24
