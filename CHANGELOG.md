@@ -10,6 +10,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- Command to clone a transform
+
 ### Changed
 
 - Cloning a source now clones the encrypted credentials.

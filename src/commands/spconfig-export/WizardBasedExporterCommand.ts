@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
 
-import { EXPORTABLE_OBJECT_TYPE_ITEMS, ExportableObjectTypeQuickPickItem } from '../../models/ObjectTypeQuickPickItem';
+import { EXPORTABLE_OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
 import { askChosenItems, askFile, askFolder, askSelectObjectTypes, openPreview } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
 import { ISCClient } from '../../services/ISCClient';
 import { SPConfigExporter } from './SPConfigExporter';
 import { ExportPayloadBetaIncludeTypesBeta, ObjectExportImportOptionsBeta } from 'sailpoint-api-client';
-import { SimpleSPConfigExporter } from '../source/CloneSourceCommand';
+import { SimpleSPConfigExporter } from './SimpleSPConfigExporter';
 
 const ALL: vscode.QuickPickItem = {
     label: "Export everything",

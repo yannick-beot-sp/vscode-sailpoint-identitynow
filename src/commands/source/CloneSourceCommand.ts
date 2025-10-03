@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { TenantService } from '../../services/TenantService';
-import { SourceTreeItem, SourcesTreeItem } from '../../models/ISCTreeItem';
+import { SourceTreeItem } from '../../models/ISCTreeItem';
 import { WizardContext } from '../../wizard/wizardContext';
 import { ISCClient } from '../../services/ISCClient';
 import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
@@ -8,12 +8,12 @@ import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep';
 import { runWizard } from '../../wizard/wizard';
 import { Validator } from '../../validator/validator';
 import { InputPromptStep } from '../../wizard/inputPromptStep';
-import { ExportPayloadBetaIncludeTypesBeta, ObjectExportImportOptionsBeta, SpConfigExportResultsBeta } from 'sailpoint-api-client';
-import { delay } from '../../utils';
+import { ExportPayloadBetaIncludeTypesBeta } from 'sailpoint-api-client';
 import crypto = require('crypto');
 import { SPConfigImporter } from '../spconfig-import/SPConfigImporter';
 import * as commands from '../constants';
 import { join } from 'path';
+import { SimpleSPConfigExporter } from '../spconfig-export/SimpleSPConfigExporter';
 
 const sourceNameValidator = new Validator({
     required: true,
@@ -21,62 +21,6 @@ const sourceNameValidator = new Validator({
     regexp: '^[A-Za-z0-9 _:;,={}@()#-|^%$!?.*]+$'
 });
 
-/**
- * Simplified version of SPConfigExporter
- */
-export class SimpleSPConfigExporter {
-    constructor(
-        private client: ISCClient,
-        private readonly tenantDisplayName: string,
-        private readonly options: {
-            [key: string]: ObjectExportImportOptionsBeta;
-        },
-        private objectTypes: ExportPayloadBetaIncludeTypesBeta[] = []
-    ) {
-    }
-
-    /**
-     * Will display a progress bar for the export
-     */
-    public async exportConfigWithProgression(): Promise<SpConfigExportResultsBeta | null> {
-
-
-        const data = await vscode.window.withProgress({
-            location: vscode.ProgressLocation.Notification,
-            title: `Exporting configuration from ${this.tenantDisplayName}...`,
-            cancellable: false
-        }, async (task, token) => {
-            return await this.exportConfig(task, token);
-        });
-        return data;
-    }
-
-    private async exportConfig(task: any, token: vscode.CancellationToken): Promise<SpConfigExportResultsBeta | null> {
-
-        const jobId = await this.client.startExportJob(
-            this.objectTypes,
-            this.options);
-
-        let jobStatus: any;
-        do {
-            if (token.isCancellationRequested) {
-                return null;
-            }
-            await delay(1000);
-            jobStatus = await this.client.getExportJobStatus(jobId);
-            console.log({ jobStatus });
-        } while (jobStatus.status === "NOT_STARTED" || jobStatus.status === "IN_PROGRESS");
-
-        if (jobStatus.status !== "COMPLETE") {
-            throw new Error("Could not export config: " + jobStatus.message);
-        }
-        if (token.isCancellationRequested) {
-            return null;
-        }
-        const data = await this.client.getExportJobResult(jobId);
-        return data;
-    }
-}
 
 
 

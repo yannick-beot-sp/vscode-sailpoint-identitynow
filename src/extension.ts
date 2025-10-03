@@ -89,6 +89,7 @@ import { isTenantReadonly } from './commands/validateTenantReadonly';
 import { OpenUrlCommand } from './commands/openUrlCommand';
 import { EmailSettingsCommand } from './commands/EmailSettingsCommand';
 import { EvaluateTransformCloudCommand } from './commands/EvaluateTransformCloudCommand';
+import { CloneTransformCommand } from './commands/CloneTransformCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -170,12 +171,6 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM_EDITOR, transformEvaluator.evaluate, transformEvaluator));
 
-	const evaluateTransformCloudCommand = new EvaluateTransformCloudCommand(tenantService);
-	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM_CLOUD, evaluateTransformCloudCommand.executeFromTreeView, evaluateTransformCloudCommand));
-	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM_CLOUD_EDITOR, evaluateTransformCloudCommand.executeFromEditor, evaluateTransformCloudCommand));
-
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.REMOVE_TENANT,
 			(tenantTreeItem) => treeManager.removeTenant(tenantTreeItem)));
@@ -244,9 +239,6 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.ENABLE_LOGGING_PALETTE,
 			enableLoggingCommand.execute, enableLoggingCommand));
 
-	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM,
-			(tenantTreeItem) => treeManager.evaluateTransform(tenantTreeItem)));
 
 	const accountImportNodeCommand = new AccountImportNodeCommand(tenantService);
 	context.subscriptions.push(
@@ -388,6 +380,25 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.NEW_TRANSFORM,
 			newTransformCommand.execute, newTransformCommand));
+
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM,
+			(tenantTreeItem) => treeManager.evaluateTransform(tenantTreeItem)));
+
+	const evaluateTransformCloudCommand = new EvaluateTransformCloudCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM_CLOUD, evaluateTransformCloudCommand.executeFromTreeView, evaluateTransformCloudCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EVALUATE_TRANSFORM_CLOUD_EDITOR, evaluateTransformCloudCommand.executeFromEditor, evaluateTransformCloudCommand));
+
+	const cloneTransformCommand = new CloneTransformCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.CLONE_TRANSFORM,
+			cloneTransformCommand.execute, cloneTransformCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.CLONE_TRANSFORM_PALETTE,
+			cloneTransformCommand.execute, cloneTransformCommand));
 
 	const newProvisioningPolicyCommand = new NewProvisioningPolicyCommand(tenantService)
 	context.subscriptions.push(

@@ -46,7 +46,7 @@ export class SPConfigImporter {
                     .forEach((element) => {
                         // cf. https://github.com/sailpoint-oss/developer.sailpoint.com/issues/785
                         // @ts-ignore
-                        errors.push(element.details.exceptionMessage ?? element.text);
+                        errors.push(element.details?.exceptionMessage ?? element.detail?.exceptionMessage ?? element.text);
                     });
             }
 

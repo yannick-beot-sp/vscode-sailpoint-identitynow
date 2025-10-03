@@ -325,6 +325,14 @@
         "icon": "$(add)"
       },
       {
+        "command": "vscode-sailpoint-identitynow.transform.clone",
+        "title": "Clone transform"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.transform.clone.palette",
+        "title": "ISC: Clone transform..."
+      },
+      {
         "command": "vscode-sailpoint-identitynow.new-provisioning-policy",
         "title": "New provisioning policy",
         "icon": "$(add)"
@@ -338,11 +346,6 @@
         "command": "vscode-sailpoint-identitynow.workflow.enable",
         "title": "Enable",
         "icon": "$(debug-start)"
-      },
-      {
-        "command": "vscode-sailpoint-identitynow.workflow.test",
-        "title": "Test workflow...",
-        "icon": "$(test-view-icon)"
       },
       {
         "command": "vscode-sailpoint-identitynow.workflow.disable",
@@ -844,6 +847,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.transform.clone",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.new-provisioning-policy",
           "when": "never"
         },
@@ -859,10 +866,7 @@
           "command": "vscode-sailpoint-identitynow.workflow.disable",
           "when": "never"
         },
-        {
-          "command": "vscode-sailpoint-identitynow.workflow.test",
-          "when": "never"
-        },
+
         {
           "command": "vscode-sailpoint-identitynow.workflow.view-execution-history",
           "when": "never"
@@ -1330,12 +1334,12 @@
           "group": "workflow"
         },
         {
-          "command": "vscode-sailpoint-identitynow.workflow.test",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /XXX$/i",
-          "group": "workflow"
+          "command": "vscode-sailpoint-identitynow.transform.evaluate",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == transform",
+          "group": "transform"
         },
         {
-          "command": "vscode-sailpoint-identitynow.transform.evaluate",
+          "command": "vscode-sailpoint-identitynow.transform.clone",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == transform",
           "group": "transform"
         },

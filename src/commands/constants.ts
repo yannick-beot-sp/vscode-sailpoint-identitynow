@@ -49,19 +49,13 @@ export const RESET_SOURCE_ACCOUNTS = `${COMMAND_PREFIX}.reset-source-accounts`;
 export const RESET_SOURCE_ENTITLEMENTS = `${COMMAND_PREFIX}.reset-source-entitlements`;
 export const ENABLE_LOGGING = `${COMMAND_PREFIX}.enable-logging`;
 export const ENABLE_LOGGING_PALETTE = `${COMMAND_PREFIX}.enable-logging.palette`;
-export const NEW_TRANSFORM = `${COMMAND_PREFIX}.new-transform`;
 export const NEW_PROVISIONING_POLICY = `${COMMAND_PREFIX}.new-provisioning-policy`;
 export const NEW_SCHEMA = `${COMMAND_PREFIX}.new-schema`;
-export const EVALUATE_TRANSFORM = `${COMMAND_PREFIX}.transform.evaluate`;
-export const EVALUATE_TRANSFORM_EDITOR = `${COMMAND_PREFIX}.transform.evaluate.editor`;
-export const EVALUATE_TRANSFORM_CLOUD = `${COMMAND_PREFIX}.transform.evaluate.cloud`;
-export const EVALUATE_TRANSFORM_CLOUD_EDITOR = `${COMMAND_PREFIX}.transform.evaluate.cloud.editor`;
 export const ENABLE_WORKFLOW = `${COMMAND_PREFIX}.workflow.enable`;
 export const DISABLE_WORKFLOW = `${COMMAND_PREFIX}.workflow.disable`;
 export const EXPORT_WORKFLOW = `${COMMAND_PREFIX}.workflow.export`;
 export const IMPORT_WORKFLOW = `${COMMAND_PREFIX}.workflow.import`;
 export const IMPORT_WORKFLOW_VIEW_ICON = `${COMMAND_PREFIX}.workflow.import.view-icon`;
-export const TEST_WORKFLOW = `${COMMAND_PREFIX}.workflow.test`;
 export const VIEW_WORKFLOW_EXECUTION_HISTORY = `${COMMAND_PREFIX}.workflow.view-execution-history`;
 export const EDIT_CONNECTOR_RULE = `${COMMAND_PREFIX}.connector-rule.edit`;
 export const NEW_CONNECTOR_RULE = `${COMMAND_PREFIX}.new-connector-rule`;
@@ -75,6 +69,16 @@ export const REFRESH_IDENTITY_PROFILE = `${COMMAND_PREFIX}.identity-profile.refr
 export const TREE_VIEW = `${COMMAND_PREFIX}.view`;
 
 export const LOAD_MORE = `${COMMAND_PREFIX}.load-more`;
+
+// Transforms
+
+export const NEW_TRANSFORM = `${COMMAND_PREFIX}.new-transform`;
+export const CLONE_TRANSFORM = `${COMMAND_PREFIX}.transform.clone`;
+export const CLONE_TRANSFORM_PALETTE = `${COMMAND_PREFIX}.transform.clone.palette`;
+export const EVALUATE_TRANSFORM = `${COMMAND_PREFIX}.transform.evaluate`;
+export const EVALUATE_TRANSFORM_EDITOR = `${COMMAND_PREFIX}.transform.evaluate.editor`;
+export const EVALUATE_TRANSFORM_CLOUD = `${COMMAND_PREFIX}.transform.evaluate.cloud`;
+export const EVALUATE_TRANSFORM_CLOUD_EDITOR = `${COMMAND_PREFIX}.transform.evaluate.cloud.editor`;
 
 // New Access Profile
 export const NEW_ACCESS_PROFILE_VIEW = `${COMMAND_PREFIX}.new-access-profile.view`;

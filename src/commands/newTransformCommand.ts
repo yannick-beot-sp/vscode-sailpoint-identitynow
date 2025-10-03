@@ -14,8 +14,10 @@ import { QuickPickPromptStep } from '../wizard/quickPickPromptStep';
 import { TenantInfo } from '../models/TenantInfo';
 const transforms = require('../../snippets/transforms.json');
 
-
-const transformNameValidator = new Validator({
+/**
+ * Export for reuse
+ */
+export const transformNameValidator = new Validator({
     required: true,
     maxLength: 50,
     regexp: '^[A-Za-z0-9 _:;,={}@()#-|^%$!?.*]{1,50}$'
