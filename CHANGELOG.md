@@ -12,6 +12,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Changed
 
+- Cloning a source now clones the encrypted credentials.
+
 ### Fixed
 
 ### Removed
