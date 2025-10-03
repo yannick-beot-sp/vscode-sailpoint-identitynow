@@ -421,6 +421,12 @@ The extension supports the following settings:
 
 ### Unreleased
 
+### 1.3.22
+
+- Command to clone a transform
+- Cloning a source now clones the encrypted credentials.
+- Issue Attribute Sync Config export in multiple files if the source have been deleted (cf. [#123](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/123))
+
 ### 1.3.21
 
 - Semantic errors do not display cause (cf. [#122](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/122))
