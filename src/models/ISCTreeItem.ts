@@ -11,8 +11,6 @@ import { convertConstantToTitleCase, escapeFilter, isEmpty, isNotEmpty } from ".
 import { TenantService } from "../services/TenantService";
 import { CampaignStatusV3 } from "sailpoint-api-client";
 import { convertToBaseTreeItem } from "../views/utils";
-import { EndpointUtils } from "../utils/EndpointUtils";
-
 
 /**
  * Base class to expose getChildren and updateIcon methods
@@ -338,8 +336,8 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 
 	updateIcon(context: vscode.ExtensionContext): void {
 		this.iconPath = {
-			light: context.asAbsolutePath("resources/light/source.svg"),
-			dark: context.asAbsolutePath("resources/dark/source.svg"),
+			light: vscode.Uri.file(context.asAbsolutePath("resources/light/source.svg")),
+			dark: vscode.Uri.file(context.asAbsolutePath("resources/dark/source.svg")),
 		};
 	}
 
@@ -400,8 +398,8 @@ export class TransformTreeItem extends ISCResourceTreeItem {
 
 	updateIcon(context: vscode.ExtensionContext): void {
 		this.iconPath = {
-			light: context.asAbsolutePath("resources/light/transform.svg"),
-			dark: context.asAbsolutePath("resources/dark/transform.svg"),
+			light: vscode.Uri.file(context.asAbsolutePath("resources/light/transform.svg")),
+			dark: vscode.Uri.file(context.asAbsolutePath("resources/dark/transform.svg")),
 		};
 	}
 }
@@ -523,8 +521,8 @@ export class ProvisioningPolicyTreeItem extends ISCResourceTreeItem {
 
 	updateIcon(context: vscode.ExtensionContext): void {
 		this.iconPath = {
-			light: context.asAbsolutePath("resources/light/provisioning-policy.svg"),
-			dark: context.asAbsolutePath("resources/dark/provisioning-policy.svg"),
+			light: vscode.Uri.file(context.asAbsolutePath("resources/light/provisioning-policy.svg")),
+			dark: vscode.Uri.file(context.asAbsolutePath("resources/dark/provisioning-policy.svg")),
 		};
 	}
 }
@@ -588,13 +586,13 @@ export class WorkflowTreeItem extends ISCResourceTreeItem {
 	updateIcon(context: vscode.ExtensionContext): void {
 		if (this.enabled) {
 			this.iconPath = {
-				light: context.asAbsolutePath("resources/light/workflow-enabled.svg"),
-				dark: context.asAbsolutePath("resources/dark/workflow-enabled.svg"),
+				light: vscode.Uri.file(context.asAbsolutePath("resources/light/workflow-enabled.svg")),
+				dark: vscode.Uri.file(context.asAbsolutePath("resources/dark/workflow-enabled.svg")),
 			};
 		} else {
 			this.iconPath = {
-				light: context.asAbsolutePath("resources/light/workflow-disabled.svg"),
-				dark: context.asAbsolutePath("resources/dark/workflow-disabled.svg"),
+				light: vscode.Uri.file(context.asAbsolutePath("resources/light/workflow-disabled.svg")),
+				dark: vscode.Uri.file(context.asAbsolutePath("resources/dark/workflow-disabled.svg")),
 			};
 		}
 	}

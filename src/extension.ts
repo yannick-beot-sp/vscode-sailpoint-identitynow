@@ -90,6 +90,7 @@ import { OpenUrlCommand } from './commands/openUrlCommand';
 import { EmailSettingsCommand } from './commands/EmailSettingsCommand';
 import { EvaluateTransformCloudCommand } from './commands/EvaluateTransformCloudCommand';
 import { CloneTransformCommand } from './commands/CloneTransformCommand';
+import { McpManager } from './mcp/McpManager';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -660,6 +661,8 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.EDIT_SERVICE_DESK_INTEGRATIONS_STATUS_CHECK_CONFIGURATION,
 			editServiceDeskTimeCheckConfiguration.execute, editServiceDeskTimeCheckConfiguration))
 
+	const mcpManager = new McpManager(context, tenantService)
+	mcpManager.initialize()
 
 	let api = {
 		getRoots(): Array<TenantInfo | FolderTreeNode> {
