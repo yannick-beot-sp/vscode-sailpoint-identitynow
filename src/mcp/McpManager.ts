@@ -1,11 +1,14 @@
 import * as vscode from 'vscode';
 import * as configuration from '../configurationConstants';
 import { IscMcpServer, IscMcpServerConfig } from 'isc-mcp-server'
-import { TenantService } from '../services/TenantService';
+import { TenantService, TenantServiceEventType } from '../services/TenantService';
 import { VSCodeTenantManager } from './VSCodeTenantManager';
+import { Observer } from '../services/Observer';
 
 
-export class McpManager {
+const mcpServerLabel = "Identity Security Cloud"
+
+export class McpManager implements Observer<TenantServiceEventType, any>{
     private mcpServer: IscMcpServer | null = null;
     private didChangeEmitter = new vscode.EventEmitter<void>();
 
@@ -18,6 +21,15 @@ export class McpManager {
         this.context.subscriptions.push(
             vscode.workspace.onDidChangeConfiguration(this.onConfigurationChanged.bind(this))
         );
+
+        tenantService.registerObserver(TenantServiceEventType.updateTree, this)
+        tenantService.registerObserver(TenantServiceEventType.removeTenant, this)
+    }
+
+    update(t: TenantServiceEventType, message: any): void | Promise<void> {
+        // If any update in the list of nodes in the tree view (could be a container or a tenant)
+        // or tenant is removed, let's update the MCP configuration
+        this.didChangeEmitter.fire()
     }
 
     async initialize(): Promise<void> {
@@ -37,9 +49,15 @@ export class McpManager {
         const config = vscode.workspace.getConfiguration(configuration.SECTION_CONF);
         return config.get<boolean>(configuration.MCP_ENABLED, false);
     }
+
     private getPreferredPort(): number {
         const config = vscode.workspace.getConfiguration(configuration.SECTION_CONF);
         return config.get<number>(configuration.MCP_PORT, 0);
+    }
+
+    private savePreferredPort(port?: number): void {
+        const config = vscode.workspace.getConfiguration(configuration.SECTION_CONF);
+        config.update(configuration.MCP_PORT, port ?? 0);
     }
 
     /**
@@ -48,7 +66,6 @@ export class McpManager {
     private isMcpApiAvailable(): boolean {
         return typeof vscode.lm?.registerMcpServerDefinitionProvider === 'function';
     }
-
 
     private async onConfigurationChanged(event: vscode.ConfigurationChangeEvent): Promise<void> {
 
@@ -59,6 +76,7 @@ export class McpManager {
             if (mcpEnabled && !this.mcpServer) {
                 // MCP was enabled, start server
                 await this.startMcpServer();
+                await this.registerServer();
             } else if (!mcpEnabled && this.mcpServer) {
                 // MCP was disabled, stop server
                 await this.stopMcpServer();
@@ -80,15 +98,32 @@ export class McpManager {
             console.error('MCP API not available, skipping MCP initialization');
             return;
         }
-        const port = this.getPreferredPort()
 
-        const config: IscMcpServerConfig = {
-            mode: "http",
-            port,
-            iscTenantManager: new VSCodeTenantManager(this.tenantService)
+        try {
+            const port = this.getPreferredPort()
+
+            const config: IscMcpServerConfig = {
+                mode: "http",
+                port,
+                iscTenantManager: new VSCodeTenantManager(this.tenantService)
+            }
+
+            this.mcpServer = new IscMcpServer(config)
+            await this.mcpServer.registerTools()
+            await this.mcpServer.start();
+            
+            const serverStatus = this.mcpServer.getServerStatus();
+            console.log(`VSCode Extension: ISC MCP Server started on ${serverStatus.url}`);
+            console.log(`VSCode Extension: MCP endpoint: ${serverStatus.mcpUrl}`);
+
+            if (port !== serverStatus.port) {
+                this.savePreferredPort(serverStatus.port)
+            }
+
+        } catch (error) {
+            console.error('Failed to start ISC MCP Server:', error);
+            // vscode.window.showErrorMessage(`Failed to start ISC MCP Server: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
-        this.mcpServer = new IscMcpServer(config)
-
     }
 
     private async stopMcpServer(): Promise<void> {
@@ -124,8 +159,6 @@ export class McpManager {
         }
     }
 
-
-
     /**
      * Register the MCP server with VS Code
      */
@@ -137,7 +170,7 @@ export class McpManager {
         }
 
         try {
-            this.context.subscriptions.push(vscode.lm.registerMcpServerDefinitionProvider('isc-mcp-server', {
+            this.context.subscriptions.push(vscode.lm.registerMcpServerDefinitionProvider('isc-mcp-server-provider', {
                 onDidChangeMcpServerDefinitions: this.didChangeEmitter.event,
                 provideMcpServerDefinitions: async () => {
                     let servers: vscode.McpServerDefinition[] = [];
@@ -147,7 +180,7 @@ export class McpManager {
                         const serverStatus = this.mcpServer.getServerStatus();
                         if (serverStatus.mcpUrl) {
                             servers.push(new vscode.McpHttpServerDefinition(
-                                'isc-mcp-server',
+                                mcpServerLabel,
                                 vscode.Uri.parse(serverStatus.mcpUrl),
                                 {
                                     // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -161,7 +194,8 @@ export class McpManager {
                     return servers;
                 },
                 resolveMcpServerDefinition: async (server: vscode.McpServerDefinition) => {
-                    if (server.label === 'isc-mcp-server') {
+                    
+                    if (server.label === mcpServerLabel) {
                         // Ensure server is running
                         if (!this.mcpServer || !this.mcpServer.isRunning()) {
                             throw new Error('ISC MCP Server is not running');

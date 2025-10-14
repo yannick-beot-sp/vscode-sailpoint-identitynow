@@ -170,3 +170,12 @@ export function getUIUrl(tenantName: string, ...pathParts: string[]): Uri {
     );
     return targetUrl.with({fragment});
 }
+
+export function getPortFromUrl(url: string): string | null {
+  try {
+    const urlObject = new URL(url);
+    return urlObject.port || (urlObject.protocol === 'https:' ? '443' : urlObject.protocol === 'http:' ? '80' : null);
+  } catch (error) {
+    return null;
+  }
+}

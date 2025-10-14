@@ -242,7 +242,7 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
 
         // Recursive function to process folder nodes
         function processFolder(folder: FolderTreeNode): boolean {
-            if (!folder.children) return false;
+            if (!folder.children) {return false;}
 
             // Check children of this folder
             for (let i = 0; i < folder.children.length; i++) {
@@ -258,7 +258,7 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
                 // If this child is a folder, recursively process it
                 if (isFolderTreeNode(child)) {
                     const found = processFolder(child);
-                    if (found) return true;
+                    if (found) {return true;}
                 }
             }
 
@@ -281,7 +281,7 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
             // If it's a folder, process its children
             if (isFolderTreeNode(item)) {
                 found = processFolder(item);
-                if (found) break;
+                if (found) {break;}
             }
         }
 
@@ -307,13 +307,13 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
                 folder.children.splice(childIndex, 1);
                 return true;
             }
-            if (!folder.children) return false;
+            if (!folder.children) {return false;}
             // Recursively process child folders
             for (let i = 0; i < folder.children.length; i++) {
                 const child = folder.children[i];
                 if (isFolderTreeNode(child)) {
                     const removed = processFolder(child);
-                    if (removed) return true;
+                    if (removed) {return true;}
                 }
             }
 
@@ -331,7 +331,7 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
             for (const item of roots) {
                 if (isFolderTreeNode(item)) {
                     const removed = processFolder(item);
-                    if (removed) break;
+                    if (removed) {break;}
                 }
             }
         }
@@ -371,7 +371,7 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
 
         // If not found at top level, search recursively
         function findAndRemoveNode(folder: FolderTreeNode): boolean {
-            if (!folder.children) return false;
+            if (!folder.children) {return false;}
 
             // Check if any direct children are the node to move
             const childIndex = folder.children.findIndex(child => child.id === nodeIdToMove);
@@ -388,7 +388,7 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
                 const child = folder.children[i];
                 if (isFolderTreeNode(child)) {
                     const removed = findAndRemoveNode(child);
-                    if (removed) return true;
+                    if (removed) {return true;}
                 }
             }
 
@@ -400,7 +400,7 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
             for (const item of items) {
                 if (isFolderTreeNode(item)) {
                     nodeRemoved = findAndRemoveNode(item);
-                    if (nodeRemoved) break;
+                    if (nodeRemoved) {break;}
                 }
             }
         }
@@ -436,7 +436,7 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
                 for (const child of folder.children) {
                     if (isFolderTreeNode(child)) {
                         const added = addNodeToFolder(child);
-                        if (added) return true;
+                        if (added) {return true;}
                     }
                 }
             }
@@ -449,7 +449,7 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
         for (const item of items) {
             if (isFolderTreeNode(item)) {
                 folderFound = addNodeToFolder(item);
-                if (folderFound) break;
+                if (folderFound) {break;}
             }
         }
 
@@ -466,7 +466,7 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
 
         // Recursive function to process folder nodes
         async function processFolder(folder: FolderTreeNode): Promise<void> {
-            if (!folder.children) return;
+            if (!folder.children) {return;}
 
             // Recursively process child folders
             for (let i = 0; i < folder.children.length; i++) {

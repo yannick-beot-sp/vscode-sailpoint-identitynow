@@ -1769,7 +1769,13 @@
           "default": 0
         }
       }
-    }
+    },
+    "mcpServerDefinitionProviders": [
+      {
+        "id": "isc-mcp-server-provider",
+        "label": "ISC MCP Server Provider"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run esbuild-base -- --minify",
