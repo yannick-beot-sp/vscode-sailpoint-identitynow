@@ -73,7 +73,8 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
 
 
     public registerObserver(t: TenantServiceEventType, o: Observer<TenantServiceEventType, any>): void {
-        this.eventEmitter.on(t, o.update)
+         this.eventEmitter.on(t, o.update.bind(o))
+
     }
     public removeObserver(t: TenantServiceEventType, o: Observer<TenantServiceEventType, any>): void {
         this.eventEmitter.removeListener(t, o.update);
