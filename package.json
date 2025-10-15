@@ -14,7 +14,7 @@
   },
   "homepage": "https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/",
   "engines": {
-    "vscode": "^1.74.0"
+    "vscode": "^1.104.0"
   },
   "extensionKind": [
     "ui",
@@ -1817,7 +1817,7 @@
     "axios-retry": "^3.4.0",
     "csv-parse": "^6.1.0",
     "fast-json-patch": "^3.1.1",
-    "isc-mcp-server": "^0.0.3",
+    "isc-mcp-server": "^0.0.4",
     "lodash": "^4.17.21",
     "sailpoint-api-client": "^1.6.2",
     "tmp": "^0.2.1",
