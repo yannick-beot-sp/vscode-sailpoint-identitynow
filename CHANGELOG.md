@@ -10,6 +10,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- Add `dimensional` flag for role import
+
 ### Changed
 
 ### Fixed

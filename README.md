@@ -197,6 +197,7 @@ The following table provides the expected column for the CSV to import Roles:
 | `description`                  | No   | Description of the role                                                                        | `null`             |
 | `enabled`                      | No   | Is the role enabled?                                                                           | `false`            |
 | `requestable`                  | No   | Is the role requestable?                                                                       | `false`            |
+| `dimensional`                  | No   | Is the role dynamic? Does it support dimensions?                                               | `false`            |
 | `commentsRequired`             | No   | Require comments when the user requests access                                                 | `false`            |
 | `denialCommentsRequired`       | No   | Require comments when a reviewer denies the request                                            | `false`            |
 | `approvalSchemes`              | No   | List of reviewers among `OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |

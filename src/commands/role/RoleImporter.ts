@@ -29,6 +29,7 @@ interface RoleCSVRecord {
     description: string
     enabled: boolean
     requestable: boolean
+    dimensional?: boolean
     owner: string
     commentsRequired: boolean
     denialCommentsRequired: boolean
@@ -233,6 +234,7 @@ export class RoleImporter {
                     "description": data.description?.replaceAll('\\r', '\r').replaceAll('\\n', '\n'),
                     "enabled": truethy(data.enabled),
                     requestable: truethy(data.requestable),
+                    dimensional: truethy(data.dimensional),
                     "owner": {
                         "id": ownerId,
                         "type": "IDENTITY",
