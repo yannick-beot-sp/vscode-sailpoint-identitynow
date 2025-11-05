@@ -14,6 +14,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Fixed
 
+- Fix issue with Access Profile & Entitlement Pie Chart of a campaign (cf. [#125](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/125))
+
 ### Removed
 
 ## [1.3.22] - 2025-10-03
