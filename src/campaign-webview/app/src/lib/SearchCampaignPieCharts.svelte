@@ -11,12 +11,12 @@
 
   const dataRoles = [data.rolesApproved, data.rolesRevoked, data.roleDecisionsTotal - data.roleDecisionsMade];
   const dataAccessProfiles = [
-    data.accessProfilesRevoked,
+    data.accessProfilesApproved,
     data.accessProfilesRevoked,
     data.accessProfileDecisionsTotal - data.accessProfileDecisionsMade,
   ];
   const dataEntitlements = [
-    data.entitlementsRevoked,
+    data.entitlementsApproved,
     data.entitlementsRevoked,
     data.entitlementDecisionsTotal - data.entitlementDecisionsMade,
   ];
