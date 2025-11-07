@@ -103,7 +103,7 @@ interface AccessProfileDto {
      * A list of metadata associated with the Access Profile. metadata are seperated by ";". 
      * The expected format is key:value1,value2;key2:value3
      */
-    'metadata'?: string;
+    metadata?: string;
 }
 class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
     constructor(
@@ -185,9 +185,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
                         item.revocationRequestConfig?.approvalSchemes,
                         governanceGroupCache),
                     // @ts-ignore Waiting for client SDK to be updated
-                    metadata: item.accessModelMetadata?.attributes?.
-                        map(attribute => `${attribute.key}:${attribute.values.map(v => v.value).join(",")}`)
-                        .join(CSV_MULTIVALUE_SEPARATOR),
+                    metadata: metadataToString(item.accessModelMetadata)
                 };
 
                 return itemDto;

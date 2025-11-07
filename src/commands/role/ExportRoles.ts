@@ -13,9 +13,10 @@ import { SourceIdToNameCacheService } from '../../services/cache/SourceIdToNameC
 import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator';
 import { CacheService } from '../../services/cache/CacheService';
 import { EntitlementIdToSourceNameCacheService } from '../../services/cache/EntitlementIdToSourceNameCacheService';
+import { metadataToString } from '../../utils/metadataUtils';
 
 export class RoleExporterCommand {
-    
+
     /**
      * Entry point 
      * @param node 
@@ -119,6 +120,12 @@ export interface RoleDto {
      */
     membershipCriteria?: string;
 
+    /**
+     * A list of metadata associated with the Role. metadata are seperated by ";". 
+     * The expected format is key:value1,value2;key2:value3
+     */
+    metadata?: string;
+
 }
 
 class RoleExporter extends BaseCSVExporter<Role> {
@@ -152,7 +159,8 @@ class RoleExporter extends BaseCSVExporter<Role> {
             "revokeApprovalSchemes",
             "accessProfiles",
             "entitlements",
-            "membershipCriteria"
+            "membershipCriteria",
+            "metadata"
         ];
         const paths = [
             "name",
@@ -168,7 +176,8 @@ class RoleExporter extends BaseCSVExporter<Role> {
             "revokeApprovalSchemes",
             "accessProfiles",
             "entitlements",
-            "membershipCriteria"
+            "membershipCriteria",
+            "metadata"
         ];
         const unwindablePaths: string[] = [];
 
@@ -196,7 +205,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
                 }
                 let owner: string | undefined = undefined;
                 try {
-                    owner =  item.owner ? (await identityCacheIdToName.get(item.owner.id!)) : null
+                    owner = item.owner ? (await identityCacheIdToName.get(item.owner.id!)) : null
                 } catch (error) {
                     console.warn(`Error converting owner identity "${item.owner.id}" for role "${item.name}:"`, error);
                 }
@@ -231,7 +240,8 @@ class RoleExporter extends BaseCSVExporter<Role> {
                     revokeApprovalSchemes: await roleApprovalSchemeToStringConverter(
                         item.revocationRequestConfig?.approvalSchemes,
                         governanceGroupCache),
-                    membershipCriteria
+                    membershipCriteria,
+                    metadata: metadataToString(item.accessModelMetadata)
                 };
 
                 return itemDto;
