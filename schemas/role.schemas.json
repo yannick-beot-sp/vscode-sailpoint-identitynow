@@ -597,6 +597,38 @@
       "description": "List of IDs of segments, if any, to which this Role is assigned.",
       "example": ["f7b1b8a3-5fed-4fd4-ad29-82014e137e19", "29cb6c06-1da8-43ea-8be4-b3125f248f2a"]
     },
+    "dimensional": {
+      "description": "Whether the Role is dimensional.",
+      "type": "boolean",
+      "nullable": true,
+      "default": false
+    },
+    "dimensionRefs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["DIMENSION"],
+            "description": "The type of the object to which this reference applies",
+            "example": "DIMENSION"
+          },
+          "id": {
+            "type": "string",
+            "description": "ID of the object to which this reference applies",
+            "example": "2c91808568c529c60168cca6f90c1313"
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable display name of the object to which this reference applies",
+            "example": "Role 2"
+          }
+        }
+      },
+      "nullable": true,
+      "description": "List of references to dimensions to which this Role is assigned. This field is only relevant if the Role is dimensional."
+    },
     "accessModelMetadata": {
       "type": "object",
       "properties": {
