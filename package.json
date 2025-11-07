@@ -866,7 +866,6 @@
           "command": "vscode-sailpoint-identitynow.workflow.disable",
           "when": "never"
         },
-
         {
           "command": "vscode-sailpoint-identitynow.workflow.view-execution-history",
           "when": "never"
@@ -1639,7 +1638,7 @@
         }
       ]
     },
-    "keybindings":[
+    "keybindings": [
       {
         "command": "vscode-sailpoint-identitynow.transform.evaluate.cloud.editor",
         "key": "ctrl+alt+t",
@@ -1806,7 +1805,7 @@
     "csv-parse": "^6.1.0",
     "fast-json-patch": "^3.1.1",
     "lodash": "^4.17.21",
-    "sailpoint-api-client": "^1.6.2",
+    "sailpoint-api-client": "^1.7.0",
     "tmp": "^0.2.1",
     "vscode-sailpoint-identitynow": "file:"
   }
