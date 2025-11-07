@@ -1,14 +1,14 @@
 import * as vscode from 'vscode';
 import { AccessProfileImporter } from './AccessProfileImporter';
 import { TenantService } from '../../services/TenantService';
-import { chooseTenant } from '../../utils/vsCodeHelpers';
+import { askCreateOrUpdate, chooseTenant } from '../../utils/vsCodeHelpers';
 import { validateTenantReadonly } from '../validateTenantReadonly';
 
 
 export class AccessProfileImporterExplorerCommand {
     constructor(
         private readonly tenantService: TenantService
-    ) {  }
+    ) { }
 
     async execute(fileUri: vscode.Uri, selectedFiles: vscode.Uri[]): Promise<void> {
         console.log("> AccessProfileImporterExplorerCommand.execute");
@@ -23,11 +23,15 @@ export class AccessProfileImporterExplorerCommand {
             return
         }
 
+        const mode = await askCreateOrUpdate("access profile")
+        if (mode === undefined) { return; }
+
         const accessProfileImporter = new AccessProfileImporter(
             tenantInfo.id,
             tenantInfo.tenantName,
             tenantInfo.name,
-            fileUri
+            fileUri,
+            mode
         );
 
         await accessProfileImporter.importFileWithProgression();

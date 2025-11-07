@@ -8,7 +8,7 @@ import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskManagementBetaApi, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, IdentityProfilesV2025Api, IdentityPreviewResponseV2025, IdentityAttributeTransformV2025 } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordConfigurationApi, PasswordOrgConfig, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, IdentityProfilesV2025Api, IdentityPreviewResponseV2025, IdentityAttributeTransformV2025, SourcesV2025Api, TaskManagementV2025Api } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -16,7 +16,6 @@ import { basename } from 'path';
 import { createReadStream } from 'fs';
 import { DEFAULT_ACCESSPROFILES_QUERY_PARAMS } from "../models/AccessProfiles";
 import { DEFAULT_ROLES_QUERY_PARAMS } from "../models/Roles";
-// import axiosRetry = require("axios-retry");
 import { addQueryParams } from "../utils/UriUtils";
 import { onErrorResponse, onRequest, onResponse } from "./AxiosHandlers";
 import { EmailTestMode } from "../models/EmailTestMode";
@@ -336,24 +335,26 @@ export class ISCClient {
 	): Promise<any> {
 		console.log("> ISCClient.startAccountAggregation");
 
-		const endpoint = `beta/sources/${sourceID}/load-accounts`;
-		console.log("endpoint = " + endpoint);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 
-		const formData = new FormData();
-
-		if (disableOptimization) {
-			formData.append("disableOptimization", "true");
+		let f: File | undefined = undefined
+		if (filePath) {
+			const mimeType = 'application/octet-stream'
+			const fileBuffer = fs.readFileSync(filePath);
+			const blob = new Blob([fileBuffer], { type: mimeType });
+			f = new File([blob], basename(filePath), {
+				type: mimeType,
+			})
 		}
 
-		if (filePath !== undefined) {
-			const blob = createReadStream(filePath);
-			formData.append('file', blob, basename(filePath));
-		}
+		const response = await api.importAccounts({
+			id: sourceID,
+			disableOptimization: disableOptimization ? "true" : undefined,
+			file: f
+		})
 
-		const httpClient = await this.getAxios(CONTENT_TYPE_FORM_DATA);
-		const response = await httpClient.post(endpoint, formData);
-		return response.data;
-
+		return response.data
 	}
 
 	public async getTaskStatus(
@@ -361,7 +362,7 @@ export class ISCClient {
 	): Promise<TaskStatusBeta> {
 		console.log("> getTaskStatus", taskId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new TaskManagementBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new TaskManagementV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.getTaskStatus({
 			id: taskId
 		})
@@ -1095,8 +1096,7 @@ export class ISCClient {
 				identityAttributeConfig: {
 					attributeTransforms: config
 				}
-			},
-			xSailPointExperimental:"True"
+			}
 		})
 		return resp.data;
 	}

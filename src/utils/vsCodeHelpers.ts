@@ -262,12 +262,12 @@ export async function askChosenItems<Tin extends BasicObject, Tout>(title: strin
 			canPickMany: true
 		});
 
-		
+
 	return result?.map(obj => {
 		const { picked, label, ...rest } = obj;
 		return rest;
 		// @ts-ignore
-	  }).map(mapFn); // Compiler is not considering the input as Tin anymore
+	}).map(mapFn); // Compiler is not considering the input as Tin anymore
 };
 
 
@@ -304,5 +304,42 @@ export async function createNewFile(newUri: vscode.Uri, obj: any): Promise<void>
 
 	const edit = new vscode.WorkspaceEdit();
 	edit.insert(newUri, new vscode.Position(0, 0), strContent);
-	let success = await vscode.workspace.applyEdit(edit);
+	await vscode.workspace.applyEdit(edit);
 }
+
+declare type ValueOf<T> = T[keyof T];
+
+export const importMode = {
+	createOnly: 'CREATE_ONLY',
+	createOrUpdate: 'CREATE_OR_UPDATE',
+}
+
+export type ImportModeType = ValueOf<typeof importMode>;
+
+/**
+ * Used for import, whether or not we support update
+ * @returns 
+ */
+export async function askCreateOrUpdate(objectType: string): Promise<ImportModeType | undefined> {
+
+	const result = await vscode.window.showQuickPick([
+		{
+			label: "Only Create",
+			detail: `Will only try to create new ${objectType}s. If the ${objectType} already exists, an error is raised`,
+			picked: true,
+			value: importMode.createOnly
+		},
+		{
+			label: "Create Or Update",
+			detail: `Will try to create new ${objectType}s and update them if the ${objectType} already exists`,
+			value: importMode.createOrUpdate
+		}
+
+	], {
+		ignoreFocusOut: false,
+		title: "Import Mode",
+		canPickMany: false
+	});
+
+	return result?.value
+} 
