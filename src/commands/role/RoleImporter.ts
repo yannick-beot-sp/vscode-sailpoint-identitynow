@@ -3,14 +3,14 @@ import * as tmp from "tmp";
 
 import { ISCClient } from "../../services/ISCClient";
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
-import { AccessProfileRef, ApprovalSchemeForRole, EntitlementRef, Role, RoleMembershipSelector, RoleMembershipSelectorType } from 'sailpoint-api-client';
+import { AccessProfileRef, ApprovalSchemeForRole, EntitlementRef, JsonPatchOperationV2025OpV2025, Role, RoleMembershipSelector, RoleMembershipSelectorType } from 'sailpoint-api-client';
 import { CSVReader } from '../../services/CSVReader';
 import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
 import { IdentityNameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { AccessProfileNameToIdCacheService } from '../../services/cache/AccessProfileNameToIdCacheService';
 import { stringToRoleApprovalSchemeConverter } from '../../utils/approvalSchemeConverter';
-import { openPreview } from '../../utils/vsCodeHelpers';
+import { importMode, ImportModeType, openPreview } from '../../utils/vsCodeHelpers';
 import { isEmpty, isNotBlank } from '../../utils/stringUtils';
 import { RoleMembershipSelectorConverter } from '../../parser/RoleMembershipSelectorConverter';
 import { Parser } from '../../parser/parser';
@@ -53,7 +53,8 @@ export class RoleImporter {
         private tenantId: string,
         private tenantName: string,
         private tenantDisplayName: string,
-        private fileUri: vscode.Uri
+        private fileUri: vscode.Uri,
+        private mode: ImportModeType
     ) {
         this.client = new ISCClient(this.tenantId, this.tenantName);
 
@@ -230,10 +231,11 @@ export class RoleImporter {
                         return;
                     }
                 }
+                const description = data.description?.replaceAll("\\r", "\r").replaceAll("\\n", "\n")
 
                 const rolePayload: Role = {
                     "name": roleName,
-                    "description": data.description?.replaceAll('\\r', '\r').replaceAll('\\n', '\n'),
+                    description,
                     "enabled": truethy(data.enabled),
                     requestable: truethy(data.requestable),
                     dimensional: truethy(data.dimensional),
@@ -257,7 +259,7 @@ export class RoleImporter {
                     membership
                 };
 
-                
+
                 if (token.isCancellationRequested) {
                     throw new UserCancelledError();
                 }
@@ -265,6 +267,7 @@ export class RoleImporter {
 
                 try {
                     const newRole = await this.client.createRole(rolePayload);
+
                     if (data.metadata) {
                         const attributes = stringToAttributeMetadata(data.metadata)
                         await this.client.updateRoleMetadata(
@@ -276,8 +279,105 @@ export class RoleImporter {
                     await this.writeLog(processedLines, roleName, CSVLogWriterLogType.SUCCESS, `Successfully imported role '${data.name}'`);
                     result.success++;
                 } catch (error: any) {
-                    result.error++;
-                    await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, `Cannot create role: '${error.message}' in ISC`);
+                    const isConflict = error.message?.endsWith("already exists.")
+                    if (isConflict && this.mode === importMode.createOrUpdate) {
+                        console.log(`Access Profile ${roleName} already exists. Try to update...`);
+
+                        // Try to get the id
+                        const role = await this.client.getRoleByName(roleName);
+                        if (role) {
+
+                            const updates = [
+                                {
+                                    "property": "name",
+                                    "value": roleName
+                                },
+                                {
+                                    "property": "description",
+                                    "value": description
+                                },
+                                {
+                                    "property": "enabled",
+                                    "value": truethy(data.enabled)
+                                },
+                                {
+                                    "property": "requestable",
+                                    "value": truethy(data.requestable)
+                                },
+                                {
+                                    "property": "dimensional",
+                                    "value": truethy(data.dimensional)
+                                },
+                                {
+                                    "property": "owner",
+                                    "value": {
+                                        "id": ownerId,
+                                        "type": "IDENTITY",
+                                        "name": data.owner
+                                    }
+                                },
+                                {
+                                    "property": "accessRequestConfig",
+                                    "value": {
+                                        "commentsRequired": truethy(data.commentsRequired),
+                                        "denialCommentsRequired": truethy(data.denialCommentsRequired),
+                                        "approvalSchemes": approvalSchemes
+                                    }
+                                },
+                                {
+                                    "property": "revocationRequestConfig",
+                                    "value": {
+                                        "commentsRequired": truethy(data.revokeCommentsRequired),
+                                        "denialCommentsRequired": truethy(data.revokeDenialCommentsRequired),
+                                        "approvalSchemes": revokeApprovalSchemes
+                                    }
+                                },
+                                {
+                                    "property": "accessProfiles",
+                                    "value": accessProfiles ?? null
+                                },
+                                {
+                                    "property": "entitlements",
+                                    "value": entitlements ?? null
+                                },
+                                {
+                                    "property": "membership",
+                                    "value": membership ?? null
+                                },
+                                {
+                                    "property": "accessModelMetadata/attributes",
+                                    "value": stringToAttributeMetadata(data.metadata) ?? null
+                                },
+                            ].map((item) => ({
+                                "op": JsonPatchOperationV2025OpV2025.Replace,
+                                "path": `/${item.property}`,
+                                "value": item.value
+                            }))
+                            try {
+                                await this.client.updateRole(role.id, updates)
+                                await this.writeLog(processedLines, roleName, CSVLogWriterLogType.SUCCESS, `Successfully updated access profile '${roleName}'`);
+                                result.success++;
+                            } catch (error) {
+                                result.error++;
+                                await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, `Cannot update role: '${error.message}'`);
+
+                            }
+
+                        } else {
+                            // Role not found
+                            // very unlikely. We shall find the role as we have a conflicting name
+                            result.error++;
+                            await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, `Cannot update role: '${roleName}' not found.`);
+                        }
+
+                    } else if (isConflict && this.mode === importMode.createOrUpdate) {
+                        result.error++;
+                        await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, `Cannot create role: '${roleName}' already exists.`);
+
+                    } else {
+                        result.error++;
+                        await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, `Cannot create role: '${error.message}'`);
+                    }
                 }
             });
         } catch { }

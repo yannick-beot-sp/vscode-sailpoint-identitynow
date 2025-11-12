@@ -14,8 +14,6 @@ import { importMode, ImportModeType, openPreview } from '../../utils/vsCodeHelpe
 import { isEmpty, isNotBlank } from "../../utils/stringUtils";
 import { truethy } from "../../utils/booleanUtils";
 import { UserCancelledError } from "../../errors";
-import { AccessProfileNameToIdCacheService } from "../../services/cache/AccessProfileNameToIdCacheService";
-import { property, update } from "lodash";
 import { stringToAttributeMetadata } from "../../utils/metadataUtils";
 
 
@@ -218,7 +216,7 @@ export class AccessProfileImporter {
                     "revocationRequestConfig": {
                         "approvalSchemes": revokeApprovalSchemes
                     },
-                    "entitlements": entitlements
+                    entitlements
                 }
 
                 if (token.isCancellationRequested) {
@@ -311,7 +309,7 @@ export class AccessProfileImporter {
                             }
 
                         } else {
-                            // Access Propfile not found
+                            // Access Profile not found
                             // very unlikely. We shall find the access profile as we have a conflicting name
                             result.error++;
                             await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, `Cannot update access profile: '${apName}' not found.`);

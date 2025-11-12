@@ -126,6 +126,8 @@ export interface RoleDto {
      */
     metadata?: string;
 
+    dimensional?: boolean
+
 }
 
 class RoleExporter extends BaseCSVExporter<Role> {
@@ -160,6 +162,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
             "accessProfiles",
             "entitlements",
             "membershipCriteria",
+            "dimensional",
             "metadata"
         ];
         const paths = [
@@ -177,6 +180,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
             "accessProfiles",
             "entitlements",
             "membershipCriteria",
+            "dimensional",
             "metadata"
         ];
         const unwindablePaths: string[] = [];
@@ -223,6 +227,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
                     description: item.description?.replaceAll('\r', "\\r").replaceAll('\n', "\\n"),
                     enabled: item.enabled,
                     requestable: item.requestable,
+                    dimensional: item.dimensional,
                     owner: owner,
                     accessProfiles: item.accessProfiles?.map(x => x.name).join(CSV_MULTIVALUE_SEPARATOR),
                     entitlements,

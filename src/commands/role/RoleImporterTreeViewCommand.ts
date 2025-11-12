@@ -1,5 +1,5 @@
 import { RoleImporter } from './RoleImporter';
-import { chooseFile } from '../../utils/vsCodeHelpers';
+import { askCreateOrUpdate, chooseFile } from '../../utils/vsCodeHelpers';
 import { RolesTreeItem } from '../../models/ISCTreeItem';
 import { TenantService } from '../../services/TenantService';
 import { validateTenantReadonly } from '../validateTenantReadonly';
@@ -18,11 +18,15 @@ export class RoleImporterTreeViewCommand {
         const fileUri = await chooseFile('CSV files', 'csv');
         if (fileUri === undefined) { return; }
 
+        const mode = await askCreateOrUpdate("role")
+        if (mode === undefined) { return; }
+
         const roleImporter = new RoleImporter(
             node.tenantId,
             node.tenantName,
             node.tenantDisplayName,
-            fileUri
+            fileUri,
+            mode
         );
         await roleImporter.importFileWithProgression();
     }
