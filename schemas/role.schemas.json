@@ -157,7 +157,20 @@
           "properties": {
             "operation": {
               "type": "string",
-              "enum": ["EQUALS", "NOT_EQUALS", "CONTAINS", "STARTS_WITH", "ENDS_WITH", "AND", "OR"],
+              "enum": [
+                "EQUALS",
+                "NOT_EQUALS",
+                "CONTAINS",
+                "STARTS_WITH",
+                "ENDS_WITH",
+                "AND",
+                "OR",
+                "DOES_NOT_CONTAIN",
+                "GREATER_THAN_EQUALS",
+                "GREATER_THAN",
+                "LESS_THAN",
+                "LESS_THAN_EQUALS"
+              ],
               "description": "An operation",
               "example": "EQUALS"
             },
@@ -232,7 +245,20 @@
                 "properties": {
                   "operation": {
                     "type": "string",
-                    "enum": ["EQUALS", "NOT_EQUALS", "CONTAINS", "STARTS_WITH", "ENDS_WITH", "AND", "OR"],
+                    "enum": [
+                      "EQUALS",
+                      "NOT_EQUALS",
+                      "CONTAINS",
+                      "STARTS_WITH",
+                      "ENDS_WITH",
+                      "AND",
+                      "OR",
+                      "DOES_NOT_CONTAIN",
+                      "GREATER_THAN_EQUALS",
+                      "GREATER_THAN",
+                      "LESS_THAN",
+                      "LESS_THAN_EQUALS"
+                    ],
                     "description": "An operation",
                     "example": "EQUALS"
                   },
@@ -307,7 +333,12 @@
                             "STARTS_WITH",
                             "ENDS_WITH",
                             "AND",
-                            "OR"
+                            "OR",
+                            "DOES_NOT_CONTAIN",
+                            "GREATER_THAN_EQUALS",
+                            "GREATER_THAN",
+                            "LESS_THAN",
+                            "LESS_THAN_EQUALS"
                           ],
                           "description": "An operation",
                           "example": "EQUALS"
