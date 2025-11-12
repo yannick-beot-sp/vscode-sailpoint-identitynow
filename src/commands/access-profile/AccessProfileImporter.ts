@@ -1,6 +1,6 @@
 import * as tmp from "tmp";
 import * as vscode from 'vscode';
-import { AccessProfile, EntitlementBeta } from 'sailpoint-api-client';
+import { AccessProfile, EntitlementBeta, JsonPatchOperationV2025OpV2025 } from 'sailpoint-api-client';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
 import { CSVReader } from '../../services/CSVReader';
@@ -16,6 +16,7 @@ import { truethy } from "../../utils/booleanUtils";
 import { UserCancelledError } from "../../errors";
 import { AccessProfileNameToIdCacheService } from "../../services/cache/AccessProfileNameToIdCacheService";
 import { property, update } from "lodash";
+import { stringToAttributeMetadata } from "../../utils/metadataUtils";
 
 
 interface AccessProfileImportResult {
@@ -35,6 +36,7 @@ interface AccessProfileCSVRecord {
     denialCommentsRequired: boolean
     revokeApprovalSchemes: string
     approvalSchemes: string
+    metadata: string
 }
 
 export class AccessProfileImporter {
@@ -224,7 +226,16 @@ export class AccessProfileImporter {
                 }
                 processedLines++;
                 try {
-                    await this.client.createResource('/v3/access-profiles', JSON.stringify(accessProfilePayload));
+                    const newAP = await this.client.createAccessProfile(accessProfilePayload)
+
+                    if (data.metadata) {
+                        const attributes = stringToAttributeMetadata(data.metadata)
+                        await this.client.updateAccessProfileMetadata(
+                            newAP.id,
+                            attributes
+                        )
+                    }
+
                     await this.writeLog(processedLines, apName, CSVLogWriterLogType.SUCCESS, `Successfully imported access profile '${data.name}'`);
                     result.success++;
                 } catch (error: any) {
@@ -239,54 +250,58 @@ export class AccessProfileImporter {
 
                             const updates = [
                                 {
-                                "property": "name",
-                                "value": apName
-                            },
-                            {
-                                "property": "enabled",
-                                "value": truethy(data.enabled)
-                            },
-                            {
-                                "property": "requestable",
-                                "value": truethy(data.requestable)
-                            },
-                            {
-                                "property": "description",
-                                "value": description
-                            },
-                            {
-                                "property": "owner",
-                                "value": {
-                                    "id": ownerId,
-                                    "type": "IDENTITY",
-                                    "name": data.owner
-                                }
-                            },
-                            {
-                                "property": "accessRequestConfig",
-                                "value": {
-                                    "commentsRequired": truethy(data.commentsRequired),
-                                    "denialCommentsRequired": truethy(data.denialCommentsRequired),
-                                    "approvalSchemes": approvalSchemes
-                                }
-                            },
-                            {
-                                "property": "revocationRequestConfig",
-                                "value": {
-                                    "approvalSchemes": revokeApprovalSchemes
-                                }
-                            },
-                            {
-                                "property": "entitlements",
-                                "value": entitlements
-                            },
+                                    "property": "name",
+                                    "value": apName
+                                },
+                                {
+                                    "property": "enabled",
+                                    "value": truethy(data.enabled)
+                                },
+                                {
+                                    "property": "requestable",
+                                    "value": truethy(data.requestable)
+                                },
+                                {
+                                    "property": "description",
+                                    "value": description
+                                },
+                                {
+                                    "property": "owner",
+                                    "value": {
+                                        "id": ownerId,
+                                        "type": "IDENTITY",
+                                        "name": data.owner
+                                    }
+                                },
+                                {
+                                    "property": "accessRequestConfig",
+                                    "value": {
+                                        "commentsRequired": truethy(data.commentsRequired),
+                                        "denialCommentsRequired": truethy(data.denialCommentsRequired),
+                                        "approvalSchemes": approvalSchemes
+                                    }
+                                },
+                                {
+                                    "property": "revocationRequestConfig",
+                                    "value": {
+                                        "approvalSchemes": revokeApprovalSchemes
+                                    }
+                                },
+                                {
+                                    "property": "entitlements",
+                                    "value": entitlements
+                                },
+                                {
+                                    "property": "accessModelMetadata/attributes",
+                                    "value": stringToAttributeMetadata(data.metadata) ?? null
+                                },
                             ].map((item) => ({
-                                "op": "replace",
+                                "op": JsonPatchOperationV2025OpV2025.Replace,
                                 "path": `/${item.property}`,
                                 "value": item.value
                             }))
                             try {
-                                await this.client.patchResource(`/v3/access-profiles/${ap.id}`, JSON.stringify(updates))
+                                await this.client.updateAccessProfile(ap.id, updates)
                                 await this.writeLog(processedLines, apName, CSVLogWriterLogType.SUCCESS, `Successfully updated access profile '${apName}'`);
                                 result.success++;
                             } catch (error) {
@@ -295,7 +310,7 @@ export class AccessProfileImporter {
 
                             }
 
-                        } else { 
+                        } else {
                             // Access Propfile not found
                             // very unlikely. We shall find the access profile as we have a conflicting name
                             result.error++;

@@ -9,6 +9,7 @@ import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { accessProfileApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
 import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
+import { metadataToString } from '../../utils/metadataUtils';
 
 export class AccessProfileExporterCommand {
     /**

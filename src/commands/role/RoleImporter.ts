@@ -18,6 +18,7 @@ import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdC
 import { EntitlementCacheService, KEY_SEPARATOR } from '../../services/cache/EntitlementCacheService';
 import { truethy } from '../../utils/booleanUtils';
 import { UserCancelledError } from '../../errors';
+import { stringToAttributeMetadata } from '../../utils/metadataUtils';
 
 interface RolesImportResult {
     success: number
@@ -40,6 +41,7 @@ interface RoleCSVRecord {
     accessProfiles: string
     entitlements: string
     membershipCriteria: string
+    metadata: string
 }
 
 export class RoleImporter {
@@ -262,7 +264,15 @@ export class RoleImporter {
                 processedLines++
 
                 try {
-                    await this.client.createRole(rolePayload);
+                    const newRole = await this.client.createRole(rolePayload);
+                    if (data.metadata) {
+                        const attributes = stringToAttributeMetadata(data.metadata)
+                        await this.client.updateRoleMetadata(
+                            newRole.id,
+                            attributes
+                        )
+                    }
+
                     await this.writeLog(processedLines, roleName, CSVLogWriterLogType.SUCCESS, `Successfully imported role '${data.name}'`);
                     result.success++;
                 } catch (error: any) {
