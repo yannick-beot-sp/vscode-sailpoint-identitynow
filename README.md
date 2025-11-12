@@ -183,6 +183,7 @@ The following table provides the expected column for the CSV to import Access Pr
 | `approvalSchemes`        | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
 | `revokeApprovalSchemes`  | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
 | `entitlements`           | No   | Entitlements of the access profile                                                                                          | `[]`               |
+| `metadata`               | No   | Metadata of the access profile                                                                                              | `[]`               |
 
 [*]: ## "Mandatory"
 
@@ -254,6 +255,21 @@ identity.department eq 'Customer Service' and identity.cloudLifecycleState eq 'a
 'Active Directory'.entitlement.memberOf eq 'CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com' and 'Active Directory'.attribute.departmentNumber eq '1234'
 (identity.department eq 'Customer Service' and identity.cloudLifecycleState eq 'active') or (identity.cloudLifecycleState eq 'active' and identity.jobTitle co 'Accounts Payable Analyst')
 ```
+
+### Metadata
+
+The metadata column will be exported as or will be imported as:
+
+```
+<technicalName1>:<value1>,<value2>;<technicalName2>:<value3>
+```
+
+> NOTE: Only technical names and values are used.
+>
+> For custom metadata attribute and values, it's just the Camel Case of the display name. e.g. Domain->`domain`, Back Office->`backOffice`
+>
+> Default metadata starts with isc. For instance, "Access Type"'s technical name is `iscAccessType`
+
 
 ### Certification Campaign Custom Reviewers
 
