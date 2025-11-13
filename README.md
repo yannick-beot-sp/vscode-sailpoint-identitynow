@@ -183,7 +183,7 @@ The following table provides the expected column for the CSV to import Access Pr
 | `approvalSchemes`        | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
 | `revokeApprovalSchemes`  | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
 | `entitlements`           | No   | Entitlements of the access profile                                                                                          | `[]`               |
-| `metadata`               | No   | Metadata of the access profile                                                                                              | `[]`               |
+| `metadata`               | No   | Metadata of the access profile  (cf. below for format)                                                                      | `[]`               |
 
 [*]: ## "Mandatory"
 
@@ -198,7 +198,6 @@ The following table provides the expected column for the CSV to import Roles:
 | `description`                  | No   | Description of the role                                                                        | `null`             |
 | `enabled`                      | No   | Is the role enabled?                                                                           | `false`            |
 | `requestable`                  | No   | Is the role requestable?                                                                       | `false`            |
-| `dimensional`                  | No   | Is the role dynamic? Does it support dimensions?                                               | `false`            |
 | `commentsRequired`             | No   | Require comments when the user requests access                                                 | `false`            |
 | `denialCommentsRequired`       | No   | Require comments when a reviewer denies the request                                            | `false`            |
 | `approvalSchemes`              | No   | List of reviewers among `OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
@@ -206,7 +205,10 @@ The following table provides the expected column for the CSV to import Roles:
 | `revokeDenialCommentsRequired` | No   | Require comments when a reviewer denies the revocation request                                 | `false`            |
 | `revokeApprovalSchemes`        | No   | List of reviewers among `OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
 | `accessProfiles`               | No   | List of access profiles                                                                        | `[]`               |
-| `membershipCriteria`           | No   | Membership criteria for automatic assignment                                                   |                    |
+| `membershipCriteria`           | No   | Membership criteria for automatic assignment (cf. below for format)                            |                    |
+| `dimensional`                  | No   | Is the role dynamic? Does it support dimensions?                                               | `false`            |
+| `dimensionAttributes`          | No   | List of attributes used for dimension, separated by ;                                          | `[]`               |
+| `metadata`                     | No   | Metadata of the role (cf. below for format)                                                    | `[]`               |
 
 #### Membership criteria
 

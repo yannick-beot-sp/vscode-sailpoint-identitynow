@@ -3,7 +3,7 @@ import * as tmp from "tmp";
 
 import { ISCClient } from "../../services/ISCClient";
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
-import { AccessProfileRef, ApprovalSchemeForRole, EntitlementRef, JsonPatchOperationV2025OpV2025, Role, RoleMembershipSelector, RoleMembershipSelectorType } from 'sailpoint-api-client';
+import { AccessProfileRef, ApprovalSchemeForRole, EntitlementRef, JsonPatchOperationV2025OpV2025, Role, RoleMembershipSelector, RoleMembershipSelectorType, RoleV2025 } from 'sailpoint-api-client';
 import { CSVReader } from '../../services/CSVReader';
 import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
 import { IdentityNameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
@@ -19,6 +19,7 @@ import { EntitlementCacheService, KEY_SEPARATOR } from '../../services/cache/Ent
 import { truethy } from '../../utils/booleanUtils';
 import { UserCancelledError } from '../../errors';
 import { stringToAttributeMetadata } from '../../utils/metadataUtils';
+import { stringToDimensionAttributes } from '../../utils/dimensionUtils';
 
 interface RolesImportResult {
     success: number
@@ -30,7 +31,6 @@ interface RoleCSVRecord {
     description: string
     enabled: boolean
     requestable: boolean
-    dimensional?: boolean
     owner: string
     commentsRequired: boolean
     denialCommentsRequired: boolean
@@ -41,6 +41,8 @@ interface RoleCSVRecord {
     accessProfiles: string
     entitlements: string
     membershipCriteria: string
+    dimensional?: boolean
+    dimensionAttributes?: string
     metadata: string
 }
 
@@ -233,12 +235,11 @@ export class RoleImporter {
                 }
                 const description = data.description?.replaceAll("\\r", "\r").replaceAll("\\n", "\n")
 
-                const rolePayload: Role = {
+                const rolePayload: RoleV2025 = {
                     "name": roleName,
                     description,
                     "enabled": truethy(data.enabled),
                     requestable: truethy(data.requestable),
-                    dimensional: truethy(data.dimensional),
                     "owner": {
                         "id": ownerId,
                         "type": "IDENTITY",
@@ -247,7 +248,8 @@ export class RoleImporter {
                     "accessRequestConfig": {
                         "commentsRequired": truethy(data.commentsRequired),
                         "denialCommentsRequired": truethy(data.denialCommentsRequired),
-                        "approvalSchemes": approvalSchemes
+                        "approvalSchemes": approvalSchemes,
+                        dimensionSchema: stringToDimensionAttributes(data.dimensionAttributes)
                     },
                     "revocationRequestConfig": {
                         "commentsRequired": truethy(data.revokeCommentsRequired),
@@ -256,7 +258,8 @@ export class RoleImporter {
                     },
                     accessProfiles,
                     entitlements,
-                    membership
+                    membership,
+                    dimensional: truethy(data.dimensional),
                 };
 
 
@@ -321,7 +324,8 @@ export class RoleImporter {
                                     "value": {
                                         "commentsRequired": truethy(data.commentsRequired),
                                         "denialCommentsRequired": truethy(data.denialCommentsRequired),
-                                        "approvalSchemes": approvalSchemes
+                                        "approvalSchemes": approvalSchemes,
+                                        "dimensionSchema": stringToDimensionAttributes(data.dimensionAttributes)
                                     }
                                 },
                                 {

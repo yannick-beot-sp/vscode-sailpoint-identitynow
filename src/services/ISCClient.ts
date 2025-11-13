@@ -1542,7 +1542,7 @@ export class ISCClient {
 			...query
 		};
 		const apiConfig = await this.getApiConfiguration();
-		const api = new RolesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new RolesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.listRoles(queryValues);
 		return response;
 	}

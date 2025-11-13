@@ -10,7 +10,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
-- Add `dimensional` flag for role import
+- Add `dimensional` flag and attributes for dimention for role import and export
 - Add support for metadata when importing or exporting Access Profiles
 - Access Profiles can be updated when importing a CSV
 - Add support for metadata when importing or exporting Roles

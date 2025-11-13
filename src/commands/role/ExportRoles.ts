@@ -3,7 +3,7 @@ import { BaseCSVExporter } from "../BaseExporter";
 import { RolesTreeItem } from '../../models/ISCTreeItem';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
-import { EntitlementRef, RequestabilityForRole, RevocabilityForRole, Role, RoleMembershipSelectorType, RolesApiListRolesRequest } from 'sailpoint-api-client';
+import { EntitlementRef, RequestabilityForRole, RevocabilityForRole, Role, RoleMembershipSelectorType, RolesApiListRolesRequest, RoleV2025 } from 'sailpoint-api-client';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { roleApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
@@ -14,6 +14,7 @@ import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIt
 import { CacheService } from '../../services/cache/CacheService';
 import { EntitlementIdToSourceNameCacheService } from '../../services/cache/EntitlementIdToSourceNameCacheService';
 import { metadataToString } from '../../utils/metadataUtils';
+import { dimensionSchemaToString } from '../../utils/dimensionUtils';
 
 export class RoleExporterCommand {
 
@@ -120,13 +121,14 @@ export interface RoleDto {
      */
     membershipCriteria?: string;
 
+    dimensional?: boolean
+    dimensionAttributes?:string
     /**
      * A list of metadata associated with the Role. metadata are seperated by ";". 
      * The expected format is key:value1,value2;key2:value3
      */
     metadata?: string;
 
-    dimensional?: boolean
 
 }
 
@@ -163,6 +165,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
             "entitlements",
             "membershipCriteria",
             "dimensional",
+            "dimensionAttributes",
             "metadata"
         ];
         const paths = [
@@ -181,6 +184,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
             "entitlements",
             "membershipCriteria",
             "dimensional",
+            "dimensionAttributes",
             "metadata"
         ];
         const unwindablePaths: string[] = [];
@@ -190,12 +194,12 @@ class RoleExporter extends BaseCSVExporter<Role> {
         const sourceIdToNameCacheService = new SourceIdToNameCacheService(this.client);
         const entitlementIdToSourceNameCacheService = new EntitlementIdToSourceNameCacheService(this.client);
 
-        const iterator = new GenericAsyncIterableIterator<Role, RolesApiListRolesRequest>(
+        const iterator = new GenericAsyncIterableIterator<RoleV2025, RolesApiListRolesRequest>(
             this.client,
             this.client.getRoles);
 
         await this.writeData(headers, paths, unwindablePaths, iterator, task, token,
-            async (item: Role): Promise<RoleDto> => {
+            async (item: RoleV2025): Promise<RoleDto> => {
                 let membershipCriteria: string | undefined = undefined;
                 if (item.membership !== undefined && item.membership !== null
                     && RoleMembershipSelectorType.Standard === item.membership.type
@@ -227,7 +231,6 @@ class RoleExporter extends BaseCSVExporter<Role> {
                     description: item.description?.replaceAll('\r', "\\r").replaceAll('\n', "\\n"),
                     enabled: item.enabled,
                     requestable: item.requestable,
-                    dimensional: item.dimensional,
                     owner: owner,
                     accessProfiles: item.accessProfiles?.map(x => x.name).join(CSV_MULTIVALUE_SEPARATOR),
                     entitlements,
@@ -246,6 +249,8 @@ class RoleExporter extends BaseCSVExporter<Role> {
                         item.revocationRequestConfig?.approvalSchemes,
                         governanceGroupCache),
                     membershipCriteria,
+                    dimensional: item.dimensional,
+                    dimensionAttributes: dimensionSchemaToString(item.accessRequestConfig?.dimensionSchema),
                     metadata: metadataToString(item.accessModelMetadata)
                 };
 
