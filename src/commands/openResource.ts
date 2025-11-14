@@ -7,11 +7,11 @@ import { openPreview } from '../utils/vsCodeHelpers';
  */
 export class OpenResourceCommand {
 
-    async execute(node?: ISCResourceTreeItem, nodes?: ISCResourceTreeItem[]): Promise<void> {
+    async execute(node?: ISCResourceTreeItem): Promise<void> {
 
         console.log("> OpenResourceCommand.execute", node);
         // assessing that item is a SourceTreeItem
-        if (node === undefined || !(node instanceof ISCResourceTreeItem)) {
+        if (node === undefined || !node.hasOwnProperty("uri")) {
             console.log("WARNING: OpenResourceCommand: invalid item", node);
             throw new Error("OpenResourceCommand: invalid item");
         }
