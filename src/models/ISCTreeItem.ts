@@ -1056,12 +1056,12 @@ export class RoleTreeItem extends PageableFolderTreeItem<DimensionV2025> {
 
 	protected async loadNext(): Promise<AxiosResponse<DimensionV2025[]>> {
 		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
-		return await this.client.getPaginatedDimensions(
-			this.id,
-			undefined,
+		return await this.client.getPaginatedDimensions({
+			roleId: this.id,
 			limit,
-			this.currentOffset,
-			(this._total === 0))
+			offset: this.currentOffset,
+			count: (this._total === 0)
+		})
 	}
 
 	/**

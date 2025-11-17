@@ -488,6 +488,10 @@
         "title": "Export all Roles as CSV..."
       },
       {
+        "command": "vscode-sailpoint-identitynow.csv.export.dimensions.view",
+        "title": "Export all Dimensions as CSV..."
+      },
+      {
         "command": "vscode-sailpoint-identitynow.csv.export.roles-icon.view",
         "title": "Export all Roles as CSV...",
         "icon": {
@@ -944,6 +948,10 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.csv.export.roles.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.csv.export.dimensions.view",
           "when": "never"
         },
         {
@@ -1436,6 +1444,10 @@
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^roles/"
         },
         {
+          "command": "vscode-sailpoint-identitynow.csv.export.dimensions.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^role/"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.csv.export.roles-icon.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^roles/",
           "group": "inline@3"
@@ -1723,6 +1735,14 @@
         "vscode-sailpoint-identitynow.report.roles.filename": {
           "type": "string",
           "default": "%x/reports/%T-Roles-%y%M%d-%h%m%s.csv"
+        },
+        "vscode-sailpoint-identitynow.report.dimensions.filename": {
+          "type": "string",
+          "default": "%x/reports/%T-Dimensions-%y%M%d-%h%m%s.csv"
+        },
+        "vscode-sailpoint-identitynow.report.dimensions.for.role.filename": {
+          "type": "string",
+          "default": "%x/reports/%T-Dimensions-%S-%y%M%d-%h%m%s.csv"
         },
         "vscode-sailpoint-identitynow.sP-Config.singleResource.filename": {
           "type": "string",
