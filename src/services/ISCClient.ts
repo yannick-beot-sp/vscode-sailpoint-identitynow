@@ -1590,6 +1590,39 @@ export class ISCClient {
 
 	}
 
+	public async createDimension(roleId: string, dim: DimensionV2025): Promise<DimensionV2025> {
+		console.log("> createDimension", dim);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new DimensionsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.createDimension({ roleId, dimensionV2025: dim });
+		return response.data;
+	}
+
+	public async updateDimension(roleId: string, dimensionId: string, ops: Array<JsonPatchOperationV2025>) {
+		const apiConfig = await this.getApiConfiguration();
+		const api = new DimensionsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.patchDimension({
+			roleId,
+			dimensionId,
+			jsonPatchOperationV2025: ops
+		})
+		return response.data
+	}
+
+	
+	public async getDimensionByName(roleId: string,name: string): Promise<Role> {
+		console.log("> getDimensionByName", roleId, name);
+		const result = await this.getPaginatedDimensions({
+			roleId,
+			filters: `name eq "${name}"`,
+			limit: 2,
+			count: true
+		});
+		const dimension = this.ensureOneElement(result.data, "dimension", name);
+		console.log("< getDimensionByName", dimension);
+		return dimension;
+	}
+
 	//////////////////////////////
 	//#endregion Roles
 	//////////////////////////////

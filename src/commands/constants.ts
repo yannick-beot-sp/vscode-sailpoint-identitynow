@@ -108,6 +108,7 @@ export const IMPORT_ROLE_EXPLORER = `${COMMAND_PREFIX}.csv.import.roles.explorer
 export const ROLE_FILTER_VIEW = `${COMMAND_PREFIX}.roles.filter`;
 export const ROLE_UPDATE_FILTER_VIEW = `${COMMAND_PREFIX}.roles.update-filter`;
 export const EXPORT_DIMENSION_VIEW = `${COMMAND_PREFIX}.csv.export.dimensions.view`;
+export const IMPORT_DIMENSION_VIEW = `${COMMAND_PREFIX}.csv.import.dimensions.view`;
 
 // FORMS
 export const EXPORT_FORMS_VIEW = `${COMMAND_PREFIX}.forms.export.view`;

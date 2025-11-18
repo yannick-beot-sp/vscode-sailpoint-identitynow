@@ -91,6 +91,7 @@ import { EmailSettingsCommand } from './commands/EmailSettingsCommand';
 import { EvaluateTransformCloudCommand } from './commands/EvaluateTransformCloudCommand';
 import { CloneTransformCommand } from './commands/CloneTransformCommand';
 import { DimensionExporterCommand } from './commands/role/ExportDimensions';
+import { DimensionImporterTreeViewCommand } from './commands/role/DimensionImporterTreeViewCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -515,6 +516,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_DIMENSION_VIEW,
 			dimensionExporterCommand.execute, dimensionExporterCommand));
+	const dimensionImporterCommand = new DimensionImporterTreeViewCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_DIMENSION_VIEW,
+			dimensionImporterCommand.execute, dimensionImporterCommand));
 
 	// Access Profiles
 	const newAccessProfileCommand = new NewAccessProfileCommand(tenantService);

@@ -12,6 +12,7 @@ import { EntitlementIdToSourceNameCacheService } from '../../services/cache/Enti
 import { roleMembershipSelectorToStringConverter } from '../../parser/roleMembershipSelectorToStringConverter';
 import { UserCancelledError } from '../../errors';
 import { addRoleName, DimensionWithRoleNameName, getAllDimensions } from './DimensionAsyncIterables';
+import { DimensionCSVRecord } from '../../models/DimensionCsvRecord';
 
 export class DimensionExporterCommand {
 
@@ -57,38 +58,7 @@ export class DimensionExporterCommand {
     }
 }
 
-/**
- * A Dimension as exported to CSV
- */
-interface DimensionDto {
-    /**
-     * The human-readable display name of the Dimension
-     * @type {string}
-     * @memberof Dimension
-     */
-    'name': string;
 
-    /**
-     * A human-readable description of the Dimension
-     * @type {string}
-     * @memberof Dimension
-     */
-    'description'?: string;
-    /**
-     *
-     * @type {Array<AccessProfileRef>}
-     * @memberof Dimension
-     */
-    'accessProfiles'?: string;
-    'entitlements'?: string;
-
-    /**
-     * String representation of the membership criteria
-     */
-    membershipCriteria?: string;
-
-    roleName: string
-}
 
 const headers = [
     "roleName",
@@ -160,7 +130,7 @@ class DimensionExporter extends BaseCSVExporter<DimensionV2025> {
         console.log("> DimensionExporter.exportData");
 
         await this.writeData(headers, paths, unwindablePaths, iterator, task, token,
-            async (item: DimensionWithRoleNameName): Promise<DimensionDto> => {
+            async (item: DimensionWithRoleNameName): Promise<DimensionCSVRecord> => {
                 if (token.isCancellationRequested) {
                     throw new UserCancelledError();
                 }
@@ -184,7 +154,7 @@ class DimensionExporter extends BaseCSVExporter<DimensionV2025> {
                     console.warn(`Error converting entitlements for Dimension "${item.name}:"`, error);
                 }
 
-                const itemDto: DimensionDto = {
+                const itemDto: DimensionCSVRecord = {
                     name: item.name,
                     // Escape carriage returns in description.
                     description: item.description?.replaceAll('\r', "\\r").replaceAll('\n', "\\n"),

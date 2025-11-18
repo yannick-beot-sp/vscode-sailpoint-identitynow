@@ -3,46 +3,23 @@ import * as tmp from "tmp";
 
 import { ISCClient } from "../../services/ISCClient";
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
-import { AccessProfileRef, ApprovalSchemeForRole, EntitlementRef, JsonPatchOperationV2025OpV2025, RoleMembershipSelector, RoleMembershipSelectorType, RoleV2025 } from 'sailpoint-api-client';
+import { AccessProfileRef, DimensionCriteriaLevel2V2025, DimensionMembershipSelectorV2025, DimensionV2025, EntitlementRef, JsonPatchOperationV2025OpV2025, RoleMembershipSelectorType } from 'sailpoint-api-client';
 import { CSVReader } from '../../services/CSVReader';
-import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
-import { IdentityNameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { AccessProfileNameToIdCacheService } from '../../services/cache/AccessProfileNameToIdCacheService';
-import { stringToRoleApprovalSchemeConverter } from '../../utils/approvalSchemeConverter';
 import { importMode, ImportModeType, openPreview } from '../../utils/vsCodeHelpers';
 import { isEmpty, isNotBlank } from '../../utils/stringUtils';
-import { RoleMembershipSelectorConverter } from '../../parser/RoleMembershipSelectorConverter';
 import { Parser } from '../../parser/parser';
 import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService';
 import { EntitlementCacheService, KEY_SEPARATOR } from '../../services/cache/EntitlementCacheService';
-import { truethy } from '../../utils/booleanUtils';
 import { UserCancelledError } from '../../errors';
-import { stringToAttributeMetadata } from '../../utils/metadataUtils';
-import { stringToDimensionAttributes } from '../../utils/dimensionUtils';
+import { DimensionCSVRecord } from '../../models/DimensionCsvRecord';
 import { ImportResult } from '../../models/ImportResult';
+import { RoleNameToIdCacheService } from '../../services/cache/RoleNameToIdCacheService';
+import { DimensionMembershipSelectorConverter } from '../../parser/DimensionMembershipSelectorConverter';
 
-interface RoleCSVRecord {
-    name: string
-    description: string
-    enabled: boolean
-    requestable: boolean
-    owner: string
-    commentsRequired: boolean
-    denialCommentsRequired: boolean
-    approvalSchemes: string
-    revokeCommentsRequired: boolean
-    revokeDenialCommentsRequired: boolean
-    revokeApprovalSchemes: string
-    accessProfiles: string
-    entitlements: string
-    membershipCriteria: string
-    dimensional?: boolean
-    dimensionAttributes?: string
-    metadata: string
-}
 
-export class RoleImporter {
+export class DimensionImporter {
     readonly client: ISCClient;
     readonly logFilePath: string;
     readonly logWriter: CSVLogWriter;
@@ -57,7 +34,7 @@ export class RoleImporter {
         this.client = new ISCClient(this.tenantId, this.tenantName);
 
         this.logFilePath = tmp.tmpNameSync({
-            prefix: 'import-roles',
+            prefix: 'import-dimensions',
             postfix: ".log",
         });
 
@@ -80,9 +57,9 @@ export class RoleImporter {
     }
 
     protected async importFile(task: any, token: vscode.CancellationToken): Promise<void> {
-        console.log("> RoleImporter.importFile");
-        const csvReader = new CSVReader<RoleCSVRecord>(this.fileUri.fsPath);
-        await this.writeLog(null, 'Role', CSVLogWriterLogType.INFO, `Importing file from ${this.fileUri.fsPath} in ${this.tenantDisplayName}`);
+        console.log("> dimensionImporter.importFile");
+        const csvReader = new CSVReader<DimensionCSVRecord>(this.fileUri.fsPath);
+        await this.writeLog(null, 'Dimension', CSVLogWriterLogType.INFO, `Importing file from ${this.fileUri.fsPath} in ${this.tenantDisplayName}`);
 
         const nbLines = await csvReader.getLines();
         const incr = 100 / nbLines;
@@ -95,14 +72,13 @@ export class RoleImporter {
             error: 0
         };
 
-        const governanceGroupCache = new GovernanceGroupNameToIdCacheService(this.client);
+        const roleCache = new RoleNameToIdCacheService(this.client);
         const accessProfileNameToIdCacheService = new AccessProfileNameToIdCacheService(this.client);
-        const identityCacheService = new IdentityNameToIdCacheService(this.client);
         const sourceCacheService = new SourceNameToIdCacheService(this.client);
         const entitlementCacheService = new EntitlementCacheService(this.client);
         const parser = new Parser();
         try {
-            await csvReader.processLine(async (data: RoleCSVRecord) => {
+            await csvReader.processLine(async (data: DimensionCSVRecord) => {
                 if (token.isCancellationRequested) {
                     throw new UserCancelledError();
                 }
@@ -110,30 +86,28 @@ export class RoleImporter {
                 task.report({ increment: incr, message: data.name });
                 if (isEmpty(data.name)) {
                     result.error++;
-                    const nameMessage = `Missing attribute 'name' in record`;
-                    await this.writeLog(processedLines, 'role', CSVLogWriterLogType.ERROR, nameMessage);
-                    vscode.window.showErrorMessage(nameMessage);
+                    const nameMessage = `Missing 'name' in record`;
+                    await this.writeLog(processedLines, 'dimension', CSVLogWriterLogType.ERROR, nameMessage);
                     return;
                 }
 
-                const roleName = data.name.trim();
+                const dimensionName = data.name.trim();
 
-                if (isEmpty(data.owner)) {
+                if (isEmpty(data.roleName)) {
                     result.error++;
-                    const owMessage = `Missing 'owner' in CSV`;
-                    await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, owMessage);
+                    const owMessage = `Missing 'roleName' in CSV`;
+                    await this.writeLog(processedLines, dimensionName, CSVLogWriterLogType.ERROR, owMessage);
                     vscode.window.showErrorMessage(owMessage);
                     return;
                 }
 
-                let ownerId: string;
+                let roleId: string;
                 try {
-                    ownerId = await identityCacheService.get(data.owner);
+                    roleId = await roleCache.get(data.roleName);
                 } catch (error) {
                     result.error++;
-                    const srcMessage = `Unable to find owner with name '${data.owner}' in ISC`;
-                    await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, srcMessage);
-                    vscode.window.showErrorMessage(srcMessage);
+                    const srcMessage = `Unable to find role with name '${data.roleName}' in ISC`;
+                    await this.writeLog(processedLines, dimensionName, CSVLogWriterLogType.ERROR, srcMessage);
                     return;
                 }
 
@@ -152,7 +126,7 @@ export class RoleImporter {
                     } catch (error) {
                         result.error++;
                         const etMessage = `Unable to find access an access profile: ${error}`;
-                        await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, etMessage);
+                        await this.writeLog(processedLines, dimensionName, CSVLogWriterLogType.ERROR, etMessage);
                         vscode.window.showErrorMessage(etMessage);
                         return;
                     }
@@ -180,7 +154,7 @@ export class RoleImporter {
                     } catch (error) {
                         result.error++;
                         const etMessage = `Unable to find access an entitlement: ${error}`;
-                        await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, etMessage);
+                        await this.writeLog(processedLines, dimensionName, CSVLogWriterLogType.ERROR, etMessage);
                         vscode.window.showErrorMessage(etMessage);
                         return;
                     }
@@ -190,72 +164,39 @@ export class RoleImporter {
                     throw new UserCancelledError();
                 }
 
-                let approvalSchemes: ApprovalSchemeForRole[] | undefined = undefined,
-                    revokeApprovalSchemes: ApprovalSchemeForRole[] | undefined = undefined;
-                try {
-                    approvalSchemes = await stringToRoleApprovalSchemeConverter(
-                        data.approvalSchemes, governanceGroupCache);
-                    revokeApprovalSchemes = await stringToRoleApprovalSchemeConverter(
-                        data.revokeApprovalSchemes, governanceGroupCache);
-                } catch (error) {
-                    result.error++;
-                    const srcMessage = `Unable to build approval scheme: ${error}`;
-                    await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, srcMessage);
-                    vscode.window.showErrorMessage(srcMessage);
-                    return;
-                }
-
-                if (token.isCancellationRequested) {
-                    throw new UserCancelledError();
-                }
-
-                let membership: RoleMembershipSelector | undefined = undefined;
+                let membership: DimensionMembershipSelectorV2025 | undefined = undefined;
                 if (isNotBlank(data.membershipCriteria)) {
                     try {
                         const expression = parser.parse(data.membershipCriteria);
 
-                        const converter = new RoleMembershipSelectorConverter(sourceCacheService);
+                        const converter = new DimensionMembershipSelectorConverter();
                         await converter.visitExpression(expression, undefined);
 
                         membership = {
                             type: RoleMembershipSelectorType.Standard,
-                            criteria: converter.root
+                            criteria: {
+                                operation: 'AND',
+                                children: [converter.root as DimensionCriteriaLevel2V2025]
+                            }
+
                         };
                     } catch (error) {
                         result.error++;
                         const srcMessage = `Unable to build membership criteria: ${error}`;
-                        await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, srcMessage);
+                        await this.writeLog(processedLines, dimensionName, CSVLogWriterLogType.ERROR, srcMessage);
                         vscode.window.showErrorMessage(srcMessage);
                         return;
                     }
                 }
                 const description = data.description?.replaceAll("\\r", "\r").replaceAll("\\n", "\n")
 
-                const rolePayload: RoleV2025 = {
-                    "name": roleName,
+                const dimensionPayload: DimensionV2025 = {
+                    "name": dimensionName,
                     description,
-                    "enabled": truethy(data.enabled),
-                    requestable: truethy(data.requestable),
-                    "owner": {
-                        "id": ownerId,
-                        "type": "IDENTITY",
-                        "name": data.owner
-                    },
-                    "accessRequestConfig": {
-                        "commentsRequired": truethy(data.commentsRequired),
-                        "denialCommentsRequired": truethy(data.denialCommentsRequired),
-                        "approvalSchemes": approvalSchemes,
-                        dimensionSchema: stringToDimensionAttributes(data.dimensionAttributes)
-                    },
-                    "revocationRequestConfig": {
-                        "commentsRequired": truethy(data.revokeCommentsRequired),
-                        "denialCommentsRequired": truethy(data.revokeDenialCommentsRequired),
-                        "approvalSchemes": revokeApprovalSchemes
-                    },
                     accessProfiles,
                     entitlements,
                     membership,
-                    dimensional: truethy(data.dimensional),
+                    owner: null
                 };
 
 
@@ -265,68 +206,22 @@ export class RoleImporter {
                 processedLines++
 
                 try {
-                    const newRole = await this.client.createRole(rolePayload);
-
-                    if (data.metadata) {
-                        const attributes = stringToAttributeMetadata(data.metadata)
-                        await this.client.updateRoleMetadata(
-                            newRole.id,
-                            attributes
-                        )
-                    }
-
-                    await this.writeLog(processedLines, roleName, CSVLogWriterLogType.SUCCESS, `Successfully imported role '${data.name}'`);
+                    await this.client.createDimension(roleId, dimensionPayload)
+                    await this.writeLog(processedLines, dimensionName, CSVLogWriterLogType.SUCCESS, `Successfully imported dimension '${data.name}'`);
                     result.success++;
                 } catch (error: any) {
-                    const isConflict = error.message?.endsWith("already exists.")
+                    const isConflict = error.message?.includes("is already associated with ROLE")
                     if (isConflict && this.mode === importMode.createOrUpdate) {
-                        console.log(`Role ${roleName} already exists. Try to update...`);
+                        console.log(`Dimension ${dimensionName} already exists. Try to update...`);
 
-                        // Try to get the id
-                        const role = await this.client.getRoleByName(roleName);
-                        if (role) {
+                        // Try to get the id of the dimension
+                        const dimension = await this.client.getDimensionByName(roleId, dimensionName);
+                        if (dimension) {
 
                             const updates = [
                                 {
                                     "property": "description",
                                     "value": description
-                                },
-                                {
-                                    "property": "enabled",
-                                    "value": truethy(data.enabled)
-                                },
-                                {
-                                    "property": "requestable",
-                                    "value": truethy(data.requestable)
-                                },
-                                {
-                                    "property": "dimensional",
-                                    "value": truethy(data.dimensional)
-                                },
-                                {
-                                    "property": "owner",
-                                    "value": {
-                                        "id": ownerId,
-                                        "type": "IDENTITY",
-                                        "name": data.owner
-                                    }
-                                },
-                                {
-                                    "property": "accessRequestConfig",
-                                    "value": {
-                                        "commentsRequired": truethy(data.commentsRequired),
-                                        "denialCommentsRequired": truethy(data.denialCommentsRequired),
-                                        "approvalSchemes": approvalSchemes,
-                                        "dimensionSchema": stringToDimensionAttributes(data.dimensionAttributes)
-                                    }
-                                },
-                                {
-                                    "property": "revocationRequestConfig",
-                                    "value": {
-                                        "commentsRequired": truethy(data.revokeCommentsRequired),
-                                        "denialCommentsRequired": truethy(data.revokeDenialCommentsRequired),
-                                        "approvalSchemes": revokeApprovalSchemes
-                                    }
                                 },
                                 {
                                     "property": "accessProfiles",
@@ -340,39 +235,36 @@ export class RoleImporter {
                                     "property": "membership",
                                     "value": membership ?? null
                                 },
-                                {
-                                    "property": "accessModelMetadata/attributes",
-                                    "value": stringToAttributeMetadata(data.metadata) ?? null
-                                },
+
                             ].map((item) => ({
                                 "op": JsonPatchOperationV2025OpV2025.Replace,
                                 "path": `/${item.property}`,
                                 "value": item.value
                             }))
                             try {
-                                await this.client.updateRole(role.id, updates)
-                                await this.writeLog(processedLines, roleName, CSVLogWriterLogType.SUCCESS, `Successfully updated access profile '${roleName}'`);
+                                await this.client.updateDimension(roleId, dimension.id, updates)
+                                await this.writeLog(processedLines, dimensionName, CSVLogWriterLogType.SUCCESS, `Successfully updated access profile '${dimensionName}'`);
                                 result.success++;
                             } catch (error) {
                                 result.error++;
-                                await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, `Cannot update role: '${error.message}'`);
+                                await this.writeLog(processedLines, dimensionName, CSVLogWriterLogType.ERROR, `Cannot update dimension: '${error.message}'`);
 
                             }
 
                         } else {
-                            // Role not found
-                            // very unlikely. We shall find the role as we have a conflicting name
+                            // dimension not found
+                            // very unlikely. We shall find the dimension as we have a conflicting name
                             result.error++;
-                            await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, `Cannot update role: '${roleName}' not found.`);
+                            await this.writeLog(processedLines, dimensionName, CSVLogWriterLogType.ERROR, `Cannot update dimension: '${dimensionName}' not found.`);
                         }
 
                     } else if (isConflict && this.mode === importMode.createOnly) {
                         result.error++;
-                        await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, `Cannot create role: '${roleName}' already exists.`);
+                        await this.writeLog(processedLines, dimensionName, CSVLogWriterLogType.ERROR, `Cannot create dimension: '${dimensionName}' already exists for ${data.roleName}.`);
 
                     } else {
                         result.error++;
-                        await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, `Cannot create role: '${error.message}'`);
+                        await this.writeLog(processedLines, dimensionName, CSVLogWriterLogType.ERROR, `Cannot create dimension: '${error.message}'`);
                     }
                 }
             });
@@ -393,10 +285,8 @@ export class RoleImporter {
             // do nothing hopefully
         }
 
-        console.log("Governance Group Cache stats", governanceGroupCache.getStats());
-        governanceGroupCache.flushAll();
-        console.log("Identity Cache stats", identityCacheService.getStats());
-        identityCacheService.flushAll();
+        console.log("Role Cache stats", roleCache.getStats());
+        roleCache.flushAll();
         console.log("Access Profile Cache stats", accessProfileNameToIdCacheService.getStats());
         accessProfileNameToIdCacheService.flushAll();
         console.log("Source Cache stats", sourceCacheService.getStats());

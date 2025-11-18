@@ -15,12 +15,7 @@ import { isEmpty, isNotBlank } from "../../utils/stringUtils";
 import { truethy } from "../../utils/booleanUtils";
 import { UserCancelledError } from "../../errors";
 import { stringToAttributeMetadata } from "../../utils/metadataUtils";
-
-
-interface AccessProfileImportResult {
-    success: number
-    error: number
-}
+import { ImportResult } from "../../models/ImportResult";
 
 interface AccessProfileCSVRecord {
     name: string
@@ -84,7 +79,7 @@ export class AccessProfileImporter {
         const incr = 100 / nbLines;
         task.report({ increment: 0 });
 
-        const result: AccessProfileImportResult = {
+        const result: ImportResult = {
             success: 0,
             error: 0
         };

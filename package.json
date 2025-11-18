@@ -492,6 +492,10 @@
         "title": "Export all Dimensions as CSV..."
       },
       {
+        "command": "vscode-sailpoint-identitynow.csv.import.dimensions.view",
+        "title": "Import Dimensions as CSV..."
+      },
+      {
         "command": "vscode-sailpoint-identitynow.csv.export.roles-icon.view",
         "title": "Export all Roles as CSV...",
         "icon": {
@@ -955,6 +959,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.csv.import.dimensions.view",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.csv.export.roles-icon.view",
           "when": "never"
         },
@@ -1143,7 +1151,7 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.refresh-forced",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|transforms|provisioning-policies|roles|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions|search-attributes|identity-attributes|source-apps|source-app|campaigns/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|transforms|provisioning-policies|roles|roleDimensional|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions|search-attributes|identity-attributes|source-apps|source-app|campaigns/",
           "group": "inline@50"
         },
         {
@@ -1445,7 +1453,13 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.csv.export.dimensions.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(^roles|roleDimensional)/"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(^roles|roleDimensional)/",
+          "group": "dimension"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.csv.import.dimensions.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^roles/",
+          "group": "dimension"
         },
         {
           "command": "vscode-sailpoint-identitynow.csv.export.roles-icon.view",
