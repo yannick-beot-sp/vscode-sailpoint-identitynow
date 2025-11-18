@@ -7,6 +7,7 @@ The SailPoint Identity Security Cloud extension makes it easy to:
 
 - Connect to several tenants
 - Import and export config of a tenant
+- Edit access request, public identities, password, and org configuration for a tenant
 - View, edit, aggregate, test, peek, ping, clone, or reset sources
 - View, create, edit, delete, clone, and test transforms
 - View, create, edit, delete provisioning policies of a source

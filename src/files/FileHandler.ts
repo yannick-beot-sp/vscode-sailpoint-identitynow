@@ -56,12 +56,8 @@ export class FileHandler {
         // going through all object types for a more "dynamic" approach 
         // => you only need to update FileHandlerObjectType
         let resourceType: FileHandlerObjectType;
-        let isBeta = false;
         const objectType = Object.keys(FileHandlerObjectType).find(x => olduri.path.match(FileHandlerObjectType[x]));
         resourceType = FileHandlerObjectType[objectType];
-        if (resourceType === FileHandlerObjectType.connectorRule) {
-            isBeta = true;
-        }
 
         // 3. get the object by name to get the new id
         let data: any;
@@ -92,11 +88,11 @@ export class FileHandler {
         // Close the active window to open the 'new' uri with the id
         if (oldid !== data.id && olduri === vscode.window.activeTextEditor?.document.uri) {
             await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
-            const newUri = getResourceUri(tenantName, resourceType, data.id, data.name, isBeta);
+            const newUri = getResourceUri(tenantName, resourceType, data.id, data.name);
 
             // Open document and then show document to force JSON
-           openPreview(newUri, 'json', false)
-           vscode.commands.executeCommand(commands.REFRESH_FORCED)
+            openPreview(newUri, 'json', false)
+            vscode.commands.executeCommand(commands.REFRESH_FORCED)
         }
     }
 }

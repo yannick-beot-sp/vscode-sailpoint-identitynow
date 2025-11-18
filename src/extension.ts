@@ -92,6 +92,7 @@ import { EvaluateTransformCloudCommand } from './commands/EvaluateTransformCloud
 import { CloneTransformCommand } from './commands/CloneTransformCommand';
 import { DimensionExporterCommand } from './commands/role/ExportDimensions';
 import { DimensionImporterTreeViewCommand } from './commands/role/DimensionImporterTreeViewCommand';
+import { EditOrgConfigCommand } from './commands/tenant/EditOrgConfigCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -144,6 +145,11 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.EDIT_PASSWORD_ORG_CONFIG,
 			editPasswordConfigCommand.execute,
 			editPasswordConfigCommand));
+	const editOrgConfigCommand = new EditOrgConfigCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EDIT_ORG_CONFIG,
+			editOrgConfigCommand.execute,
+			editOrgConfigCommand));
 
 	const generateDigitTokenCommand = new GenerateDigitTokenCommand(tenantService)
 	context.subscriptions.push(

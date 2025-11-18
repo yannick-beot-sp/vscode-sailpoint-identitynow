@@ -56,8 +56,7 @@ export class UpdateWorkflowStatusCommand {
                 node.tenantName,
                 "workflows",
                 node.resourceId,
-                node.label as string,
-                true
+                node.label as string
             )
             await vscode.commands.executeCommand(commands.MODIFIED_RESOURCE, uri);
         });

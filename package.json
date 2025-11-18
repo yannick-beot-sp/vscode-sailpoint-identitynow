@@ -117,6 +117,10 @@
         "title": "Edit password org configuration..."
       },
       {
+        "command": "vscode-sailpoint-identitynow.tenant.edit.org-config",
+        "title": "Edit organization configuration..."
+      },
+      {
         "command": "vscode-sailpoint-identitynow.tenant.generate-digit-token",
         "title": "Generate a digit token for password reset..."
       },
@@ -715,6 +719,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.tenant.edit.org-config",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.tenant.generate-digit-token",
           "when": "never"
         },
@@ -1178,6 +1186,10 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.tenant.edit.access-request-config",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^tenant/"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.tenant.edit.org-config",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^tenant/"
         },
         {

@@ -82,8 +82,7 @@ export class NewAttributeSearchConfigCommand {
                 values["tenant"].tenantName,
                 "accounts/search-attribute-config",
                 name,
-                name,
-                true
+                name
             )
 
             openPreview(newUri);

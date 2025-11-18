@@ -16,6 +16,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 - Access Profiles can be updated when importing a CSV (cf. [#84](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/84))
 - Add support for metadata when importing or exporting Access Profiles
 - Import/Export of dimensions for dimensional roles
+- Edit org settings
 
 ### Changed
 

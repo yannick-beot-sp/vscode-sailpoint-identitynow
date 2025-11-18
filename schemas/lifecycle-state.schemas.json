@@ -41,15 +41,11 @@
       "example": "Technical Name",
       "description": "The technical name for lifecycle state. This is for internal use."
     },
-    "identityState":{
+    "identityState": {
       "anyOf": [
         {
           "type": "string",
-          "enum": [
-            "ACTIVE",
-            "INACTIVE_SHORT_TERM",
-            "INACTIVE_LONG_TERM"
-          ]
+          "enum": ["ACTIVE", "INACTIVE_SHORT_TERM", "INACTIVE_LONG_TERM"]
         },
         {
           "type": "null"
@@ -68,6 +64,30 @@
       ],
       "example": "Lifecycle description",
       "description": "Lifecycle state description."
+    },
+    "accessActionConfiguration": {
+      "type": "object",
+      "description": "This is used for access configuration for a lifecycle state",
+      "properties": {
+        "removeAllAccessEnabled": {
+          "type": "boolean",
+          "example": true,
+          "description": "If true, then all accesses are marked for removal."
+        }
+      }
+    },
+    "priority": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "format": "int32"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "example": 10,
+      "description": "Used to control the order of lifecycle states when listing with `?sorters=priority`. Lower numbers appear first (ascending order). Out-of-the-box lifecycle states are assigned priorities in increments of 10."
     },
     "identityCount": {
       "type": "integer",
@@ -97,10 +117,7 @@
         },
         "emailAddressList": {
           "type": "array",
-          "example": [
-            "test@test.com",
-            "test2@test.com"
-          ],
+          "example": ["test@test.com", "test2@test.com"],
           "items": {
             "type": "string"
           },
@@ -118,10 +135,7 @@
             "example": "ENABLE",
             "type": "string",
             "description": "Describes if action will be enabled or disabled",
-            "enum": [
-              "ENABLE",
-              "DISABLE"
-            ]
+            "enum": ["ENABLE", "DISABLE"]
           },
           "sourceIds": {
             "type": "array",
@@ -129,10 +143,7 @@
               "type": "string"
             },
             "uniqueItems": true,
-            "example": [
-              "2c918084660f45d6016617daa9210584",
-              "2c918084660f45d6016617daa9210500"
-            ],
+            "example": ["2c918084660f45d6016617daa9210584", "2c918084660f45d6016617daa9210500"],
             "description": "List of unique source IDs. The sources must have the ENABLE feature or flat file source. See \"/sources\" endpoint for source features."
           }
         }
@@ -144,15 +155,9 @@
         "type": "string"
       },
       "uniqueItems": true,
-      "example": [
-        "2c918084660f45d6016617daa9210584",
-        "2c918084660f45d6016617daa9210500"
-      ],
+      "example": ["2c918084660f45d6016617daa9210584", "2c918084660f45d6016617daa9210500"],
       "description": "List of unique access-profile IDs that are associated with the lifecycle state."
     }
   },
-  "required": [
-    "name",
-    "technicalName"
-  ]
+  "required": ["name", "technicalName"]
 }

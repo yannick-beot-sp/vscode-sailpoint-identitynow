@@ -71,7 +71,7 @@ export function buildResourceUri(params: {
  * @param name 
  * @returns 
  */
-export function getResourceUri(tenantName: string, resourceType: string, id: string, name: string, beta = false): Uri {
+export function getResourceUri(tenantName: string, resourceType: string, id: string, name: string): Uri {
     const baseUri = Uri.from({ scheme: URL_PREFIX, authority: tenantName, path: '/' });
     name = name?.replaceAll("/", "%2F")
     // ensure all parts are not null

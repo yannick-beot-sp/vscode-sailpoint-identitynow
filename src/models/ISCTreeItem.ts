@@ -252,7 +252,6 @@ export class ISCResourceTreeItem extends BaseTreeItem {
 		resourceType: string;
 		id: string;
 		resourceId?: string,
-		beta?: boolean;
 		collapsible?: vscode.TreeItemCollapsibleState;
 		parentId?: string;
 		subId?: string;
@@ -264,7 +263,6 @@ export class ISCResourceTreeItem extends BaseTreeItem {
 			...{
 				// By default, a ISCResourceTreeItem will be a leaf, meaning that there will not be any childs
 				collapsible: vscode.TreeItemCollapsibleState.None,
-				beta: false // v3 by default
 			},
 			...options
 		}
@@ -276,7 +274,7 @@ export class ISCResourceTreeItem extends BaseTreeItem {
 			this.uri = getResourceUri(options.tenantName,
 				options.resourceType,
 				options.parentId,
-				options.label, options.beta)
+				options.label)
 			this.uri = this.uri.with({
 				path: path.posix.join(
 					getPathByUri(this.uri) || "",
@@ -289,7 +287,7 @@ export class ISCResourceTreeItem extends BaseTreeItem {
 			this.uri = getResourceUri(options.tenantName,
 				options.resourceType,
 				options.resourceId ?? options.id,
-				options.label, options.beta);
+				options.label);
 			this.resourceId = options.resourceId ?? options.id
 		}
 	}
@@ -640,7 +638,6 @@ export class RuleTreeItem extends ISCResourceTreeItem {
 			label,
 			resourceType: "connector-rules",
 			id,
-			beta: true
 		})
 	}
 
@@ -1215,8 +1212,7 @@ export class FormTreeItem extends ISCResourceTreeItem {
 			label,
 			resourceType: "form-definitions",
 			id: `${tenantId}-${id}`,
-			resourceId: id,
-			beta: true
+			resourceId: id
 		})
 	}
 
@@ -1266,7 +1262,6 @@ export class SearchAttributeTreeItem extends ISCResourceTreeItem {
 			label: name,
 			resourceType: "accounts/search-attribute-config",
 			id: uniqueId,
-			beta: true,
 			resourceId: name
 		})
 	}
@@ -1316,7 +1311,6 @@ export class IdentityAttributeTreeItem extends ISCResourceTreeItem {
 			label: displayName,
 			resourceType: "identity-attributes",
 			id: uniqueId,
-			beta: true,
 			resourceId: name
 		})
 	}
@@ -1393,7 +1387,6 @@ export class IdentityTreeItem extends ISCResourceTreeItem {
 			label,
 			resourceType: "identities",
 			id,
-			beta: true
 		})
 	}
 
@@ -1480,7 +1473,6 @@ export class ApplicationTreeItem extends ISCResourceTreeItem implements Pageable
 			label,
 			resourceType: "source-apps",
 			id,
-			beta: true,
 			collapsible: vscode.TreeItemCollapsibleState.Collapsed
 		})
 		this.client = new ISCClient(this.tenantId, this.tenantName);

@@ -120,6 +120,7 @@ export const IMPORT_FORMS_ICON_VIEW = `${COMMAND_PREFIX}.forms.import.icon-view`
 export const EDIT_PUBLIC_IDENTITIES_CONFIG = `${COMMAND_PREFIX}.tenant.edit.public-identities-config`;
 export const EDIT_ACCESS_REQUEST_CONFIG = `${COMMAND_PREFIX}.tenant.edit.access-request-config`;
 export const EDIT_PASSWORD_ORG_CONFIG = `${COMMAND_PREFIX}.tenant.edit.password-org-config`;
+export const EDIT_ORG_CONFIG = `${COMMAND_PREFIX}.tenant.edit.org-config`;
 export const GENERATE_DIGIT_TOKEN = `${COMMAND_PREFIX}.tenant.generate-digit-token`;
 export const EMAIL_SETTINGS = `${COMMAND_PREFIX}.tenant.email-settings`;
 

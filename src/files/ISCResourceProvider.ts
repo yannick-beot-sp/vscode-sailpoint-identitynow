@@ -216,8 +216,8 @@ export class ISCResourceProvider implements FileSystemProvider {
 					JSON.stringify(jsonpatch)
 				);
 
-			} else if (resourcePath.match("identity-profiles|access-profiles|roles|search-attribute-config|source-apps|campaigns")) {
-				// special treatment to send patch as PUT is not supported
+			} else if (resourcePath.match("identity-profiles|access-profiles|roles|search-attribute-config|source-apps|campaigns|org-config")) {
+				// special treatment to use PATCH method as PUT is not supported
 				let oldData
 				// special case for applications
 				if (/\/source-apps\//.test(resourcePath)) {
@@ -233,11 +233,11 @@ export class ISCResourceProvider implements FileSystemProvider {
 				jsonpatch = jsonpatch.filter((p) => p.path !== "/modified" && p.path !== "/identityRefreshRequired");
 				let patchResourcePath;
 				// Patch support for identity profiles only in beta for now
-				if (!resourcePath.match("lifecycle-states")) {
-					patchResourcePath = resourcePath.replace("v3", "beta");
-				} else {
-					patchResourcePath = resourcePath;
-				}
+				// if (!resourcePath.match("lifecycle-states")) {
+				// 	patchResourcePath = resourcePath.replace("v3", "beta");
+				// } else {
+				// 	patchResourcePath = resourcePath;
+				// }
 
 				if (resourcePath.match("search-attribute-config")) {
 					// Supported patchable fields are: /displayName, /name, /applicationAttributes
@@ -284,7 +284,8 @@ export class ISCResourceProvider implements FileSystemProvider {
 				}
 
 				await client.patchResource(
-					patchResourcePath,
+					// patchResourcePath,
+					resourcePath,
 					JSON.stringify(jsonpatch)
 				);
 			} else if (resourcePath.match(/identities\//)) {
