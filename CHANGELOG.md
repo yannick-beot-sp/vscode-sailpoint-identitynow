@@ -10,6 +10,16 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Removed
+
+## [1.3.23] - 2025-11-18
+
+### Added
+
 - Add `dimensional` flag and attributes for dimention for role import and export
 - Add support for metadata when importing or exporting Roles
 - Roles can be updated when importing a CSV (cf. [#84](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/84))
@@ -21,13 +31,14 @@ This changelog is following the recommended format by [keepachangelog](https://k
 ### Changed
 
 - Update to use V2025 by default. Not all endpoints have been updated.
-- Remove the cloning of password when cloning a source
 
 ### Fixed
 
 - Fix issue with Access Profile & Entitlement Pie Chart of a campaign (cf. [#125](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/125))
 
 ### Removed
+
+- Remove the cloning of password when cloning a source
 
 ## [1.3.22] - 2025-10-03
 

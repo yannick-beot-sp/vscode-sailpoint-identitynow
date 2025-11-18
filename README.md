@@ -455,6 +455,19 @@ The extension supports the following settings:
 
 ### Unreleased
 
+### 1.3.23
+
+- Add `dimensional` flag and attributes for dimention for role import and export
+- Add support for metadata when importing or exporting Roles
+- Roles can be updated when importing a CSV (cf. [#84](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/84))
+- Access Profiles can be updated when importing a CSV (cf. [#84](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/84))
+- Add support for metadata when importing or exporting Access Profiles
+- Import/Export of dimensions for dimensional roles
+- Edit org settings
+- Update to use V2025 by default. Not all endpoints have been updated.
+- Fix issue with Access Profile & Entitlement Pie Chart of a campaign (cf. [#125](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/125))
+- Remove the cloning of password when cloning a source
+
 ### 1.3.22
 
 - Command to clone a transform
