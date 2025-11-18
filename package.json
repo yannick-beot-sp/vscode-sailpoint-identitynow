@@ -1123,12 +1123,12 @@
       "view/item/context": [
         {
           "command": "vscode-sailpoint-identitynow.open-url",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(tenantReadOnly|tenantWritable|.*source|disabledWorkflow|identity-profile|lifecycle-state|role|dimension|access-profile|service-desk-integration|form-definition|source-app|campaign|identity)$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(tenantReadOnly|tenantWritable|.*source|disabledWorkflow|identity-profile|lifecycle-state|role|roleDimensional|dimension|access-profile|service-desk-integration|form-definition|source-app|campaign|identity)$/",
           "group": "_@0"
         },
         {
           "command": "vscode-sailpoint-identitynow.open-resource",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|source|schema|provisioning-policy|role|dimension|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|identities|source-app|campaign)$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|source|schema|provisioning-policy|role|roleDimensional|dimension|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|identities|source-app|campaign)$/",
           "group": "_@0"
         },
         {
@@ -1138,7 +1138,7 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.remove-resource",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|schema|provisioning-policy|role|dimension|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|search-attribute|identity-attribute|source-app)$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|schema|provisioning-policy|role|roleDimensional|dimension|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|search-attribute|identity-attribute|source-app)$/",
           "group": "zzzremove@100"
         },
         {
@@ -1445,7 +1445,7 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.csv.export.dimensions.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^role/"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(^roles|roleDimensional)/"
         },
         {
           "command": "vscode-sailpoint-identitynow.csv.export.roles-icon.view",

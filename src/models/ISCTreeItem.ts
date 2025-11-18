@@ -1028,7 +1028,7 @@ export class RoleTreeItem extends PageableFolderTreeItem<DimensionV2025> {
 		tenantDisplayName: string,
 		label: string,
 		id: string,
-		dimensional: boolean) {
+		private readonly dimensional: boolean) {
 		super(label, "role", tenantId, tenantName, tenantDisplayName, 'No dimension found',
 			(dimension => new DimensionTreeItem({
 				tenantId,
@@ -1068,7 +1068,7 @@ export class RoleTreeItem extends PageableFolderTreeItem<DimensionV2025> {
 	 * Filtering not supported... yet
 	 */
 	get computedContextValue() {
-		return this.contextValue
+		return this.dimensional ?  `${this.contextValue}Dimensional` : this.contextValue
 	}
 	/**
 	 * Need to force open command as it's not inhereting from ISCResourceTreeItem anymore

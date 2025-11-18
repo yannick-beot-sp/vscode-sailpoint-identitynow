@@ -195,8 +195,7 @@ class DimensionExporter extends BaseCSVExporter<DimensionV2025> {
                 };
 
                 return itemDto;
-            }, false);
-
+            })
     }
 }
 
