@@ -3,7 +3,7 @@ import * as tmp from "tmp";
 
 import { ISCClient } from "../../services/ISCClient";
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
-import { AccessProfileRef, DimensionCriteriaLevel2V2025, DimensionMembershipSelectorV2025, DimensionV2025, EntitlementRef, JsonPatchOperationV2025OpV2025, RoleMembershipSelectorType } from 'sailpoint-api-client';
+import { AccessProfileRef, DimensionCriteriaLevel1V2025, DimensionMembershipSelectorV2025, DimensionV2025, EntitlementRef, JsonPatchOperationV2025OpV2025, RoleMembershipSelectorType, RoleV2025 } from 'sailpoint-api-client';
 import { CSVReader } from '../../services/CSVReader';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { AccessProfileNameToIdCacheService } from '../../services/cache/AccessProfileNameToIdCacheService';
@@ -17,6 +17,64 @@ import { DimensionCSVRecord } from '../../models/DimensionCsvRecord';
 import { ImportResult } from '../../models/ImportResult';
 import { RoleNameToIdCacheService } from '../../services/cache/RoleNameToIdCacheService';
 import { DimensionMembershipSelectorConverter } from '../../parser/DimensionMembershipSelectorConverter';
+
+/**
+ * Go through membership criteria and extract the identity attributes
+ * @param node 
+ * @param uniqueProperties 
+ */
+function extractAllIdentityAttributes(node: DimensionCriteriaLevel1V2025, uniqueProperties = new Set<string>): Set<string> {
+    /**
+     * membership criteria is like: {
+        "type": "STANDARD",
+        "criteria": {
+            "operation": "AND",
+            "key": null,
+            "stringValue": null,
+            "children": [
+                {
+                    "operation": "OR",
+                    "key": null,
+                    "stringValue": null,
+                    "children": [
+                        {
+                            "operation": "EQUALS",
+                            "key": {
+                                "type": "IDENTITY",
+                                "property": "attribute.city",
+                                "sourceId": null
+                            },
+                            "stringValue": "Lyon",
+                            "children": null
+                        }
+                    ]
+                }
+            ]
+        },
+        "identities": null
+    }
+     */
+    // Check if any key
+    if (node.key && node.key.property) {
+        const propertyValue = node.key.property;
+
+        // Split the property 
+        const parts = propertyValue.split('.');
+
+        // carefully get the second part (city, costCenter, etc.) and add it to the list
+        if (parts.length > 1) {
+            uniqueProperties.add(parts[parts.length - 1]);
+        }
+    }
+
+    // Recursive call
+    if (node.children && node.children.length > 0) {
+        for (const child of node.children) {
+            extractAllIdentityAttributes(child, uniqueProperties);
+        }
+    }
+    return uniqueProperties;
+}
 
 
 export class DimensionImporter {
@@ -101,12 +159,20 @@ export class DimensionImporter {
                     return;
                 }
 
-                let roleId: string;
+                let role: RoleV2025;
                 try {
-                    roleId = await roleCache.get(data.roleName);
+                    role = await roleCache.get(data.roleName);
                 } catch (error) {
                     result.error++;
                     const srcMessage = `Unable to find role with name '${data.roleName}' in ISC`;
+                    await this.writeLog(processedLines, dimensionName, CSVLogWriterLogType.ERROR, srcMessage);
+                    return;
+                }
+                const roleId = role.id
+
+                if (!role.dimensional) {
+                    result.error++;
+                    const srcMessage = `The role '${data.roleName}' is not dimensional`;
                     await this.writeLog(processedLines, dimensionName, CSVLogWriterLogType.ERROR, srcMessage);
                     return;
                 }
@@ -176,15 +242,24 @@ export class DimensionImporter {
                             type: RoleMembershipSelectorType.Standard,
                             criteria: {
                                 operation: 'AND',
-                                children: [converter.root as DimensionCriteriaLevel2V2025]
+                                children: [converter.root as DimensionCriteriaLevel1V2025]
                             }
 
                         };
+
+                        const usedIdentityAttributes = extractAllIdentityAttributes(converter.root as DimensionCriteriaLevel1V2025)
+                        const allowedIdentity = role.accessRequestConfig?.dimensionSchema?.dimensionAttributes?.map(x => x.name)
+                        if (!Array.from(usedIdentityAttributes).every(attribute => allowedIdentity.includes(attribute))) {
+                            result.error++;
+                            const srcMessage = `The membership criteria is using dimension attribute(s) '${Array.from(usedIdentityAttributes).filter(x => !allowedIdentity.includes(x)).join(', ')}' that is not allowed in the role '${data.roleName}'`;
+                            await this.writeLog(processedLines, dimensionName, CSVLogWriterLogType.ERROR, srcMessage);
+                            return;
+                        }
+
                     } catch (error) {
                         result.error++;
                         const srcMessage = `Unable to build membership criteria: ${error}`;
                         await this.writeLog(processedLines, dimensionName, CSVLogWriterLogType.ERROR, srcMessage);
-                        vscode.window.showErrorMessage(srcMessage);
                         return;
                     }
                 }
