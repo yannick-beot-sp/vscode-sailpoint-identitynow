@@ -9,7 +9,7 @@ import * as commands from "../commands/constants";
 import * as configuration from '../configurationConstants';
 import { convertConstantToTitleCase, escapeFilter, isEmpty, isNotEmpty } from "../utils/stringUtils";
 import { TenantService } from "../services/TenantService";
-import { CampaignStatusV3 } from "sailpoint-api-client";
+import { CampaignStatusV3, DimensionV2025 } from "sailpoint-api-client";
 import { convertToBaseTreeItem } from "../views/utils";
 import { EndpointUtils } from "../utils/EndpointUtils";
 
@@ -992,7 +992,8 @@ export class RolesTreeItem extends PageableFolderTreeItem<Document> {
 				tenantName,
 				tenantDisplayName,
 				role.name,
-				role.id
+				role.id,
+				role.dimensional
 			))
 		);
 	}
@@ -1018,34 +1019,108 @@ export class RolesTreeItem extends PageableFolderTreeItem<Document> {
 	}
 }
 
-/**
- * Represents the single role.
- * Added by richastral 06/07/2023
- */
-export class RoleTreeItem extends ISCResourceTreeItem {
+
+export class RoleTreeItem extends PageableFolderTreeItem<DimensionV2025> {
+	public readonly uri: vscode.Uri
 	constructor(
 		tenantId: string,
 		tenantName: string,
 		tenantDisplayName: string,
 		label: string,
-		id: string) {
-		super({
-			tenantId,
-			tenantName,
-			tenantDisplayName,
-			label,
-			resourceType: "roles",
-			id
-		})
+		id: string,
+		private readonly dimensional: boolean) {
+		super(label, "role", tenantId, tenantName, tenantDisplayName, 'No dimension found',
+			(dimension => new DimensionTreeItem({
+				tenantId,
+				tenantName,
+				tenantDisplayName,
+				label: dimension.name,
+				dimensionId: dimension.id,
+				roleId: dimension.parentId
+			}))
+		)
+		this.id = id
+		this.collapsibleState = dimensional ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None
+		this.uri = getResourceUri(tenantName,
+			"roles",
+			id,
+			label)
+
 	}
 
-	contextValue = "role";
-	iconPath = new vscode.ThemeIcon("account");
+	iconPath = new vscode.ThemeIcon("account")
 
 	getUrl(): vscode.Uri | undefined {
 		return getUIUrl(this.tenantName, "ui/a/admin/access/roles/manage", this.id)
 	}
+
+	protected async loadNext(): Promise<AxiosResponse<DimensionV2025[]>> {
+		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
+		return await this.client.getPaginatedDimensions({
+			roleId: this.id,
+			limit,
+			offset: this.currentOffset,
+			count: (this._total === 0)
+		})
+	}
+
+	/**
+	 * Filtering not supported... yet
+	 */
+	get computedContextValue() {
+		return this.dimensional ?  `${this.contextValue}Dimensional` : this.contextValue
+	}
+	/**
+	 * Need to force open command as it's not inhereting from ISCResourceTreeItem anymore
+	 */
+	command = {
+		title: "open",
+		command: commands.OPEN_RESOURCE,
+		arguments: [this],
+	};
 }
+
+
+export class DimensionTreeItem extends ISCResourceTreeItem {
+	constructor(
+		options: {
+			tenantId: string;
+			tenantName: string;
+			tenantDisplayName: string;
+			label: string,
+			roleId: string,
+			dimensionId: string
+		}
+	) {
+		super({
+			tenantId: options.tenantId,
+			tenantName: options.tenantName,
+			tenantDisplayName: options.tenantDisplayName,
+			label: options.label,
+			resourceType: "roles",
+			id: options.dimensionId,
+			parentId: options.roleId,
+			subResourceType: "dimensions",
+			subId: options.dimensionId,
+		})
+	}
+
+	contextValue = "dimension";
+	iconPath = new vscode.ThemeIcon("list-tree");
+
+	getUrl(): vscode.Uri | undefined {
+		return getUIUrl(this.tenantName,
+			"ui/a/admin/access/roles/manage",
+			this.parentId,
+			"dimensions",
+			this.id,
+			"basic-config",
+		)
+	}
+
+}
+
+
 
 export class LoadMoreNode extends BaseTreeItem {
 	contextValue = "loadMore";

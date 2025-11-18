@@ -9,6 +9,7 @@ import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { accessProfileApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
 import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
+import { metadataToString } from '../../utils/metadataUtils';
 
 export class AccessProfileExporterCommand {
     /**
@@ -99,6 +100,11 @@ interface AccessProfileDto {
      * @type {Requestability}
      */
     'accessRequestConfig'?: Requestability;
+    /**
+     * A list of metadata associated with the Access Profile. metadata are seperated by ";". 
+     * The expected format is key:value1,value2;key2:value3
+     */
+    metadata?: string;
 }
 class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
     constructor(
@@ -128,7 +134,8 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
             "denialCommentsRequired",
             "approvalSchemes",
             "revokeApprovalSchemes",
-            "entitlements"
+            "entitlements",
+            "metadata"
         ];
         const paths = [
             "name",
@@ -141,7 +148,8 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
             "accessRequestConfig.denialCommentsRequired",
             "approvalSchemes",
             "revokeApprovalSchemes",
-            "entitlements"
+            "entitlements",
+            "metadata"
         ];
         const unwindablePaths: string[] = [];
 
@@ -176,7 +184,9 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
                         governanceGroupCache),
                     revokeApprovalSchemes: await accessProfileApprovalSchemeToStringConverter(
                         item.revocationRequestConfig?.approvalSchemes,
-                        governanceGroupCache)
+                        governanceGroupCache),
+                    // @ts-ignore Waiting for client SDK to be updated
+                    metadata: metadataToString(item.accessModelMetadata)
                 };
 
                 return itemDto;

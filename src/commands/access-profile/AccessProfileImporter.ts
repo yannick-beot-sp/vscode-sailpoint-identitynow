@@ -1,6 +1,6 @@
 import * as tmp from "tmp";
 import * as vscode from 'vscode';
-import { AccessProfile, EntitlementBeta } from 'sailpoint-api-client';
+import { AccessProfile, EntitlementBeta, JsonPatchOperationV2025OpV2025 } from 'sailpoint-api-client';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
 import { CSVReader } from '../../services/CSVReader';
@@ -10,16 +10,12 @@ import { GovernanceGroupNameToIdCacheService } from '../../services/cache/Govern
 import { IdentityNameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
 import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService';
 import { stringToAccessProfileApprovalSchemeConverter } from '../../utils/approvalSchemeConverter';
-import { openPreview } from '../../utils/vsCodeHelpers';
+import { importMode, ImportModeType, openPreview } from '../../utils/vsCodeHelpers';
 import { isEmpty, isNotBlank } from "../../utils/stringUtils";
 import { truethy } from "../../utils/booleanUtils";
 import { UserCancelledError } from "../../errors";
-
-
-interface AccessProfileImportResult {
-    success: number
-    error: number
-}
+import { stringToAttributeMetadata } from "../../utils/metadataUtils";
+import { ImportResult } from "../../models/ImportResult";
 
 interface AccessProfileCSVRecord {
     name: string
@@ -33,6 +29,7 @@ interface AccessProfileCSVRecord {
     denialCommentsRequired: boolean
     revokeApprovalSchemes: string
     approvalSchemes: string
+    metadata: string
 }
 
 export class AccessProfileImporter {
@@ -44,7 +41,8 @@ export class AccessProfileImporter {
         private tenantId: string,
         private tenantName: string,
         private tenantDisplayName: string,
-        private fileUri: vscode.Uri
+        private fileUri: vscode.Uri,
+        private mode: ImportModeType
     ) {
         this.client = new ISCClient(this.tenantId, this.tenantName);
 
@@ -81,7 +79,7 @@ export class AccessProfileImporter {
         const incr = 100 / nbLines;
         task.report({ increment: 0 });
 
-        const result: AccessProfileImportResult = {
+        const result: ImportResult = {
             success: 0,
             error: 0
         };
@@ -189,10 +187,10 @@ export class AccessProfileImporter {
                     vscode.window.showErrorMessage(srcMessage);
                     return;
                 }
-
+                const description = data.description?.replaceAll("\\r", "\r").replaceAll("\\n", "\n")
                 const accessProfilePayload: AccessProfile = {
-                    "name": data.name,
-                    "description": data.description?.replaceAll("\\r", "\r").replaceAll("\\n", "\n"),
+                    "name": apName,
+                    description,
                     "enabled": truethy(data.enabled),
                     "requestable": truethy(data.requestable),
                     "owner": {
@@ -213,7 +211,7 @@ export class AccessProfileImporter {
                     "revocationRequestConfig": {
                         "approvalSchemes": revokeApprovalSchemes
                     },
-                    "entitlements": entitlements
+                    entitlements
                 }
 
                 if (token.isCancellationRequested) {
@@ -221,13 +219,107 @@ export class AccessProfileImporter {
                 }
                 processedLines++;
                 try {
-                    await this.client.createResource('/v3/access-profiles', JSON.stringify(accessProfilePayload));
+                    const newAP = await this.client.createAccessProfile(accessProfilePayload)
+
+                    if (data.metadata) {
+                        const attributes = stringToAttributeMetadata(data.metadata)
+                        await this.client.updateAccessProfileMetadata(
+                            newAP.id,
+                            attributes
+                        )
+                    }
+
                     await this.writeLog(processedLines, apName, CSVLogWriterLogType.SUCCESS, `Successfully imported access profile '${data.name}'`);
                     result.success++;
                 } catch (error: any) {
-                    result.error++;
-                    await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, `Cannot create access profile: '${error.message}'`);
+                    const isConflict = error.message?.endsWith("already exists.")
+
+                    if (isConflict && this.mode === importMode.createOrUpdate) {
+                        console.log(`Access Profile ${apName} already exists. Try to update...`);
+
+                        // Try to get the id
+                        const ap = await this.client.getAccessProfileByName(apName);
+                        if (ap) {
+
+                            const updates = [
+                                {
+                                    "property": "name",
+                                    "value": apName
+                                },
+                                {
+                                    "property": "enabled",
+                                    "value": truethy(data.enabled)
+                                },
+                                {
+                                    "property": "requestable",
+                                    "value": truethy(data.requestable)
+                                },
+                                {
+                                    "property": "description",
+                                    "value": description
+                                },
+                                {
+                                    "property": "owner",
+                                    "value": {
+                                        "id": ownerId,
+                                        "type": "IDENTITY",
+                                        "name": data.owner
+                                    }
+                                },
+                                {
+                                    "property": "accessRequestConfig",
+                                    "value": {
+                                        "commentsRequired": truethy(data.commentsRequired),
+                                        "denialCommentsRequired": truethy(data.denialCommentsRequired),
+                                        "approvalSchemes": approvalSchemes
+                                    }
+                                },
+                                {
+                                    "property": "revocationRequestConfig",
+                                    "value": {
+                                        "approvalSchemes": revokeApprovalSchemes
+                                    }
+                                },
+                                {
+                                    "property": "entitlements",
+                                    "value": entitlements
+                                },
+                                {
+                                    "property": "accessModelMetadata/attributes",
+                                    "value": stringToAttributeMetadata(data.metadata) ?? null
+                                },
+                            ].map((item) => ({
+                                "op": JsonPatchOperationV2025OpV2025.Replace,
+                                "path": `/${item.property}`,
+                                "value": item.value
+                            }))
+                            try {
+                                await this.client.updateAccessProfile(ap.id, updates)
+                                await this.writeLog(processedLines, apName, CSVLogWriterLogType.SUCCESS, `Successfully updated access profile '${apName}'`);
+                                result.success++;
+                            } catch (error) {
+                                result.error++;
+                                await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, `Cannot update access profile: '${error.message}'`);
+
+                            }
+
+                        } else {
+                            // Access Profile not found
+                            // very unlikely. We shall find the access profile as we have a conflicting name
+                            result.error++;
+                            await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, `Cannot update access profile: '${apName}' not found.`);
+                        }
+
+                    } else if (isConflict && this.mode === importMode.createOrUpdate) {
+                        result.error++;
+                        await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, `Cannot create access profile: '${apName}' already exists.`);
+
+                    } else {
+                        result.error++;
+                        await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, `Cannot create access profile: '${error.message}'`);
+                    }
                 }
+
             })
         } catch { }
 

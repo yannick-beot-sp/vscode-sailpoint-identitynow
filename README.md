@@ -17,7 +17,7 @@ The SailPoint Identity Security Cloud extension makes it easy to:
 - View, edit, delete identity profiles and lifecycle states, and refreshes all the identities under a profile
 - Import/Export Accounts (import for delimited files only), uncorrelated accounts, entitlement details
 - View, edit, create, delete, export, import access profiles
-- View, edit, create, delete, export, import roles
+- View, edit, create, delete, export, import roles, and dimensions
 - View, edit, create, delete, export, import forms
 - View, edit, create, delete search attribute config
 - View, edit, create, delete identity attribute
@@ -183,6 +183,7 @@ The following table provides the expected column for the CSV to import Access Pr
 | `approvalSchemes`        | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
 | `revokeApprovalSchemes`  | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
 | `entitlements`           | No   | Entitlements of the access profile                                                                                          | `[]`               |
+| `metadata`               | No   | Metadata of the access profile (cf. below for format)                                                                       | `[]`               |
 
 [*]: ## "Mandatory"
 
@@ -203,8 +204,26 @@ The following table provides the expected column for the CSV to import Roles:
 | `revokeCommentsRequired`       | No   | Require comments when the user requests revocation                                             | `false`            |
 | `revokeDenialCommentsRequired` | No   | Require comments when a reviewer denies the revocation request                                 | `false`            |
 | `revokeApprovalSchemes`        | No   | List of reviewers among `OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
+| `entitlements`                 | No   | List of entitlements                                                                           | `[]`               |
+| `entitlements`                 | No   | List of entitlements                                                                           | `[]`               |
 | `accessProfiles`               | No   | List of access profiles                                                                        | `[]`               |
-| `membershipCriteria`           | No   | Membership criteria for automatic assignment                                                   |                    |
+| `membershipCriteria`           | No   | Membership criteria for automatic assignment (cf. below for format)                            |                    |
+| `dimensional`                  | No   | Is the role dynamic? Does it support dimensions?                                               | `false`            |
+| `dimensionAttributes`          | No   | List of attributes used for dimension, separated by ;                                          | `[]`               |
+| `metadata`                     | No   | Metadata of the role (cf. below for format)                                                    | `[]`               |
+
+### Dimensions
+
+The following table provides the expected column for the CSV to import Roles:
+
+| Header                | M[*] | Description                                                         | Default Value |
+| --------------------- | ---- | ------------------------------------------------------------------- | ------------- |
+| `name`                | Yes  | Name of the dimension                                               |               |
+| `roleName`            | Yes  | Name of the role                                                    |               |
+| `description`         | No   | Description of the role                                             | `null`        |
+| `entitlements`        | No   | List of entitlements                                                | `[]`          |
+| `accessProfiles`      | No   | List of access profiles                                             | `[]`          |
+| `membershipCriteria`  | No   | Membership criteria for automatic assignment (cf. below for format) |               |
 
 #### Membership criteria
 
@@ -254,17 +273,31 @@ identity.department eq 'Customer Service' and identity.cloudLifecycleState eq 'a
 (identity.department eq 'Customer Service' and identity.cloudLifecycleState eq 'active') or (identity.cloudLifecycleState eq 'active' and identity.jobTitle co 'Accounts Payable Analyst')
 ```
 
+### Metadata
+
+The metadata column will be exported as or will be imported as:
+
+```
+<technicalName1>:<value1>,<value2>;<technicalName2>:<value3>
+```
+
+> NOTE: Only technical names and values are used.
+>
+> For custom metadata attribute and values, it's just the Camel Case of the display name. e.g. Domain->`domain`, Back Office->`backOffice`
+>
+> Default metadata starts with isc. For instance, "Access Type"'s technical name is `iscAccessType`
+
 ### Certification Campaign Custom Reviewers
 
 The following table provides the expected column for the CSV to import Custom Reviewer logic:
 
-| Header              | M[*] | Description                                                                                           | Supported Values                              |
-| ------------------- | ---- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| `reviewerAttribute` | Yes  | Identity attribute used to identify the defined reviewer                                              | `id\|name\|email`                             |
-| `reviewerValue`     | Yes  | The value of identity attribute for the defined reviewer (e.g. the email address of the reviewer)     |                                               |
-| `itemType`          | Yes  | The type of object to scope the reviewer's review items                                               | `IDENTITY\|ENTITLEMENT\|ACCESS_PROFILE\|ROLE\|ALL` |
-| `itemSelectorType`  | Yes, unless itemType=ALL | The type of selector used to define the reviewer's scope                                              | `id\|name\|query\|all`[**]                         |
-| `itemSelectorValue` | Yes, unless itemType=ALL or itemSelectorType=all | The value of the selector used to define the reviewer's scope (e.g. a valid entitlement Search Query) |                                               |
+| Header              | M[*]                                             | Description                                                                                           | Supported Values                                   |
+| ------------------- | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| `reviewerAttribute` | Yes                                              | Identity attribute used to identify the defined reviewer                                              | `id\|name\|email`                                  |
+| `reviewerValue`     | Yes                                              | The value of identity attribute for the defined reviewer (e.g. the email address of the reviewer)     |                                                    |
+| `itemType`          | Yes                                              | The type of object to scope the reviewer's review items                                               | `IDENTITY\|ENTITLEMENT\|ACCESS_PROFILE\|ROLE\|ALL` |
+| `itemSelectorType`  | Yes, unless itemType=ALL                         | The type of selector used to define the reviewer's scope                                              | `id\|name\|query\|all`[**]                         |
+| `itemSelectorValue` | Yes, unless itemType=ALL or itemSelectorType=all | The value of the selector used to define the reviewer's scope (e.g. a valid entitlement Search Query) |                                                    |
 
 [**]: ## "`itemSelectorType=name` is not supported with `itemType=ENTITLEMENT`"
 
@@ -513,8 +546,7 @@ The extension supports the following settings:
 ### 1.3.8
 
 - Viewing a workflow does not bring statistics as this can cause timeouts.
-- Support of certifications with the help of [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp
-) and [@bassem-mohamed-sp](https://github.com/bassem-mohamed-sp):
+- Support of certifications with the help of [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp) and [@bassem-mohamed-sp](https://github.com/bassem-mohamed-sp):
   - Dashboard
   - Escalation
   - Reminders

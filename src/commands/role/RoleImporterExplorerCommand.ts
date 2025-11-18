@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { TenantService } from '../../services/TenantService';
-import { chooseTenant } from '../../utils/vsCodeHelpers';
+import { askCreateOrUpdate, chooseTenant } from '../../utils/vsCodeHelpers';
 import { RoleImporter } from './RoleImporter';
 import { validateTenantReadonly } from '../validateTenantReadonly';
 
@@ -20,13 +20,17 @@ export class RoleImporterExplorerCommand {
         if (!(await validateTenantReadonly(this.tenantService, tenantInfo.id, `import roles`))) {
             return
         }
+        const mode = await askCreateOrUpdate("role")
+        if (mode === undefined) { return; }
 
         const roleImporter = new RoleImporter(
             tenantInfo.id,
             tenantInfo.tenantName,
             tenantInfo.name,
-            fileUri
+            fileUri,
+            mode
         );
+        
         await roleImporter.importFileWithProgression();
     }
 }

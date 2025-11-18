@@ -1,4 +1,4 @@
-import { chooseFile } from '../../utils/vsCodeHelpers';
+import { askCreateOrUpdate, chooseFile } from '../../utils/vsCodeHelpers';
 import { AccessProfilesTreeItem } from '../../models/ISCTreeItem';
 import { AccessProfileImporter } from './AccessProfileImporter';
 import { validateTenantReadonly } from '../validateTenantReadonly';
@@ -17,12 +17,16 @@ export class AccessProfileImporterTreeViewCommand {
 
         const fileUri = await chooseFile('CSV files', 'csv');
         if (fileUri === undefined) { return; }
+        
+        const mode = await askCreateOrUpdate("access profile") 
+        if (mode === undefined) { return; }
 
         const accessProfileImporter = new AccessProfileImporter(
             node.tenantId,
             node.tenantName,
             node.tenantDisplayName,
-            fileUri
+            fileUri,
+            mode
         );
         await accessProfileImporter.importFileWithProgression();
     }

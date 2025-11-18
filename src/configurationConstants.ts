@@ -5,6 +5,8 @@ export const UNCORRELATED_ACCOUNT_REPORT_FILENAME_CONF = "report.uncorrelatedAcc
 export const ENTITLEMENT_REPORT_FILENAME_CONF = "report.entitlements.filename";
 export const ACCESS_PROFILE_REPORT_FILENAME_CONF = "report.accessProfiles.filename";
 export const ROLE_REPORT_FILENAME_CONF = "report.roles.filename";
+export const DIMENSION_REPORT_FILENAME_CONF = "report.dimensions.filename";
+export const DIMENSION_REPORT_ROLE_FILENAME_CONF = "report.dimensions.for.role.filename";
 
 export const SPCONFIG_SINGLE_RESOURCE_CONF = "sP-Config.singleResource.filename";
 export const SPCONFIG_SINGLE_FILE_CONF = "sP-Config.singleFile.filename";

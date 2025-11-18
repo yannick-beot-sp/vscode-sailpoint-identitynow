@@ -113,59 +113,11 @@ export class CloneSourceCommand {
         await importer.importConfig()
         const newSource = await client.getSourceByName(newSourceName)
 
-        const operations =
-            [
-                {
-                    "op": "add",
-                    "path": "/cluster",
-                    "value": oldSource.cluster
-                }
-            ]
-        //@ts-ignore
-        oldSource.connectorAttributes?.encrypted?.split(",").forEach(attrName => {
-            if (oldSource.connectorAttributes[attrName]) {
-                operations.push({
-                    "op": "add",
-                    "path": `/connectorAttributes/${attrName}`,
-                    "value": oldSource.connectorAttributes[attrName]
-                })
-            }
-        })
-
-        /**
-         * Recursively traverses an object or array to find primitive values (the attributes)
-         * and constructs the JSON Pointer path for each.
-         * @param currentObject The object or array being processed.
-         * @param currentPath The accumulated JSON Pointer path segment (e.g., "/connectorAttributes/key").
-         */
-        function findPassword(currentObject: any, currentPath: string): void {
-            if (typeof currentObject !== 'object' || currentObject === null || currentObject === undefined) {
-                return;
-            }
-
-            // Handle Arrays and Objects
-            for (const key in currentObject) {
-                const value = currentObject[key];
-                const newPath = `${currentPath}/${key}`
-                if ("password" === key) {
-                    // Primitive leaf node: This is the attribute we want to patch
-                    operations.push({
-                        op: 'add',
-                        path: newPath,
-                        value: value
-                    });
-                } else if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
-                    // Recurse: Go deeper into nested objects or arrays
-                    findPassword(value, newPath);
-                } else {
-
-                }
-            }
-        }
-
-        // Start traversal from the connectorAttributes object
-        // "password" property is always encrypted if present, even if not specified in "encrypted"
-        findPassword(oldSource.connectorAttributes, '/connectorAttributes');
+        const operations = [{
+            "op": "add",
+            "path": "/cluster",
+            "value": oldSource.cluster
+        }]
 
         await client.patchResource(
             join('v3', "sources", newSource.id),

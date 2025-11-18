@@ -488,6 +488,14 @@
         "title": "Export all Roles as CSV..."
       },
       {
+        "command": "vscode-sailpoint-identitynow.csv.export.dimensions.view",
+        "title": "Export all Dimensions as CSV..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.csv.import.dimensions.view",
+        "title": "Import Dimensions as CSV..."
+      },
+      {
         "command": "vscode-sailpoint-identitynow.csv.export.roles-icon.view",
         "title": "Export all Roles as CSV...",
         "icon": {
@@ -866,7 +874,6 @@
           "command": "vscode-sailpoint-identitynow.workflow.disable",
           "when": "never"
         },
-
         {
           "command": "vscode-sailpoint-identitynow.workflow.view-execution-history",
           "when": "never"
@@ -945,6 +952,14 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.csv.export.roles.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.csv.export.dimensions.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.csv.import.dimensions.view",
           "when": "never"
         },
         {
@@ -1116,12 +1131,12 @@
       "view/item/context": [
         {
           "command": "vscode-sailpoint-identitynow.open-url",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(tenantReadOnly|tenantWritable|.*source|disabledWorkflow|identity-profile|lifecycle-state|role|access-profile|service-desk-integration|form-definition|source-app|campaign|identity)$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(tenantReadOnly|tenantWritable|.*source|disabledWorkflow|identity-profile|lifecycle-state|role|roleDimensional|dimension|access-profile|service-desk-integration|form-definition|source-app|campaign|identity)$/",
           "group": "_@0"
         },
         {
           "command": "vscode-sailpoint-identitynow.open-resource",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|source|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|identities|source-app|campaign)$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|source|schema|provisioning-policy|role|roleDimensional|dimension|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|identities|source-app|campaign)$/",
           "group": "_@0"
         },
         {
@@ -1131,12 +1146,12 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.remove-resource",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|schema|provisioning-policy|role|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|search-attribute|identity-attribute|source-app)$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|schema|provisioning-policy|role|roleDimensional|dimension|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|search-attribute|identity-attribute|source-app)$/",
           "group": "zzzremove@100"
         },
         {
           "command": "vscode-sailpoint-identitynow.refresh-forced",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|transforms|provisioning-policies|roles|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions|search-attributes|identity-attributes|source-apps|source-app|campaigns/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|transforms|provisioning-policies|roles|roleDimensional|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions|search-attributes|identity-attributes|source-apps|source-app|campaigns/",
           "group": "inline@50"
         },
         {
@@ -1437,6 +1452,16 @@
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^roles/"
         },
         {
+          "command": "vscode-sailpoint-identitynow.csv.export.dimensions.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(^roles|roleDimensional)/",
+          "group": "dimension"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.csv.import.dimensions.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^roles/",
+          "group": "dimension"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.csv.export.roles-icon.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^roles/",
           "group": "inline@3"
@@ -1639,7 +1664,7 @@
         }
       ]
     },
-    "keybindings":[
+    "keybindings": [
       {
         "command": "vscode-sailpoint-identitynow.transform.evaluate.cloud.editor",
         "key": "ctrl+alt+t",
@@ -1725,6 +1750,14 @@
           "type": "string",
           "default": "%x/reports/%T-Roles-%y%M%d-%h%m%s.csv"
         },
+        "vscode-sailpoint-identitynow.report.dimensions.filename": {
+          "type": "string",
+          "default": "%x/reports/%T-Dimensions-%y%M%d-%h%m%s.csv"
+        },
+        "vscode-sailpoint-identitynow.report.dimensions.for.role.filename": {
+          "type": "string",
+          "default": "%x/reports/%T-Dimensions-%S-%y%M%d-%h%m%s.csv"
+        },
         "vscode-sailpoint-identitynow.sP-Config.singleResource.filename": {
           "type": "string",
           "default": "%x/exportedObjects/identitynowconfig-%t-%S-%y%M%d-%h%m%s.json"
@@ -1806,7 +1839,7 @@
     "csv-parse": "^6.1.0",
     "fast-json-patch": "^3.1.1",
     "lodash": "^4.17.21",
-    "sailpoint-api-client": "^1.6.2",
+    "sailpoint-api-client": "^1.7.0",
     "tmp": "^0.2.1",
     "vscode-sailpoint-identitynow": "file:"
   }

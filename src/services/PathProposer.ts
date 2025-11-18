@@ -235,6 +235,25 @@ export class PathProposer {
             tenantName,
             tenantDisplayName);
     }
+    public static getDimensionReportFilename(
+        tenantName: string,
+        tenantDisplayName: string
+    ): string {
+        return this.getTenantBasedReportFilename(configuration.DIMENSION_REPORT_FILENAME_CONF,
+            tenantName,
+            tenantDisplayName);
+    }
+    public static getDimensionReportForRoleFilename(
+        tenantName: string,
+        tenantDisplayName: string,
+        roleName: string
+    ): string {
+        return this.getObjectBasedReportFilename(configuration.DIMENSION_REPORT_ROLE_FILENAME_CONF,
+            tenantName,
+            tenantDisplayName,
+            "role",
+            roleName);
+    }
 
     public static getFormsExportFilename(
         tenantName: string,
