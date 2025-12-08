@@ -47,6 +47,7 @@ export class ExportCampaignReportCommand {
             "Access Type": "accessSummary.access.type",
             "Role Name": "accessSummary.role.name",
             "Role Description": "accessSummary.role.description",
+            "Role Privileged": "accessSummary.role.privileged",
             "Access Profile Name": "accessSummary.accessProfile.name",
             "Access Profile Description": "accessSummary.accessProfile.description",
             "Access Profile Privileged": "accessSummary.accessProfile.privileged",
