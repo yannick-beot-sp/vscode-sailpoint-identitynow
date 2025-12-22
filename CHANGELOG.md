@@ -16,6 +16,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Fixed
 
+- Force X-SailPoint-Experimental header for all deletion. Error while deleting applications.
+
 ### Removed
 
 ## [1.3.23] - 2025-11-18

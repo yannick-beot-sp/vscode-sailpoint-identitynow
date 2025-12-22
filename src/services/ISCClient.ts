@@ -506,7 +506,11 @@ export class ISCClient {
 	public async deleteResource(path: string): Promise<void> {
 		console.log("> ISCClient.deleteResource", path);
 		const httpClient = await this.getAxios();
-		const response = await httpClient.delete(path);
+		const response = await httpClient.delete(path, {
+			headers: {
+				"X-SailPoint-Experimental": true
+			}
+		});
 		console.log("< ISCClient.deleteResource");
 	}
 
