@@ -150,10 +150,9 @@ export class ISCResourceProvider implements FileSystemProvider {
 
 		const id = path.posix.basename(resourcePath);
 		if (id === NEW_ID) {
-			console.log("New file");
-			if (resourcePath.match("transform")) {
-				const createdData = await client.createResource("/v3/transforms", data);
-			} else if (
+			console.log("New file", path.posix.dirname(resourcePath));
+			if (
+				resourcePath.match("transform") ||
 				resourcePath.match("schemas") ||
 				resourcePath.match("provisioning-policies") ||
 				resourcePath.match("connector-rules") ||
@@ -216,7 +215,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 					JSON.stringify(jsonpatch)
 				);
 
-			} else if (resourcePath.match("identity-profiles|access-profiles|roles|search-attribute-config|source-apps|campaigns|org-config")) {
+			} else if (resourcePath.match("identity-profiles|access-profiles|roles|search-attribute-config|source-apps|campaigns|\/org-config")) {
 				// special treatment to use PATCH method as PUT is not supported
 				let oldData
 				// special case for applications
@@ -291,8 +290,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 			} else if (resourcePath.match(/identities\//)) {
 				console.log("save identities - cant do this folks");
 				vscode.window.showErrorMessage("Identities cannot be modified directly");
-			}
-			else {
+			} else {
 				// Need to update the content to remove id and internal properties from the payload
 				// to prevent a bad request error
 				if (resourcePath.match("transform")) {
