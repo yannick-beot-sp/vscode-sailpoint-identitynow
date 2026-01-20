@@ -187,7 +187,7 @@ export class AccessProfileImporter {
                     vscode.window.showErrorMessage(srcMessage);
                     return;
                 }
-                const description = data.description?.replaceAll("\\r", "\r").replaceAll("\\n", "\n")
+                const description = data.description
                 const accessProfilePayload: AccessProfile = {
                     "name": apName,
                     description,

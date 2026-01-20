@@ -263,7 +263,7 @@ export class DimensionImporter {
                         return;
                     }
                 }
-                const description = data.description?.replaceAll("\\r", "\r").replaceAll("\\n", "\n")
+                const description = data.description
 
                 const dimensionPayload: DimensionV2025 = {
                     "name": dimensionName,

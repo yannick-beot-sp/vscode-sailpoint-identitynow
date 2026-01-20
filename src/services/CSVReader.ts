@@ -7,6 +7,7 @@ import { parse as parseSync } from 'csv-parse/sync';
 // Note, the `stream/promises` module is only available
 // starting with Node.js version 16
 import { getFirstLine } from '../utils/fileutils';
+import { transformNewlines } from '../utils/CSVTransform';
 
 
 export class CSVReader<T> {
@@ -26,7 +27,8 @@ export class CSVReader<T> {
                 columns: true,
                 comment: '#',
                 delimiter: [",", ";"],
-                bom: true
+                bom: true,
+                cast:transformNewlines
             }));
 
         for await (const record of parser) {

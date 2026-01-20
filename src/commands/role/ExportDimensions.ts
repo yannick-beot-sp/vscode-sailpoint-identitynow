@@ -157,7 +157,7 @@ class DimensionExporter extends BaseCSVExporter<DimensionV2025> {
                 const itemDto: DimensionCSVRecord = {
                     name: item.name,
                     // Escape carriage returns in description.
-                    description: item.description?.replaceAll('\r', "\\r").replaceAll('\n', "\\n"),
+                    description: item.description,
                     accessProfiles: item.accessProfiles?.map(x => x.name).join(CSV_MULTIVALUE_SEPARATOR),
                     entitlements,
                     membershipCriteria,

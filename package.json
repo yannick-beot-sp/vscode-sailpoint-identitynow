@@ -1827,7 +1827,7 @@
   "devDependencies": {
     "@types/glob": "^8.0.0",
     "@types/lodash": "^4.14.191",
-    "@types/mocha": "^10.0.1",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^18.19.64",
     "@types/tmp": "^0.2.5",
     "@types/vscode": "^1.74.0",
@@ -1837,9 +1837,9 @@
     "esbuild": "^0.25.1",
     "eslint": "^8.30.0",
     "glob": "^8.0.3",
-    "mocha": "^10.2.0",
+    "mocha": "^11.7.5",
     "rimraf": "^3.0.2",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.2"
   },
   "dependencies": {
     "@json2csv/node": "^7.0.6",

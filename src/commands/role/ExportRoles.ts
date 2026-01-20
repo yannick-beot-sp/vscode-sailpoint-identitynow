@@ -122,7 +122,7 @@ export interface RoleDto {
     membershipCriteria?: string;
 
     dimensional?: boolean
-    dimensionAttributes?:string
+    dimensionAttributes?: string
     /**
      * A list of metadata associated with the Role. metadata are seperated by ";". 
      * The expected format is key:value1,value2;key2:value3
@@ -228,7 +228,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
                 const itemDto: RoleDto = {
                     name: item.name,
                     // Escape carriage returns in description.
-                    description: item.description?.replaceAll('\r', "\\r").replaceAll('\n', "\\n"),
+                    description: item.description,
                     enabled: item.enabled,
                     requestable: item.requestable,
                     owner: owner,

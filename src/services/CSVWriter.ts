@@ -17,6 +17,8 @@ function stringFormatter(
     opts: { quote?: string, escapedQuote?: string, escaptedEol?: string } = {},
 ) {
     const quote = typeof opts.quote === 'string' ? opts.quote : '"';
+    const backslashn = "\\n"
+    const escaptedBackslashn = "\\\\n"
     const escaptedEol = typeof opts.escaptedEol === 'string' ? opts.escaptedEol : '\\n';
     const escapedQuote =
         typeof opts.escapedQuote === 'string'
@@ -24,13 +26,19 @@ function stringFormatter(
             : `${quote}${quote}`;
 
     const quoteRegExp = new RegExp(quote, 'g');
+    const backslashnRegExp = new RegExp("\\\\n", 'g');
     const eolRegExp = new RegExp("\r?\n", 'g');
     return (value) => {
         if (value.includes(quote)) {
             value = value.replace(quoteRegExp, escapedQuote);
         }
+
+        if (value.includes(backslashn)) {
+            value = value.replace(backslashnRegExp, escaptedBackslashn);
+        }
+
         if (value.includes("\n")) {
-            value.replace(eolRegExp, escaptedEol);
+            value = value.replace(eolRegExp, escaptedEol);
         }
 
         return `${quote}${value}${quote}`;
