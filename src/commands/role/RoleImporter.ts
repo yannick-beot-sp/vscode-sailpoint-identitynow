@@ -229,7 +229,7 @@ export class RoleImporter {
                         return;
                     }
                 }
-                const description = data.description?.replaceAll("\\r", "\r").replaceAll("\\n", "\n")
+                const description = data.description
 
                 const rolePayload: RoleV2025 = {
                     "name": roleName,

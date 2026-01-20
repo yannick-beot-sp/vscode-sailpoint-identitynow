@@ -206,7 +206,6 @@ The following table provides the expected column for the CSV to import Roles:
 | `revokeDenialCommentsRequired` | No   | Require comments when a reviewer denies the revocation request                                 | `false`            |
 | `revokeApprovalSchemes`        | No   | List of reviewers among `OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
 | `entitlements`                 | No   | List of entitlements                                                                           | `[]`               |
-| `entitlements`                 | No   | List of entitlements                                                                           | `[]`               |
 | `accessProfiles`               | No   | List of access profiles                                                                        | `[]`               |
 | `membershipCriteria`           | No   | Membership criteria for automatic assignment (cf. below for format)                            |                    |
 | `dimensional`                  | No   | Is the role dynamic? Does it support dimensions?                                               | `false`            |

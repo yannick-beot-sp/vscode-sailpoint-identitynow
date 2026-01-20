@@ -58,3 +58,16 @@ export function customUnwind(params: { paths: string[] } = { paths: [] }) {
     return (dataRow: any) =>
         unwind(params.paths, dataRow).flat(2);
 }
+
+export function transformNewlines(value: any, context?: any): any {
+    if (value !== null && value !== undefined && typeof value === 'string') {
+        // replace "\n" to the character \n but not "\\n"
+        value = value.replace(/(?<!\\)\\n/g, '\n');
+         //value = value.replace(/[^\\]\\n/g, '\n');
+        // Replace "\\n" by "\n"
+        value = value.replace(/\\\\n/g, '\\n');
+    }
+    return value;
+}
+
+

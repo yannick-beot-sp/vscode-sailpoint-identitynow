@@ -8,6 +8,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Security
 
+- Update dependencies (mocha)
+
 ### Added
 
 - Add "Role Privileged" column in Campaign Status Report (cf. [#128](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/128))
@@ -17,6 +19,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 ### Fixed
 
 - Force X-SailPoint-Experimental header for all deletion. Error while deleting applications.
+- Escape newline for export and properly import "\n" (cf. [#129](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/129))
 
 ### Removed
 
