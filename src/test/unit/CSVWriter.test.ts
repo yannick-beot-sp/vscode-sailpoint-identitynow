@@ -87,17 +87,17 @@ const data = [
     }
 ];
 
-const headers = ["id","first_name","last_name","email"];
+const headers = ["id", "first_name", "last_name", "email", "description"];
 
 suite('CSVWriter Test Suite', () => {
     describe('CSVWriter without transform', () => {
-        const outputPath =   path.join(os.tmpdir(), './dummy-array.csv');
+        const outputPath = path.join(os.tmpdir(), './dummy-array.csv');
         console.log("Writing to", outputPath);
-        const csvWriter = new CSVWriter(outputPath,headers,headers);
-        it("should not fail",async () => {
+        const csvWriter = new CSVWriter(outputPath, headers, headers);
+        it("should not fail", async () => {
             await csvWriter.write(data);
             csvWriter.end();
-            
+
         });
     });
 
