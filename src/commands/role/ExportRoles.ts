@@ -5,6 +5,7 @@ import { askFile } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
 import { EntitlementRef, RequestabilityForRole, RevocabilityForRole, Role, RoleMembershipSelectorType, RolesApiListRolesRequest, RoleV2025 } from 'sailpoint-api-client';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
+import { WorkflowIdToNameCacheService } from '../../services/cache/WorkflowIdToNameCacheService';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { roleApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
 import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
@@ -190,6 +191,8 @@ class RoleExporter extends BaseCSVExporter<Role> {
         const unwindablePaths: string[] = [];
 
         const governanceGroupCache = new GovernanceGroupIdToNameCacheService(this.client);
+        const workflowCache = new WorkflowIdToNameCacheService(this.client);
+        await workflowCache.init()
         const identityCacheIdToName = new IdentityIdToNameCacheService(this.client);
         const sourceIdToNameCacheService = new SourceIdToNameCacheService(this.client);
         const entitlementIdToSourceNameCacheService = new EntitlementIdToSourceNameCacheService(this.client);
@@ -244,10 +247,12 @@ class RoleExporter extends BaseCSVExporter<Role> {
                     },
                     approvalSchemes: await roleApprovalSchemeToStringConverter(
                         item.accessRequestConfig?.approvalSchemes,
-                        governanceGroupCache),
+                        governanceGroupCache,
+                        workflowCache),
                     revokeApprovalSchemes: await roleApprovalSchemeToStringConverter(
                         item.revocationRequestConfig?.approvalSchemes,
-                        governanceGroupCache),
+                        governanceGroupCache,
+                        workflowCache),
                     membershipCriteria,
                     dimensional: item.dimensional,
                     dimensionAttributes: dimensionSchemaToString(item.accessRequestConfig?.dimensionSchema),
@@ -258,6 +263,8 @@ class RoleExporter extends BaseCSVExporter<Role> {
             });
         console.log("Governance Group Cache stats", governanceGroupCache.getStats());
         governanceGroupCache.flushAll();
+        console.log("Workflow Cache stats", workflowCache.getStats());
+        workflowCache.flushAll();
         console.log("Identity Cache stats", identityCacheIdToName.getStats());
         identityCacheIdToName.flushAll();
         console.log("Source Cache stats", sourceIdToNameCacheService.getStats());

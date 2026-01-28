@@ -6,6 +6,7 @@ import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
 import { AccessProfileRef, ApprovalSchemeForRole, EntitlementRef, JsonPatchOperationV2025OpV2025, RoleMembershipSelector, RoleMembershipSelectorType, RoleV2025 } from 'sailpoint-api-client';
 import { CSVReader } from '../../services/CSVReader';
 import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
+import { WorkflowNameToIdCacheService } from '../../services/cache/WorkflowNameToIdCacheService';
 import { IdentityNameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { AccessProfileNameToIdCacheService } from '../../services/cache/AccessProfileNameToIdCacheService';
@@ -96,6 +97,8 @@ export class RoleImporter {
         };
 
         const governanceGroupCache = new GovernanceGroupNameToIdCacheService(this.client);
+        const workflowCache = new WorkflowNameToIdCacheService(this.client);
+        await workflowCache.init()
         const accessProfileNameToIdCacheService = new AccessProfileNameToIdCacheService(this.client);
         const identityCacheService = new IdentityNameToIdCacheService(this.client);
         const sourceCacheService = new SourceNameToIdCacheService(this.client);
@@ -194,9 +197,9 @@ export class RoleImporter {
                     revokeApprovalSchemes: ApprovalSchemeForRole[] | undefined = undefined;
                 try {
                     approvalSchemes = await stringToRoleApprovalSchemeConverter(
-                        data.approvalSchemes, governanceGroupCache);
+                        data.approvalSchemes, governanceGroupCache, workflowCache);
                     revokeApprovalSchemes = await stringToRoleApprovalSchemeConverter(
-                        data.revokeApprovalSchemes, governanceGroupCache);
+                        data.revokeApprovalSchemes, governanceGroupCache, workflowCache);
                 } catch (error) {
                     result.error++;
                     const srcMessage = `Unable to build approval scheme: ${error}`;
@@ -395,6 +398,8 @@ export class RoleImporter {
 
         console.log("Governance Group Cache stats", governanceGroupCache.getStats());
         governanceGroupCache.flushAll();
+        console.log("Workflow Cache stats", workflowCache.getStats());
+        workflowCache.flushAll();
         console.log("Identity Cache stats", identityCacheService.getStats());
         identityCacheService.flushAll();
         console.log("Access Profile Cache stats", accessProfileNameToIdCacheService.getStats());

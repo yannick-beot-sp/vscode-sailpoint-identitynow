@@ -7,6 +7,7 @@ import { CSVReader } from '../../services/CSVReader';
 import { ISCClient } from "../../services/ISCClient";
 import { EntitlementCacheService, KEY_SEPARATOR } from '../../services/cache/EntitlementCacheService';
 import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
+import { WorkflowNameToIdCacheService } from '../../services/cache/WorkflowNameToIdCacheService';
 import { IdentityNameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
 import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService';
 import { stringToAccessProfileApprovalSchemeConverter } from '../../utils/approvalSchemeConverter';
@@ -85,6 +86,8 @@ export class AccessProfileImporter {
         };
 
         const governanceGroupCache = new GovernanceGroupNameToIdCacheService(this.client);
+        const workflowCache = new WorkflowNameToIdCacheService(this.client);
+        await workflowCache.init()
         const identityCacheService = new IdentityNameToIdCacheService(this.client);
         const sourceCacheService = new SourceNameToIdCacheService(this.client);
         const entitlementCacheService = new EntitlementCacheService(this.client);
@@ -177,9 +180,9 @@ export class AccessProfileImporter {
                 let approvalSchemes, revokeApprovalSchemes;
                 try {
                     approvalSchemes = await stringToAccessProfileApprovalSchemeConverter(
-                        data.approvalSchemes, governanceGroupCache);
+                        data.approvalSchemes, governanceGroupCache, workflowCache);
                     revokeApprovalSchemes = await stringToAccessProfileApprovalSchemeConverter(
-                        data.revokeApprovalSchemes, governanceGroupCache);
+                        data.revokeApprovalSchemes, governanceGroupCache, workflowCache);
                 } catch (error) {
                     result.error++;
                     const srcMessage = `Unable to build approval scheme: ${error}`;
@@ -340,6 +343,8 @@ export class AccessProfileImporter {
         }
         console.log("Governance Group Cache stats", governanceGroupCache.getStats());
         governanceGroupCache.flushAll();
+        console.log("Workflow Cache stats", workflowCache.getStats());
+        workflowCache.flushAll();
         console.log("Identity Cache stats", identityCacheService.getStats());
         identityCacheService.flushAll();
         console.log("Source Cache stats", sourceCacheService.getStats());
