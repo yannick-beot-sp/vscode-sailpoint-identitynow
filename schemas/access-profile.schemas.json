@@ -165,8 +165,8 @@
             "properties": {
               "approverType": {
                 "type": "string",
-                "enum": ["APP_OWNER", "OWNER", "SOURCE_OWNER", "MANAGER", "GOVERNANCE_GROUP"],
-                "description": "Describes the individual or group that is responsible for an approval step. Values are as follows.\n**APP_OWNER**: The owner of the Application\n\n**OWNER**: Owner of the associated Access Profile or Role\n\n**SOURCE_OWNER**: Owner of the Source associated with an Access Profile\n\n**MANAGER**: Manager of the Identity making the request\n\n**GOVERNANCE_GROUP**: A Governance Group, the ID of which is specified by the **approverId** field",
+                "enum": ["APP_OWNER", "OWNER", "SOURCE_OWNER", "MANAGER", "GOVERNANCE_GROUP", "WORKFLOW"],
+                "description": "Describes the individual or group that is responsible for an approval step. Values are as follows.\n**APP_OWNER**: The owner of the Application\n\n**OWNER**: Owner of the associated Access Profile or Role\n\n**SOURCE_OWNER**: Owner of the Source associated with an Access Profile\n\n**MANAGER**: Manager of the Identity making the request\n\n**GOVERNANCE_GROUP**: A Governance Group, the ID of which is specified by the **approverId** field\n\n**WORKFLOW**: A Workflow, the ID of which is specified by the **approverId** field. Workflow is exclusive to other types of approvals and License required.",
                 "example": "GOVERNANCE_GROUP"
               },
               "approverId": {
@@ -178,7 +178,7 @@
                     "type": "null"
                   }
                 ],
-                "description": "Id of the specific approver, used only when approverType is GOVERNANCE_GROUP",
+                "description": "Id of the specific approver, used when approverType is GOVERNANCE_GROUP or WORKFLOW.",
                 "example": "46c79819-a69f-49a2-becb-12c971ae66c6"
               }
             }
