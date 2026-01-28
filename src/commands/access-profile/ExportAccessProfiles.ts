@@ -7,6 +7,7 @@ import { AccessProfile, AccessProfileSourceRef, AccessProfilesApiListAccessProfi
 import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
+import { WorkflowIdToNameCacheService } from '../../services/cache/WorkflowIdToNameCacheService';
 import { accessProfileApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
 import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
 import { metadataToString } from '../../utils/metadataUtils';
@@ -154,6 +155,8 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
         const unwindablePaths: string[] = [];
 
         const governanceGroupCache = new GovernanceGroupIdToNameCacheService(this.client);
+        const workflowCache = new WorkflowIdToNameCacheService(this.client);
+        await workflowCache.init();
         const identityCacheIdToName = new IdentityIdToNameCacheService(this.client);
 
         const iterator = new GenericAsyncIterableIterator<AccessProfile, AccessProfilesApiListAccessProfilesRequest>(
@@ -181,10 +184,12 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
                     },
                     approvalSchemes: await accessProfileApprovalSchemeToStringConverter(
                         item.accessRequestConfig?.approvalSchemes,
-                        governanceGroupCache),
+                        governanceGroupCache,
+                        workflowCache),
                     revokeApprovalSchemes: await accessProfileApprovalSchemeToStringConverter(
                         item.revocationRequestConfig?.approvalSchemes,
-                        governanceGroupCache),
+                        governanceGroupCache,
+                        workflowCache),
                     // @ts-ignore Waiting for client SDK to be updated
                     metadata: metadataToString(item.accessModelMetadata)
                 };
@@ -193,6 +198,8 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
             });
         console.log("Governance Group Cache stats", governanceGroupCache.getStats());
         governanceGroupCache.flushAll();
+        console.log("Workflow Cache stats", workflowCache.getStats());
+        workflowCache.flushAll();
         console.log("Identity Cache stats", identityCacheIdToName.getStats());
         identityCacheIdToName.flushAll();
     }

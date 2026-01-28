@@ -211,4 +211,11 @@ export class CacheService<T> {
     public getStats(): CacheStats {
         return this._stats;
     }
+
+    /**
+     * Optional method to setup the cache if needed
+     */
+    public async init() : Promise<void> {
+
+    }
 }

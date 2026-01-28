@@ -181,8 +181,8 @@ The following table provides the expected column for the CSV to import Access Pr
 | `requestable`            | No   | Is the access profile requestable?                                                                                          | `false`            |
 | `commentsRequired`       | No   | Require comments when the user requests access                                                                              | `false`            |
 | `denialCommentsRequired` | No   | Require comments when a reviewer denies the request                                                                         | `false`            |
-| `approvalSchemes`        | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
-| `revokeApprovalSchemes`  | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
+| `approvalSchemes`        | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by ; | `[]` (No approval) |
+| `revokeApprovalSchemes`  | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by ; | `[]` (No approval) |
 | `entitlements`           | No   | Entitlements of the access profile                                                                                          | `[]`               |
 | `metadata`               | No   | Metadata of the access profile (cf. below for format)                                                                       | `[]`               |
 
@@ -201,16 +201,35 @@ The following table provides the expected column for the CSV to import Roles:
 | `requestable`                  | No   | Is the role requestable?                                                                       | `false`            |
 | `commentsRequired`             | No   | Require comments when the user requests access                                                 | `false`            |
 | `denialCommentsRequired`       | No   | Require comments when a reviewer denies the request                                            | `false`            |
-| `approvalSchemes`              | No   | List of reviewers among `OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
+| `approvalSchemes`              | No   | List of reviewers among `OWNER`, `MANAGER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by ; | `[]` (No approval) |
 | `revokeCommentsRequired`       | No   | Require comments when the user requests revocation                                             | `false`            |
 | `revokeDenialCommentsRequired` | No   | Require comments when a reviewer denies the revocation request                                 | `false`            |
-| `revokeApprovalSchemes`        | No   | List of reviewers among `OWNER`, `MANAGER`, or the name of the governance group separated by ; | `[]` (No approval) |
+| `revokeApprovalSchemes`        | No   | List of reviewers among `OWNER`, `MANAGER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by ; | `[]` (No approval) |
 | `entitlements`                 | No   | List of entitlements                                                                           | `[]`               |
 | `accessProfiles`               | No   | List of access profiles                                                                        | `[]`               |
 | `membershipCriteria`           | No   | Membership criteria for automatic assignment (cf. below for format)                            |                    |
 | `dimensional`                  | No   | Is the role dynamic? Does it support dimensions?                                               | `false`            |
 | `dimensionAttributes`          | No   | List of attributes used for dimension, separated by ;                                          | `[]`               |
 | `metadata`                     | No   | Metadata of the role (cf. below for format)                                                    | `[]`               |
+
+#### Approval Schemes Format
+
+Approval schemes (`approvalSchemes` and `revokeApprovalSchemes`) are exported and imported using the following format:
+
+- **Standard approvers**: Use enum values directly
+  - For Access Profiles: `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`
+  - For Roles: `OWNER`, `MANAGER`
+- **Governance Groups**: Use the prefix format `GOVERNANCE_GROUP:<Group Name>`
+- **Workflows**: Use the prefix format `WORKFLOW:<Workflow Name>`
+- **Separator**: Semicolon (`;`)
+
+**Example**:
+```csv
+approvalSchemes: MANAGER;GOVERNANCE_GROUP:My Approval Group;WORKFLOW:My Approval Workflow;OWNER
+```
+
+**Backward Compatibility**:
+Older exports without prefixes (e.g., `My Approval Group`) are still supported during import and will be treated as Governance Groups.
 
 ### Dimensions
 

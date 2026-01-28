@@ -16,6 +16,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Changed
 
+- Add support for dynamic approval for roles and access profiles
+
 ### Fixed
 
 - Force X-SailPoint-Experimental header for all deletion. Error while deleting applications.
