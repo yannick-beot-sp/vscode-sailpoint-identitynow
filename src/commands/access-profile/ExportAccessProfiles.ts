@@ -3,14 +3,15 @@ import { BaseCSVExporter } from "../BaseExporter";
 import { AccessProfilesTreeItem } from '../../models/ISCTreeItem';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
-import { AccessProfile, AccessProfileSourceRef, AccessProfilesApiListAccessProfilesRequest, OwnerReference, Requestability, Revocability } from 'sailpoint-api-client';
+import { AccessProfile, AccessProfileSourceRef, AccessProfilesApiListAccessProfilesRequest, Requestability } from 'sailpoint-api-client';
 import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator';
-import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { WorkflowIdToNameCacheService } from '../../services/cache/WorkflowIdToNameCacheService';
 import { accessProfileApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
 import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
 import { metadataToString } from '../../utils/metadataUtils';
+import { EntitlementIdToSourceNameCacheService } from '../../services/cache/EntitlementIdToSourceNameCacheService';
+import { entitlementToStringConverter } from '../../utils/entitlementToStringConverter';
 
 export class AccessProfileExporterCommand {
     /**
@@ -158,6 +159,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
         const workflowCache = new WorkflowIdToNameCacheService(this.client);
         await workflowCache.init();
         const identityCacheIdToName = new IdentityIdToNameCacheService(this.client);
+        const entitlementIdToSourceNameCacheService = new EntitlementIdToSourceNameCacheService(this.client);
 
         const iterator = new GenericAsyncIterableIterator<AccessProfile, AccessProfilesApiListAccessProfilesRequest>(
             this.client,
@@ -166,6 +168,14 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
         await this.writeData(headers, paths, unwindablePaths, iterator, task, token,
             async (item: AccessProfile): Promise<AccessProfileDto> => {
                 const owner = item.owner ? (await identityCacheIdToName.get(item.owner.id!)) : null
+
+                let entitlements: string | undefined = undefined;
+                try {
+                    entitlements = (item.entitlements ? (await entitlementToStringConverter(item.entitlements, entitlementIdToSourceNameCacheService)) : null);
+                } catch (error) {
+                    console.warn(`Error converting entitlements for role "${item.name}:"`, error);
+                }
+
 
                 const itemDto: AccessProfileDto = {
                     name: item.name,
@@ -177,7 +187,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
                         name: item.source.name
                     },
                     owner: owner,
-                    entitlements: item.entitlements?.map(x => x.name).join(CSV_MULTIVALUE_SEPARATOR),
+                    entitlements,
                     accessRequestConfig: {
                         commentsRequired: item.accessRequestConfig?.commentsRequired ?? false,
                         denialCommentsRequired: item.accessRequestConfig?.denialCommentsRequired ?? false,
@@ -202,5 +212,8 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
         workflowCache.flushAll();
         console.log("Identity Cache stats", identityCacheIdToName.getStats());
         identityCacheIdToName.flushAll();
+        console.log("Entitlement Cache stats", entitlementIdToSourceNameCacheService.getStats());
+        entitlementIdToSourceNameCacheService.flushAll();
     }
 }
+

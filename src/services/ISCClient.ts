@@ -1271,10 +1271,13 @@ export class ISCClient {
 		return Number(resp.headers[TOTAL_COUNT_HEADER]);
 	}
 
-	public async getEntitlementByName(sourceId: string, entitlementName: string): Promise<EntitlementBeta> {
+	public async getEntitlementByName(sourceId: string, entitlementName: string, attribute: string| undefined = undefined): Promise<EntitlementBeta> {
 		console.log("> getEntitlementByName", sourceId, entitlementName);
 
-		const filters = `source.id eq "${sourceId}" and name eq "${entitlementName}"`;
+		let filters = `source.id eq "${sourceId}" and name eq "${entitlementName}"`;
+		if (attribute) {
+			filters += ` and attribute eq "${attribute}"`
+		}
 		const response = await this.getEntitlements({
 			filters,
 			limit: 2,

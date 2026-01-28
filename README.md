@@ -231,6 +231,37 @@ approvalSchemes: MANAGER;GOVERNANCE_GROUP:My Approval Group;WORKFLOW:My Approval
 **Backward Compatibility**:
 Older exports without prefixes (e.g., `My Approval Group`) are still supported during import and will be treated as Governance Groups.
 
+#### Entitlements Format
+
+Entitlements are exported and imported with the following format to ensure uniqueness:
+
+- **Access Profiles**: Use the format `<attribute>|<entitlement name>`
+  - Example: `groups|All_Users;groups|campusAccess`
+  - The attribute field identifies the type of entitlement (e.g., `groups`, `permissions`, `roles`)
+
+- **Roles**: Use the format `<source name>|<attribute>|<entitlement name>`
+  - Example: `Active Directory|groups|SupplyChain;Active Directory|groups|TCOMControls`
+  - The source name is required because roles can have entitlements from multiple sources
+
+- **Separator**: Semicolon (`;`) separates multiple entitlements
+- **Format**: Pipe character (`|`) separates the components
+
+**Examples**:
+```csv
+# Access Profile entitlements
+entitlements: groups|All_Users;permissions|Read;permissions|Write
+
+# Role entitlements
+entitlements: Active Directory|groups|Accounting;HR System|permissions|ViewEmployee
+```
+
+**Backward Compatibility**:
+Older exports without the attribute field are still supported during import:
+- **Access Profiles**: Format `<entitlement name>` (e.g., `All_Users;campusAccess`)
+- **Roles**: Format `<source name>|<entitlement name>` (e.g., `Active Directory|SupplyChain`)
+
+These legacy formats will be automatically detected and processed correctly during import.
+
 ### Dimensions
 
 The following table provides the expected column for the CSV to import Roles:

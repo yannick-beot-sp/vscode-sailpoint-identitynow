@@ -159,11 +159,34 @@ export class AccessProfileImporter {
                 let entitlements: EntitlementBeta[] = [];
                 if (isNotBlank(data.entitlements)) {
                     try {
-                        entitlements = await Promise.all(data.entitlements?.split(CSV_MULTIVALUE_SEPARATOR).map(async (entitlementName) => ({
-                            name: entitlementName,
-                            "id": (await entitlementCacheService.get([sourceId, entitlementName].join(KEY_SEPARATOR))),
-                            "type": "ENTITLEMENT"
-                        })));
+                        entitlements = await Promise.all(data.entitlements?.split(CSV_MULTIVALUE_SEPARATOR).map(async (entitlementStr) => {
+                            const parts = entitlementStr.split(KEY_SEPARATOR);
+                            let entitlementId: string;
+                            let entitlementName: string;
+
+                            if (parts.length === 2) {
+                                // New format: attribute|name
+                                const [attribute, name] = parts;
+                                entitlementName = name;
+                                entitlementId = await entitlementCacheService.get(
+                                    [sourceId, attribute, entitlementName].join(KEY_SEPARATOR))
+
+                            } else if (parts.length === 1) {
+                                // Legacy format: name only
+                                entitlementName = entitlementStr;
+                                entitlementId = await entitlementCacheService.get(
+                                    [sourceId, entitlementName].join(KEY_SEPARATOR)
+                                );
+                            } else {
+                                throw Error(`invalid entitlement format: ${entitlementStr}`)
+                            }
+
+                            return {
+                                name: entitlementName,
+                                id: entitlementId,
+                                type: "ENTITLEMENT"
+                            };
+                        }));
                     } catch (error) {
                         result.error++;
                         const srcMessage = `Unable to find entitlement: ${error}`;
