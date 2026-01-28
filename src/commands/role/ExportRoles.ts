@@ -16,6 +16,7 @@ import { CacheService } from '../../services/cache/CacheService';
 import { EntitlementIdToSourceNameCacheService } from '../../services/cache/EntitlementIdToSourceNameCacheService';
 import { metadataToString } from '../../utils/metadataUtils';
 import { dimensionSchemaToString } from '../../utils/dimensionUtils';
+import { entitlementToStringConverter } from '../../utils/entitlementToStringConverter';
 
 export class RoleExporterCommand {
 
@@ -274,17 +275,3 @@ class RoleExporter extends BaseCSVExporter<Role> {
     }
 }
 
-async function entitlementToStringConverter(
-    entitlementRefs: Array<EntitlementRef> | null | undefined,
-    entitlementToString: CacheService<string>): Promise<string | undefined> {
-
-    if (entitlementRefs === undefined
-        || entitlementRefs === null
-        || !Array.isArray(entitlementRefs)
-        || entitlementRefs.length === 0) {
-        return undefined
-    }
-    return (await Promise.all(entitlementRefs
-        .map(ref => entitlementToString.get(ref.id))))
-        .join(CSV_MULTIVALUE_SEPARATOR)
-}

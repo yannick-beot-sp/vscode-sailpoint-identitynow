@@ -7,13 +7,24 @@ import { CacheService } from "./CacheService";
 
 export const KEY_SEPARATOR = "|";
 
-export class EntitlementCacheService extends CacheService<string>{
+export class EntitlementCacheService extends CacheService<string> {
     constructor(readonly client: ISCClient) {
         super(
             async (key: string) => {
-                const [sourceId, entitlementName] = key.split(KEY_SEPARATOR);
-                const entitlement = await client.getEntitlementByName(sourceId, entitlementName);
-                return entitlement.id;
+                const parts = key.split(KEY_SEPARATOR);
+                let sourceId, attribute, name
+                if (parts.length === 2 || parts.length === 3) {
+                    [sourceId, attribute, name] = parts;
+                    if (!name) {
+                        // old format source|name
+                        name = attribute
+                        attribute = undefined
+                    }
+                    const entitlement = await client.getEntitlementByName(sourceId, name, attribute);
+                    return entitlement.id;
+                } else {
+                    throw new Error(`Invalid entitlement cache key format: ${key}`);
+                }
             }
         );
     }

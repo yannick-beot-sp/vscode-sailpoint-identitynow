@@ -170,19 +170,41 @@ export class RoleImporter {
                     try {
                         entitlements = await Promise.all(data.entitlements
                             .split(CSV_MULTIVALUE_SEPARATOR)
-                            .map(async (sourceAndEntitlementNames) => {
-                                const [sourceName, entitlementName] = sourceAndEntitlementNames.split(KEY_SEPARATOR)
-                                const sourceId = await sourceCacheService.get(sourceName)
-                                const entitlementId = await entitlementCacheService.get([sourceId, entitlementName].join(KEY_SEPARATOR))
+                            .map(async (entitlementStr) => {
+                                const parts = entitlementStr.split(KEY_SEPARATOR);
+                                let sourceName: string;
+                                let entitlementName: string;
+                                let sourceId: string;
+                                let entitlementId: string;
+
+                                if (parts.length === 3) {
+                                    // New format: sourceName|attribute|name
+                                    let attribute
+                                    [sourceName, attribute, entitlementName] = parts;
+                                    sourceId = await sourceCacheService.get(sourceName);
+                                    entitlementId = await entitlementCacheService.get(
+                                        [sourceId, attribute, entitlementName].join(KEY_SEPARATOR)
+                                    );
+                                } else if (parts.length === 2) {
+                                    // Legacy format: sourceName|name
+                                    [sourceName, entitlementName] = parts;
+                                    sourceId = await sourceCacheService.get(sourceName);
+                                    entitlementId = await entitlementCacheService.get(
+                                        [sourceId, entitlementName].join(KEY_SEPARATOR)
+                                    );
+                                } else {
+                                    throw new Error(`Invalid entitlement format: ${entitlementStr}`);
+                                }
+
                                 return {
                                     name: entitlementName,
-                                    "id": entitlementId,
-                                    "type": "ENTITLEMENT"
+                                    id: entitlementId,
+                                    type: "ENTITLEMENT"
                                 }
                             }));
                     } catch (error) {
                         result.error++;
-                        const etMessage = `Unable to find access an entitlement: ${error}`;
+                        const etMessage = `Unable to find an entitlement: ${error}`;
                         await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, etMessage);
                         vscode.window.showErrorMessage(etMessage);
                         return;

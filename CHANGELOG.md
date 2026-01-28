@@ -16,7 +16,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Changed
 
-- Add support for dynamic approval for roles and access profiles
+- Add support for dynamic approval for roles and access profiles (cf. [#133](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/133))
+- Add support for entitlement type during import and export for roles and access profiles (cf. [#130](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/130))
 
 ### Fixed
 
