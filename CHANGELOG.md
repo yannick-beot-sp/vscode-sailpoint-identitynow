@@ -8,6 +8,18 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Security
 
+### Added
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [1.3.24] - 2026-01-28
+
+### Security
+
 - Update dependencies (mocha)
 
 ### Added
@@ -23,8 +35,6 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 - Force X-SailPoint-Experimental header for all deletion. Error while deleting applications.
 - Escape newline for export and properly import "\n" (cf. [#129](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/129))
-
-### Removed
 
 ## [1.3.23] - 2025-11-18
 
