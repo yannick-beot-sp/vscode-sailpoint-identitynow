@@ -14,6 +14,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Fixed
 
+- Issue with creation of temporary file for peek command
+
 ### Removed
 
 ## [1.3.24] - 2026-01-28

@@ -504,6 +504,8 @@ The extension supports the following settings:
 
 ### Unreleased
 
+- Issue with creation of temporary file for peek command
+
 ### 1.3.24
 
 - Add "Role Privileged" column in Campaign Status Report (cf. [#128](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/128))

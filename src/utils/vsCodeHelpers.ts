@@ -295,6 +295,12 @@ export async function askSelectObjectTypes<T extends vscode.QuickPickItem>(title
 	return undefined;
 }
 
+export async function createNewUntitledFile(obj: any, language = 'json'): Promise<void> {
+	const strContent = typeof obj === 'object' ? JSON.stringify(obj, null, 4) : obj;
+	const document = await vscode.workspace.openTextDocument({ content: strContent, language });
+	await vscode.window.showTextDocument(document, { preview: true });
+}
+
 export async function createNewFile(newUri: vscode.Uri, obj: any): Promise<void> {
 	let document = await vscode.workspace.openTextDocument(newUri);
 	document = await vscode.languages.setTextDocumentLanguage(document, 'json');

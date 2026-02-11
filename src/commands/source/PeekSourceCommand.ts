@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as tmp from "tmp";
 import { Schema } from 'sailpoint-api-client';
 import { SourceTreeItem } from '../../models/ISCTreeItem';
 import { ISCClient } from '../../services/ISCClient';
@@ -9,8 +8,7 @@ import { runWizard } from '../../wizard/wizard';
 import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
 import { QuickPickPromptStep } from '../../wizard/quickPickPromptStep';
 import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep';
-import { createNewFile } from '../../utils/vsCodeHelpers';
-import { createWriteStream } from 'node:fs';
+import { createNewUntitledFile } from '../../utils/vsCodeHelpers';
 
 
 
@@ -86,14 +84,7 @@ export class PeekSourceCommand {
                 10
             )
 
-            const tmpPath = tmp.tmpNameSync({
-                prefix: `${values["source"].name}-${values["schema"].name}`,
-                postfix: ".json",
-            });
-            // creating tmp file
-            const s = createWriteStream(tmpPath, { encoding: 'utf8', autoClose: false });
-            s.close();
-            await createNewFile(vscode.Uri.file(tmpPath), resources);
+            await createNewUntitledFile(resources);
         })
     }
 }
