@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as readline from 'readline';
+import * as os from 'os';
 import { parse } from 'csv-parse';
 import { parse as parseSync } from 'csv-parse/sync';
 
@@ -61,7 +62,7 @@ export class CSVReader<T> {
         this.checkExists();
         return new Promise((resolve, reject) => {
             const input = fs.createReadStream(this.filepath);
-            const write2Null = fs.createWriteStream('/dev/null');
+            const write2Null = fs.createWriteStream(os.devNull);
             var linesCount = -1;
             let rl = readline.createInterface(input, write2Null);
             rl.on('line', function (line) {
