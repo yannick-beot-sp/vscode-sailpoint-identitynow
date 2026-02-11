@@ -344,7 +344,7 @@ export class DimensionImporter {
                 }
             });
         } catch { }
-        const message = `${processedLines} line(s) processed. ${result.success} sucessfully import. ${result.error} error(s).`;
+        const message = `${processedLines} line(s) processed. ${result.success} successfully import. ${result.error} error(s).`;
 
         if (result.error === processedLines) {
             vscode.window.showErrorMessage(message);

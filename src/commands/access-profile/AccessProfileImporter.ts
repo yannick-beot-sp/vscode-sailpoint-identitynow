@@ -349,7 +349,7 @@ export class AccessProfileImporter {
             })
         } catch { }
 
-        const message = `${processedLines} line(s) processed. ${result.success} sucessfully imported. ${result.error} error(s).`;
+        const message = `${processedLines} line(s) processed. ${result.success} successfully imported. ${result.error} error(s).`;
 
         if (result.error === processedLines) {
             vscode.window.showErrorMessage(message);

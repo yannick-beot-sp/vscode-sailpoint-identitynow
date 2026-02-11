@@ -164,7 +164,7 @@ export class CustomReviewerImporter {
                 }
             });
         } catch { }
-        const message = `${processedLines} line(s) imported. ${result.success} sucessfully imported. ${result.error} invalid line(s).`;
+        const message = `${processedLines} line(s) imported. ${result.success} successfully imported. ${result.error} invalid line(s).`;
 
         if (result.error === processedLines) {
             vscode.window.showErrorMessage(message);

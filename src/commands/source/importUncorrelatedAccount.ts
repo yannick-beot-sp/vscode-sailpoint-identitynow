@@ -115,7 +115,7 @@ class UncorrelatedAccountImporter {
 
         });
 
-        const message = `${nbLines} line(s) processed. ${result.correlated} sucessfully correlated. ${result.emptyUsername} with empty userName. ${result.error} error(s). ${result.identityNotFound} identities not found. ${result.accountNotFound} account(s) not found.`;
+        const message = `${nbLines} line(s) processed. ${result.correlated} successfully correlated. ${result.emptyUsername} with empty userName. ${result.error} error(s). ${result.identityNotFound} identities not found. ${result.accountNotFound} account(s) not found.`;
 
         if (result.error > 0) {
             vscode.window.showErrorMessage(message);
