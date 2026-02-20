@@ -20,6 +20,17 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Removed
 
+## [1.3.25] - 2026-02-20
+
+### Added
+
+- Publication to Open VSX Registry
+
+### Fixed
+
+- Issue with creation of temporary file for peek command
+
+
 ## [1.3.24] - 2026-01-28
 
 ### Security
