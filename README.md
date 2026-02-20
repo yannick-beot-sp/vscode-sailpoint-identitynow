@@ -505,6 +505,7 @@ The extension supports the following settings:
 ### Unreleased
 
 - Issue with creation of temporary file for peek command
+- Publication to Open VSX Registry
 
 ### 1.3.24
 

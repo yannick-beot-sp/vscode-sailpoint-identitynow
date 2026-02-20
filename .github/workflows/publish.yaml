@@ -45,3 +45,8 @@ jobs:
     - name: Publish
       if: success() && startsWith( github.ref, 'refs/tags/releases/')
       run: vsce publish -p ${{ secrets.VSCE_PAT }} --allow-package-secrets sendgrid
+    - name: Publish to Open VSX Registry
+      if: success() && startsWith( github.ref, 'refs/tags/releases/')
+      run: npx ovsx publish ${{github.workspace}}/vscode-sailpoint-identitynow-*.vsix
+      env:
+        OVSX_PAT: ${{ secrets.OVSX_PAT }}
