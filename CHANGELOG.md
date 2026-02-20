@@ -10,17 +10,17 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
-- Publication to Open VSX Registry
-
 ### Changed
 
 ### Fixed
 
-- Issue with creation of temporary file for peek command
-
 ### Removed
 
 ## [1.3.25] - 2026-02-20
+
+### Security
+
+- Update dependencies (mocha, diff, glob, ESLint, rimraf, axios, sailpoint-api-client)
 
 ### Added
 

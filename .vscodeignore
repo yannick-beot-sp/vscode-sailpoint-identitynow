@@ -18,4 +18,6 @@ RELEASE.md
 scripts/**
 CHANGELOG.md
 .prettierignore
+.prettierrc
 resources/readme/**
+**/eslint.config.mjs

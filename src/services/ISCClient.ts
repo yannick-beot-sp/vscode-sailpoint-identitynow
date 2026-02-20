@@ -1490,7 +1490,7 @@ export class ISCClient {
 		return response.data
 	}
 
-	public async updateAccessProfile(id: string, operations: Array<JsonPatchOperation>) {
+	public async updateAccessProfile(id: string, operations: Array<JsonPatchOperationV2025>) {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new AccessProfilesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.patchAccessProfile({

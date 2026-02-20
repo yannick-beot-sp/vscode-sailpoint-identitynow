@@ -508,6 +508,7 @@ The extension supports the following settings:
 
 - Issue with creation of temporary file for peek command
 - Publication to Open VSX Registry
+- Update dependencies (mocha, diff, glob, ESLint, rimraf, axios, sailpoint-api-client)
 
 ### 1.3.24
 
