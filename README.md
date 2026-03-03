@@ -504,6 +504,8 @@ The extension supports the following settings:
 
 ### Unreleased
 
+- Escape '\' when exporting and importing roles and access profiles
+
 ### 1.3.25
 
 - Issue with creation of temporary file for peek command

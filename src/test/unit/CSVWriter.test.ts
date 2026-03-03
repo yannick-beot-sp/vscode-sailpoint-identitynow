@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as os from 'os';
 import { it, describe } from 'mocha';
+import * as assert from 'assert';
 import * as path from 'path'
-import { CSVWriter } from '../../services/CSVWriter';
+import { CSVWriter, stringFormatter } from '../../services/CSVWriter';
 
 const data = [
     {
@@ -39,7 +40,7 @@ const data = [
         "email": "bharrald3@foxnews.com",
         "gender": "Female",
         "ip_address": "164.57.246.150",
-        "description": "UX designer with a passion for accessibility"
+        "description": "K:\\share read-only"
     },
     {
         "id": 5,
@@ -109,6 +110,64 @@ suite('CSVWriter Test Suite', () => {
             csvWriter.end();
 
         });
+    });
+
+    describe('stringFormatter', () => {
+        const format = stringFormatter();
+
+        const cases: { label: string; input: string; expected: string }[] = [
+            {
+                label: 'plain string',
+                input: 'hello',
+                expected: '"hello"',
+            },
+            {
+                label: 'empty string',
+                input: '',
+                expected: '""',
+            },
+            {
+                label: 'string with double quotes',
+                input: 'say "hello"',
+                expected: '"say ""hello"""',
+            },
+            {
+                label: 'string with real LF newline',
+                input: 'line1\nline2',
+                expected: '"line1\\nline2"',
+            },
+            {
+                label: 'string with real CRLF newline',
+                input: 'line1\r\nline2',
+                expected: '"line1\\nline2"',
+            },
+            {
+                label: 'string with multiple real newlines',
+                input: 'a\nb\nc',
+                expected: '"a\\nb\\nc"',
+            },
+            {
+                label: 'string with a single backslash',
+                input: 'K:\\share',
+                expected: '"K:\\\\share"',
+            },
+            {
+                label: 'string with literal \\n (backslash + n, not a newline)',
+                input: 'product manager \\nfocused',
+                expected: '"product manager \\\\nfocused"',
+            },
+            {
+                label: 'string with both double quote and real newline',
+                input: 'line1 "quoted"\nline2',
+                expected: '"line1 ""quoted""\\nline2"',
+            },
+        ];
+
+        for (const { label, input, expected } of cases) {
+            it(`should format: ${label}`, () => {
+                assert.strictEqual(format(input), expected);
+            });
+        }
     });
 
 });

@@ -13,12 +13,14 @@ import { customUnwind } from '../utils/CSVTransform';
  * @param opts 
  * @returns 
  */
-function stringFormatter(
-    opts: { quote?: string, escapedQuote?: string, escaptedEol?: string } = {},
+export function stringFormatter(
+    opts: { quote?: string, escapedQuote?: string, escaptedEol?: string,escaptedBackslash?: string  } = {},
 ) {
     const quote = typeof opts.quote === 'string' ? opts.quote : '"';
     const backslashn = "\\n"
     const escaptedBackslashn = "\\\\n"
+    const backslash = "\\"
+    const escaptedBackslash = typeof opts.escaptedBackslash === 'string' ? opts.escaptedBackslash : '\\\\';
     const escaptedEol = typeof opts.escaptedEol === 'string' ? opts.escaptedEol : '\\n';
     const escapedQuote =
         typeof opts.escapedQuote === 'string'
@@ -27,14 +29,18 @@ function stringFormatter(
 
     const quoteRegExp = new RegExp(quote, 'g');
     const backslashnRegExp = new RegExp("\\\\n", 'g');
+    const backslashRegExp = new RegExp("\\\\", 'g');
     const eolRegExp = new RegExp("\r?\n", 'g');
     return (value) => {
         if (value.includes(quote)) {
             value = value.replace(quoteRegExp, escapedQuote);
         }
 
-        if (value.includes(backslashn)) {
-            value = value.replace(backslashnRegExp, escaptedBackslashn);
+        // if (value.includes(backslashn)) {
+        //     value = value.replace(backslashnRegExp, escaptedBackslashn);
+        // }
+        if (value.includes(backslash)) {
+            value = value.replace(backslashRegExp, escaptedBackslash);
         }
 
         if (value.includes("\n")) {

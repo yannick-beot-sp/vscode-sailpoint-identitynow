@@ -12,6 +12,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Changed
 
+- Escape '\' when exporting and importing roles and access profiles
+
 ### Fixed
 
 ### Removed

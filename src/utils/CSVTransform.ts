@@ -63,9 +63,8 @@ export function transformNewlines(value: any, context?: any): any {
     if (value !== null && value !== undefined && typeof value === 'string') {
         // replace "\n" to the character \n but not "\\n"
         value = value.replace(/(?<!\\)\\n/g, '\n');
-         //value = value.replace(/[^\\]\\n/g, '\n');
-        // Replace "\\n" by "\n"
-        value = value.replace(/\\\\n/g, '\\n');
+        // Replace "\\" by "\"
+        value = value.replace(/\\\\/g, '\\');
     }
     return value;
 }

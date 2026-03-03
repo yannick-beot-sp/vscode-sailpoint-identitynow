@@ -51,6 +51,15 @@ suite('transformNewlines Test Suite', () => {
         runTests(tests)
     });
 
+    describe('Transform "\\\\" to "\\" (lone backslash)', () => {
+        const tests = [
+            { input: 'K:\\\\share', expected: 'K:\\share', it: 'should transform "\\\\" to single backslash (Windows path)' },
+            { input: 'C:\\\\folder\\\\file.txt', expected: 'C:\\folder\\file.txt', it: 'should transform multiple "\\\\" to single backslash' },
+            { input: 'end\\\\', expected: 'end\\', it: 'should transform "\\\\" at end of string' },
+        ];
+        runTests(tests)
+    });
+
     describe('Edge cases', () => {
         const tests = [
             { input: '', expected: '', it: 'should handle empty string' },
