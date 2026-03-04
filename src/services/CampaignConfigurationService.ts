@@ -1,6 +1,6 @@
 import { SecretStorage } from "vscode";
-import { TenantCredentials, TenantInfo, TenantToken } from "../models/TenantInfo";
-import { isEmpty, isNotEmpty } from '../utils/stringUtils';
+import { TenantToken } from "../models/TenantInfo";
+import { isNotEmpty } from '../utils/stringUtils';
 import { EndpointUtils } from "../utils/EndpointUtils";
 import { AccessToken, OAuth2Client } from "./OAuth2Client";
 import { CertificationCampaignInfo } from "../models/CertificationCampaignInfo";

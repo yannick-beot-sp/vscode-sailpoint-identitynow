@@ -11,7 +11,6 @@ import { convertConstantToTitleCase, escapeFilter, isEmpty, isNotEmpty } from ".
 import { TenantService } from "../services/TenantService";
 import { CampaignStatusV3, DimensionV2025 } from "sailpoint-api-client";
 import { convertToBaseTreeItem } from "../views/utils";
-import { EndpointUtils } from "../utils/EndpointUtils";
 
 
 /**
