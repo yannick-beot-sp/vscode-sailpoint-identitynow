@@ -14,7 +14,7 @@
   },
   "homepage": "https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/",
   "engines": {
-    "vscode": "^1.74.0"
+    "vscode": "^1.99.0"
   },
   "extensionKind": [
     "ui",
@@ -1805,9 +1805,25 @@
         "vscode-sailpoint-identitynow.report.campaigns.filename": {
           "type": "string",
           "default": "%x/reports/%T-Campaign-%S-%y%M%d-%h%m%s.csv"
+        },
+        "vscode-sailpoint-identitynow.mCP.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable the MCP server for Transform management."
+        },
+        "vscode-sailpoint-identitynow.mCP.port": {
+          "type": "integer",
+          "default": 0,
+          "description": "Port for the MCP HTTP server. 0 = auto-assign a free port."
         }
       }
-    }
+    },
+    "mcpServerDefinitionProviders": [
+      {
+        "id": "sailpoint-identitynow-mcp",
+        "label": "SailPoint Identity Security Cloud"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run esbuild-base -- --minify",
@@ -1834,7 +1850,7 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^18.19.64",
     "@types/tmp": "^0.2.5",
-    "@types/vscode": "^1.74.0",
+    "@types/vscode": "^1.109.0",
     "@typescript-eslint/eslint-plugin": "^8.56.0",
     "@typescript-eslint/parser": "^8.56.0",
     "@vscode/test-electron": "^2.5.2",
@@ -1846,6 +1862,7 @@
     "ts-node": "^10.9.2"
   },
   "dependencies": {
+    "@frontmcp/sdk": "^0.12.2",
     "@json2csv/node": "^7.0.6",
     "@json2csv/transforms": "^7.0.6",
     "@types/uuid": "^10.0.0",
@@ -1853,6 +1870,7 @@
     "axios-retry": "^4.5.0",
     "csv-parse": "^6.1.0",
     "fast-json-patch": "^3.1.1",
+    "frontmcp": "^0.12.2",
     "lodash": "^4.17.21",
     "sailpoint-api-client": "^1.7.10",
     "tmp": "^0.2.1",
