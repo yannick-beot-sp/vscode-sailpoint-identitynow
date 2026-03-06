@@ -93,6 +93,7 @@ import { CloneTransformCommand } from './commands/CloneTransformCommand';
 import { DimensionExporterCommand } from './commands/role/ExportDimensions';
 import { DimensionImporterTreeViewCommand } from './commands/role/DimensionImporterTreeViewCommand';
 import { EditOrgConfigCommand } from './commands/tenant/EditOrgConfigCommand';
+import { McpServerManager } from './mcp/McpServerManager'
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -678,6 +679,11 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EDIT_SERVICE_DESK_INTEGRATIONS_STATUS_CHECK_CONFIGURATION,
 			editServiceDeskTimeCheckConfiguration.execute, editServiceDeskTimeCheckConfiguration))
+
+
+	// MCP Server
+	const mcpServerManager = new McpServerManager(context, tenantService);
+	mcpServerManager.initialize()
 
 
 	let api = {
