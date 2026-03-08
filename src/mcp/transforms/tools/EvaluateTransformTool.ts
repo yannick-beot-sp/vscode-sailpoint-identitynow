@@ -3,20 +3,19 @@ import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
 import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
+import { tenantNameField } from "../../inputFields";
+import { transformNameField } from "../transformInputFields";
 
 const IDENTITY_ATTRIBUTE = "uid";
 
 const inputSchema = z.object({
-    tenantName: z.string().describe(
-        "Tenant identifier: full domain, a prefix (e.g. 'company-poc'), or display name."
+    tenantName: tenantNameField,
+    identity: z.string().describe(
+        "ID or name of the identity to evaluate the transform for. " +
+        "Accepts either a 32-character hexadecimal ID (e.g. 'f142565e845049c2bcad8931def5fcd6') " +
+        "or an exact identity name (e.g. 'john.doe')."
     ),
-    identityName: z.string().describe(
-        "Name of the identity to evaluate the transform for (e.g. 'john.doe'). " +
-        "The identity is resolved by searching for an exact name match."
-    ),
-    transformName: z.string().describe(
-        "Name of the transform to evaluate."
-    ),
+    transformName: transformNameField,
 });
 
 const outputSchema = z.object({
@@ -31,10 +30,12 @@ const outputSchema = z.object({
 type Input = z.infer<typeof inputSchema>;
 type Output = z.infer<typeof outputSchema>;
 
+const IDENTITY_ID_REGEX = /^[0-9a-f]{32}$/;
+
 /**
- * Evaluates a transform for a given identity by name.
- * Resolves the identity ID from the provided name, then calls the identity preview API
- * using the transform as a reference.
+ * Evaluates a transform for a given identity by ID or name.
+ * If an ID is provided, it is used directly. Otherwise, resolves the identity ID
+ * from the provided name, then calls the identity preview API using the transform as a reference.
  */
 @Tool({
     name: "evaluateTransform",
@@ -52,20 +53,24 @@ export class EvaluateTransformTool extends ToolContext {
     async execute(input: Input): Promise<Output> {
         const client = getIscClient(this);
 
-        // Resolve identity by name
+        // Resolve identity ID
         let identityId: string;
-        try {
-            const identities = await client.searchIdentities(input.identityName, 1);
-            if (!identities || identities.length === 0) {
-                throw new McpError(
-                    ErrorCodes.INVALID_INPUT,
-                    `Identity "${input.identityName}" not found.`
-                );
+        if (IDENTITY_ID_REGEX.test(input.identity)) {
+            identityId = input.identity;
+        } else {
+            try {
+                const identities = await client.searchIdentities(input.identity, 1);
+                if (!identities || identities.length === 0) {
+                    throw new McpError(
+                        ErrorCodes.INVALID_INPUT,
+                        `Identity "${input.identity}" not found.`
+                    );
+                }
+                identityId = identities[0].id;
+            } catch (err: any) {
+                if (err instanceof McpError) { throw err; }
+                throw new McpError(ErrorCodes.ISC_API_ERROR, String(err?.message ?? err));
             }
-            identityId = identities[0].id;
-        } catch (err: any) {
-            if (err instanceof McpError) { throw err; }
-            throw new McpError(ErrorCodes.ISC_API_ERROR, String(err?.message ?? err));
         }
 
         // Evaluate the transform via identity preview
