@@ -3,11 +3,10 @@ import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
 import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
+import { tenantNameField } from "../../inputFields";
 
 const inputSchema = z.object({
-    tenantName: z.string().describe(
-        "Tenant identifier: full domain, a prefix (e.g. 'company-poc'), or display name."
-    ),
+    tenantName: tenantNameField,
     name: z.string().describe("Unique name for the new transform."),
     type: z.string().describe(
         "Transform type (e.g. 'accountAttribute', 'static', 'concat', 'dateFormat', …)."

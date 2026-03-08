@@ -3,17 +3,15 @@ import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
 import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
+import { tenantNameField } from "../../inputFields";
+import { transformNameField } from "../transformInputFields";
 
 /** Matches a UUID / GUID (case-insensitive). */
 const GUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const inputSchema = z.object({
-    tenantName: z.string().describe(
-        "Tenant identifier: full domain, a prefix (e.g. 'company-poc'), or display name."
-    ),
-    transformName: z.string().describe(
-        "Transform name or ID (UUID). When the value matches a GUID pattern the lookup is done by ID; otherwise by name."
-    ),
+    tenantName: tenantNameField,
+    transformName: transformNameField,
     attributes: z.record(z.string(), z.unknown()).describe(
         "Replacement attributes for the transform. Replaces the entire attributes map."
     ),

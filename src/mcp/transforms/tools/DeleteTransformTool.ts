@@ -3,12 +3,12 @@ import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
 import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
+import { tenantNameField } from "../../inputFields";
+import { transformNameField } from "../transformInputFields";
 
 const inputSchema = z.object({
-    tenantName: z.string().describe(
-        "Tenant identifier: full domain, a prefix (e.g. 'company-poc'), or display name."
-    ),
-    transformName: z.string().describe("Name of the transform to delete."),
+    tenantName: tenantNameField,
+    transformName: transformNameField,
 });
 
 const outputSchema = z.object({

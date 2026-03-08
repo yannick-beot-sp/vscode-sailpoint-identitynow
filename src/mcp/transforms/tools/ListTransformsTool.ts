@@ -2,11 +2,10 @@ import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
 import { getIscClient } from "../../plugins/TenantResolverPlugin";
+import { tenantNameField } from "../../inputFields";
 
 const inputSchema = z.object({
-    tenantName: z.string().describe(
-        "Tenant identifier: full domain, a prefix (e.g. 'company-poc'), or display name."
-    ),
+    tenantName: tenantNameField,
 });
 
 const outputSchema = z.object({
