@@ -6,18 +6,18 @@ import { resolveTenant } from "../utils/tenantResolver";
 import { getTenantService } from "../plugins/TenantResolverPlugin";
 import { isGuid } from "../../utils/stringUtils";
 
-type TransformParams = { tenantName: string; transformName: string };
+type WorkflowParams = { tenantName: string; workflowName: string };
 
 @ResourceTemplate({
-    name: "transform",
-    uriTemplate: "idn://{tenantName}/transforms/{transformName}",
-    description: "Returns the full JSON definition of a SailPoint ISC transform.",
+    name: "workflow",
+    uriTemplate: "idn://{tenantName}/workflows/{workflowName}",
+    description: "Returns the full JSON definition of a SailPoint ISC workflow.",
     mimeType: "application/json",
 })
-export class TransformResource extends ResourceContext<TransformParams> {
-    async execute(uri: string, params: TransformParams) {
-        const { tenantName, transformName } = params;
-        const decodedName = decodeURIComponent(transformName);
+export class WorkflowResource extends ResourceContext<WorkflowParams> {
+    async execute(uri: string, params: WorkflowParams) {
+        const { tenantName, workflowName } = params;
+        const decodedName = decodeURIComponent(workflowName);
 
         const ts = getTenantService();
         const tenant = resolveTenant(ts.getTenants(), tenantName);
@@ -25,25 +25,26 @@ export class TransformResource extends ResourceContext<TransformParams> {
             throw new McpError(ErrorCodes.TENANT_NOT_FOUND, `Tenant "${tenantName}" not found.`);
         }
 
-        console.log(`[INFO] transform_retrieved tenant=${tenant.tenantName} transformName=${decodedName}`);
+        console.log(`[INFO] workflow_retrieved tenant=${tenant.tenantName} workflowName=${decodedName}`);
 
         const client = new ISCClient(tenant.id, tenant.tenantName);
         try {
-            const transform = isGuid(decodedName)
-                ? await client.getTransformById(decodedName)
-                : await client.getTransformByName(decodedName);
+            const workflow = isGuid(decodedName)
+                ? await client.getWorflow(decodedName)
+                : await client.getWorkflowByName(decodedName);
+
             return {
                 contents: [{
                     uri,
                     mimeType: "application/json",
-                    text: JSON.stringify(transform),
+                    text: JSON.stringify(workflow),
                 }],
             };
         } catch (err: any) {
             if (err?.response?.status === 404 || err?.message?.includes("Could not find")) {
-                throw new McpError(ErrorCodes.TRANSFORM_NOT_FOUND, `Transform "${decodedName}" not found.`);
+                throw new McpError(ErrorCodes.WORKFLOW_NOT_FOUND, `Workflow "${decodedName}" not found.`);
             }
-            console.error(`[ERROR] ISC API error endpoint=transforms/${decodedName} statusCode=${err?.response?.status ?? "unknown"}`);
+            console.error(`[ERROR] ISC API error endpoint=workflows/${decodedName} statusCode=${err?.response?.status ?? "unknown"}`);
             throw new McpError(ErrorCodes.ISC_API_ERROR, String(err?.message ?? err));
         }
     }
