@@ -5,9 +5,7 @@ import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
 import { tenantNameField } from "../../inputFields";
 import { transformNameField } from "../transformInputFields";
-
-/** Matches a UUID / GUID (case-insensitive). */
-const GUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+import { isGuid } from "../../../utils/stringUtils";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -45,7 +43,7 @@ export class GetTransformTool extends ToolContext {
         const client = getIscClient(this);
 
         try {
-            const transform = GUID_PATTERN.test(input.transformName)
+            const transform = isGuid(input.transformName)
                 ? await client.getTransformById(input.transformName)
                 : await client.getTransformByName(input.transformName);
 

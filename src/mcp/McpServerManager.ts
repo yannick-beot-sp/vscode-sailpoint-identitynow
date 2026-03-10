@@ -5,6 +5,7 @@ import { FrontMcpInstance } from "@frontmcp/sdk";
 import { TenantService, TenantServiceEventType } from "../services/TenantService";
 import { setTenantService, TenantResolverPlugin } from "./plugins/TenantResolverPlugin";
 import { TransformApp } from "./transforms/TransformApp";
+import { WorkflowApp } from "./workflows/WorkflowApp";
 import * as configuration from '../configurationConstants';
 import { ISCMcpServerDefinitionProvider } from "./McpServerDefinitionProvider";
 import { MCP_ID, MCP_NAME, MCP_VERSION } from "./constants";
@@ -124,7 +125,7 @@ export class McpServerManager {
         // all scopes, but does NOT start the HTTP server — we call start() ourselves.
         this._instance = await FrontMcpInstance.createForGraph({
             info: { name: MCP_NAME, version: MCP_VERSION },
-            apps: [TransformApp],
+            apps: [TransformApp, WorkflowApp],
             plugins: [TenantResolverPlugin],
             http: {
                 port: resolvedPort,

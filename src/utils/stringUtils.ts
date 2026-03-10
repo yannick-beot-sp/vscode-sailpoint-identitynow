@@ -61,6 +61,11 @@ export function toCamelCase(input: string): string {
     }).join('');
 }
 
+/** Returns true if the value matches a UUID / GUID pattern (case-insensitive). */
+export function isGuid(value: string): boolean {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+}
+
 export function decomposeDiacriticalMarks(input: string): string {
     return input
         // Decompose the string into separate unicode symbols for diacritical marks in compatibility mode, 
