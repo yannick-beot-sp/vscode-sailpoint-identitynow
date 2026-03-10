@@ -112,10 +112,8 @@ export class McpServerManager {
      */
     async startMcpServer(): Promise<void> {
 
-        // "Dependency Injection"
-        // could have use Provider of FrontMCP but it would have just been a wrapper
         setTenantService(this.tenantService);
-        
+
         let resolvedPort = getPreferredPort();
         if (resolvedPort <= 0) {
             resolvedPort = await findFreePort()
@@ -131,7 +129,6 @@ export class McpServerManager {
             http: {
                 port: resolvedPort,
                 entryPath: "/mcp",
-
             },
         });
 

@@ -6,9 +6,10 @@ import { CreateTransformTool } from "./tools/CreateTransformTool";
 import { DeleteTransformTool } from "./tools/DeleteTransformTool";
 import { UpdateTransformTool } from "./tools/UpdateTransformTool";
 import { EvaluateTransformTool } from "./tools/EvaluateTransformTool";
+import { TransformResource } from "./TransformResource";
 
 /**
- * FrontMCP application grouping all Transform management tools.
+ * FrontMCP application grouping all Transform management tools and resources.
  */
 @App({
     id: "transforms",
@@ -20,6 +21,9 @@ import { EvaluateTransformTool } from "./tools/EvaluateTransformTool";
         UpdateTransformTool,
         DeleteTransformTool,
         EvaluateTransformTool,
+    ],
+    resources: [
+        TransformResource,
     ],
 })
 export class TransformApp { }

@@ -39,6 +39,10 @@ export function setTenantService(ts: TenantService): void {
     _tenantService = ts;
 }
 
+export function getTenantService(): TenantService {
+    return _tenantService
+}
+
 /**
  * FrontMCP plugin that:
  * 1. Auto-injects `tenantName` into the tool input when only one tenant is configured
