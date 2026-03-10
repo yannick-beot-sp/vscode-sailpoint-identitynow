@@ -6,9 +6,10 @@ import { SetWorkflowStatusTool } from "./tools/SetWorkflowStatusTool";
 import { DeleteWorkflowTool } from "./tools/DeleteWorkflowTool";
 import { CreateWorkflowTool } from "./tools/CreateWorkflowTool";
 import { UpdateWorkflowTool } from "./tools/UpdateWorkflowTool";
+import { WorkflowResource } from "./WorkflowResource";
 
 /**
- * FrontMCP application grouping all Workflow management tools.
+ * FrontMCP application grouping all Workflow management tools and resources.
  */
 @App({
     id: "workflows",
@@ -20,6 +21,9 @@ import { UpdateWorkflowTool } from "./tools/UpdateWorkflowTool";
         CreateWorkflowTool,
         UpdateWorkflowTool,
         DeleteWorkflowTool,
+    ],
+    resources: [
+        WorkflowResource,
     ],
 })
 export class WorkflowApp { }
