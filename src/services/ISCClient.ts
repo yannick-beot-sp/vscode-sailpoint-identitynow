@@ -1007,25 +1007,18 @@ export class ISCClient {
 	public async getWorkflowExecution(workflowExecutionId: string): Promise<WorkflowExecutionBeta> {
 		console.log("> getWorkflowExecution", workflowExecutionId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new WorkflowsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await api.getWorkflowExecution({ id: workflowExecutionId });
-		return resp.data;
-	}
-
-	public async getWorflowTriggers(): Promise<WorkflowLibraryTriggerBeta[]> {
-		const apiConfig = await this.getApiConfiguration();
-		const api = new WorkflowsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.listWorkflowLibraryTriggers({});
 		return resp.data;
 	}
 
 	public async testWorkflow(id: string, payload: any): Promise<string> {
 		console.log("> testWorkflow", id, payload);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new WorkflowsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await api.testWorkflow({
 			id,
-			testWorkflowRequestBeta: {
+			testWorkflowRequestV2025: {
 				input: payload
 			}
 		});

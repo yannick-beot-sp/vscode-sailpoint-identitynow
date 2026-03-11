@@ -6,17 +6,14 @@ import { Subject } from "./Subject";
 import { Observer } from "./Observer";
 import { EventEmitter } from 'events';
 import { FolderTreeNode, isFolderTreeNode, isTenantInfo } from "../models/TreeNode";
+export { TenantServiceEventType } from "./TenantServiceEventType";
+import { TenantServiceEventType } from "./TenantServiceEventType";
 const SECRET_PAT_PREFIX = "IDENTITYNOW_SECRET_PAT_";
 const SECRET_AT_PREFIX = "IDENTITYNOW_SECRET_AT_";
 const TENANT_PREFIX = "IDENTITYNOW_TENANT_";
 const ALL_TENANTS_KEY = "IDENTITYNOW_TENANTS";
 // New key for storing tenants and folders
 const TREE_KEY = "IDENTITYNOW_TREE";
-
-export enum TenantServiceEventType {
-    removeTenant = "REMOVE_TENANT",
-    updateTree = "UPDATE_TREE", // When there is any change in the tree
-}
 
 
 /**
