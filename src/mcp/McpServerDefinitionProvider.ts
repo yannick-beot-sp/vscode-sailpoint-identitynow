@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { McpServerManager } from "./McpServerManager";
+import { McpServer } from "./McpServer";
 import { MCP_NAME } from "./constants";
 
 /**
@@ -11,18 +11,18 @@ import { MCP_NAME } from "./constants";
 export class ISCMcpServerDefinitionProvider
     implements vscode.McpServerDefinitionProvider
 {
-    constructor(private readonly serverManager: McpServerManager) {
+    constructor(private readonly server: McpServer) {
     }
 
     async provideMcpServerDefinitions(): Promise<vscode.McpServerDefinition[]> {
-        if (!this.serverManager.isRunning() || this.serverManager.port === 0) {
+        if (!this.server.isRunning() || this.server.port === 0) {
             return [];
         }
 
         return [
             new vscode.McpHttpServerDefinition(
                 MCP_NAME,
-                vscode.Uri.parse(`http://localhost:${this.serverManager.port}/mcp`)
+                vscode.Uri.parse(`http://localhost:${this.server.port}/mcp`)
             ),
         ];
     }

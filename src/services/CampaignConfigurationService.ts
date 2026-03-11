@@ -4,7 +4,8 @@ import { isNotEmpty } from '../utils/stringUtils';
 import { EndpointUtils } from "../utils/EndpointUtils";
 import { AccessToken, OAuth2Client } from "./OAuth2Client";
 import { CertificationCampaignInfo } from "../models/CertificationCampaignInfo";
-import { TenantService, TenantServiceEventType } from "./TenantService";
+import { TenantService } from "./TenantService";
+import { TenantServiceEventType } from "./TenantServiceEventType";
 import { Observer } from "./Observer";
 
 const CAMPAIGN_CONFIGURATION_PREFIX = "IDENTITYNOW_TENANT_CAMPAIGN_CONFIGURATION_";
