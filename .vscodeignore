@@ -26,3 +26,4 @@ IDEAS.md
 RELEASE.md
 webpack.config.js
 jest.mcp.config.js
+.env

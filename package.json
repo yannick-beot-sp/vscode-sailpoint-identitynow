@@ -14,7 +14,7 @@
   },
   "homepage": "https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/",
   "engines": {
-    "vscode": "^1.99.0"
+    "vscode": "^1.109.0"
   },
   "extensionKind": [
     "ui",
@@ -1827,7 +1827,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run esbuild-base -- --minify",
-    "esbuild-base": "rimraf out && cd ./src/campaign-webview/app && npm run build && cd ../../.. && esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+    "esbuild-base": "rimraf out && cd ./src/campaign-webview/app && npm run build && cd ../../.. && esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --external:esbuild --external:@swc/core --external:@swc/wasm --format=cjs --platform=node",
     "esbuild": "npm run esbuild-base -- --sourcemap",
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "test-compile": "tsc -p ./",
