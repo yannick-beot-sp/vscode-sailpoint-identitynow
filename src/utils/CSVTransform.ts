@@ -1,9 +1,11 @@
-import * as _ from "lodash";
+function get(obj: any, path: string): any {
+    return path.split('.').reduce((o, k) => o?.[k], obj);
+}
 
 function unwind(arr1: string[], obj: any): any {
     const [firstProp, ...restProps] = arr1;
     if (restProps.length === 0) {
-        let values = _.get(obj, firstProp);
+        let values = get(obj, firstProp);
         if (values === undefined || values === null) {
             return [obj];
         }
@@ -16,7 +18,7 @@ function unwind(arr1: string[], obj: any): any {
         });
     } else {
         let currentObjs = unwind(restProps, obj);
-        let values = _.get(obj, firstProp);
+        let values = get(obj, firstProp);
         if (values === undefined || values === null) {
             return currentObjs;
         }

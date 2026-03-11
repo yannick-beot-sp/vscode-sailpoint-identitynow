@@ -8,7 +8,7 @@ import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, Transform, TransformRead,GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, IdentityProfilesV2025Api, IdentityPreviewResponseV2025, IdentityAttributeTransformV2025, SourcesV2025Api, TaskManagementV2025Api, AttributeDTO, RolesV2025Api, AccessProfilesV2025Api, JsonPatchOperation, JsonPatchOperationV2025, DimensionsV2025Api, RolesV2025ApiListRolesRequest, DimensionV2025, DimensionsV2025ApiListDimensionsRequest, PasswordConfigurationV2025Api, PasswordOrgConfigV2025, WorkflowsV2025Api, WorkflowsV2024Api, WorkflowV2025, WorkflowBodyV2025 } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, Transform, TransformRead,GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, IdentityProfilesV2025Api, IdentityPreviewResponseV2025, IdentityAttributeTransformV2025, SourcesV2025Api, TaskManagementV2025Api, AttributeDTO, RolesV2025Api, AccessProfilesV2025Api, JsonPatchOperation, JsonPatchOperationV2025, DimensionsV2025Api, RolesV2025ApiListRolesRequest, DimensionV2025, DimensionsV2025ApiListDimensionsRequest, PasswordConfigurationV2025Api, PasswordOrgConfigV2025, WorkflowsV2025Api, WorkflowsV2024Api, WorkflowV2025, WorkflowBodyV2025, WorkflowExecutionEventV2025, CreateWorkflowRequestV2025 } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -925,12 +925,11 @@ export class ISCClient {
 		return resp.data;
 	}
 
-	public async createWorflow(workflow: WorkflowV2025): Promise<WorkflowV2025> {
+	public async createWorflow(workflow: CreateWorkflowRequestV2025): Promise<WorkflowV2025> {
 		const apiConfig = await this.getApiConfiguration()
 		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors())
 		const resp = await api.createWorkflow({
-			// @ts-ignore
-			createWorkflowRequestBeta: workflow
+			createWorkflowRequestV2025: workflow
 		})
 		return resp.data;
 	}
@@ -1023,6 +1022,14 @@ export class ISCClient {
 			}
 		});
 		return resp.data.workflowExecutionId;
+	}
+
+	public async getWorkflowExecutionEvents(executionId: string): Promise<WorkflowExecutionEventV2025[]> {
+		console.log("> getWorkflowExecutionEvents", executionId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const resp = await api.getWorkflowExecutionHistory({ id: executionId });
+		return resp.data;
 	}
 
 	public async callWorkflowExternalTrigger(id: string, accessToken: string, payload: any): Promise<string> {

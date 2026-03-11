@@ -6,6 +6,7 @@ import { SetWorkflowStatusTool } from "./tools/SetWorkflowStatusTool";
 import { DeleteWorkflowTool } from "./tools/DeleteWorkflowTool";
 import { CreateWorkflowTool } from "./tools/CreateWorkflowTool";
 import { UpdateWorkflowTool } from "./tools/UpdateWorkflowTool";
+import { TestWorkflowTool } from "./tools/TestWorkflowTool";
 import { WorkflowResource } from "./WorkflowResource";
 
 /**
@@ -21,6 +22,7 @@ import { WorkflowResource } from "./WorkflowResource";
         CreateWorkflowTool,
         UpdateWorkflowTool,
         DeleteWorkflowTool,
+        TestWorkflowTool,
     ],
     resources: [
         WorkflowResource,
