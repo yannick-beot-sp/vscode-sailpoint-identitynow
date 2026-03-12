@@ -6,28 +6,28 @@ import { ErrorCodes, McpError } from "../../errors";
 import { tenantNameField } from "../../inputFields";
 
 const inputSchema = z.object({
-    tenantName:  tenantNameField,
-    name:        z.string().describe("Unique name for the new workflow."),
+    tenantName: tenantNameField,
+    name: z.string().describe("Unique name for the new workflow."),
     description: z.string().optional().describe("Description of what the workflow accomplishes."),
-    owner:       z.object({
+    owner: z.object({
         type: z.string().optional().describe("Owner type, e.g. 'IDENTITY'."),
-        id:   z.string().optional().describe("Owner identity ID."),
+        id: z.string().optional().describe("Owner identity ID."),
         name: z.string().optional().describe("Owner display name."),
     }).optional().describe("Owner of the workflow."),
-    definition:  z.unknown().optional().describe(
+    definition: z.unknown().optional().describe(
         "Workflow definition with 'start' and 'steps' fields. "
     ),
-    trigger:     z.unknown().optional().describe(
+    trigger: z.unknown().optional().describe(
         "Workflow trigger configuration (type, attributes)."
     ),
 });
 
 const outputSchema = z.object({
-    id:     z.string(),
+    id: z.string(),
     status: z.literal("created"),
 });
 
-type Input  = z.infer<typeof inputSchema>;
+type Input = z.infer<typeof inputSchema>;
 type Output = z.infer<typeof outputSchema>;
 
 /**
@@ -42,8 +42,8 @@ type Output = z.infer<typeof outputSchema>;
     inputSchema,
     outputSchema,
     annotations: {
-        title:           "Create Workflow",
-        readOnlyHint:    false,
+        title: "Create Workflow",
+        readOnlyHint: false,
         destructiveHint: false,
     },
 })
@@ -53,12 +53,11 @@ export class CreateWorkflowTool extends ToolContext {
 
         try {
             const created = await client.createWorflow({
-                name:        input.name,
+                name: input.name,
                 description: input.description,
-                owner:       input.owner as any,
-                definition:  input.definition as any,
-                trigger:     input.trigger as any,
-                enabled:     false,
+                definition: input.definition as any,
+                trigger: input.trigger as any,
+                enabled: false,
             });
             return { id: created.id!, status: "created" };
         } catch (err: any) {

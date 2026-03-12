@@ -30,7 +30,7 @@ export class WorkflowResource extends ResourceContext<WorkflowParams> {
         const client = new ISCClient(tenant.id, tenant.tenantName);
         try {
             const workflow = isGuid(decodedName)
-                ? await client.getWorflow(decodedName)
+                ? await client.getWorflowById(decodedName)
                 : await client.getWorkflowByName(decodedName);
 
             return {
