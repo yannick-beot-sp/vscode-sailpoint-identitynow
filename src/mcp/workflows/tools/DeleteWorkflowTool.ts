@@ -40,7 +40,7 @@ export class DeleteWorkflowTool extends ToolContext {
         let id: string;
         try {
             const w = isGuid(input.workflowName)
-                ? await client.getWorflow(input.workflowName)
+                ? await client.getWorflowById(input.workflowName)
                 : await client.getWorkflowByName(input.workflowName);
             id = w.id!;
         } catch (err: any) {

@@ -45,7 +45,7 @@ export class GetWorkflowTool extends ToolContext {
 
         try {
             const w = isGuid(input.workflowName)
-                ? await client.getWorflow(input.workflowName)
+                ? await client.getWorflowById(input.workflowName)
                 : await client.getWorkflowByName(input.workflowName);
 
             return {
