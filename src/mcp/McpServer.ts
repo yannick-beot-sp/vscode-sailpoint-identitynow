@@ -3,9 +3,11 @@ import * as net from "net";
 import { FrontMcpInstance } from "@frontmcp/sdk";
 import { TenantService } from "../services/TenantService";
 import { setTenantService, TenantResolverPlugin } from "./plugins/TenantResolverPlugin";
+import { IdentityApp } from "./identities/IdentityApp";
 import { TransformApp } from "./transforms/TransformApp";
 import { WorkflowApp } from "./workflows/WorkflowApp";
 import { MCP_NAME, MCP_VERSION } from "./constants";
+import { StoppableExpressAdapter } from "./StoppableExpressAdapter";
 
 /**
  * Pure HTTP MCP server — no VS Code dependency.
@@ -14,6 +16,7 @@ import { MCP_NAME, MCP_VERSION } from "./constants";
  */
 export class McpServer {
     private _instance?: FrontMcpInstance;
+    private _adapter?: StoppableExpressAdapter;
     private _port = 0;
 
     constructor(private readonly tenantService: TenantService) {}
@@ -29,23 +32,28 @@ export class McpServer {
         setTenantService(this.tenantService);
 
         const resolvedPort = port > 0 ? port : await findFreePort();
+        const adapter = new StoppableExpressAdapter();
 
         this._instance = await FrontMcpInstance.createForGraph({
             info: { name: MCP_NAME, version: MCP_VERSION },
-            apps: [TransformApp, WorkflowApp],
+            apps: [IdentityApp, TransformApp, WorkflowApp],
             plugins: [TenantResolverPlugin],
             http: {
                 port: resolvedPort,
                 entryPath: "/mcp",
+                hostFactory: adapter,
             },
         });
 
         await this._instance.start();
+        this._adapter = adapter;
         this._port = resolvedPort;
     }
 
     /** Stops the HTTP server and resets state. */
     async stop(): Promise<void> {
+        await this._adapter?.stop();
+        this._adapter = undefined;
         this._instance = undefined;
         this._port = 0;
     }

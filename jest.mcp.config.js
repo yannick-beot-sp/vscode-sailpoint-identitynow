@@ -18,5 +18,5 @@ module.exports = {
     // Allow Jest to transform ESM-only packages (jose, @frontmcp/testing, etc.)
     transformIgnorePatterns: [
         "node_modules/(?!(jose|@frontmcp)/)",
-    ],
+    ]
 };
