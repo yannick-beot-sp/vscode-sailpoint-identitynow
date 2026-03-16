@@ -23,7 +23,7 @@ const activitySchema = z.object({
 const inputSchema = z.object({
     tenantName: tenantNameField,
     workflowName: workflowNameField,
-    payload: z.record(z.string(), z.unknown()).optional().describe(
+    payload: z.record(z.string(), z.unknown()).describe(
         "Input data to test the workflow as expected by the trigger"
     ),
 });

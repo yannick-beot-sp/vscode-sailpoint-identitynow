@@ -1837,7 +1837,7 @@
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
     "test:unit": "npm run compile && mocha -u tdd ./out/test/unit/*.test.js",
-    "test:mcp": "jest --config jest.mcp.config.js",
+    "test:mcp": "jest --runInBand --config jest.mcp.config.js --runTestsByPath ./src/test/mcp/workflows/WorkflowTools.test.ts",
     "clean": "shx rm -rf out",
     "postinstall": "cd src/campaign-webview/app && npm install"
   },
