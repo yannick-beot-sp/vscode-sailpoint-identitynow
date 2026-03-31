@@ -76,6 +76,8 @@ export interface RoleDto {
      * @memberof Role
      */
     'owner': string | null;
+    'additionalOwners'?: string | null;
+    'additionalOwnerGovernanceGroup'?: string | null;
     /**
      *
      * @type {Array<AccessProfileRef>}
@@ -134,6 +136,41 @@ export interface RoleDto {
 
 }
 
+type AdditionalOwnerRef = { type?: string; id?: string; name?: string };
+
+async function formatAdditionalOwners(
+    additionalOwners: AdditionalOwnerRef[] | undefined,
+    identityCacheIdToName: IdentityIdToNameCacheService,
+    governanceGroupCacheIdToName: GovernanceGroupIdToNameCacheService
+): Promise<{ additionalOwners: string | null; additionalOwnerGovernanceGroup: string | null }> {
+    if (!additionalOwners || additionalOwners.length === 0) {
+        return { additionalOwners: null, additionalOwnerGovernanceGroup: null };
+    }
+
+    const governanceGroupOwner = additionalOwners.find((owner) => owner.type === "GOVERNANCE_GROUP");
+    if (governanceGroupOwner?.id) {
+        const governanceGroupName = governanceGroupOwner.name
+            ?? await governanceGroupCacheIdToName.get(governanceGroupOwner.id);
+        return { additionalOwners: null, additionalOwnerGovernanceGroup: governanceGroupName };
+    }
+
+    const identityNames = await Promise.all(additionalOwners.map(async (owner) => {
+        if (owner.name) {
+            return owner.name;
+        }
+        if (owner.id) {
+            return identityCacheIdToName.get(owner.id);
+        }
+        return null;
+    }));
+
+    const filteredNames = identityNames.filter((name): name is string => !!name);
+    return {
+        additionalOwners: filteredNames.length ? filteredNames.join(CSV_MULTIVALUE_SEPARATOR) : null,
+        additionalOwnerGovernanceGroup: null
+    };
+}
+
 class RoleExporter extends BaseCSVExporter<Role> {
     constructor(
         tenantId: string,
@@ -157,6 +194,8 @@ class RoleExporter extends BaseCSVExporter<Role> {
             "enabled",
             "requestable",
             "owner",
+            "additionalOwners",
+            "additionalOwnerGovernanceGroup",
             "commentsRequired",
             "denialCommentsRequired",
             "approvalSchemes",
@@ -176,6 +215,8 @@ class RoleExporter extends BaseCSVExporter<Role> {
             "enabled",
             "requestable",
             "owner",
+            "additionalOwners",
+            "additionalOwnerGovernanceGroup",
             "accessRequestConfig.commentsRequired",
             "accessRequestConfig.denialCommentsRequired",
             "approvalSchemes",
@@ -222,6 +263,12 @@ class RoleExporter extends BaseCSVExporter<Role> {
                     console.warn(`Error converting owner identity "${item.owner.id}" for role "${item.name}:"`, error);
                 }
 
+                const additionalOwnersInfo = await formatAdditionalOwners(
+                    (item as any).additionalOwners,
+                    identityCacheIdToName,
+                    governanceGroupCache
+                );
+
                 let entitlements: string | undefined = undefined;
                 try {
                     entitlements = (item.entitlements ? (await entitlementToStringConverter(item.entitlements, entitlementIdToSourceNameCacheService)) : null);
@@ -236,6 +283,8 @@ class RoleExporter extends BaseCSVExporter<Role> {
                     enabled: item.enabled,
                     requestable: item.requestable,
                     owner: owner,
+                    additionalOwners: additionalOwnersInfo.additionalOwners,
+                    additionalOwnerGovernanceGroup: additionalOwnersInfo.additionalOwnerGovernanceGroup,
                     accessProfiles: item.accessProfiles?.map(x => x.name).join(CSV_MULTIVALUE_SEPARATOR),
                     entitlements,
                     accessRequestConfig: {

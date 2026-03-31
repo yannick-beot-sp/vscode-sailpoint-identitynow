@@ -29,6 +29,8 @@ interface RoleCSVRecord {
     enabled: boolean
     requestable: boolean
     owner: string
+    additionalOwners?: string
+    additionalOwnerGovernanceGroup?: string
     commentsRequired: boolean
     denialCommentsRequired: boolean
     approvalSchemes: string
@@ -41,6 +43,63 @@ interface RoleCSVRecord {
     dimensional?: boolean
     dimensionAttributes?: string
     metadata: string
+}
+
+const OWNER_ID_REGEX = /^[a-f0-9]{32}$/;
+
+async function resolveAdditionalOwners(
+    additionalOwnersRaw: string | undefined,
+    additionalOwnerGovernanceGroupRaw: string | undefined,
+    identityCacheService: IdentityNameToIdCacheService,
+    governanceGroupCache: GovernanceGroupNameToIdCacheService
+): Promise<Array<{ type: "IDENTITY" | "GOVERNANCE_GROUP"; id: string; name?: string }> | undefined> {
+    if (additionalOwnersRaw === undefined && additionalOwnerGovernanceGroupRaw === undefined) {
+        return undefined;
+    }
+
+    const ownerNames = (additionalOwnersRaw ?? "")
+        .split(CSV_MULTIVALUE_SEPARATOR)
+        .map((value) => value.trim())
+        .filter((value) => value.length > 0);
+
+    const governanceGroupName = additionalOwnerGovernanceGroupRaw?.trim() ?? "";
+
+    if (governanceGroupName && ownerNames.length > 0) {
+        throw new Error("Both additionalOwners and additionalOwnerGovernanceGroup are set. Only one is allowed.");
+    }
+
+    if (ownerNames.length > 10) {
+        throw new Error("Too many additional owners. Maximum is 10 identities.");
+    }
+
+    if (governanceGroupName) {
+        const groupId = await governanceGroupCache.get(governanceGroupName);
+        return [{
+            type: "GOVERNANCE_GROUP",
+            id: groupId,
+            name: governanceGroupName
+        }];
+    }
+
+    if (ownerNames.length === 0) {
+        return [];
+    }
+
+    return Promise.all(ownerNames.map(async (ownerNameOrId) => {
+        if (OWNER_ID_REGEX.test(ownerNameOrId)) {
+            return {
+                type: "IDENTITY",
+                id: ownerNameOrId
+            };
+        }
+
+        const ownerId = await identityCacheService.get(ownerNameOrId);
+        return {
+            type: "IDENTITY",
+            id: ownerId,
+            name: ownerNameOrId
+        };
+    }));
 }
 
 export class RoleImporter {
@@ -137,6 +196,22 @@ export class RoleImporter {
                     const srcMessage = `Unable to find owner with name '${data.owner}' in ISC`;
                     await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, srcMessage);
                     vscode.window.showErrorMessage(srcMessage);
+                    return;
+                }
+
+                let additionalOwners: Array<{ type: "IDENTITY" | "GOVERNANCE_GROUP"; id: string; name?: string }> | undefined;
+                try {
+                    additionalOwners = await resolveAdditionalOwners(
+                        data.additionalOwners,
+                        data.additionalOwnerGovernanceGroup,
+                        identityCacheService,
+                        governanceGroupCache
+                    );
+                } catch (error: any) {
+                    result.error++;
+                    const message = `Invalid additional owners: ${error.message ?? error}`;
+                    await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, message);
+                    vscode.window.showErrorMessage(message);
                     return;
                 }
 
@@ -283,6 +358,10 @@ export class RoleImporter {
                     dimensional: truethy(data.dimensional),
                 };
 
+                if (additionalOwners !== undefined) {
+                    (rolePayload as any).additionalOwners = additionalOwners;
+                }
+
 
                 if (token.isCancellationRequested) {
                     throw new UserCancelledError();
@@ -336,6 +415,10 @@ export class RoleImporter {
                                         "name": data.owner
                                     }
                                 },
+                                ...(additionalOwners !== undefined ? [{
+                                    "property": "additionalOwners",
+                                    "value": additionalOwners
+                                }] : []),
                                 {
                                     "property": "accessRequestConfig",
                                     "value": {

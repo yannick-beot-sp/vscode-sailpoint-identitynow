@@ -7,6 +7,13 @@
         "id": "<<<OWNER_ID>>>",
         "name": "<<<OWNER_NAME>>>"
     },
+    "additionalOwners": [
+        {
+            "type": "IDENTITY",
+            "id": "<<<ADDITIONAL_OWNER_ID>>>",
+            "name": "<<<ADDITIONAL_OWNER_NAME>>>"
+        }
+    ],
     "source": {},
     "entitlements": [],
     "requestable": true,

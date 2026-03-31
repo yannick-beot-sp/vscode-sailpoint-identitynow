@@ -7,11 +7,15 @@ import { chooseFile } from '../../utils/vsCodeHelpers';
 import { JsonPatchOperationBeta } from 'sailpoint-api-client';
 import { TenantService } from '../../services/TenantService';
 import { validateTenantReadonly } from '../validateTenantReadonly';
+import { IdentityNameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
+import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
+import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 
 // List of mandatory headers to update the description of entitlements
 const mandatoryHeadersDescription = ["attributeName", "attributeValue", "displayName", "description", "schema"];
 const mandatoryHeadersOthers = ["attributeName", "attributeValue", "schema"];
-const optionalHeadersOthers = ["requestable", "owner", "privileged"];
+const optionalHeadersOthers = ["requestable", "owner", "privileged", "additionalOwners", "additionalOwnerGovernanceGroup"];
+const OWNER_ID_REGEX = /^[a-f0-9]{32}$/;
 
 
 interface UncorrelatedAccountImportResult {
@@ -29,6 +33,8 @@ interface UncorrelatedAccountImportResult {
 class EntitlementDetailsImporter {
     readonly client: ISCClient;
     readonly csvReader: CSVReader<any>;
+    readonly identityCacheService: IdentityNameToIdCacheService;
+    readonly governanceGroupCacheService: GovernanceGroupNameToIdCacheService;
     readonly result: UncorrelatedAccountImportResult = {
         totalDescription: 0,
         totalDescriptionUpdated: 0,
@@ -51,6 +57,8 @@ class EntitlementDetailsImporter {
     ) {
         this.client = new ISCClient(this.tenantId, this.tenantName);
         this.csvReader = new CSVReader<any>(this.fileUri.fsPath);
+        this.identityCacheService = new IdentityNameToIdCacheService(this.client);
+        this.governanceGroupCacheService = new GovernanceGroupNameToIdCacheService(this.client);
     }
 
     public async importFileWithProgression(): Promise<void> {
@@ -204,6 +212,68 @@ class EntitlementDetailsImporter {
                         this.result.identityNotFound++;
                     }
                 }
+            }
+
+            const additionalOwnersRaw = data.additionalOwners;
+            const additionalOwnerGovernanceGroupRaw = data.additionalOwnerGovernanceGroup;
+            if (isNotEmpty(additionalOwnersRaw) || isNotEmpty(additionalOwnerGovernanceGroupRaw)) {
+                const ownerNames = (additionalOwnersRaw ?? "")
+                    .split(CSV_MULTIVALUE_SEPARATOR)
+                    .map((value: string) => value.trim())
+                    .filter((value: string) => value.length > 0);
+
+                const governanceGroupName = additionalOwnerGovernanceGroupRaw?.trim() ?? "";
+
+                if (governanceGroupName && ownerNames.length > 0) {
+                    this.result.error++;
+                    return;
+                }
+
+                if (ownerNames.length > 10) {
+                    this.result.error++;
+                    return;
+                }
+
+                let additionalOwners: Array<{ type: "IDENTITY" | "GOVERNANCE_GROUP"; id: string; name?: string }> = [];
+                if (governanceGroupName) {
+                    try {
+                        const groupId = await this.governanceGroupCacheService.get(governanceGroupName);
+                        additionalOwners = [{
+                            type: "GOVERNANCE_GROUP",
+                            id: groupId,
+                            name: governanceGroupName
+                        }];
+                    } catch (error) {
+                        this.result.error++;
+                        return;
+                    }
+                } else {
+                    try {
+                        additionalOwners = await Promise.all(ownerNames.map(async (ownerNameOrId: string) => {
+                            if (OWNER_ID_REGEX.test(ownerNameOrId)) {
+                                return {
+                                    type: "IDENTITY",
+                                    id: ownerNameOrId
+                                };
+                            }
+                            const ownerId = await this.identityCacheService.get(ownerNameOrId);
+                            return {
+                                type: "IDENTITY",
+                                id: ownerId,
+                                name: ownerNameOrId
+                            };
+                        }));
+                    } catch (error) {
+                        this.result.identityNotFound++;
+                        return;
+                    }
+                }
+
+                payload.push({
+                    "op": "replace",
+                    "path": "/additionalOwners",
+                    "value": additionalOwners
+                });
             }
 
             if (payload.length === 0) {

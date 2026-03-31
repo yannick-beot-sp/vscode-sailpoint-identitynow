@@ -25,12 +25,71 @@ interface AccessProfileCSVRecord {
     requestable: boolean
     source: string
     owner: string
+    additionalOwners?: string
+    additionalOwnerGovernanceGroup?: string
     entitlements: string
     commentsRequired: boolean
     denialCommentsRequired: boolean
     revokeApprovalSchemes: string
     approvalSchemes: string
     metadata: string
+}
+
+const OWNER_ID_REGEX = /^[a-f0-9]{32}$/;
+
+async function resolveAdditionalOwners(
+    additionalOwnersRaw: string | undefined,
+    additionalOwnerGovernanceGroupRaw: string | undefined,
+    identityCacheService: IdentityNameToIdCacheService,
+    governanceGroupCache: GovernanceGroupNameToIdCacheService
+): Promise<Array<{ type: "IDENTITY" | "GOVERNANCE_GROUP"; id: string; name?: string }> | undefined> {
+    if (additionalOwnersRaw === undefined && additionalOwnerGovernanceGroupRaw === undefined) {
+        return undefined;
+    }
+
+    const ownerNames = (additionalOwnersRaw ?? "")
+        .split(CSV_MULTIVALUE_SEPARATOR)
+        .map((value) => value.trim())
+        .filter((value) => value.length > 0);
+
+    const governanceGroupName = additionalOwnerGovernanceGroupRaw?.trim() ?? "";
+
+    if (governanceGroupName && ownerNames.length > 0) {
+        throw new Error("Both additionalOwners and additionalOwnerGovernanceGroup are set. Only one is allowed.");
+    }
+
+    if (ownerNames.length > 10) {
+        throw new Error("Too many additional owners. Maximum is 10 identities.");
+    }
+
+    if (governanceGroupName) {
+        const groupId = await governanceGroupCache.get(governanceGroupName);
+        return [{
+            type: "GOVERNANCE_GROUP",
+            id: groupId,
+            name: governanceGroupName
+        }];
+    }
+
+    if (ownerNames.length === 0) {
+        return [];
+    }
+
+    return Promise.all(ownerNames.map(async (ownerNameOrId) => {
+        if (OWNER_ID_REGEX.test(ownerNameOrId)) {
+            return {
+                type: "IDENTITY",
+                id: ownerNameOrId
+            };
+        }
+
+        const ownerId = await identityCacheService.get(ownerNameOrId);
+        return {
+            type: "IDENTITY",
+            id: ownerId,
+            name: ownerNameOrId
+        };
+    }));
 }
 
 export class AccessProfileImporter {
@@ -152,6 +211,22 @@ export class AccessProfileImporter {
                     return;
                 }
 
+                let additionalOwners: Array<{ type: "IDENTITY" | "GOVERNANCE_GROUP"; id: string; name?: string }> | undefined;
+                try {
+                    additionalOwners = await resolveAdditionalOwners(
+                        data.additionalOwners,
+                        data.additionalOwnerGovernanceGroup,
+                        identityCacheService,
+                        governanceGroupCache
+                    );
+                } catch (error: any) {
+                    result.error++;
+                    const message = `Invalid additional owners: ${error.message ?? error}`;
+                    await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, message);
+                    vscode.window.showErrorMessage(message);
+                    return;
+                }
+
                 if (token.isCancellationRequested) {
                     throw new UserCancelledError();
                 }
@@ -240,6 +315,10 @@ export class AccessProfileImporter {
                     entitlements
                 }
 
+                if (additionalOwners !== undefined) {
+                    (accessProfilePayload as any).additionalOwners = additionalOwners;
+                }
+
                 if (token.isCancellationRequested) {
                     throw new UserCancelledError();
                 }
@@ -292,6 +371,10 @@ export class AccessProfileImporter {
                                         "name": data.owner
                                     }
                                 },
+                                ...(additionalOwners !== undefined ? [{
+                                    "property": "additionalOwners",
+                                    "value": additionalOwners
+                                }] : []),
                                 {
                                     "property": "accessRequestConfig",
                                     "value": {

@@ -175,6 +175,8 @@ The following table provides the expected column for the CSV to import Access Pr
 | ------------------------ | ---- | --------------------------------------------------------------------------------------------------------------------------- | ------------------ |
 | `name`                   | Yes  | Name of the access profile                                                                                                  |                    |
 | `owner`                  | Yes  | Owner of the access profile                                                                                                 |                    |
+| `additionalOwners`       | No   | Additional owners (identity names or IDs), separated by ;. Maximum 10 identities. Mutually exclusive with `additionalOwnerGovernanceGroup`. | `[]`               |
+| `additionalOwnerGovernanceGroup` | No | Additional owners as a single governance group name. Mutually exclusive with `additionalOwners`.                         | `null`             |
 | `source`                 | Yes  | Source associated with the access profile                                                                                   |                    |
 | `description`            | No   | Description of the access profile                                                                                           | `null`             |
 | `enabled`                | No   | Is the access profile enabled?                                                                                              | `false`            |
@@ -196,6 +198,8 @@ The following table provides the expected column for the CSV to import Roles:
 | ------------------------------ | ---- | ---------------------------------------------------------------------------------------------- | ------------------ |
 | `name`                         | Yes  | Name of the role                                                                               |                    |
 | `owner`                        | Yes  | Owner of the role                                                                              |                    |
+| `additionalOwners`             | No   | Additional owners (identity names or IDs), separated by ;. Maximum 10 identities. Mutually exclusive with `additionalOwnerGovernanceGroup`. | `[]`               |
+| `additionalOwnerGovernanceGroup` | No | Additional owners as a single governance group name. Mutually exclusive with `additionalOwners`.                         | `null`             |
 | `description`                  | No   | Description of the role                                                                        | `null`             |
 | `enabled`                      | No   | Is the role enabled?                                                                           | `false`            |
 | `requestable`                  | No   | Is the role requestable?                                                                       | `false`            |
@@ -336,6 +340,23 @@ The metadata column will be exported as or will be imported as:
 > For custom metadata attribute and values, it's just the Camel Case of the display name. e.g. Domain->`domain`, Back Office->`backOffice`
 >
 > Default metadata starts with isc. For instance, "Access Type"'s technical name is `iscAccessType`
+
+### Entitlement Details
+
+The following table provides the expected columns for the CSV to import entitlement details (metadata updates):
+
+| Header                          | M[*] | Description                                                                 | Default Value |
+| ------------------------------- | ---- | --------------------------------------------------------------------------- | ------------- |
+| `attributeName`                 | Yes  | Entitlement attribute name                                                  |               |
+| `attributeValue`                | Yes  | Entitlement attribute value                                                 |               |
+| `schema`                        | Yes  | Entitlement schema/object type                                              |               |
+| `displayName`                   | No   | Entitlement display name                                                    |               |
+| `description`                   | No   | Entitlement description                                                     |               |
+| `requestable`                   | No   | Whether entitlement is requestable                                          |               |
+| `owner`                         | No   | Primary owner (identity alias or ID)                                        |               |
+| `additionalOwners`              | No   | Additional owners (identity names or IDs), separated by ;. Maximum 10 identities. Mutually exclusive with `additionalOwnerGovernanceGroup`. | `[]`          |
+| `additionalOwnerGovernanceGroup`| No   | Additional owners as a single governance group name. Mutually exclusive with `additionalOwners`. | `null`        |
+| `privileged`                    | No   | Whether entitlement is privileged                                           |               |
 
 ### Certification Campaign Custom Reviewers
 

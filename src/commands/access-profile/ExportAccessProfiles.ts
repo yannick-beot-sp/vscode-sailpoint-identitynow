@@ -12,6 +12,7 @@ import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToN
 import { metadataToString } from '../../utils/metadataUtils';
 import { EntitlementIdToSourceNameCacheService } from '../../services/cache/EntitlementIdToSourceNameCacheService';
 import { entitlementToStringConverter } from '../../utils/entitlementToStringConverter';
+import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 
 export class AccessProfileExporterCommand {
     /**
@@ -73,6 +74,8 @@ interface AccessProfileDto {
      * @memberof Role
      */
     'owner': string | null;
+    'additionalOwners'?: string | null;
+    'additionalOwnerGovernanceGroup'?: string | null;
     /**
      *
      * @type {AccessProfileSourceRef}
@@ -108,6 +111,41 @@ interface AccessProfileDto {
      */
     metadata?: string;
 }
+
+type AdditionalOwnerRef = { type?: string; id?: string; name?: string };
+
+async function formatAdditionalOwners(
+    additionalOwners: AdditionalOwnerRef[] | undefined,
+    identityCacheIdToName: IdentityIdToNameCacheService,
+    governanceGroupCacheIdToName: GovernanceGroupIdToNameCacheService
+): Promise<{ additionalOwners: string | null; additionalOwnerGovernanceGroup: string | null }> {
+    if (!additionalOwners || additionalOwners.length === 0) {
+        return { additionalOwners: null, additionalOwnerGovernanceGroup: null };
+    }
+
+    const governanceGroupOwner = additionalOwners.find((owner) => owner.type === "GOVERNANCE_GROUP");
+    if (governanceGroupOwner?.id) {
+        const governanceGroupName = governanceGroupOwner.name
+            ?? await governanceGroupCacheIdToName.get(governanceGroupOwner.id);
+        return { additionalOwners: null, additionalOwnerGovernanceGroup: governanceGroupName };
+    }
+
+    const identityNames = await Promise.all(additionalOwners.map(async (owner) => {
+        if (owner.name) {
+            return owner.name;
+        }
+        if (owner.id) {
+            return identityCacheIdToName.get(owner.id);
+        }
+        return null;
+    }));
+
+    const filteredNames = identityNames.filter((name): name is string => !!name);
+    return {
+        additionalOwners: filteredNames.length ? filteredNames.join(CSV_MULTIVALUE_SEPARATOR) : null,
+        additionalOwnerGovernanceGroup: null
+    };
+}
 class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
     constructor(
         tenantId: string,
@@ -132,6 +170,8 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
             "requestable",
             "source",
             "owner",
+            "additionalOwners",
+            "additionalOwnerGovernanceGroup",
             "commentsRequired",
             "denialCommentsRequired",
             "approvalSchemes",
@@ -146,6 +186,8 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
             "requestable",
             "source.name",
             "owner",
+            "additionalOwners",
+            "additionalOwnerGovernanceGroup",
             "accessRequestConfig.commentsRequired",
             "accessRequestConfig.denialCommentsRequired",
             "approvalSchemes",
@@ -168,6 +210,11 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
         await this.writeData(headers, paths, unwindablePaths, iterator, task, token,
             async (item: AccessProfile): Promise<AccessProfileDto> => {
                 const owner = item.owner ? (await identityCacheIdToName.get(item.owner.id!)) : null
+                const additionalOwnersInfo = await formatAdditionalOwners(
+                    (item as any).additionalOwners,
+                    identityCacheIdToName,
+                    governanceGroupCache
+                );
 
                 let entitlements: string | undefined = undefined;
                 try {
@@ -187,6 +234,8 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
                         name: item.source.name
                     },
                     owner: owner,
+                    additionalOwners: additionalOwnersInfo.additionalOwners,
+                    additionalOwnerGovernanceGroup: additionalOwnersInfo.additionalOwnerGovernanceGroup,
                     entitlements,
                     accessRequestConfig: {
                         commentsRequired: item.accessRequestConfig?.commentsRequired ?? false,
