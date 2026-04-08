@@ -55,13 +55,21 @@ export class McpServerManager {
         this.didChangeEmitter.fire();
     }
 
+    private async startAndRegisterServer() {
+        const preferredPort = getPreferredPort()
+        await this.server.start(preferredPort);
+        if (preferredPort <= 0) {
+            savePreferredPort(this.server.port);
+        }
+        console.log(`MCP Server started on port ${this.server.port}`)
+        await this.registerServer();
+    }
+
     private async onConfigurationChanged(event: vscode.ConfigurationChangeEvent): Promise<void> {
         if (event.affectsConfiguration(`${configuration.SECTION_CONF}.${configuration.MCP_ENABLED_CONF}`)) {
             const mcpEnabled = isMcpEnabled();
             if (mcpEnabled && !this.server.isRunning()) {
-                await this.server.start(getPreferredPort());
-                savePreferredPort(this.server.port);
-                await this.registerServer();
+                await this.startAndRegisterServer()
             } else if (!mcpEnabled && this.server.isRunning()) {
                 await this.server.stop();
             }
@@ -74,9 +82,7 @@ export class McpServerManager {
 
     async initialize(): Promise<void> {
         if (isMcpEnabled()) {
-            await this.server.start(getPreferredPort());
-            savePreferredPort(this.server.port);
-            await this.registerServer();
+            await this.startAndRegisterServer()
         } else {
             console.log("Nothing to be done. MCP not enabled");
         }
@@ -87,9 +93,7 @@ export class McpServerManager {
             await this.server.stop();
         }
         if (isMcpEnabled() && isMcpApiAvailable()) {
-            await this.server.start(getPreferredPort());
-            savePreferredPort(this.server.port);
-            await this.registerServer();
+            await this.startAndRegisterServer()
         }
     }
 
@@ -103,7 +107,7 @@ export class McpServerManager {
             const mcpProvider = new ISCMcpServerDefinitionProvider(this.server);
             this.context.subscriptions.push(
                 vscode.lm.registerMcpServerDefinitionProvider(MCP_ID, mcpProvider)
-            );
+            )
             this.context.subscriptions.push({ dispose: () => { this.dispose(); } });
         } catch (error) {
             console.error('Failed to register MCP server definition provider:', error);
