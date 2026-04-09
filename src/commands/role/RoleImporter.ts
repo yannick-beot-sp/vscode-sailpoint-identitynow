@@ -314,7 +314,7 @@ export class RoleImporter {
                             const updates = [
                                 {
                                     "property": "description",
-                                    "value": description
+                                    "value": description ?? null
                                 },
                                 {
                                     "property": "enabled",
