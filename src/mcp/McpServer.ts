@@ -20,7 +20,7 @@ export class McpServer {
     private _adapter?: StoppableExpressAdapter;
     private _port = 0;
 
-    constructor(private readonly tenantService: TenantService) {}
+    constructor(private readonly tenantService: TenantService) { }
 
     get port(): number { return this._port; }
     isRunning(): boolean { return this._instance !== undefined; }
@@ -69,5 +69,24 @@ function findFreePort(): Promise<number> {
             server.close(err => (err ? reject(err) : resolve(port)));
         });
         server.on("error", reject);
+    });
+}
+
+
+export function isPortAvailable(port: number) {
+    return new Promise((resolve, reject) => {
+        const server = net.createServer();
+        server.once('error', (err: NodeJS.ErrnoException) => {
+            if (err.code === 'EADDRINUSE') {
+                resolve(false); // Port is in use
+            } else {
+                reject(err);
+            }
+        });
+        server.once('listening', () => {
+            server.close();
+            resolve(true); // Port is available
+        });
+        server.listen(port);
     });
 }
