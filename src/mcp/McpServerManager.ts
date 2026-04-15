@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { McpServer } from "./McpServer";
+import { isPortAvailable, McpServer } from "./McpServer";
 import { TenantService } from "../services/TenantService";
 import { TenantServiceEventType } from "../services/TenantServiceEventType";
 import * as configuration from '../configurationConstants';
@@ -56,8 +56,18 @@ export class McpServerManager {
     }
 
     private async startAndRegisterServer() {
+        // Get confgured port
         const preferredPort = getPreferredPort()
-        await this.server.start(preferredPort);
+        let port = preferredPort
+        if (preferredPort > 0 && !(await isPortAvailable(preferredPort))) {
+            // If the port previously defined is taken, will determine 
+            // randomly the port by setting at 0
+            // This random port won't be saved for next time so we don't store it
+            // NOTE: this can be the case if several instance of VSCode are started
+            // We would each instance to have it's own MCP Server and not rely on other instances
+            port = 0
+        }
+        await this.server.start(port);
         if (preferredPort <= 0) {
             savePreferredPort(this.server.port);
         }
