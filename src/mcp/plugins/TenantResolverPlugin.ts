@@ -12,6 +12,22 @@ import { ErrorCodes, McpError } from "../errors";
 const iscClientStore = new WeakMap<object, ISCClient>();
 
 /**
+ * Set of tool names that are exempt from tenant resolution.
+ * Exempt tools skip both the auto-inject and ISCClient-inject hooks.
+ */
+const _exemptTools = new Set<string>();
+
+/**
+ * Registers tool names that should bypass the TenantResolverPlugin hooks.
+ * Call this at module scope in any tool that does not require a tenantName argument.
+ */
+export function bypassTenantResolver(...toolNames: string[]): void {
+    for (const name of toolNames) {
+        _exemptTools.add(name);
+    }
+}
+
+/**
  * Retrieves the ISCClient injected for the current tool execution.
  * Call this from within a tool's execute() method using `this` as the key.
  *
@@ -40,7 +56,7 @@ export function setTenantService(ts: TenantService): void {
 }
 
 export function getTenantService(): TenantService {
-    return _tenantService
+    return _tenantService!
 }
 
 /**
@@ -62,6 +78,8 @@ export class TenantResolverPlugin {
      */
     @ToolHook.Will("parseInput", { priority: 100 })
     async autoInjectTenantName(ctx: FlowCtxOf<'tools:call-tool'>): Promise<void> {
+        const toolName = ctx.rawInput?.request?.params?.name as string | undefined;
+        if (toolName && _exemptTools.has(toolName)) { return; }
         if (!_tenantService) { return; }
         const args = ctx.rawInput?.request?.params?.arguments
         if (args && !('tenantName' in args)) {
@@ -79,6 +97,8 @@ export class TenantResolverPlugin {
      */
     @ToolHook.Will("validateInput", { priority: 100 })
     async injectIscClient(ctx: FlowCtxOf<'tools:call-tool'>): Promise<void> {
+        const toolName = ctx.rawInput?.request?.params?.name as string | undefined;
+        if (toolName && _exemptTools.has(toolName)) { return; }
         if (!_tenantService) { return; }
 
         const args: Record<string, unknown> = ctx.state?.input?.arguments ?? {};

@@ -9,6 +9,10 @@ export const identityIdField = z.string().describe(
     "When the value matches a UUID pattern the lookup is done by ID; otherwise by name."
 );
 
+export const identitySortField = z.string().optional().describe(
+    "Field to sort results by. Prefix with '-' for descending order (e.g. '-name'). Defaults to 'name'."
+);
+
 export const identityQueryField = z.string().describe(
     "Lucene query string to search identities. " +
     "Supports field-specific queries such as 'email:*@example.com', " +
