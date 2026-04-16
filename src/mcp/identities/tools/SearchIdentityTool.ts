@@ -4,7 +4,9 @@ import { z } from "zod";
 import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
 import { tenantNameField } from "../../inputFields";
-import { identityQueryField } from "../identityInputFields";
+import { identityQueryField, identitySortField } from "../identityInputFields";
+
+const DEFAULT_SORT = "name";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -12,6 +14,7 @@ const inputSchema = z.object({
     limit: z.number().int().min(1).max(250).optional().describe(
         "Maximum number of results to return. Defaults to 50."
     ),
+    sort: identitySortField,
 });
 
 const outputSchema = z.object({
@@ -52,7 +55,8 @@ export class SearchIdentityTool extends ToolContext {
             const results = await client.searchIdentities(
                 input.query,
                 input.limit ?? 50,
-                ["id", "name", "email"]
+                ["id", "name", "email"],
+                input.sort ?? DEFAULT_SORT,
             );
 
             const out = {

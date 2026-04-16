@@ -691,8 +691,11 @@ export function activate(context: vscode.ExtensionContext) {
 		getRoots(): Array<TenantInfo | FolderTreeNode> {
 			return tenantService.getRoots()
 		},
-		getChildren(id: string | undefined): Array<TenantInfo | FolderTreeNode> {
-			return tenantService.getChildren(id)
+		getChildren(id: string | undefined): Array<TenantInfo | FolderTreeNode> | undefined {
+			if (id) {
+				return tenantService.getChildren(id)
+			}
+			return undefined;
 		},
 		registerTreeUpdate(o: Observer<TenantServiceEventType, any>): void {
 			tenantService.registerObserver(TenantServiceEventType.updateTree, o)
