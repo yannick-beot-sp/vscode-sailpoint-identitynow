@@ -3,7 +3,7 @@ import { BaseCSVExporter } from "../BaseExporter";
 import { RolesTreeItem } from '../../models/ISCTreeItem';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
-import { EntitlementRef, RequestabilityForRole, RevocabilityForRole, Role, RoleMembershipSelectorType, RolesApiListRolesRequest, RoleV2025 } from 'sailpoint-api-client';
+import { RequestabilityForRole, RevocabilityForRole, RoleMembershipSelectorType, RolesApiListRolesRequest, RoleV2025 } from 'sailpoint-api-client';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { WorkflowIdToNameCacheService } from '../../services/cache/WorkflowIdToNameCacheService';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
@@ -12,11 +12,11 @@ import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToN
 import { roleMembershipSelectorToStringConverter } from '../../parser/roleMembershipSelectorToStringConverter';
 import { SourceIdToNameCacheService } from '../../services/cache/SourceIdToNameCacheService';
 import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator';
-import { CacheService } from '../../services/cache/CacheService';
 import { EntitlementIdToSourceNameCacheService } from '../../services/cache/EntitlementIdToSourceNameCacheService';
 import { metadataToString } from '../../utils/metadataUtils';
 import { dimensionSchemaToString } from '../../utils/dimensionUtils';
 import { entitlementToStringConverter } from '../../utils/entitlementToStringConverter';
+import { getAdditionalOwners } from '../../utils/getAdditionalOwners';
 
 export class RoleExporterCommand {
 
@@ -69,7 +69,7 @@ export interface RoleDto {
      * @type {string}
      * @memberof Role
      */
-    'description'?: string;
+    'description'?: string | null;
     /**
      *
      * @type {string}
@@ -83,8 +83,8 @@ export interface RoleDto {
      * @type {Array<AccessProfileRef>}
      * @memberof Role
      */
-    'accessProfiles'?: string;
-    'entitlements'?: string;
+    'accessProfiles'?: string | null;
+    'entitlements'?: string | null;
     /**
      * Whether the Role is enabled or not.
      * @type {boolean}
@@ -125,7 +125,7 @@ export interface RoleDto {
      */
     membershipCriteria?: string;
 
-    dimensional?: boolean
+    dimensional?: boolean | null
     dimensionAttributes?: string
     /**
      * A list of metadata associated with the Role. metadata are seperated by ";". 
@@ -136,42 +136,7 @@ export interface RoleDto {
 
 }
 
-type AdditionalOwnerRef = { type?: string; id?: string; name?: string };
-
-async function formatAdditionalOwners(
-    additionalOwners: AdditionalOwnerRef[] | undefined,
-    identityCacheIdToName: IdentityIdToNameCacheService,
-    governanceGroupCacheIdToName: GovernanceGroupIdToNameCacheService
-): Promise<{ additionalOwners: string | null; additionalOwnerGovernanceGroup: string | null }> {
-    if (!additionalOwners || additionalOwners.length === 0) {
-        return { additionalOwners: null, additionalOwnerGovernanceGroup: null };
-    }
-
-    const governanceGroupOwner = additionalOwners.find((owner) => owner.type === "GOVERNANCE_GROUP");
-    if (governanceGroupOwner?.id) {
-        const governanceGroupName = governanceGroupOwner.name
-            ?? await governanceGroupCacheIdToName.get(governanceGroupOwner.id);
-        return { additionalOwners: null, additionalOwnerGovernanceGroup: governanceGroupName };
-    }
-
-    const identityNames = await Promise.all(additionalOwners.map(async (owner) => {
-        if (owner.name) {
-            return owner.name;
-        }
-        if (owner.id) {
-            return identityCacheIdToName.get(owner.id);
-        }
-        return null;
-    }));
-
-    const filteredNames = identityNames.filter((name): name is string => !!name);
-    return {
-        additionalOwners: filteredNames.length ? filteredNames.join(CSV_MULTIVALUE_SEPARATOR) : null,
-        additionalOwnerGovernanceGroup: null
-    };
-}
-
-class RoleExporter extends BaseCSVExporter<Role> {
+class RoleExporter extends BaseCSVExporter<RoleV2025> {
     constructor(
         tenantId: string,
         tenantName: string,
@@ -199,6 +164,10 @@ class RoleExporter extends BaseCSVExporter<Role> {
             "commentsRequired",
             "denialCommentsRequired",
             "approvalSchemes",
+            "reauthorizationRequired",
+            "requireEndDate",
+            "maxPermittedAccessDurationValue",
+            "maxPermittedAccessDurationTimeUnit",
             "revokeCommentsRequired",
             "revokeDenialCommentsRequired",
             "revokeApprovalSchemes",
@@ -220,6 +189,10 @@ class RoleExporter extends BaseCSVExporter<Role> {
             "accessRequestConfig.commentsRequired",
             "accessRequestConfig.denialCommentsRequired",
             "approvalSchemes",
+            "accessRequestConfig.reauthorizationRequired",
+            "accessRequestConfig.requireEndDate",
+            "accessRequestConfig.maxPermittedAccessDuration.value",
+            "accessRequestConfig.maxPermittedAccessDuration.timeUnit",
             "revocationRequestConfig.commentsRequired",
             "revocationRequestConfig.denialCommentsRequired",
             "revokeApprovalSchemes",
@@ -256,20 +229,20 @@ class RoleExporter extends BaseCSVExporter<Role> {
                         console.warn(`Error converting membership criteria for role "${item.name}:"`, error);
                     }
                 }
-                let owner: string | undefined = undefined;
+                let owner: string | null = null;
                 try {
                     owner = item.owner ? (await identityCacheIdToName.get(item.owner.id!)) : null
                 } catch (error) {
-                    console.warn(`Error converting owner identity "${item.owner.id}" for role "${item.name}:"`, error);
+                    console.warn(`Error converting owner identity "${item.owner?.id}" for role "${item.name}:"`, error);
                 }
 
-                const additionalOwnersInfo = await formatAdditionalOwners(
-                    (item as any).additionalOwners,
+                const additionalOwnersInfo = await getAdditionalOwners(
+                    item.additionalOwners,
                     identityCacheIdToName,
                     governanceGroupCache
                 );
 
-                let entitlements: string | undefined = undefined;
+                let entitlements: string | undefined | null = null;
                 try {
                     entitlements = (item.entitlements ? (await entitlementToStringConverter(item.entitlements, entitlementIdToSourceNameCacheService)) : null);
                 } catch (error) {
@@ -290,6 +263,10 @@ class RoleExporter extends BaseCSVExporter<Role> {
                     accessRequestConfig: {
                         commentsRequired: item.accessRequestConfig?.commentsRequired ?? false,
                         denialCommentsRequired: item.accessRequestConfig?.denialCommentsRequired ?? false,
+                        reauthorizationRequired: item.accessRequestConfig?.reauthorizationRequired ?? false,
+                        requireEndDate: item.accessRequestConfig?.requireEndDate ?? false,
+                        maxPermittedAccessDuration: item.accessRequestConfig?.maxPermittedAccessDuration
+
                     },
                     revocationRequestConfig: {
                         commentsRequired: item.revocationRequestConfig?.commentsRequired ?? false,

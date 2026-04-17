@@ -73,7 +73,7 @@ export async function stringToAccessProfileApprovalSchemeConverter(
 
     if (isEmpty(schemes)) { return new Array<AccessProfileApprovalScheme>; }
 
-    return await Promise.all(schemes.split(CSV_MULTIVALUE_SEPARATOR).map(async (approver) => {
+    return await Promise.all(schemes!.split(CSV_MULTIVALUE_SEPARATOR).map(async (approver) => {
 
         let approverType: AccessProfileApprovalSchemeV2025ApproverTypeV2025;
         let approverId: string | undefined = undefined;

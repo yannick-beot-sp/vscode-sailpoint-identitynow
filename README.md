@@ -171,22 +171,26 @@ This extension includes the following snippets for the Public Identities Configu
 
 The following table provides the expected column for the CSV to import Access Profiles:
 
-| Header                   | M[*] | Description                                                                                                                 | Default Value      |
-| ------------------------ | ---- | --------------------------------------------------------------------------------------------------------------------------- | ------------------ |
-| `name`                   | Yes  | Name of the access profile                                                                                                  |                    |
-| `owner`                  | Yes  | Owner of the access profile                                                                                                 |                    |
-| `additionalOwners`       | No   | Additional owners (identity names or IDs), separated by ;. Maximum 10 identities. Mutually exclusive with `additionalOwnerGovernanceGroup`. | `[]`               |
-| `additionalOwnerGovernanceGroup` | No | Additional owners as a single governance group name. Mutually exclusive with `additionalOwners`.                         | `null`             |
-| `source`                 | Yes  | Source associated with the access profile                                                                                   |                    |
-| `description`            | No   | Description of the access profile                                                                                           | `null`             |
-| `enabled`                | No   | Is the access profile enabled?                                                                                              | `false`            |
-| `requestable`            | No   | Is the access profile requestable?                                                                                          | `false`            |
-| `commentsRequired`       | No   | Require comments when the user requests access                                                                              | `false`            |
-| `denialCommentsRequired` | No   | Require comments when a reviewer denies the request                                                                         | `false`            |
-| `approvalSchemes`        | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by ; | `[]` (No approval) |
-| `revokeApprovalSchemes`  | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by ; | `[]` (No approval) |
-| `entitlements`           | No   | Entitlements of the access profile                                                                                          | `[]`               |
-| `metadata`               | No   | Metadata of the access profile (cf. below for format)                                                                       | `[]`               |
+| Header                               | M[*] | Description                                                                                                                                   | Default Value |
+| ------------------------------------ | ---- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| `name`                               | Yes  | Name of the access profile                                                                                                                    |               |
+| `owner`                              | Yes  | Owner of the access profile                                                                                                                   |               |
+| `additionalOwners`                   | No   | Additional owners (identity names or IDs), separated by `;`. Maximum 10 identities. Mutually exclusive with `additionalOwnerGovernanceGroup`. |               |
+| `additionalOwnerGovernanceGroup`     | No   | Additional owners as a single governance group name. Mutually exclusive with `additionalOwners`.                                              | `null`        |
+| `source`                             | Yes  | Source associated with the access profile                                                                                                     |               |
+| `description`                        | No   | Description of the access profile                                                                                                             | `null`        |
+| `enabled`                            | No   | Is the access profile enabled?                                                                                                                | `false`       |
+| `requestable`                        | No   | Is the access profile requestable?                                                                                                            | `false`       |
+| `commentsRequired`                   | No   | Require comments when the user requests access                                                                                                | `false`       |
+| `denialCommentsRequired`             | No   | Require comments when a reviewer denies the request                                                                                           | `false`       |
+| `approvalSchemes`                    | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`,`ALL_OWNERS`, `ADDITIONAL_OWNER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by `;`     |               |
+| `reauthorizationRequired`            | No   | Indicates whether reauthorization is required for the request.                                                                                | `false`       |
+| `requireEndDate`                     | No   | Indicates whether the requester of the containing object must provide access end date.                                                        | `false`       |
+| `maxPermittedAccessDurationValue`    | No   | The numeric value representing the amount of time, which is defined in the timeUnit.                                                          |               |
+| `maxPermittedAccessDurationTimeUnit` | No   | The unit of time that corresponds to the value among `HOURS`, `DAYS`, `WEEKS`, or `MONTHS`.                                                   |               |
+| `revokeApprovalSchemes`              | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by `;`     |               |
+| `entitlements`                       | No   | Entitlements of the access profile                                                                                                            |               |
+| `metadata`                           | No   | Metadata of the access profile (cf. below for format)                                                                                         |               |
 
 [*]: ## "Mandatory"
 
@@ -194,40 +198,45 @@ The following table provides the expected column for the CSV to import Access Pr
 
 The following table provides the expected column for the CSV to import Roles:
 
-| Header                         | M[*] | Description                                                                                    | Default Value      |
-| ------------------------------ | ---- | ---------------------------------------------------------------------------------------------- | ------------------ |
-| `name`                         | Yes  | Name of the role                                                                               |                    |
-| `owner`                        | Yes  | Owner of the role                                                                              |                    |
-| `additionalOwners`             | No   | Additional owners (identity names or IDs), separated by ;. Maximum 10 identities. Mutually exclusive with `additionalOwnerGovernanceGroup`. | `[]`               |
-| `additionalOwnerGovernanceGroup` | No | Additional owners as a single governance group name. Mutually exclusive with `additionalOwners`.                         | `null`             |
-| `description`                  | No   | Description of the role                                                                        | `null`             |
-| `enabled`                      | No   | Is the role enabled?                                                                           | `false`            |
-| `requestable`                  | No   | Is the role requestable?                                                                       | `false`            |
-| `commentsRequired`             | No   | Require comments when the user requests access                                                 | `false`            |
-| `denialCommentsRequired`       | No   | Require comments when a reviewer denies the request                                            | `false`            |
-| `approvalSchemes`              | No   | List of reviewers among `OWNER`, `MANAGER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by ; | `[]` (No approval) |
-| `revokeCommentsRequired`       | No   | Require comments when the user requests revocation                                             | `false`            |
-| `revokeDenialCommentsRequired` | No   | Require comments when a reviewer denies the revocation request                                 | `false`            |
-| `revokeApprovalSchemes`        | No   | List of reviewers among `OWNER`, `MANAGER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by ; | `[]` (No approval) |
-| `entitlements`                 | No   | List of entitlements                                                                           | `[]`               |
-| `accessProfiles`               | No   | List of access profiles                                                                        | `[]`               |
-| `membershipCriteria`           | No   | Membership criteria for automatic assignment (cf. below for format)                            |                    |
-| `dimensional`                  | No   | Is the role dynamic? Does it support dimensions?                                               | `false`            |
-| `dimensionAttributes`          | No   | List of attributes used for dimension, separated by ;                                          | `[]`               |
-| `metadata`                     | No   | Metadata of the role (cf. below for format)                                                    | `[]`               |
+| Header                               | M[*] | Description                                                                                                                                    | Default Value |
+| ------------------------------------ | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| `name`                               | Yes  | Name of the role                                                                                                                               |               |
+| `owner`                              | Yes  | Owner of the role                                                                                                                              |               |
+| `additionalOwners`                   | No   | Additional owners (identity names or IDs), separated by ;. Maximum 10 identities. Mutually exclusive with `additionalOwnerGovernanceGroup`.    |               |
+| `additionalOwnerGovernanceGroup`     | No   | Additional owners as a single governance group name. Mutually exclusive with `additionalOwners`.                                               | `null`        |
+| `description`                        | No   | Description of the role                                                                                                                        | `null`        |
+| `enabled`                            | No   | Is the role enabled?                                                                                                                           | `false`       |
+| `requestable`                        | No   | Is the role requestable?                                                                                                                       | `false`       |
+| `commentsRequired`                   | No   | Require comments when the user requests access                                                                                                 | `false`       |
+| `denialCommentsRequired`             | No   | Require comments when a reviewer denies the request                                                                                            | `false`       |
+| `approvalSchemes`                    | No   | List of reviewers among `OWNER`, `MANAGER`, `ALL_OWNERS`, `ADDITIONAL_OWNER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by `;` |               |
+| `reauthorizationRequired`            | No   | Indicates whether reauthorization is required for the request.                                                                                 | `false`       |
+| `requireEndDate`                     | No   | Indicates whether the requester of the containing object must provide access end date.                                                         | `false`       |
+| `maxPermittedAccessDurationValue`    | No   | The numeric value representing the amount of time, which is defined in the timeUnit.                                                           |               |
+| `maxPermittedAccessDurationTimeUnit` | No   | The unit of time that corresponds to the value among `HOURS`, `DAYS`, `WEEKS`, or `MONTHS`.                                                    |               |
+| `revokeCommentsRequired`             | No   | Require comments when the user requests revocation                                                                                             | `false`       |
+| `revokeDenialCommentsRequired`       | No   | Require comments when a reviewer denies the revocation request                                                                                 | `false`       |
+| `revokeApprovalSchemes`              | No   | List of reviewers among `OWNER`, `MANAGER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by `;`                                   |               |
+| `entitlements`                       | No   | List of entitlements                                                                                                                           |               |
+| `accessProfiles`                     | No   | List of access profiles                                                                                                                        |               |
+| `membershipCriteria`                 | No   | Membership criteria for automatic assignment (cf. below for format)                                                                            |               |
+| `dimensional`                        | No   | Is the role dynamic? Does it support dimensions?                                                                                               | `false`       |
+| `dimensionAttributes`                | No   | List of attributes used for dimension, separated by `;`                                                                                        |               |
+| `metadata`                           | No   | Metadata of the role (cf. below for format)                                                                                                    |               |
 
 #### Approval Schemes Format
 
 Approval schemes (`approvalSchemes` and `revokeApprovalSchemes`) are exported and imported using the following format:
 
 - **Standard approvers**: Use enum values directly
-  - For Access Profiles: `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`
-  - For Roles: `OWNER`, `MANAGER`
+  - For Access Profiles: `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, `ALL_OWNERS`, `ADDITIONAL_OWNER`
+  - For Roles: `OWNER`, `MANAGER`, `ALL_OWNERS`, `ADDITIONAL_OWNER`
 - **Governance Groups**: Use the prefix format `GOVERNANCE_GROUP:<Group Name>`
 - **Workflows**: Use the prefix format `WORKFLOW:<Workflow Name>`
 - **Separator**: Semicolon (`;`)
 
 **Example**:
+
 ```csv
 approvalSchemes: MANAGER;GOVERNANCE_GROUP:My Approval Group;WORKFLOW:My Approval Workflow;OWNER
 ```
@@ -251,6 +260,7 @@ Entitlements are exported and imported with the following format to ensure uniqu
 - **Format**: Pipe character (`|`) separates the components
 
 **Examples**:
+
 ```csv
 # Access Profile entitlements
 entitlements: groups|All_Users;permissions|Read;permissions|Write
@@ -261,6 +271,7 @@ entitlements: Active Directory|groups|Accounting;HR System|permissions|ViewEmplo
 
 **Backward Compatibility**:
 Older exports without the attribute field are still supported during import:
+
 - **Access Profiles**: Format `<entitlement name>` (e.g., `All_Users;campusAccess`)
 - **Roles**: Format `<source name>|<entitlement name>` (e.g., `Active Directory|SupplyChain`)
 
@@ -270,14 +281,14 @@ These legacy formats will be automatically detected and processed correctly duri
 
 The following table provides the expected column for the CSV to import Roles:
 
-| Header                | M[*] | Description                                                         | Default Value |
-| --------------------- | ---- | ------------------------------------------------------------------- | ------------- |
-| `name`                | Yes  | Name of the dimension                                               |               |
-| `roleName`            | Yes  | Name of the role                                                    |               |
-| `description`         | No   | Description of the role                                             | `null`        |
-| `entitlements`        | No   | List of entitlements                                                | `[]`          |
-| `accessProfiles`      | No   | List of access profiles                                             | `[]`          |
-| `membershipCriteria`  | No   | Membership criteria for automatic assignment (cf. below for format) |               |
+| Header               | M[*] | Description                                                         | Default Value |
+| -------------------- | ---- | ------------------------------------------------------------------- | ------------- |
+| `name`               | Yes  | Name of the dimension                                               |               |
+| `roleName`           | Yes  | Name of the role                                                    |               |
+| `description`        | No   | Description of the role                                             | `null`        |
+| `entitlements`       | No   | List of entitlements                                                |               |
+| `accessProfiles`     | No   | List of access profiles                                             |               |
+| `membershipCriteria` | No   | Membership criteria for automatic assignment (cf. below for format) |               |
 
 #### Membership criteria
 
@@ -345,18 +356,18 @@ The metadata column will be exported as or will be imported as:
 
 The following table provides the expected columns for the CSV to import entitlement details (metadata updates):
 
-| Header                          | M[*] | Description                                                                 | Default Value |
-| ------------------------------- | ---- | --------------------------------------------------------------------------- | ------------- |
-| `attributeName`                 | Yes  | Entitlement attribute name                                                  |               |
-| `attributeValue`                | Yes  | Entitlement attribute value                                                 |               |
-| `schema`                        | Yes  | Entitlement schema/object type                                              |               |
-| `displayName`                   | No   | Entitlement display name                                                    |               |
-| `description`                   | No   | Entitlement description                                                     |               |
-| `requestable`                   | No   | Whether entitlement is requestable                                          |               |
-| `owner`                         | No   | Primary owner (identity alias or ID)                                        |               |
-| `additionalOwners`              | No   | Additional owners (identity names or IDs), separated by ;. Maximum 10 identities. Mutually exclusive with `additionalOwnerGovernanceGroup`. | `[]`          |
-| `additionalOwnerGovernanceGroup`| No   | Additional owners as a single governance group name. Mutually exclusive with `additionalOwners`. | `null`        |
-| `privileged`                    | No   | Whether entitlement is privileged                                           |               |
+| Header                           | M[*] | Description                                                                                                                                 | Default Value |
+| -------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| `attributeName`                  | Yes  | Entitlement attribute name                                                                                                                  |               |
+| `attributeValue`                 | Yes  | Entitlement attribute value                                                                                                                 |               |
+| `schema`                         | Yes  | Entitlement schema/object type                                                                                                              |               |
+| `displayName`                    | No   | Entitlement display name                                                                                                                    |               |
+| `description`                    | No   | Entitlement description                                                                                                                     |               |
+| `requestable`                    | No   | Whether entitlement is requestable                                                                                                          |               |
+| `owner`                          | No   | Primary owner (identity alias or ID)                                                                                                        |               |
+| `additionalOwners`               | No   | Additional owners (identity names or IDs), separated by ;. Maximum 10 identities. Mutually exclusive with `additionalOwnerGovernanceGroup`. |               |
+| `additionalOwnerGovernanceGroup` | No   | Additional owners as a single governance group name. Mutually exclusive with `additionalOwners`.                                            | `null`        |
+| `privileged`                     | No   | Whether entitlement is privileged                                                                                                           |               |
 
 ### Certification Campaign Custom Reviewers
 
@@ -503,7 +514,6 @@ The extension supports the following settings:
 - `vscode-sailpoint-identitynow.treeView.pagination`: Define the number of roles and access profiles that are displayed in the tree view
   - Default value: 100
 - `vscode-sailpoint-identitynow.report.campaigns.filename`: Define the pattern for the folder to export access profiles.
-
   - Default value: `%x/reports/%T-Campaign-%S-%y%M%d-%h%m%s.csv`
     The patterns defined above use the following tokens:
 
@@ -526,6 +536,11 @@ The extension supports the following settings:
 ### Unreleased
 
 - Escape '\' when exporting and importing roles and access profiles
+- Export and import additional owners for Access Profiles and Roles by [@nusrathdev](https://github.com/nusrathdev) (cf. [#138](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/138))
+- Export and import max duration config and reauthorization for Access Profiles and Roles
+- Support of new approval steps (`ALL_OWNERS`, `ADDITIONAL_OWNER`)
+- Update schema for additional owners and max duration.
+- Update dependency for `axios`
 
 ### 1.3.25
 

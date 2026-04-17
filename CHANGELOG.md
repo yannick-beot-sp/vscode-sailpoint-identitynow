@@ -8,11 +8,20 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Security
 
+- Update dependency for `axios`
+
 ### Added
+
+- Export and import additional owners for Access Profiles and Roles by [@nusrathdev](https://github.com/nusrathdev) (cf. [#138](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/138))
+- Export and import max duration config and reauthorization for Access Profiles and Roles
 
 ### Changed
 
 - Escape '\' when exporting and importing roles and access profiles
+- Support of new approval steps (`ALL_OWNERS`, `ADDITIONAL_OWNER`)
+- Update schema for additional owners and max duration.
+- Update dependency for `sailpoint-api-client`
+
 
 ### Fixed
 
@@ -121,7 +130,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Fixed
 
-- Issue with missing role entitlements from campaign status report [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp) (cf. [#120](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/120))
+- Issue with missing role entitlements from campaign status report by [@mostafa-helmy-sp](https://github.com/mostafa-helmy-sp) (cf. [#120](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/120))
 
 ## [1.3.18] - 2025-07-03
 

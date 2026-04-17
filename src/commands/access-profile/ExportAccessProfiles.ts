@@ -3,7 +3,7 @@ import { BaseCSVExporter } from "../BaseExporter";
 import { AccessProfilesTreeItem } from '../../models/ISCTreeItem';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
-import { AccessProfile, AccessProfileSourceRef, AccessProfilesApiListAccessProfilesRequest, Requestability } from 'sailpoint-api-client';
+import { AccessProfileSourceRef, AccessProfilesApiListAccessProfilesRequest, Requestability, AccessProfileV2025 } from 'sailpoint-api-client';
 import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { WorkflowIdToNameCacheService } from '../../services/cache/WorkflowIdToNameCacheService';
@@ -12,7 +12,7 @@ import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToN
 import { metadataToString } from '../../utils/metadataUtils';
 import { EntitlementIdToSourceNameCacheService } from '../../services/cache/EntitlementIdToSourceNameCacheService';
 import { entitlementToStringConverter } from '../../utils/entitlementToStringConverter';
-import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
+import { getAdditionalOwners } from '../../utils/getAdditionalOwners';
 
 export class AccessProfileExporterCommand {
     /**
@@ -51,6 +51,8 @@ export class AccessProfileExporterCommand {
         await exporter.exportFileWithProgression();
     }
 }
+
+
 interface AccessProfileDto {
     /**
      * Name of the Access Profile
@@ -61,7 +63,7 @@ interface AccessProfileDto {
      * Information about the Access Profile
      * @type {string}
      */
-    'description'?: string;
+    'description'?: string | null;
 
     /**
      * Whether the Access Profile is enabled. If the Access Profile is enabled then you must include at least one Entitlement.
@@ -74,7 +76,14 @@ interface AccessProfileDto {
      * @memberof Role
      */
     'owner': string | null;
+    /**
+     * List of additional owner identities beyond the primary owner.
+     */
     'additionalOwners'?: string | null;
+
+    /**
+     * List of additional owner reference to a governance group beyond the primary owner.
+     */
     'additionalOwnerGovernanceGroup'?: string | null;
     /**
      *
@@ -91,20 +100,24 @@ interface AccessProfileDto {
      * List describing the steps in approving the revocation request
      */
     'revokeApprovalSchemes'?: string;
+
     /**
      * A list of entitlements associated with the Access Profile. If enabled is false this is allowed to be empty otherwise it needs to contain at least one Entitlement.
      */
     'entitlements'?: string;
+
     /**
      * Whether the Access Profile is requestable via access request. Currently, making an Access Profile non-requestable is only supported  for customers enabled with the new Request Center. Otherwise, attempting to create an Access Profile with a value  **false** in this field results in a 400 error.
      * @type {boolean}
      */
     'requestable'?: boolean;
+
     /**
      *
      * @type {Requestability}
      */
     'accessRequestConfig'?: Requestability;
+
     /**
      * A list of metadata associated with the Access Profile. metadata are seperated by ";". 
      * The expected format is key:value1,value2;key2:value3
@@ -112,41 +125,8 @@ interface AccessProfileDto {
     metadata?: string;
 }
 
-type AdditionalOwnerRef = { type?: string; id?: string; name?: string };
 
-async function formatAdditionalOwners(
-    additionalOwners: AdditionalOwnerRef[] | undefined,
-    identityCacheIdToName: IdentityIdToNameCacheService,
-    governanceGroupCacheIdToName: GovernanceGroupIdToNameCacheService
-): Promise<{ additionalOwners: string | null; additionalOwnerGovernanceGroup: string | null }> {
-    if (!additionalOwners || additionalOwners.length === 0) {
-        return { additionalOwners: null, additionalOwnerGovernanceGroup: null };
-    }
-
-    const governanceGroupOwner = additionalOwners.find((owner) => owner.type === "GOVERNANCE_GROUP");
-    if (governanceGroupOwner?.id) {
-        const governanceGroupName = governanceGroupOwner.name
-            ?? await governanceGroupCacheIdToName.get(governanceGroupOwner.id);
-        return { additionalOwners: null, additionalOwnerGovernanceGroup: governanceGroupName };
-    }
-
-    const identityNames = await Promise.all(additionalOwners.map(async (owner) => {
-        if (owner.name) {
-            return owner.name;
-        }
-        if (owner.id) {
-            return identityCacheIdToName.get(owner.id);
-        }
-        return null;
-    }));
-
-    const filteredNames = identityNames.filter((name): name is string => !!name);
-    return {
-        additionalOwners: filteredNames.length ? filteredNames.join(CSV_MULTIVALUE_SEPARATOR) : null,
-        additionalOwnerGovernanceGroup: null
-    };
-}
-class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
+class AccessProfileExporter extends BaseCSVExporter<AccessProfileV2025> {
     constructor(
         tenantId: string,
         tenantName: string,
@@ -175,6 +155,10 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
             "commentsRequired",
             "denialCommentsRequired",
             "approvalSchemes",
+            "reauthorizationRequired",
+            "requireEndDate",
+            "maxPermittedAccessDurationValue",
+            "maxPermittedAccessDurationTimeUnit",
             "revokeApprovalSchemes",
             "entitlements",
             "metadata"
@@ -191,6 +175,10 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
             "accessRequestConfig.commentsRequired",
             "accessRequestConfig.denialCommentsRequired",
             "approvalSchemes",
+            "accessRequestConfig.reauthorizationRequired",
+            "accessRequestConfig.requireEndDate",
+            "accessRequestConfig.maxPermittedAccessDuration.value",
+            "accessRequestConfig.maxPermittedAccessDuration.timeUnit",
             "revokeApprovalSchemes",
             "entitlements",
             "metadata"
@@ -203,14 +191,14 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
         const identityCacheIdToName = new IdentityIdToNameCacheService(this.client);
         const entitlementIdToSourceNameCacheService = new EntitlementIdToSourceNameCacheService(this.client);
 
-        const iterator = new GenericAsyncIterableIterator<AccessProfile, AccessProfilesApiListAccessProfilesRequest>(
+        const iterator = new GenericAsyncIterableIterator<AccessProfileV2025, AccessProfilesApiListAccessProfilesRequest>(
             this.client,
             this.client.getAccessProfiles);
 
         await this.writeData(headers, paths, unwindablePaths, iterator, task, token,
-            async (item: AccessProfile): Promise<AccessProfileDto> => {
+            async (item: AccessProfileV2025): Promise<AccessProfileDto> => {
                 const owner = item.owner ? (await identityCacheIdToName.get(item.owner.id!)) : null
-                const additionalOwnersInfo = await formatAdditionalOwners(
+                const additionalOwnersInfo = await getAdditionalOwners(
                     (item as any).additionalOwners,
                     identityCacheIdToName,
                     governanceGroupCache
@@ -218,7 +206,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
 
                 let entitlements: string | undefined = undefined;
                 try {
-                    entitlements = (item.entitlements ? (await entitlementToStringConverter(item.entitlements, entitlementIdToSourceNameCacheService)) : null);
+                    entitlements = (item.entitlements ? (await entitlementToStringConverter(item.entitlements, entitlementIdToSourceNameCacheService)) : undefined);
                 } catch (error) {
                     console.warn(`Error converting entitlements for role "${item.name}:"`, error);
                 }
@@ -240,6 +228,8 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
                     accessRequestConfig: {
                         commentsRequired: item.accessRequestConfig?.commentsRequired ?? false,
                         denialCommentsRequired: item.accessRequestConfig?.denialCommentsRequired ?? false,
+                        requireEndDate: item.accessRequestConfig?.requireEndDate ?? false,
+                        maxPermittedAccessDuration: item.accessRequestConfig?.maxPermittedAccessDuration
                     },
                     approvalSchemes: await accessProfileApprovalSchemeToStringConverter(
                         item.accessRequestConfig?.approvalSchemes,

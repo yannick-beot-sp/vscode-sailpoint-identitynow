@@ -21,3 +21,4 @@ CHANGELOG.md
 .prettierrc
 resources/readme/**
 **/eslint.config.mjs
+.env
