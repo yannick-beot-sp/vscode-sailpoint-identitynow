@@ -21,7 +21,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 - Support of new approval steps (`ALL_OWNERS`, `ADDITIONAL_OWNER`)
 - Update schema for additional owners and max duration.
 - Update dependency for `sailpoint-api-client`
-
+- Update of roles and access profiles only take into account the columns provided. Mandatory columns are still mandatory (`source` for access profiles for instance)
 
 ### Fixed
 

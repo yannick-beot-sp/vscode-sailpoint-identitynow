@@ -6,12 +6,12 @@ export function dimensionSchemaToString(dimensionSchema: DimensionSchemaV2025 | 
     return dimensionSchema?.dimensionAttributes?.map(x => x.name).join(CSV_MULTIVALUE_SEPARATOR)
 }
 
-export function stringToDimensionAttributes(input: string): DimensionSchemaV2025 | undefined {
+export function stringToDimensionAttributes(input: string | undefined): DimensionSchemaV2025 | undefined {
     if (isEmpty(input)) {
         return undefined;
     }
 
-    const dimensionAttributes = input
+    const dimensionAttributes = input!
         .split(CSV_MULTIVALUE_SEPARATOR)
         .map(name => ({
             name: name.trim(),

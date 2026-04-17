@@ -541,6 +541,7 @@ The extension supports the following settings:
 - Support of new approval steps (`ALL_OWNERS`, `ADDITIONAL_OWNER`)
 - Update schema for additional owners and max duration.
 - Update dependency for `axios`
+- Update of roles and access profiles only take into account the columns provided. Mandatory columns are still mandatory (`source` for access profiles for instance)
 
 ### 1.3.25
 

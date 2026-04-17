@@ -1,6 +1,6 @@
 import * as tmp from "tmp";
 import * as vscode from 'vscode';
-import { AccessProfile, AdditionalOwnerRefV2025, EntitlementBeta, JsonPatchOperationV2025OpV2025 } from 'sailpoint-api-client';
+import { AccessDurationV2025, AccessProfile, AdditionalOwnerRefV2025, EntitlementBeta, JsonPatchOperationV2025OpV2025 } from 'sailpoint-api-client';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
 import { CSVReader } from '../../services/CSVReader';
@@ -18,6 +18,7 @@ import { UserCancelledError } from "../../errors";
 import { stringToAttributeMetadata } from "../../utils/metadataUtils";
 import { ImportResult } from "../../models/ImportResult";
 import { resolveAdditionalOwners } from "../../utils/additionalOwners";
+import { formatMaxPermittedAccessDuration } from "../../utils/maxPermittedAccessDuration";
 
 interface AccessProfileCSVRecord {
     name: string
@@ -33,6 +34,10 @@ interface AccessProfileCSVRecord {
     denialCommentsRequired: boolean
     revokeApprovalSchemes: string
     approvalSchemes: string
+    reauthorizationRequired?: boolean
+    requireEndDate?: boolean
+    maxPermittedAccessDurationValue?: number
+    maxPermittedAccessDurationTimeUnit?: string
     metadata: string
 }
 
@@ -238,7 +243,23 @@ export class AccessProfileImporter {
                     vscode.window.showErrorMessage(srcMessage);
                     return;
                 }
+
                 const description = data.description ?? ""
+
+                let maxPermittedAccessDuration: AccessDurationV2025 | null = null
+                try {
+                    maxPermittedAccessDuration = formatMaxPermittedAccessDuration(
+                        data.maxPermittedAccessDurationValue,
+                        data.maxPermittedAccessDurationTimeUnit)
+
+                } catch (error) {
+                    result.error++;
+                    const srcMessage = `Unable to parse max permitted access duration: ${error}`;
+                    await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, srcMessage);
+                    vscode.window.showErrorMessage(srcMessage);
+                    return;
+                }
+
                 const accessProfilePayload: AccessProfile = {
                     "name": apName,
                     description,
@@ -257,7 +278,10 @@ export class AccessProfileImporter {
                     "accessRequestConfig": {
                         "commentsRequired": truethy(data.commentsRequired),
                         "denialCommentsRequired": truethy(data.denialCommentsRequired),
-                        "approvalSchemes": approvalSchemes
+                        "approvalSchemes": approvalSchemes,
+                        reauthorizationRequired: truethy(data.reauthorizationRequired),
+                        requireEndDate: truethy(data.requireEndDate),
+                        maxPermittedAccessDuration
                     },
                     "revocationRequestConfig": {
                         "approvalSchemes": revokeApprovalSchemes
@@ -299,13 +323,12 @@ export class AccessProfileImporter {
                                 { columns: ['requestable'], path: 'requestable', getValue: () => truethy(data.requestable) },
                                 { columns: ['description'], path: 'description', getValue: () => description },
                                 { columns: ['owner'], path: 'owner', getValue: () => ({ id: ownerId, type: "IDENTITY", name: data.owner }) },
-                                {
-                                    columns: ['additionalOwners', 'additionalOwnerGovernanceGroup'],
-                                    path: 'additionalOwners',
-                                    getValue: () => additionalOwners
-                                },
+                                { columns: ['additionalOwners', 'additionalOwnerGovernanceGroup'], path: 'additionalOwners', getValue: () => additionalOwners },
                                 { columns: ['commentsRequired'], path: 'accessRequestConfig/commentsRequired', getValue: () => truethy(data.commentsRequired) },
                                 { columns: ['denialCommentsRequired'], path: 'accessRequestConfig/denialCommentsRequired', getValue: () => truethy(data.denialCommentsRequired) },
+                                { columns: ['reauthorizationRequired'], path: 'accessRequestConfig/reauthorizationRequired', getValue: () => truethy(data.reauthorizationRequired) },
+                                { columns: ['requireEndDate'], path: 'accessRequestConfig/requireEndDate', getValue: () => truethy(data.requireEndDate) },
+                                { columns: ['maxPermittedAccessDurationValue', 'maxPermittedAccessDurationTimeUnit'], path: 'accessRequestConfig/maxPermittedAccessDuration', getValue: () => maxPermittedAccessDuration },
                                 { columns: ['approvalSchemes'], path: 'accessRequestConfig/approvalSchemes', getValue: () => approvalSchemes },
                                 { columns: ['revokeApprovalSchemes'], path: 'revocationRequestConfig/approvalSchemes', getValue: () => revokeApprovalSchemes },
                                 { columns: ['entitlements'], path: 'entitlements', getValue: () => entitlements },

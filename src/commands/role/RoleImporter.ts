@@ -3,7 +3,7 @@ import * as tmp from "tmp";
 
 import { ISCClient } from "../../services/ISCClient";
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
-import { AccessProfileRef, ApprovalSchemeForRole, EntitlementRef, JsonPatchOperationV2025OpV2025, RoleMembershipSelector, RoleMembershipSelectorType } from 'sailpoint-api-client';
+import { AccessDurationV2025, AccessProfileRef, ApprovalSchemeForRole, EntitlementRef, JsonPatchOperationV2025OpV2025, RoleMembershipSelector, RoleMembershipSelectorType } from 'sailpoint-api-client';
 import { RoleV2025, AdditionalOwnerRefV2025 } from 'sailpoint-api-client/dist/v2025';
 import { CSVReader } from '../../services/CSVReader';
 import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
@@ -24,6 +24,7 @@ import { stringToAttributeMetadata } from '../../utils/metadataUtils';
 import { stringToDimensionAttributes } from '../../utils/dimensionUtils';
 import { ImportResult } from '../../models/ImportResult';
 import { resolveAdditionalOwners } from '../../utils/additionalOwners';
+import { formatMaxPermittedAccessDuration } from '../../utils/maxPermittedAccessDuration';
 
 interface RoleCSVRecord {
     name: string
@@ -44,6 +45,10 @@ interface RoleCSVRecord {
     membershipCriteria: string
     dimensional?: boolean
     dimensionAttributes?: string
+    reauthorizationRequired?: boolean
+    requireEndDate?: boolean
+    maxPermittedAccessDurationValue?: number
+    maxPermittedAccessDurationTimeUnit?: string
     metadata: string
 }
 
@@ -277,6 +282,20 @@ export class RoleImporter {
                 }
                 const description = data.description ?? ""
 
+                let maxPermittedAccessDuration: AccessDurationV2025 | null = null
+                try {
+                    maxPermittedAccessDuration = formatMaxPermittedAccessDuration(
+                        data.maxPermittedAccessDurationValue,
+                        data.maxPermittedAccessDurationTimeUnit)
+
+                } catch (error) {
+                    result.error++;
+                    const srcMessage = `Unable to parse max permitted access duration: ${error}`;
+                    await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, srcMessage);
+                    vscode.window.showErrorMessage(srcMessage);
+                    return;
+                }
+
                 const rolePayload: RoleV2025 = {
                     "name": roleName,
                     description,
@@ -291,7 +310,10 @@ export class RoleImporter {
                         "commentsRequired": truethy(data.commentsRequired),
                         "denialCommentsRequired": truethy(data.denialCommentsRequired),
                         "approvalSchemes": approvalSchemes,
-                        dimensionSchema: stringToDimensionAttributes(data.dimensionAttributes)
+                        dimensionSchema: stringToDimensionAttributes(data.dimensionAttributes),
+                        reauthorizationRequired: truethy(data.reauthorizationRequired),
+                        requireEndDate: truethy(data.requireEndDate),
+                        maxPermittedAccessDuration
                     },
                     "revocationRequestConfig": {
                         "commentsRequired": truethy(data.revokeCommentsRequired),
@@ -345,6 +367,9 @@ export class RoleImporter {
                                 { columns: ['additionalOwners', 'additionalOwnerGovernanceGroup'], path: 'additionalOwners', getValue: () => additionalOwners, },
                                 { columns: ['commentsRequired'], path: 'accessRequestConfig/commentsRequired', getValue: () => truethy(data.commentsRequired) },
                                 { columns: ['denialCommentsRequired'], path: 'accessRequestConfig/denialCommentsRequired', getValue: () => truethy(data.denialCommentsRequired) },
+                                { columns: ['reauthorizationRequired'], path: 'accessRequestConfig/reauthorizationRequired', getValue: () => truethy(data.reauthorizationRequired) },
+                                { columns: ['requireEndDate'], path: 'accessRequestConfig/requireEndDate', getValue: () => truethy(data.requireEndDate) },
+                                { columns: ['maxPermittedAccessDurationValue', 'maxPermittedAccessDurationTimeUnit'], path: 'accessRequestConfig/maxPermittedAccessDuration', getValue: () => maxPermittedAccessDuration },
                                 { columns: ['approvalSchemes'], path: 'accessRequestConfig/approvalSchemes', getValue: () => approvalSchemes },
                                 { columns: ['dimensionAttributes'], path: 'accessRequestConfig/dimensionSchema', getValue: () => stringToDimensionAttributes(data.dimensionAttributes ?? "") },
                                 { columns: ['revokeCommentsRequired'], path: 'revocationRequestConfig/commentsRequired', getValue: () => truethy(data.revokeCommentsRequired) },
@@ -367,7 +392,7 @@ export class RoleImporter {
                                 await this.client.updateRole(role.id!, updates)
                                 await this.writeLog(processedLines, roleName, CSVLogWriterLogType.SUCCESS, `Successfully updated access profile '${roleName}'`);
                                 result.success++;
-                            } catch (error) {
+                            } catch (error: any) {
                                 result.error++;
                                 await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, `Cannot update role: '${error.message}'`);
 
