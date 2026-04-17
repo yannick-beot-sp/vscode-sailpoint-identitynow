@@ -159,6 +159,7 @@ export class RoleImporter {
         const workflowCache = new WorkflowNameToIdCacheService(this.client);
         await workflowCache.init()
         const accessProfileNameToIdCacheService = new AccessProfileNameToIdCacheService(this.client);
+        const headers = await csvReader.getHeaders();
         const identityCacheService = new IdentityUsernameToIdCacheService(this.client);
         const sourceCacheService = new SourceNameToIdCacheService(this.client);
         const entitlementCacheService = new EntitlementCacheService(this.client);
@@ -329,7 +330,7 @@ export class RoleImporter {
                         return;
                     }
                 }
-                const description = data.description
+                const description = data.description ?? ""
 
                 const rolePayload: RoleV2025 = {
                     "name": roleName,
@@ -371,11 +372,11 @@ export class RoleImporter {
                 try {
                     const newRole = await this.client.createRole(rolePayload);
 
-                    if (data.metadata) {
+                    if (isNotBlank(data.metadata)) {
                         const attributes = stringToAttributeMetadata(data.metadata)
                         await this.client.updateRoleMetadata(
-                            newRole.id,
-                            attributes
+                            newRole.id!,
+                            attributes!
                         )
                     }
 
@@ -390,75 +391,39 @@ export class RoleImporter {
                         const role = await this.client.getRoleByName(roleName);
                         if (role) {
 
-                            const updates = [
+                            const updateMappings: { columns: string[]; path: string; getValue: () => any; condition?: () => boolean }[] = [
+                                { columns: ['description'], path: 'description', getValue: () => description },
+                                { columns: ['enabled'], path: 'enabled', getValue: () => truethy(data.enabled) },
+                                { columns: ['requestable'], path: 'requestable', getValue: () => truethy(data.requestable) },
+                                { columns: ['dimensional'], path: 'dimensional', getValue: () => truethy(data.dimensional) },
+                                { columns: ['owner'], path: 'owner', getValue: () => ({ id: ownerId, type: "IDENTITY", name: data.owner }) },
                                 {
-                                    "property": "description",
-                                    "value": description
+                                    columns: ['additionalOwners', 'additionalOwnerGovernanceGroup'],
+                                    path: 'additionalOwners',
+                                    getValue: () => additionalOwners,
                                 },
-                                {
-                                    "property": "enabled",
-                                    "value": truethy(data.enabled)
-                                },
-                                {
-                                    "property": "requestable",
-                                    "value": truethy(data.requestable)
-                                },
-                                {
-                                    "property": "dimensional",
-                                    "value": truethy(data.dimensional)
-                                },
-                                {
-                                    "property": "owner",
-                                    "value": {
-                                        "id": ownerId,
-                                        "type": "IDENTITY",
-                                        "name": data.owner
-                                    }
-                                },
-                                ...(additionalOwners !== undefined ? [{
-                                    "property": "additionalOwners",
-                                    "value": additionalOwners
-                                }] : []),
-                                {
-                                    "property": "accessRequestConfig",
-                                    "value": {
-                                        "commentsRequired": truethy(data.commentsRequired),
-                                        "denialCommentsRequired": truethy(data.denialCommentsRequired),
-                                        "approvalSchemes": approvalSchemes,
-                                        "dimensionSchema": stringToDimensionAttributes(data.dimensionAttributes)
-                                    }
-                                },
-                                {
-                                    "property": "revocationRequestConfig",
-                                    "value": {
-                                        "commentsRequired": truethy(data.revokeCommentsRequired),
-                                        "denialCommentsRequired": truethy(data.revokeDenialCommentsRequired),
-                                        "approvalSchemes": revokeApprovalSchemes
-                                    }
-                                },
-                                {
-                                    "property": "accessProfiles",
-                                    "value": accessProfiles ?? null
-                                },
-                                {
-                                    "property": "entitlements",
-                                    "value": entitlements ?? null
-                                },
-                                {
-                                    "property": "membership",
-                                    "value": membership ?? null
-                                },
-                                {
-                                    "property": "accessModelMetadata/attributes",
-                                    "value": stringToAttributeMetadata(data.metadata) ?? null
-                                },
-                            ].map((item) => ({
-                                "op": JsonPatchOperationV2025OpV2025.Replace,
-                                "path": `/${item.property}`,
-                                "value": item.value
-                            }))
+                                { columns: ['commentsRequired'], path: 'accessRequestConfig/commentsRequired', getValue: () => truethy(data.commentsRequired) },
+                                { columns: ['denialCommentsRequired'], path: 'accessRequestConfig/denialCommentsRequired', getValue: () => truethy(data.denialCommentsRequired) },
+                                { columns: ['approvalSchemes'], path: 'accessRequestConfig/approvalSchemes', getValue: () => approvalSchemes },
+                                { columns: ['dimensionAttributes'], path: 'accessRequestConfig/dimensionSchema', getValue: () => stringToDimensionAttributes(data.dimensionAttributes ?? "") },
+                                { columns: ['revokeCommentsRequired'], path: 'revocationRequestConfig/commentsRequired', getValue: () => truethy(data.revokeCommentsRequired) },
+                                { columns: ['revokeDenialCommentsRequired'], path: 'revocationRequestConfig/denialCommentsRequired', getValue: () => truethy(data.revokeDenialCommentsRequired) },
+                                { columns: ['revokeApprovalSchemes'], path: 'revocationRequestConfig/approvalSchemes', getValue: () => revokeApprovalSchemes },
+                                { columns: ['accessProfiles'], path: 'accessProfiles', getValue: () => accessProfiles ?? null },
+                                { columns: ['entitlements'], path: 'entitlements', getValue: () => entitlements ?? null },
+                                { columns: ['membershipCriteria'], path: 'membership', getValue: () => membership ?? null },
+                                { columns: ['metadata'], path: 'accessModelMetadata/attributes', getValue: () => stringToAttributeMetadata(data.metadata) ?? null },
+                            ];
+
+                            const updates = updateMappings
+                                .filter(m => m.columns.some(col => headers.includes(col)))
+                                .map(m => ({
+                                    op: JsonPatchOperationV2025OpV2025.Replace,
+                                    path: `/${m.path}`,
+                                    value: m.getValue()
+                                }))
                             try {
-                                await this.client.updateRole(role.id, updates)
+                                await this.client.updateRole(role.id!, updates)
                                 await this.writeLog(processedLines, roleName, CSVLogWriterLogType.SUCCESS, `Successfully updated access profile '${roleName}'`);
                                 result.success++;
                             } catch (error) {

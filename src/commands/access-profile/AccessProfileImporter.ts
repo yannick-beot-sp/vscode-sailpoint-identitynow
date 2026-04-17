@@ -161,7 +161,7 @@ export class AccessProfileImporter {
                     return;
                 }
 
-                let additionalOwners: AdditionalOwnerRefV2025[] | undefined;
+                let additionalOwners: AdditionalOwnerRefV2025[] | null;
                 try {
                     additionalOwners = await resolveAdditionalOwners(
                         data.additionalOwners,
@@ -262,11 +262,8 @@ export class AccessProfileImporter {
                     "revocationRequestConfig": {
                         "approvalSchemes": revokeApprovalSchemes
                     },
-                    entitlements
-                }
-
-                if (additionalOwners !== undefined) {
-                    (accessProfilePayload as any).additionalOwners = additionalOwners;
+                    entitlements,
+                    additionalOwners
                 }
 
                 if (token.isCancellationRequested) {
@@ -296,67 +293,37 @@ export class AccessProfileImporter {
                         const ap = await this.client.getAccessProfileByName(apName);
                         if (ap) {
 
-                            const updates = [
+                            const updateMappings: { columns: string[]; path: string; getValue: () => any; condition?: () => boolean }[] = [
+                                { columns: ['name'], path: 'name', getValue: () => apName },
+                                { columns: ['enabled'], path: 'enabled', getValue: () => truethy(data.enabled) },
+                                { columns: ['requestable'], path: 'requestable', getValue: () => truethy(data.requestable) },
+                                { columns: ['description'], path: 'description', getValue: () => description },
+                                { columns: ['owner'], path: 'owner', getValue: () => ({ id: ownerId, type: "IDENTITY", name: data.owner }) },
                                 {
-                                    "property": "name",
-                                    "value": apName
+                                    columns: ['additionalOwners', 'additionalOwnerGovernanceGroup'],
+                                    path: 'additionalOwners',
+                                    getValue: () => additionalOwners
                                 },
-                                {
-                                    "property": "enabled",
-                                    "value": truethy(data.enabled)
-                                },
-                                {
-                                    "property": "requestable",
-                                    "value": truethy(data.requestable)
-                                },
-                                {
-                                    "property": "description",
-                                    "value": description
-                                },
-                                {
-                                    "property": "owner",
-                                    "value": {
-                                        "id": ownerId,
-                                        "type": "IDENTITY",
-                                        "name": data.owner
-                                    }
-                                },
-                                ...(additionalOwners !== undefined ? [{
-                                    "property": "additionalOwners",
-                                    "value": additionalOwners
-                                }] : []),
-                                {
-                                    "property": "accessRequestConfig",
-                                    "value": {
-                                        "commentsRequired": truethy(data.commentsRequired),
-                                        "denialCommentsRequired": truethy(data.denialCommentsRequired),
-                                        "approvalSchemes": approvalSchemes
-                                    }
-                                },
-                                {
-                                    "property": "revocationRequestConfig",
-                                    "value": {
-                                        "approvalSchemes": revokeApprovalSchemes
-                                    }
-                                },
-                                {
-                                    "property": "entitlements",
-                                    "value": entitlements
-                                },
-                                {
-                                    "property": "accessModelMetadata/attributes",
-                                    "value": stringToAttributeMetadata(data.metadata) ?? null
-                                },
-                            ].map((item) => ({
-                                "op": JsonPatchOperationV2025OpV2025.Replace,
-                                "path": `/${item.property}`,
-                                "value": item.value
-                            }))
+                                { columns: ['commentsRequired'], path: 'accessRequestConfig/commentsRequired', getValue: () => truethy(data.commentsRequired) },
+                                { columns: ['denialCommentsRequired'], path: 'accessRequestConfig/denialCommentsRequired', getValue: () => truethy(data.denialCommentsRequired) },
+                                { columns: ['approvalSchemes'], path: 'accessRequestConfig/approvalSchemes', getValue: () => approvalSchemes },
+                                { columns: ['revokeApprovalSchemes'], path: 'revocationRequestConfig/approvalSchemes', getValue: () => revokeApprovalSchemes },
+                                { columns: ['entitlements'], path: 'entitlements', getValue: () => entitlements },
+                                { columns: ['metadata'], path: 'accessModelMetadata/attributes', getValue: () => stringToAttributeMetadata(data.metadata) ?? null },
+                            ];
+
+                            const updates = updateMappings
+                                .filter(m => m.columns.some(col => headers.includes(col)))
+                                .map(m => ({
+                                    op: JsonPatchOperationV2025OpV2025.Replace,
+                                    path: `/${m.path}`,
+                                    value: m.getValue()
+                                }))
                             try {
                                 await this.client.updateAccessProfile(ap.id!, updates)
                                 await this.writeLog(processedLines, apName, CSVLogWriterLogType.SUCCESS, `Successfully updated access profile '${apName}'`);
                                 result.success++;
-                            } catch (error) {
+                            } catch (error: any) {
                                 result.error++;
                                 await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, `Cannot update access profile: '${error.message}'`);
 

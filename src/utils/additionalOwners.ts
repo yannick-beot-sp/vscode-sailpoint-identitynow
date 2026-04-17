@@ -45,9 +45,9 @@ export async function resolveAdditionalOwners(
     additionalOwnerGovernanceGroupRaw: string | undefined,
     identityCacheService: IdentityUsernameToIdCacheService,
     governanceGroupCache: GovernanceGroupNameToIdCacheService
-): Promise<Array<AdditionalOwnerRefV2025> | undefined> {
+): Promise<Array<AdditionalOwnerRefV2025> | null> {
     if (!additionalOwnersRaw && !additionalOwnerGovernanceGroupRaw) {
-        return undefined;
+        return null;
     }
 
     const ownerNames = (additionalOwnersRaw ?? "")
@@ -75,7 +75,7 @@ export async function resolveAdditionalOwners(
     }
 
     if (ownerNames.length === 0) {
-        return [];
+        return null;
     }
 
     return Promise.all(ownerNames.map(async (name) => {
