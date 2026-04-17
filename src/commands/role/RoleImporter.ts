@@ -3,7 +3,8 @@ import * as tmp from "tmp";
 
 import { ISCClient } from "../../services/ISCClient";
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
-import { AccessProfileRef, ApprovalSchemeForRole, EntitlementRef, JsonPatchOperationV2025OpV2025, RoleMembershipSelector, RoleMembershipSelectorType, RoleV2025 } from 'sailpoint-api-client';
+import { AccessProfileRef, ApprovalSchemeForRole, EntitlementRef, JsonPatchOperationV2025OpV2025, RoleMembershipSelector, RoleMembershipSelectorType } from 'sailpoint-api-client';
+import { RoleV2025, AdditionalOwnerRefV2025 } from 'sailpoint-api-client/dist/v2025';
 import { CSVReader } from '../../services/CSVReader';
 import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
 import { WorkflowNameToIdCacheService } from '../../services/cache/WorkflowNameToIdCacheService';
@@ -22,6 +23,7 @@ import { UserCancelledError } from '../../errors';
 import { stringToAttributeMetadata } from '../../utils/metadataUtils';
 import { stringToDimensionAttributes } from '../../utils/dimensionUtils';
 import { ImportResult } from '../../models/ImportResult';
+import { resolveAdditionalOwners } from '../../utils/additionalOwners';
 
 interface RoleCSVRecord {
     name: string
@@ -43,63 +45,6 @@ interface RoleCSVRecord {
     dimensional?: boolean
     dimensionAttributes?: string
     metadata: string
-}
-
-const OWNER_ID_REGEX = /^[a-f0-9]{32}$/;
-
-async function resolveAdditionalOwners(
-    additionalOwnersRaw: string | undefined,
-    additionalOwnerGovernanceGroupRaw: string | undefined,
-    identityCacheService: IdentityUsernameToIdCacheService,
-    governanceGroupCache: GovernanceGroupNameToIdCacheService
-): Promise<Array<{ type: "IDENTITY" | "GOVERNANCE_GROUP"; id: string; name?: string }> | undefined> {
-    if (additionalOwnersRaw === undefined && additionalOwnerGovernanceGroupRaw === undefined) {
-        return undefined;
-    }
-
-    const ownerNames = (additionalOwnersRaw ?? "")
-        .split(CSV_MULTIVALUE_SEPARATOR)
-        .map((value) => value.trim())
-        .filter((value) => value.length > 0);
-
-    const governanceGroupName = additionalOwnerGovernanceGroupRaw?.trim() ?? "";
-
-    if (governanceGroupName && ownerNames.length > 0) {
-        throw new Error("Both additionalOwners and additionalOwnerGovernanceGroup are set. Only one is allowed.");
-    }
-
-    if (ownerNames.length > 10) {
-        throw new Error("Too many additional owners. Maximum is 10 identities.");
-    }
-
-    if (governanceGroupName) {
-        const groupId = await governanceGroupCache.get(governanceGroupName);
-        return [{
-            type: "GOVERNANCE_GROUP",
-            id: groupId,
-            name: governanceGroupName
-        }];
-    }
-
-    if (ownerNames.length === 0) {
-        return [];
-    }
-
-    return Promise.all(ownerNames.map(async (ownerNameOrId) => {
-        if (OWNER_ID_REGEX.test(ownerNameOrId)) {
-            return {
-                type: "IDENTITY",
-                id: ownerNameOrId
-            };
-        }
-
-        const ownerId = await identityCacheService.get(ownerNameOrId);
-        return {
-            type: "IDENTITY",
-            id: ownerId,
-            name: ownerNameOrId
-        };
-    }));
 }
 
 export class RoleImporter {
@@ -200,7 +145,7 @@ export class RoleImporter {
                     return;
                 }
 
-                let additionalOwners: Array<{ type: "IDENTITY" | "GOVERNANCE_GROUP"; id: string; name?: string }> | undefined;
+                let additionalOwners: Array<AdditionalOwnerRefV2025> | null;
                 try {
                     additionalOwners = await resolveAdditionalOwners(
                         data.additionalOwners,
@@ -397,11 +342,7 @@ export class RoleImporter {
                                 { columns: ['requestable'], path: 'requestable', getValue: () => truethy(data.requestable) },
                                 { columns: ['dimensional'], path: 'dimensional', getValue: () => truethy(data.dimensional) },
                                 { columns: ['owner'], path: 'owner', getValue: () => ({ id: ownerId, type: "IDENTITY", name: data.owner }) },
-                                {
-                                    columns: ['additionalOwners', 'additionalOwnerGovernanceGroup'],
-                                    path: 'additionalOwners',
-                                    getValue: () => additionalOwners,
-                                },
+                                { columns: ['additionalOwners', 'additionalOwnerGovernanceGroup'], path: 'additionalOwners', getValue: () => additionalOwners, },
                                 { columns: ['commentsRequired'], path: 'accessRequestConfig/commentsRequired', getValue: () => truethy(data.commentsRequired) },
                                 { columns: ['denialCommentsRequired'], path: 'accessRequestConfig/denialCommentsRequired', getValue: () => truethy(data.denialCommentsRequired) },
                                 { columns: ['approvalSchemes'], path: 'accessRequestConfig/approvalSchemes', getValue: () => approvalSchemes },

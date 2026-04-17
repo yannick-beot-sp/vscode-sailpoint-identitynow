@@ -1568,11 +1568,11 @@ export class ISCClient {
 		return response;
 	}
 
-	public async createRole(role: Role): Promise<Role> {
-		console.log("> createRole", role);
+	public async createRole(roleV2025: RoleV2025): Promise<RoleV2025> {
+		console.log("> createRole", roleV2025);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new RolesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.createRole({ role });
+		const api = new RolesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.createRole({ roleV2025 });
 		return response.data;
 	}
 

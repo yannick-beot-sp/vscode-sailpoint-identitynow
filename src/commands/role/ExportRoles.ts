@@ -7,7 +7,7 @@ import { RequestabilityForRole, RevocabilityForRole, RoleMembershipSelectorType,
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { WorkflowIdToNameCacheService } from '../../services/cache/WorkflowIdToNameCacheService';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
-import { roleApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
+import { approvalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
 import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
 import { roleMembershipSelectorToStringConverter } from '../../parser/roleMembershipSelectorToStringConverter';
 import { SourceIdToNameCacheService } from '../../services/cache/SourceIdToNameCacheService';
@@ -272,11 +272,11 @@ class RoleExporter extends BaseCSVExporter<RoleV2025> {
                         commentsRequired: item.revocationRequestConfig?.commentsRequired ?? false,
                         denialCommentsRequired: item.revocationRequestConfig?.denialCommentsRequired ?? false
                     },
-                    approvalSchemes: await roleApprovalSchemeToStringConverter(
+                    approvalSchemes: await approvalSchemeToStringConverter(
                         item.accessRequestConfig?.approvalSchemes,
                         governanceGroupCache,
                         workflowCache),
-                    revokeApprovalSchemes: await roleApprovalSchemeToStringConverter(
+                    revokeApprovalSchemes: await approvalSchemeToStringConverter(
                         item.revocationRequestConfig?.approvalSchemes,
                         governanceGroupCache,
                         workflowCache),
