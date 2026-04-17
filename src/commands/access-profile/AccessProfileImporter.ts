@@ -1,6 +1,6 @@
 import * as tmp from "tmp";
 import * as vscode from 'vscode';
-import { AccessProfile, EntitlementBeta, JsonPatchOperationV2025OpV2025 } from 'sailpoint-api-client';
+import { AccessProfile, AdditionalOwnerRefV2025, EntitlementBeta, JsonPatchOperationV2025OpV2025 } from 'sailpoint-api-client';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
 import { CSVReader } from '../../services/CSVReader';
@@ -8,7 +8,7 @@ import { ISCClient } from "../../services/ISCClient";
 import { EntitlementCacheService, KEY_SEPARATOR } from '../../services/cache/EntitlementCacheService';
 import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
 import { WorkflowNameToIdCacheService } from '../../services/cache/WorkflowNameToIdCacheService';
-import { IdentityNameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
+import * as IdentityNameToIdCacheService from '../../services/cache/IdentityNameToIdCacheService';
 import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService';
 import { stringToAccessProfileApprovalSchemeConverter } from '../../utils/approvalSchemeConverter';
 import { importMode, ImportModeType, openPreview } from '../../utils/vsCodeHelpers';
@@ -17,6 +17,7 @@ import { truethy } from "../../utils/booleanUtils";
 import { UserCancelledError } from "../../errors";
 import { stringToAttributeMetadata } from "../../utils/metadataUtils";
 import { ImportResult } from "../../models/ImportResult";
+import { resolveAdditionalOwners } from "../../utils/additionalOwners";
 
 interface AccessProfileCSVRecord {
     name: string
@@ -35,62 +36,9 @@ interface AccessProfileCSVRecord {
     metadata: string
 }
 
-const OWNER_ID_REGEX = /^[a-f0-9]{32}$/;
+//const OWNER_ID_REGEX = /^[a-f0-9]{32}$/;
 
-async function resolveAdditionalOwners(
-    additionalOwnersRaw: string | undefined,
-    additionalOwnerGovernanceGroupRaw: string | undefined,
-    identityCacheService: IdentityNameToIdCacheService,
-    governanceGroupCache: GovernanceGroupNameToIdCacheService
-): Promise<Array<{ type: "IDENTITY" | "GOVERNANCE_GROUP"; id: string; name?: string }> | undefined> {
-    if (additionalOwnersRaw === undefined && additionalOwnerGovernanceGroupRaw === undefined) {
-        return undefined;
-    }
 
-    const ownerNames = (additionalOwnersRaw ?? "")
-        .split(CSV_MULTIVALUE_SEPARATOR)
-        .map((value) => value.trim())
-        .filter((value) => value.length > 0);
-
-    const governanceGroupName = additionalOwnerGovernanceGroupRaw?.trim() ?? "";
-
-    if (governanceGroupName && ownerNames.length > 0) {
-        throw new Error("Both additionalOwners and additionalOwnerGovernanceGroup are set. Only one is allowed.");
-    }
-
-    if (ownerNames.length > 10) {
-        throw new Error("Too many additional owners. Maximum is 10 identities.");
-    }
-
-    if (governanceGroupName) {
-        const groupId = await governanceGroupCache.get(governanceGroupName);
-        return [{
-            type: "GOVERNANCE_GROUP",
-            id: groupId,
-            name: governanceGroupName
-        }];
-    }
-
-    if (ownerNames.length === 0) {
-        return [];
-    }
-
-    return Promise.all(ownerNames.map(async (ownerNameOrId) => {
-        if (OWNER_ID_REGEX.test(ownerNameOrId)) {
-            return {
-                type: "IDENTITY",
-                id: ownerNameOrId
-            };
-        }
-
-        const ownerId = await identityCacheService.get(ownerNameOrId);
-        return {
-            type: "IDENTITY",
-            id: ownerId,
-            name: ownerNameOrId
-        };
-    }));
-}
 
 export class AccessProfileImporter {
     readonly client: ISCClient;
@@ -147,9 +95,11 @@ export class AccessProfileImporter {
         const governanceGroupCache = new GovernanceGroupNameToIdCacheService(this.client);
         const workflowCache = new WorkflowNameToIdCacheService(this.client);
         await workflowCache.init()
-        const identityCacheService = new IdentityNameToIdCacheService(this.client);
+        const identityCacheService = new IdentityNameToIdCacheService.IdentityUsernameToIdCacheService(this.client);
         const sourceCacheService = new SourceNameToIdCacheService(this.client);
         const entitlementCacheService = new EntitlementCacheService(this.client);
+
+        const headers = await csvReader.getHeaders();
 
         let processedLines = 0;
         try {
@@ -211,7 +161,7 @@ export class AccessProfileImporter {
                     return;
                 }
 
-                let additionalOwners: Array<{ type: "IDENTITY" | "GOVERNANCE_GROUP"; id: string; name?: string }> | undefined;
+                let additionalOwners: AdditionalOwnerRefV2025[] | undefined;
                 try {
                     additionalOwners = await resolveAdditionalOwners(
                         data.additionalOwners,
@@ -288,7 +238,7 @@ export class AccessProfileImporter {
                     vscode.window.showErrorMessage(srcMessage);
                     return;
                 }
-                const description = data.description
+                const description = data.description ?? ""
                 const accessProfilePayload: AccessProfile = {
                     "name": apName,
                     description,
@@ -329,8 +279,8 @@ export class AccessProfileImporter {
                     if (data.metadata) {
                         const attributes = stringToAttributeMetadata(data.metadata)
                         await this.client.updateAccessProfileMetadata(
-                            newAP.id,
-                            attributes
+                            newAP.id!,
+                            attributes!
                         )
                     }
 
@@ -403,7 +353,7 @@ export class AccessProfileImporter {
                                 "value": item.value
                             }))
                             try {
-                                await this.client.updateAccessProfile(ap.id, updates)
+                                await this.client.updateAccessProfile(ap.id!, updates)
                                 await this.writeLog(processedLines, apName, CSVLogWriterLogType.SUCCESS, `Successfully updated access profile '${apName}'`);
                                 result.success++;
                             } catch (error) {

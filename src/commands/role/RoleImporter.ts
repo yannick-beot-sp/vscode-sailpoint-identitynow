@@ -7,7 +7,7 @@ import { AccessProfileRef, ApprovalSchemeForRole, EntitlementRef, JsonPatchOpera
 import { CSVReader } from '../../services/CSVReader';
 import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
 import { WorkflowNameToIdCacheService } from '../../services/cache/WorkflowNameToIdCacheService';
-import { IdentityNameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
+import { IdentityUsernameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { AccessProfileNameToIdCacheService } from '../../services/cache/AccessProfileNameToIdCacheService';
 import { stringToRoleApprovalSchemeConverter } from '../../utils/approvalSchemeConverter';
@@ -50,7 +50,7 @@ const OWNER_ID_REGEX = /^[a-f0-9]{32}$/;
 async function resolveAdditionalOwners(
     additionalOwnersRaw: string | undefined,
     additionalOwnerGovernanceGroupRaw: string | undefined,
-    identityCacheService: IdentityNameToIdCacheService,
+    identityCacheService: IdentityUsernameToIdCacheService,
     governanceGroupCache: GovernanceGroupNameToIdCacheService
 ): Promise<Array<{ type: "IDENTITY" | "GOVERNANCE_GROUP"; id: string; name?: string }> | undefined> {
     if (additionalOwnersRaw === undefined && additionalOwnerGovernanceGroupRaw === undefined) {
@@ -159,7 +159,7 @@ export class RoleImporter {
         const workflowCache = new WorkflowNameToIdCacheService(this.client);
         await workflowCache.init()
         const accessProfileNameToIdCacheService = new AccessProfileNameToIdCacheService(this.client);
-        const identityCacheService = new IdentityNameToIdCacheService(this.client);
+        const identityCacheService = new IdentityUsernameToIdCacheService(this.client);
         const sourceCacheService = new SourceNameToIdCacheService(this.client);
         const entitlementCacheService = new EntitlementCacheService(this.client);
         const parser = new Parser();

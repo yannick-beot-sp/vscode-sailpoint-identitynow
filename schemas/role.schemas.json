@@ -530,8 +530,14 @@
           "default": false
         },
         "maxPermittedAccessDuration": {
-          "type": "object",
-          "nullable": true,
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
           "properties": {
             "value": {
               "type": "integer",

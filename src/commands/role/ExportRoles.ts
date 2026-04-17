@@ -16,7 +16,7 @@ import { EntitlementIdToSourceNameCacheService } from '../../services/cache/Enti
 import { metadataToString } from '../../utils/metadataUtils';
 import { dimensionSchemaToString } from '../../utils/dimensionUtils';
 import { entitlementToStringConverter } from '../../utils/entitlementToStringConverter';
-import { getAdditionalOwners } from '../../utils/getAdditionalOwners';
+import { getAdditionalOwners } from '../../utils/additionalOwners';
 
 export class RoleExporterCommand {
 

@@ -7,12 +7,13 @@ import { AccessProfileSourceRef, AccessProfilesApiListAccessProfilesRequest, Req
 import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { WorkflowIdToNameCacheService } from '../../services/cache/WorkflowIdToNameCacheService';
-import { accessProfileApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
-import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
+import { approvalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
 import { metadataToString } from '../../utils/metadataUtils';
-import { EntitlementIdToSourceNameCacheService } from '../../services/cache/EntitlementIdToSourceNameCacheService';
+import { EntitlementIdToAttributeNameCacheService } from '../../services/cache/EntitlementIdToSourceNameCacheService';
 import { entitlementToStringConverter } from '../../utils/entitlementToStringConverter';
-import { getAdditionalOwners } from '../../utils/getAdditionalOwners';
+import { getAdditionalOwners } from '../../utils/additionalOwners';
+import { IdentityUsernameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
+import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
 
 export class AccessProfileExporterCommand {
     /**
@@ -189,7 +190,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfileV2025> {
         const workflowCache = new WorkflowIdToNameCacheService(this.client);
         await workflowCache.init();
         const identityCacheIdToName = new IdentityIdToNameCacheService(this.client);
-        const entitlementIdToSourceNameCacheService = new EntitlementIdToSourceNameCacheService(this.client);
+        const entitlementIdToSourceNameCacheService = new EntitlementIdToAttributeNameCacheService(this.client);
 
         const iterator = new GenericAsyncIterableIterator<AccessProfileV2025, AccessProfilesApiListAccessProfilesRequest>(
             this.client,
@@ -197,12 +198,18 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfileV2025> {
 
         await this.writeData(headers, paths, unwindablePaths, iterator, task, token,
             async (item: AccessProfileV2025): Promise<AccessProfileDto> => {
-                const owner = item.owner ? (await identityCacheIdToName.get(item.owner.id!)) : null
+                let owner: string | null = null
+                try {
+                    owner = item.owner ? (await identityCacheIdToName.get(item.owner?.id!)) : null
+                } catch (error) {
+                    console.warn(`Could not find owner with id "${item.owner?.id}:"`, error);
+                }
+                
                 const additionalOwnersInfo = await getAdditionalOwners(
-                    (item as any).additionalOwners,
+                    item.additionalOwners,
                     identityCacheIdToName,
                     governanceGroupCache
-                );
+                )
 
                 let entitlements: string | undefined = undefined;
                 try {
@@ -210,7 +217,6 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfileV2025> {
                 } catch (error) {
                     console.warn(`Error converting entitlements for role "${item.name}:"`, error);
                 }
-
 
                 const itemDto: AccessProfileDto = {
                     name: item.name,
@@ -231,11 +237,11 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfileV2025> {
                         requireEndDate: item.accessRequestConfig?.requireEndDate ?? false,
                         maxPermittedAccessDuration: item.accessRequestConfig?.maxPermittedAccessDuration
                     },
-                    approvalSchemes: await accessProfileApprovalSchemeToStringConverter(
+                    approvalSchemes: await approvalSchemeToStringConverter(
                         item.accessRequestConfig?.approvalSchemes,
                         governanceGroupCache,
                         workflowCache),
-                    revokeApprovalSchemes: await accessProfileApprovalSchemeToStringConverter(
+                    revokeApprovalSchemes: await approvalSchemeToStringConverter(
                         item.revocationRequestConfig?.approvalSchemes,
                         governanceGroupCache,
                         workflowCache),

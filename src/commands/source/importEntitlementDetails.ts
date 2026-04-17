@@ -7,7 +7,7 @@ import { chooseFile } from '../../utils/vsCodeHelpers';
 import { JsonPatchOperationBeta } from 'sailpoint-api-client';
 import { TenantService } from '../../services/TenantService';
 import { validateTenantReadonly } from '../validateTenantReadonly';
-import { IdentityNameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
+import { IdentityUsernameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
 import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 
@@ -33,7 +33,7 @@ interface UncorrelatedAccountImportResult {
 class EntitlementDetailsImporter {
     readonly client: ISCClient;
     readonly csvReader: CSVReader<any>;
-    readonly identityCacheService: IdentityNameToIdCacheService;
+    readonly identityCacheService: IdentityUsernameToIdCacheService;
     readonly governanceGroupCacheService: GovernanceGroupNameToIdCacheService;
     readonly result: UncorrelatedAccountImportResult = {
         totalDescription: 0,
@@ -57,7 +57,7 @@ class EntitlementDetailsImporter {
     ) {
         this.client = new ISCClient(this.tenantId, this.tenantName);
         this.csvReader = new CSVReader<any>(this.fileUri.fsPath);
-        this.identityCacheService = new IdentityNameToIdCacheService(this.client);
+        this.identityCacheService = new IdentityUsernameToIdCacheService(this.client);
         this.governanceGroupCacheService = new GovernanceGroupNameToIdCacheService(this.client);
     }
 
