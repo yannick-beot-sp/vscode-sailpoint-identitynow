@@ -1474,12 +1474,6 @@ export class ISCClient {
 		return response;
 	}
 
-	public async getAccessProfileById(id: string): Promise<AccessProfile> {
-		console.log("> getAccessProfileById", id);
-		const accessProfile = await this.getAccessProfileById(id)
-		return accessProfile;
-	}
-
 	public async getAccessProfileByName(name: string): Promise<AccessProfile> {
 		console.log("> getAccessProfileByName", name);
 		let filters = `name eq "${name}"`;
@@ -1903,16 +1897,6 @@ export class ISCClient {
 		}
 
 		return val.data;
-	}
-
-	public async getCampaignReviewItems(campaignId: string): Promise<AccessReviewItemV2025[]> {
-		let allAccessReviewItems: AccessReviewItemV2025[] = []
-		const certifications = await this.getCampaignCertifications(campaignId, false)
-		for (const certification of certifications) {
-			const accessReviewItems = await this.getCertificationReviewItems(certification.id)
-			allAccessReviewItems = [...allAccessReviewItems, ...accessReviewItems]
-		}
-		return allAccessReviewItems
 	}
 
 	public async getPaginatedCampaignCertifications({ campaignId, offset, sorters = "name", limit = 250 }: {
