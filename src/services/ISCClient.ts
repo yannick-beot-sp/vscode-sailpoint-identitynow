@@ -8,7 +8,7 @@ import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { compareByName, convertToText } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, IdentityProfilesV2025Api, IdentityPreviewResponseV2025, IdentityAttributeTransformV2025, SourcesV2025Api, TaskManagementV2025Api, AttributeDTO, RolesV2025Api, AccessProfilesV2025Api, JsonPatchOperation, JsonPatchOperationV2025, DimensionsV2025Api, RolesV2025ApiListRolesRequest, DimensionV2025, DimensionsV2025ApiListDimensionsRequest, PasswordConfigurationV2025Api, PasswordOrgConfigV2025, WorkflowsV2025Api, WorkflowsV2024Api, WorkflowV2025, RoleV2025, PublicIdentitiesV2025ApiGetPublicIdentitiesRequest, PublicIdentitiesV2025Api } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, EntitlementsV2025Api, EntitlementsV2025ApiListEntitlementsRequest, EntitlementV2025, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, IdentityProfilesV2025Api, IdentityPreviewResponseV2025, IdentityAttributeTransformV2025, SourcesV2025Api, TaskManagementV2025Api, AttributeDTO, RolesV2025Api, AccessProfilesV2025Api, JsonPatchOperation, JsonPatchOperationV2025, DimensionsV2025Api, RolesV2025ApiListRolesRequest, DimensionV2025, DimensionsV2025ApiListDimensionsRequest, PasswordConfigurationV2025Api, PasswordOrgConfigV2025, WorkflowsV2025Api, WorkflowsV2024Api, WorkflowV2025, RoleV2025, PublicIdentitiesV2025ApiGetPublicIdentitiesRequest, PublicIdentitiesV2025Api, ConnectorRuleManagementV2025Api, ConnectorRuleResponseV2025 } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -434,7 +434,6 @@ export class ISCClient {
 	/////////////////////
 	//#region Configuration Hub
 	/////////////////////
-	x
 
 	public async uploadBackup(data: string, fileName: string, name: string): Promise<BackupResponseV2024> {
 		console.log("> uploadBackup");
@@ -527,7 +526,7 @@ export class ISCClient {
 		const response = await httpClient.patch(path, data);
 		const text = await response.data;
 		if (response.headers.hasOwnProperty(CONTENT_TYPE_HEADER)
-			&& response.headers[CONTENT_TYPE_HEADER].toString().startsWith(CONTENT_TYPE_JSON)
+			&& response.headers?.[CONTENT_TYPE_HEADER]?.toString().startsWith(CONTENT_TYPE_JSON)
 			&& text) {
 			return JSON.parse(text);
 		}
@@ -976,7 +975,7 @@ export class ISCClient {
 				input: payload
 			}
 		});
-		return resp.data.workflowExecutionId;
+		return resp.data.workflowExecutionId!;
 	}
 
 	public async callWorkflowExternalTrigger(id: string, accessToken: string, payload: any): Promise<string> {
@@ -989,7 +988,7 @@ export class ISCClient {
 				input: payload
 			}
 		});
-		return resp.data.workflowExecutionId;
+		return resp.data.workflowExecutionId!;
 	}
 
 
@@ -1002,18 +1001,18 @@ export class ISCClient {
 	//#region Connector Rules
 	/////////////////////////////
 
-	public async getConnectorRules(): Promise<ConnectorRuleResponseBeta[]> {
+	public async getConnectorRules(): Promise<ConnectorRuleResponseV2025[]> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new ConnectorRuleManagementBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new ConnectorRuleManagementV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await api.getConnectorRuleList();
 		const rules = resp.data;
 		rules.sort(compareByName);
 		return rules;
 	}
 
-	public async getConnectorRuleById(id: string): Promise<ConnectorRuleResponseBeta> {
+	public async getConnectorRuleById(id: string): Promise<ConnectorRuleResponseV2025> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new ConnectorRuleManagementBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new ConnectorRuleManagementV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await api.getConnectorRule({ id });
 		return resp.data;
 	}
@@ -1026,7 +1025,7 @@ export class ISCClient {
 	 */
 	public async getConnectorRuleByName(
 		name: string
-	): Promise<ConnectorRuleResponseBeta> {
+	): Promise<ConnectorRuleResponseV2025 | undefined> {
 		console.log("> getConnectorRuleByName", name);
 		const rules = await this.getConnectorRules();
 		return rules.find((r) => r.name === name);
@@ -1222,17 +1221,17 @@ export class ISCClient {
 	//#region Entitlements
 	/////////////////////////
 
-	public async getEntitlement(id: string): Promise<EntitlementBeta> {
+	public async getEntitlement(id: string): Promise<EntitlementV2025> {
 		console.log("> getEntitlement");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new EntitlementsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new EntitlementsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.getEntitlement({ id })
 		return response.data
 	}
-	public async getAllEntitlements(query: string): Promise<EntitlementBeta[]> {
+	public async getAllEntitlements(query: string): Promise<EntitlementV2025[]> {
 		console.log("> getAllEntitlements");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new EntitlementsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new EntitlementsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const result = await Paginator.paginate(api,
 			api.listEntitlements,
 			{ filters: query, sorters: "name" });
@@ -1245,33 +1244,21 @@ export class ISCClient {
 	 * @returns list of entitlements
 	 */
 	public async getEntitlements(
-		query: EntitlementsBetaApiListEntitlementsRequest = DEFAULT_ENTITLEMENTS_QUERY_PARAMS
+		query: EntitlementsV2025ApiListEntitlementsRequest = DEFAULT_ENTITLEMENTS_QUERY_PARAMS
 		// @ts-ignore 
-	): Promise<AxiosResponse<EntitlementBeta[], any>> {
+	): Promise<AxiosResponse<EntitlementV2025[], any>> {
 		console.log("> getEntitlements", query);
-		const queryValues: EntitlementsBetaApiListEntitlementsRequest = {
+		const queryValues: EntitlementsV2025ApiListEntitlementsRequest = {
 			...DEFAULT_ENTITLEMENTS_QUERY_PARAMS,
 			...query
 		};
 		const apiConfig = await this.getApiConfiguration();
-		const api = new EntitlementsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new EntitlementsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.listEntitlements(queryValues);
 		return response;
 	}
 
-	public async getEntitlementCountBySource(sourceId: string): Promise<number> {
-		console.log("> getEntitlementCountBySource", sourceId);
-		const filters = `source.id eq "${sourceId}"`;
-		const resp = await this.getEntitlements({
-			filters,
-			count: true,
-			limit: 1,
-			offset: 0
-		});
-		return Number(resp.headers[TOTAL_COUNT_HEADER]);
-	}
-
-	public async getEntitlementByName(sourceId: string, entitlementName: string, attribute: string| undefined = undefined): Promise<EntitlementBeta> {
+	public async getEntitlementByName(sourceId: string, entitlementName: string, attribute: string | undefined = undefined): Promise<EntitlementV2025> {
 		console.log("> getEntitlementByName", sourceId, entitlementName);
 
 		let filters = `source.id eq "${sourceId}" and name eq "${entitlementName}"`;
@@ -1288,23 +1275,7 @@ export class ISCClient {
 		return entitlement;
 	}
 
-	/**
-	 * This function is used to support "manual" pagination and only returns a maximum of 250 records
-	 * @param sourceId Id of the source
-	 * @returns list of entitlements
-	*/
-	public async getEntitlementsBySource(sourceId: string, offset = 0, limit = DEFAULT_PAGINATION): Promise<EntitlementBeta[]> {
-		console.log("> getEntitlementsBySource", sourceId, offset, limit);
-		const filters = `source.id eq "${sourceId}"`;
-		const resp = await this.getEntitlements({
-			filters,
-			limit,
-			offset
-		});
-		return resp.data;
-	}
-
-	public async getAllEntitlementsBySource(sourceId: string): Promise<EntitlementBeta[]> {
+	public async getAllEntitlementsBySource(sourceId: string): Promise<EntitlementV2025[]> {
 		console.log("> getAllEntitlementsBySource", sourceId);
 		const filters = `source.id eq "${sourceId}"`;
 		const resp = await this.getAllEntitlements(filters);
@@ -1383,7 +1354,7 @@ export class ISCClient {
 		return identity;
 	}
 
-		public async getPublicIdentityByUsernameOrDisplayName(name: string): Promise<PublicIdentity> {
+	public async getPublicIdentityByUsernameOrDisplayName(name: string): Promise<PublicIdentity> {
 		const filters = `alias eq "${name}" or name eq "${name}"`;
 		const response = await this.getPublicIdentities({
 			filters,
@@ -1624,8 +1595,8 @@ export class ISCClient {
 		return response.data
 	}
 
-	
-	public async getDimensionByName(roleId: string,name: string): Promise<Role> {
+
+	public async getDimensionByName(roleId: string, name: string): Promise<DimensionV2025> {
 		console.log("> getDimensionByName", roleId, name);
 		const result = await this.getPaginatedDimensions({
 			roleId,

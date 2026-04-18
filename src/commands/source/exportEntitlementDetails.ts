@@ -3,19 +3,19 @@ import { SourceTreeItem } from '../../models/ISCTreeItem';
 import { PathProposer } from '../../services/PathProposer';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { BaseCSVExporter } from '../BaseExporter';
-import EntitlementPaginator from './EntitlementPaginator';
-import { Entitlement } from 'sailpoint-api-client';
+import { EntitlementV2025, EntitlementsV2025ApiListEntitlementsRequest } from 'sailpoint-api-client';
 import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { getAdditionalOwners } from '../../utils/additionalOwners';
 import { metadataToString } from '../../utils/metadataUtils';
+import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator';
 
 
 export class EntitlementExporterCommand {
     /**
-     * Entry point 
-     * @param node 
-     * @returns 
+     * Entry point
+     * @param node
+     * @returns
      */
     async execute(node?: SourceTreeItem) {
         console.log("> EntitlementExporter.execute");
@@ -108,8 +108,7 @@ interface EntitlementDto {
 
 }
 
-
-class EntitlementExporter extends BaseCSVExporter<Entitlement> {
+class EntitlementExporter extends BaseCSVExporter<EntitlementV2025> {
 
     constructor(
         tenantId: string,
@@ -143,26 +142,30 @@ class EntitlementExporter extends BaseCSVExporter<Entitlement> {
             "additionalOwnerGovernanceGroup"
         ];
         const paths = [
-            "attributeName",
-            "attributeValue",
             "displayName",
+            "attributeValue",
+            "attributeName",
             "description",
             "sourceSchemaObjectType",
             "privileged",
             "requestable",
-            "owner",
+            "owner.name",
             "metadata",
             "additionalOwners.additionalOwners",
             "additionalOwners.additionalOwnerGovernanceGroup"
         ];
         const unwindablePaths: string[] = [];
 
-        const iterator = new EntitlementPaginator(this.client, this.sourceId);
+        const iterator = new GenericAsyncIterableIterator<EntitlementV2025, EntitlementsV2025ApiListEntitlementsRequest>(
+            this.client,
+            this.client.getEntitlements,
+            { filters: `source.id eq "${this.sourceId}"` }
+        );
         const identityCacheIdToName = new IdentityIdToNameCacheService(this.client);
         const governanceGroupCacheIdToName = new GovernanceGroupIdToNameCacheService(this.client);
 
         await this.writeData(headers, paths, unwindablePaths, iterator, task, token,
-            async (item: Entitlement): Promise<EntitlementDto> => {
+            async (item: EntitlementV2025): Promise<EntitlementDto> => {
                 const additionalOwnersInfo = await getAdditionalOwners(
                     item.additionalOwners,
                     identityCacheIdToName,
@@ -171,16 +174,15 @@ class EntitlementExporter extends BaseCSVExporter<Entitlement> {
 
                 let owner: string | null = null;
                 try {
-                    // Converting ID to username
                     owner = item.owner ? (await identityCacheIdToName.get(item.owner.id!)) : null
                 } catch (error) {
                     console.warn(`Error converting owner identity "${item.owner?.id}" for entitlement "${item.name}" (${item.id}):`, error);
                 }
 
                 return {
-                    displayName: item.name,
-                    attributeValue: item.value,
                     attributeName: item.attribute,
+                    attributeValue: item.value,
+                    displayName: item.name,
                     description: item.description,
                     sourceSchemaObjectType: item.sourceSchemaObjectType,
                     privileged: item.privileged,
@@ -193,7 +195,3 @@ class EntitlementExporter extends BaseCSVExporter<Entitlement> {
     }
 
 }
-
-
-
-
