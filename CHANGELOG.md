@@ -12,8 +12,9 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
-- Export and import additional owners for Access Profiles and Roles by [@nusrathdev](https://github.com/nusrathdev) (cf. [#138](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/138))
+- Export and import additional owners for Entitlements, Access Profiles and Roles by [@nusrathdev](https://github.com/nusrathdev) (cf. [#138](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/138))
 - Export and import max duration config and reauthorization for Access Profiles and Roles
+- Export metadata for Entitlements
 
 ### Changed
 

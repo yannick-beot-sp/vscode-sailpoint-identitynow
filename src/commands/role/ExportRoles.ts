@@ -233,7 +233,7 @@ class RoleExporter extends BaseCSVExporter<RoleV2025> {
                 try {
                     owner = item.owner ? (await identityCacheIdToName.get(item.owner.id!)) : null
                 } catch (error) {
-                    console.warn(`Error converting owner identity "${item.owner?.id}" for role "${item.name}:"`, error);
+                    console.warn(`Error converting owner identity "${item.owner?.id}" for role "${item.name}":`, error);
                 }
 
                 const additionalOwnersInfo = await getAdditionalOwners(

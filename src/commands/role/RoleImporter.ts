@@ -324,12 +324,8 @@ export class RoleImporter {
                     entitlements,
                     membership,
                     dimensional: truethy(data.dimensional),
+                    additionalOwners
                 };
-
-                if (additionalOwners !== undefined) {
-                    (rolePayload as any).additionalOwners = additionalOwners;
-                }
-
 
                 if (token.isCancellationRequested) {
                     throw new UserCancelledError();

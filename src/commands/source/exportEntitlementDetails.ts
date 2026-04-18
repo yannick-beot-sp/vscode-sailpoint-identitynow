@@ -5,14 +5,13 @@ import { askFile } from '../../utils/vsCodeHelpers';
 import { BaseCSVExporter } from '../BaseExporter';
 import EntitlementPaginator from './EntitlementPaginator';
 import { Entitlement } from 'sailpoint-api-client';
-import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
+import { getAdditionalOwners } from '../../utils/additionalOwners';
+import { metadataToString } from '../../utils/metadataUtils';
 
 
 export class EntitlementExporterCommand {
-
-
     /**
      * Entry point 
      * @param node 
@@ -50,6 +49,66 @@ export class EntitlementExporterCommand {
     }
 }
 
+interface EntitlementDto {
+    /**
+     * The entitlement attribute name
+     * @type {string}
+     * @memberof Entitlement
+     */
+    'attributeName'?: string;
+    /**
+     * The value of the entitlement
+     * @type {string}
+     * @memberof Entitlement
+     */
+    'attributeValue'?: string;
+    /**
+     * The entitlement name
+     * @type {string}
+     * @memberof Entitlement
+     */
+    'displayName'?: string;
+    /**
+     * The description of the entitlement
+     * @type {string}
+     * @memberof Entitlement
+     */
+    'description'?: string | null;
+
+    /**
+     * The object type of the entitlement from the source schema
+     * @type {string}
+     * @memberof Entitlement
+     */
+    'sourceSchemaObjectType'?: string;
+
+    /**
+     * True if the entitlement is privileged
+     * @type {boolean}
+     * @memberof Entitlement
+     */
+    'privileged'?: boolean;
+
+    /**
+     * True if the entitlement is able to be directly requested
+     * @type {boolean}
+     * @memberof Entitlement
+     */
+    'requestable'?: boolean;
+    
+    'owner': string | null;
+
+    'additionalOwners'?: { additionalOwners: string | null; additionalOwnerGovernanceGroup: string | null }
+
+    /**
+     * A list of metadata associated with the Role. metadata are seperated by ";". 
+     * The expected format is key:value1,value2;key2:value3
+     */
+    metadata?: string;
+
+}
+
+
 class EntitlementExporter extends BaseCSVExporter<Entitlement> {
 
     constructor(
@@ -71,28 +130,30 @@ class EntitlementExporter extends BaseCSVExporter<Entitlement> {
     protected async exportFile(task: any, token: vscode.CancellationToken): Promise<void> {
         console.log("> BaseEntitlementExporter.exportFile");
         const headers = [
-            "attributeName",
-            "attributeValue",
             "displayName",
+            "attributeValue",
+            "attributeName",
             "description",
             "schema",
             "privileged",
             "requestable",
             "owner",
+            "metadata",
             "additionalOwners",
             "additionalOwnerGovernanceGroup"
         ];
         const paths = [
-            "attribute",
-            "value",
-            "name",
+            "attributeName",
+            "attributeValue",
+            "displayName",
             "description",
             "sourceSchemaObjectType",
             "privileged",
             "requestable",
-            "owner.name",
-            "additionalOwners",
-            "additionalOwnerGovernanceGroup"
+            "owner",
+            "metadata",
+            "additionalOwners.additionalOwners",
+            "additionalOwners.additionalOwnerGovernanceGroup"
         ];
         const unwindablePaths: string[] = [];
 
@@ -101,45 +162,32 @@ class EntitlementExporter extends BaseCSVExporter<Entitlement> {
         const governanceGroupCacheIdToName = new GovernanceGroupIdToNameCacheService(this.client);
 
         await this.writeData(headers, paths, unwindablePaths, iterator, task, token,
-            async (item: Entitlement): Promise<any> => {
-                const additionalOwners = (item as any).additionalOwners as Array<{ type?: string; id?: string; name?: string }> | undefined;
+            async (item: Entitlement): Promise<EntitlementDto> => {
+                const additionalOwnersInfo = await getAdditionalOwners(
+                    item.additionalOwners,
+                    identityCacheIdToName,
+                    governanceGroupCacheIdToName
+                );
 
-                let additionalOwnersValue: string | null = null;
-                let additionalOwnerGovernanceGroup: string | null = null;
-
-                if (additionalOwners && additionalOwners.length > 0) {
-                    const governanceGroupOwner = additionalOwners.find((owner) => owner.type === "GOVERNANCE_GROUP");
-                    if (governanceGroupOwner?.id) {
-                        additionalOwnerGovernanceGroup = governanceGroupOwner.name
-                            ?? await governanceGroupCacheIdToName.get(governanceGroupOwner.id);
-                    } else {
-                        const identityNames = await Promise.all(additionalOwners.map(async (owner) => {
-                            if (owner.name) {
-                                return owner.name;
-                            }
-                            if (owner.id) {
-                                return identityCacheIdToName.get(owner.id);
-                            }
-                            return null;
-                        }));
-                        additionalOwnersValue = identityNames.filter((name): name is string => !!name)
-                            .join(CSV_MULTIVALUE_SEPARATOR);
-                    }
+                let owner: string | null = null;
+                try {
+                    // Converting ID to username
+                    owner = item.owner ? (await identityCacheIdToName.get(item.owner.id!)) : null
+                } catch (error) {
+                    console.warn(`Error converting owner identity "${item.owner?.id}" for entitlement "${item.name}" (${item.id}):`, error);
                 }
 
                 return {
-                    attribute: (item as any).attribute,
-                    value: (item as any).value,
-                    name: (item as any).name,
-                    description: (item as any).description,
-                    sourceSchemaObjectType: (item as any).sourceSchemaObjectType,
-                    privileged: (item as any).privileged,
-                    requestable: (item as any).requestable,
-                    owner: {
-                        name: (item as any).owner?.name ?? null
-                    },
-                    additionalOwners: additionalOwnersValue,
-                    additionalOwnerGovernanceGroup: additionalOwnerGovernanceGroup
+                    displayName: item.name,
+                    attributeValue: item.value,
+                    attributeName: item.attribute,
+                    description: item.description,
+                    sourceSchemaObjectType: item.sourceSchemaObjectType,
+                    privileged: item.privileged,
+                    requestable: item.requestable,
+                    owner,
+                    additionalOwners: additionalOwnersInfo,
+                    metadata: metadataToString(item.accessModelMetadata)
                 };
             });
     }
