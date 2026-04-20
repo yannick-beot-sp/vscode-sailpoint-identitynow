@@ -535,6 +535,8 @@ The extension supports the following settings:
 
 ### Unreleased
 
+### 1.3.26
+
 - Escape '\' when exporting and importing roles and access profiles
 - Export and import additional owners for Access Profiles and Roles by [@nusrathdev](https://github.com/nusrathdev) (cf. [#138](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/138))
 - Export and import max duration config and reauthorization for Access Profiles and Roles

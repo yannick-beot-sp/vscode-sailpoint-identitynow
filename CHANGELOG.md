@@ -6,6 +6,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+## [1.3.26] - 2026-04-20
+
 ### Security
 
 - Update dependency for `axios`
