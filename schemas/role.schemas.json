@@ -503,6 +503,55 @@
           "example": true,
           "default": false
         },
+        "reauthorizationRequired": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Indicates whether reauthorization is required for the request.",
+          "example": true,
+          "default": false
+        },
+        "requireEndDate": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Indicates whether the requester of the containing object must provide access end date.",
+          "example": true,
+          "default": false
+        },
+        "maxPermittedAccessDuration": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "properties": {
+            "value": {
+              "type": "integer",
+              "description": "The numeric value representing the amount of time, which is defined in the `timeUnit`.",
+              "example": 6
+            },
+            "timeUnit": {
+              "type": "string",
+              "enum": ["HOURS", "DAYS", "WEEKS", "MONTHS"],
+              "description": "The unit of time that corresponds to the `value`. It defines the scale of the time period.",
+              "example": "MONTHS"
+            }
+          }
+        },
         "denialCommentsRequired": {
           "anyOf": [
             {
@@ -524,8 +573,15 @@
             "properties": {
               "approverType": {
                 "type": "string",
-                "enum": ["OWNER", "MANAGER", "GOVERNANCE_GROUP", "WORKFLOW"],
-                "description": "Describes the individual or group that is responsible for an approval step. Values are as follows.\n\n**OWNER**: Owner of the associated Role\n\n**MANAGER**: Manager of the Identity making the request\n\n**GOVERNANCE_GROUP**: A Governance Group, the ID of which is specified by the **approverId** fieldn\n**WORKFLOW**: A Workflow, the ID of which is specified by the **approverId** field. Workflow is exclusive to other types of approvals and License required.",
+                "enum": [
+                  "OWNER",
+                  "MANAGER",
+                  "GOVERNANCE_GROUP",
+                  "WORKFLOW",
+                  "ALL_OWNERS",
+                  "ADDITIONAL_OWNER"
+                ],
+                "description": "Describes the individual or group that is responsible for an approval step. Values are as follows.\n\n**OWNER**: Primary Owner of the associated Role\n\n**MANAGER**: Manager of the Identity making the request\n\n**GOVERNANCE_GROUP**: A Governance Group, the ID of which is specified by the **approverId** fieldn\n**WORKFLOW**: A Workflow, the ID of which is specified by the **approverId** field. Workflow is exclusive to other types of approvals and License required.\n**ADDITIONAL_OWNER**: Additional owners associated to this role.\n**ALL_OWNERS**: Primary and additional owners.",
                 "example": "GOVERNANCE_GROUP"
               },
               "approverId": {
@@ -591,8 +647,16 @@
             "properties": {
               "approverType": {
                 "type": "string",
-                "enum": ["APP_OWNER", "OWNER", "SOURCE_OWNER", "MANAGER", "GOVERNANCE_GROUP"],
-                "description": "Describes the individual or group that is responsible for an approval step. Values are as follows.\n**APP_OWNER**: The owner of the Application\n\n**OWNER**: Owner of the associated Access Profile or Role\n\n**SOURCE_OWNER**: Owner of the Source associated with an Access Profile\n\n**MANAGER**: Manager of the Identity making the request\n\n**GOVERNANCE_GROUP**: A Governance Group, the ID of which is specified by the **approverId** field",
+                "enum": [
+                  "APP_OWNER",
+                  "OWNER",
+                  "SOURCE_OWNER",
+                  "MANAGER",
+                  "GOVERNANCE_GROUP",
+                  "ALL_OWNERS",
+                  "ADDITIONAL_OWNER"
+                ],
+                "description": "Describes the individual or group that is responsible for an approval step. Values are as follows.\n**APP_OWNER**: The owner of the Application\n\n**OWNER**: Owner of the associated Access Profile or Role\n\n**SOURCE_OWNER**: Owner of the Source associated with an Access Profile\n\n**MANAGER**: Manager of the Identity making the request\n\n**GOVERNANCE_GROUP**: A Governance Group, the ID of which is specified by the **approverId** field\n**ADDITIONAL_OWNER**: Additional owners associated to this role.\n**ALL_OWNERS**: Primary and additional owners.",
                 "example": "GOVERNANCE_GROUP"
               },
               "approverId": {
@@ -734,6 +798,33 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "additionalOwners": {
+      "description": "List of additional owner references beyond the primary owner. Each entry may be an identity (IDENTITY) or a governance group (GOVERNANCE_GROUP).",
+      "type": "array",
+      "nullable": true,
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Type of the additional owner; IDENTITY for an identity, GOVERNANCE_GROUP for a governance group.",
+            "example": "IDENTITY"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name. It may be left null or omitted on input. If set, it must match the current display name of the identity or governance group, otherwise a 400 Bad Request error may result.",
+            "example": "support",
+            "nullable": true
+          },
+          "id": {
+            "type": "string",
+
+            "description": "ID of the identity or governance group.",
+            "example": "2c9180a46faadee4016fb4e018c20639"
           }
         }
       }

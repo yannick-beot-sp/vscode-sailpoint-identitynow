@@ -3,11 +3,12 @@ import * as tmp from "tmp";
 
 import { ISCClient } from "../../services/ISCClient";
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
-import { AccessProfileRef, ApprovalSchemeForRole, EntitlementRef, JsonPatchOperationV2025OpV2025, RoleMembershipSelector, RoleMembershipSelectorType, RoleV2025 } from 'sailpoint-api-client';
+import { AccessDurationV2025, AccessProfileRef, ApprovalSchemeForRole, EntitlementRef, JsonPatchOperationV2025OpV2025, RoleMembershipSelector, RoleMembershipSelectorType } from 'sailpoint-api-client';
+import { RoleV2025, AdditionalOwnerRefV2025 } from 'sailpoint-api-client/dist/v2025';
 import { CSVReader } from '../../services/CSVReader';
 import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
 import { WorkflowNameToIdCacheService } from '../../services/cache/WorkflowNameToIdCacheService';
-import { IdentityNameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
+import { IdentityUsernameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { AccessProfileNameToIdCacheService } from '../../services/cache/AccessProfileNameToIdCacheService';
 import { stringToRoleApprovalSchemeConverter } from '../../utils/approvalSchemeConverter';
@@ -22,6 +23,8 @@ import { UserCancelledError } from '../../errors';
 import { stringToAttributeMetadata } from '../../utils/metadataUtils';
 import { stringToDimensionAttributes } from '../../utils/dimensionUtils';
 import { ImportResult } from '../../models/ImportResult';
+import { resolveAdditionalOwners } from '../../utils/additionalOwners';
+import { formatMaxPermittedAccessDuration } from '../../utils/maxPermittedAccessDuration';
 
 interface RoleCSVRecord {
     name: string
@@ -29,6 +32,8 @@ interface RoleCSVRecord {
     enabled: boolean
     requestable: boolean
     owner: string
+    additionalOwners?: string
+    additionalOwnerGovernanceGroup?: string
     commentsRequired: boolean
     denialCommentsRequired: boolean
     approvalSchemes: string
@@ -40,6 +45,10 @@ interface RoleCSVRecord {
     membershipCriteria: string
     dimensional?: boolean
     dimensionAttributes?: string
+    reauthorizationRequired?: boolean
+    requireEndDate?: boolean
+    maxPermittedAccessDurationValue?: number
+    maxPermittedAccessDurationTimeUnit?: string
     metadata: string
 }
 
@@ -100,7 +109,8 @@ export class RoleImporter {
         const workflowCache = new WorkflowNameToIdCacheService(this.client);
         await workflowCache.init()
         const accessProfileNameToIdCacheService = new AccessProfileNameToIdCacheService(this.client);
-        const identityCacheService = new IdentityNameToIdCacheService(this.client);
+        const headers = await csvReader.getHeaders();
+        const identityCacheService = new IdentityUsernameToIdCacheService(this.client);
         const sourceCacheService = new SourceNameToIdCacheService(this.client);
         const entitlementCacheService = new EntitlementCacheService(this.client);
         const parser = new Parser();
@@ -137,6 +147,22 @@ export class RoleImporter {
                     const srcMessage = `Unable to find owner with name '${data.owner}' in ISC`;
                     await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, srcMessage);
                     vscode.window.showErrorMessage(srcMessage);
+                    return;
+                }
+
+                let additionalOwners: Array<AdditionalOwnerRefV2025> | null;
+                try {
+                    additionalOwners = await resolveAdditionalOwners(
+                        data.additionalOwners,
+                        data.additionalOwnerGovernanceGroup,
+                        identityCacheService,
+                        governanceGroupCache
+                    );
+                } catch (error: any) {
+                    result.error++;
+                    const message = `Invalid additional owners: ${error.message ?? error}`;
+                    await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, message);
+                    vscode.window.showErrorMessage(message);
                     return;
                 }
 
@@ -254,7 +280,21 @@ export class RoleImporter {
                         return;
                     }
                 }
-                const description = data.description
+                const description = data.description ?? ""
+
+                let maxPermittedAccessDuration: AccessDurationV2025 | null = null
+                try {
+                    maxPermittedAccessDuration = formatMaxPermittedAccessDuration(
+                        data.maxPermittedAccessDurationValue,
+                        data.maxPermittedAccessDurationTimeUnit)
+
+                } catch (error) {
+                    result.error++;
+                    const srcMessage = `Unable to parse max permitted access duration: ${error}`;
+                    await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, srcMessage);
+                    vscode.window.showErrorMessage(srcMessage);
+                    return;
+                }
 
                 const rolePayload: RoleV2025 = {
                     "name": roleName,
@@ -270,7 +310,10 @@ export class RoleImporter {
                         "commentsRequired": truethy(data.commentsRequired),
                         "denialCommentsRequired": truethy(data.denialCommentsRequired),
                         "approvalSchemes": approvalSchemes,
-                        dimensionSchema: stringToDimensionAttributes(data.dimensionAttributes)
+                        dimensionSchema: stringToDimensionAttributes(data.dimensionAttributes),
+                        reauthorizationRequired: truethy(data.reauthorizationRequired),
+                        requireEndDate: truethy(data.requireEndDate),
+                        maxPermittedAccessDuration
                     },
                     "revocationRequestConfig": {
                         "commentsRequired": truethy(data.revokeCommentsRequired),
@@ -281,8 +324,8 @@ export class RoleImporter {
                     entitlements,
                     membership,
                     dimensional: truethy(data.dimensional),
+                    additionalOwners
                 };
-
 
                 if (token.isCancellationRequested) {
                     throw new UserCancelledError();
@@ -292,11 +335,11 @@ export class RoleImporter {
                 try {
                     const newRole = await this.client.createRole(rolePayload);
 
-                    if (data.metadata) {
+                    if (isNotBlank(data.metadata)) {
                         const attributes = stringToAttributeMetadata(data.metadata)
                         await this.client.updateRoleMetadata(
-                            newRole.id,
-                            attributes
+                            newRole.id!,
+                            attributes!
                         )
                     }
 
@@ -311,74 +354,41 @@ export class RoleImporter {
                         const role = await this.client.getRoleByName(roleName);
                         if (role) {
 
-                            const updates = [
-                                {
-                                    "property": "description",
-                                    "value": description
-                                },
-                                {
-                                    "property": "enabled",
-                                    "value": truethy(data.enabled)
-                                },
-                                {
-                                    "property": "requestable",
-                                    "value": truethy(data.requestable)
-                                },
-                                {
-                                    "property": "dimensional",
-                                    "value": truethy(data.dimensional)
-                                },
-                                {
-                                    "property": "owner",
-                                    "value": {
-                                        "id": ownerId,
-                                        "type": "IDENTITY",
-                                        "name": data.owner
-                                    }
-                                },
-                                {
-                                    "property": "accessRequestConfig",
-                                    "value": {
-                                        "commentsRequired": truethy(data.commentsRequired),
-                                        "denialCommentsRequired": truethy(data.denialCommentsRequired),
-                                        "approvalSchemes": approvalSchemes,
-                                        "dimensionSchema": stringToDimensionAttributes(data.dimensionAttributes)
-                                    }
-                                },
-                                {
-                                    "property": "revocationRequestConfig",
-                                    "value": {
-                                        "commentsRequired": truethy(data.revokeCommentsRequired),
-                                        "denialCommentsRequired": truethy(data.revokeDenialCommentsRequired),
-                                        "approvalSchemes": revokeApprovalSchemes
-                                    }
-                                },
-                                {
-                                    "property": "accessProfiles",
-                                    "value": accessProfiles ?? null
-                                },
-                                {
-                                    "property": "entitlements",
-                                    "value": entitlements ?? null
-                                },
-                                {
-                                    "property": "membership",
-                                    "value": membership ?? null
-                                },
-                                {
-                                    "property": "accessModelMetadata/attributes",
-                                    "value": stringToAttributeMetadata(data.metadata) ?? null
-                                },
-                            ].map((item) => ({
-                                "op": JsonPatchOperationV2025OpV2025.Replace,
-                                "path": `/${item.property}`,
-                                "value": item.value
-                            }))
+                            const updateMappings: { columns: string[]; path: string; getValue: () => any; condition?: () => boolean }[] = [
+                                { columns: ['description'], path: 'description', getValue: () => description },
+                                { columns: ['enabled'], path: 'enabled', getValue: () => truethy(data.enabled) },
+                                { columns: ['requestable'], path: 'requestable', getValue: () => truethy(data.requestable) },
+                                { columns: ['dimensional'], path: 'dimensional', getValue: () => truethy(data.dimensional) },
+                                { columns: ['owner'], path: 'owner', getValue: () => ({ id: ownerId, type: "IDENTITY", name: data.owner }) },
+                                { columns: ['additionalOwners', 'additionalOwnerGovernanceGroup'], path: 'additionalOwners', getValue: () => additionalOwners, },
+                                { columns: ['commentsRequired'], path: 'accessRequestConfig/commentsRequired', getValue: () => truethy(data.commentsRequired) },
+                                { columns: ['denialCommentsRequired'], path: 'accessRequestConfig/denialCommentsRequired', getValue: () => truethy(data.denialCommentsRequired) },
+                                { columns: ['reauthorizationRequired'], path: 'accessRequestConfig/reauthorizationRequired', getValue: () => truethy(data.reauthorizationRequired) },
+                                { columns: ['requireEndDate'], path: 'accessRequestConfig/requireEndDate', getValue: () => truethy(data.requireEndDate) },
+                                { columns: ['maxPermittedAccessDurationValue', 'maxPermittedAccessDurationTimeUnit'], path: 'accessRequestConfig/maxPermittedAccessDuration', getValue: () => maxPermittedAccessDuration },
+                                { columns: ['approvalSchemes'], path: 'accessRequestConfig/approvalSchemes', getValue: () => approvalSchemes },
+                                { columns: ['dimensionAttributes'], path: 'accessRequestConfig/dimensionSchema', getValue: () => stringToDimensionAttributes(data.dimensionAttributes ?? "") },
+                                { columns: ['revokeCommentsRequired'], path: 'revocationRequestConfig/commentsRequired', getValue: () => truethy(data.revokeCommentsRequired) },
+                                { columns: ['revokeDenialCommentsRequired'], path: 'revocationRequestConfig/denialCommentsRequired', getValue: () => truethy(data.revokeDenialCommentsRequired) },
+                                { columns: ['revokeApprovalSchemes'], path: 'revocationRequestConfig/approvalSchemes', getValue: () => revokeApprovalSchemes },
+                                { columns: ['accessProfiles'], path: 'accessProfiles', getValue: () => accessProfiles ?? null },
+                                { columns: ['entitlements'], path: 'entitlements', getValue: () => entitlements ?? null },
+                                { columns: ['membershipCriteria'], path: 'membership', getValue: () => membership ?? null },
+                                { columns: ['metadata'], path: 'accessModelMetadata/attributes', getValue: () => stringToAttributeMetadata(data.metadata) ?? null },
+                            ];
+
+                            const updates = updateMappings
+                                .filter(m => m.columns.some(col => headers.includes(col)))
+                                .map(m => ({
+                                    op: JsonPatchOperationV2025OpV2025.Replace,
+                                    path: `/${m.path}`,
+                                    value: m.getValue()
+                                }))
                             try {
-                                await this.client.updateRole(role.id, updates)
+                                await this.client.updateRole(role.id!, updates)
                                 await this.writeLog(processedLines, roleName, CSVLogWriterLogType.SUCCESS, `Successfully updated access profile '${roleName}'`);
                                 result.success++;
-                            } catch (error) {
+                            } catch (error: any) {
                                 result.error++;
                                 await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, `Cannot update role: '${error.message}'`);
 

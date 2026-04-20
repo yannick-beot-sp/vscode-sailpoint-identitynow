@@ -1,6 +1,6 @@
 import * as tmp from "tmp";
 import * as vscode from 'vscode';
-import { AccessProfile, EntitlementBeta, JsonPatchOperationV2025OpV2025 } from 'sailpoint-api-client';
+import { AccessDurationV2025, AccessProfile, AdditionalOwnerRefV2025, EntitlementBeta, JsonPatchOperationV2025OpV2025 } from 'sailpoint-api-client';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
 import { CSVReader } from '../../services/CSVReader';
@@ -8,7 +8,7 @@ import { ISCClient } from "../../services/ISCClient";
 import { EntitlementCacheService, KEY_SEPARATOR } from '../../services/cache/EntitlementCacheService';
 import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
 import { WorkflowNameToIdCacheService } from '../../services/cache/WorkflowNameToIdCacheService';
-import { IdentityNameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
+import * as IdentityNameToIdCacheService from '../../services/cache/IdentityNameToIdCacheService';
 import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService';
 import { stringToAccessProfileApprovalSchemeConverter } from '../../utils/approvalSchemeConverter';
 import { importMode, ImportModeType, openPreview } from '../../utils/vsCodeHelpers';
@@ -17,6 +17,8 @@ import { truethy } from "../../utils/booleanUtils";
 import { UserCancelledError } from "../../errors";
 import { stringToAttributeMetadata } from "../../utils/metadataUtils";
 import { ImportResult } from "../../models/ImportResult";
+import { resolveAdditionalOwners } from "../../utils/additionalOwners";
+import { formatMaxPermittedAccessDuration } from "../../utils/maxPermittedAccessDuration";
 
 interface AccessProfileCSVRecord {
     name: string
@@ -25,13 +27,23 @@ interface AccessProfileCSVRecord {
     requestable: boolean
     source: string
     owner: string
+    additionalOwners?: string
+    additionalOwnerGovernanceGroup?: string
     entitlements: string
     commentsRequired: boolean
     denialCommentsRequired: boolean
     revokeApprovalSchemes: string
     approvalSchemes: string
+    reauthorizationRequired?: boolean
+    requireEndDate?: boolean
+    maxPermittedAccessDurationValue?: number
+    maxPermittedAccessDurationTimeUnit?: string
     metadata: string
 }
+
+//const OWNER_ID_REGEX = /^[a-f0-9]{32}$/;
+
+
 
 export class AccessProfileImporter {
     readonly client: ISCClient;
@@ -88,9 +100,11 @@ export class AccessProfileImporter {
         const governanceGroupCache = new GovernanceGroupNameToIdCacheService(this.client);
         const workflowCache = new WorkflowNameToIdCacheService(this.client);
         await workflowCache.init()
-        const identityCacheService = new IdentityNameToIdCacheService(this.client);
+        const identityCacheService = new IdentityNameToIdCacheService.IdentityUsernameToIdCacheService(this.client);
         const sourceCacheService = new SourceNameToIdCacheService(this.client);
         const entitlementCacheService = new EntitlementCacheService(this.client);
+
+        const headers = await csvReader.getHeaders();
 
         let processedLines = 0;
         try {
@@ -149,6 +163,22 @@ export class AccessProfileImporter {
                     const srcMessage = `Unable to find owner with name '${data.owner}' in ISC`;
                     await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, srcMessage);
                     vscode.window.showErrorMessage(srcMessage);
+                    return;
+                }
+
+                let additionalOwners: AdditionalOwnerRefV2025[] | null;
+                try {
+                    additionalOwners = await resolveAdditionalOwners(
+                        data.additionalOwners,
+                        data.additionalOwnerGovernanceGroup,
+                        identityCacheService,
+                        governanceGroupCache
+                    );
+                } catch (error: any) {
+                    result.error++;
+                    const message = `Invalid additional owners: ${error.message ?? error}`;
+                    await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, message);
+                    vscode.window.showErrorMessage(message);
                     return;
                 }
 
@@ -213,7 +243,23 @@ export class AccessProfileImporter {
                     vscode.window.showErrorMessage(srcMessage);
                     return;
                 }
-                const description = data.description
+
+                const description = data.description ?? ""
+
+                let maxPermittedAccessDuration: AccessDurationV2025 | null = null
+                try {
+                    maxPermittedAccessDuration = formatMaxPermittedAccessDuration(
+                        data.maxPermittedAccessDurationValue,
+                        data.maxPermittedAccessDurationTimeUnit)
+
+                } catch (error) {
+                    result.error++;
+                    const srcMessage = `Unable to parse max permitted access duration: ${error}`;
+                    await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, srcMessage);
+                    vscode.window.showErrorMessage(srcMessage);
+                    return;
+                }
+
                 const accessProfilePayload: AccessProfile = {
                     "name": apName,
                     description,
@@ -232,12 +278,16 @@ export class AccessProfileImporter {
                     "accessRequestConfig": {
                         "commentsRequired": truethy(data.commentsRequired),
                         "denialCommentsRequired": truethy(data.denialCommentsRequired),
-                        "approvalSchemes": approvalSchemes
+                        "approvalSchemes": approvalSchemes,
+                        reauthorizationRequired: truethy(data.reauthorizationRequired),
+                        requireEndDate: truethy(data.requireEndDate),
+                        maxPermittedAccessDuration
                     },
                     "revocationRequestConfig": {
                         "approvalSchemes": revokeApprovalSchemes
                     },
-                    entitlements
+                    entitlements,
+                    additionalOwners
                 }
 
                 if (token.isCancellationRequested) {
@@ -250,8 +300,8 @@ export class AccessProfileImporter {
                     if (data.metadata) {
                         const attributes = stringToAttributeMetadata(data.metadata)
                         await this.client.updateAccessProfileMetadata(
-                            newAP.id,
-                            attributes
+                            newAP.id!,
+                            attributes!
                         )
                     }
 
@@ -267,63 +317,36 @@ export class AccessProfileImporter {
                         const ap = await this.client.getAccessProfileByName(apName);
                         if (ap) {
 
-                            const updates = [
-                                {
-                                    "property": "name",
-                                    "value": apName
-                                },
-                                {
-                                    "property": "enabled",
-                                    "value": truethy(data.enabled)
-                                },
-                                {
-                                    "property": "requestable",
-                                    "value": truethy(data.requestable)
-                                },
-                                {
-                                    "property": "description",
-                                    "value": description
-                                },
-                                {
-                                    "property": "owner",
-                                    "value": {
-                                        "id": ownerId,
-                                        "type": "IDENTITY",
-                                        "name": data.owner
-                                    }
-                                },
-                                {
-                                    "property": "accessRequestConfig",
-                                    "value": {
-                                        "commentsRequired": truethy(data.commentsRequired),
-                                        "denialCommentsRequired": truethy(data.denialCommentsRequired),
-                                        "approvalSchemes": approvalSchemes
-                                    }
-                                },
-                                {
-                                    "property": "revocationRequestConfig",
-                                    "value": {
-                                        "approvalSchemes": revokeApprovalSchemes
-                                    }
-                                },
-                                {
-                                    "property": "entitlements",
-                                    "value": entitlements
-                                },
-                                {
-                                    "property": "accessModelMetadata/attributes",
-                                    "value": stringToAttributeMetadata(data.metadata) ?? null
-                                },
-                            ].map((item) => ({
-                                "op": JsonPatchOperationV2025OpV2025.Replace,
-                                "path": `/${item.property}`,
-                                "value": item.value
-                            }))
+                            const updateMappings: { columns: string[]; path: string; getValue: () => any; condition?: () => boolean }[] = [
+                                { columns: ['name'], path: 'name', getValue: () => apName },
+                                { columns: ['enabled'], path: 'enabled', getValue: () => truethy(data.enabled) },
+                                { columns: ['requestable'], path: 'requestable', getValue: () => truethy(data.requestable) },
+                                { columns: ['description'], path: 'description', getValue: () => description },
+                                { columns: ['owner'], path: 'owner', getValue: () => ({ id: ownerId, type: "IDENTITY", name: data.owner }) },
+                                { columns: ['additionalOwners', 'additionalOwnerGovernanceGroup'], path: 'additionalOwners', getValue: () => additionalOwners },
+                                { columns: ['commentsRequired'], path: 'accessRequestConfig/commentsRequired', getValue: () => truethy(data.commentsRequired) },
+                                { columns: ['denialCommentsRequired'], path: 'accessRequestConfig/denialCommentsRequired', getValue: () => truethy(data.denialCommentsRequired) },
+                                { columns: ['reauthorizationRequired'], path: 'accessRequestConfig/reauthorizationRequired', getValue: () => truethy(data.reauthorizationRequired) },
+                                { columns: ['requireEndDate'], path: 'accessRequestConfig/requireEndDate', getValue: () => truethy(data.requireEndDate) },
+                                { columns: ['maxPermittedAccessDurationValue', 'maxPermittedAccessDurationTimeUnit'], path: 'accessRequestConfig/maxPermittedAccessDuration', getValue: () => maxPermittedAccessDuration },
+                                { columns: ['approvalSchemes'], path: 'accessRequestConfig/approvalSchemes', getValue: () => approvalSchemes },
+                                { columns: ['revokeApprovalSchemes'], path: 'revocationRequestConfig/approvalSchemes', getValue: () => revokeApprovalSchemes },
+                                { columns: ['entitlements'], path: 'entitlements', getValue: () => entitlements },
+                                { columns: ['metadata'], path: 'accessModelMetadata/attributes', getValue: () => stringToAttributeMetadata(data.metadata) ?? null },
+                            ];
+
+                            const updates = updateMappings
+                                .filter(m => m.columns.some(col => headers.includes(col)))
+                                .map(m => ({
+                                    op: JsonPatchOperationV2025OpV2025.Replace,
+                                    path: `/${m.path}`,
+                                    value: m.getValue()
+                                }))
                             try {
-                                await this.client.updateAccessProfile(ap.id, updates)
+                                await this.client.updateAccessProfile(ap.id!, updates)
                                 await this.writeLog(processedLines, apName, CSVLogWriterLogType.SUCCESS, `Successfully updated access profile '${apName}'`);
                                 result.success++;
-                            } catch (error) {
+                            } catch (error: any) {
                                 result.error++;
                                 await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, `Cannot update access profile: '${error.message}'`);
 

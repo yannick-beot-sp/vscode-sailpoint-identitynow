@@ -1,16 +1,16 @@
-import { AttributeDTO, AttributeDTOList } from "sailpoint-api-client";
+import { AttributeDTO, AttributeDTOListV2025 } from "sailpoint-api-client";
 import { CSV_MULTIVALUE_SEPARATOR } from "../constants";
 import { isEmpty } from "./stringUtils";
 
-export function metadataToString(m: AttributeDTOList): string | undefined {
+export function metadataToString(m: AttributeDTOListV2025 | undefined): string | undefined {
   return m?.attributes?.
-    map(attribute => `${attribute.key}:${attribute.values.map(v => v.value).join(",")}`)
+    map(attribute => `${attribute.key}:${attribute.values?.map(v => v.value).join(",")}`)
     .join(CSV_MULTIVALUE_SEPARATOR)
 
 }
 
 
-export function stringToAttributeMetadata(input: string): AttributeDTO[] {
+export function stringToAttributeMetadata(input: string): AttributeDTO[] | undefined {
   if (isEmpty(input)) {
     return undefined
   }

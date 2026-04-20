@@ -1,43 +1,73 @@
 import * as vscode from 'vscode';
+import * as tmp from "tmp";
 import { SourceTreeItem } from "../../models/ISCTreeItem";
 import { ISCClient } from '../../services/ISCClient';
 import { CSVReader } from '../../services/CSVReader';
+import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
 import { isNotEmpty } from '../../utils/stringUtils';
-import { chooseFile } from '../../utils/vsCodeHelpers';
-import { JsonPatchOperationBeta } from 'sailpoint-api-client';
+import { chooseFile, openPreview } from '../../utils/vsCodeHelpers';
+import { AdditionalOwnerRefV2025, JsonPatchOperationBeta, JsonPatchOperationV2025 } from 'sailpoint-api-client';
 import { TenantService } from '../../services/TenantService';
 import { validateTenantReadonly } from '../validateTenantReadonly';
+import { IdentityUsernameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
+import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
+import { truethy } from '../../utils/booleanUtils';
+import { metadataToString, stringToAttributeMetadata } from '../../utils/metadataUtils';
+import { resolveAdditionalOwners } from '../../utils/additionalOwners';
 
-// List of mandatory headers to update the description of entitlements
+function isSameAdditionalOwners(a: AdditionalOwnerRefV2025[] | null, b: AdditionalOwnerRefV2025[] | undefined | null): boolean {
+    if (!a && !b) { return true; }
+    if (!a || !b) { return false; }
+    if (a.length !== b.length) { return false; }
+    return a.every((ownerA, i) => ownerA.type === b[i].type && ownerA.id === b[i].id);
+}
+
 const mandatoryHeadersDescription = ["attributeName", "attributeValue", "displayName", "description", "schema"];
 const mandatoryHeadersOthers = ["attributeName", "attributeValue", "schema"];
-const optionalHeadersOthers = ["requestable", "owner", "privileged"];
+const optionalHeadersOthers = ["requestable", "privileged", "owner", "metadata", "additionalOwners", "additionalOwnerGovernanceGroup"];
 
+interface EntitlementCSVRecord {
+    attributeName: string
+    attributeValue: string
+    schema: string
+    displayName?: string
+    description?: string
+    requestable?: string
+    privileged?: string
+    owner?: string
+    metadata?: string
+    additionalOwners?: string
+    additionalOwnerGovernanceGroup?: string
+}
 
-interface UncorrelatedAccountImportResult {
+interface EntitlementDetailsImportResult {
     totalDescription: number
     totalDescriptionUpdated: number
     totalDescriptionSaved: number
     emptyEntitlement: number
-    noMetadataUpdate: number
     identityNotFound: number
     entitlementNotFound: number
-    metadataUpdated: number
     error: number
+    metadataUpdated: number
+    noMetadataUpdate: number
 }
 
 class EntitlementDetailsImporter {
     readonly client: ISCClient;
-    readonly csvReader: CSVReader<any>;
-    readonly result: UncorrelatedAccountImportResult = {
+    readonly csvReader: CSVReader<EntitlementCSVRecord>;
+    readonly identityCacheService: IdentityUsernameToIdCacheService;
+    readonly governanceGroupCache: GovernanceGroupNameToIdCacheService;
+    readonly logFilePath: string;
+    readonly logWriter: CSVLogWriter;
+    readonly result: EntitlementDetailsImportResult = {
         totalDescription: 0,
         totalDescriptionUpdated: 0,
         totalDescriptionSaved: 0,
         emptyEntitlement: 0,
-        noMetadataUpdate: 0,
         identityNotFound: 0,
         entitlementNotFound: 0,
         metadataUpdated: 0,
+        noMetadataUpdate: 0,
         error: 0,
     };
 
@@ -50,16 +80,29 @@ class EntitlementDetailsImporter {
         private fileUri: vscode.Uri
     ) {
         this.client = new ISCClient(this.tenantId, this.tenantName);
-        this.csvReader = new CSVReader<any>(this.fileUri.fsPath);
+        this.csvReader = new CSVReader<EntitlementCSVRecord>(this.fileUri.fsPath);
+        this.identityCacheService = new IdentityUsernameToIdCacheService(this.client);
+        this.governanceGroupCache = new GovernanceGroupNameToIdCacheService(this.client);
+
+        this.logFilePath = tmp.tmpNameSync({
+            prefix: 'import-entitlement-details',
+            postfix: ".log",
+        });
+
+        try {
+            this.logWriter = new CSVLogWriter(this.logFilePath);
+        } catch (_exc: any) {
+            console.error(_exc);
+            throw _exc;
+        }
     }
 
     public async importFileWithProgression(): Promise<void> {
         const headers = await this.csvReader.getHeaders();
 
-        const updateDescription = mandatoryHeadersDescription.every((element) => {
-            return headers.includes(element);
-        });
+        const updateDescription = mandatoryHeadersDescription.every(element => headers.includes(element));
         let message = '';
+
         if (updateDescription) {
             let inError = false;
 
@@ -80,20 +123,15 @@ class EntitlementDetailsImporter {
             message = `${this.result.totalDescriptionUpdated} description(s) updated.`;
         }
 
-        let updateOthersMetadata = mandatoryHeadersOthers.every(element => {
-            return headers.includes(element);
-        });
-
-        updateOthersMetadata = updateOthersMetadata && optionalHeadersOthers.some(element => {
-            return headers.includes(element);
-        });
+        let updateOthersMetadata = mandatoryHeadersOthers.every(element => headers.includes(element));
+        updateOthersMetadata = updateOthersMetadata && optionalHeadersOthers.some(element => headers.includes(element));
 
         if (updateOthersMetadata) {
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
                 title: `Importing entitlement metadata for ${this.sourceName}...`,
                 cancellable: true
-            }, async (task, token) => await this.importMetadata(task, token))
+            }, async (task, token) => await this.importMetadata(task, token, headers))
                 .then(() => { return; },
                     error => {
                         vscode.window.showErrorMessage(error.toString());
@@ -102,7 +140,6 @@ class EntitlementDetailsImporter {
         }
 
         if (updateDescription || updateOthersMetadata) {
-
             if (this.result.error > 0) {
                 message += ` ${this.result.error} error(s).`;
                 vscode.window.showErrorMessage(message);
@@ -114,34 +151,46 @@ class EntitlementDetailsImporter {
             }
         } else {
             vscode.window.showWarningMessage("No update");
-
         }
+
+        try {
+            this.logWriter?.end();
+        } catch (_exc) {
+            // do nothing
+        }
+
+        console.log("Identity Cache stats", this.identityCacheService.getStats());
+        this.identityCacheService.flushAll();
+        console.log("Governance Group Cache stats", this.governanceGroupCache.getStats());
+        this.governanceGroupCache.flushAll();
+
+        await openPreview(this.logFilePath, "log");
     }
 
-    private async importDescription(task: any, token: vscode.CancellationToken): Promise<void> {
+    private async importDescription(_task: any, _token: vscode.CancellationToken): Promise<void> {
         console.log("> EntitlementDetailsImporter.importDescription");
         const result = await this.client.importEntitlements(this.sourceId, this.fileUri.fsPath);
         this.result.totalDescription = result.total;
         this.result.totalDescriptionUpdated = result.updated;
         this.result.totalDescriptionSaved = result.saved;
-
     }
 
-    private async importMetadata(task: any, token: vscode.CancellationToken): Promise<void> {
-        console.log("> EntitlementDetailsImporter.importDescription");
-
+    private async importMetadata(task: any, token: vscode.CancellationToken, headers: string[]): Promise<void> {
+        console.log("> EntitlementDetailsImporter.importMetadata");
 
         const nbLines = await this.csvReader.getLines();
         const incr = 100 / nbLines;
         task.report({ increment: 0 });
 
-        await this.csvReader.processLine(async (data: any) => {
+        let processedLines = 0;
+
+        await this.csvReader.processLine(async (data: EntitlementCSVRecord) => {
             if (token.isCancellationRequested) {
-                // skip
                 return;
             }
             task.report({ increment: incr, message: data.attributeValue });
-            if (!mandatoryHeadersOthers.every(p => isNotEmpty(data[p]))) {
+
+            if (!mandatoryHeadersOthers.every(p => isNotEmpty(data[p as keyof EntitlementCSVRecord]))) {
                 this.result.emptyEntitlement++;
                 return;
             }
@@ -153,72 +202,85 @@ class EntitlementDetailsImporter {
             const entitlements = response.data;
             if (!Array.isArray(entitlements) || entitlements.length !== 1) {
                 this.result.entitlementNotFound++;
+                await this.writeLog(processedLines, data.attributeValue, CSVLogWriterLogType.WARNING, `Entitlement not found: ${data.attributeName}=${data.attributeValue} (schema: ${data.schema})`);
                 return;
             }
             const entitlement = entitlements[0];
 
-            const payload : JsonPatchOperationBeta[] = [];
-
-            if (isNotEmpty(data.requestable)) {
-                payload.push({
-                    "op": "replace",
-                    "path": "/requestable",
-                    //@ts-ignore cf. https://github.com/sailpoint-oss/typescript-sdk/issues/18
-                    "value": ("TRUE" === data.requestable.toUpperCase())
-                });
-            }
-            if (isNotEmpty(data.privileged)) {
-                payload.push({
-                    "op": "replace",
-                    "path": "/privileged",
-                    //@ts-ignore cf. https://github.com/sailpoint-oss/typescript-sdk/issues/18
-                    "value": ("TRUE" === data.privileged.toUpperCase())
-                });
-            }
-            if (isNotEmpty(data.owner)) {
-                if (/^[a-f0-9]{32}$/.test(data.owner)) {
-                    // is id
-                    payload.push({
-                        "op": "replace",
-                        "path": "/owner",
-                        "value": {
-                            "type": "IDENTITY",
-                            "id": data.owner
-                        }
-                    });
+            let ownerId: string | undefined;
+            if (headers.includes('owner') && isNotEmpty(data.owner)) {
+                if (/^[a-f0-9]{32}$/.test(data.owner!)) {
+                    ownerId = data.owner!;
                 } else {
-                    // need to get id 
                     try {
-                        const ownerIdentity = await this.client.getPublicIdentityByAlias(data.owner);
-
-                        payload.push({
-                            "op": "replace",
-                            "path": "/owner",
-                            "value": {
-                                "type": "IDENTITY",
-                                "id": ownerIdentity.id
-                            }
-                        });
+                        ownerId = await this.identityCacheService.get(data.owner!);
                     } catch (error) {
-                        console.error(error);
                         this.result.identityNotFound++;
+                        await this.writeLog(processedLines, data.attributeValue, CSVLogWriterLogType.ERROR, `Identity not found: ${data.owner}`);
+                        return;
                     }
                 }
             }
 
+            let additionalOwners: AdditionalOwnerRefV2025[] | null = null;
+            if (headers.includes('additionalOwners') || headers.includes('additionalOwnerGovernanceGroup')) {
+                try {
+                    additionalOwners = await resolveAdditionalOwners(
+                        data.additionalOwners,
+                        data.additionalOwnerGovernanceGroup,
+                        this.identityCacheService,
+                        this.governanceGroupCache
+                    )
+                } catch (error: any) {
+                    this.result.error++;
+                    await this.writeLog(processedLines, data.attributeValue, CSVLogWriterLogType.ERROR, `Invalid additional owners: ${error.message ?? error}`);
+                    return;
+                }
+            }
+
+            const updateMappings: { columns: string[]; path: string; getValue: () => any; condition: () => boolean; isSame: () => boolean }[] = [
+                { columns: ['requestable'], path: 'requestable', getValue: () => truethy(data.requestable), condition: () => isNotEmpty(data.requestable), isSame: () => truethy(data.requestable) === entitlement.requestable },
+                { columns: ['privileged'], path: 'privileged', getValue: () => truethy(data.privileged), condition: () => isNotEmpty(data.privileged), isSame: () => truethy(data.privileged) === entitlement.privileged },
+                { columns: ['owner'], path: 'owner', getValue: () => ({ type: "IDENTITY", id: ownerId }), condition: () => ownerId !== undefined, isSame: () => ownerId === entitlement.owner?.id },
+                { columns: ['additionalOwners', 'additionalOwnerGovernanceGroup'], path: 'additionalOwners', getValue: () => additionalOwners, condition: () => additionalOwners !== null, isSame: () => isSameAdditionalOwners(additionalOwners, entitlement.additionalOwners) },
+                { columns: ['metadata'], path: 'accessModelMetadata', getValue: () => ({ attributes: stringToAttributeMetadata(data.metadata!) }), condition: () => isNotEmpty(data.metadata), isSame: () => metadataToString({ attributes: stringToAttributeMetadata(data.metadata!) }) === metadataToString(entitlement.accessModelMetadata) },
+            ];
+
+            const payload: JsonPatchOperationV2025[] = updateMappings
+                .filter(m => m.columns.some(col => headers.includes(col)) && m.condition() && !m.isSame())
+                .map(m => ({
+                    op: "replace",
+                    path: `/${m.path}`,
+                    value: m.getValue()
+                }));
+
+            processedLines++;
             if (payload.length === 0) {
                 this.result.noMetadataUpdate++;
+                await this.writeLog(processedLines, data.attributeValue, CSVLogWriterLogType.SUCCESS, `No update needed for entitlement '${data.attributeValue}'`);
                 return;
             }
             try {
                 await this.client.updateEntitlement(entitlement.id!, payload);
                 this.result.metadataUpdated++;
-            } catch (error) {
+                await this.writeLog(processedLines, data.attributeValue, CSVLogWriterLogType.SUCCESS, `Successfully updated entitlement '${data.attributeValue}'`);
+            } catch (error: any) {
                 this.result.error++;
+                await this.writeLog(processedLines, data.attributeValue, CSVLogWriterLogType.ERROR, `Cannot update entitlement: '${error.message}'`);
                 console.error(error);
             }
-
         });
+    }
+
+    private async writeLog(csvLine: number | string | null, objectName: string, type: CSVLogWriterLogType, message: string) {
+        if (this.logWriter) {
+            if (!csvLine) {
+                csvLine = '0';
+            }
+            const lnStr = '' + csvLine;
+            const logMessage = `[CSV${lnStr.padStart(8, '0')}][${objectName}] ${message}`;
+            await this.logWriter.writeLine(type, logMessage);
+        }
     }
 }
 
@@ -229,15 +291,15 @@ export class EntitlementDetailsImportNodeCommand {
 
     constructor(private readonly tenantService: TenantService) { }
 
-    async execute(node?: SourceTreeItem): Promise<void> {
+    async execute(node: SourceTreeItem): Promise<void> {
         console.log("> EntitlementDetailsImportNodeCommand.execute");
-        
+
         if (!(await validateTenantReadonly(this.tenantService, node.tenantId, `import entitlements details in ${node.label}`))) {
-            return
+            return;
         }
 
         const fileUri = await chooseFile('CSV files', 'csv');
-        if (fileUri === undefined ) { return; }
+        if (fileUri === undefined) { return; }
 
         const entitlementImporter = new EntitlementDetailsImporter(
             node.tenantId,

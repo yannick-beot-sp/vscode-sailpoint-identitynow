@@ -3,7 +3,7 @@ import { CSV_MULTIVALUE_SEPARATOR } from "../constants"
 import { CacheService } from "../services/cache/CacheService"
 
 export async function entitlementToStringConverter(
-    entitlementRefs: Array<EntitlementRef> | null | undefined,
+    entitlementRefs: Array<EntitlementRef> | undefined,
     entitlementToString: CacheService<string>): Promise<string | undefined> {
 
     if (entitlementRefs === undefined
@@ -13,6 +13,6 @@ export async function entitlementToStringConverter(
         return undefined
     }
     return (await Promise.all(entitlementRefs
-        .map(ref => entitlementToString.get(ref.id))))
+        .map(ref => entitlementToString.get(ref.id!))))
         .join(CSV_MULTIVALUE_SEPARATOR)
 }

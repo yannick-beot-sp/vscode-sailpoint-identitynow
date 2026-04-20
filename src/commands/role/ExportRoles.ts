@@ -3,20 +3,20 @@ import { BaseCSVExporter } from "../BaseExporter";
 import { RolesTreeItem } from '../../models/ISCTreeItem';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
-import { EntitlementRef, RequestabilityForRole, RevocabilityForRole, Role, RoleMembershipSelectorType, RolesApiListRolesRequest, RoleV2025 } from 'sailpoint-api-client';
+import { RequestabilityForRole, RevocabilityForRole, RoleMembershipSelectorType, RolesApiListRolesRequest, RoleV2025 } from 'sailpoint-api-client';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { WorkflowIdToNameCacheService } from '../../services/cache/WorkflowIdToNameCacheService';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
-import { roleApprovalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
+import { approvalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
 import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
 import { roleMembershipSelectorToStringConverter } from '../../parser/roleMembershipSelectorToStringConverter';
 import { SourceIdToNameCacheService } from '../../services/cache/SourceIdToNameCacheService';
 import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator';
-import { CacheService } from '../../services/cache/CacheService';
 import { EntitlementIdToSourceNameCacheService } from '../../services/cache/EntitlementIdToSourceNameCacheService';
 import { metadataToString } from '../../utils/metadataUtils';
 import { dimensionSchemaToString } from '../../utils/dimensionUtils';
 import { entitlementToStringConverter } from '../../utils/entitlementToStringConverter';
+import { getAdditionalOwners } from '../../utils/additionalOwners';
 
 export class RoleExporterCommand {
 
@@ -69,20 +69,22 @@ export interface RoleDto {
      * @type {string}
      * @memberof Role
      */
-    'description'?: string;
+    'description'?: string | null;
     /**
      *
      * @type {string}
      * @memberof Role
      */
     'owner': string | null;
+    'additionalOwners'?: string | null;
+    'additionalOwnerGovernanceGroup'?: string | null;
     /**
      *
      * @type {Array<AccessProfileRef>}
      * @memberof Role
      */
-    'accessProfiles'?: string;
-    'entitlements'?: string;
+    'accessProfiles'?: string | null;
+    'entitlements'?: string | null;
     /**
      * Whether the Role is enabled or not.
      * @type {boolean}
@@ -123,7 +125,7 @@ export interface RoleDto {
      */
     membershipCriteria?: string;
 
-    dimensional?: boolean
+    dimensional?: boolean | null
     dimensionAttributes?: string
     /**
      * A list of metadata associated with the Role. metadata are seperated by ";". 
@@ -134,7 +136,7 @@ export interface RoleDto {
 
 }
 
-class RoleExporter extends BaseCSVExporter<Role> {
+class RoleExporter extends BaseCSVExporter<RoleV2025> {
     constructor(
         tenantId: string,
         tenantName: string,
@@ -157,9 +159,15 @@ class RoleExporter extends BaseCSVExporter<Role> {
             "enabled",
             "requestable",
             "owner",
+            "additionalOwners",
+            "additionalOwnerGovernanceGroup",
             "commentsRequired",
             "denialCommentsRequired",
             "approvalSchemes",
+            "reauthorizationRequired",
+            "requireEndDate",
+            "maxPermittedAccessDurationValue",
+            "maxPermittedAccessDurationTimeUnit",
             "revokeCommentsRequired",
             "revokeDenialCommentsRequired",
             "revokeApprovalSchemes",
@@ -176,9 +184,15 @@ class RoleExporter extends BaseCSVExporter<Role> {
             "enabled",
             "requestable",
             "owner",
+            "additionalOwners",
+            "additionalOwnerGovernanceGroup",
             "accessRequestConfig.commentsRequired",
             "accessRequestConfig.denialCommentsRequired",
             "approvalSchemes",
+            "accessRequestConfig.reauthorizationRequired",
+            "accessRequestConfig.requireEndDate",
+            "accessRequestConfig.maxPermittedAccessDuration.value",
+            "accessRequestConfig.maxPermittedAccessDuration.timeUnit",
             "revocationRequestConfig.commentsRequired",
             "revocationRequestConfig.denialCommentsRequired",
             "revokeApprovalSchemes",
@@ -215,14 +229,20 @@ class RoleExporter extends BaseCSVExporter<Role> {
                         console.warn(`Error converting membership criteria for role "${item.name}:"`, error);
                     }
                 }
-                let owner: string | undefined = undefined;
+                let owner: string | null = null;
                 try {
                     owner = item.owner ? (await identityCacheIdToName.get(item.owner.id!)) : null
                 } catch (error) {
-                    console.warn(`Error converting owner identity "${item.owner.id}" for role "${item.name}:"`, error);
+                    console.warn(`Error converting owner identity "${item.owner?.id}" for role "${item.name}":`, error);
                 }
 
-                let entitlements: string | undefined = undefined;
+                const additionalOwnersInfo = await getAdditionalOwners(
+                    item.additionalOwners,
+                    identityCacheIdToName,
+                    governanceGroupCache
+                );
+
+                let entitlements: string | undefined | null = null;
                 try {
                     entitlements = (item.entitlements ? (await entitlementToStringConverter(item.entitlements, entitlementIdToSourceNameCacheService)) : null);
                 } catch (error) {
@@ -236,21 +256,27 @@ class RoleExporter extends BaseCSVExporter<Role> {
                     enabled: item.enabled,
                     requestable: item.requestable,
                     owner: owner,
+                    additionalOwners: additionalOwnersInfo.additionalOwners,
+                    additionalOwnerGovernanceGroup: additionalOwnersInfo.additionalOwnerGovernanceGroup,
                     accessProfiles: item.accessProfiles?.map(x => x.name).join(CSV_MULTIVALUE_SEPARATOR),
                     entitlements,
                     accessRequestConfig: {
                         commentsRequired: item.accessRequestConfig?.commentsRequired ?? false,
                         denialCommentsRequired: item.accessRequestConfig?.denialCommentsRequired ?? false,
+                        reauthorizationRequired: item.accessRequestConfig?.reauthorizationRequired ?? false,
+                        requireEndDate: item.accessRequestConfig?.requireEndDate ?? false,
+                        maxPermittedAccessDuration: item.accessRequestConfig?.maxPermittedAccessDuration
+
                     },
                     revocationRequestConfig: {
                         commentsRequired: item.revocationRequestConfig?.commentsRequired ?? false,
                         denialCommentsRequired: item.revocationRequestConfig?.denialCommentsRequired ?? false
                     },
-                    approvalSchemes: await roleApprovalSchemeToStringConverter(
+                    approvalSchemes: await approvalSchemeToStringConverter(
                         item.accessRequestConfig?.approvalSchemes,
                         governanceGroupCache,
                         workflowCache),
-                    revokeApprovalSchemes: await roleApprovalSchemeToStringConverter(
+                    revokeApprovalSchemes: await approvalSchemeToStringConverter(
                         item.revocationRequestConfig?.approvalSchemes,
                         governanceGroupCache,
                         workflowCache),

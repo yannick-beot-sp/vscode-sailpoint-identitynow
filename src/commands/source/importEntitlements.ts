@@ -54,7 +54,7 @@ class EntitlementImporter {
 export class EntitlementImportNodeCommand {
     constructor(private readonly tenantService: TenantService) { }
 
-    async execute(node?: SourceTreeItem): Promise<void> {
+    async execute(node: SourceTreeItem): Promise<void> {
         console.log("> EntitlementImportNodeCommand.execute");
         
         if (!(await validateTenantReadonly(this.tenantService, node.tenantId, `import entitlements in ${node.label}`))) {

@@ -1,4 +1,4 @@
-import { RoleCriteriaKeyType, RoleCriteriaLevel1, RoleCriteriaLevel2, RoleCriteriaLevel3, RoleCriteriaOperation } from "sailpoint-api-client";
+import { RoleCriteriaKeyType, RoleCriteriaLevel1, RoleCriteriaLevel2, RoleCriteriaLevel3, RoleCriteriaOperation, RoleCriteriaOperationV2025 } from "sailpoint-api-client";
 import { CacheService } from "../services/cache/CacheService";
 import { ComparisonOperation, isLogicalOperation } from "./ast";
 
@@ -12,8 +12,8 @@ export async function roleMembershipSelectorToStringConverter(
     roleCriteriaLevel1: RoleCriteriaLevel1,
     sourceIdToName: CacheService<string>): Promise<string> {
 
-    if (roleCriteriaLevel1 === undefined
-        || roleCriteriaLevel1.children === undefined
+    if (!roleCriteriaLevel1 
+        || !roleCriteriaLevel1.children
         || roleCriteriaLevel1.children.length === 0) {
         return "";
     }
@@ -82,7 +82,7 @@ async function convertRoleCriteriaLevel3(
     return `${left} ${operator} ${EXPORT_QUOTE}${value}${EXPORT_QUOTE}`;
 }
 
-function comparisonOperationMapper(op: RoleCriteriaOperation): ComparisonOperation {
+function comparisonOperationMapper(op: RoleCriteriaOperationV2025): ComparisonOperation {
     switch (op) {
         case "EQUALS":
             return "eq";
