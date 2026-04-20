@@ -6,12 +6,21 @@ import { CSVReader } from '../../services/CSVReader';
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
 import { isNotEmpty } from '../../utils/stringUtils';
 import { chooseFile, openPreview } from '../../utils/vsCodeHelpers';
-import { JsonPatchOperationBeta } from 'sailpoint-api-client';
+import { AdditionalOwnerRefV2025, JsonPatchOperationBeta, JsonPatchOperationV2025 } from 'sailpoint-api-client';
 import { TenantService } from '../../services/TenantService';
 import { validateTenantReadonly } from '../validateTenantReadonly';
 import { IdentityUsernameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
+import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
 import { truethy } from '../../utils/booleanUtils';
-import { stringToAttributeMetadata } from '../../utils/metadataUtils';
+import { metadataToString, stringToAttributeMetadata } from '../../utils/metadataUtils';
+import { resolveAdditionalOwners } from '../../utils/additionalOwners';
+
+function isSameAdditionalOwners(a: AdditionalOwnerRefV2025[] | null, b: AdditionalOwnerRefV2025[] | undefined | null): boolean {
+    if (!a && !b) { return true; }
+    if (!a || !b) { return false; }
+    if (a.length !== b.length) { return false; }
+    return a.every((ownerA, i) => ownerA.type === b[i].type && ownerA.id === b[i].id);
+}
 
 const mandatoryHeadersDescription = ["attributeName", "attributeValue", "displayName", "description", "schema"];
 const mandatoryHeadersOthers = ["attributeName", "attributeValue", "schema"];
@@ -47,6 +56,7 @@ class EntitlementDetailsImporter {
     readonly client: ISCClient;
     readonly csvReader: CSVReader<EntitlementCSVRecord>;
     readonly identityCacheService: IdentityUsernameToIdCacheService;
+    readonly governanceGroupCache: GovernanceGroupNameToIdCacheService;
     readonly logFilePath: string;
     readonly logWriter: CSVLogWriter;
     readonly result: EntitlementDetailsImportResult = {
@@ -72,6 +82,7 @@ class EntitlementDetailsImporter {
         this.client = new ISCClient(this.tenantId, this.tenantName);
         this.csvReader = new CSVReader<EntitlementCSVRecord>(this.fileUri.fsPath);
         this.identityCacheService = new IdentityUsernameToIdCacheService(this.client);
+        this.governanceGroupCache = new GovernanceGroupNameToIdCacheService(this.client);
 
         this.logFilePath = tmp.tmpNameSync({
             prefix: 'import-entitlement-details',
@@ -150,6 +161,8 @@ class EntitlementDetailsImporter {
 
         console.log("Identity Cache stats", this.identityCacheService.getStats());
         this.identityCacheService.flushAll();
+        console.log("Governance Group Cache stats", this.governanceGroupCache.getStats());
+        this.governanceGroupCache.flushAll();
 
         await openPreview(this.logFilePath, "log");
     }
@@ -209,24 +222,44 @@ class EntitlementDetailsImporter {
                 }
             }
 
-            const updateMappings: { columns: string[]; path: string; getValue: () => any; condition: () => boolean }[] = [
-                { columns: ['displayName'], path: 'name', getValue: () => data.displayName, condition: () => isNotEmpty(data.displayName) },
-                { columns: ['description'], path: 'description', getValue: () => data.description, condition: () => isNotEmpty(data.description) },
-                { columns: ['requestable'], path: 'requestable', getValue: () => truethy(data.requestable), condition: () => isNotEmpty(data.requestable) },
-                { columns: ['privileged'], path: 'privileged', getValue: () => truethy(data.privileged), condition: () => isNotEmpty(data.privileged) },
-                { columns: ['owner'], path: 'owner', getValue: () => ({ type: "IDENTITY", id: ownerId }), condition: () => ownerId !== undefined },
-                { columns: ['metadata'], path: 'accessModelMetadata', getValue: () => { attributes: stringToAttributeMetadata(data.metadata!) }, condition: () => isNotEmpty(data.metadata) },
+            let additionalOwners: AdditionalOwnerRefV2025[] | null = null;
+            if (headers.includes('additionalOwners') || headers.includes('additionalOwnerGovernanceGroup')) {
+                try {
+                    additionalOwners = await resolveAdditionalOwners(
+                        data.additionalOwners,
+                        data.additionalOwnerGovernanceGroup,
+                        this.identityCacheService,
+                        this.governanceGroupCache
+                    )
+                } catch (error: any) {
+                    this.result.error++;
+                    await this.writeLog(processedLines, data.attributeValue, CSVLogWriterLogType.ERROR, `Invalid additional owners: ${error.message ?? error}`);
+                    return;
+                }
+            }
+
+            const updateMappings: { columns: string[]; path: string; getValue: () => any; condition: () => boolean; isSame: () => boolean }[] = [
+                { columns: ['requestable'], path: 'requestable', getValue: () => truethy(data.requestable), condition: () => isNotEmpty(data.requestable), isSame: () => truethy(data.requestable) === entitlement.requestable },
+                { columns: ['privileged'], path: 'privileged', getValue: () => truethy(data.privileged), condition: () => isNotEmpty(data.privileged), isSame: () => truethy(data.privileged) === entitlement.privileged },
+                { columns: ['owner'], path: 'owner', getValue: () => ({ type: "IDENTITY", id: ownerId }), condition: () => ownerId !== undefined, isSame: () => ownerId === entitlement.owner?.id },
+                { columns: ['additionalOwners', 'additionalOwnerGovernanceGroup'], path: 'additionalOwners', getValue: () => additionalOwners, condition: () => additionalOwners !== null, isSame: () => isSameAdditionalOwners(additionalOwners, entitlement.additionalOwners) },
+                { columns: ['metadata'], path: 'accessModelMetadata', getValue: () => ({ attributes: stringToAttributeMetadata(data.metadata!) }), condition: () => isNotEmpty(data.metadata), isSame: () => metadataToString({ attributes: stringToAttributeMetadata(data.metadata!) }) === metadataToString(entitlement.accessModelMetadata) },
             ];
 
-            const payload: JsonPatchOperationBeta[] = updateMappings
-                .filter(m => m.columns.some(col => headers.includes(col)) && m.condition())
+            const payload: JsonPatchOperationV2025[] = updateMappings
+                .filter(m => m.columns.some(col => headers.includes(col)) && m.condition() && !m.isSame())
                 .map(m => ({
-                    op: "replace" as const,
+                    op: "replace",
                     path: `/${m.path}`,
                     value: m.getValue()
                 }));
 
             processedLines++;
+            if (payload.length === 0) {
+                this.result.noMetadataUpdate++;
+                await this.writeLog(processedLines, data.attributeValue, CSVLogWriterLogType.SUCCESS, `No update needed for entitlement '${data.attributeValue}'`);
+                return;
+            }
             try {
                 await this.client.updateEntitlement(entitlement.id!, payload);
                 this.result.metadataUpdated++;

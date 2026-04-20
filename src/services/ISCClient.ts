@@ -1283,20 +1283,20 @@ export class ISCClient {
 	}
 
 	/**
-	 * cf. https://developer.sailpoint.com/idn/api/beta/patch-entitlement
+	 * cf. https://developer.sailpoint.com/docs/api/v2025/patch-entitlement/
 	 * @param id
 	 * @param payload
 	  */
 	public async updateEntitlement(
 		id: string,
-		payload: Array<JsonPatchOperationBeta>
+		payload: Array<JsonPatchOperationV2025>
 	): Promise<void> {
 		console.log("> updateEntitlement", id, payload);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new EntitlementsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new EntitlementsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.patchEntitlement({
 			id,
-			jsonPatchOperationBeta: payload
+			jsonPatchOperationV2025: payload
 		});
 		console.log("< updateEntitlement");
 	}
