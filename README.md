@@ -542,7 +542,7 @@ The extension supports the following settings:
 - Update schema for additional owners and max duration.
 - Update dependency for `axios`
 - Update of roles and access profiles only take into account the columns provided. Mandatory columns are still mandatory (`source` for access profiles for instance)
-- Export metadata for Entitlements
+- Export and import metadata for Entitlements
 
 ### 1.3.25
 
