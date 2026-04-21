@@ -405,8 +405,39 @@ export class ISCClient {
 		console.log("> getTransforms");
 		const apiConfig = await this.getApiConfiguration();
 		const api = new TransformsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await Paginator.paginate(api, api.listTransforms);
-		const transforms = result.data;
+		const transforms: TransformRead[] = [];
+		let offset = 0;
+		let totalCount: number | undefined;
+
+		while (true) {
+			const response = await api.listTransforms({
+				offset,
+				limit: DEFAULT_PAGINATION,
+				count: totalCount === undefined
+			});
+
+			if (totalCount === undefined) {
+				const totalCountHeader = response.headers[TOTAL_COUNT_HEADER];
+				const totalCountValue = Array.isArray(totalCountHeader) ? totalCountHeader[0] : totalCountHeader;
+				const parsedTotalCount = Number(totalCountValue);
+				if (Number.isFinite(parsedTotalCount) && parsedTotalCount >= 0) {
+					totalCount = parsedTotalCount;
+				}
+			}
+
+			const page = response.data;
+			if (!page || page.length === 0) {
+				break;
+			}
+
+			transforms.push(...page);
+			offset += page.length;
+
+			if ((totalCount !== undefined && offset >= totalCount) || page.length < DEFAULT_PAGINATION) {
+				break;
+			}
+		}
+
 		if (transforms !== undefined && transforms instanceof Array) {
 			transforms.sort(compareByName);
 		}
