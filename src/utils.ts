@@ -133,10 +133,6 @@ export function sanitizePath(input: string, options: undefined | { replacement?:
 };
 
 
-interface String {
-    format(...replacements: string[]): string;
-}
-
 /**
  * cf. https://stackoverflow.com/a/20070599
  */
