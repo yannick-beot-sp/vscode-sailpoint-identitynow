@@ -8,22 +8,22 @@ import { workflowNameField } from "../workflowInputFields";
 import { isGuid } from "../../../utils/stringUtils";
 
 const inputSchema = z.object({
-    tenantName:   tenantNameField,
+    tenantName: tenantNameField,
     workflowName: workflowNameField,
 });
 
 const outputSchema = z.object({
-    id:          z.string(),
-    name:        z.string(),
+    id: z.string(),
+    name: z.string(),
     description: z.string().optional(),
-    enabled:     z.boolean(),
-    definition:  z.unknown().nullable(),
-    trigger:     z.unknown().nullable(),
-    created:     z.date().optional(),
-    modified:    z.date().optional(),
+    enabled: z.boolean(),
+    definition: z.unknown().nullable(),
+    trigger: z.unknown().nullable(),
+    created: z.date().optional(),
+    modified: z.date().optional(),
 });
 
-type Input  = z.infer<typeof inputSchema>;
+type Input = z.infer<typeof inputSchema>;
 type Output = z.infer<typeof outputSchema>;
 
 /**
@@ -35,7 +35,7 @@ type Output = z.infer<typeof outputSchema>;
     inputSchema,
     outputSchema,
     annotations: {
-        title:        "Get Workflow",
+        title: "Get Workflow",
         readOnlyHint: true,
     },
 })
@@ -49,15 +49,15 @@ export class GetWorkflowTool extends ToolContext {
                 : await client.getWorkflowByName(input.workflowName);
 
             return {
-                id:          w.id!,
-                name:        w.name!,
+                id: w.id!,
+                name: w.name!,
                 description: w.description,
-                enabled:     w.enabled ?? false,
-                definition:  w.definition ?? null,
-                trigger:     w.trigger ?? null,
-                created:     w.created ? new Date(w.created) : undefined,
-                modified:    w.modified ? new Date(w.modified) : undefined,
-              
+                enabled: w.enabled ?? false,
+                definition: w.definition ?? null,
+                trigger: w.trigger ?? null,
+                created: w.created ? new Date(w.created) : undefined,
+                modified: w.modified ? new Date(w.modified) : undefined,
+
             };
         } catch (err: any) {
             if (err?.response?.status === 404 || err?.message?.includes("Could not find")) {

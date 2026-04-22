@@ -8,30 +8,30 @@ import { workflowNameField } from "../workflowInputFields";
 import { isGuid } from "../../../utils/stringUtils";
 
 const inputSchema = z.object({
-    tenantName:   tenantNameField,
+    tenantName: tenantNameField,
     workflowName: workflowNameField,
-    name:         z.string().optional().describe("New name for the workflow."),
-    description:  z.string().optional().describe("New description for the workflow."),
-    owner:        z.object({
+    name: z.string().optional().describe("New name for the workflow."),
+    description: z.string().optional().describe("New description for the workflow."),
+    owner: z.object({
         type: z.string().optional().describe("Owner type, e.g. 'IDENTITY'."),
-        id:   z.string().optional().describe("Owner identity ID."),
+        id: z.string().optional().describe("Owner identity ID."),
         name: z.string().optional().describe("Owner display name."),
     }).optional().describe("New owner of the workflow."),
-    definition:   z.unknown().optional().describe(
+    definition: z.unknown().optional().describe(
         "Replacement workflow definition with 'start' and 'steps' fields."
     ),
-    trigger:      z.unknown().optional().describe(
+    trigger: z.unknown().optional().describe(
         "Replacement trigger configuration (type, attributes)."
     ),
 });
 
 const outputSchema = z.object({
-    id:     z.string(),
-    name:   z.string(),
+    id: z.string(),
+    name: z.string(),
     status: z.literal("updated"),
 });
 
-type Input  = z.infer<typeof inputSchema>;
+type Input = z.infer<typeof inputSchema>;
 type Output = z.infer<typeof outputSchema>;
 
 /**
@@ -46,8 +46,8 @@ type Output = z.infer<typeof outputSchema>;
     inputSchema,
     outputSchema,
     annotations: {
-        title:           "Update Workflow",
-        readOnlyHint:    false,
+        title: "Update Workflow",
+        readOnlyHint: false,
         destructiveHint: false,
     },
 })
@@ -70,11 +70,11 @@ export class UpdateWorkflowTool extends ToolContext {
 
         try {
             const updated = await client.putWorkflow(id, {
-                name:        input.name,
+                name: input.name,
                 description: input.description,
-                owner:       input.owner as any,
-                definition:  input.definition as any,
-                trigger:     input.trigger as any,
+                owner: input.owner as any,
+                definition: input.definition as any,
+                trigger: input.trigger as any,
             });
             return { id: updated.id!, name: updated.name!, status: "updated" };
         } catch (err: any) {

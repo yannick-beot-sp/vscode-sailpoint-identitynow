@@ -8,16 +8,16 @@ import { workflowNameField } from "../workflowInputFields";
 import { isGuid } from "../../../utils/stringUtils";
 
 const inputSchema = z.object({
-    tenantName:   tenantNameField,
+    tenantName: tenantNameField,
     workflowName: workflowNameField,
-    enabled:      z.boolean().describe("Set to true to enable the workflow, false to disable it."),
+    enabled: z.boolean().describe("Set to true to enable the workflow, false to disable it."),
 });
 
 const outputSchema = z.object({
     status: z.enum(["enabled", "disabled"]),
 });
 
-type Input  = z.infer<typeof inputSchema>;
+type Input = z.infer<typeof inputSchema>;
 type Output = z.infer<typeof outputSchema>;
 
 /**
@@ -29,8 +29,8 @@ type Output = z.infer<typeof outputSchema>;
     inputSchema,
     outputSchema,
     annotations: {
-        title:           "Set Workflow Status",
-        readOnlyHint:    false,
+        title: "Set Workflow Status",
+        readOnlyHint: false,
         destructiveHint: false,
     },
 })

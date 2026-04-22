@@ -11,15 +11,15 @@ const inputSchema = z.object({
 const outputSchema = z.object({
     workflows: z.array(
         z.object({
-            id:          z.string(),
-            name:        z.string(),
+            id: z.string(),
+            name: z.string(),
             description: z.string().optional(),
-            enabled:     z.boolean(),
+            enabled: z.boolean(),
         })
     ),
 });
 
-type Input  = z.infer<typeof inputSchema>;
+type Input = z.infer<typeof inputSchema>;
 type Output = z.infer<typeof outputSchema>;
 
 /**
@@ -32,7 +32,7 @@ type Output = z.infer<typeof outputSchema>;
     inputSchema,
     outputSchema,
     annotations: {
-        title:        "List Workflows",
+        title: "List Workflows",
         readOnlyHint: true,
     },
 })
@@ -42,10 +42,10 @@ export class ListWorkflowsTool extends ToolContext {
         const workflows = await client.getWorflows();
         return {
             workflows: workflows.map(w => ({
-                id:          w.id!,
-                name:        w.name!,
+                id: w.id!,
+                name: w.name!,
                 description: w.description,
-                enabled:     w.enabled ?? false,
+                enabled: w.enabled ?? false,
             })),
         };
     }

@@ -17,11 +17,11 @@ const inputSchema = z.object({
 });
 
 const outputSchema = z.object({
-    id:     z.string(),
+    id: z.string(),
     status: z.literal("created"),
 });
 
-type Input  = z.infer<typeof inputSchema>;
+type Input = z.infer<typeof inputSchema>;
 type Output = z.infer<typeof outputSchema>;
 
 /**
@@ -33,8 +33,8 @@ type Output = z.infer<typeof outputSchema>;
     inputSchema,
     outputSchema,
     annotations: {
-        title:           "Create Transform",
-        readOnlyHint:    false,
+        title: "Create Transform",
+        readOnlyHint: false,
         destructiveHint: false,
     },
 })
@@ -44,8 +44,8 @@ export class CreateTransformTool extends ToolContext {
 
         try {
             const created = await client.createTransform({
-                name:       input.name,
-                type:       input.type as any,
+                name: input.name,
+                type: input.type as any,
                 attributes: (input.attributes ?? null) as any,
             });
             return { id: created.id, status: "created" };

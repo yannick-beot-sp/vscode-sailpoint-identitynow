@@ -101,8 +101,7 @@ export class TenantResolverPlugin {
         if (toolName && _exemptTools.has(toolName)) { return; }
         if (!_tenantService) { return; }
 
-        const args: Record<string, unknown> = ctx.state?.input?.arguments ?? {};
-        const tenantName = ctx.state.input.arguments.tenantName as string | undefined;
+        const tenantName = ctx.state.input?.arguments?.tenantName as string;
 
         if (!tenantName) {
             throw new McpError(
@@ -119,6 +118,16 @@ export class TenantResolverPlugin {
                 ErrorCodes.TENANT_NOT_FOUND,
                 `Tenant "${tenantName}" not found. Check the tenantName value.`
             );
+        }
+
+        if (tenant.readOnly) {
+            const annotations = (ctx.state as any)?.tool?.metadata?.annotations;
+            if (annotations?.readOnlyHint !== true) {
+                throw new McpError(
+                    ErrorCodes.TENANT_READ_ONLY,
+                    `Tenant "${tenantName}" is read-only. Create, update, and delete operations are not allowed.`
+                );
+            }
         }
 
         const toolContext = ctx.state?.toolContext;
