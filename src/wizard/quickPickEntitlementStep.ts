@@ -20,7 +20,7 @@ export class QuickPickEntitlementStep extends QuickPickPromptStep<WizardContext,
             skipIfOne: true,
             items: async (context: WizardContext): Promise<vscode.QuickPickItem[]> => {
                 const client = getISCClient()
-                const results = (await client.searchEntitlements(context[entitlementQueryKey], 100, ["id", "name", "description", "source.name"]))
+                const results = (await client.searchAllEntitlements(context[entitlementQueryKey], 100, ["id", "name", "description", "source.name"]))
                     .map(x => ({
                         id: x.id,
                         label: x.name,

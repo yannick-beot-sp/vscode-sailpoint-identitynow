@@ -8,7 +8,7 @@ import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { compareByName } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowExecutionBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, PublicIdentity, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, EventDocument, AccountActivityDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, IdentityProfilesV2025Api, IdentityPreviewResponseV2025, IdentityAttributeTransformV2025, SourcesV2025Api, TaskManagementV2025Api, AttributeDTO, RolesV2025Api, AccessProfilesV2025Api, JsonPatchOperationV2025, DimensionsV2025Api, RolesV2025ApiListRolesRequest, DimensionV2025, DimensionsV2025ApiListDimensionsRequest, PasswordConfigurationV2025Api, PasswordOrgConfigV2025, WorkflowsV2025Api, WorkflowV2025, WorkflowBodyV2025, WorkflowExecutionEventV2025, CreateWorkflowRequestV2025, WorkflowExecutionV2025, ConnectorRuleManagementV2025Api, ConnectorRuleResponseV2025, EntitlementsV2025Api, EntitlementsV2025ApiListEntitlementsRequest, EntitlementV2025, PublicIdentitiesV2025Api, PublicIdentitiesV2025ApiGetPublicIdentitiesRequest, RoleV2025, TransformsV2025Api, TransformV2025, TransformReadV2025 } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowExecutionBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, PublicIdentity, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, EventDocument, AccountActivityDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, IdentityProfilesV2025Api, IdentityPreviewResponseV2025, IdentityAttributeTransformV2025, SourcesV2025Api, TaskManagementV2025Api, AttributeDTO, RolesV2025Api, AccessProfilesV2025Api, JsonPatchOperationV2025, DimensionsV2025Api, RolesV2025ApiListRolesRequest, DimensionV2025, DimensionsV2025ApiListDimensionsRequest, PasswordConfigurationV2025Api, PasswordOrgConfigV2025, WorkflowsV2025Api, WorkflowV2025, WorkflowBodyV2025, WorkflowExecutionEventV2025, CreateWorkflowRequestV2025, WorkflowExecutionV2025, ConnectorRuleManagementV2025Api, ConnectorRuleResponseV2025, EntitlementsV2025Api, EntitlementsV2025ApiListEntitlementsRequest, EntitlementV2025, PublicIdentitiesV2025Api, PublicIdentitiesV2025ApiGetPublicIdentitiesRequest, RoleV2025, TransformsV2025Api, TransformV2025, TransformReadV2025, SearchV2025Api, SearchV2025, IndexV2025, AccessProfileDocumentV2025, EntitlementDocumentV2025, RoleDocumentV2025, EventDocumentV2025, AccountActivityDocumentV2025 } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -20,6 +20,8 @@ import { addQueryParams } from "../utils/UriUtils";
 import { onErrorResponse, onRequest, onResponse } from "./AxiosHandlers";
 import { EmailTestMode } from "../models/EmailTestMode";
 import { Transform } from "node:stream";
+import { DEFAULT_PAGINATED_PARAMS, DEFAULT_PAGINATED_SEARCH_REQUEST_PARAMS, PaginatedSearch, PaginatedSearchRequest } from "../models/SearchQuery";
+import { buildSearchQuery } from "../utils/buildSearchQueryV2025";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const FormData = require('form-data');
@@ -43,6 +45,14 @@ const DEFAULT_PAGINATION = 250;
 
 export interface PaginatedData<T> {
 	data: T[],
+	count: number;
+	limit: number;
+	offset: number;
+}
+
+export interface PaginatedResult<T> {
+	data: T[];
+	total: number | undefined;
 	count: number;
 	limit: number;
 	offset: number;
@@ -432,12 +442,12 @@ export class ISCClient {
 		await api.deleteTransform({
 			id
 		})
-	
+
 	}
-	public async getTransformByName(name: string): Promise<TransformRead> {
+	public async getTransformByName(name: string): Promise<TransformReadV2025> {
 		console.log("> getTransformByName", name);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new TransformsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new TransformsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.listTransforms({
 			filters: `name eq "${name}"`,
 			limit: 1,
@@ -446,6 +456,28 @@ export class ISCClient {
 
 		const transform = this.ensureOneBasedOnHeader(response, "transform", name);
 		return transform;
+	}
+	public async getTransformById(id: string): Promise<TransformReadV2025> {
+		console.log("> getTransformById", id);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new TransformsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getTransform({
+			id
+		});
+
+		return response.data
+	}
+
+
+	public async updateTransform(id: string, transform: TransformV2025): Promise<TransformReadV2025> {
+		console.log("> updateTransform", id, transform);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new TransformsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.updateTransform({
+			id,
+			transformV2025: transform
+		});
+		return response.data
 	}
 
 	////////////////////////
@@ -564,7 +596,7 @@ export class ISCClient {
 
 	public async getIdentity(identityNameOrId: string): Promise<any> {
 		console.log("> getIdentity", identityNameOrId);
-		const results = await this.searchIdentities(
+		const results = await this.searchAllIdentities(
 			'"' + identityNameOrId + '"',
 			1,
 			["name", "displayName", "id"]
@@ -573,67 +605,25 @@ export class ISCClient {
 		return identity;
 	}
 
-	public async searchAccessProfiles(query: string, limit?: number, fields?: string[], includeNested = false): Promise<AccessProfileDocument[]> {
+	public async searchAllAccessProfiles(query: string, limit?: number, fields?: string[], includeNested = false): Promise<AccessProfileDocument[]> {
 		console.log("> searchAccessProfiles", query);
-
-		const search: Search = {
-			indices: [
-				"accessprofiles"
-			],
-			query: {
-				query: query
-			},
-			sort: ["name"],
-			includeNested: includeNested,
-			queryResultFilter: {
-				includes: fields
-			}
-		};
-
-		return await this.search(search, limit) as IdentityDocument[];
+		const search = buildSearchQuery({ index: IndexV2025.Accessprofiles, query, sort: "name", fields, includeNested })
+		return await this.searchAll(search, limit) as IdentityDocument[];
 	}
 
-	public async searchEntitlements(query: string, limit?: number, fields?: string[], includeNested = false): Promise<EntitlementDocument[]> {
+	public async searchAllEntitlements(query: string, limit?: number, fields?: string[], includeNested = false): Promise<EntitlementDocument[]> {
+		console.log("> searchEntitlements", query);
+		const search = buildSearchQuery({ index: IndexV2025.Entitlements, query, sort: "name", fields, includeNested })
+		return await this.searchAll(search, limit) as EntitlementDocument[];
+	}
+
+	public async searchAllIdentities(query: string, limit?: number, fields?: string[], sort = "name"): Promise<IdentityDocument[]> {
 		console.log("> searchIdentity", query);
-
-		const search: Search = {
-			indices: [
-				"entitlements"
-			],
-			query: {
-				query: query
-			},
-			sort: ["name"],
-			includeNested: includeNested,
-			queryResultFilter: {
-				includes: fields
-			}
-		};
-
-		return await this.search(search, limit) as EntitlementDocument[];
+		const search = buildSearchQuery({ index: IndexV2025.Identities, query, sort, fields, includeNested: false })
+		return await this.searchAll(search, limit) as IdentityDocument[];
 	}
 
-	public async searchIdentities(query: string, limit?: number, fields?: string[], sort = "name"): Promise<IdentityDocument[]> {
-		console.log("> searchIdentity", query);
-
-		const search: Search = {
-			indices: [
-				"identities"
-			],
-			query: {
-				query: query
-			},
-			sort: [sort],
-			includeNested: false,
-			queryResultFilter: {
-				includes: fields
-			}
-		};
-
-		return await this.search(search, limit) as IdentityDocument[];
-	}
-
-	public async search(query: Search, limit?: number): Promise<SearchDocument[]> {
+	public async searchAll(query: Search, limit?: number): Promise<SearchDocument[]> {
 		console.log("> search", query);
 
 		const increment = limit ? Math.min(DEFAULT_PAGINATION, limit) : DEFAULT_PAGINATION;
@@ -648,103 +638,102 @@ export class ISCClient {
 	public async paginatedSearchRoles(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"]): Promise<AxiosResponse<RoleDocument[]>> {
 		console.log("> paginatedSearchRoles", query);
 
-		const search: Search = {
-			indices: [
-				"roles"
-			],
-			query: {
-				query: query
-			},
-			sort: ["name"],
-			includeNested: false,
-			queryResultFilter: {
-				includes: fields
-			}
-		};
-
-		return await this.paginatedSearch(search, limit, offset, count) as AxiosResponse<RoleDocument[]>;
+		return await this.searchPost<AccessProfileDocument>({
+			query: buildSearchQuery({ index: IndexV2025.Roles, query, sort: "name", fields }),
+			count,
+			limit,
+			offset
+		})
 	}
+
 	public async paginatedSearchAccessProfiles(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"], includeNested = false): Promise<AxiosResponse<AccessProfileDocument[]>> {
 		console.log("> paginatedSearchAccessProfiles", query);
 
-		const search: Search = {
-			indices: [
-				"accessprofiles"
-			],
-			query: {
-				query: query
-			},
-			sort: ["name"],
-			includeNested: includeNested,
-			queryResultFilter: {
-				includes: fields
-			}
-		};
-
-		return await this.paginatedSearch(search, limit, offset, count) as AxiosResponse<AccessProfileDocument[]>;
+		return await this.searchPost<AccessProfileDocument>({
+			query: buildSearchQuery({ index: IndexV2025.Accessprofiles, query, sort: "name", fields, includeNested }),
+			count,
+			limit,
+			offset
+		})
 	}
+
 	public async paginatedSearchIdentities(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"], includeNested = false): Promise<AxiosResponse<IdentityDocument[]>> {
 		console.log("> paginatedSearchIdentities", query);
-
-		const search: Search = {
-			indices: [
-				"identities"
-			],
-			query: {
-				query: query
-			},
-			sort: ["name"],
-			includeNested,
-			queryResultFilter: {
-				includes: fields
-			}
-		};
-
-		return await this.paginatedSearch(search, limit, offset, count) as AxiosResponse<IdentityDocument[]>
-	}
-
-	public async paginatedSearchEvents(query: string, limit?: number, offset?: number, count = false, sort = "-created"): Promise<AxiosResponse<EventDocument[]>> {
-		console.log("> paginatedSearchEvents", query);
-		const search: Search = {
-			indices: ["events"],
-			query: { query },
-			sort: [sort],
-			includeNested: false,
-		};
-		return await this.searchPost(search, limit, offset, count) as AxiosResponse<EventDocument[]>;
-	}
-
-	public async paginatedSearchAccountActivities(query: string, limit?: number, offset?: number, count = false, sort = "-modified"): Promise<AxiosResponse<AccountActivityDocument[]>> {
-		console.log("> paginatedSearchAccountActivities", query);
-		const search: Search = {
-			indices: ["accountactivities"],
-			query: { query },
-			sort: [sort],
-			includeNested: false,
-		};
-		return await this.searchPost(search, limit, offset, count) as AxiosResponse<AccountActivityDocument[]>;
-	}
-
-	private async searchPost(query: Search, limit?: number, offset?: number, count?: boolean): Promise<AxiosResponse<SearchDocument[]>> {
-		const apiConfig = await this.getApiConfiguration();
-		const api = new SearchApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		return api.searchPost({ search: query, limit, offset, count });
-	}
-
-	public async paginatedSearch(query: Search, limit?: number, offset?: number, count?: boolean): Promise<AxiosResponse<SearchDocument[]>> {
-		console.log("> paginatedSearch", query);
-
-		limit = limit ? Math.min(DEFAULT_PAGINATION, limit) : DEFAULT_PAGINATION;
-
-		const apiConfig = await this.getApiConfiguration();
-		const api = new SearchApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.searchPost({
-			search: query,
+		return await this.searchPost<IdentityDocument>({
+			query: buildSearchQuery({ index: IndexV2025.Identities, query, sort: "name", fields, includeNested }),
+			count,
 			limit,
+			offset
+		})
+	}
+
+	private async searchPost<T>(input: PaginatedSearchRequest): Promise<AxiosResponse<T[]>> {
+		const {
+			query,
+			limit = DEFAULT_PAGINATED_PARAMS.limit,
+			offset = DEFAULT_PAGINATED_PARAMS.offset,
+			count = DEFAULT_PAGINATED_PARAMS.count
+		} = input;
+
+		const cappedLimit = Math.min(limit, 10000)
+
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SearchV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.searchPost({
+			searchV2025: query,
+			limit: cappedLimit,
 			offset,
 			count
+		}) as AxiosResponse<T[]>
+		return response
+	}
+
+	private async paginatedSearch<T>(input: PaginatedSearchRequest): Promise<PaginatedResult<T>> {
+		input.limit = input.limit ?? DEFAULT_PAGINATED_PARAMS.limit
+		input.offset = input.offset ?? DEFAULT_PAGINATED_PARAMS.offset
+
+		const response = await this.searchPost(input)
+
+		const rawCount = response.headers?.[TOTAL_COUNT_HEADER];
+		const total = rawCount !== undefined ? Number(rawCount) : undefined;
+
+		const data = response.data as T[]
+		return { data, total, count: data.length, limit: input.limit, offset: input.offset };
+	}
+
+	public async paginatedSearchAccessProfilesV2025(input: PaginatedSearch): Promise<PaginatedResult<AccessProfileDocumentV2025>> {
+		return this.paginatedSearch<AccessProfileDocumentV2025>({
+			...input,
+			query: buildSearchQuery({ ...input, sort: input.sort ?? "name", index: IndexV2025.Accessprofiles })
 		});
-		return resp;
+	}
+
+	public async paginatedSearchEntitlementsV2025(input: PaginatedSearch): Promise<PaginatedResult<EntitlementDocumentV2025>> {
+		return this.paginatedSearch<EntitlementDocumentV2025>({
+			...input,
+			query: buildSearchQuery({ ...input, index: IndexV2025.Entitlements })
+		});
+	}
+
+	public async paginatedSearchRolesV2025(input: PaginatedSearch): Promise<PaginatedResult<RoleDocumentV2025>> {
+		return this.paginatedSearch<RoleDocumentV2025>({
+			...input,
+			query: buildSearchQuery({ ...input, index: IndexV2025.Roles })
+		})
+	}
+
+	public async paginatedSearchEventsV2025(input: PaginatedSearch): Promise<PaginatedResult<EventDocumentV2025>> {
+		return this.paginatedSearch<EventDocumentV2025>({
+			...input,
+			query: buildSearchQuery({ ...input, index: IndexV2025.Events })
+		})
+	}
+
+	public async paginatedSearchAccountActivitiesV2025(input: PaginatedSearch): Promise<PaginatedResult<AccountActivityDocumentV2025>> {
+		return this.paginatedSearch<AccountActivityDocumentV2025>({
+			...input,
+			query: buildSearchQuery({ ...input, index: IndexV2025.Accountactivities })
+		})
 	}
 
 	/////////////////////////////

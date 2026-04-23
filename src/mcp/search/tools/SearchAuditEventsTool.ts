@@ -4,9 +4,8 @@ import { z } from "zod";
 import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
 import { tenantNameField } from "../../inputFields";
-import { searchQueryField, offsetField, limitField, sortField } from "../searchInputFields";
+import { DEFAULT_SEARCH_LIMIT, paginationOutputFields, searchQueryField, offsetField, limitField, sortField } from "../searchInputFields";
 
-const DEFAULT_LIMIT = 250;
 const DEFAULT_SORT = "-created";
 
 const inputSchema = z.object({
@@ -18,10 +17,7 @@ const inputSchema = z.object({
 });
 
 const outputSchema = z.object({
-    total: z.number().optional().describe("Total number of matching audit events (when available)."),
-    offset: z.number().describe("Offset used for this result page."),
-    limit: z.number().describe("Limit used for this result page."),
-    count: z.number().describe("Number of events returned in this response."),
+    ...paginationOutputFields,
     events: z.array(
         z.object({
             id: z.string().optional(),
@@ -46,10 +42,6 @@ const outputSchema = z.object({
 type Input = z.infer<typeof inputSchema>;
 type Output = z.infer<typeof outputSchema>;
 
-/**
- * Searches audit events (index: events) using a Lucene query, with support for
- * offset-based pagination and limits up to 10 000.
- */
 @Tool({
     name: "searchAuditEvents",
     description:
@@ -69,39 +61,18 @@ export class SearchAuditEventsTool extends ToolContext {
     async execute(input: Input): Promise<Output> {
         const client = getIscClient(this);
         const offset = input.offset ?? 0;
-        const limit = input.limit ?? DEFAULT_LIMIT;
+        const limit = input.limit ?? DEFAULT_SEARCH_LIMIT;
 
         try {
-            const response = await client.paginatedSearchEvents(
-                input.query,
+            const result = await client.paginatedSearchEventsV2025({
+                query: input.query,
+                sort: input.sort ?? DEFAULT_SORT,
                 limit,
                 offset,
-                true, // request total count
-                input.sort ?? DEFAULT_SORT,
-            );
+            })
 
-            const rawCount = response.headers?.["x-total-count"];
-            const total = rawCount !== undefined ? Number(rawCount) : undefined;
-
-            const events = (response.data ?? []).map(e => ({
-                id: e.id,
-                name: e.name,
-                created: e.created,
-                action: e.action,
-                type: e.type,
-                actor: e.actor ? { name: e.actor.name } : undefined,
-                target: e.target ? { name: e.target.name } : undefined,
-                stack: e.stack,
-                trackingNumber: e.trackingNumber,
-                ipAddress: e.ipAddress,
-                operation: e.operation,
-                status: e.status,
-                technicalName: e.technicalName,
-                objects: e.objects,
-                attributes: e.attributes,
-            }));
-
-            return { total, offset, limit, count: events.length, events };
+            return { total: result.total, offset: result.offset, limit: result.limit, count: result.count, events: result.data };
+            
         } catch (err: any) {
             if (err instanceof McpError) { throw err; }
             throw new McpError(ErrorCodes.ISC_API_ERROR, String(err?.message ?? err));

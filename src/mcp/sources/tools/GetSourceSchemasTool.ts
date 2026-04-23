@@ -71,8 +71,8 @@ export class GetSourceSchemasTool extends ToolContext {
                     identityAttribute: s.identityAttribute,
                     displayAttribute: s.displayAttribute,
                     attributes: s.attributes?.map(a => ({
-                        name: a.name,
-                        type: a.type,
+                        name: a.name!,
+                        type: a.type?.toString(),
                         isMultiValued: a.isMulti,
                         isEntitlement: a.isEntitlement,
                     })),

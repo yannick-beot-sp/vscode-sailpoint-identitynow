@@ -171,26 +171,26 @@ This extension includes the following snippets for the Public Identities Configu
 
 The following table provides the expected column for the CSV to import Access Profiles:
 
-| Header                               | M[*] | Description                                                                                                                                   | Default Value |
-| ------------------------------------ | ---- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| `name`                               | Yes  | Name of the access profile                                                                                                                    |               |
-| `owner`                              | Yes  | Owner of the access profile                                                                                                                   |               |
-| `additionalOwners`                   | No   | Additional owners (identity names or IDs), separated by `;`. Maximum 10 identities. Mutually exclusive with `additionalOwnerGovernanceGroup`. |               |
-| `additionalOwnerGovernanceGroup`     | No   | Additional owners as a single governance group name. Mutually exclusive with `additionalOwners`.                                              | `null`        |
-| `source`                             | Yes  | Source associated with the access profile                                                                                                     |               |
-| `description`                        | No   | Description of the access profile                                                                                                             | `null`        |
-| `enabled`                            | No   | Is the access profile enabled?                                                                                                                | `false`       |
-| `requestable`                        | No   | Is the access profile requestable?                                                                                                            | `false`       |
-| `commentsRequired`                   | No   | Require comments when the user requests access                                                                                                | `false`       |
-| `denialCommentsRequired`             | No   | Require comments when a reviewer denies the request                                                                                           | `false`       |
-| `approvalSchemes`                    | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`,`ALL_OWNERS`, `ADDITIONAL_OWNER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by `;`     |               |
-| `reauthorizationRequired`            | No   | Indicates whether reauthorization is required for the request.                                                                                | `false`       |
-| `requireEndDate`                     | No   | Indicates whether the requester of the containing object must provide access end date.                                                        | `false`       |
-| `maxPermittedAccessDurationValue`    | No   | The numeric value representing the amount of time, which is defined in the timeUnit.                                                          |               |
-| `maxPermittedAccessDurationTimeUnit` | No   | The unit of time that corresponds to the value among `HOURS`, `DAYS`, `WEEKS`, or `MONTHS`.                                                   |               |
-| `revokeApprovalSchemes`              | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by `;`     |               |
-| `entitlements`                       | No   | Entitlements of the access profile                                                                                                            |               |
-| `metadata`                           | No   | Metadata of the access profile (cf. below for format)                                                                                         |               |
+| Header                               | M[*] | Description                                                                                                                                                                | Default Value |
+| ------------------------------------ | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| `name`                               | Yes  | Name of the access profile                                                                                                                                                 |               |
+| `owner`                              | Yes  | Owner of the access profile                                                                                                                                                |               |
+| `additionalOwners`                   | No   | Additional owners (identity names or IDs), separated by `;`. Maximum 10 identities. Mutually exclusive with `additionalOwnerGovernanceGroup`.                              |               |
+| `additionalOwnerGovernanceGroup`     | No   | Additional owners as a single governance group name. Mutually exclusive with `additionalOwners`.                                                                           | `null`        |
+| `source`                             | Yes  | Source associated with the access profile                                                                                                                                  |               |
+| `description`                        | No   | Description of the access profile                                                                                                                                          | `null`        |
+| `enabled`                            | No   | Is the access profile enabled?                                                                                                                                             | `false`       |
+| `requestable`                        | No   | Is the access profile requestable?                                                                                                                                         | `false`       |
+| `commentsRequired`                   | No   | Require comments when the user requests access                                                                                                                             | `false`       |
+| `denialCommentsRequired`             | No   | Require comments when a reviewer denies the request                                                                                                                        | `false`       |
+| `approvalSchemes`                    | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`,`ALL_OWNERS`, `ADDITIONAL_OWNER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by `;` |               |
+| `reauthorizationRequired`            | No   | Indicates whether reauthorization is required for the request.                                                                                                             | `false`       |
+| `requireEndDate`                     | No   | Indicates whether the requester of the containing object must provide access end date.                                                                                     | `false`       |
+| `maxPermittedAccessDurationValue`    | No   | The numeric value representing the amount of time, which is defined in the timeUnit.                                                                                       |               |
+| `maxPermittedAccessDurationTimeUnit` | No   | The unit of time that corresponds to the value among `HOURS`, `DAYS`, `WEEKS`, or `MONTHS`.                                                                                |               |
+| `revokeApprovalSchemes`              | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by `;`                                  |               |
+| `entitlements`                       | No   | Entitlements of the access profile                                                                                                                                         |               |
+| `metadata`                           | No   | Metadata of the access profile (cf. below for format)                                                                                                                      |               |
 
 [*]: ## "Mandatory"
 
@@ -304,13 +304,18 @@ There are 3 kind of attributes:
 
 ##### Attribute operators
 
-| Operator | Description |
-| -------- | ----------- |
-| eq       | equals      |
-| ne       | not equals  |
-| co       | contains    |
-| sw       | starts with |
-| ew       | ends with   |
+| Operator | Description      |
+| -------- | ---------------- |
+| eq       | equals           |
+| ne       | not equals       |
+| co       | contains         |
+| sw       | starts with      |
+| ew       | ends with        |
+| in       | in               |
+| gt       | greater than     |
+| ge       | greater or equal |
+| lt       | less than        |
+| le       | less or equal    |
 
 ##### Logical operators
 

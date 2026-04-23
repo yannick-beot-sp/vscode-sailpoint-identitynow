@@ -5,6 +5,7 @@ import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
 import { tenantNameField } from "../../inputFields";
 import { transformNameField } from "../transformInputFields";
+import { isUuid } from "../../../utils/stringUtils";
 
 const IDENTITY_ATTRIBUTE = "uid";
 
@@ -30,8 +31,6 @@ const outputSchema = z.object({
 type Input = z.infer<typeof inputSchema>;
 type Output = z.infer<typeof outputSchema>;
 
-const IDENTITY_ID_REGEX = /^[0-9a-f]{32}$/;
-
 /**
  * Evaluates a transform for a given identity by ID or name.
  * If an ID is provided, it is used directly. Otherwise, resolves the identity ID
@@ -55,11 +54,11 @@ export class EvaluateTransformTool extends ToolContext {
 
         // Resolve identity ID
         let identityId: string;
-        if (IDENTITY_ID_REGEX.test(input.identity)) {
+        if (isUuid(input.identity)) {
             identityId = input.identity;
         } else {
             try {
-                const identities = await client.searchIdentities(input.identity, 1);
+                const identities = await client.searchAllIdentities(input.identity, 1);
                 if (!identities || identities.length === 0) {
                     throw new McpError(
                         ErrorCodes.INVALID_INPUT,
@@ -90,7 +89,7 @@ export class EvaluateTransformTool extends ToolContext {
 
             const attr = result?.previewAttributes?.find(x => x.name === IDENTITY_ATTRIBUTE);
             if (attr?.errorMessages && attr.errorMessages.length > 0) {
-                return { errors: attr.errorMessages.map(x => x.text) };
+                return { errors: attr.errorMessages?.map(x => x.text).filter(x => x !== undefined) ?? ["Could not evaluate the transform"] };
             }
             return { value: attr?.value as string ?? null };
         } catch (err: any) {

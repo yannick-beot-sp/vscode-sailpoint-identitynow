@@ -3,7 +3,6 @@ import * as vscode from 'vscode';
 import { ISCClient } from '../services/ISCClient';
 import { CSVReader } from '../services/CSVReader';
 import { UserCancelledError } from '../errors';
-import { error } from 'console';
 import { Index, Search } from 'sailpoint-api-client';
 
 const VALID_REVIEWER_ATTRIBUTES = ["id", "name", "email"]
@@ -82,28 +81,28 @@ export class CustomReviewerImporter {
                 try {
                     // Confirm reviewer values
                     if (!data.reviewerValue) {
-                        throw new error(`reviewerValue is empty`)
+                        throw new Error(`reviewerValue is empty`)
                     }
                     if (!data.reviewerAttribute || VALID_REVIEWER_ATTRIBUTES.indexOf(data.reviewerAttribute) === -1) {
-                        throw new error(`Invalid reviewerAttribute. Accepted values: ${JSON.stringify(VALID_REVIEWER_ATTRIBUTES)}`)
+                        throw new Error(`Invalid reviewerAttribute. Accepted values: ${JSON.stringify(VALID_REVIEWER_ATTRIBUTES)}`)
                     }
                     // Confirm itemType value
                     if (!data.itemType || VALID_ITEM_TYPES.indexOf(data.itemType) === -1) {
-                        throw new error(`Invalid itemType. Accepted values: ${JSON.stringify(VALID_ITEM_TYPES)}`)
+                        throw new Error(`Invalid itemType. Accepted values: ${JSON.stringify(VALID_ITEM_TYPES)}`)
                     }
                     // Confirm itemSelector values unless using itemType:ALL
                     if (data.itemType !== "ALL") {
                         if (!data.itemSelectorType || VALID_ITEM_SELECTOR_TYPES.indexOf(data.itemSelectorType) === -1) {
-                            throw new error(`Invalid itemSelectorType. Accepted values: ${JSON.stringify(VALID_ITEM_SELECTOR_TYPES)}`)
+                            throw new Error(`Invalid itemSelectorType. Accepted values: ${JSON.stringify(VALID_ITEM_SELECTOR_TYPES)}`)
                         }
                         // Confirm itemSelectorValue unless using itemSelectorType:all
                         if (data.itemSelectorType !== "all") {
                             if (!data.itemSelectorValue) {
-                                throw new error(`itemSelectorValue is empty`)
+                                throw new Error(`itemSelectorValue is empty`)
                             }
                             // Confirm not using itemSelectorType name with itemType ENTITLEMENT
                             if (data.itemType === "ENTITLEMENT" && data.itemSelectorType === "name") {
-                                throw new error(`'itemSelectorType:${data.itemSelectorType}' is not supported with 'itemType:${data.itemType}'`)
+                                throw new Error(`'itemSelectorType:${data.itemSelectorType}' is not supported with 'itemType:${data.itemType}'`)
                             }
                         }
                     }
@@ -111,19 +110,19 @@ export class CustomReviewerImporter {
                     // Find an active reviewer using the supplied attribute/value
                     const identityFilter = `${data.reviewerAttribute === "name" ? "alias" : data.reviewerAttribute} eq "${data.reviewerValue}"`
                     const findReviewerResult = await this.client.listIdentities({ filters: identityFilter })
-                    let reviewerId: string
+                    let reviewerId: string | undefined = undefined
                     // only expecting one result but just in case fetching the first active identity
                     for (const reviewer of findReviewerResult.data) {
-                        if (reviewer.attributes['identityState'] === "ACTIVE") {
-                            reviewerId = reviewer.id
+                        if (reviewer.attributes?.['identityState'] === "ACTIVE") {
+                            reviewerId = reviewer.id!
                             break
                         }
                     }
                     if (!reviewerId) {
-                        throw new error(`Unable to find an active reviewer using the Identities API filter: ${identityFilter}`)
+                        throw new Error(`Unable to find an active reviewer using the Identities API filter: ${identityFilter}`)
                     }
 
-                    let itemIds = []
+                    let itemIds: string[] = []
                     const isAllItems = data.itemType === "ALL" || data.itemSelectorType === "all" || data.itemSelectorValue === "*"
                     // Only get Item IDs if not using ANY/all/* selectors
                     if (!isAllItems) {
@@ -144,7 +143,7 @@ export class CustomReviewerImporter {
                                 break
                         }
                         if (itemIds.length === 0) {
-                            throw new error(`No items found using 'itemType:${data.itemType}' and 'itemSelector:${data.itemSelectorType}'`)
+                            throw new Error(`No items found using 'itemType:${data.itemType}' and 'itemSelector:${data.itemSelectorType}'`)
                         }
                     }
 
@@ -233,12 +232,8 @@ export class CustomReviewerImporter {
             }
         }
         // Run Search API
-        const searchResults = await this.client.search(search)
-        if (!searchResults.length || searchResults.length === 0) {
-            return []
-        } else {
-            // Return only list of IDs
-            return searchResults.map(searchResult => searchResult.id)
-        }
+        const searchResults = await this.client.searchAll(search)
+        return searchResults?.map(searchResult => searchResult.id!) ?? []
+
     }
 }

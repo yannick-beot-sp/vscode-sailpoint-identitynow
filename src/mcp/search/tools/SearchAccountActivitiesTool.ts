@@ -4,9 +4,8 @@ import { z } from "zod";
 import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
 import { tenantNameField } from "../../inputFields";
-import { searchQueryField, offsetField, limitField, sortField } from "../searchInputFields";
+import { DEFAULT_SEARCH_LIMIT, paginationOutputFields, searchQueryField, offsetField, limitField, sortField } from "../searchInputFields";
 
-const DEFAULT_LIMIT = 250;
 const DEFAULT_SORT = "-modified";
 
 const inputSchema = z.object({
@@ -24,10 +23,7 @@ const identitySchema = z.object({
 });
 
 const outputSchema = z.object({
-    total: z.number().optional().describe("Total number of matching account activities (when available)."),
-    offset: z.number().describe("Offset used for this result page."),
-    limit: z.number().describe("Limit used for this result page."),
-    count: z.number().describe("Number of account activities returned in this response."),
+    ...paginationOutputFields,
     accountActivities: z.array(
         z.object({
             id: z.string().optional(),
@@ -48,10 +44,6 @@ const outputSchema = z.object({
 type Input = z.infer<typeof inputSchema>;
 type Output = z.infer<typeof outputSchema>;
 
-/**
- * Searches account activities (index: accountactivities) using a Lucene query, with support for
- * offset-based pagination and limits up to 10 000.
- */
 @Tool({
     name: "searchAccountActivities",
     description:
@@ -71,35 +63,18 @@ export class SearchAccountActivitiesTool extends ToolContext {
     async execute(input: Input): Promise<Output> {
         const client = getIscClient(this);
         const offset = input.offset ?? 0;
-        const limit = input.limit ?? DEFAULT_LIMIT;
+        const limit = input.limit ?? DEFAULT_SEARCH_LIMIT;
 
         try {
-            const response = await client.paginatedSearchAccountActivities(
-                input.query,
+            const result = await client.paginatedSearchAccountActivitiesV2025({
+                query: input.query,
+                sort: input.sort ?? DEFAULT_SORT,
                 limit,
                 offset,
-                true, // request total count
-                input.sort ?? DEFAULT_SORT,
-            );
+            })
 
-            const rawCount = response.headers?.["x-total-count"];
-            const total = rawCount !== undefined ? Number(rawCount) : undefined;
 
-            const accountActivities = (response.data ?? []).map(a => ({
-                id: a.id,
-                action: a.action,
-                created: a.created,
-                modified: a.modified,
-                stage: a.stage,
-                status: a.status,
-                requester: a.requester ? { id: a.requester.id, name: a.requester.name, type: a.requester.type } : undefined,
-                recipient: a.recipient ? { id: a.recipient.id, name: a.recipient.name, type: a.recipient.type } : undefined,
-                trackingNumber: a.trackingNumber,
-                errors: a.errors,
-                warnings: a.warnings,
-            }));
-
-            return { total, offset, limit, count: accountActivities.length, accountActivities };
+            return { total: result.total, offset: result.offset, limit: result.limit, count: result.count, accountActivities:result.data };
         } catch (err: any) {
             if (err instanceof McpError) { throw err; }
             throw new McpError(ErrorCodes.ISC_API_ERROR, String(err?.message ?? err));

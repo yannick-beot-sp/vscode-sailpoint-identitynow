@@ -52,7 +52,7 @@ export class SearchIdentityTool extends ToolContext {
         const client = getIscClient(this);
 
         try {
-            const results = await client.searchIdentities(
+            const results = await client.searchAllIdentities(
                 input.query,
                 input.limit ?? 50,
                 ["id", "name", "email"],
