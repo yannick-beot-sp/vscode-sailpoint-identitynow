@@ -6,6 +6,19 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ## [Unreleased]
 
+### Security
+
+### Added
+
+### Changed
+
+### Fixed
+
+- Fix issue when exporting SPConfig for chosen forms, segments or connector rules
+
+
+### Removed
+
 ## [1.3.26] - 2026-04-20
 
 ### Security
@@ -25,10 +38,6 @@ This changelog is following the recommended format by [keepachangelog](https://k
 - Update schema for additional owners and max duration.
 - Update dependency for `sailpoint-api-client`
 - Update of roles and access profiles only take into account the columns provided. Mandatory columns are still mandatory (`source` for access profiles for instance)
-
-### Fixed
-
-### Removed
 
 ## [1.3.25] - 2026-02-20
 
