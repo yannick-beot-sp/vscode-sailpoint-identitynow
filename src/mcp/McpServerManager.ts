@@ -36,12 +36,17 @@ function savePreferredPort(port?: number): void {
 export class McpServerManager {
     readonly server: McpServer;
     private didChangeEmitter = new vscode.EventEmitter<void>();
+    private readonly statusBarItem: vscode.StatusBarItem;
 
     constructor(
         private readonly context: vscode.ExtensionContext,
         tenantService: TenantService,
     ) {
         this.server = new McpServer(tenantService);
+
+        this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right);
+        this.statusBarItem.text = "$(hubot)";
+        context.subscriptions.push(this.statusBarItem);
 
         context.subscriptions.push(
             vscode.workspace.onDidChangeConfiguration(this.onConfigurationChanged.bind(this))
@@ -72,6 +77,8 @@ export class McpServerManager {
             savePreferredPort(this.server.port);
         }
         console.log(`MCP Server started on port ${this.server.port}`)
+        this.statusBarItem.tooltip = `ISC MCP Server listening on port ${this.server.port}`;
+        this.statusBarItem.show();
         await this.registerServer();
     }
 
@@ -82,6 +89,7 @@ export class McpServerManager {
                 await this.startAndRegisterServer()
             } else if (!mcpEnabled && this.server.isRunning()) {
                 await this.server.stop();
+                this.statusBarItem.hide();
             }
         }
 
@@ -127,5 +135,6 @@ export class McpServerManager {
 
     dispose(): void {
         this.server.stop().catch(() => undefined);
+        this.statusBarItem.hide();
     }
 }

@@ -4,7 +4,6 @@
 .vscode/**
 
 node_modules/**
-resources/readme/**
 scripts/**
 src/**
 
