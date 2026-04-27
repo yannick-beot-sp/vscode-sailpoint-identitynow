@@ -20,7 +20,7 @@ const inputSchema = z.object({
 
 const refSchema = z.object({
     id: z.string().optional(),
-    name: z.string().optional(),
+    name: z.string().optional().nullable(),
     type: z.string().optional(),
 });
 
