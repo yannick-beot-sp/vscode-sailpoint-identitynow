@@ -14,6 +14,7 @@ import { Parser } from "../../../parser/parser";
 import { RoleMembershipSelectorConverter } from "../../../parser/RoleMembershipSelectorConverter";
 import { SourceNameToIdCacheService } from "../../../services/cache/SourceNameToIdCacheService";
 import { isUuid } from "../../../utils/stringUtils";
+import { membershipCriteriaField, roleBaseOutputSchema } from "./roleSchemas";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -27,27 +28,10 @@ const inputSchema = z.object({
     accessProfiles: z.array(z.string()).optional().describe(
         "Access profile names or IDs to include in the role."
     ),
-    membershipCriteria: z.string().optional().describe(
-        "Membership criteria in SCIM-like format. " +
-        "Supported attributes: identity.attribute.<attributeName>, '{source name}'.attribute.{attribute name}, '{source name}'.entitlement.{attribute name}. " +
-        "Operators: eq, ne, in, co, sw, ew, gt, ge, lt, le. " +
-        "Logical: AND, OR. Grouping: ( ). " +
-        'Example: identity.attribute.department eq "Engineering" AND identity.attribute.location eq "HQ".'
-    ),
+    membershipCriteria: membershipCriteriaField,
 });
 
-const outputSchema = z.object({
-    id: z.string().describe("ID of the created role."),
-    name: z.string().describe("Name of the created role."),
-    description: z.string().nullable().optional(),
-    enabled: z.boolean().optional(),
-    requestable: z.boolean().optional(),
-    owner: z.object({
-        id: z.string().optional(),
-        name: z.string().optional(),
-        type: z.string().optional(),
-    }).optional(),
-});
+const outputSchema = roleBaseOutputSchema;
 
 type Input = z.infer<typeof inputSchema>;
 type Output = z.infer<typeof outputSchema>;

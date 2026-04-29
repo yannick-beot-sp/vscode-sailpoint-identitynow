@@ -5,6 +5,7 @@ import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
 import { tenantNameField } from "../../inputFields";
 import { isUuid } from "../../../utils/stringUtils";
+import { accessProfileBaseOutputSchema, refSchema } from "./accessProfileSchemas";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -18,20 +19,7 @@ const inputSchema = z.object({
     ),
 });
 
-const refSchema = z.object({
-    id: z.string().optional(),
-    name: z.string().optional().nullable(),
-    type: z.string().optional(),
-});
-
-const outputSchema = z.object({
-    id: z.string(),
-    name: z.string(),
-    description: z.string().nullable().optional(),
-    enabled: z.boolean().optional(),
-    requestable: z.boolean().optional(),
-    source: refSchema.optional(),
-    owner: refSchema.nullable().optional(),
+const outputSchema = accessProfileBaseOutputSchema.extend({
     entitlements: z.array(refSchema).optional().nullable(),
 });
 

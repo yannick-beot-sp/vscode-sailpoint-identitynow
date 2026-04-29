@@ -8,6 +8,7 @@ import { Parser } from "../../../parser/parser";
 import { RoleMembershipSelectorConverter } from "../../../parser/RoleMembershipSelectorConverter";
 import { SourceNameToIdCacheService } from "../../../services/cache/SourceNameToIdCacheService";
 import { isUuid } from "../../../utils/stringUtils";
+import { membershipCriteriaField, refSchema, roleBaseOutputSchema } from "./roleSchemas";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -22,29 +23,10 @@ const inputSchema = z.object({
     accessProfiles: z.array(z.string()).optional().describe(
         "New list of access profile names or IDs. Replaces the existing list."
     ),
-    membershipCriteria: z.string().optional().describe(
-        "New membership criteria in SCIM-like format. " +
-        "Supported attributes: identity.attribute.<attributeName>, '{source name}'.attribute.{attribute name}, '{source name}'.entitlement.{attribute name}. " +
-        "Operators: eq, ne, in, co, sw, ew, gt, ge, lt, le. " +
-        "Logical: AND, OR. Grouping: ( ). " +
-        'Example: identity.attribute.department eq "Engineering" AND identity.attribute.location eq "HQ". ' +
-        "Pass an empty string to remove membership criteria."
-    ),
+    membershipCriteria: membershipCriteriaField,
 });
 
-const refSchema = z.object({
-    id: z.string().optional(),
-    name: z.string().optional(),
-    type: z.string().optional(),
-});
-
-const outputSchema = z.object({
-    id: z.string(),
-    name: z.string(),
-    description: z.string().nullable().optional(),
-    enabled: z.boolean().optional(),
-    requestable: z.boolean().optional(),
-    owner: refSchema.optional().nullable(),
+const outputSchema = roleBaseOutputSchema.extend({
     entitlements: z.array(refSchema).optional(),
     accessProfiles: z.array(refSchema).optional(),
     membership: z.object({

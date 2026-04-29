@@ -4,8 +4,8 @@ import { AccessProfileV2025, EntitlementRefV2025 } from "sailpoint-api-client";
 import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
 import { tenantNameField } from "../../inputFields";
-import { SourceNameToIdCacheService } from "../../../services/cache/SourceNameToIdCacheService";
 import { isUuid } from "../../../utils/stringUtils";
+import { accessProfileBaseOutputSchema } from "./accessProfileSchemas";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -20,22 +20,7 @@ const inputSchema = z.object({
     ),
 });
 
-const outputSchema = z.object({
-    id: z.string().describe("ID of the created access profile."),
-    name: z.string().describe("Name of the created access profile."),
-    description: z.string().nullable().optional(),
-    enabled: z.boolean().optional(),
-    requestable: z.boolean().optional(),
-    source: z.object({
-        id: z.string().optional(),
-        name: z.string().optional(),
-    }).optional(),
-    owner: z.object({
-        id: z.string().optional(),
-        name: z.string().optional(),
-        type: z.string().optional(),
-    }).optional(),
-});
+const outputSchema = accessProfileBaseOutputSchema;
 
 type Input = z.infer<typeof inputSchema>;
 type Output = z.infer<typeof outputSchema>;
