@@ -125,8 +125,8 @@ export class CreateRoleTool extends ToolContext {
                 enabled: true,
                 requestable: input.requestable ?? false,
                 owner: { id: ownerId, type: "IDENTITY" } as any,
-                accessProfiles: accessProfiles.length > 0 ? accessProfiles : undefined,
-                entitlements: entitlements.length > 0 ? entitlements : undefined,
+                accessProfiles,
+                entitlements,
                 membership,
             };
 

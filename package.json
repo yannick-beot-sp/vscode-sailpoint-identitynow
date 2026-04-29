@@ -1809,7 +1809,7 @@
         "vscode-sailpoint-identitynow.mCP.enabled": {
           "type": "boolean",
           "default": false,
-          "description": "Enable the MCP server for Transform management."
+          "description": "Enable the MCP server for ISC."
         },
         "vscode-sailpoint-identitynow.mCP.port": {
           "type": "integer",
