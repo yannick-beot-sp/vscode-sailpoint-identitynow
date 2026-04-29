@@ -69,11 +69,13 @@ export class UpdateAccessProfileTool extends ToolContext {
                 if (isUuid(input.owner)) {
                     ownerId = input.owner;
                 } else {
-                    const identities = await client.searchAllIdentities(input.owner, 1);
-                    if (!identities || identities.length === 0) {
-                        throw new McpError(ErrorCodes.INVALID_INPUT, `Identity "${input.owner}" not found.`);
+                    try {
+                        const identity = await client.getPublicIdentityByAlias(input.owner);
+                        ownerId = identity.id!;
+                    } catch (err: any) {
+                        if (err instanceof McpError) { throw err; }
+                        throw new McpError(ErrorCodes.ISC_API_ERROR, String(err?.message ?? err));
                     }
-                    ownerId = identities[0].id;
                 }
                 patches.push({ op: "replace", path: "/owner", value: { id: ownerId, type: "IDENTITY" } });
             }

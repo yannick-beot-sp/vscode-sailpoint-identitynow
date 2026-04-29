@@ -58,14 +58,8 @@ export class EvaluateTransformTool extends ToolContext {
             identityId = input.identity;
         } else {
             try {
-                const identities = await client.searchAllIdentities(input.identity, 1);
-                if (!identities || identities.length === 0) {
-                    throw new McpError(
-                        ErrorCodes.INVALID_INPUT,
-                        `Identity "${input.identity}" not found.`
-                    );
-                }
-                identityId = identities[0].id;
+                const identity = await client.getPublicIdentityByAlias(input.identity);
+                identityId = identity.id!;
             } catch (err: any) {
                 if (err instanceof McpError) { throw err; }
                 throw new McpError(ErrorCodes.ISC_API_ERROR, String(err?.message ?? err));
