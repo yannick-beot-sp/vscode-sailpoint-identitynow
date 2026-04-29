@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { App } from "@frontmcp/sdk";
 import { SearchIdentityTool } from "./tools/SearchIdentityTool";
 import { GetIdentityTool } from "./tools/GetIdentityTool";
+import { ListIdentityAttributesTool } from "./tools/ListIdentityAttributesTool";
 import { IdentityResource } from "./IdentityResource";
 
 /**
@@ -13,6 +14,7 @@ import { IdentityResource } from "./IdentityResource";
     tools: [
         SearchIdentityTool,
         GetIdentityTool,
+        ListIdentityAttributesTool,
     ],
     resources: [
         IdentityResource,
