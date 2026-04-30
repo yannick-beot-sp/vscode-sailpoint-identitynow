@@ -29,7 +29,7 @@ export class WorkflowExportCommand {
         }
 
         const client = new ISCClient(node.tenantId, node.tenantName);
-        const data = await client.getWorflow(node.resourceId)
+        const data = await client.getWorflowById(node.resourceId)
 
         const cleanedWorkflow = cleanUpWorkflow(data)
 

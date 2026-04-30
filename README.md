@@ -171,26 +171,26 @@ This extension includes the following snippets for the Public Identities Configu
 
 The following table provides the expected column for the CSV to import Access Profiles:
 
-| Header                               | M[*] | Description                                                                                                                                   | Default Value |
-| ------------------------------------ | ---- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| `name`                               | Yes  | Name of the access profile                                                                                                                    |               |
-| `owner`                              | Yes  | Owner of the access profile                                                                                                                   |               |
-| `additionalOwners`                   | No   | Additional owners (identity names or IDs), separated by `;`. Maximum 10 identities. Mutually exclusive with `additionalOwnerGovernanceGroup`. |               |
-| `additionalOwnerGovernanceGroup`     | No   | Additional owners as a single governance group name. Mutually exclusive with `additionalOwners`.                                              | `null`        |
-| `source`                             | Yes  | Source associated with the access profile                                                                                                     |               |
-| `description`                        | No   | Description of the access profile                                                                                                             | `null`        |
-| `enabled`                            | No   | Is the access profile enabled?                                                                                                                | `false`       |
-| `requestable`                        | No   | Is the access profile requestable?                                                                                                            | `false`       |
-| `commentsRequired`                   | No   | Require comments when the user requests access                                                                                                | `false`       |
-| `denialCommentsRequired`             | No   | Require comments when a reviewer denies the request                                                                                           | `false`       |
-| `approvalSchemes`                    | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`,`ALL_OWNERS`, `ADDITIONAL_OWNER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by `;`     |               |
-| `reauthorizationRequired`            | No   | Indicates whether reauthorization is required for the request.                                                                                | `false`       |
-| `requireEndDate`                     | No   | Indicates whether the requester of the containing object must provide access end date.                                                        | `false`       |
-| `maxPermittedAccessDurationValue`    | No   | The numeric value representing the amount of time, which is defined in the timeUnit.                                                          |               |
-| `maxPermittedAccessDurationTimeUnit` | No   | The unit of time that corresponds to the value among `HOURS`, `DAYS`, `WEEKS`, or `MONTHS`.                                                   |               |
-| `revokeApprovalSchemes`              | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by `;`     |               |
-| `entitlements`                       | No   | Entitlements of the access profile                                                                                                            |               |
-| `metadata`                           | No   | Metadata of the access profile (cf. below for format)                                                                                         |               |
+| Header                               | M[*] | Description                                                                                                                                                                | Default Value |
+| ------------------------------------ | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| `name`                               | Yes  | Name of the access profile                                                                                                                                                 |               |
+| `owner`                              | Yes  | Owner of the access profile                                                                                                                                                |               |
+| `additionalOwners`                   | No   | Additional owners (identity names or IDs), separated by `;`. Maximum 10 identities. Mutually exclusive with `additionalOwnerGovernanceGroup`.                              |               |
+| `additionalOwnerGovernanceGroup`     | No   | Additional owners as a single governance group name. Mutually exclusive with `additionalOwners`.                                                                           | `null`        |
+| `source`                             | Yes  | Source associated with the access profile                                                                                                                                  |               |
+| `description`                        | No   | Description of the access profile                                                                                                                                          | `null`        |
+| `enabled`                            | No   | Is the access profile enabled?                                                                                                                                             | `false`       |
+| `requestable`                        | No   | Is the access profile requestable?                                                                                                                                         | `false`       |
+| `commentsRequired`                   | No   | Require comments when the user requests access                                                                                                                             | `false`       |
+| `denialCommentsRequired`             | No   | Require comments when a reviewer denies the request                                                                                                                        | `false`       |
+| `approvalSchemes`                    | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`,`ALL_OWNERS`, `ADDITIONAL_OWNER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by `;` |               |
+| `reauthorizationRequired`            | No   | Indicates whether reauthorization is required for the request.                                                                                                             | `false`       |
+| `requireEndDate`                     | No   | Indicates whether the requester of the containing object must provide access end date.                                                                                     | `false`       |
+| `maxPermittedAccessDurationValue`    | No   | The numeric value representing the amount of time, which is defined in the timeUnit.                                                                                       |               |
+| `maxPermittedAccessDurationTimeUnit` | No   | The unit of time that corresponds to the value among `HOURS`, `DAYS`, `WEEKS`, or `MONTHS`.                                                                                |               |
+| `revokeApprovalSchemes`              | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by `;`                                  |               |
+| `entitlements`                       | No   | Entitlements of the access profile                                                                                                                                         |               |
+| `metadata`                           | No   | Metadata of the access profile (cf. below for format)                                                                                                                      |               |
 
 [*]: ## "Mandatory"
 
@@ -304,13 +304,18 @@ There are 3 kind of attributes:
 
 ##### Attribute operators
 
-| Operator | Description |
-| -------- | ----------- |
-| eq       | equals      |
-| ne       | not equals  |
-| co       | contains    |
-| sw       | starts with |
-| ew       | ends with   |
+| Operator | Description      |
+| -------- | ---------------- |
+| eq       | equals           |
+| ne       | not equals       |
+| co       | contains         |
+| sw       | starts with      |
+| ew       | ends with        |
+| in       | in               |
+| gt       | greater than     |
+| ge       | greater or equal |
+| lt       | less than        |
+| le       | less or equal    |
 
 ##### Logical operators
 
@@ -483,6 +488,84 @@ The external JSON trigger is:
 }
 ```
 
+## MCP Server
+
+The extension includes a built-in [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server that exposes SailPoint ISC resources and operations to AI assistants (such as Claude). Enable it via the `vscode-sailpoint-identitynow.mCP.enabled` setting.
+
+### Tenants
+
+| Tool            | Description                                                                         |
+| --------------- | ----------------------------------------------------------------------------------- |
+| `listTenants`   | List all configured tenants with their display name, domain name, and base API URL. |
+| `getTenantInfo` | Get the display name, domain name, and base API URL for a specific tenant.          |
+
+### Identities
+
+| Tool                     | Description                                                                                                                |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `searchIdentities`       | Search identities. Returns id, name, and email for each matching identity.                                                 |
+| `getIdentity`            | Get the full details of an identity by name or ID. Returns attributes, accounts, entitlements, access profiles, and roles. |
+| `listIdentityAttributes` | List all identity attributes defined in the tenant. Returns name and display name for each attribute.                      |
+
+### Sources
+
+| Tool               | Description                                                                                  |
+| ------------------ | -------------------------------------------------------------------------------------------- |
+| `listSources`      | List all sources for a given tenant. Returns the id, name and connector name of each source. |
+| `getSourceSchemas` | Get the schemas of a source by name or ID.                                                   |
+
+### Entitlements
+
+| Tool                 | Description                                                                                                                                                |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `searchEntitlements` | Search entitlements. Returns id, name, displayName, source, attribute, requestable, privileged, and tags for each match. Supports offset-based pagination. |
+
+### Access Profiles
+
+| Tool                   | Description                                                                                                                                                                |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `searchAccessProfiles` | Search access profiles. Returns id, name, description, enabled, requestable, owner, source, entitlements, apps, and tags for each match. Supports offset-based pagination. |
+| `createAccessProfile`  | Create a new access profile. Specify name, source, owner, and optionally description, enabled flag, requestable flag, and entitlement IDs.                                 |
+| `updateAccessProfile`  | Update an existing access profile using JSON Patch. Identify it by id or name, then specify only the fields to change.                                                     |
+
+### Roles
+
+| Tool          | Description                                                                                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `searchRoles` | Search roles. Returns id, name, description, enabled, requestable, owner, and tags for each match. Supports offset-based pagination.                         |
+| `createRole`  | Create a new role. Specify name, owner, and optionally description, requestable flag, entitlement IDs, access profile names or IDs, and membership criteria. |
+| `updateRole`  | Update an existing role using JSON Patch. Identify it by id or name, then specify only the fields to change.                                                 |
+
+### Transforms
+
+| Tool                | Description                                                                                                                      |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `listTransforms`    | List all transforms for a given tenant.                                                                                          |
+| `getTransform`      | Get the full details of a transform by name or ID.                                                                               |
+| `createTransform`   | Create a new transform for a given tenant.                                                                                       |
+| `updateTransform`   | Update the attributes of an existing transform by name or ID. The transform name and type cannot be changed.                     |
+| `deleteTransform`   | Delete an existing transform by name. Fails if the transform is still referenced by an Identity Profile mapping.                 |
+| `evaluateTransform` | Evaluate a transform for a given identity. Returns the computed value or error messages if the transform could not be evaluated. |
+
+### Workflows
+
+| Tool                | Description                                                                                                                           |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `listWorkflows`     | List all workflows for a given tenant.                                                                                                |
+| `getWorkflow`       | Get the full details of a workflow by name or ID.                                                                                     |
+| `createWorkflow`    | Create a new workflow for a given tenant. Workflows are always created in a disabled state.                                           |
+| `updateWorkflow`    | Update a workflow by name or ID using a full replacement (PUT). Fetch the workflow first if you need to preserve existing fields.     |
+| `deleteWorkflow`    | Delete a workflow by name or ID.                                                                                                      |
+| `setWorkflowStatus` | Enable or disable a workflow by name or ID.                                                                                           |
+| `testWorkflow`      | Test a workflow with an optional payload. Waits for the execution to finish and returns a summary of all activities and their status. |
+
+### Search
+
+| Tool                      | Description                                                                                                                                                    |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `searchAuditEvents`       | Search audit events. Returns id, action, type, actor, target, status, technicalName, and more for each matching event. Supports offset-based pagination.       |
+| `searchAccountActivities` | Search account activities. Returns id, action, status, stage, requester, recipient, trackingNumber, and more for each match. Supports offset-based pagination. |
+
 ## Extension Settings
 
 The extension supports the following settings:
@@ -515,7 +598,12 @@ The extension supports the following settings:
   - Default value: 100
 - `vscode-sailpoint-identitynow.report.campaigns.filename`: Define the pattern for the folder to export access profiles.
   - Default value: `%x/reports/%T-Campaign-%S-%y%M%d-%h%m%s.csv`
-    The patterns defined above use the following tokens:
+- `vscode-sailpoint-identitynow.mCP.enabled`: Enable the MCP server for ISC.
+  - Default value: `false`
+- `vscode-sailpoint-identitynow.mCP.port`: Port for the MCP HTTP server. 0 = auto-assign a free port.
+  - Default value: `0`
+
+The patterns defined above use the following tokens:
 
 - `%u`: User Home Dir
 - `%w`: Workspace folder
@@ -534,6 +622,8 @@ The extension supports the following settings:
 ## Release Notes
 
 ### Unreleased
+
+- Fix issue when exporting SPConfig for chosen forms, segments or connector rules
 
 ### 1.3.26
 

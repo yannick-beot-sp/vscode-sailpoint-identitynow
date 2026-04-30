@@ -38,7 +38,8 @@ import { FileHandler } from './files/FileHandler';
 import { ISCResourceProvider } from './files/ISCResourceProvider';
 import { LoadMoreNode } from './models/ISCTreeItem';
 import { SailPointISCAuthenticationProvider } from './services/AuthenticationProvider';
-import { TenantService, TenantServiceEventType } from './services/TenantService';
+import { TenantService } from './services/TenantService';
+import { TenantServiceEventType } from './services/TenantServiceEventType';
 import { TransformEvaluator } from './services/TransformEvaluator';
 import { TreeManager } from './services/TreeManager';
 import { ISCUriHandler } from './ISCUriHandler';
@@ -93,6 +94,7 @@ import { CloneTransformCommand } from './commands/CloneTransformCommand';
 import { DimensionExporterCommand } from './commands/role/ExportDimensions';
 import { DimensionImporterTreeViewCommand } from './commands/role/DimensionImporterTreeViewCommand';
 import { EditOrgConfigCommand } from './commands/tenant/EditOrgConfigCommand';
+import { McpServerManager } from './mcp/McpServerManager'
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -680,12 +682,20 @@ export function activate(context: vscode.ExtensionContext) {
 			editServiceDeskTimeCheckConfiguration.execute, editServiceDeskTimeCheckConfiguration))
 
 
+	// MCP Server
+	const mcpServerManager = new McpServerManager(context, tenantService);
+	mcpServerManager.initialize()
+
+
 	let api = {
 		getRoots(): Array<TenantInfo | FolderTreeNode> {
 			return tenantService.getRoots()
 		},
-		getChildren(id: string | undefined): Array<TenantInfo | FolderTreeNode> {
-			return tenantService.getChildren(id)
+		getChildren(id: string | undefined): Array<TenantInfo | FolderTreeNode> | undefined {
+			if (id) {
+				return tenantService.getChildren(id)
+			}
+			return undefined;
 		},
 		registerTreeUpdate(o: Observer<TenantServiceEventType, any>): void {
 			tenantService.registerObserver(TenantServiceEventType.updateTree, o)

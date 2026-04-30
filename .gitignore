@@ -1,9 +1,11 @@
 out
 dist
 node_modules
+.env
 .vscode-test/
 *.vsix
 exportedObjects/
 *.zip
 .env
 .claude
+.frontmcp

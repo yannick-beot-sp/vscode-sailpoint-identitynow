@@ -206,7 +206,7 @@ export abstract class WizardBasedExporterCommand {
                     || objectTypeItem.objectType === ExportPayloadBetaIncludeTypesBeta.ConnectorRule) {
                     // Need to select by name because it does not work by id
                     propertyName = "includedNames";
-                    selectedItems = await askChosenItems(objectTypeItem.label, placeHolder, items, x => x.label);
+                    selectedItems = await askChosenItems(objectTypeItem.label, placeHolder, items, x => x.name);
                 } else {
                     selectedItems = await askChosenItems(objectTypeItem.label, placeHolder, items, x => x.id);
                 }

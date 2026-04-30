@@ -28,7 +28,7 @@ export class QuickPickAccessProfileStep extends QuickPickPromptStep<WizardContex
             skipIfOne: true,
             items: async (context: WizardContext): Promise<vscode.QuickPickItem[]> => {
                 const client = getISCClient()
-                const results = (await client.searchAccessProfiles(context[accessProfileQueryKey], 100, ["id", "name", "description", "source.name"]))
+                const results = (await client.searchAllAccessProfiles(context[accessProfileQueryKey], 100, ["id", "name", "description", "source.name"]))
                     .map(x => ({
                         id: x.id,
                         label: x.name,

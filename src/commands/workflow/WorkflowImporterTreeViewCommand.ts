@@ -3,7 +3,7 @@ import { WorkflowsTreeItem } from '../../models/ISCTreeItem';
 import { ISCClient } from '../../services/ISCClient';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
-import { WorkflowBeta } from 'sailpoint-api-client';
+import { CreateWorkflowRequestV2025 } from 'sailpoint-api-client';
 import { cleanUpWorkflow } from './utils';
 import { isBlank } from '../../utils/stringUtils';
 import * as commands from '../constants';
@@ -45,7 +45,7 @@ export class WorkflowImporterTreeViewCommand {
 
         const data = fs.readFileSync(fileUri.fsPath).toString();
 
-        const workflow = JSON.parse(data) as WorkflowBeta
+        const workflow = JSON.parse(data) as CreateWorkflowRequestV2025
 
         const name = await askWorkflowName(workflow.name)
         if (isBlank(name)) {

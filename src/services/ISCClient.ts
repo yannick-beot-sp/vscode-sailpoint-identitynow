@@ -5,10 +5,10 @@ import * as fs from 'fs';
 import { File } from 'node:buffer';
 import { EndpointUtils } from "../utils/EndpointUtils";
 import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
-import { compareByName, convertToText } from "../utils";
+import { compareByName } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowBeta, WorkflowExecutionBeta, WorkflowLibraryTriggerBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, EntitlementsBetaApiListEntitlementsRequest, EntitlementsV2025Api, EntitlementsV2025ApiListEntitlementsRequest, EntitlementV2025, PublicIdentitiesApi, PublicIdentitiesApiGetPublicIdentitiesRequest, PublicIdentity, JsonPatchOperationBeta, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApi, AccessProfilesApiListAccessProfilesRequest, AccessProfile, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, EntitlementBeta, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, IdentityProfilesV2025Api, IdentityPreviewResponseV2025, IdentityAttributeTransformV2025, SourcesV2025Api, TaskManagementV2025Api, AttributeDTO, RolesV2025Api, AccessProfilesV2025Api, JsonPatchOperation, JsonPatchOperationV2025, DimensionsV2025Api, RolesV2025ApiListRolesRequest, DimensionV2025, DimensionsV2025ApiListDimensionsRequest, PasswordConfigurationV2025Api, PasswordOrgConfigV2025, WorkflowsV2025Api, WorkflowsV2024Api, WorkflowV2025, RoleV2025, PublicIdentitiesV2025ApiGetPublicIdentitiesRequest, PublicIdentitiesV2025Api, ConnectorRuleManagementV2025Api, ConnectorRuleResponseV2025 } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowExecutionBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, PublicIdentity, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApiListAccessProfilesRequest, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, FormBeta, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseBeta, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, IdentityProfilesV2025Api, IdentityPreviewResponseV2025, IdentityAttributeTransformV2025, SourcesV2025Api, TaskManagementV2025Api, AttributeDTO, RolesV2025Api, AccessProfilesV2025Api, JsonPatchOperationV2025, DimensionsV2025Api, RolesV2025ApiListRolesRequest, DimensionV2025, DimensionsV2025ApiListDimensionsRequest, PasswordConfigurationV2025Api, PasswordOrgConfigV2025, WorkflowsV2025Api, WorkflowV2025, WorkflowBodyV2025, WorkflowExecutionEventV2025, CreateWorkflowRequestV2025, WorkflowExecutionV2025, ConnectorRuleManagementV2025Api, ConnectorRuleResponseV2025, EntitlementsV2025Api, EntitlementsV2025ApiListEntitlementsRequest, EntitlementV2025, PublicIdentitiesV2025Api, PublicIdentitiesV2025ApiGetPublicIdentitiesRequest, RoleV2025, TransformsV2025Api, TransformV2025, TransformReadV2025, SearchV2025Api, IndexV2025, AccessProfileDocumentV2025, EntitlementDocumentV2025, RoleDocumentV2025, EventDocumentV2025, AccountActivityDocumentV2025, AccessProfileV2025 } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -19,6 +19,9 @@ import { DEFAULT_ROLES_QUERY_PARAMS } from "../models/Roles";
 import { addQueryParams } from "../utils/UriUtils";
 import { onErrorResponse, onRequest, onResponse } from "./AxiosHandlers";
 import { EmailTestMode } from "../models/EmailTestMode";
+import { DEFAULT_PAGINATED_PARAMS, PaginatedSearch, PaginatedSearchRequest } from "../models/SearchQuery";
+import { buildSearchQuery } from "../utils/buildSearchQueryV2025";
+import { AccessProfile } from "../models/AccessProfiles"
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const FormData = require('form-data');
@@ -47,30 +50,21 @@ export interface PaginatedData<T> {
 	offset: number;
 }
 
+export interface PaginatedResult<T> {
+	data: T[];
+	total: number | undefined;
+	count: number;
+	limit: number;
+	offset: number;
+}
+
 export class ISCClient {
 
 	constructor(
-		private readonly tenantId: string,
-		private readonly tenantName: string
+		public readonly tenantId: string,
+		public readonly tenantName: string
 	) {
 
-	}
-
-	private async prepareHeaders(contentType = CONTENT_TYPE_JSON): Promise<any> {
-		const headers = await this.prepareAuthenticationHeader();
-		headers[CONTENT_TYPE_HEADER] = contentType;
-		headers[USER_AGENT_HEADER] = USER_AGENT
-		return headers;
-	}
-
-	private async prepareAuthenticationHeader(): Promise<any> {
-		const session = await SailPointISCAuthenticationProvider.getInstance().getSessionByTenant(this.tenantId)
-
-		return {
-			// eslint-disable-next-line @typescript-eslint/naming-convention
-			Authorization: `Bearer ${session?.accessToken}`,
-
-		};
 	}
 
 	private ensureOneBasedOnHeader<T>(response: AxiosResponse<T[]>, type: string, value: string): T {
@@ -252,9 +246,6 @@ export class ISCClient {
 		return result.data;
 	}
 
-	/**
-	 * @param sourceName - A reference to the source to search for accounts.
-	 */
 	public async getSourceId(sourceName: string): Promise<string> {
 		console.log("> getSourceId", sourceName);
 		const apiConfig = await this.getApiConfiguration();
@@ -413,10 +404,30 @@ export class ISCClient {
 		return transforms;
 	}
 
-	public async getTransformByName(name: string): Promise<TransformRead> {
+	public async createTransform(transform: TransformV2025): Promise<TransformReadV2025> {
+		console.log("> createTransform");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new TransformsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors())
+		const response = await api.createTransform({
+			transformV2025: transform
+		})
+		return response.data
+
+	}
+
+	public async deleteTransformById(id: string): Promise<void> {
+		console.log("> deleteTransformById", id);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new TransformsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors())
+		await api.deleteTransform({
+			id
+		})
+
+	}
+	public async getTransformByName(name: string): Promise<TransformReadV2025> {
 		console.log("> getTransformByName", name);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new TransformsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new TransformsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.listTransforms({
 			filters: `name eq "${name}"`,
 			limit: 1,
@@ -425,6 +436,28 @@ export class ISCClient {
 
 		const transform = this.ensureOneBasedOnHeader(response, "transform", name);
 		return transform;
+	}
+	public async getTransformById(id: string): Promise<TransformReadV2025> {
+		console.log("> getTransformById", id);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new TransformsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getTransform({
+			id
+		});
+
+		return response.data
+	}
+
+
+	public async updateTransform(id: string, transform: TransformV2025): Promise<TransformReadV2025> {
+		console.log("> updateTransform", id, transform);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new TransformsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.updateTransform({
+			id,
+			transformV2025: transform
+		});
+		return response.data
 	}
 
 	////////////////////////
@@ -543,114 +576,34 @@ export class ISCClient {
 
 	public async getIdentity(identityNameOrId: string): Promise<any> {
 		console.log("> getIdentity", identityNameOrId);
-
-
-		let endpoint = EndpointUtils.getV3Url(this.tenantName) + "/search";
-		console.log("endpoint = " + endpoint);
-
-		const headers = await this.prepareHeaders();
-
-		const data = {
-			indices: ["identities"],
-			query: {
-				query: '"' + identityNameOrId + '"',
-				fields: ["name", "displayName", "id"],
-			},
-		};
-
-		// @ts-ignore 
-		let identity = await fetch(endpoint, {
-			headers: headers,
-			method: "POST",
-			body: convertToText(data),
-		})
-			.then(async function (response) {
-				if (response.status === 200) {
-					let json: any = await response.json();
-
-					if (json !== undefined) {
-						if (json.length > 0) {
-							return json[0];
-						}
-					}
-				} else {
-					console.error(response.statusText);
-					vscode.window.showErrorMessage(
-						`${endpoint} --> ${response.statusText}`
-					);
-					return;
-				}
-			})
-			.catch(function (error) {
-				console.log(error);
-			});
-
-		if (identity !== undefined) {
-			return identity;
-		}
+		const results = await this.searchAllIdentities(
+			'"' + identityNameOrId + '"',
+			1,
+			["name", "displayName", "id"]
+		);
+		const identity = this.ensureOneElement(results, "identity", identityNameOrId);
+		return identity;
 	}
 
-	public async searchAccessProfiles(query: string, limit?: number, fields?: string[], includeNested = false): Promise<AccessProfileDocument[]> {
+	public async searchAllAccessProfiles(query: string, limit?: number, fields?: string[], includeNested = false): Promise<AccessProfileDocument[]> {
 		console.log("> searchAccessProfiles", query);
-
-		const search: Search = {
-			indices: [
-				"accessprofiles"
-			],
-			query: {
-				query: query
-			},
-			sort: ["name"],
-			includeNested: includeNested,
-			queryResultFilter: {
-				includes: fields
-			}
-		};
-
-		return await this.search(search, limit) as IdentityDocument[];
+		const search = buildSearchQuery({ index: IndexV2025.Accessprofiles, query, sort: "name", fields, includeNested })
+		return await this.searchAll(search, limit) as IdentityDocument[];
 	}
 
-	public async searchEntitlements(query: string, limit?: number, fields?: string[], includeNested = false): Promise<EntitlementDocument[]> {
+	public async searchAllEntitlements(query: string, limit?: number, fields?: string[], includeNested = false): Promise<EntitlementDocument[]> {
+		console.log("> searchEntitlements", query);
+		const search = buildSearchQuery({ index: IndexV2025.Entitlements, query, sort: "name", fields, includeNested })
+		return await this.searchAll(search, limit) as EntitlementDocument[];
+	}
+
+	public async searchAllIdentities(query: string, limit?: number, fields?: string[], sort = "name"): Promise<IdentityDocument[]> {
 		console.log("> searchIdentity", query);
-
-		const search: Search = {
-			indices: [
-				"entitlements"
-			],
-			query: {
-				query: query
-			},
-			sort: ["name"],
-			includeNested: includeNested,
-			queryResultFilter: {
-				includes: fields
-			}
-		};
-
-		return await this.search(search, limit) as EntitlementDocument[];
+		const search = buildSearchQuery({ index: IndexV2025.Identities, query, sort, fields, includeNested: false })
+		return await this.searchAll(search, limit) as IdentityDocument[];
 	}
 
-	public async searchIdentities(query: string, limit?: number, fields?: string[]): Promise<IdentityDocument[]> {
-		console.log("> searchIdentity", query);
-
-		const search: Search = {
-			indices: [
-				"identities"
-			],
-			query: {
-				query: query
-			},
-			sort: ["name"],
-			includeNested: false,
-			queryResultFilter: {
-				includes: fields
-			}
-		};
-
-		return await this.search(search, limit) as IdentityDocument[];
-	}
-
-	public async search(query: Search, limit?: number): Promise<SearchDocument[]> {
+	public async searchAll(query: Search, limit?: number): Promise<SearchDocument[]> {
 		console.log("> search", query);
 
 		const increment = limit ? Math.min(DEFAULT_PAGINATION, limit) : DEFAULT_PAGINATION;
@@ -665,75 +618,102 @@ export class ISCClient {
 	public async paginatedSearchRoles(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"]): Promise<AxiosResponse<RoleDocument[]>> {
 		console.log("> paginatedSearchRoles", query);
 
-		const search: Search = {
-			indices: [
-				"roles"
-			],
-			query: {
-				query: query
-			},
-			sort: ["name"],
-			includeNested: false,
-			queryResultFilter: {
-				includes: fields
-			}
-		};
-
-		return await this.paginatedSearch(search, limit, offset, count) as AxiosResponse<RoleDocument[]>;
+		return await this.searchPost<AccessProfileDocument>({
+			query: buildSearchQuery({ index: IndexV2025.Roles, query, sort: "name", fields }),
+			count,
+			limit,
+			offset
+		})
 	}
+
 	public async paginatedSearchAccessProfiles(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"], includeNested = false): Promise<AxiosResponse<AccessProfileDocument[]>> {
 		console.log("> paginatedSearchAccessProfiles", query);
 
-		const search: Search = {
-			indices: [
-				"accessprofiles"
-			],
-			query: {
-				query: query
-			},
-			sort: ["name"],
-			includeNested: includeNested,
-			queryResultFilter: {
-				includes: fields
-			}
-		};
-
-		return await this.paginatedSearch(search, limit, offset, count) as AxiosResponse<AccessProfileDocument[]>;
+		return await this.searchPost<AccessProfileDocument>({
+			query: buildSearchQuery({ index: IndexV2025.Accessprofiles, query, sort: "name", fields, includeNested }),
+			count,
+			limit,
+			offset
+		})
 	}
+
 	public async paginatedSearchIdentities(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"], includeNested = false): Promise<AxiosResponse<IdentityDocument[]>> {
 		console.log("> paginatedSearchIdentities", query);
-
-		const search: Search = {
-			indices: [
-				"identities"
-			],
-			query: {
-				query: query
-			},
-			sort: ["name"],
-			includeNested,
-			queryResultFilter: {
-				includes: fields
-			}
-		};
-
-		return await this.paginatedSearch(search, limit, offset, count) as AxiosResponse<IdentityDocument[]>
+		return await this.searchPost<IdentityDocument>({
+			query: buildSearchQuery({ index: IndexV2025.Identities, query, sort: "name", fields, includeNested }),
+			count,
+			limit,
+			offset
+		})
 	}
 
-	public async paginatedSearch(query: Search, limit?: number, offset?: number, count?: boolean): Promise<AxiosResponse<SearchDocument[]>> {
-		console.log("> paginatedSearch", query);
+	private async searchPost<T>(input: PaginatedSearchRequest): Promise<AxiosResponse<T[]>> {
+		const {
+			query,
+			limit = DEFAULT_PAGINATED_PARAMS.limit,
+			offset = DEFAULT_PAGINATED_PARAMS.offset,
+			count = DEFAULT_PAGINATED_PARAMS.count
+		} = input;
 
-		limit = limit ? Math.min(DEFAULT_PAGINATION, limit) : DEFAULT_PAGINATION;
+		const cappedLimit = Math.min(limit, 10000)
 
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SearchApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.searchPost({
-			search: query,
-			limit,
+		const api = new SearchV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.searchPost({
+			searchV2025: query,
+			limit: cappedLimit,
 			offset,
 			count
+		}) as AxiosResponse<T[]>
+		return response
+	}
+
+	private async paginatedSearch<T>(input: PaginatedSearchRequest): Promise<PaginatedResult<T>> {
+		input.limit = input.limit ?? DEFAULT_PAGINATED_PARAMS.limit
+		input.offset = input.offset ?? DEFAULT_PAGINATED_PARAMS.offset
+
+		const response = await this.searchPost(input)
+
+		const rawCount = response.headers?.[TOTAL_COUNT_HEADER];
+		const total = rawCount !== undefined ? Number(rawCount) : undefined;
+
+		const data = response.data as T[]
+		return { data, total, count: data.length, limit: input.limit, offset: input.offset };
+	}
+
+	public async paginatedSearchAccessProfilesV2025(input: PaginatedSearch): Promise<PaginatedResult<AccessProfileDocumentV2025>> {
+		return this.paginatedSearch<AccessProfileDocumentV2025>({
+			...input,
+			query: buildSearchQuery({ ...input, sort: input.sort ?? "name", index: IndexV2025.Accessprofiles })
 		});
-		return resp;
+	}
+
+	public async paginatedSearchEntitlementsV2025(input: PaginatedSearch): Promise<PaginatedResult<EntitlementDocumentV2025>> {
+		return this.paginatedSearch<EntitlementDocumentV2025>({
+			...input,
+			query: buildSearchQuery({ ...input, index: IndexV2025.Entitlements })
+		});
+	}
+
+	public async paginatedSearchRolesV2025(input: PaginatedSearch): Promise<PaginatedResult<RoleDocumentV2025>> {
+		return this.paginatedSearch<RoleDocumentV2025>({
+			...input,
+			query: buildSearchQuery({ ...input, index: IndexV2025.Roles })
+		})
+	}
+
+	public async paginatedSearchEventsV2025(input: PaginatedSearch): Promise<PaginatedResult<EventDocumentV2025>> {
+		return this.paginatedSearch<EventDocumentV2025>({
+			...input,
+			query: buildSearchQuery({ ...input, index: IndexV2025.Events })
+		})
+	}
+
+	public async paginatedSearchAccountActivitiesV2025(input: PaginatedSearch): Promise<PaginatedResult<AccountActivityDocumentV2025>> {
+		return this.paginatedSearch<AccountActivityDocumentV2025>({
+			...input,
+			query: buildSearchQuery({ ...input, index: IndexV2025.Accountactivities })
+		})
 	}
 
 	/////////////////////////////
@@ -880,22 +860,43 @@ export class ISCClient {
 	//#region Workflows
 	///////////////////////
 
-	public async createWorflow(workflow: WorkflowV2025): Promise<WorkflowV2025> {
+	public async deleteWorkflow(id: string): Promise<void> {
+		const apiConfig = await this.getApiConfiguration();
+		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		await api.deleteWorkflow({ id });
+	}
+
+	public async putWorkflow(id: string, body: WorkflowBodyV2025): Promise<WorkflowV2025> {
+		const apiConfig = await this.getApiConfiguration();
+		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const resp = await api.putWorkflow({ id, workflowBodyV2025: body });
+		return resp.data;
+	}
+
+	public async createWorflow(workflow: CreateWorkflowRequestV2025): Promise<WorkflowV2025> {
 		const apiConfig = await this.getApiConfiguration()
 		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors())
 		const resp = await api.createWorkflow({
-			// @ts-ignore
-			createWorkflowRequestBeta: workflow
+			createWorkflowRequestV2025: workflow
 		})
 		return resp.data;
 	}
 
 
-	public async getWorflow(id: string): Promise<WorkflowV2025> {
+	public async getWorflowById(id: string): Promise<WorkflowV2025> {
 		const apiConfig = await this.getApiConfiguration()
 		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors())
 		const resp = await api.getWorkflow({ id })
 		return resp.data;
+	}
+
+	public async getWorkflowByName(name: string): Promise<WorkflowV2025> {
+		const workflows = await this.getWorflows();
+		const found = workflows.find(w => w.name === name);
+		if (!found) {
+			throw new Error(`Could not find workflow with name "${name}"`);
+		}
+		return found;
 	}
 
 	public async getWorflows(): Promise<WorkflowV2025[]> {
@@ -950,32 +951,33 @@ export class ISCClient {
 	 * @param workflowExecutionId
 	 * @returns
 	 */
-	public async getWorkflowExecution(workflowExecutionId: string): Promise<WorkflowExecutionBeta> {
+	public async getWorkflowExecution(workflowExecutionId: string): Promise<WorkflowExecutionV2025> {
 		console.log("> getWorkflowExecution", workflowExecutionId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new WorkflowsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await api.getWorkflowExecution({ id: workflowExecutionId });
-		return resp.data;
-	}
-
-	public async getWorflowTriggers(): Promise<WorkflowLibraryTriggerBeta[]> {
-		const apiConfig = await this.getApiConfiguration();
-		const api = new WorkflowsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.listWorkflowLibraryTriggers({});
 		return resp.data;
 	}
 
 	public async testWorkflow(id: string, payload: any): Promise<string> {
 		console.log("> testWorkflow", id, payload);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new WorkflowsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await api.testWorkflow({
 			id,
-			testWorkflowRequestBeta: {
+			testWorkflowRequestV2025: {
 				input: payload
 			}
 		});
 		return resp.data.workflowExecutionId!;
+	}
+
+	public async getWorkflowExecutionEvents(executionId: string): Promise<WorkflowExecutionEventV2025[]> {
+		console.log("> getWorkflowExecutionEvents", executionId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const resp = await api.getWorkflowExecutionHistory({ id: executionId });
+		return resp.data;
 	}
 
 	public async callWorkflowExternalTrigger(id: string, accessToken: string, payload: any): Promise<string> {
@@ -1258,6 +1260,18 @@ export class ISCClient {
 		return response;
 	}
 
+	public async getEntitlementCountBySource(sourceId: string): Promise<number> {
+		console.log("> getEntitlementCountBySource", sourceId);
+		const filters = `source.id eq "${sourceId}"`;
+		const resp = await this.getEntitlements({
+			filters,
+			count: true,
+			limit: 1,
+			offset: 0
+		});
+		return Number(resp.headers[TOTAL_COUNT_HEADER]);
+	}
+
 	public async getEntitlementByName(sourceId: string, entitlementName: string, attribute: string | undefined = undefined): Promise<EntitlementV2025> {
 		console.log("> getEntitlementByName", sourceId, entitlementName);
 
@@ -1433,19 +1447,19 @@ export class ISCClient {
 
 	public async getAccessProfiles(
 		query: AccessProfilesApiListAccessProfilesRequest = DEFAULT_ACCESSPROFILES_QUERY_PARAMS
-	): Promise<AxiosResponse<AccessProfile[], any>> {
+	): Promise<AxiosResponse<AccessProfileV2025[], any>> {
 		console.log("> getAccessProfiles", query);
 		const queryValues: AccessProfilesApiListAccessProfilesRequest = {
 			...DEFAULT_ACCESSPROFILES_QUERY_PARAMS,
 			...query
 		};
 		const apiConfig = await this.getApiConfiguration();
-		const api = new AccessProfilesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new AccessProfilesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.listAccessProfiles(queryValues);
 		return response;
 	}
 
-	public async getAccessProfileByName(name: string): Promise<AccessProfile> {
+	public async getAccessProfileByName(name: string): Promise<AccessProfileV2025> {
 		console.log("> getAccessProfileByName", name);
 		let filters = `name eq "${name}"`;
 		const response = await this.getAccessProfiles({
@@ -1458,23 +1472,23 @@ export class ISCClient {
 		return accessProfile;
 	}
 
-	public async createAccessProfile(ap: AccessProfile) {
+	public async createAccessProfile(ap: AccessProfileV2025): Promise<AccessProfile> {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new AccessProfilesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.createAccessProfile({
 			accessProfileV2025: ap
 		})
-		return response.data
+		return response.data as AccessProfile
 	}
 
-	public async updateAccessProfile(id: string, operations: Array<JsonPatchOperationV2025>) {
+	public async updateAccessProfile(id: string, operations: Array<JsonPatchOperationV2025>): Promise<AccessProfile> {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new AccessProfilesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.patchAccessProfile({
 			id,
 			jsonPatchOperationV2025: operations
 		})
-		return response.data
+		return response.data as AccessProfile
 	}
 
 	public async updateAccessProfileMetadata(id: string, attributes: Array<AttributeDTO>) {
@@ -2057,7 +2071,7 @@ export class ISCClient {
 		})
 		console.log(`generateDigitToken: Request Id = ${result.data.requestId}`);
 
-		return result.data.digitToken
+		return result.data.digitToken!
 	}
 
 	/////////////////////////
@@ -2068,15 +2082,13 @@ export class ISCClient {
 	//#region Identity Management
 	////////////////////////
 
-	public async getIdentityByName(identityName: string): Promise<IdentityBeta> {
+	public async getIdentityByName(identityName: string): Promise<IdentityBeta | undefined> {
 		// Can only ever be one ID
 		const result = await this.listIdentities({ filters: `alias eq "${identityName}"` })
 		if (result && result.data) {
 			return result.data[0]
 		}
-		else {
-			return
-		}
+		return undefined
 	}
 
 	public async listIdentities(identityFilter: IdentitiesBetaApiListIdentitiesRequest): Promise<AxiosResponse<IdentityBeta[]>> {

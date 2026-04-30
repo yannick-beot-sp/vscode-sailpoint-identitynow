@@ -61,6 +61,22 @@ export function toCamelCase(input: string): string {
     }).join('');
 }
 
+/** Returns true if the value matches a GUID pattern (case-insensitive). 
+ * Sometimes, ISC uses GUID, like IDs for workflows or transforms
+ * ex: "3940ea53-46f5-4d1a-bf07-86b3417a12ae"
+*/
+export function isGuid(value: string): boolean {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+}
+
+/** Returns true if the value matches a UUID. 
+ * Most IDs are a hexstring of 32 characters
+ * ex: 5be8c5443c514de39592d4eb14b3434b
+*/
+export function isUuid(value: string): boolean {
+    return /^[0-9a-f]{32}$/i.test(value);
+}
+
 export function decomposeDiacriticalMarks(input: string): string {
     return input
         // Decompose the string into separate unicode symbols for diacritical marks in compatibility mode, 
