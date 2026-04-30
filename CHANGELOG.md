@@ -14,10 +14,19 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Fixed
 
+### Removed
+
+
+## [1.3.27] - 2026-04-30
+
+### Added
+
+- Add MCP Server
+
+### Fixed
+
 - Fix issue when exporting SPConfig for chosen forms, segments or connector rules
 
-
-### Removed
 
 ## [1.3.26] - 2026-04-20
 

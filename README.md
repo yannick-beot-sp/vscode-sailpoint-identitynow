@@ -623,8 +623,14 @@ The patterns defined above use the following tokens:
 
 ### Unreleased
 
-- Fix issue when exporting SPConfig for chosen forms, segments or connector rules
+### 1.3.27
 
+- Fix issue when exporting SPConfig for chosen forms, segments or connector rules
+- Add MCP Server
+
+### Fixed
+
+- Fix issue when exporting SPConfig for chosen forms, segments or connector rules
 ### 1.3.26
 
 - Escape '\' when exporting and importing roles and access profiles
