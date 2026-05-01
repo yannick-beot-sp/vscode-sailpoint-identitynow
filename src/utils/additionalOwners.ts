@@ -1,4 +1,4 @@
-import { AdditionalOwnerRefV2025 } from "sailpoint-api-client/dist/v2025/api";
+import { AdditionalOwnerRefV2025 } from "sailpoint-api-client/api";
 import { IdentityIdToNameCacheService } from "../services/cache/IdentityIdToNameCacheService";
 import { GovernanceGroupIdToNameCacheService } from "../services/cache/GovernanceGroupIdToNameCacheService";
 import { CSV_MULTIVALUE_SEPARATOR } from "../constants";

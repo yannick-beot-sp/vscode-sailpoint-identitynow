@@ -1,4 +1,4 @@
-import { AccessProfileApprovalSchemeV2025, AccessProfileApprovalSchemeV2025ApproverTypeV2025, ApprovalSchemeForRoleV2025, ApprovalSchemeForRoleV2025ApproverTypeV2025 } from "sailpoint-api-client/dist/v2025";
+import { AccessProfileApprovalSchemeV2025, AccessProfileApprovalSchemeV2025ApproverTypeV2025, ApprovalSchemeForRoleV2025, ApprovalSchemeForRoleV2025ApproverTypeV2025 } from "sailpoint-api-client";
 import { CacheService } from "../services/cache/CacheService";
 import { CSV_MULTIVALUE_SEPARATOR } from "../constants";
 import { isEmpty } from "./stringUtils";

@@ -16,6 +16,11 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Removed
 
+## [1.3.28] - 2026-05-01
+
+### Fixed
+
+- Fix issue with loading SDK (cf. [#146](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/146))
 
 ## [1.3.27] - 2026-04-30
 

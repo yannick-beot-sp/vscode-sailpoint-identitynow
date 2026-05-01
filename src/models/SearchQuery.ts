@@ -1,4 +1,4 @@
-import { SearchV2025 } from "sailpoint-api-client/dist/v2025"
+import { SearchV2025 } from "sailpoint-api-client"
 
 export interface BasePaginatedSearch {
     limit?: number

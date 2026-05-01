@@ -4,7 +4,7 @@ import * as tmp from "tmp";
 import { ISCClient } from "../../services/ISCClient";
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
 import { AccessDurationV2025, AccessProfileRef, ApprovalSchemeForRole, EntitlementRef, JsonPatchOperationV2025OpV2025, RoleMembershipSelector, RoleMembershipSelectorType } from 'sailpoint-api-client';
-import { RoleV2025, AdditionalOwnerRefV2025 } from 'sailpoint-api-client/dist/v2025';
+import { RoleV2025, AdditionalOwnerRefV2025 } from 'sailpoint-api-client';
 import { CSVReader } from '../../services/CSVReader';
 import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
 import { WorkflowNameToIdCacheService } from '../../services/cache/WorkflowNameToIdCacheService';

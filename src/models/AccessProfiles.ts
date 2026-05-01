@@ -1,4 +1,4 @@
-import { AccessProfilesV2025ApiListAccessProfilesRequest, AccessProfileV2025 } from "sailpoint-api-client/dist/v2025";
+import { AccessProfilesV2025ApiListAccessProfilesRequest, AccessProfileV2025 } from "sailpoint-api-client";
 
 export const DEFAULT_ACCESSPROFILES_QUERY_PARAMS: AccessProfilesV2025ApiListAccessProfilesRequest = {
     count: false,

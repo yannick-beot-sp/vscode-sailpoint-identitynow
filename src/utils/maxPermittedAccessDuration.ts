@@ -1,4 +1,4 @@
-import { AccessDurationV2025, AccessDurationV2025TimeUnitV2025 } from "sailpoint-api-client/dist/v2025";
+import { AccessDurationV2025, AccessDurationV2025TimeUnitV2025 } from "sailpoint-api-client";
 import { isNotBlank } from "./stringUtils";
 import { isEmpty } from "lodash";
 

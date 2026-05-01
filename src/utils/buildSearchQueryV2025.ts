@@ -1,4 +1,4 @@
-import { IndexV2025, SearchV2025 } from "sailpoint-api-client/dist/v2025";
+import { IndexV2025, SearchV2025 } from "sailpoint-api-client";
 
 
 export interface SearchQuery {

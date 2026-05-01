@@ -623,6 +623,10 @@ The patterns defined above use the following tokens:
 
 ### Unreleased
 
+### 1.3.28
+
+- Fix issue with loading SDK (cf. [#146](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/146))
+
 ### 1.3.27
 
 - Fix issue when exporting SPConfig for chosen forms, segments or connector rules
