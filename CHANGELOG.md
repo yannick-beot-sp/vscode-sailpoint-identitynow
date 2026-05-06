@@ -10,6 +10,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- Add MCP tools for forms CRUD (`listForms`, `getForm`, `createForm`, `updateForm`, `deleteForm`)
+
 ### Changed
 
 ### Fixed

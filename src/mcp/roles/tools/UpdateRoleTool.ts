@@ -8,6 +8,7 @@ import { Parser } from "../../../parser/parser";
 import { RoleMembershipSelectorConverter } from "../../../parser/RoleMembershipSelectorConverter";
 import { SourceNameToIdCacheService } from "../../../services/cache/SourceNameToIdCacheService";
 import { isUuid } from "../../../utils/stringUtils";
+import { resolveIdentity } from "../../utils/identityUtils";
 import { membershipCriteriaField, refSchema, roleBaseOutputSchema } from "./roleSchemas";
 
 const inputSchema = z.object({
@@ -77,18 +78,7 @@ export class UpdateRoleTool extends ToolContext {
                 patches.push({ op: "replace", path: "/requestable", value: input.requestable });
             }
             if (input.owner !== undefined) {
-                let ownerId: string;
-                if (isUuid(input.owner)) {
-                    ownerId = input.owner;
-                } else {
-                    try {
-                        const identity = await client.getPublicIdentityByAlias(input.owner);
-                        ownerId = identity.id!;
-                    } catch (err: any) {
-                        if (err instanceof McpError) { throw err; }
-                        throw new McpError(ErrorCodes.ISC_API_ERROR, String(err?.message ?? err));
-                    }
-                }
+                const ownerId = await resolveIdentity(input.owner, client);
                 patches.push({ op: "replace", path: "/owner", value: { id: ownerId, type: "IDENTITY" } });
             }
             if (input.entitlements !== undefined) {

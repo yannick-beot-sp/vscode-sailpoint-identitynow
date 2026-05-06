@@ -536,6 +536,16 @@ The extension includes a built-in [Model Context Protocol (MCP)](https://modelco
 | `createRole`  | Create a new role. Specify name, owner, and optionally description, requestable flag, entitlement IDs, access profile names or IDs, and membership criteria. |
 | `updateRole`  | Update an existing role using JSON Patch. Identify it by id or name, then specify only the fields to change.                                                 |
 
+### Forms
+
+| Tool         | Description                                                                                                                                          |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `listForms`  | List all form definitions for a given tenant. Returns id, name, description, owner, created, and modified for each form.                             |
+| `getForm`    | Get the details of a form definition by GUID or name.                                                                                                |
+| `createForm` | Create a new form definition. Specify the form name, owner (identity alias or ID), and optionally a description.                                     |
+| `updateForm` | Update an existing form definition using JSON Patch. Identify it by GUID or name, then specify only the fields to change (name, description, owner). |
+| `deleteForm` | Delete a form definition by GUID or name.                                                                                                            |
+
 ### Transforms
 
 | Tool                | Description                                                                                                                      |
@@ -623,6 +633,8 @@ The patterns defined above use the following tokens:
 
 ### Unreleased
 
+- Add MCP tools for forms CRUD (`listForms`, `getForm`, `createForm`, `updateForm`, `deleteForm`)
+
 ### 1.3.28
 
 - Fix issue with loading SDK (cf. [#146](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/146))
@@ -635,6 +647,7 @@ The patterns defined above use the following tokens:
 ### Fixed
 
 - Fix issue when exporting SPConfig for chosen forms, segments or connector rules
+
 ### 1.3.26
 
 - Escape '\' when exporting and importing roles and access profiles

@@ -5,6 +5,7 @@ import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
 import { tenantNameField } from "../../inputFields";
 import { isUuid } from "../../../utils/stringUtils";
+import { resolveIdentity } from "../../utils/identityUtils";
 import { accessProfileBaseOutputSchema } from "./accessProfileSchemas";
 
 const inputSchema = z.object({
@@ -47,19 +48,7 @@ export class CreateAccessProfileTool extends ToolContext {
         const client = getIscClient(this);
 
         try {
-            // Resolve owner identity
-            let ownerId: string;
-            if (isUuid(input.owner)) {
-                ownerId = input.owner;
-            } else {
-                try {
-                    const identity = await client.getPublicIdentityByAlias(input.owner);
-                    ownerId = identity.id!;
-                } catch (err: any) {
-                    if (err instanceof McpError) { throw err; }
-                    throw new McpError(ErrorCodes.ISC_API_ERROR, String(err?.message ?? err));
-                }
-            }
+            const ownerId = await resolveIdentity(input.owner, client);
 
             // Resolve source
             let sourceId: string;

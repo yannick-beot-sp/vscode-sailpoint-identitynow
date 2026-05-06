@@ -12,6 +12,7 @@ import { EntitlementsApp } from "./entitlements/EntitlementsApp";
 import { AccessProfilesApp } from "./accessprofiles/AccessProfilesApp";
 import { RolesApp } from "./roles/RolesApp";
 import { TenantApp } from "./tenants/TenantApp";
+import { FormsApp } from "./forms/FormsApp";
 import { MCP_NAME, MCP_VERSION } from "./constants";
 import { StoppableExpressAdapter } from "./StoppableExpressAdapter";
 
@@ -42,7 +43,7 @@ export class McpServer {
 
         this._instance = await FrontMcpInstance.createForGraph({
             info: { name: MCP_NAME, version: MCP_VERSION },
-            apps: [IdentityApp, TransformApp, WorkflowApp, SourcesApp, SearchApp, EntitlementsApp, AccessProfilesApp, RolesApp, TenantApp],
+            apps: [IdentityApp, TransformApp, WorkflowApp, SourcesApp, SearchApp, EntitlementsApp, AccessProfilesApp, RolesApp, FormsApp, TenantApp],
             plugins: [TenantResolverPlugin],
             http: {
                 port: resolvedPort,
