@@ -1,5 +1,5 @@
-export function truethy(input: string | undefined | boolean): boolean {
-    if (input === undefined) {
+export function truethy(input: string | undefined | boolean | null): boolean {
+    if (input === undefined || input === null) {
         return false;
     }
     if (typeof input === "boolean") {

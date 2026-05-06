@@ -2,15 +2,15 @@ export function isEmpty(strValue: string | null | undefined): boolean {
     return (!strValue || strValue.trim() === "" || (strValue.trim()).length === 0);
 }
 
-export function isNotEmpty(val: any) {
+export function isNotEmpty(val: any): val is string {
     return typeof val === 'string' && !!val;
 }
 
-export function isNotBlank(val: any) {
+export function isNotBlank(val: any): val is string {
     return typeof val === 'string' && ((val?.trim()?.length || 0) > 0);
 }
 
-export function isBlank(val: any) {
+export function isBlank(val: any): val is null | undefined {
     return typeof val !== 'string' || ((val?.trim()?.length || 0) === 0);
 }
 
