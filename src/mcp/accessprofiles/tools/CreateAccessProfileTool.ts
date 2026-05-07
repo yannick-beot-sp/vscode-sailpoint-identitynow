@@ -4,8 +4,8 @@ import { AccessProfileV2025, EntitlementRefV2025 } from "sailpoint-api-client";
 import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
 import { tenantNameField } from "../../inputFields";
-import { isUuid } from "../../../utils/stringUtils";
 import { resolveIdentity } from "../../utils/identityUtils";
+import { resolveSource } from "../../utils/sourceUtils";
 import { accessProfileBaseOutputSchema } from "./accessProfileSchemas";
 
 const inputSchema = z.object({
@@ -33,8 +33,7 @@ type Output = z.infer<typeof outputSchema>;
         "Create a new access profile in SailPoint ISC. " +
         "Specify the access profile name, source (name or ID), owner (identity alias), and optionally a description, " +
         "enabled flag, requestable flag, and entitlement IDs. " +
-        "Use searchSources to find sources, searchEntitlements to discover entitlement IDs, " +
-        "and searchIdentities to find the owner before calling this tool.",
+        "Use listSources to find sources, searchEntitlements to discover entitlement IDs.",
     inputSchema,
     outputSchema,
     annotations: {
@@ -50,21 +49,7 @@ export class CreateAccessProfileTool extends ToolContext {
         try {
             const ownerId = await resolveIdentity(input.owner, client);
 
-            // Resolve source
-            let sourceId: string;
-            if (isUuid(input.source)) {
-                sourceId = input.source;
-            } else {
-                try {
-                    sourceId = (await client.getSourceByName(input.source)).id!;
-                } catch (err: any) {
-                    if (err instanceof McpError) { throw err; }
-                    throw new McpError(
-                        ErrorCodes.SOURCE_NOT_FOUND,
-                        `Source "${input.source}" not found.`
-                    );
-                }
-            }
+            const sourceId = await resolveSource(input.source, client);
 
             const entitlements: EntitlementRefV2025[] | undefined = input.entitlements?.map(id => ({
                 id,
