@@ -2,7 +2,7 @@
   "name": "vscode-sailpoint-identitynow",
   "displayName": "SailPoint Identity Security Cloud",
   "description": "Customize SailPoint Identity Security Cloud",
-  "version": "1.3.28",
+  "version": "1.3.29",
   "publisher": "yannick-beot-sp",
   "icon": "resources/isc.png",
   "bugs": {
@@ -1785,6 +1785,10 @@
         "vscode-sailpoint-identitynow.sP-Config.multipleFiles.filename": {
           "type": "string",
           "default": "%o/%S.json"
+        },
+        "vscode-sailpoint-identitynow.sP-Config.auth.baseUrl": {
+          "type": "string",
+          "default": "api.identitynow.com"
         },
         "vscode-sailpoint-identitynow.export.forms.filename": {
           "type": "string",

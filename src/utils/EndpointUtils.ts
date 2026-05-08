@@ -1,3 +1,4 @@
+import * as configuration from '../configurationConstants';
 import { Uri } from "vscode";
 export class EndpointUtils {
 
@@ -14,8 +15,21 @@ export class EndpointUtils {
         return baseApiUrl;
     }
 
+    public static getAuthUrl(tenantName: string): string {
+        let baseAuthUrl = `https://${tenantName}.${configuration.AUTH_BASE_URL}`;
+        
+        if (tenantName.indexOf('.') > 0) { 
+            if (tenantName.includes('.identitynow.com')){
+                baseAuthUrl = tenantName.replace(/([a-z0-9][a-z0-9-]+)\.(.*)/, "https://$1.") + `${configuration.AUTH_BASE_URL}`;
+            }else{
+                baseAuthUrl = this.getBaseUrl(tenantName);
+            }
+        }
+        return baseAuthUrl;
+    }
+
     public static getAccessTokenUrl(tenantName: string): string {
-        const baseApiUrl = this.getBaseUrl(tenantName);
+        const baseApiUrl = this.getAuthUrl(tenantName);
         return baseApiUrl + '/oauth/token';
     }
 
