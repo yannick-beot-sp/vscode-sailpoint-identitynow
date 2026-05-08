@@ -16,6 +16,16 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Removed
 
+## [1.3.29] - 2026-05-08
+
+### Added 
+
+- Extension parameter : `sP-Config.auth.baseUrl` to specify which auth URL to use. Default value is `api.identitynow.com`. The user can also change it to `login.sailpoint.com`
+
+### Changed
+
+- Function that loads the auth URL to use the `sP-Config.auth.baseUrl` parameter if the tenant name is the tenant itself or `<tenant>.api.identitynow.com`.
+
 ## [1.3.28] - 2026-05-01
 
 ### Fixed

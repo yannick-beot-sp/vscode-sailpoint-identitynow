@@ -13,6 +13,8 @@ export const SPCONFIG_SINGLE_FILE_CONF = "sP-Config.singleFile.filename";
 export const SPCONFIG_MULTIPLE_FILES_FOLDER_CONF = "sP-Config.multipleFiles.folder";
 export const SPCONFIG_MULTIPLE_FILES_FILENAME_CONF = "sP-Config.multipleFiles.filename";
 
+export const AUTH_BASE_URL = "sP-Config.auth.baseUrl"
+
 export const TREEVIEW_PAGINATION = "treeView.pagination";
 
 

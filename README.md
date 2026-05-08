@@ -588,6 +588,8 @@ The extension supports the following settings:
   - Default value: `%x/exportedObjects`
 - `vscode-sailpoint-identitynow.sP-Config.multipleFiles.filename`: Define the pattern for the SP-Config filename as multiple files for multiple resources. It will be concatenated to the export folder. These filenames are not confirmed.
   - Default value: `%o/%S.json`
+- `vscode-sailpoint-identitynow.sP-Config.auth.baseUrl` : Define the default base URL for authentication. It will be used during the access token loading. The values are for non-vanity urls and can be : `api.identitynow.com`  or `login.sailpoint.com`
+  - Default value : `login.sailpoint.com`
 - `vscode-sailpoint-identitynow.export.forms.filename`: Define the pattern to export forms from a tenant
   - Default value: `%x/Forms/Forms-%t-%y%M%d-%h%m%s.json`
 - `vscode-sailpoint-identitynow.export.form.filename`: Define the pattern to export a single form from a tenant
@@ -622,6 +624,11 @@ The patterns defined above use the following tokens:
 ## Release Notes
 
 ### Unreleased
+
+### 1.3.29
+
+- Added extension parameter : `sP-Config.auth.baseUrl` to specify which auth URL to use. Default value is `api.identitynow.com`. The user can also change it to `login.sailpoint.com`
+- Update the function that loads the auth URL to use the `sP-Config.auth.baseUrl` parameter if the tenant name is the tenant itself or `<tenant>.api.identitynow.com`.
 
 ### 1.3.28
 
