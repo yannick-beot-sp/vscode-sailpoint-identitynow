@@ -623,6 +623,9 @@ The patterns defined above use the following tokens:
 
 ### Unreleased
 
+- Fix issue when updating roles with empty values (cf. [#147](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/147))
+- Support of entitlements with attribute for dimension import
+
 ### 1.3.28
 
 - Fix issue with loading SDK (cf. [#146](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/146))

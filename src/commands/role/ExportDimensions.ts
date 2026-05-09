@@ -79,7 +79,7 @@ const paths = [
 const unwindablePaths: string[] = [];
 
 
-class DimensionExporter extends BaseCSVExporter<DimensionV2025> {
+class DimensionExporter extends BaseCSVExporter<DimensionWithRoleNameName> {
     private readonly sourceIdToNameCacheService: SourceIdToNameCacheService
     private readonly entitlementIdToSourceNameCacheService: EntitlementIdToSourceNameCacheService
 
@@ -135,7 +135,7 @@ class DimensionExporter extends BaseCSVExporter<DimensionV2025> {
                     throw new UserCancelledError();
                 }
                 let membershipCriteria: string | undefined = undefined;
-                if (item.membership !== undefined && item.membership !== null && item.membership?.criteria?.children?.length > 0) {
+                if (item.membership !== undefined && item.membership !== null && (item.membership?.criteria?.children?.length ?? 0) > 0) {
                     try {
                         // For some reason, membership criteria are included in a AND operation
                         membershipCriteria = await roleMembershipSelectorToStringConverter(
@@ -149,7 +149,7 @@ class DimensionExporter extends BaseCSVExporter<DimensionV2025> {
 
                 let entitlements: string | undefined = undefined;
                 try {
-                    entitlements = (item.entitlements ? (await entitlementToStringConverter(item.entitlements, this.entitlementIdToSourceNameCacheService)) : null);
+                    entitlements = (item.entitlements ? (await entitlementToStringConverter(item.entitlements, this.entitlementIdToSourceNameCacheService)) : undefined);
                 } catch (error) {
                     console.warn(`Error converting entitlements for Dimension "${item.name}:"`, error);
                 }
@@ -180,6 +180,6 @@ async function entitlementToStringConverter(
         return undefined
     }
     return (await Promise.all(entitlementRefs
-        .map(ref => entitlementToString.get(ref.id))))
+        .map(ref => entitlementToString.get(ref.id!))))
         .join(CSV_MULTIVALUE_SEPARATOR)
 }

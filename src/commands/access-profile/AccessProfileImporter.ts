@@ -1,6 +1,5 @@
 import * as tmp from "tmp";
 import * as vscode from 'vscode';
-import { AccessDurationV2025, AccessProfile, AdditionalOwnerRefV2025, EntitlementBeta, JsonPatchOperationV2025OpV2025 } from 'sailpoint-api-client';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
 import { CSVReader } from '../../services/CSVReader';
@@ -19,6 +18,7 @@ import { stringToAttributeMetadata } from "../../utils/metadataUtils";
 import { ImportResult } from "../../models/ImportResult";
 import { resolveAdditionalOwners } from "../../utils/additionalOwners";
 import { formatMaxPermittedAccessDuration } from "../../utils/maxPermittedAccessDuration";
+import { AccessDurationV2025, AccessProfileV2025, AdditionalOwnerRefV2025, EntitlementV2025, JsonPatchOperationV2025OpV2025 } from "sailpoint-api-client";
 
 interface AccessProfileCSVRecord {
     name: string
@@ -186,7 +186,7 @@ export class AccessProfileImporter {
                     throw new UserCancelledError();
                 }
 
-                let entitlements: EntitlementBeta[] = [];
+                let entitlements: EntitlementV2025[] = [];
                 if (isNotBlank(data.entitlements)) {
                     try {
                         entitlements = await Promise.all(data.entitlements?.split(CSV_MULTIVALUE_SEPARATOR).map(async (entitlementStr) => {
@@ -260,7 +260,7 @@ export class AccessProfileImporter {
                     return;
                 }
 
-                const accessProfilePayload: AccessProfile = {
+                const accessProfilePayload: AccessProfileV2025 = {
                     "name": apName,
                     description,
                     "enabled": truethy(data.enabled),

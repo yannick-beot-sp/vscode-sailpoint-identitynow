@@ -11,12 +11,13 @@ import { importMode, ImportModeType, openPreview } from '../../utils/vsCodeHelpe
 import { isEmpty, isNotBlank } from '../../utils/stringUtils';
 import { Parser } from '../../parser/parser';
 import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService';
-import { EntitlementCacheService, KEY_SEPARATOR } from '../../services/cache/EntitlementCacheService';
+import { EntitlementCacheService } from '../../services/cache/EntitlementCacheService';
 import { UserCancelledError } from '../../errors';
 import { DimensionCSVRecord } from '../../models/DimensionCsvRecord';
 import { ImportResult } from '../../models/ImportResult';
 import { RoleNameToIdCacheService } from '../../services/cache/RoleNameToIdCacheService';
 import { DimensionMembershipSelectorConverter } from '../../parser/DimensionMembershipSelectorConverter';
+import { stringToEntitlementConverter } from '../../utils/entitlementUtils';
 
 /**
  * Go through membership criteria and extract the identity attributes
@@ -168,7 +169,7 @@ export class DimensionImporter {
                     await this.writeLog(processedLines, dimensionName, CSVLogWriterLogType.ERROR, srcMessage);
                     return;
                 }
-                const roleId = role.id
+                const roleId = role.id!
 
                 if (!role.dimensional) {
                     result.error++;
@@ -184,7 +185,7 @@ export class DimensionImporter {
                 let accessProfiles: AccessProfileRef[] = [];
                 if (isNotBlank(data.accessProfiles)) {
                     try {
-                        accessProfiles = await Promise.all(data.accessProfiles.split(CSV_MULTIVALUE_SEPARATOR).map(async (apName) => ({
+                        accessProfiles = await Promise.all(data.accessProfiles!.split(CSV_MULTIVALUE_SEPARATOR).map(async (apName) => ({
                             name: apName,
                             "id": (await accessProfileNameToIdCacheService.get(apName)),
                             "type": "ACCESS_PROFILE"
@@ -205,18 +206,10 @@ export class DimensionImporter {
                 let entitlements: EntitlementRef[] = []
                 if (isNotBlank(data.entitlements)) {
                     try {
-                        entitlements = await Promise.all(data.entitlements
-                            .split(CSV_MULTIVALUE_SEPARATOR)
-                            .map(async (sourceAndEntitlementNames) => {
-                                const [sourceName, entitlementName] = sourceAndEntitlementNames.split(KEY_SEPARATOR)
-                                const sourceId = await sourceCacheService.get(sourceName)
-                                const entitlementId = await entitlementCacheService.get([sourceId, entitlementName].join(KEY_SEPARATOR))
-                                return {
-                                    name: entitlementName,
-                                    "id": entitlementId,
-                                    "type": "ENTITLEMENT"
-                                }
-                            }));
+                        entitlements = await stringToEntitlementConverter(data.entitlements,
+                            sourceCacheService,
+                            entitlementCacheService
+                        )
                     } catch (error) {
                         result.error++;
                         const etMessage = `Unable to find access an entitlement: ${error}`;
@@ -233,7 +226,7 @@ export class DimensionImporter {
                 let membership: DimensionMembershipSelectorV2025 | undefined = undefined;
                 if (isNotBlank(data.membershipCriteria)) {
                     try {
-                        const expression = parser.parse(data.membershipCriteria);
+                        const expression = parser.parse(data.membershipCriteria!);
 
                         const converter = new DimensionMembershipSelectorConverter();
                         await converter.visitExpression(expression, undefined);
@@ -249,6 +242,12 @@ export class DimensionImporter {
 
                         const usedIdentityAttributes = extractAllIdentityAttributes(converter.root as DimensionCriteriaLevel1V2025)
                         const allowedIdentity = role.accessRequestConfig?.dimensionSchema?.dimensionAttributes?.map(x => x.name)
+                        if (allowedIdentity === undefined || allowedIdentity.length === 0) {
+                            result.error++;
+                            const srcMessage = `There is no dimension attribute on role '${data.roleName}'`
+                            await this.writeLog(processedLines, dimensionName, CSVLogWriterLogType.ERROR, srcMessage);
+                            return;
+                        }
                         if (!Array.from(usedIdentityAttributes).every(attribute => allowedIdentity.includes(attribute))) {
                             result.error++;
                             const srcMessage = `The membership criteria is using dimension attribute(s) '${Array.from(usedIdentityAttributes).filter(x => !allowedIdentity.includes(x)).join(', ')}' that is not allowed in the role '${data.roleName}'`;
@@ -317,7 +316,7 @@ export class DimensionImporter {
                                 "value": item.value
                             }))
                             try {
-                                await this.client.updateDimension(roleId, dimension.id, updates)
+                                await this.client.updateDimension(roleId, dimension.id!, updates)
                                 await this.writeLog(processedLines, dimensionName, CSVLogWriterLogType.SUCCESS, `Successfully updated access profile '${dimensionName}'`);
                                 result.success++;
                             } catch (error) {

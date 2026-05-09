@@ -10,9 +10,8 @@ import { WorkflowIdToNameCacheService } from '../../services/cache/WorkflowIdToN
 import { approvalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
 import { metadataToString } from '../../utils/metadataUtils';
 import { EntitlementIdToAttributeNameCacheService } from '../../services/cache/EntitlementIdToSourceNameCacheService';
-import { entitlementToStringConverter } from '../../utils/entitlementToStringConverter';
+import { entitlementToStringConverter } from '../../utils/entitlementUtils';
 import { getAdditionalOwners } from '../../utils/additionalOwners';
-import { IdentityUsernameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
 import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
 
 export class AccessProfileExporterCommand {
