@@ -642,12 +642,13 @@ The patterns defined above use the following tokens:
 
 ### Unreleased
 
+### 1.3.29
+
 - Fix issue when updating roles with empty values (cf. [#147](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/147))
 - Support of entitlements with attribute for dimension import
 - Add MCP tools for forms (`listForms`, `getForm`, `createForm`, `updateForm`, `deleteForm`)
 - Add MCP tools for identity profiles (`listIdentityProfile`, `getIdentityProfile`, `createIdentityProfile`, `setIdentityProfileMapping`)
 - Add command for status bar to copy MCP URL
-
 
 ### 1.3.28
 

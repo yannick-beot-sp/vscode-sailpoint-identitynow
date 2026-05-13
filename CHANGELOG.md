@@ -10,6 +10,16 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Removed
+
+## [1.3.29] - 2026-05-13
+
+### Added
+
 - Add MCP tools for forms (`listForms`, `getForm`, `createForm`, `updateForm`, `deleteForm`)
 - Add MCP tools for identity profiles (`listIdentityProfile`, `getIdentityProfile`, `createIdentityProfile`, `setIdentityProfileMapping`)
 
@@ -18,10 +28,6 @@ This changelog is following the recommended format by [keepachangelog](https://k
 - Fix issue when updating roles with empty values (cf. [#147](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/147))
 - Support of entitlements with attribute for dimension import
 - Add command for status bar to copy MCP URL
-
-### Fixed
-
-### Removed
 
 ## [1.3.28] - 2026-05-01
 
