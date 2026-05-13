@@ -576,6 +576,15 @@ The extension includes a built-in [Model Context Protocol (MCP)](https://modelco
 | `searchAuditEvents`       | Search audit events. Returns id, action, type, actor, target, status, technicalName, and more for each matching event. Supports offset-based pagination.       |
 | `searchAccountActivities` | Search account activities. Returns id, action, status, stage, requester, recipient, trackingNumber, and more for each match. Supports offset-based pagination. |
 
+### Identity Profiles
+
+| Tool                        | Description                                                          |
+| --------------------------- | -------------------------------------------------------------------- |
+| `listIdentityProfile`       | List all identity profiles for a given tenant.                       |
+| `getIdentityProfile`        | Get the details of a single identity profile by name or ID.          |
+| `createIdentityProfile`     | Create a new identity profile.                                       |
+| `setIdentityProfileMapping` | "Add or update an identity attribute mapping on an identity profile. |
+
 ## Extension Settings
 
 The extension supports the following settings:
@@ -633,7 +642,9 @@ The patterns defined above use the following tokens:
 
 ### Unreleased
 
-- Add MCP tools for forms CRUD (`listForms`, `getForm`, `createForm`, `updateForm`, `deleteForm`)
+- Add MCP tools for forms (`listForms`, `getForm`, `createForm`, `updateForm`, `deleteForm`)
+- Add MCP tools for identity profiles (`listIdentityProfile`, `getIdentityProfile`, `createIdentityProfile`, `setIdentityProfileMapping`)
+- Add command for status bar to copy MCP URL
 
 ### 1.3.28
 

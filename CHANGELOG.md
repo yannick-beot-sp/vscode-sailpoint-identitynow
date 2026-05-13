@@ -10,10 +10,12 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
-- Add MCP tools for forms CRUD (`listForms`, `getForm`, `createForm`, `updateForm`, `deleteForm`)
-- Add MCP tools for Identity Profiles (`createIdentityProfile`, `listIdentityProfiles`, `setIdentityProfileMapping`)
+- Add MCP tools for forms (`listForms`, `getForm`, `createForm`, `updateForm`, `deleteForm`)
+- Add MCP tools for identity profiles (`listIdentityProfile`, `getIdentityProfile`, `createIdentityProfile`, `setIdentityProfileMapping`)
 
 ### Changed
+
+- Add command for status bar to copy MCP URL
 
 ### Fixed
 
