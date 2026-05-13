@@ -22,7 +22,7 @@ const inputSchema = z.object({
     name: z.string().min(1).describe("Name of the role."),
     description: z.string().optional().describe("Description of the role."),
     owner: z.string().min(1).describe("Username (alias) or display name of the identity who owns the role."),
-    requestable: z.boolean().optional().default(false).describe("Whether the role can be requested. Defaults to false."),
+    requestable: z.boolean().optional().default(false).describe("Whether the role can be requested."),
     entitlements: z.array(z.string()).optional().describe(
         "Entitlement IDs to include in the role. Use searchEntitlements to find entitlement IDs first."
     ),

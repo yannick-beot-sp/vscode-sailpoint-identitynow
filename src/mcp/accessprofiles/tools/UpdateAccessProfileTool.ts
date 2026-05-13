@@ -6,7 +6,7 @@ import { ErrorCodes, McpError } from "../../errors";
 import { tenantNameField } from "../../inputFields";
 import { isUuid } from "../../../utils/stringUtils";
 import { resolveIdentity } from "../../utils/identityUtils";
-import { accessProfileBaseOutputSchema, refSchema } from "./accessProfileSchemas";
+import { accessProfileOutputSchema } from "./accessProfileSchemas";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -20,9 +20,7 @@ const inputSchema = z.object({
     ),
 });
 
-const outputSchema = accessProfileBaseOutputSchema.extend({
-    entitlements: z.array(refSchema).optional().nullable(),
-});
+const outputSchema = accessProfileOutputSchema
 
 type Input = z.infer<typeof inputSchema>;
 type Output = z.infer<typeof outputSchema>;

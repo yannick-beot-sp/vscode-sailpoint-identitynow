@@ -3,13 +3,13 @@ import { z } from "zod";
 import { AccessProfileRef, EntitlementRef, RoleMembershipSelector, RoleMembershipSelectorType } from "sailpoint-api-client";
 import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
+import { refSchema, tenantNameField } from "../../inputFields";
 import { Parser } from "../../../parser/parser";
 import { RoleMembershipSelectorConverter } from "../../../parser/RoleMembershipSelectorConverter";
 import { SourceNameToIdCacheService } from "../../../services/cache/SourceNameToIdCacheService";
 import { isUuid } from "../../../utils/stringUtils";
 import { resolveIdentity } from "../../utils/identityUtils";
-import { membershipCriteriaField, refSchema, roleBaseOutputSchema } from "./roleSchemas";
+import { membershipCriteriaField, roleBaseOutputSchema } from "./roleSchemas";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,

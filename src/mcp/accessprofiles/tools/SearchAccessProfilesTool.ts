@@ -3,7 +3,8 @@ import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
 import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
-import { DEFAULT_SEARCH_LIMIT, paginationOutputFields, baseDocumentSchema, searchQueryField, offsetField, limitField, sortField, referenceSchema, paginationInputFields } from "../../search/searchInputFields";
+import { DEFAULT_SEARCH_LIMIT, paginationOutputFields, baseDocumentSchema, paginationInputFields } from "../../search/searchInputFields";
+import { refSchema } from "../../inputFields";
 
 const DEFAULT_SORT = "name";
 
@@ -29,7 +30,7 @@ const outputSchema = z.object({
                 id: z.string().optional(),
                 name: z.string().optional(),
                 description: z.string().optional(),
-                owner: referenceSchema.optional(),
+                owner: refSchema.optional(),
             })).optional(),
         })
     ),

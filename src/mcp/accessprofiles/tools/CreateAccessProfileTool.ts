@@ -6,7 +6,7 @@ import { ErrorCodes, McpError } from "../../errors";
 import { tenantNameField } from "../../inputFields";
 import { resolveIdentity } from "../../utils/identityUtils";
 import { resolveSource } from "../../utils/sourceUtils";
-import { accessProfileBaseOutputSchema } from "./accessProfileSchemas";
+import { accessProfileOutputSchema } from "./accessProfileSchemas";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -21,7 +21,7 @@ const inputSchema = z.object({
     ),
 });
 
-const outputSchema = accessProfileBaseOutputSchema;
+const outputSchema = accessProfileOutputSchema;
 
 type Input = z.infer<typeof inputSchema>;
 type Output = z.infer<typeof outputSchema>;

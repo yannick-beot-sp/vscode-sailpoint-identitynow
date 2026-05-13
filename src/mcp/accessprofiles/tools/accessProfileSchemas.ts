@@ -1,12 +1,7 @@
 import { z } from "zod";
+import { refSchema } from "../../inputFields";
 
-export const refSchema = z.object({
-    id: z.string().optional(),
-    name: z.string().optional().nullable(),
-    type: z.string().optional(),
-});
-
-export const accessProfileBaseOutputSchema = z.object({
+export const accessProfileOutputSchema = z.object({
     id: z.string(),
     name: z.string(),
     description: z.string().nullable().optional(),
@@ -14,4 +9,5 @@ export const accessProfileBaseOutputSchema = z.object({
     requestable: z.boolean().optional(),
     source: refSchema.optional(),
     owner: refSchema.nullable().optional(),
+    entitlements: z.array(refSchema).optional().nullable(),
 });

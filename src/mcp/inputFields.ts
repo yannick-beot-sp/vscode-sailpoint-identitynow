@@ -12,3 +12,10 @@ export const tenantNameField = z.string().describe(
 export const sourceNameOrIdField = z.string().describe(
     "Source name or ID."
 );
+
+
+export const refSchema = z.object({
+    id: z.string().optional(),
+    name: z.string().optional().nullable(),
+    type: z.string().optional(),
+});
