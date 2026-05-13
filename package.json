@@ -678,6 +678,10 @@
       {
         "command": "vscode-sailpoint-identitynow.service-desk-integrations.edit.status-check-configuration",
         "title": "Edit time check configuration..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.mcp.copy-url",
+        "title": "ISC: Copy MCP server URL"
       }
     ],
     "menus": {

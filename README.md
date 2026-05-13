@@ -536,6 +536,16 @@ The extension includes a built-in [Model Context Protocol (MCP)](https://modelco
 | `createRole`  | Create a new role. Specify name, owner, and optionally description, requestable flag, entitlement IDs, access profile names or IDs, and membership criteria. |
 | `updateRole`  | Update an existing role using JSON Patch. Identify it by id or name, then specify only the fields to change.                                                 |
 
+### Forms
+
+| Tool         | Description                                                                                                                                          |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `listForms`  | List all form definitions for a given tenant. Returns id, name, description, owner, created, and modified for each form.                             |
+| `getForm`    | Get the details of a form definition by GUID or name.                                                                                                |
+| `createForm` | Create a new form definition. Specify the form name, owner (identity alias or ID), and optionally a description.                                     |
+| `updateForm` | Update an existing form definition using JSON Patch. Identify it by GUID or name, then specify only the fields to change (name, description, owner). |
+| `deleteForm` | Delete a form definition by GUID or name.                                                                                                            |
+
 ### Transforms
 
 | Tool                | Description                                                                                                                      |
@@ -565,6 +575,15 @@ The extension includes a built-in [Model Context Protocol (MCP)](https://modelco
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `searchAuditEvents`       | Search audit events. Returns id, action, type, actor, target, status, technicalName, and more for each matching event. Supports offset-based pagination.       |
 | `searchAccountActivities` | Search account activities. Returns id, action, status, stage, requester, recipient, trackingNumber, and more for each match. Supports offset-based pagination. |
+
+### Identity Profiles
+
+| Tool                        | Description                                                          |
+| --------------------------- | -------------------------------------------------------------------- |
+| `listIdentityProfile`       | List all identity profiles for a given tenant.                       |
+| `getIdentityProfile`        | Get the details of a single identity profile by name or ID.          |
+| `createIdentityProfile`     | Create a new identity profile.                                       |
+| `setIdentityProfileMapping` | "Add or update an identity attribute mapping on an identity profile. |
 
 ## Extension Settings
 
@@ -625,6 +644,10 @@ The patterns defined above use the following tokens:
 
 - Fix issue when updating roles with empty values (cf. [#147](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/147))
 - Support of entitlements with attribute for dimension import
+- Add MCP tools for forms (`listForms`, `getForm`, `createForm`, `updateForm`, `deleteForm`)
+- Add MCP tools for identity profiles (`listIdentityProfile`, `getIdentityProfile`, `createIdentityProfile`, `setIdentityProfileMapping`)
+- Add command for status bar to copy MCP URL
+
 
 ### 1.3.28
 
@@ -638,6 +661,7 @@ The patterns defined above use the following tokens:
 ### Fixed
 
 - Fix issue when exporting SPConfig for chosen forms, segments or connector rules
+
 ### 1.3.26
 
 - Escape '\' when exporting and importing roles and access profiles

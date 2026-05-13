@@ -5,6 +5,7 @@ import { TenantServiceEventType } from "../services/TenantServiceEventType";
 import * as configuration from '../configurationConstants';
 import { ISCMcpServerDefinitionProvider } from "./McpServerDefinitionProvider";
 import { MCP_ID } from "./constants";
+import { MCP_COPY_URL } from "../commands/constants";
 
 /**
  * Check if MCP API is available in current VS Code version
@@ -46,6 +47,16 @@ export class McpServerManager {
 
         this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right);
         this.statusBarItem.text = "$(hubot)";
+
+        context.subscriptions.push(
+            vscode.commands.registerCommand(MCP_COPY_URL, () => {
+                const url = `http://localhost:${this.server.port}/mcp`;
+                vscode.env.clipboard.writeText(url);
+                vscode.window.showInformationMessage(`MCP server URL copied: ${url}`);
+            })
+        );
+
+        this.statusBarItem.command = MCP_COPY_URL;
         context.subscriptions.push(this.statusBarItem);
 
         context.subscriptions.push(

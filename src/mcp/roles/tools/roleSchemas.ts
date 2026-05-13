@@ -1,10 +1,6 @@
 import { z } from "zod";
+import { refSchema } from "../../inputFields";
 
-export const refSchema = z.object({
-    id: z.string().optional(),
-    name: z.string().optional(),
-    type: z.string().optional(),
-});
 
 export const membershipCriteriaField = z.string().optional().describe(
     "Membership criteria in SCIM-like format. " +

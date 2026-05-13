@@ -160,3 +160,6 @@ export const CAMPAIGN_FILTER_STATUS = `${COMMAND_PREFIX}.campaigns.filter.status
 
 // Service Desk
 export const EDIT_SERVICE_DESK_INTEGRATIONS_STATUS_CHECK_CONFIGURATION = `${COMMAND_PREFIX}.service-desk-integrations.edit.status-check-configuration`;
+
+// MCP
+export const MCP_COPY_URL = `${COMMAND_PREFIX}.mcp.copy-url`;

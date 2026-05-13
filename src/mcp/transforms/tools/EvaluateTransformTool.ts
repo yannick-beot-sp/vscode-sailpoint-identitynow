@@ -5,7 +5,7 @@ import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
 import { tenantNameField } from "../../inputFields";
 import { transformNameField } from "../transformInputFields";
-import { isUuid } from "../../../utils/stringUtils";
+import { resolveIdentity } from "../../utils/identityUtils";
 
 const IDENTITY_ATTRIBUTE = "uid";
 
@@ -52,19 +52,7 @@ export class EvaluateTransformTool extends ToolContext {
     async execute(input: Input): Promise<Output> {
         const client = getIscClient(this);
 
-        // Resolve identity ID
-        let identityId: string;
-        if (isUuid(input.identity)) {
-            identityId = input.identity;
-        } else {
-            try {
-                const identity = await client.getPublicIdentityByAlias(input.identity);
-                identityId = identity.id!;
-            } catch (err: any) {
-                if (err instanceof McpError) { throw err; }
-                throw new McpError(ErrorCodes.ISC_API_ERROR, String(err?.message ?? err));
-            }
-        }
+        const identityId = await resolveIdentity(input.identity, client);
 
         // Evaluate the transform via identity preview
         try {

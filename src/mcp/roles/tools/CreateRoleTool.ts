@@ -14,6 +14,7 @@ import { Parser } from "../../../parser/parser";
 import { RoleMembershipSelectorConverter } from "../../../parser/RoleMembershipSelectorConverter";
 import { SourceNameToIdCacheService } from "../../../services/cache/SourceNameToIdCacheService";
 import { isUuid } from "../../../utils/stringUtils";
+import { resolveIdentity } from "../../utils/identityUtils";
 import { membershipCriteriaField, roleBaseOutputSchema } from "./roleSchemas";
 
 const inputSchema = z.object({
@@ -21,7 +22,7 @@ const inputSchema = z.object({
     name: z.string().min(1).describe("Name of the role."),
     description: z.string().optional().describe("Description of the role."),
     owner: z.string().min(1).describe("Username (alias) or display name of the identity who owns the role."),
-    requestable: z.boolean().optional().default(false).describe("Whether the role can be requested. Defaults to false."),
+    requestable: z.boolean().optional().default(false).describe("Whether the role can be requested."),
     entitlements: z.array(z.string()).optional().describe(
         "Entitlement IDs to include in the role. Use searchEntitlements to find entitlement IDs first."
     ),
@@ -59,19 +60,7 @@ export class CreateRoleTool extends ToolContext {
         const client = getIscClient(this);
 
         try {
-            // Resolve owner identity
-            let ownerId: string;
-            if (isUuid(input.owner)) {
-                ownerId = input.owner;
-            } else {
-                try {
-                    const identity = await client.getPublicIdentityByAlias(input.owner);
-                    ownerId = identity.id!;
-                } catch (err: any) {
-                    if (err instanceof McpError) { throw err; }
-                    throw new McpError(ErrorCodes.ISC_API_ERROR, String(err?.message ?? err));
-                }
-            }
+            const ownerId = await resolveIdentity(input.owner, client);
 
             // Resolve access profiles
             const accessProfileIds: string[] = [];

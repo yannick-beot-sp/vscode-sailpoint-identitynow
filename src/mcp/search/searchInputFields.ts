@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { tenantNameField } from "../inputFields";
+import { refSchema, tenantNameField } from "../inputFields";
 
 export const DEFAULT_SEARCH_LIMIT = 250;
 
@@ -39,11 +39,6 @@ export const paginationOutputFields = {
     count: z.number().describe("Number of results returned in this response."),
 };
 
-export const referenceSchema = z.object({
-    id: z.string().optional(),
-    name: z.string().optional(),
-    type: z.string().optional(),
-});
 
 export const baseDocumentSchema = z.object({
     id: z.string().optional(),
@@ -51,6 +46,6 @@ export const baseDocumentSchema = z.object({
     description: z.string().nullable().optional(),
     enabled: z.boolean().optional(),
     requestable: z.boolean().optional(),
-    owner: referenceSchema.optional(),
+    owner: refSchema.optional(),
     tags: z.array(z.string()).optional(),
 });

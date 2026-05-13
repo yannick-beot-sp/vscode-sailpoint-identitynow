@@ -3,9 +3,8 @@ import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
 import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
-import { sourceNameOrIdField } from "../sourcesInputFields";
-import { isUuid } from "../../../utils/stringUtils";
+import { sourceNameOrIdField, tenantNameField } from "../../inputFields";
+import { resolveSource } from "../../utils/sourceUtils";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -53,14 +52,7 @@ export class GetSourceSchemasTool extends ToolContext {
         const client = getIscClient(this);
 
         try {
-            let sourceId: string;
-
-            if (isUuid(input.sourceNameOrId)) {
-                sourceId = input.sourceNameOrId;
-            } else {
-                const source = await client.getSourceByName(input.sourceNameOrId);
-                sourceId = source.id!;
-            }
+            const sourceId = await resolveSource(input.sourceNameOrId, client);
 
             const schemas = await client.getSchemas(sourceId);
             return {
@@ -79,12 +71,7 @@ export class GetSourceSchemasTool extends ToolContext {
                 })),
             };
         } catch (err: any) {
-            if (err?.response?.status === 404 || err?.message?.includes("Could not find")) {
-                throw new McpError(
-                    ErrorCodes.SOURCE_NOT_FOUND,
-                    `Source "${input.sourceNameOrId}" not found.`
-                );
-            }
+            if (err instanceof McpError) { throw err; }
             throw new McpError(ErrorCodes.ISC_API_ERROR, String(err?.message ?? err));
         }
     }
