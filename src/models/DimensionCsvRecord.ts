@@ -14,7 +14,7 @@ export interface DimensionCSVRecord {
      * @type {string}
      * @memberof Dimension
      */
-    'description'?: string;
+    'description'?: string | null;
     /**
      *
      * @type {Array<AccessProfileRef>}

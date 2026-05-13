@@ -1881,7 +1881,7 @@
     "fast-json-patch": "^3.1.1",
     "frontmcp": "^0.12.2",
     "lodash": "^4.17.21",
-    "sailpoint-api-client": "^1.8.20",
+    "sailpoint-api-client": "^1.8.33",
     "tmp": "^0.2.1",
     "vscode-sailpoint-identitynow": "file:"
   }

@@ -15,7 +15,7 @@ import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIt
 import { EntitlementIdToSourceNameCacheService } from '../../services/cache/EntitlementIdToSourceNameCacheService';
 import { metadataToString } from '../../utils/metadataUtils';
 import { dimensionSchemaToString } from '../../utils/dimensionUtils';
-import { entitlementToStringConverter } from '../../utils/entitlementToStringConverter';
+import { entitlementToStringConverter } from '../../utils/entitlementUtils';
 import { getAdditionalOwners } from '../../utils/additionalOwners';
 
 export class RoleExporterCommand {
@@ -168,8 +168,6 @@ class RoleExporter extends BaseCSVExporter<RoleV2025> {
             "requireEndDate",
             "maxPermittedAccessDurationValue",
             "maxPermittedAccessDurationTimeUnit",
-            "revokeCommentsRequired",
-            "revokeDenialCommentsRequired",
             "revokeApprovalSchemes",
             "accessProfiles",
             "entitlements",
@@ -193,8 +191,6 @@ class RoleExporter extends BaseCSVExporter<RoleV2025> {
             "accessRequestConfig.requireEndDate",
             "accessRequestConfig.maxPermittedAccessDuration.value",
             "accessRequestConfig.maxPermittedAccessDuration.timeUnit",
-            "revocationRequestConfig.commentsRequired",
-            "revocationRequestConfig.denialCommentsRequired",
             "revokeApprovalSchemes",
             "accessProfiles",
             "entitlements",

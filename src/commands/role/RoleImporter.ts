@@ -25,6 +25,7 @@ import { stringToDimensionAttributes } from '../../utils/dimensionUtils';
 import { ImportResult } from '../../models/ImportResult';
 import { resolveAdditionalOwners } from '../../utils/additionalOwners';
 import { formatMaxPermittedAccessDuration } from '../../utils/maxPermittedAccessDuration';
+import { stringToEntitlementConverter } from '../../utils/entitlementUtils';
 
 interface RoleCSVRecord {
     name: string
@@ -37,8 +38,6 @@ interface RoleCSVRecord {
     commentsRequired: boolean
     denialCommentsRequired: boolean
     approvalSchemes: string
-    revokeCommentsRequired: boolean
-    revokeDenialCommentsRequired: boolean
     revokeApprovalSchemes: string
     accessProfiles: string
     entitlements: string
@@ -194,40 +193,10 @@ export class RoleImporter {
                 let entitlements: EntitlementRef[] = []
                 if (isNotBlank(data.entitlements)) {
                     try {
-                        entitlements = await Promise.all(data.entitlements
-                            .split(CSV_MULTIVALUE_SEPARATOR)
-                            .map(async (entitlementStr) => {
-                                const parts = entitlementStr.split(KEY_SEPARATOR);
-                                let sourceName: string;
-                                let entitlementName: string;
-                                let sourceId: string;
-                                let entitlementId: string;
-
-                                if (parts.length === 3) {
-                                    // New format: sourceName|attribute|name
-                                    let attribute
-                                    [sourceName, attribute, entitlementName] = parts;
-                                    sourceId = await sourceCacheService.get(sourceName);
-                                    entitlementId = await entitlementCacheService.get(
-                                        [sourceId, attribute, entitlementName].join(KEY_SEPARATOR)
-                                    );
-                                } else if (parts.length === 2) {
-                                    // Legacy format: sourceName|name
-                                    [sourceName, entitlementName] = parts;
-                                    sourceId = await sourceCacheService.get(sourceName);
-                                    entitlementId = await entitlementCacheService.get(
-                                        [sourceId, entitlementName].join(KEY_SEPARATOR)
-                                    );
-                                } else {
-                                    throw new Error(`Invalid entitlement format: ${entitlementStr}`);
-                                }
-
-                                return {
-                                    name: entitlementName,
-                                    id: entitlementId,
-                                    type: "ENTITLEMENT"
-                                }
-                            }));
+                        entitlements = await stringToEntitlementConverter(data.entitlements,
+                            sourceCacheService,
+                            entitlementCacheService
+                        )
                     } catch (error) {
                         result.error++;
                         const etMessage = `Unable to find an entitlement: ${error}`;
@@ -241,13 +210,17 @@ export class RoleImporter {
                     throw new UserCancelledError();
                 }
 
-                let approvalSchemes: ApprovalSchemeForRole[] | undefined = undefined,
-                    revokeApprovalSchemes: ApprovalSchemeForRole[] | undefined = undefined;
+                let approvalSchemes: ApprovalSchemeForRole[] = [],
+                    revokeApprovalSchemes: ApprovalSchemeForRole[] = [];
                 try {
                     approvalSchemes = await stringToRoleApprovalSchemeConverter(
-                        data.approvalSchemes, governanceGroupCache, workflowCache);
+                        data.approvalSchemes,
+                        governanceGroupCache,
+                        workflowCache) ?? []
                     revokeApprovalSchemes = await stringToRoleApprovalSchemeConverter(
-                        data.revokeApprovalSchemes, governanceGroupCache, workflowCache);
+                        data.revokeApprovalSchemes,
+                        governanceGroupCache,
+                        workflowCache) ?? []
                 } catch (error) {
                     result.error++;
                     const srcMessage = `Unable to build approval scheme: ${error}`;
@@ -316,8 +289,6 @@ export class RoleImporter {
                         maxPermittedAccessDuration
                     },
                     "revocationRequestConfig": {
-                        "commentsRequired": truethy(data.revokeCommentsRequired),
-                        "denialCommentsRequired": truethy(data.revokeDenialCommentsRequired),
                         "approvalSchemes": revokeApprovalSchemes
                     },
                     accessProfiles,
@@ -367,9 +338,7 @@ export class RoleImporter {
                                 { columns: ['requireEndDate'], path: 'accessRequestConfig/requireEndDate', getValue: () => truethy(data.requireEndDate) },
                                 { columns: ['maxPermittedAccessDurationValue', 'maxPermittedAccessDurationTimeUnit'], path: 'accessRequestConfig/maxPermittedAccessDuration', getValue: () => maxPermittedAccessDuration },
                                 { columns: ['approvalSchemes'], path: 'accessRequestConfig/approvalSchemes', getValue: () => approvalSchemes },
-                                { columns: ['dimensionAttributes'], path: 'accessRequestConfig/dimensionSchema', getValue: () => stringToDimensionAttributes(data.dimensionAttributes ?? "") },
-                                { columns: ['revokeCommentsRequired'], path: 'revocationRequestConfig/commentsRequired', getValue: () => truethy(data.revokeCommentsRequired) },
-                                { columns: ['revokeDenialCommentsRequired'], path: 'revocationRequestConfig/denialCommentsRequired', getValue: () => truethy(data.revokeDenialCommentsRequired) },
+                                { columns: ['dimensionAttributes'], path: 'accessRequestConfig/dimensionSchema', getValue: () => stringToDimensionAttributes(data.dimensionAttributes) ?? {}, condition: () => truethy(role.dimensional) },
                                 { columns: ['revokeApprovalSchemes'], path: 'revocationRequestConfig/approvalSchemes', getValue: () => revokeApprovalSchemes },
                                 { columns: ['accessProfiles'], path: 'accessProfiles', getValue: () => accessProfiles ?? null },
                                 { columns: ['entitlements'], path: 'entitlements', getValue: () => entitlements ?? null },
@@ -379,6 +348,7 @@ export class RoleImporter {
 
                             const updates = updateMappings
                                 .filter(m => m.columns.some(col => headers.includes(col)))
+                                .filter(m => m.condition === undefined || m.condition())
                                 .map(m => ({
                                     op: JsonPatchOperationV2025OpV2025.Replace,
                                     path: `/${m.path}`,
@@ -386,14 +356,12 @@ export class RoleImporter {
                                 }))
                             try {
                                 await this.client.updateRole(role.id!, updates)
-                                await this.writeLog(processedLines, roleName, CSVLogWriterLogType.SUCCESS, `Successfully updated access profile '${roleName}'`);
+                                await this.writeLog(processedLines, roleName, CSVLogWriterLogType.SUCCESS, `Successfully updated role '${roleName}'`);
                                 result.success++;
                             } catch (error: any) {
                                 result.error++;
                                 await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, `Cannot update role: '${error.message}'`);
-
                             }
-
                         } else {
                             // Role not found
                             // very unlikely. We shall find the role as we have a conflicting name
