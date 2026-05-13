@@ -8,7 +8,7 @@ import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { compareByName } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowExecutionBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, PublicIdentity, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApiListAccessProfilesRequest, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseV2025, CustomFormsV2025Api, CreateFormDefinitionRequestV2025, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, IdentityProfilesV2025Api, IdentityPreviewResponseV2025, IdentityAttributeTransformV2025, SourcesV2025Api, TaskManagementV2025Api, AttributeDTO, RolesV2025Api, AccessProfilesV2025Api, JsonPatchOperationV2025, DimensionsV2025Api, RolesV2025ApiListRolesRequest, DimensionV2025, DimensionsV2025ApiListDimensionsRequest, PasswordConfigurationV2025Api, PasswordOrgConfigV2025, WorkflowsV2025Api, WorkflowV2025, WorkflowBodyV2025, WorkflowExecutionEventV2025, CreateWorkflowRequestV2025, WorkflowExecutionV2025, ConnectorRuleManagementV2025Api, ConnectorRuleResponseV2025, EntitlementsV2025Api, EntitlementsV2025ApiListEntitlementsRequest, EntitlementV2025, PublicIdentitiesV2025Api, PublicIdentitiesV2025ApiGetPublicIdentitiesRequest, RoleV2025, TransformsV2025Api, TransformV2025, TransformReadV2025, SearchV2025Api, IndexV2025, AccessProfileDocumentV2025, EntitlementDocumentV2025, RoleDocumentV2025, EventDocumentV2025, AccountActivityDocumentV2025, AccessProfileV2025 } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, IdentityAttributeTransform, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowExecutionBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, PublicIdentity, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApiListAccessProfilesRequest, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseV2025, CustomFormsV2025Api, CreateFormDefinitionRequestV2025, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, IdentityProfilesV2025Api, IdentityPreviewResponseV2025, IdentityAttributeTransformV2025, SourcesV2025Api, TaskManagementV2025Api, AttributeDTO, RolesV2025Api, AccessProfilesV2025Api, JsonPatchOperationV2025, DimensionsV2025Api, RolesV2025ApiListRolesRequest, DimensionV2025, DimensionsV2025ApiListDimensionsRequest, PasswordConfigurationV2025Api, PasswordOrgConfigV2025, WorkflowsV2025Api, WorkflowV2025, WorkflowBodyV2025, WorkflowExecutionEventV2025, CreateWorkflowRequestV2025, WorkflowExecutionV2025, ConnectorRuleManagementV2025Api, ConnectorRuleResponseV2025, EntitlementsV2025Api, EntitlementsV2025ApiListEntitlementsRequest, EntitlementV2025, PublicIdentitiesV2025Api, PublicIdentitiesV2025ApiGetPublicIdentitiesRequest, RoleV2025, TransformsV2025Api, TransformV2025, TransformReadV2025, SearchV2025Api, IndexV2025, AccessProfileDocumentV2025, EntitlementDocumentV2025, RoleDocumentV2025, EventDocumentV2025, AccountActivityDocumentV2025, AccessProfileV2025 } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -1087,11 +1087,97 @@ export class ISCClient {
 		return resp.data;
 	}
 
+	public async getIdentityProfileById(id: string): Promise<IdentityProfile> {
+		console.log("> getIdentityProfileById", id);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new IdentityProfilesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const resp = await api.getIdentityProfile({ identityProfileId: id });
+		return resp.data;
+	}
+
+	public async getIdentityProfileByName(name: string): Promise<IdentityProfile> {
+		console.log("> getIdentityProfileByName", name);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new IdentityProfilesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const resp = await api.listIdentityProfiles({
+			filters: `name eq "${name}"`,
+			limit: 2,
+		});
+		const profiles = resp.data;
+		if (!profiles || profiles.length !== 1) {
+			throw new Error(`Could not find identity profile "${name}". Found ${profiles?.length ?? 0}`);
+		}
+		return profiles[0];
+	}
+
+	public async addIdentityProfileMapping(
+		identityProfileId: string,
+		mapping: IdentityAttributeTransform
+	): Promise<IdentityProfile> {
+		console.log("> addIdentityProfileMapping", identityProfileId);
+		const apiConfig = await this.getApiConfiguration();
+		const axios = await this.getAxios(CONTENT_TYPE_FORM_JSON_PATCH);
+		const api = new IdentityProfilesApi(apiConfig, undefined, axios);
+		const resp = await api.updateIdentityProfile({
+			identityProfileId,
+			jsonPatchOperation: [
+				{
+					op: "add" as any,
+					path: "/identityAttributeConfig/attributeTransforms/-",
+					value: mapping as any,
+				},
+			],
+		});
+		return resp.data;
+	}
+
+	public async setIdentityProfileMapping(
+		identityProfileId: string,
+		mapping: IdentityAttributeTransform
+	): Promise<IdentityProfile> {
+		console.log("> setIdentityProfileMapping", identityProfileId);
+		const profile = await this.getIdentityProfileById(identityProfileId);
+		const transforms = profile.identityAttributeConfig?.attributeTransforms ?? [];
+		const existingIndex = transforms.findIndex(
+			t => t.identityAttributeName === mapping.identityAttributeName
+		);
+
+		const apiConfig = await this.getApiConfiguration();
+		const axios = await this.getAxios(CONTENT_TYPE_FORM_JSON_PATCH);
+		const api = new IdentityProfilesApi(apiConfig, undefined, axios);
+
+		const op = existingIndex >= 0
+			? {
+				op: "replace" as any,
+				path: `/identityAttributeConfig/attributeTransforms/${existingIndex}`,
+				value: mapping as any,
+			}
+			: {
+				op: "add" as any,
+				path: "/identityAttributeConfig/attributeTransforms/-",
+				value: mapping as any,
+			};
+
+		const resp = await api.updateIdentityProfile({
+			identityProfileId,
+			jsonPatchOperation: [op],
+		});
+		return resp.data;
+	}
+
 	public async refreshIdentityProfile(identityProfileId: string): Promise<void> {
 		console.log("> refreshIdentityProfile", identityProfileId);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new IdentityProfilesApi(apiConfig, undefined, (await this.getAxios()));
 		const resp = await api.syncIdentityProfile({ identityProfileId });
+	}
+
+	public async createIdentityProfile(payload: IdentityProfile): Promise<IdentityProfile> {
+		console.log("> createIdentityProfile", payload.name);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new IdentityProfilesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const resp = await api.createIdentityProfile({ identityProfile: payload });
+		return resp.data;
 	}
 
 	public async getIdentityPreview(identityId: string, config: Array<IdentityAttributeTransformV2025>): Promise<IdentityPreviewResponseV2025> {
