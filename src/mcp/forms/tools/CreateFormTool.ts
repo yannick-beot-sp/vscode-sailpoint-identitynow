@@ -5,6 +5,7 @@ import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
 import { tenantNameField } from "../../inputFields";
 import { resolveIdentity } from "../../utils/identityUtils";
+import { getFormOwner } from "../formUtils";
 import { descriptionField, formConditionSchema, formDefinitionInputSchema, formDetailOutputSchema, formElementSchema } from "./formSchemas";
 
 const inputSchema = z.object({
@@ -56,10 +57,7 @@ export class CreateFormTool extends ToolContext {
                 id: created.id,
                 name: created.name,
                 description: created.description,
-                owner: {
-                    ...created.owner,
-                    name: created.owner?.name ?? ((created.owner) as any)?.fullName // casting to any because fullName is not part of schema
-                },
+                owner: getFormOwner(created.owner),
                 created: created.created,
                 modified: created.modified,
                 formInput: created.formInput,

@@ -5,6 +5,7 @@ import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
 import { tenantNameField } from "../../inputFields";
 import { formBaseOutputSchema } from "./formSchemas";
+import { getFormOwner } from "../formUtils";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -39,10 +40,7 @@ export class ListFormsTool extends ToolContext {
                     id: f.id,
                     name: f.name,
                     description: f.description,
-                    owner: {
-                        ...f.owner,
-                        name: f.owner?.name ?? ((f.owner) as any)?.fullName // casting to any because fullName is not part of schema
-                    },
+                    owner: getFormOwner(f.owner),
                     created: f.created,
                     modified: f.modified,
                 })),

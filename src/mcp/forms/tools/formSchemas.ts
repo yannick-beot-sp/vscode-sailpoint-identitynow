@@ -1,16 +1,11 @@
 import { z } from "zod";
+import { refSchema } from "../../inputFields";
 
 export const formIdOrNameField = z.string().min(1).describe(
     "GUID (e.g. '603d301c-a57b-4ec4-939b-263ec0407b95') or name of the form definition."
 );
 
 export const descriptionField = z.string().optional().describe("Description of the form definition.")
-
-export const formOwnerSchema = z.object({
-    type: z.string().optional(),
-    id: z.string().optional(),
-    name: z.string().optional(),
-});
 
 export const formDefinitionInputSchema = z.object({
     id: z.string().optional().describe("Unique identifier for the form input."),
@@ -72,7 +67,7 @@ export const formBaseOutputSchema = z.object({
     id: z.string().optional(),
     name: z.string().optional(),
     description: z.string().optional(),
-    owner: formOwnerSchema.optional(),
+    owner: refSchema,
     created: z.string().optional(),
     modified: z.string().optional(),
 });

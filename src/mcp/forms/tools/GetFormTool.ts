@@ -7,6 +7,7 @@ import { tenantNameField } from "../../inputFields";
 import { isGuid } from "../../../utils/stringUtils";
 import { formDetailOutputSchema } from "./formSchemas";
 import { formIdOrNameField } from "./formSchemas";
+import { getFormOwner } from "../formUtils";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -43,10 +44,7 @@ export class GetFormTool extends ToolContext {
                 id: form.id,
                 name: form.name,
                 description: form.description,
-                owner: {
-                    ...form.owner,
-                    name: form.owner?.name ?? ((form.owner) as any)?.fullName // casting to any because fullName is not part of schema
-                },
+                owner: getFormOwner(form.owner),
                 created: form.created,
                 modified: form.modified,
                 formInput: form.formInput,

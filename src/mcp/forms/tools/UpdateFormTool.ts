@@ -6,6 +6,7 @@ import { ErrorCodes, McpError } from "../../errors";
 import { tenantNameField } from "../../inputFields";
 import { isGuid } from "../../../utils/stringUtils";
 import { resolveIdentity } from "../../utils/identityUtils";
+import { getFormOwner } from "../formUtils";
 import { descriptionField, formConditionSchema, formDefinitionInputSchema, formDetailOutputSchema, formElementSchema } from "./formSchemas";
 import { formIdOrNameField } from "./formSchemas";
 import { JsonPatchOperationV2025 } from "sailpoint-api-client";
@@ -86,10 +87,7 @@ export class UpdateFormTool extends ToolContext {
                 id: updated.id,
                 name: updated.name,
                 description: updated.description,
-                owner: {
-                    ...updated.owner,
-                    name: updated.owner?.name ?? ((updated.owner) as any)?.fullName // casting to any because fullName is not part of schema
-                },
+                owner: getFormOwner(updated.owner),
                 created: updated.created,
                 modified: updated.modified,
                 formInput: updated.formInput,
