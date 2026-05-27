@@ -12,6 +12,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Changed
 
+- Order dimensions by name
+
 ### Fixed
 
 ### Removed

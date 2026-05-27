@@ -32,7 +32,7 @@ export class DimensionExporterCommand {
         const proposedPath = singleRole ? PathProposer.getDimensionReportForRoleFilename(
             node.tenantName,
             node.tenantDisplayName,
-            roleName) : PathProposer.getDimensionReportFilename(
+            roleName!) : PathProposer.getDimensionReportFilename(
                 node.tenantName,
                 node.tenantDisplayName)
 
@@ -89,8 +89,8 @@ class DimensionExporter extends BaseCSVExporter<DimensionWithRoleNameName> {
         tenantDisplayName: string,
         path: string,
         private readonly singleRole: boolean,
-        private readonly roleId: string,
-        private readonly roleName: string
+        private readonly roleId: string | undefined,
+        private readonly roleName: string | undefined
     ) {
         super("Dimensions",
             tenantId,
@@ -110,8 +110,8 @@ class DimensionExporter extends BaseCSVExporter<DimensionWithRoleNameName> {
         if (this.singleRole) {
             const iterator = new GenericAsyncIterableIterator<DimensionV2025, DimensionsV2025ApiListDimensionsRequest>(
                 this.client,
-                this.client.getPaginatedDimensions, { roleId: this.roleId });
-            await this.exportData(addRoleName(iterator, this.roleName), task, token)
+                this.client.getPaginatedDimensions, { roleId: this.roleId!, sorters: "name" });
+            await this.exportData(addRoleName(iterator, this.roleName!), task, token)
         } else {
             const iterator = getAllDimensions(this.client)
             await this.exportData(iterator, task, token)

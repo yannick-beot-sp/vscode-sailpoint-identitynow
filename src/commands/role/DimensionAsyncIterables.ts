@@ -1,7 +1,6 @@
 import { DimensionsV2025ApiListDimensionsRequest, DimensionV2025, Role, RolesApiListRolesRequest, RoleV2025 } from "sailpoint-api-client";
 import { ISCClient } from "../../services/ISCClient";
 import { GenericAsyncIterableIterator } from "../../utils/GenericAsyncIterableIterator";
-import { UserCancelledError } from "../../errors";
 
 export interface DimensionWithRoleNameName extends DimensionV2025 {
     roleName: string
@@ -34,7 +33,7 @@ export async function* getAllDimensions(
         for (let role of roles) {
             const dimIterator = new GenericAsyncIterableIterator<DimensionV2025, DimensionsV2025ApiListDimensionsRequest>(
                 client,
-                client.getPaginatedDimensions, { roleId: role.id });
+                client.getPaginatedDimensions, { roleId: role.id!, sorters: "name" });
             for await (const dimensions of dimIterator) {
                 if (dimensions && dimensions.length > 0) {
                     yieldEmpty = false

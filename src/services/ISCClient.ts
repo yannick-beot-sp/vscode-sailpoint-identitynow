@@ -1673,7 +1673,6 @@ export class ISCClient {
 		const api = new DimensionsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.listDimensions(query)
 		return response
-
 	}
 
 	public async createDimension(roleId: string, dim: DimensionV2025): Promise<DimensionV2025> {
@@ -1701,8 +1700,7 @@ export class ISCClient {
 		const result = await this.getPaginatedDimensions({
 			roleId,
 			filters: `name eq "${name}"`,
-			limit: 2,
-			count: true
+			limit: 2
 		});
 		const dimension = this.ensureOneElement(result.data, "dimension", name);
 		console.log("< getDimensionByName", dimension);

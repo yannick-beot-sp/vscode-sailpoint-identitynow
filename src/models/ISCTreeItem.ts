@@ -1047,16 +1047,17 @@ export class RoleTreeItem extends PageableFolderTreeItem<DimensionV2025> {
 	iconPath = new vscode.ThemeIcon("account")
 
 	getUrl(): vscode.Uri | undefined {
-		return getUIUrl(this.tenantName, "ui/a/admin/access/roles/manage", this.id)
+		return getUIUrl(this.tenantName, "ui/a/admin/access/roles/manage", this.id!)
 	}
 
 	protected async loadNext(): Promise<AxiosResponse<DimensionV2025[]>> {
 		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
 		return await this.client.getPaginatedDimensions({
-			roleId: this.id,
+			roleId: this.id!,
 			limit,
 			offset: this.currentOffset,
-			count: (this._total === 0)
+			count: (this._total === 0),
+			sorters: "name"
 		})
 	}
 

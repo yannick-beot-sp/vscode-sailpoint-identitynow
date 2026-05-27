@@ -642,6 +642,8 @@ The patterns defined above use the following tokens:
 
 ### Unreleased
 
+- Order dimensions by name
+
 ### 1.3.29
 
 - Fix issue when updating roles with empty values (cf. [#147](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/147))
