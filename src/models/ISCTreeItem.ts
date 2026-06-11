@@ -174,9 +174,10 @@ export class SourcesTreeItem extends FolderTreeItem {
 					this.tenantName,
 					this.tenantDisplayName,
 					source.name,
-					source.id,
-					source.type,
-					source.connectorAttributes["delimiter"],
+					source.id!,
+					source.type!,
+					source.connectorAttributes?.["delimiter"],
+					source.features
 				));
 		}
 		return results;
@@ -311,6 +312,7 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 		id: string,
 		public readonly type: string,
 		public readonly delimiter: string,
+		public readonly features: Array<string> | undefined,
 	) {
 		super({
 			tenantId,
@@ -321,7 +323,7 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 			id,
 			collapsible: vscode.TreeItemCollapsibleState.Collapsed
 		})
-		this.contextValue = type.replaceAll(" ", "") + "source";
+		this.contextValue = (features?.find(x => x === "MACHINE_IDENTITY_AGGREGATION") ?? "") + type.replaceAll(" ", "") + "source";
 	}
 
 	getChildren(): Promise<BaseTreeItem[]> {
@@ -1064,7 +1066,7 @@ export class RoleTreeItem extends PageableFolderTreeItem<DimensionV2025> {
 	 * Filtering not supported... yet
 	 */
 	get computedContextValue() {
-		return this.dimensional ?  `${this.contextValue}Dimensional` : this.contextValue
+		return this.dimensional ? `${this.contextValue}Dimensional` : this.contextValue
 	}
 	/**
 	 * Need to force open command as it's not inhereting from ISCResourceTreeItem anymore

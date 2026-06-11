@@ -227,6 +227,10 @@
         "title": "Aggregate entitlements"
       },
       {
+        "command": "vscode-sailpoint-identitynow.aggregate-machine-identities",
+        "title": "Aggregate machine identities"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.test-source",
         "title": "Test connection",
         "icon": "$(beaker)"
@@ -799,6 +803,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.aggregate-machine-identities",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.test-source",
           "when": "never"
         },
@@ -1239,6 +1247,11 @@
           "command": "vscode-sailpoint-identitynow.aggregate-entitlements",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/ && viewItem != DelimitedFilesource",
           "group": "aggregate@2"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.aggregate-machine-identities",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^MACHINE_IDENTITY_AGGREGATION/",
+          "group": "aggregate@3"
         },
         {
           "command": "vscode-sailpoint-identitynow.test-source",
@@ -1881,7 +1894,7 @@
     "fast-json-patch": "^3.1.1",
     "frontmcp": "^0.12.2",
     "lodash": "^4.17.21",
-    "sailpoint-api-client": "^1.8.33",
+    "sailpoint-api-client": "^1.8.42",
     "tmp": "^0.2.1",
     "vscode-sailpoint-identitynow": "file:"
   }

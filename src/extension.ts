@@ -194,6 +194,12 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.AGGREGATE_ENTITLEMENTS,
 			(sourceTreeItem) => treeManager.aggregateEntitlements(sourceTreeItem)));
 	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.AGGREGATE_MACHINE_IDENTITIES,
+			(sourceTreeItem) => treeManager.aggregateMachineIdentities(sourceTreeItem)));
+	// context.subscriptions.push(
+	// 	vscode.commands.registerCommand(commands.AGGREGATE_MACHINE_IDENTITIES_DISABLE_OPTIMIZATION,
+	// 		(sourceTreeItem) => treeManager.aggregateMachineIdentities(sourceTreeItem, true)));
+	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.RESET_SOURCE,
 			(sourceTreeItem) => treeManager.resetSource(sourceTreeItem)));
 	context.subscriptions.push(
