@@ -9,7 +9,7 @@ import * as commands from "../commands/constants";
 import * as configuration from '../configurationConstants';
 import { convertConstantToTitleCase, escapeFilter, isEmpty, isNotEmpty } from "../utils/stringUtils";
 import { TenantService } from "../services/TenantService";
-import { CampaignStatusV3, DimensionV2025 } from "sailpoint-api-client";
+import { CampaignStatusV3, DimensionV2025, MachineIdentityResponseV2025 } from "sailpoint-api-client";
 import { convertToBaseTreeItem } from "../views/utils";
 
 
@@ -83,6 +83,7 @@ export class TenantTreeItem extends BaseTreeItem {
 		results.push(new SearchAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new IdentityAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new IdentitiesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new MachineIdentitiesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new ApplicationsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new CampaignsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 
@@ -1396,6 +1397,55 @@ export class IdentityTreeItem extends ISCResourceTreeItem {
 	getUrl(): vscode.Uri | undefined {
 		return getUIUrl(this.tenantName, "ui/a/admin/identities", this.id, "details/attributes")
 	}
+}
+
+export class MachineIdentitiesTreeItem extends PageableFolderTreeItem<MachineIdentityResponseV2025> {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {
+		super("Machine Identities", "machine-identities", tenantId, tenantName, tenantDisplayName, 'No machine identities found',
+			(item => new MachineIdentityTreeItem(
+				tenantId,
+				tenantName,
+				tenantDisplayName,
+				item.name ?? item.id ?? "",
+				item.id ?? ""
+			))
+		);
+	}
+
+	protected async loadNext(): Promise<AxiosResponse<MachineIdentityResponseV2025[]>> {
+		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
+		return await this.client.listMachineIdentities({
+			filters: this.filters || undefined,
+			limit,
+			offset: this.currentOffset,
+			count: (this._total === 0)
+		});
+	}
+}
+
+export class MachineIdentityTreeItem extends ISCResourceTreeItem {
+	contextValue = "machine-identity";
+
+	constructor(tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			resourceType: "machine-identities",
+			id,
+		})
+	}
+
+	iconPath = new vscode.ThemeIcon("robot");
 }
 
 /**
