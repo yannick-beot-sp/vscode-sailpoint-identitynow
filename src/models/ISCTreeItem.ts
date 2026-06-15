@@ -1400,6 +1400,10 @@ export class IdentityTreeItem extends ISCResourceTreeItem {
 }
 
 export class MachineIdentitiesTreeItem extends PageableFolderTreeItem<MachineIdentityResponseV2025> {
+	filterTypes?: string[];
+	filterSourceIds?: string[];
+	filterAdditional?: string;
+
 	constructor(
 		tenantId: string,
 		tenantName: string,
@@ -1411,7 +1415,8 @@ export class MachineIdentitiesTreeItem extends PageableFolderTreeItem<MachineIde
 				tenantName,
 				tenantDisplayName,
 				item.name ?? item.id ?? "",
-				item.id ?? ""
+				item.id ?? "",
+				item.subtype
 			))
 		);
 	}
@@ -1422,7 +1427,8 @@ export class MachineIdentitiesTreeItem extends PageableFolderTreeItem<MachineIde
 			filters: this.filters || undefined,
 			limit,
 			offset: this.currentOffset,
-			count: (this._total === 0)
+			count: (this._total === 0),
+			sorters: "name"
 		});
 	}
 }
@@ -1434,7 +1440,8 @@ export class MachineIdentityTreeItem extends ISCResourceTreeItem {
 		tenantName: string,
 		tenantDisplayName: string,
 		label: string,
-		id: string) {
+		id: string,
+		public readonly subtype?: string) {
 		super({
 			tenantId,
 			tenantName,
@@ -1445,7 +1452,17 @@ export class MachineIdentityTreeItem extends ISCResourceTreeItem {
 		})
 	}
 
-	iconPath = new vscode.ThemeIcon("robot");
+	iconPath = new vscode.ThemeIcon("window");
+
+	getUrl(): vscode.Uri | undefined {
+		const segment = this.subtype === "AI Agent" ? "ai-agents" : "machine-identities";
+		return getUIUrl(this.tenantName, `ui/a/admin/${segment}`, this.resourceId, "details");
+	}
+
+	updateIcon(context: vscode.ExtensionContext): void {
+		this.iconPath = this.subtype === "AI Agent" ?
+			new vscode.ThemeIcon("robot") : new vscode.ThemeIcon("window")
+	}
 }
 
 /**

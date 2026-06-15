@@ -11,6 +11,7 @@ import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './co
 import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from './commands/source/exportEntitlementDetails';
 import { ExportScriptFromRuleCommand } from './commands/rule/exportScriptFromRuleCommand';
 import { AccessProfileFilterCommand, RoleFilterCommand, IdentityDefinitionFilterCommand } from './commands/filterCommand';
+import { MachineIdentityFilterCommand } from './commands/machine-identity/machineIdentityFilterCommand';
 import { AccountImportNodeCommand } from './commands/source/importAccount';
 import { EntitlementDetailsImportNodeCommand } from './commands/source/importEntitlementDetails';
 import { UncorrelatedAccountImportNodeCommand } from './commands/source/importUncorrelatedAccount';
@@ -326,6 +327,13 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.ACCESS_PROFILE_UPDATE_FILTER_VIEW,
 			accessProfileFilterCommand.execute, accessProfileFilterCommand));
+	const machineIdentityFilterCommand = new MachineIdentityFilterCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.MACHINE_IDENTITIES_FILTER_VIEW,
+			machineIdentityFilterCommand.execute, machineIdentityFilterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.MACHINE_IDENTITIES_UPDATE_FILTER_VIEW,
+			machineIdentityFilterCommand.execute, machineIdentityFilterCommand));
 
 	const updateWorkflowStatusCommand = new UpdateWorkflowStatusCommand(tenantService)
 	context.subscriptions.push(

@@ -324,19 +324,15 @@ export class ISCClient {
 		disableOptimization = false
 	): Promise<any> {
 		console.log("> ISCClient.startMachineIdentityAggregation");
-		const axiosInstance = await this.getAxios();
-		const response = await axiosInstance.post(
-			`/v2025/sources/${sourceId}/aggregate-agents`,
-			{ disableOptimization, datasetIds },
-			{ headers: { 'X-SailPoint-Experimental': 'true' } }
-		);
-
-		/** 
+		
 		const apiConfig = await this.getApiConfiguration();
 		const api = new MachineIdentitiesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.startMachineIdentityAggregation({
-			machineIdentityAggregationRequestV2025: 
-		})*/
+			sourceId,
+			machineIdentityAggregationRequestV2025: {
+				disableOptimization, datasetIds
+			}
+		})
 
 		return response.data;
 	}
