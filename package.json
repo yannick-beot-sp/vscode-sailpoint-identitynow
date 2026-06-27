@@ -113,6 +113,10 @@
         "title": "Edit access request configuration..."
       },
       {
+        "command": "vscode-sailpoint-identitynow.machine-account-subtype.edit.approval-config",
+        "title": "Edit Approval..."
+      },
+      {
         "command": "vscode-sailpoint-identitynow.tenant.edit.password-org-config",
         "title": "Edit password org configuration..."
       },
@@ -225,6 +229,20 @@
       {
         "command": "vscode-sailpoint-identitynow.aggregate-entitlements",
         "title": "Aggregate entitlements"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.aggregate-machine-identities",
+        "title": "Aggregate machine identities"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.machine-identities.filter",
+        "title": "Filter",
+        "icon": "$(filter)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.machine-identities.update-filter",
+        "title": "Filter",
+        "icon": "$(filter-filled)"
       },
       {
         "command": "vscode-sailpoint-identitynow.test-source",
@@ -719,6 +737,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.machine-account-subtype.edit.approval-config",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.tenant.edit.password-org-config",
           "when": "never"
         },
@@ -787,6 +809,14 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.machine-identities.filter",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.machine-identities.update-filter",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.remove-resource",
           "when": "never"
         },
@@ -796,6 +826,10 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.aggregate-entitlements",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.aggregate-machine-identities",
           "when": "never"
         },
         {
@@ -1158,12 +1192,12 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.remove-resource",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|schema|provisioning-policy|role|roleDimensional|dimension|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|search-attribute|identity-attribute|source-app)$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|schema|provisioning-policy|role|roleDimensional|dimension|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|search-attribute|identity-attribute|source-app|machine-identity|machine-account-subtype)$/",
           "group": "zzzremove@100"
         },
         {
           "command": "vscode-sailpoint-identitynow.refresh-forced",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|transforms|provisioning-policies|roles|roleDimensional|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions|search-attributes|identity-attributes|source-apps|source-app|campaigns/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|transforms|provisioning-policies|roles|roleDimensional|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions|search-attributes|identity-attributes|source-apps|source-app|campaigns|machine-identities|machine-account-subtypes/",
           "group": "inline@50"
         },
         {
@@ -1191,6 +1225,10 @@
         {
           "command": "vscode-sailpoint-identitynow.tenant.edit.access-request-config",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^tenant/"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.machine-account-subtype.edit.approval-config",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == machine-account-subtype"
         },
         {
           "command": "vscode-sailpoint-identitynow.tenant.edit.org-config",
@@ -1239,6 +1277,11 @@
           "command": "vscode-sailpoint-identitynow.aggregate-entitlements",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/ && viewItem != DelimitedFilesource",
           "group": "aggregate@2"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.aggregate-machine-identities",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^MACHINE_IDENTITY_AGGREGATION/",
+          "group": "aggregate@3"
         },
         {
           "command": "vscode-sailpoint-identitynow.test-source",
@@ -1425,6 +1468,16 @@
         {
           "command": "vscode-sailpoint-identitynow.access-profiles.update-filter",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == access-profilesFiltered",
+          "group": "inline@0"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.machine-identities.filter",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == machine-identitiesUnfiltered",
+          "group": "inline@0"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.machine-identities.update-filter",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == machine-identitiesFiltered",
           "group": "inline@0"
         },
         {
@@ -1741,6 +1794,14 @@
       {
         "fileMatch": "idn://**/service-desk-integrations/status-check-configuration/**/*",
         "url": "./schemas/status-check-configuration.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/source-subtypes/*/*",
+        "url": "./schemas/source-subtype.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/machine-config/**/*",
+        "url": "./schemas/machine-config.schemas.json"
       }
     ],
     "configuration": {
@@ -1881,7 +1942,7 @@
     "fast-json-patch": "^3.1.1",
     "frontmcp": "^0.12.2",
     "lodash": "^4.17.21",
-    "sailpoint-api-client": "^1.8.33",
+    "sailpoint-api-client": "^1.8.60",
     "tmp": "^0.2.1",
     "vscode-sailpoint-identitynow": "file:"
   }

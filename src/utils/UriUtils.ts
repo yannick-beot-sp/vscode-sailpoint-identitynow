@@ -75,8 +75,8 @@ export function getResourceUri(tenantName: string, resourceType: string, id: str
     const baseUri = Uri.from({ scheme: URL_PREFIX, authority: tenantName, path: '/' });
     name = name?.replaceAll("/", "%2F")
     // ensure all parts are not null
-    // const pathParts = [(beta ? 'beta' : 'v2025'),
-    const pathParts = ['v2025',
+    const prefix = { "source-subtypes": "v2026" }[resourceType] ?? "v2025";
+    const pathParts = [prefix,
         resourceType,
         id,
         name].filter(x => !!x)
@@ -165,9 +165,9 @@ export function getUIUrl(tenantName: string, ...pathParts: string[]): Uri {
 
     // You can pass an array to a rest parameter by using the spread operator
     // cf. https://stackoverflow.com/a/43897911
-    const targetUrl =  Uri.joinPath(
+    const targetUrl = Uri.joinPath(
         baseUri,
         ...pathParts
     );
-    return targetUrl.with({fragment});
+    return targetUrl.with({ fragment });
 }
