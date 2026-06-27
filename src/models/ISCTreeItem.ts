@@ -9,7 +9,7 @@ import * as commands from "../commands/constants";
 import * as configuration from '../configurationConstants';
 import { convertConstantToTitleCase, escapeFilter, isEmpty, isNotEmpty } from "../utils/stringUtils";
 import { TenantService } from "../services/TenantService";
-import { CampaignStatusV3, DimensionV2025, MachineIdentityResponseV2025 } from "sailpoint-api-client";
+import { CampaignStatusV3, DimensionV2025, MachineIdentityResponseV2025, SourceSubtypeV2025, SourceSubtypeWithSourceV2026 } from "sailpoint-api-client";
 import { convertToBaseTreeItem } from "../views/utils";
 
 
@@ -333,6 +333,10 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 		results.push(
 			new ProvisioningPoliciesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, this.uri)
 		);
+		// TODO Only show this depending on the tenant features
+		results.push(
+			new MachineAccountSubtypesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, this.uri)
+		)
 		return new Promise((resolve) => resolve(results));
 	}
 
@@ -527,6 +531,60 @@ export class ProvisioningPolicyTreeItem extends ISCResourceTreeItem {
 			dark: vscode.Uri.file(context.asAbsolutePath("resources/dark/provisioning-policy.svg")),
 		};
 	}
+}
+
+/**
+ * Containers for machine account subtypes
+ */
+export class MachineAccountSubtypesTreeItem extends FolderTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		parentUri: vscode.Uri
+	) {
+		super("Machine Account Subtypes", "machine-account-subtypes", tenantId, tenantName, tenantDisplayName, parentUri);
+	}
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		const client = new ISCClient(this.tenantId, this.tenantName);
+		const sourceId = getIdByUri(this.parentUri) || "";
+		// no pagination for now
+		const subtypes = await client.listMachineAccountSubtypes(sourceId);
+
+		return subtypes.map((subtype: SourceSubtypeWithSourceV2026) => new MachineAccountSubtypeTreeItem(
+			this.tenantId,
+			this.tenantName,
+			this.tenantDisplayName,
+			subtype.displayName!,
+			subtype.id!,
+			subtype.technicalName!
+		));
+	}
+}
+
+export class MachineAccountSubtypeTreeItem extends ISCResourceTreeItem {
+	contextValue = "machine-account-subtype";
+
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		subtypeId: string,
+		public readonly technicalName: string
+	) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			resourceType: "source-subtypes",
+			id: subtypeId
+		})
+	}
+
+	iconPath = new vscode.ThemeIcon("symbol-misc");
 }
 
 /**
