@@ -113,6 +113,10 @@
         "title": "Edit access request configuration..."
       },
       {
+        "command": "vscode-sailpoint-identitynow.machine-account-subtype.edit.approval-config",
+        "title": "Edit Approval..."
+      },
+      {
         "command": "vscode-sailpoint-identitynow.tenant.edit.password-org-config",
         "title": "Edit password org configuration..."
       },
@@ -733,6 +737,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.machine-account-subtype.edit.approval-config",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.tenant.edit.password-org-config",
           "when": "never"
         },
@@ -1217,6 +1225,10 @@
         {
           "command": "vscode-sailpoint-identitynow.tenant.edit.access-request-config",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^tenant/"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.machine-account-subtype.edit.approval-config",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == machine-account-subtype"
         },
         {
           "command": "vscode-sailpoint-identitynow.tenant.edit.org-config",
@@ -1782,6 +1794,14 @@
       {
         "fileMatch": "idn://**/service-desk-integrations/status-check-configuration/**/*",
         "url": "./schemas/status-check-configuration.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/source-subtypes/*/*",
+        "url": "./schemas/source-subtype.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/machine-config/**/*",
+        "url": "./schemas/machine-config.schemas.json"
       }
     ],
     "configuration": {

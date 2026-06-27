@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://developer.sailpoint.com/schemas/machine-config.json",
+  "title": "Machine Account Subtype Approval Config",
+  "description": "Configuration details for machine account subtype approval, including creation and deletion approval requirements, approver lists, form and entitlement references, and approval status options.",
+  "type": "object",
+  "additionalProperties": false,
+  "definitions": {
+    "approvalConfig": {
+      "type": "object",
+      "title": "Machine Subtype Approval Config",
+      "additionalProperties": false,
+      "properties": {
+        "approvers": {
+          "type": "string",
+          "description": "Comma separated string of approvers.\n\nFollowing are the options for approver types: manager, sourceOwner, accountOwner, workgroup:[workgroupId] (Governance group).\n\nApproval request will be assigned based on the order of the approvers passed.\n\nMultiple workgroups(governance groups) can be selected as an approver.\n\n>**Note:** accountOwner approver type is only for machine account delete approval settings.",
+          "example": "manager, workgroup:1419fc28-a8ed-4a07-9f5c-0cb5dfad6311"
+        },
+        "comments": {
+          "type": "string",
+          "description": "Comment configurations for the approval request.\n\nFollowing are the options for comments: ALL, OFF, APPROVAL, REJECT.",
+          "example": "ALL"
+        }
+      }
+    }
+  },
+  "properties": {
+    "subtypeId": {
+      "type": "string",
+      "description": "Unique identifier representing the specific subtype of the machine account. This is read-only.",
+      "example": "1419fc28-a8ed-4a07-9f5c-0cb5dfad6311"
+    },
+    "machineAccountCreate": {
+      "type": "object",
+      "description": "Configuration options for machine account creation.",
+      "additionalProperties": false,
+      "properties": {
+        "accountCreateEnabled": {
+          "type": "boolean",
+          "description": "Specifies if the creation of machine accounts is allowed for this subtype.",
+          "default": false,
+          "example": true
+        },
+        "approvalRequired": {
+          "type": "boolean",
+          "description": "Specifies if approval is required for machine account creation requests for this subtype.",
+          "default": false,
+          "example": true
+        },
+        "formId": {
+          "type": "string",
+          "description": "Id of the form linked to subtype. This is read-only.",
+          "example": "4f1bb61b-a0ab-4c0a-b9fb-20f44407b75a"
+        },
+        "entitlementId": {
+          "type": "string",
+          "description": "Id of the system created entitlement upon enabling account creation for this subtype. This is read-only.",
+          "example": "858d2151-ff19-464b-ae0d-6938b3af2baf"
+        },
+        "passwordSetting": {
+          "type": "string",
+          "description": "This is required before enabling the account creation to true. Default value will be null.",
+          "enum": [
+            "DO_NOT_SET_PASSWORD",
+            "SET_TO_EXISTING_ATTRIBUTE",
+            "SET_TO_NEW_ATTRIBUTE"
+          ],
+          "example": "SET_TO_EXISTING_ATTRIBUTE"
+        },
+        "passwordAttribute": {
+          "type": "string",
+          "description": "Name of the account attribute from the source's schema or new custom attribute to use when password settings is enabled.",
+          "example": "accountName"
+        },
+        "approvalConfig": {
+          "$ref": "#/definitions/approvalConfig"
+        }
+      }
+    },
+    "machineAccountDelete": {
+      "type": "object",
+      "description": "Configuration options for machine account deletion.",
+      "additionalProperties": false,
+      "properties": {
+        "approvalRequired": {
+          "type": "boolean",
+          "description": "Indicates whether approval is required for an account deletion request.",
+          "default": false,
+          "example": true
+        },
+        "approvalConfig": {
+          "$ref": "#/definitions/approvalConfig"
+        }
+      }
+    }
+  }
+}

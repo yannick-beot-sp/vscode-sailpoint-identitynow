@@ -55,6 +55,7 @@ import { WorkflowExportCommand } from './commands/workflow/WorkflowExportCommand
 import { WorkflowImporterTreeViewCommand } from './commands/workflow/WorkflowImporterTreeViewCommand';
 import { EditPublicIdentitiesConfigCommand } from './commands/tenant/editPublicIdentitiesConfigCommand';
 import { EditAccessRequestConfigCommand } from './commands/tenant/editAccessRequestConfigCommand';
+import { EditMachineAccountSubtypeApprovalConfigCommand } from './commands/source/editMachineAccountSubtypeApprovalConfigCommand';
 import { NewAttributeSearchConfigCommand } from './commands/NewAttributeSearchConfigCommand';
 import { EditPasswordConfigCommand } from './commands/tenant/editPasswordConfigCommand';
 import { GenerateDigitTokenCommand } from './commands/tenant/generateDigitTokenCommand';
@@ -142,6 +143,12 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.EDIT_ACCESS_REQUEST_CONFIG,
 			editAccessRequestConfigCommand.execute,
 			editAccessRequestConfigCommand));
+
+	const editMachineAccountSubtypeApprovalConfigCommand = new EditMachineAccountSubtypeApprovalConfigCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EDIT_MACHINE_ACCOUNT_SUBTYPE_APPROVAL_CONFIG,
+			editMachineAccountSubtypeApprovalConfigCommand.execute,
+			editMachineAccountSubtypeApprovalConfigCommand));
 
 	const editPasswordConfigCommand = new EditPasswordConfigCommand()
 	context.subscriptions.push(

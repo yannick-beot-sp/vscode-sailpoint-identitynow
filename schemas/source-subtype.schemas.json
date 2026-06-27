@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://developer.sailpoint.com/schemas/source-subtype.json",
+  "title": "Machine Account Subtype",
+  "description": "A machine account subtype, used to categorize machine accounts under a source.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for the subtype. This is read-only.",
+      "example": "43bdd144-4b17-4fce-a744-17c7fd3e717b"
+    },
+    "sourceId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The ID of the source. This is read-only.",
+      "example": "6d0458373bec4b4b80460992b76016da"
+    },
+    "technicalName": {
+      "type": "string",
+      "description": "Technical name of the subtype.",
+      "example": "foo"
+    },
+    "displayName": {
+      "type": "string",
+      "description": "Display name of the subtype.",
+      "example": "Mr Foo"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of the subtype.",
+      "example": "fighters"
+    },
+    "created": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Creation timestamp. This is read-only.",
+      "example": "2025-07-28T16:13:42.801300Z"
+    },
+    "modified": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last modified timestamp. This is read-only.",
+      "example": "2025-07-28T16:13:42.750850Z"
+    },
+    "type": {
+      "type": "string",
+      "description": "Type of the subtype. Either MACHINE or null. This is read-only.",
+      "example": "MACHINE"
+    },
+    "source": {
+      "type": "object",
+      "description": "Source reference of the subtype. This is read-only.",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Type of the reference object.",
+          "enum": [
+            "SOURCE"
+          ],
+          "example": "SOURCE"
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the source.",
+          "example": "6d0458373bec4b4b80460992b76016da"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the source.",
+          "example": "Test Source"
+        }
+      }
+    },
+    "systemManaged": {
+      "type": "boolean",
+      "description": "Indicates if the subtype is managed by the system. This is read-only.",
+      "default": false,
+      "example": true
+    }
+  },
+  "required": [
+    "technicalName",
+    "displayName",
+    "description"
+  ]
+}
