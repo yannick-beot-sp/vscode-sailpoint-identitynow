@@ -71,6 +71,7 @@ import { RemoveAccessProfileFromAppCommand } from './commands/applications/remov
 import { AddAccessProfileToApplication } from './commands/applications/addAccessProfileToApplication';
 import { NewApplicationCommand } from './commands/applications/newApplicationCommand';
 import { OpenCampaignPanelCommand } from './campaign-webview/openCampaignPanelCommand';
+import { OpenDependencyPanelCommand } from './dependency-webview/openDependencyPanelCommand';
 import { ConfigureReminderWorkflowCommand } from './campaign-webview/configureReminderWorkflow';
 import { ExportCampaignReportCommand } from './campaign-webview/exportCampaignReportCommand';
 import { SendReminderCommand } from './campaign-webview/sendReminderCommand';
@@ -672,6 +673,11 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.VIEW_CAMPAIGN_PANEL,
 			openCampaignPanel.execute, openCampaignPanel))
 
+
+	const openDependencyPanel = new OpenDependencyPanelCommand(context.extensionUri)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.VIEW_DEPENDENCIES,
+			openDependencyPanel.execute, openDependencyPanel))
 
 	const configureReminderWorkflow = new ConfigureReminderWorkflowCommand(tenantService, campaignService)
 	context.subscriptions.push(

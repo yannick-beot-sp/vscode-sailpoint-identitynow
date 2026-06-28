@@ -22,6 +22,7 @@
 	"exclude": [
 		"node_modules",
 		".vscode-test",
-		"src/campaign-webview/app"
+		"src/campaign-webview/app",
+		"src/dependency-webview/app"
 	]
 }
