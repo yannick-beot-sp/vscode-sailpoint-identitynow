@@ -1,21 +1,29 @@
+import type { Component } from "svelte";
+import IdentityAttributeIcon from "../svgs/identity-attribute.svelte";
+import IdentityProfileIcon from "../svgs/identity-profile.svelte";
+import TransformIcon from "../svgs/transform.svelte";
+import ProvisioningPolicyIcon from "../svgs/provisioning-policy.svelte";
+import RoleIcon from "../svgs/role.svelte";
+import ResourceIcon from "../svgs/resource.svelte";
+
 export interface TypeStyle {
     color: string;
-    /** Short text differentiator shown in a colored chip, in addition to the color itself */
-    badge: string;
+    /** Icon shown in a colored chip, in addition to the color itself */
+    icon: Component;
     label: string;
 }
 
-const DEFAULT_STYLE: TypeStyle = { color: "#888888", badge: "?", label: "Resource" };
+const DEFAULT_STYLE: TypeStyle = { color: "#888888", icon: ResourceIcon, label: "Resource" };
 
 /**
  * Single place to extend when new resource types are added to the graph.
  */
 const TYPE_STYLES: Record<string, TypeStyle> = {
-    "identity-attribute": { color: "#3794ff", badge: "ATTR", label: "Identity Attribute" },
-    "identity-profile": { color: "#89d185", badge: "IP", label: "Identity Profile" },
-    "transform": { color: "#cca700", badge: "XFM", label: "Transform" },
-    "provisioning-policy": { color: "#d18616", badge: "PP", label: "Provisioning Policy" },
-    "role": { color: "#b180d7", badge: "ROLE", label: "Role" },
+    "identity-attribute": { color: "#3794ff", icon: IdentityAttributeIcon, label: "Identity Attribute" },
+    "identity-profile": { color: "#89d185", icon: IdentityProfileIcon, label: "Identity Profile" },
+    "transform": { color: "#cca700", icon: TransformIcon, label: "Transform" },
+    "provisioning-policy": { color: "#d18616", icon: ProvisioningPolicyIcon, label: "Provisioning Policy" },
+    "role": { color: "#b180d7", icon: RoleIcon, label: "Role" },
 };
 
 export function getTypeStyle(type: string): TypeStyle {

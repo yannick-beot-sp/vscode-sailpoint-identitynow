@@ -21,7 +21,7 @@ export type GroupFlowNodeData = {
 
 export type FlowNodeData = DependencyFlowNodeData | GroupFlowNodeData;
 
-export type FlowNode = Node<FlowNodeData, "dependency" | "group">;
+export type FlowNode = Node<FlowNodeData, "dependency" | "group-summary">;
 export type FlowEdge = Edge;
 
 export function groupKey(sourceNodeId: string, type: string): string {
@@ -33,7 +33,7 @@ export function groupKey(sourceNodeId: string, type: string): string {
  *
  * For every node in the graph, its outgoing neighbors are grouped by `type` into one group node
  * per type. The group node is always present (never replaced) so it can act as a permanent,
- * double-clickable toggle: when its key is in `expandedGroupIds`, its individual children are
+ * double-clickable toggle: when its flow id is in `expandedGroupIds`, its individual children are
  * additionally rendered (hanging off the group node, not the original source) and recursed into.
  * This is evaluated per-node (not hardcoded to the root) so deeper multi-hop graphs group/expand
  * the same way, even though phase-1 mock data is only one hop deep from the root.
@@ -81,12 +81,12 @@ export function buildDisplayGraph(
 
         for (const [type, edgesOfType] of byType) {
             const key = groupKey(nodeId, type);
-            const expanded = expandedGroupIds.has(key);
             const groupNodeId = `group:${key}`;
+            const expanded = expandedGroupIds.has(groupNodeId);
 
             nodes.push({
                 id: groupNodeId,
-                type: "group",
+                type: "group-summary",
                 data: { kind: "group", groupKey: key, groupType: type, count: edgesOfType.length, expanded },
                 position: { x: 0, y: 0 }
             });

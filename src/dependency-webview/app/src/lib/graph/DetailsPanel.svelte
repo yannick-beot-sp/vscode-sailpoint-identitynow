@@ -39,8 +39,9 @@
     {#if activeTab === "attributes"}
       {#if selected.kind === "dependency"}
         {@const style = getTypeStyle(selected.node.type)}
+        {@const Icon = style.icon}
         <h2>{selected.node.label}</h2>
-        <span class="chip" style="--accent: {style.color}">{style.label}</span>
+        <span class="chip" style="--accent: {style.color}"><Icon />{style.label}</span>
 
         <dl>
           <dt>Id</dt>
@@ -63,8 +64,9 @@
         </section>
       {:else}
         {@const style = getTypeStyle(selected.groupType)}
+        {@const Icon = style.icon}
         <h2>{selected.count} {pluralizeTypeLabel(selected.groupType, selected.count)}</h2>
-        <span class="chip" style="--accent: {style.color}">{style.label}</span>
+        <span class="chip" style="--accent: {style.color}"><Icon />{style.label}</span>
         <p class="placeholder">
           {selected.expanded
             ? "Double-click this node in the graph to collapse it."
@@ -99,7 +101,9 @@
   }
 
   .chip {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     background: var(--accent);
     color: #1e1e1e;
     border-radius: 4px;

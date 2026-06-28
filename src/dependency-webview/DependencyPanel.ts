@@ -62,6 +62,7 @@ export class DependencyPanel extends BaseWebviewPanel {
         private readonly key: string,
         private readonly tenantId: string,
         private readonly tenantName: string,
+        private readonly tenantDisplayname: string,
         private readonly resourceType: string,
         private readonly resourceId: string,
         private readonly label: string) {

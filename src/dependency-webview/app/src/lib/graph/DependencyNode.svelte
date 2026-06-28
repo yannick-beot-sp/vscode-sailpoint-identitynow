@@ -6,11 +6,12 @@
   let { data, selected }: NodeProps & { data: DependencyFlowNodeData } = $props();
 
   const style = $derived(getTypeStyle(data.node.type));
+  const Icon = $derived(style.icon);
 </script>
 
 <div class="dep-node" class:selected style="--accent: {style.color}">
   <Handle type="target" position={Position.Top} isConnectable={false} />
-  <span class="chip">{style.badge}</span>
+  <span class="chip" title={style.label}><Icon /></span>
   <span class="label" title={data.node.label}>{data.node.label}</span>
   <Handle type="source" position={Position.Bottom} isConnectable={false} />
 </div>
@@ -36,12 +37,15 @@
 
   .chip {
     flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
     background: var(--accent);
     color: #1e1e1e;
     border-radius: 4px;
-    padding: 1px 5px;
-    font-size: 10px;
-    font-weight: 600;
+    font-size: 11px;
   }
 
   .label {

@@ -58,7 +58,12 @@
     </div>
   {:then graph}
     <div class="content">
-      <GraphView graph={graph!} onSelectNode={(data) => (selected = data)} />
+      <GraphView
+        graph={graph!}
+        resourceType={window.data.resourceType}
+        resourceId={window.data.resourceId}
+        onSelectNode={(data) => (selected = data)}
+      />
       <div class="resizer" onpointerdown={startResize} role="separator" aria-orientation="vertical"></div>
       <DetailsPanel {selected} width={detailsPanelWidth} />
     </div>

@@ -1,20 +1,24 @@
 <script lang="ts">
   import { SvelteFlow, Background, Controls, MiniMap, Panel } from "@xyflow/svelte";
   import "@xyflow/svelte/dist/style.css";
+  import { untrack } from "svelte";
   import { SvelteSet } from "svelte/reactivity";
-  import type { DependencyGraphData } from "../../services/Client";
+  import type { DependencyGraphData, NodeViewState } from "../../services/Client";
+  import { ClientFactory } from "../../services/ClientFactory";
   import { buildDisplayGraph, type FlowNode, type FlowEdge, type FlowNodeData } from "./grouping";
   import { runElkLayout, LAYOUT_ALGORITHMS, type LayoutAlgorithm } from "./layout";
   import DependencyNode from "./DependencyNode.svelte";
   import GroupNode from "./GroupNode.svelte";
   import FloatingEdge from "./FloatingEdge.svelte";
 
-  let { graph, onSelectNode }: {
+  let { graph, resourceType, resourceId, onSelectNode }: {
     graph: DependencyGraphData;
+    resourceType: string;
+    resourceId: string;
     onSelectNode: (data: FlowNodeData | undefined) => void;
   } = $props();
 
-  const nodeTypes = { dependency: DependencyNode, group: GroupNode };
+  const nodeTypes = { dependency: DependencyNode, "group-summary": GroupNode };
   const edgeTypes = { floating: FloatingEdge };
   const defaultEdgeOptions = { type: "floating" as const };
   const proOptions = { hideAttribution: true };
@@ -22,11 +26,34 @@
   // background) needs to be told explicitly since it can't see our CSS-variable-based theming.
   const colorMode = document.body.classList.contains("vscode-light") ? "light" : "dark";
 
-  const expandedGroupIds = new SvelteSet<string>();
-  let layoutAlgorithm = $state<LayoutAlgorithm>("layered");
+  const client = ClientFactory.getClient();
+
+  // Per-node UI state (position, group expansion) cached for this resource, keyed by flow node id.
+  // Read once on mount: resourceType/resourceId are stable for the lifetime of this component
+  // (a new instance is created whenever the parent switches resource or forces a reload).
+  let nodeViewStates: Record<string, NodeViewState> = untrack(
+    () => ({ ...(client.getNodeViewStates(resourceType, resourceId) ?? {}) })
+  );
+
+  const expandedGroupIds = new SvelteSet<string>(
+    Object.entries(nodeViewStates).filter(([, s]) => s.expanded).map(([id]) => id)
+  );
+
+  const savedLayoutAlgorithm = untrack(() => client.getLayoutAlgorithm(resourceType, resourceId));
+  let layoutAlgorithm = $state<LayoutAlgorithm>(
+    LAYOUT_ALGORITHMS.some(o => o.value === savedLayoutAlgorithm) ? savedLayoutAlgorithm as LayoutAlgorithm : "layered"
+  );
 
   let nodes = $state.raw<FlowNode[]>([]);
   let edges = $state.raw<FlowEdge[]>([]);
+
+  function persistNodeViewStates() {
+    client.setNodeViewStates(resourceType, resourceId, nodeViewStates);
+  }
+
+  $effect(() => {
+    client.setLayoutAlgorithm(resourceType, resourceId, layoutAlgorithm);
+  });
 
   $effect(() => {
     const { nodes: rawNodes, edges: rawEdges } = buildDisplayGraph(graph, expandedGroupIds);
@@ -41,11 +68,14 @@
         data: {
           ...data,
           onToggle: () => {
-            if (expandedGroupIds.has(data.groupKey)) {
-              expandedGroupIds.delete(data.groupKey);
+            const expanded = !expandedGroupIds.has(n.id);
+            if (expanded) {
+              expandedGroupIds.add(n.id);
             } else {
-              expandedGroupIds.add(data.groupKey);
+              expandedGroupIds.delete(n.id);
             }
+            nodeViewStates = { ...nodeViewStates, [n.id]: { ...nodeViewStates[n.id], expanded } };
+            persistNodeViewStates();
           }
         }
       };
@@ -53,7 +83,10 @@
 
     runElkLayout(rawNodes, rawEdges, layoutAlgorithm).then((positioned) => {
       const positionById = new Map(positioned.map(n => [n.id, n.position]));
-      nodes = decoratedNodes.map(n => ({ ...n, position: positionById.get(n.id) ?? n.position }));
+      nodes = decoratedNodes.map(n => ({
+        ...n,
+        position: nodeViewStates[n.id]?.position ?? positionById.get(n.id) ?? n.position
+      }));
       edges = rawEdges;
     });
   });
@@ -64,6 +97,14 @@
 
   function handlePaneClick() {
     onSelectNode(undefined);
+  }
+
+  function handleNodeDragStop({ targetNode }: { targetNode: FlowNode | null }) {
+    if (!targetNode) {
+      return;
+    }
+    nodeViewStates = { ...nodeViewStates, [targetNode.id]: { ...nodeViewStates[targetNode.id], position: targetNode.position } };
+    persistNodeViewStates();
   }
 </script>
 
@@ -82,6 +123,7 @@
     elementsSelectable={true}
     deleteKey={null}
     onnodeclick={handleNodeClick}
+    onnodedragstop={handleNodeDragStop}
     onpaneclick={handlePaneClick}
   >
     <Background />

@@ -6,6 +6,7 @@
   let { data }: NodeProps & { data: GroupFlowNodeData } = $props();
 
   const style = $derived(getTypeStyle(data.groupType));
+  const Icon = $derived(style.icon);
 </script>
 
 <div
@@ -19,7 +20,7 @@
   title={data.expanded ? "Double-click to collapse" : "Double-click to expand"}
 >
   <Handle type="target" position={Position.Top} isConnectable={false} />
-  <span class="chip">{style.badge}</span>
+  <span class="chip" title={style.label}><Icon /></span>
   <span class="label">{data.count} {pluralizeTypeLabel(data.groupType, data.count)}</span>
   <Handle type="source" position={Position.Bottom} isConnectable={false} />
 </div>
@@ -29,7 +30,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    max-width: 220px;
+    width: max-content;
     padding: 6px 10px;
     border-radius: 16px;
     border: 2px dashed var(--accent);
@@ -45,12 +46,15 @@
 
   .chip {
     flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
     background: var(--accent);
     color: #1e1e1e;
     border-radius: 4px;
-    padding: 1px 5px;
-    font-size: 10px;
-    font-weight: 600;
+    font-size: 11px;
   }
 
   .label {
