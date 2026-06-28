@@ -1,4 +1,8 @@
-import type { Client, DependencyEdgeData, DependencyGraphData, DependencyNodeData } from "./Client";
+import type { Client, DependencyEdgeData, DependencyGraphData, DependencyNodeData, NodeViewState } from "./Client";
+
+function cacheKey(resourceType: string, resourceId: string): string {
+    return `${resourceType}/${resourceId}`;
+}
 
 function getRandomInt(min: number, max: number): number {
     min = Math.ceil(min);
@@ -48,9 +52,28 @@ function buildGraph(rootType: string, rootId: string, rootLabel: string): Depend
 
 export class MockupClient implements Client {
 
+    private nodeViewStates: Record<string, Record<string, NodeViewState>> = {};
+    private layoutAlgorithms: Record<string, string> = {};
+
     async getDependencyGraph(resourceType: string, resourceId: string, force: boolean): Promise<DependencyGraphData> {
         await stall()
         console.log(">getDependencyGraph", { resourceType, resourceId, force });
         return buildGraph(resourceType, resourceId, window.data.label ?? resourceId);
+    }
+
+    getNodeViewStates(resourceType: string, resourceId: string): Record<string, NodeViewState> | undefined {
+        return this.nodeViewStates[cacheKey(resourceType, resourceId)];
+    }
+
+    setNodeViewStates(resourceType: string, resourceId: string, states: Record<string, NodeViewState>): void {
+        this.nodeViewStates[cacheKey(resourceType, resourceId)] = states;
+    }
+
+    getLayoutAlgorithm(resourceType: string, resourceId: string): string | undefined {
+        return this.layoutAlgorithms[cacheKey(resourceType, resourceId)];
+    }
+
+    setLayoutAlgorithm(resourceType: string, resourceId: string, algorithm: string): void {
+        this.layoutAlgorithms[cacheKey(resourceType, resourceId)] = algorithm;
     }
 }
