@@ -12,6 +12,7 @@ import { CampaignsTreeItem } from '../models/ISCTreeItem';
 import { BulkCampaignManagerEscalation } from './BulkCampaignManagerEscalation';
 import { IdentityCertificationDto } from 'sailpoint-api-client';
 import { BulkCertificationDecision } from './BulkCertificationDecision';
+import { BaseWebviewPanel } from '../webview/BaseWebviewPanel';
 
 function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
     return {
@@ -23,25 +24,11 @@ function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
     };
 }
 
-function getNonce() {
-    let text = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < 32; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
-}
-
-
-
-export class CampaignPanel {
+export class CampaignPanel extends BaseWebviewPanel {
 
     public static currentPanels: Map<string, CampaignPanel> = new Map()
     public static readonly viewType = 'campaignView';
-    private readonly _panel: vscode.WebviewPanel;
-    private readonly _extensionUri: vscode.Uri;
-    private _disposables: vscode.Disposable[] = [];
-
+    private readonly client: ISCClient;
 
     public static createOrShow(extensionUri: vscode.Uri,
         tenantId: string,
@@ -85,21 +72,13 @@ export class CampaignPanel {
         }
         CampaignPanel.currentPanels = new Map();
 
-        // Clean up our resources
-        this._panel.dispose();
-
-        while (this._disposables.length) {
-            const x = this._disposables.pop();
-            if (x) {
-                x.dispose();
-            }
-        }
+        super.dispose();
     }
 
 
-    /** 
+    /**
      * TODO Serializer
-    
+
     public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
         CatCodingPanel.currentPanel = new CatCodingPanel(panel, extensionUri);
     }*/
@@ -113,157 +92,99 @@ export class CampaignPanel {
         private campaignName: string,
         private campaignType: string,
         private campaignService: CampaignConfigurationService) {
-        this._panel = panel;
-        this._extensionUri = extensionUri;
-
-
-        this._update()
-        // Listen for when the panel is disposed
-        // This happens when the user closes the panel or when the panel is closed programmatically
-        this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
-
-        // Update the content based on view changes
-        this._panel.onDidChangeViewState(
-            () => {
-                if (this._panel.visible) {
-                    this._update();
-                }
-            },
-            null,
-            this._disposables
-        );
-        const client = new ISCClient(this.tenantId, this.tenantName)
-        // Handle messages from the webview
-        this._panel.webview.onDidReceiveMessage(async message => {
-            const { command, requestId, payload } = message;
-            switch (command) {
-                case commands.GET_KPIS_AND_REVIEWERS:
-                    const kpIsAndReviewersQuery = new KPIsAndReviewersQuery(client)
-                    const kpIsAndReviewersQueryResult = await kpIsAndReviewersQuery.execute(this.campaignId)
-                    this._panel.webview.postMessage({ command, requestId, payload: kpIsAndReviewersQueryResult });
-                    return;
-
-                case commands.GET_PAGINATED_REVIEWERS:
-                    const { currentPage, pageSize, sort } = payload as FetchOptions
-                    let sorters = sort?.field ?? "name"
-                    if (sort?.order === "desc") {
-                        sorters = "-" + sorters
-                    }
-
-                    const response = await client.getPaginatedCampaignCertifications({
-                        campaignId: this.campaignId,
-                        offset: currentPage * pageSize,
-                        limit: pageSize,
-                        sorters
-                    })
-
-                    const reviewers = response.data.map(r => {
-                        return {
-                            ...r,
-                            name: r.reviewer.name,
-                            email: r.reviewer.email,
-                            identitiesRemaining: r.identitiesTotal - r.identitiesCompleted,
-                            decisionsRemaining: r.decisionsTotal - r.decisionsMade,
-                            reassignmentName: r.reassignment?.from?.name,
-                            reassignmentComment: r.reassignment?.comment,
-                            reassignmentEmail: r.reassignment?.from?.reviewer?.email
-
-                        }
-                    })
-
-                    this._panel.webview.postMessage({ command, requestId, payload: { data: reviewers, count: response.count } as PaginatedData<Reviewer> });
-                    return;
-
-                case commands.SEND_REMINDERS:
-                    const info = await campaignService.getCertificationCampaignInfo(this.tenantName)
-                    if (info === undefined) {
-                        vscode.window.showWarningMessage("You must configure the workflow to send mails.")
-                        vscode.commands.executeCommand(extensionCommands.CAMPAIGN_CONFIGURE_REMINDER, new CampaignsTreeItem(this.tenantId, this.tenantName, ""));
-                        return
-                    }
-                    const sender = new BulkSendReminder(
-                        info.workflowSendingReminderId,
-                        (await this.campaignService.getWorkflowAccessToken(this.tenantName)),
-                        client)
-                    await sender.call(payload)
-                    return;
-
-                case commands.ESCALATE_REVIEWERS:
-                    const bulkManagerEscalator = new BulkCampaignManagerEscalation(client)
-                    await bulkManagerEscalator.escalateCertifications(this.campaignId,
-                        this.campaignName,
-                        payload as IdentityCertificationDto[])
-                    this._panel.webview.postMessage({ command, requestId, payload: { data: "OK" } });
-                    return;
-
-                case commands.GET_STATUS:
-                    const campaign = await client.getCampaign(payload)
-                    this._panel.webview.postMessage({ command, requestId, payload: campaign.status });
-                    return;
-
-                case commands.BULK_DECISION:
-                    const bulkDecision = new BulkCertificationDecision(client);
-                    const report = await bulkDecision.processBulkDecision(payload as IdentityCertificationDto[]);
-                    this._panel.webview.postMessage({ command, requestId, payload: report });
-                    return;
-            }
-        },
-            null,
-            this._disposables
-        );
+        super(panel, extensionUri);
+        this.client = new ISCClient(this.tenantId, this.tenantName);
     }
 
-    private _update() {
-        const webview = this._panel.webview;
-        // Set the webview's initial html content
-        this._panel.title = this.campaignName;
-        this._panel.webview.html = this._getHtmlForWebview(this._panel.webview);
-
+    protected get webviewFolderName(): string {
+        return 'campaign-webview';
     }
 
-    private _getHtmlForWebview(webview: vscode.Webview) {
-        // Local path to main script run in the webview
-        const scriptPathOnDisk = vscode.Uri.joinPath(this._extensionUri, 'campaign-webview', 'assets', 'index.js');
+    protected get title(): string {
+        return this.campaignName;
+    }
 
-        // And the uri we use to load this script in the webview
-        const scriptUri = webview.asWebviewUri(scriptPathOnDisk);
-
-        // Local path to css styles
-        // const styleResetPath = vscode.Uri.joinPath(this._extensionUri, 'media', 'reset.css');
-        const stylesPathMainPath = vscode.Uri.joinPath(this._extensionUri, 'campaign-webview', 'assets', 'index.css');
-
-        // Uri to load styles into webview
-        // const stylesResetUri = webview.asWebviewUri(styleResetPath);
-        const stylesMainUri = webview.asWebviewUri(stylesPathMainPath);
-
-        // Use a nonce to only allow specific scripts to be run
-        const nonce = getNonce();
-
-        return `<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <!--
-        Use a content security policy to only allow loading images from https or from our extension directory,
-        and only allow scripts that have a specific nonce.
-    -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' ${webview.cspSource}; img-src 'self' data: ${webview.cspSource} https:; script-src 'nonce-${nonce}';">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Certification Campaign</title>
-    <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
-    <link href="${stylesMainUri}" rel="stylesheet">
-  </head>
-  <body>
-    <div id="app"></div>
-    <script nonce="${nonce}">
-      window.data=${JSON.stringify({
+    protected get initialData(): Record<string, unknown> {
+        return {
             campaignId: this.campaignId,
             campaignName: this.campaignName,
             campaignType: this.campaignType
-        })};
-    </script>
-  </body>
-</html>`;
+        };
     }
-}    
+
+    protected async handleMessage(message: any): Promise<void> {
+        const client = this.client;
+        const { command, requestId, payload } = message;
+        switch (command) {
+            case commands.GET_KPIS_AND_REVIEWERS:
+                const kpIsAndReviewersQuery = new KPIsAndReviewersQuery(client)
+                const kpIsAndReviewersQueryResult = await kpIsAndReviewersQuery.execute(this.campaignId)
+                this._panel.webview.postMessage({ command, requestId, payload: kpIsAndReviewersQueryResult });
+                return;
+
+            case commands.GET_PAGINATED_REVIEWERS:
+                const { currentPage, pageSize, sort } = payload as FetchOptions
+                let sorters = sort?.field ?? "name"
+                if (sort?.order === "desc") {
+                    sorters = "-" + sorters
+                }
+
+                const response = await client.getPaginatedCampaignCertifications({
+                    campaignId: this.campaignId,
+                    offset: currentPage * pageSize,
+                    limit: pageSize,
+                    sorters
+                })
+
+                const reviewers = response.data.map(r => {
+                    return {
+                        ...r,
+                        name: r.reviewer.name,
+                        email: r.reviewer.email,
+                        identitiesRemaining: r.identitiesTotal - r.identitiesCompleted,
+                        decisionsRemaining: r.decisionsTotal - r.decisionsMade,
+                        reassignmentName: r.reassignment?.from?.name,
+                        reassignmentComment: r.reassignment?.comment,
+                        reassignmentEmail: r.reassignment?.from?.reviewer?.email
+
+                    }
+                })
+
+                this._panel.webview.postMessage({ command, requestId, payload: { data: reviewers, count: response.count } as PaginatedData<Reviewer> });
+                return;
+
+            case commands.SEND_REMINDERS:
+                const info = await this.campaignService.getCertificationCampaignInfo(this.tenantName)
+                if (info === undefined) {
+                    vscode.window.showWarningMessage("You must configure the workflow to send mails.")
+                    vscode.commands.executeCommand(extensionCommands.CAMPAIGN_CONFIGURE_REMINDER, new CampaignsTreeItem(this.tenantId, this.tenantName, ""));
+                    return
+                }
+                const sender = new BulkSendReminder(
+                    info.workflowSendingReminderId,
+                    (await this.campaignService.getWorkflowAccessToken(this.tenantName)),
+                    client)
+                await sender.call(payload)
+                return;
+
+            case commands.ESCALATE_REVIEWERS:
+                const bulkManagerEscalator = new BulkCampaignManagerEscalation(client)
+                await bulkManagerEscalator.escalateCertifications(this.campaignId,
+                    this.campaignName,
+                    payload as IdentityCertificationDto[])
+                this._panel.webview.postMessage({ command, requestId, payload: { data: "OK" } });
+                return;
+
+            case commands.GET_STATUS:
+                const campaign = await client.getCampaign(payload)
+                this._panel.webview.postMessage({ command, requestId, payload: campaign.status });
+                return;
+
+            case commands.BULK_DECISION:
+                const bulkDecision = new BulkCertificationDecision(client);
+                const report = await bulkDecision.processBulkDecision(payload as IdentityCertificationDto[]);
+                this._panel.webview.postMessage({ command, requestId, payload: report });
+                return;
+        }
+    }
+}

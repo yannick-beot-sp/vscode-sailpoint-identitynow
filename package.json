@@ -641,6 +641,11 @@
         "title": "View campaign dashboard"
       },
       {
+        "command": "vscode-sailpoint-identitynow.dependencies.view",
+        "title": "View Dependencies",
+        "icon": "$(references)"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.campaigns.export.report",
         "title": "Export campaign status report"
       },
@@ -1155,6 +1160,11 @@
           "command": "vscode-sailpoint-identitynow.export-node-config.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^(.*source|identity-profile|connector-rule|transform|service-desk-integration)$/i",
           "group": "zzspconfig"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.dependencies.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-attribute",
+          "group": "_@1"
         },
         {
           "command": "vscode-sailpoint-identitynow.remove-resource",
@@ -1831,7 +1841,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run esbuild-base -- --minify",
-    "esbuild-base": "shx rm -rf out && cd ./src/campaign-webview/app && npm run build && cd ../../.. && shx mkdir -p out/node_modules/sailpoint-api-client && esbuild ./node_modules/sailpoint-api-client/dist/index.js --bundle --outfile=out/node_modules/sailpoint-api-client/index.js --format=cjs --platform=node --minify && esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --external:esbuild --external:@swc/core --external:@swc/wasm --external:sailpoint-api-client --format=cjs --platform=node",
+    "esbuild-base": "shx rm -rf out && cd ./src/campaign-webview/app && npm run build && cd ../../.. && cd ./src/dependency-webview/app && npm run build && cd ../../.. && shx mkdir -p out/node_modules/sailpoint-api-client && esbuild ./node_modules/sailpoint-api-client/dist/index.js --bundle --outfile=out/node_modules/sailpoint-api-client/index.js --format=cjs --platform=node --minify && esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --external:esbuild --external:@swc/core --external:@swc/wasm --external:sailpoint-api-client --format=cjs --platform=node",
     "esbuild": "npm run esbuild-base -- --sourcemap",
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "test-compile": "tsc -p ./",
@@ -1843,7 +1853,7 @@
     "test:unit": "npm run compile && mocha -u tdd ./out/test/unit/*.test.js",
     "test:mcp": "jest --runInBand --config jest.mcp.config.js --runTestsByPath ./src/test/mcp/workflows/WorkflowTools.test.ts",
     "clean": "shx rm -rf out",
-    "postinstall": "cd src/campaign-webview/app && npm install"
+    "postinstall": "cd src/campaign-webview/app && npm install && cd ../../dependency-webview/app && npm install"
   },
   "overrides": {
     "diff": "8.0.3",
