@@ -178,7 +178,7 @@ export class IdentityAttributeDependencyService extends DependencyService {
                 continue;
             }
 
-            this.nodes.push({
+            this.addNodeOnce({
                 id: source.id,
                 type: "source",
                 label: source.name,
@@ -289,7 +289,7 @@ export class IdentityAttributeDependencyService extends DependencyService {
                 continue;
             }
 
-            this.nodes.push({
+            this.addNodeOnce({
                 id: transform.id,
                 type: "transform",
                 label: transform.name,
@@ -311,10 +311,16 @@ export class IdentityAttributeDependencyService extends DependencyService {
 
     /**
      * An identity attribute is mapped to at most one attributeTransform per identity profile.
+     * That mapping always pulls from exactly one source, optionally through one named transform.
+     * When a named transform is used, the chain is rendered as profile -> transform -> source
+     * (the transform is what actually reads from the source); otherwise the profile links
+     * straight to the source.
      */
     private filterIdentityProfile(data: SpConfigExportResultsBeta | null) {
 
         const profiles = (data?.objects ?? []).filter(o => o.self?.type === "IDENTITY_PROFILE");
+        const sources = (data?.objects ?? []).filter(o => o.self?.type === "SOURCE");
+        const transforms = (data?.objects ?? []).filter(o => o.self?.type === "TRANSFORM");
 
         for (const profileObject of profiles) {
             const profile = profileObject.object;
@@ -324,13 +330,15 @@ export class IdentityAttributeDependencyService extends DependencyService {
                 continue;
             }
 
-            this.nodes.push({
+            const transformDefinition = attributeTransform.transformDefinition;
+
+            this.addNodeOnce({
                 id: profile.id,
                 type: "identity-profile",
                 label: profile.name,
                 description: profile.description ?? undefined,
                 resourceId: profile.id,
-                attributes: this.transformDefinitionAttributes(attributeTransform.transformDefinition),
+                attributes: this.transformDefinitionAttributes(transformDefinition),
                 data: profile
             });
 
@@ -340,6 +348,85 @@ export class IdentityAttributeDependencyService extends DependencyService {
                 target: profile.id,
                 label: "attribute mapping"
             });
+
+            const sourceNames = this.collectReferencedSourceNames(transformDefinition);
+            const transformNames = this.collectReferencedTransformNames(transformDefinition);
+
+            if (transformNames.length > 0) {
+                for (const transformName of transformNames) {
+                    const transform = transforms.find(o => o.object?.name === transformName)?.object;
+                    if (!transform) {
+                        continue;
+                    }
+
+                    this.addNodeOnce({
+                        id: transform.id,
+                        type: "transform",
+                        label: transform.name,
+                        resourceId: transform.id,
+                        attributes: {
+                            type: transform.type
+                        },
+                        data: transform
+                    });
+
+                    this.edges.push({
+                        id: `${profile.id}-${transform.id}`,
+                        source: profile.id,
+                        target: transform.id,
+                        label: "transform reference",
+                        noGroup: true
+                    });
+
+                    for (const sourceName of sourceNames) {
+                        const source = sources.find(o => o.object?.name === sourceName)?.object;
+                        if (!source) {
+                            continue;
+                        }
+
+                        this.addNodeOnce({
+                            id: source.id,
+                            type: "source",
+                            label: source.name,
+                            description: source.description ?? undefined,
+                            resourceId: source.id,
+                            data: source
+                        });
+
+                        this.edges.push({
+                            id: `${transform.id}-${source.id}`,
+                            source: transform.id,
+                            target: source.id,
+                            label: "account attribute",
+                            noGroup: true
+                        });
+                    }
+                }
+            } else {
+                for (const sourceName of sourceNames) {
+                    const source = sources.find(o => o.object?.name === sourceName)?.object;
+                    if (!source) {
+                        continue;
+                    }
+
+                    this.addNodeOnce({
+                        id: source.id,
+                        type: "source",
+                        label: source.name,
+                        description: source.description ?? undefined,
+                        resourceId: source.id,
+                        data: source
+                    });
+
+                    this.edges.push({
+                        id: `${profile.id}-${source.id}`,
+                        source: profile.id,
+                        target: source.id,
+                        label: "account attribute",
+                        noGroup: true
+                    });
+                }
+            }
         }
     }
 
@@ -347,17 +434,14 @@ export class IdentityAttributeDependencyService extends DependencyService {
         if (transformDefinition?.type === "accountAttribute") {
             return {
                 sourceName: transformDefinition.attributes?.sourceName ?? "",
-                attributeName: transformDefinition.attributes?.attributeName ?? "",
-                sourceId: transformDefinition.attributes?.sourceId ?? ""
+                sourceAttribute: transformDefinition.attributes?.attributeName ?? ""
             };
         }
         if (transformDefinition?.type === "reference") {
             const input = transformDefinition.attributes?.input;
             return {
                 sourceName: input?.attributes?.sourceName ?? "",
-                attributeName: input?.attributes?.attributeName ?? "",
-                sourceId: input?.attributes?.sourceId ?? "",
-                transformName: transformDefinition.attributes?.id ?? ""
+                sourceAttribute: input?.attributes?.attributeName ?? ""
             };
         }
         return {};
