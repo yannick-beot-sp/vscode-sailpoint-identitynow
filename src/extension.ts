@@ -11,6 +11,7 @@ import { AccountExporterCommand, UncorrelatedAccountExporterCommand } from './co
 import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from './commands/source/exportEntitlementDetails';
 import { ExportScriptFromRuleCommand } from './commands/rule/exportScriptFromRuleCommand';
 import { AccessProfileFilterCommand, RoleFilterCommand, IdentityDefinitionFilterCommand } from './commands/filterCommand';
+import { MachineIdentityFilterCommand } from './commands/machine-identity/machineIdentityFilterCommand';
 import { AccountImportNodeCommand } from './commands/source/importAccount';
 import { EntitlementDetailsImportNodeCommand } from './commands/source/importEntitlementDetails';
 import { UncorrelatedAccountImportNodeCommand } from './commands/source/importUncorrelatedAccount';
@@ -54,6 +55,7 @@ import { WorkflowExportCommand } from './commands/workflow/WorkflowExportCommand
 import { WorkflowImporterTreeViewCommand } from './commands/workflow/WorkflowImporterTreeViewCommand';
 import { EditPublicIdentitiesConfigCommand } from './commands/tenant/editPublicIdentitiesConfigCommand';
 import { EditAccessRequestConfigCommand } from './commands/tenant/editAccessRequestConfigCommand';
+import { EditMachineAccountSubtypeApprovalConfigCommand } from './commands/source/editMachineAccountSubtypeApprovalConfigCommand';
 import { NewAttributeSearchConfigCommand } from './commands/NewAttributeSearchConfigCommand';
 import { EditPasswordConfigCommand } from './commands/tenant/editPasswordConfigCommand';
 import { GenerateDigitTokenCommand } from './commands/tenant/generateDigitTokenCommand';
@@ -143,6 +145,12 @@ export function activate(context: vscode.ExtensionContext) {
 			editAccessRequestConfigCommand.execute,
 			editAccessRequestConfigCommand));
 
+	const editMachineAccountSubtypeApprovalConfigCommand = new EditMachineAccountSubtypeApprovalConfigCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EDIT_MACHINE_ACCOUNT_SUBTYPE_APPROVAL_CONFIG,
+			editMachineAccountSubtypeApprovalConfigCommand.execute,
+			editMachineAccountSubtypeApprovalConfigCommand));
+
 	const editPasswordConfigCommand = new EditPasswordConfigCommand()
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EDIT_PASSWORD_ORG_CONFIG,
@@ -194,6 +202,12 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.AGGREGATE_ENTITLEMENTS,
 			(sourceTreeItem) => treeManager.aggregateEntitlements(sourceTreeItem)));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.AGGREGATE_MACHINE_IDENTITIES,
+			(sourceTreeItem) => treeManager.aggregateMachineIdentities(sourceTreeItem)));
+	// context.subscriptions.push(
+	// 	vscode.commands.registerCommand(commands.AGGREGATE_MACHINE_IDENTITIES_DISABLE_OPTIMIZATION,
+	// 		(sourceTreeItem) => treeManager.aggregateMachineIdentities(sourceTreeItem, true)));
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.RESET_SOURCE,
 			(sourceTreeItem) => treeManager.resetSource(sourceTreeItem)));
@@ -321,6 +335,13 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.ACCESS_PROFILE_UPDATE_FILTER_VIEW,
 			accessProfileFilterCommand.execute, accessProfileFilterCommand));
+	const machineIdentityFilterCommand = new MachineIdentityFilterCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.MACHINE_IDENTITIES_FILTER_VIEW,
+			machineIdentityFilterCommand.execute, machineIdentityFilterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.MACHINE_IDENTITIES_UPDATE_FILTER_VIEW,
+			machineIdentityFilterCommand.execute, machineIdentityFilterCommand));
 
 	const updateWorkflowStatusCommand = new UpdateWorkflowStatusCommand(tenantService)
 	context.subscriptions.push(

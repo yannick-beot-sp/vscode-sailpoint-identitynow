@@ -9,7 +9,7 @@ import * as commands from "../commands/constants";
 import * as configuration from '../configurationConstants';
 import { convertConstantToTitleCase, escapeFilter, isEmpty, isNotEmpty } from "../utils/stringUtils";
 import { TenantService } from "../services/TenantService";
-import { CampaignStatusV3, DimensionV2025 } from "sailpoint-api-client";
+import { CampaignStatusV3, DimensionV2025, MachineIdentityResponseV2025, SourceSubtypeV2025, SourceSubtypeWithSourceV2026 } from "sailpoint-api-client";
 import { convertToBaseTreeItem } from "../views/utils";
 
 
@@ -83,6 +83,7 @@ export class TenantTreeItem extends BaseTreeItem {
 		results.push(new SearchAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new IdentityAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new IdentitiesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new MachineIdentitiesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new ApplicationsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new CampaignsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 
@@ -174,9 +175,10 @@ export class SourcesTreeItem extends FolderTreeItem {
 					this.tenantName,
 					this.tenantDisplayName,
 					source.name,
-					source.id,
-					source.type,
-					source.connectorAttributes["delimiter"],
+					source.id!,
+					source.type!,
+					source.connectorAttributes?.["delimiter"],
+					source.features
 				));
 		}
 		return results;
@@ -311,6 +313,7 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 		id: string,
 		public readonly type: string,
 		public readonly delimiter: string,
+		public readonly features: Array<string> | undefined,
 	) {
 		super({
 			tenantId,
@@ -321,7 +324,7 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 			id,
 			collapsible: vscode.TreeItemCollapsibleState.Collapsed
 		})
-		this.contextValue = type.replaceAll(" ", "") + "source";
+		this.contextValue = (features?.find(x => x === "MACHINE_IDENTITY_AGGREGATION") ?? "") + type.replaceAll(" ", "") + "source";
 	}
 
 	getChildren(): Promise<BaseTreeItem[]> {
@@ -330,6 +333,10 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 		results.push(
 			new ProvisioningPoliciesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, this.uri)
 		);
+		// TODO Only show this depending on the tenant features
+		results.push(
+			new MachineAccountSubtypesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, this.uri)
+		)
 		return new Promise((resolve) => resolve(results));
 	}
 
@@ -524,6 +531,60 @@ export class ProvisioningPolicyTreeItem extends ISCResourceTreeItem {
 			dark: vscode.Uri.file(context.asAbsolutePath("resources/dark/provisioning-policy.svg")),
 		};
 	}
+}
+
+/**
+ * Containers for machine account subtypes
+ */
+export class MachineAccountSubtypesTreeItem extends FolderTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		parentUri: vscode.Uri
+	) {
+		super("Machine Account Subtypes", "machine-account-subtypes", tenantId, tenantName, tenantDisplayName, parentUri);
+	}
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		const client = new ISCClient(this.tenantId, this.tenantName);
+		const sourceId = getIdByUri(this.parentUri) || "";
+		// no pagination for now
+		const subtypes = await client.listMachineAccountSubtypes(sourceId);
+
+		return subtypes.map((subtype: SourceSubtypeWithSourceV2026) => new MachineAccountSubtypeTreeItem(
+			this.tenantId,
+			this.tenantName,
+			this.tenantDisplayName,
+			subtype.displayName!,
+			subtype.id!,
+			subtype.technicalName!
+		));
+	}
+}
+
+export class MachineAccountSubtypeTreeItem extends ISCResourceTreeItem {
+	contextValue = "machine-account-subtype";
+
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		subtypeId: string,
+		public readonly technicalName: string
+	) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			resourceType: "source-subtypes",
+			id: subtypeId
+		})
+	}
+
+	iconPath = new vscode.ThemeIcon("symbol-misc");
 }
 
 /**
@@ -1394,6 +1455,72 @@ export class IdentityTreeItem extends ISCResourceTreeItem {
 
 	getUrl(): vscode.Uri | undefined {
 		return getUIUrl(this.tenantName, "ui/a/admin/identities", this.id, "details/attributes")
+	}
+}
+
+export class MachineIdentitiesTreeItem extends PageableFolderTreeItem<MachineIdentityResponseV2025> {
+	filterTypes?: string[];
+	filterSourceIds?: string[];
+	filterAdditional?: string;
+
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {
+		super("Machine Identities", "machine-identities", tenantId, tenantName, tenantDisplayName, 'No machine identities found',
+			(item => new MachineIdentityTreeItem(
+				tenantId,
+				tenantName,
+				tenantDisplayName,
+				item.name ?? item.id ?? "",
+				item.id ?? "",
+				item.subtype
+			))
+		);
+	}
+
+	protected async loadNext(): Promise<AxiosResponse<MachineIdentityResponseV2025[]>> {
+		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
+		return await this.client.listMachineIdentities({
+			filters: this.filters || undefined,
+			limit,
+			offset: this.currentOffset,
+			count: (this._total === 0),
+			sorters: "name"
+		});
+	}
+}
+
+export class MachineIdentityTreeItem extends ISCResourceTreeItem {
+	contextValue = "machine-identity";
+
+	constructor(tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string,
+		public readonly subtype?: string) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			resourceType: "machine-identities",
+			id,
+		})
+	}
+
+	iconPath = new vscode.ThemeIcon("window");
+
+	getUrl(): vscode.Uri | undefined {
+		const segment = this.subtype === "AI Agent" ? "ai-agents" : "machine-identities";
+		return getUIUrl(this.tenantName, `ui/a/admin/${segment}`, this.resourceId, "details");
+	}
+
+	updateIcon(context: vscode.ExtensionContext): void {
+		this.iconPath = this.subtype === "AI Agent" ?
+			new vscode.ThemeIcon("robot") : new vscode.ThemeIcon("window")
 	}
 }
 

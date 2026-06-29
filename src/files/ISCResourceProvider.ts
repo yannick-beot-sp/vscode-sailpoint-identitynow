@@ -215,7 +215,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 					JSON.stringify(jsonpatch)
 				);
 
-			} else if (resourcePath.match("identity-profiles|access-profiles|roles|search-attribute-config|source-apps|campaigns|\/org-config")) {
+			} else if (resourcePath.match("identity-profiles|machine-identities|source-subtypes|access-profiles|roles|search-attribute-config|source-apps|campaigns|\/org-config")) {
 				// special treatment to use PATCH method as PUT is not supported
 				let oldData
 				// special case for applications

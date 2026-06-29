@@ -9,6 +9,7 @@ import { TaskStatusBeta, TaskStatusBetaCompletionStatusBeta } from 'sailpoint-ap
 import { confirm } from '../utils/vsCodeHelpers';
 import { formatTask, waifForJob } from '../commands/source/sourceUtils';
 import { isTenantReadonly, validateTenantReadonly } from '../commands/validateTenantReadonly';
+import { isEmpty } from '../utils/arrayUtils';
 
 export class TreeManager {
 
@@ -126,6 +127,44 @@ export class TreeManager {
                 "Source entitlements {0} successfully aggregated",
                 "Warning during aggregation of {0}: {1}",
                 "Aggregation of entitlements for {0} failed: {1}: {2}"
+            )
+        });
+    }
+
+    public async aggregateMachineIdentities(item: SourceTreeItem, disableOptimization = false): Promise<void> {
+        console.log("> aggregateMachineIdentities", item, disableOptimization);
+
+        if (!(await validateTenantReadonly(this.tenantService, item.tenantId, `aggregate machine identities from ${item.label}`))) {
+            return
+        }
+
+        const client = new ISCClient(item.tenantId, item.tenantName);
+        await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: `Aggregating machine identities from ${item.label}`,
+            cancellable: true
+        }, async (progress, token) => {
+
+            const schemas = await client.getSchemas(item.id!)
+
+            /*
+            Examples of how dataset info is stored in schema configuration:
+            {
+                "datasetType": "std:machine-identity",
+                "datasetId": "azure:foundry"
+            }*/
+            const datasetIds = schemas.filter(x => (x.configuration as any)?.datasetType === "std:machine-identity").map(x => (x.configuration as any).datasetId).filter(Boolean)
+            if (isEmpty(datasetIds)) {
+                vscode.window.showErrorMessage("No schema for machine identities")
+                return;
+            }
+            const job = await client.startMachineIdentityAggregation(item.id!, datasetIds, disableOptimization)
+            const task = await waifForJob(client, job.id, token)
+            formatTask(task,
+                item.label as string,
+                "Machine identities for {0} successfully aggregated",
+                "Warning during machine identity aggregation of {0}: {1}",
+                "Machine identity aggregation of {0} failed: {1}: {2}"
             )
         });
     }
