@@ -24,6 +24,8 @@ export interface DependencyEdgeData {
     source: string;
     target: string;
     label?: string;
+    /** Set when the source node can only ever have one such target, so the group-summary node would be pointless. */
+    noGroup?: boolean;
 }
 
 export interface DependencyGraphData {

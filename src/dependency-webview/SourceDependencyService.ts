@@ -64,7 +64,7 @@ export class SourceDependencyService extends DependencyService {
                 continue;
             }
 
-            this.nodes.push({
+            this.addNodeOnce({
                 id: transform.id,
                 type: "transform",
                 label: transform.name,
@@ -88,11 +88,14 @@ export class SourceDependencyService extends DependencyService {
      * An identity attribute mapping references this source the same way as a transform: through
      * an "accountAttribute" transform whose "sourceName" attribute holds this source's name. The
      * same source may be used by several attribute mappings within the same identity profile, so
-     * a profile can end up with more than one edge to the root.
+     * each mapping is surfaced as its own "identity-attribute" node hanging off the profile
+     * (rather than a single profile node listing every attribute name), so the named transform
+     * applied on top of the source for that attribute, if any, can hang off the attribute node.
      */
     private filterIdentityProfile(data: SpConfigExportResultsBeta | null) {
 
         const profiles = (data?.objects ?? []).filter(o => o.self?.type === "IDENTITY_PROFILE");
+        const transforms = (data?.objects ?? []).filter(o => o.self?.type === "TRANSFORM");
 
         for (const profileObject of profiles) {
             const profile = profileObject.object;
@@ -102,28 +105,66 @@ export class SourceDependencyService extends DependencyService {
                 continue;
             }
 
-            this.nodes.push({
+            this.addNodeOnce({
                 id: profile.id,
                 type: "identity-profile",
                 label: profile.name,
                 description: profile.description ?? undefined,
                 resourceId: profile.id,
-                attributes: {
-                    identityAttributes: matchingAttributeTransforms.map((at: any) => at.identityAttributeName).join(", ")
-                },
                 data: profile
             });
 
+            this.edges.push({
+                id: `${DependencyService.rootId}-${profile.id}`,
+                source: DependencyService.rootId,
+                target: profile.id,
+                label: "attribute mapping"
+            });
+
             for (const attributeTransform of matchingAttributeTransforms) {
-                const transformUsage = this.describeTransformUsage(attributeTransform.transformDefinition);
-                this.edges.push({
-                    id: `${DependencyService.rootId}-${profile.id}-${attributeTransform.identityAttributeName}`,
-                    source: DependencyService.rootId,
-                    target: profile.id,
-                    label: transformUsage
-                        ? `${attributeTransform.identityAttributeName} (${transformUsage})`
-                        : attributeTransform.identityAttributeName
+                const attributeNodeId = `${profile.id}::${attributeTransform.identityAttributeName}`;
+
+                this.addNodeOnce({
+                    id: attributeNodeId,
+                    type: "identity-attribute",
+                    label: attributeTransform.identityAttributeName,
+                    resourceId: attributeTransform.identityAttributeName,
+                    data: attributeTransform
                 });
+
+                this.edges.push({
+                    id: `${profile.id}-${attributeNodeId}`,
+                    source: profile.id,
+                    target: attributeNodeId
+                });
+
+                const transformNames = this.collectReferencedTransformNames(attributeTransform.transformDefinition);
+                for (const transformName of transformNames) {
+                    const transform = transforms.find(o => o.object?.name === transformName)?.object;
+                    if (!transform) {
+                        continue;
+                    }
+
+                    this.addNodeOnce({
+                        id: transform.id,
+                        type: "transform",
+                        label: transform.name,
+                        resourceId: transform.id,
+                        attributes: {
+                            type: transform.type
+                        },
+                        data: transform
+                    });
+
+                    this.edges.push({
+                        id: `${attributeNodeId}-${transform.id}`,
+                        source: attributeNodeId,
+                        target: transform.id,
+                        label: "transform reference",
+                        // An identity attribute mapping uses at most one named transform.
+                        noGroup: true
+                    });
+                }
             }
         }
     }
@@ -185,20 +226,6 @@ export class SourceDependencyService extends DependencyService {
                 label: "application"
             });
         }
-    }
-
-    /**
-     * Describes how a transform definition uses this source, beyond a bare "accountAttribute"
-     * pull, e.g. when it goes through a named transform or a composite transform.
-     */
-    private describeTransformUsage(transformDefinition: any): string | undefined {
-        if (transformDefinition?.type === "accountAttribute") {
-            return undefined;
-        }
-        if (transformDefinition?.type === "reference") {
-            return `via transform "${transformDefinition.attributes?.id}"`;
-        }
-        return `via ${transformDefinition?.type} transform`;
     }
 
     private transformReferencesSource(transform: any, sourceName: string): boolean {

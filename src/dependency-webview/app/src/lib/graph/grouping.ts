@@ -28,7 +28,13 @@ export function groupKey(sourceNodeId: string, type: string): string {
     return `${sourceNodeId}::${type}`;
 }
 
-/** Types that never need a group wrapper because a single node can only ever have one such neighbor. */
+/**
+ * Types that never need a group wrapper because a single node can only ever have one such
+ * neighbor, regardless of which kind of node is asking. When the same target type can be either
+ * singular or plural depending on the relationship (e.g. a profile's one source for a given
+ * attribute vs. all sources that sync that attribute tenant-wide), the backend marks the
+ * singular edges with `noGroup` instead of listing the type here.
+ */
 const NO_GROUP_TYPES = new Set(["public-identities-config"]);
 
 /** Node types that can be the root of their own dependency graph (mirrors DependencyServiceFactory on the extension side). */
@@ -86,7 +92,7 @@ export function buildDisplayGraph(
         }
 
         for (const [type, edgesOfType] of byType) {
-            if (NO_GROUP_TYPES.has(type)) {
+            if (NO_GROUP_TYPES.has(type) || edgesOfType.every(edge => edge.noGroup)) {
                 for (const edge of edgesOfType) {
                     edges.push({ id: edge.id, source: nodeId, target: edge.target, label: edge.label });
                     visit(edge.target);

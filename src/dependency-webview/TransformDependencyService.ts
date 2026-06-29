@@ -33,6 +33,7 @@ export class TransformDependencyService extends DependencyService {
             [
                 ExportPayloadV2025IncludeTypesV2025.Transform,
                 ExportPayloadV2025IncludeTypesV2025.IdentityProfile,
+                ExportPayloadV2025IncludeTypesV2025.Source,
             ]
         )
 
@@ -84,12 +85,15 @@ export class TransformDependencyService extends DependencyService {
     /**
      * An identity attribute mapping references this transform the same way: a "reference"
      * transform whose "id" attribute holds this transform's name. The same transform may be
-     * used by several attribute mappings within the same identity profile, so a profile can
-     * end up with more than one edge to the root.
+     * used by several attribute mappings within the same identity profile, so each mapping is
+     * surfaced as its own "identity-attribute" node hanging off the profile (rather than a single
+     * profile node listing every attribute name) so the source feeding that attribute, if any,
+     * can in turn hang off the attribute node.
      */
     private filterIdentityProfile(data: SpConfigExportResultsBeta | null) {
 
         const profiles = (data?.objects ?? []).filter(o => o.self?.type === "IDENTITY_PROFILE");
+        const sources = (data?.objects ?? []).filter(o => o.self?.type === "SOURCE");
 
         for (const profileObject of profiles) {
             const profile = profileObject.object;
@@ -99,25 +103,64 @@ export class TransformDependencyService extends DependencyService {
                 continue;
             }
 
-            this.nodes.push({
+            this.addNodeOnce({
                 id: profile.id,
                 type: "identity-profile",
                 label: profile.name,
                 description: profile.description ?? undefined,
                 resourceId: profile.id,
-                attributes: {
-                    identityAttributes: matchingTransforms.map((at: any) => at.identityAttributeName).join(", ")
-                },
                 data: profile
             });
 
+            this.edges.push({
+                id: `${DependencyService.rootId}-${profile.id}`,
+                source: DependencyService.rootId,
+                target: profile.id,
+                label: "attribute mapping"
+            });
+
             for (const attributeTransform of matchingTransforms) {
-                this.edges.push({
-                    id: `${DependencyService.rootId}-${profile.id}-${attributeTransform.identityAttributeName}`,
-                    source: DependencyService.rootId,
-                    target: profile.id,
-                    label: attributeTransform.identityAttributeName
+                const attributeNodeId = `${profile.id}::${attributeTransform.identityAttributeName}`;
+
+                this.addNodeOnce({
+                    id: attributeNodeId,
+                    type: "identity-attribute",
+                    label: attributeTransform.identityAttributeName,
+                    resourceId: attributeTransform.identityAttributeName,
+                    data: attributeTransform
                 });
+
+                this.edges.push({
+                    id: `${profile.id}-${attributeNodeId}`,
+                    source: profile.id,
+                    target: attributeNodeId
+                });
+
+                const sourceNames = this.collectReferencedSourceNames(attributeTransform.transformDefinition);
+                for (const sourceName of sourceNames) {
+                    const source = sources.find(o => o.object?.name === sourceName)?.object;
+                    if (!source) {
+                        continue;
+                    }
+
+                    this.addNodeOnce({
+                        id: source.id,
+                        type: "source",
+                        label: source.name,
+                        description: source.description ?? undefined,
+                        resourceId: source.id,
+                        data: source
+                    });
+
+                    this.edges.push({
+                        id: `${attributeNodeId}-${source.id}`,
+                        source: attributeNodeId,
+                        target: source.id,
+                        label: "account attribute",
+                        // An identity attribute mapping always pulls from exactly one source.
+                        noGroup: true
+                    });
+                }
             }
         }
     }
