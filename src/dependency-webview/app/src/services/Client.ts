@@ -10,7 +10,7 @@ export interface DependencyNodeData {
     /** Resource type, e.g. "identity-attribute" | "identity-profile" | "transform" | "provisioning-policy" | "role" */
     type: string;
     label: string;
-    description?: string;
+    description?: string | null;
     /** Id of the real ISC object, for future "open" actions */
     resourceId?: string;
     /** Extra key/values shown in the details panel */

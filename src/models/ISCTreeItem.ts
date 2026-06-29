@@ -377,7 +377,7 @@ export class TransformsTreeItem extends FolderTreeItem {
 }
 
 export class TransformTreeItem extends ISCResourceTreeItem {
-	contextValue = "transform";
+	contextValue: "transform" = "transform";
 
 	constructor(
 		tenantId: string,
@@ -1065,7 +1065,7 @@ export class RoleTreeItem extends PageableFolderTreeItem<DimensionV2025> {
 	 * Filtering not supported... yet
 	 */
 	get computedContextValue() {
-		return this.dimensional ?  `${this.contextValue}Dimensional` : this.contextValue
+		return this.dimensional ? `${this.contextValue}Dimensional` : this.contextValue
 	}
 	/**
 	 * Need to force open command as it's not inhereting from ISCResourceTreeItem anymore
@@ -1295,7 +1295,7 @@ export class IdentityAttributesTreeItem extends FolderTreeItem {
 }
 
 export class IdentityAttributeTreeItem extends ISCResourceTreeItem {
-	contextValue = "identity-attribute";
+	contextValue: "identity-attribute" = "identity-attribute";
 
 	constructor(tenantId: string,
 		tenantName: string,
@@ -1673,4 +1673,17 @@ export class CampaignTreeItem extends ISCResourceTreeItem {
 	getUrl(): vscode.Uri | undefined {
 		return getUIUrl(this.tenantName, "ui/a/admin/certifications/campaigns-list/all-campaigns", this.id)
 	}
+}
+
+
+export function isTransformTreeItem(o: BaseTreeItem): o is TransformTreeItem {
+	return o.contextValue === "transform";
+}
+
+export function isIdentityAttributeTreeItem(o: BaseTreeItem): o is IdentityAttributeTreeItem {
+	return o.contextValue === "identity-attribute";
+}
+
+export function isSourceTreeItem(o: BaseTreeItem): o is SourceTreeItem {
+	return o instanceof SourceTreeItem;
 }

@@ -94,11 +94,12 @@ export function buildDisplayGraph(
             const key = groupKey(nodeId, type);
             const groupNodeId = `group:${key}`;
             const expanded = expandedGroupIds.has(groupNodeId);
+            const distinctTargetCount = new Set(edgesOfType.map(edge => edge.target)).size;
 
             nodes.push({
                 id: groupNodeId,
                 type: "group-summary",
-                data: { kind: "group", groupKey: key, groupType: type, count: edgesOfType.length, expanded },
+                data: { kind: "group", groupKey: key, groupType: type, count: distinctTargetCount, expanded },
                 position: { x: 0, y: 0 }
             });
             edges.push({ id: `${nodeId}->${groupNodeId}`, source: nodeId, target: groupNodeId });

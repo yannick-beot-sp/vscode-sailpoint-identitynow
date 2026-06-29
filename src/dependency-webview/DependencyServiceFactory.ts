@@ -1,5 +1,6 @@
 import { DependencyService } from "./DependencyService"
 import { IdentityAttributeDependencyService } from "./IdentityAttributeDependencyService"
+import { SourceDependencyService } from "./SourceDependencyService"
 import { TransformDependencyService } from "./TransformDependencyService"
 
 export class DependencyServiceFactory {
@@ -29,6 +30,16 @@ export class DependencyServiceFactory {
                 )
             case "transform":
                 return new TransformDependencyService(
+                    this.tenantId,
+                    this.tenantName,
+                    this.tenantDisplayname,
+                    this.resourceType,
+                    this.resourceId,
+                    this.resourceName,
+                    this.label
+                )
+            case "source":
+                return new SourceDependencyService(
                     this.tenantId,
                     this.tenantName,
                     this.tenantDisplayname,
