@@ -51,6 +51,8 @@ export interface ViewportState {
 
 export interface Client {
     getDependencyGraph(resourceType: string, resourceId: string, resourceName: string, force: boolean): Promise<DependencyGraphData>
+    /** Opens a new dependency graph panel rooted on the given node. */
+    viewNodeDependencies(resourceType: string, resourceId: string, resourceName: string): void
     getNodeViewStates(resourceType: string, resourceId: string): Record<string, NodeViewState> | undefined
     setNodeViewStates(resourceType: string, resourceId: string, states: Record<string, NodeViewState>): void
     getLayoutAlgorithm(resourceType: string, resourceId: string): string | undefined

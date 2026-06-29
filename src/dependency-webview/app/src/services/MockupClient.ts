@@ -62,6 +62,10 @@ export class MockupClient implements Client {
         return buildGraph(resourceType, resourceId, window.data.label ?? resourceId);
     }
 
+    viewNodeDependencies(resourceType: string, resourceId: string, resourceName: string): void {
+        console.log(">viewNodeDependencies", { resourceType, resourceId, resourceName });
+    }
+
     getNodeViewStates(resourceType: string, resourceId: string): Record<string, NodeViewState> | undefined {
         return this.nodeViewStates[cacheKey(resourceType, resourceId)];
     }
