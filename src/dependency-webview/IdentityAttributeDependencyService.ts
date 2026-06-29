@@ -172,7 +172,7 @@ export class IdentityAttributeDependencyService extends DependencyService {
                 (policy.fields ?? []).some((field: any) => this.fieldReferencesAttribute(field, this.resourceName)));
 
             const syncConfig = syncConfigs.find(o => o.object?.source?.id === source.id);
-            const synchronized = syncConfig?.object?.attributes?.some((attr: any) => attr.name === this.resourceName && attr.enabled);
+            const synchronized = syncConfig?.object?.attributes?.some((attr: any) => attr.name === this.resourceName && attr.enabled) ?? false;
 
             if (matchingPolicies.length === 0 && !synchronized) {
                 continue;
@@ -184,9 +184,6 @@ export class IdentityAttributeDependencyService extends DependencyService {
                 label: source.name,
                 description: source.description ?? undefined,
                 resourceId: source.id,
-                attributes: {
-                    synchronized: String(synchronized)
-                },
                 data: source
             });
 
