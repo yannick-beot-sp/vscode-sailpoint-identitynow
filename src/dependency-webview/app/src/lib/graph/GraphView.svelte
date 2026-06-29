@@ -6,7 +6,7 @@
   import type { DependencyGraphData, NodeViewState, ViewportState } from "../../services/Client";
   import { ClientFactory } from "../../services/ClientFactory";
   import { buildDisplayGraph, type FlowNode, type FlowEdge, type FlowNodeData } from "./grouping";
-  import { runElkLayout, LAYOUT_ALGORITHMS, type LayoutAlgorithm } from "./layout";
+  import { runTreeLayout, LAYOUT_ALGORITHMS, type LayoutAlgorithm } from "./layout";
   import DependencyNode from "./DependencyNode.svelte";
   import GroupNode from "./GroupNode.svelte";
   import FloatingEdge from "./FloatingEdge.svelte";
@@ -41,7 +41,7 @@
 
   const savedLayoutAlgorithm = untrack(() => client.getLayoutAlgorithm(resourceType, resourceId));
   let layoutAlgorithm = $state<LayoutAlgorithm>(
-    LAYOUT_ALGORITHMS.some(o => o.value === savedLayoutAlgorithm) ? savedLayoutAlgorithm as LayoutAlgorithm : "layered"
+    LAYOUT_ALGORITHMS.some(o => o.value === savedLayoutAlgorithm) ? savedLayoutAlgorithm as LayoutAlgorithm : "vertical"
   );
 
   // Restored once on mount; when present it replaces fitView so reopening the panel shows
@@ -89,7 +89,7 @@
       };
     });
 
-    runElkLayout(rawNodes, rawEdges, layoutAlgorithm).then((positioned) => {
+    runTreeLayout(rawNodes, rawEdges, layoutAlgorithm).then((positioned) => {
       const positionById = new Map(positioned.map(n => [n.id, n.position]));
       nodes = decoratedNodes.map(n => ({
         ...n,
