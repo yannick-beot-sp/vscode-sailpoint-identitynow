@@ -10,6 +10,8 @@ import SegmentIcon from "../svgs/segment.svelte";
 import PublicIdentitiesConfigIcon from "../svgs/public-identities-config.svelte";
 import WorkflowIcon from "../svgs/workflow.svelte";
 import EventTriggerIcon from "../svgs/event-trigger.svelte";
+import AccessProfileIcon from "../svgs/access-profile.svelte";
+import ApplicationIcon from "../svgs/application.svelte";
 
 export interface TypeStyle {
     color: string;
@@ -34,6 +36,8 @@ const TYPE_STYLES: Record<string, TypeStyle> = {
     "public-identities-config": { color: "#c586c0", icon: PublicIdentitiesConfigIcon, label: "Public Identities Config" },
     "workflow": { color: "#3d8c34", icon: WorkflowIcon, label: "Workflow" },
     "event-trigger": { color: "#e2b93d", icon: EventTriggerIcon, label: "Event Trigger" },
+    "access-profile": { color: "#ce9178", icon: AccessProfileIcon, label: "Access Profile" },
+    "application": { color: "#9cdcfe", icon: ApplicationIcon, label: "Application" },
 };
 
 export function getTypeStyle(type: string): TypeStyle {

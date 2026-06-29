@@ -664,7 +664,7 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.dependencies.view",
-        "title": "View Dependencies",
+        "title": "View dependencies",
         "icon": "$(references)"
       },
       {
@@ -1205,7 +1205,7 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.dependencies.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-attribute",
+          "when": "view == vscode-sailpoint-identitynow.view && (viewItem == identity-attribute || viewItem == transform || viewItem =~ /source$/)",
           "group": "_@1"
         },
         {
