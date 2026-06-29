@@ -31,6 +31,9 @@ export function groupKey(sourceNodeId: string, type: string): string {
 /** Types that never need a group wrapper because a single node can only ever have one such neighbor. */
 const NO_GROUP_TYPES = new Set(["public-identities-config"]);
 
+/** Node types that can be the root of their own dependency graph (mirrors DependencyServiceFactory on the extension side). */
+export const VIEWABLE_DEPENDENCY_TYPES = new Set(["identity-attribute", "transform", "source"]);
+
 /**
  * Builds the nodes/edges to render for the current expansion state.
  *

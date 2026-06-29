@@ -120,6 +120,18 @@ export class DependencyPanel extends BaseWebviewPanel {
                     this._panel.webview.postMessage({ command, requestId, error: error?.message ?? String(error) });
                 }
                 return;
+            case commands.VIEW_NODE_DEPENDENCIES:
+                DependencyPanel.createOrShow(
+                    this._extensionUri,
+                    this.tenantId,
+                    this.tenantName,
+                    this.tenantDisplayname,
+                    payload.resourceType,
+                    payload.resourceId,
+                    payload.resourceName,
+                    payload.resourceName
+                );
+                return;
         }
     }
 }

@@ -5,7 +5,7 @@
   import { SvelteSet } from "svelte/reactivity";
   import type { DependencyGraphData, NodeViewState, ViewportState } from "../../services/Client";
   import { ClientFactory } from "../../services/ClientFactory";
-  import { buildDisplayGraph, type FlowNode, type FlowEdge, type FlowNodeData } from "./grouping";
+  import { buildDisplayGraph, VIEWABLE_DEPENDENCY_TYPES, type FlowNode, type FlowEdge, type FlowNodeData } from "./grouping";
   import { runTreeLayout, LAYOUT_ALGORITHMS, type LayoutAlgorithm } from "./layout";
   import DependencyNode from "./DependencyNode.svelte";
   import GroupNode from "./GroupNode.svelte";
@@ -50,6 +50,8 @@
 
   let nodes = $state.raw<FlowNode[]>([]);
   let edges = $state.raw<FlowEdge[]>([]);
+
+  let contextMenu = $state<{ x: number; y: number; data: FlowNodeData } | undefined>(undefined);
 
   function persistNodeViewStates() {
     client.setNodeViewStates(resourceType, resourceId, nodeViewStates);
@@ -101,10 +103,29 @@
 
   function handleNodeClick({ node }: { node: FlowNode }) {
     onSelectNode(node.data);
+    contextMenu = undefined;
   }
 
   function handlePaneClick() {
     onSelectNode(undefined);
+    contextMenu = undefined;
+  }
+
+  function handleNodeContextMenu({ event, node }: { event: MouseEvent; node: FlowNode }) {
+    event.preventDefault();
+    if (node.data.kind !== "dependency" || !VIEWABLE_DEPENDENCY_TYPES.has(node.data.node.type)) {
+      contextMenu = undefined;
+      return;
+    }
+    contextMenu = { x: event.clientX, y: event.clientY, data: node.data };
+  }
+
+  function handleViewDependencies() {
+    if (contextMenu?.data.kind === "dependency") {
+      const { type, resourceId, id, label } = contextMenu.data.node;
+      client.viewNodeDependencies(type, resourceId ?? id, label);
+    }
+    contextMenu = undefined;
   }
 
   function handleNodeDragStop({ targetNode }: { targetNode: FlowNode | null }) {
@@ -132,6 +153,7 @@
     elementsSelectable={true}
     deleteKey={null}
     onnodeclick={handleNodeClick}
+    onnodecontextmenu={handleNodeContextMenu}
     onnodedragstop={handleNodeDragStop}
     onpaneclick={handlePaneClick}
     onmoveend={handleMoveEnd}
@@ -150,6 +172,13 @@
       </label>
     </Panel>
   </SvelteFlow>
+
+  {#if contextMenu}
+    <button class="context-menu-backdrop" aria-label="Close menu" onclick={() => (contextMenu = undefined)}></button>
+    <ul class="context-menu" style="left: {contextMenu.x}px; top: {contextMenu.y}px">
+      <li><button onclick={handleViewDependencies}>View dependencies</button></li>
+    </ul>
+  {/if}
 </div>
 
 <style>
@@ -182,5 +211,49 @@
     color: var(--vscode-dropdown-foreground, #f0f0f0);
     border: 1px solid var(--vscode-dropdown-border, #3c3c3c);
     border-radius: 2px;
+  }
+
+  .context-menu-backdrop {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: default;
+    z-index: 10;
+  }
+
+  .context-menu {
+    position: fixed;
+    z-index: 11;
+    margin: 0;
+    padding: 4px;
+    list-style: none;
+    min-width: 160px;
+    background: var(--vscode-menu-background, #252526);
+    color: var(--vscode-menu-foreground, #ccc);
+    border: 1px solid var(--vscode-menu-border, #454545);
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  }
+
+  .context-menu button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  .context-menu button:hover {
+    background: var(--vscode-menu-selectionBackground, #04395e);
+    color: var(--vscode-menu-selectionForeground, #fff);
   }
 </style>

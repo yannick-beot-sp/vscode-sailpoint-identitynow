@@ -38,6 +38,10 @@ export class VsCodeClient implements Client {
         return graph
     }
 
+    viewNodeDependencies(resourceType: string, resourceId: string, resourceName: string): void {
+        messageHandler.send(commands.VIEW_NODE_DEPENDENCIES, { resourceType, resourceId, resourceName })
+    }
+
     getNodeViewStates(resourceType: string, resourceId: string): Record<string, NodeViewState> | undefined {
         const key = cacheKey(resourceType, resourceId)
         const state = Messenger.getState() as State
