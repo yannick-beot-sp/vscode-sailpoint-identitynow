@@ -14,7 +14,9 @@ export class OpenDependencyPanelCommand {
             this.extensionUri,
             node.tenantId,
             node.tenantName,
-            "identity-attribute",
+            node.tenantDisplayName,
+            node.contextValue,
+            node.id!,
             node.resourceId,
             node.label as string);
     }

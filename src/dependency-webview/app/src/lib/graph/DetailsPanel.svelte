@@ -16,7 +16,7 @@
     selected === undefined
       ? undefined
       : selected.kind === "dependency"
-        ? selected.node
+        ? (selected.node.data ?? selected.node)
         : { groupType: selected.groupType, count: selected.count, expanded: selected.expanded }
   );
 
@@ -85,7 +85,7 @@
     box-sizing: border-box;
     padding: 1rem;
     overflow-y: auto;
-    background: var(--vscode-sideBar-background, #252526);
+    background: var(--vscode-editor-background, #1e1e1e);
     border-left: 1px solid var(--vscode-panel-border, rgba(128, 128, 128, 0.35));
   }
 

@@ -1,15 +1,21 @@
-import ELK from "elkjs/lib/elk.bundled.js";
 import type { FlowEdge, FlowNode } from "./grouping";
 
-export type LayoutAlgorithm = "layered" | "radial" | "mrtree";
+export type LayoutAlgorithm = "layered" | "radial" | "vertical" | "horizontal";
 
 export const LAYOUT_ALGORITHMS: { value: LayoutAlgorithm; label: string }[] = [
     { value: "layered", label: "Layered" },
     { value: "radial", label: "Radial" },
-    { value: "mrtree", label: "Tree" }
+    { value: "vertical", label: "Vertical" },
+    { value: "horizontal", label: "Horizontal" }
 ];
 
-const elk = new ELK();
+// Maps our layout choice to the underlying elk algorithm + direction.
+const ELK_OPTIONS: Record<LayoutAlgorithm, { algorithm: string; direction: string }> = {
+    layered: { algorithm: "layered", direction: "DOWN" },
+    radial: { algorithm: "radial", direction: "DOWN" },
+    vertical: { algorithm: "mrtree", direction: "DOWN" },
+    horizontal: { algorithm: "mrtree", direction: "RIGHT" }
+};
 
 // Rough estimate matching the rendered node size; elk only needs this to compute spacing.
 const NODE_WIDTH = 190;
@@ -20,11 +26,17 @@ export async function runElkLayout(nodes: FlowNode[], edges: FlowEdge[], algorit
         return nodes;
     }
 
+    // Dynamically imported so elkjs (the bulk of the bundle) lands in its own chunk.
+    const ELK = (await import("elkjs/lib/elk.bundled.js")).default;
+    const elk = new ELK();
+
+    const { algorithm: elkAlgorithm, direction } = ELK_OPTIONS[algorithm];
+
     const layouted = await elk.layout({
         id: "root",
         layoutOptions: {
-            "elk.algorithm": algorithm,
-            "elk.direction": "DOWN",
+            "elk.algorithm": elkAlgorithm,
+            "elk.direction": direction,
             "elk.spacing.nodeNode": "40",
             "elk.layered.spacing.nodeNodeBetweenLayers": "80"
         },

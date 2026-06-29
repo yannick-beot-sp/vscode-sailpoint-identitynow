@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as commands from './app/src/services/Commands';
-import { DependencyMockService } from './DependencyMockService';
 import { BaseWebviewPanel } from '../webview/BaseWebviewPanel';
+import { DependencyServiceFactory } from './DependencyServiceFactory';
 
 function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
     return {
@@ -17,13 +17,14 @@ export class DependencyPanel extends BaseWebviewPanel {
 
     public static currentPanels: Map<string, DependencyPanel> = new Map();
     public static readonly viewType = 'dependencyGraphView';
-    private readonly mockService = new DependencyMockService();
 
     public static createOrShow(extensionUri: vscode.Uri,
         tenantId: string,
         tenantName: string,
+        tenantDisplayname: string,
         resourceType: string,
         resourceId: string,
+        resourceName: string,
         label: string) {
         const column = vscode.window.activeTextEditor
             ? vscode.window.activeTextEditor.viewColumn
@@ -52,8 +53,10 @@ export class DependencyPanel extends BaseWebviewPanel {
             key,
             tenantId,
             tenantName,
+            tenantDisplayname,
             resourceType,
             resourceId,
+            resourceName,
             label));
     }
 
@@ -65,8 +68,13 @@ export class DependencyPanel extends BaseWebviewPanel {
         private readonly tenantDisplayname: string,
         private readonly resourceType: string,
         private readonly resourceId: string,
+        private readonly resourceName: string,
         private readonly label: string) {
         super(panel, extensionUri);
+        // BaseWebviewPanel's constructor renders the webview HTML (baking in `initialData`)
+        // before the parameter properties above are assigned, so that first render serializes
+        // `window.data` with everything undefined. Re-render now that the fields are set.
+        this.update();
     }
 
     public dispose(): void {
@@ -86,6 +94,7 @@ export class DependencyPanel extends BaseWebviewPanel {
         return {
             resourceType: this.resourceType,
             resourceId: this.resourceId,
+            resourceName: this.resourceName,
             label: this.label
         };
     }
@@ -94,10 +103,22 @@ export class DependencyPanel extends BaseWebviewPanel {
         const { command, requestId, payload } = message;
         switch (command) {
             case commands.GET_DEPENDENCY_GRAPH:
-                // tenantId/tenantName are kept on the instance for the future phase where this
-                // calls real ISCClient lookups instead of the mock service.
-                const graph = await this.mockService.getDependencyGraph(payload.resourceType, payload.resourceId, this.label);
-                this._panel.webview.postMessage({ command, requestId, payload: graph });
+                try {
+                    const factory = new DependencyServiceFactory(
+                        this.tenantId,
+                        this.tenantName,
+                        this.tenantDisplayname,
+                        payload.resourceType,
+                        payload.resourceId,
+                        payload.resourceName,
+                        this.label
+                    )
+                    const service = factory.getService()
+                    const graph = await service.getDependencyGraph();
+                    this._panel.webview.postMessage({ command, requestId, payload: graph });
+                } catch (error: any) {
+                    this._panel.webview.postMessage({ command, requestId, error: error?.message ?? String(error) });
+                }
                 return;
         }
     }

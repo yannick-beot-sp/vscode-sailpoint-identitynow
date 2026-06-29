@@ -5,6 +5,11 @@ import TransformIcon from "../svgs/transform.svelte";
 import ProvisioningPolicyIcon from "../svgs/provisioning-policy.svelte";
 import RoleIcon from "../svgs/role.svelte";
 import ResourceIcon from "../svgs/resource.svelte";
+import SourceIcon from "../svgs/source.svelte";
+import SegmentIcon from "../svgs/segment.svelte";
+import PublicIdentitiesConfigIcon from "../svgs/public-identities-config.svelte";
+import WorkflowIcon from "../svgs/workflow.svelte";
+import EventTriggerIcon from "../svgs/event-trigger.svelte";
 
 export interface TypeStyle {
     color: string;
@@ -24,6 +29,11 @@ const TYPE_STYLES: Record<string, TypeStyle> = {
     "transform": { color: "#cca700", icon: TransformIcon, label: "Transform" },
     "provisioning-policy": { color: "#d18616", icon: ProvisioningPolicyIcon, label: "Provisioning Policy" },
     "role": { color: "#b180d7", icon: RoleIcon, label: "Role" },
+    "source": { color: "#4ec9b0", icon: SourceIcon, label: "Source" },
+    "segment": { color: "#f14c4c", icon: SegmentIcon, label: "Segment" },
+    "public-identities-config": { color: "#c586c0", icon: PublicIdentitiesConfigIcon, label: "Public Identities Config" },
+    "workflow": { color: "#3d8c34", icon: WorkflowIcon, label: "Workflow" },
+    "event-trigger": { color: "#e2b93d", icon: EventTriggerIcon, label: "Event Trigger" },
 };
 
 export function getTypeStyle(type: string): TypeStyle {

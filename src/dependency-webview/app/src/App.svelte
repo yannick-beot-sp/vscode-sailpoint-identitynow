@@ -17,7 +17,7 @@
 
   function load(force: boolean = false) {
     selected = undefined;
-    promiseGraph = client.getDependencyGraph(window.data.resourceType, window.data.resourceId, force);
+    promiseGraph = client.getDependencyGraph(window.data.resourceType, window.data.resourceId, window.data.resourceName, force);
   }
 
   function startResize(event: PointerEvent) {
