@@ -28,6 +28,9 @@ export function groupKey(sourceNodeId: string, type: string): string {
     return `${sourceNodeId}::${type}`;
 }
 
+/** Types that never need a group wrapper because a single node can only ever have one such neighbor. */
+const NO_GROUP_TYPES = new Set(["public-identities-config"]);
+
 /**
  * Builds the nodes/edges to render for the current expansion state.
  *
@@ -80,6 +83,14 @@ export function buildDisplayGraph(
         }
 
         for (const [type, edgesOfType] of byType) {
+            if (NO_GROUP_TYPES.has(type)) {
+                for (const edge of edgesOfType) {
+                    edges.push({ id: edge.id, source: nodeId, target: edge.target, label: edge.label });
+                    visit(edge.target);
+                }
+                continue;
+            }
+
             const key = groupKey(nodeId, type);
             const groupNodeId = `group:${key}`;
             const expanded = expandedGroupIds.has(groupNodeId);

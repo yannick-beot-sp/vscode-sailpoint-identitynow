@@ -1,4 +1,4 @@
-import type { Client, DependencyGraphData, NodeViewState } from "./Client";
+import type { Client, DependencyGraphData, NodeViewState, ViewportState } from "./Client";
 import * as commands from "./Commands";
 import { messageHandler } from "./MessageHandler";
 import { Messenger } from "./Messenger";
@@ -7,6 +7,7 @@ interface State {
     graphs?: Record<string, DependencyGraphData>;
     nodeViewStates?: Record<string, Record<string, NodeViewState>>;
     layoutAlgorithms?: Record<string, string>;
+    viewports?: Record<string, ViewportState>;
 }
 
 function cacheKey(resourceType: string, resourceId: string): string {
@@ -15,8 +16,8 @@ function cacheKey(resourceType: string, resourceId: string): string {
 
 export class VsCodeClient implements Client {
 
-    async getDependencyGraph(resourceType: string, resourceId: string, force: boolean = false): Promise<DependencyGraphData> {
-        console.log("> VsCodeClient.getDependencyGraph", { resourceType, resourceId, force });
+    async getDependencyGraph(resourceType: string, resourceId: string, resourceName: string, force: boolean = false): Promise<DependencyGraphData> {
+        console.log("> VsCodeClient.getDependencyGraph", { resourceType, resourceId, resourceName, force });
         const key = cacheKey(resourceType, resourceId)
         const state = Messenger.getState() as State
         const cached = state?.graphs?.[key]
@@ -27,7 +28,7 @@ export class VsCodeClient implements Client {
 
         const graph = await messageHandler.request<DependencyGraphData>(
             commands.GET_DEPENDENCY_GRAPH,
-            { resourceType, resourceId })
+            { resourceType, resourceId, resourceName })
 
         const latest = Messenger.getState() as State
         Messenger.setState({
@@ -64,6 +65,21 @@ export class VsCodeClient implements Client {
         Messenger.setState({
             ...state,
             layoutAlgorithms: { ...(state?.layoutAlgorithms ?? {}), [key]: algorithm }
+        })
+    }
+
+    getViewport(resourceType: string, resourceId: string): ViewportState | undefined {
+        const key = cacheKey(resourceType, resourceId)
+        const state = Messenger.getState() as State
+        return state?.viewports?.[key]
+    }
+
+    setViewport(resourceType: string, resourceId: string, viewport: ViewportState): void {
+        const key = cacheKey(resourceType, resourceId)
+        const state = Messenger.getState() as State
+        Messenger.setState({
+            ...state,
+            viewports: { ...(state?.viewports ?? {}), [key]: viewport }
         })
     }
 }

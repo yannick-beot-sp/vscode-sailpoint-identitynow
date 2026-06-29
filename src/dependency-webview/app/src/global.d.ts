@@ -5,6 +5,7 @@ declare global {
         data: {
             resourceType: string;
             resourceId: string;
+            resourceName: string;
             label: string;
         };
     }

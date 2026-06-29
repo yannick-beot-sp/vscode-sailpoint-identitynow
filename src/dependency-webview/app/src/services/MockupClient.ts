@@ -1,4 +1,4 @@
-import type { Client, DependencyEdgeData, DependencyGraphData, DependencyNodeData, NodeViewState } from "./Client";
+import type { Client, DependencyEdgeData, DependencyGraphData, DependencyNodeData, NodeViewState, ViewportState } from "./Client";
 
 function cacheKey(resourceType: string, resourceId: string): string {
     return `${resourceType}/${resourceId}`;
@@ -54,10 +54,11 @@ export class MockupClient implements Client {
 
     private nodeViewStates: Record<string, Record<string, NodeViewState>> = {};
     private layoutAlgorithms: Record<string, string> = {};
+    private viewports: Record<string, ViewportState> = {};
 
-    async getDependencyGraph(resourceType: string, resourceId: string, force: boolean): Promise<DependencyGraphData> {
+    async getDependencyGraph(resourceType: string, resourceId: string, resourceName: string, force: boolean): Promise<DependencyGraphData> {
         await stall()
-        console.log(">getDependencyGraph", { resourceType, resourceId, force });
+        console.log(">getDependencyGraph", { resourceType, resourceId, resourceName, force });
         return buildGraph(resourceType, resourceId, window.data.label ?? resourceId);
     }
 
@@ -75,5 +76,13 @@ export class MockupClient implements Client {
 
     setLayoutAlgorithm(resourceType: string, resourceId: string, algorithm: string): void {
         this.layoutAlgorithms[cacheKey(resourceType, resourceId)] = algorithm;
+    }
+
+    getViewport(resourceType: string, resourceId: string): ViewportState | undefined {
+        return this.viewports[cacheKey(resourceType, resourceId)];
+    }
+
+    setViewport(resourceType: string, resourceId: string, viewport: ViewportState): void {
+        this.viewports[cacheKey(resourceType, resourceId)] = viewport;
     }
 }

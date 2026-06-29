@@ -3,7 +3,7 @@
   import "@xyflow/svelte/dist/style.css";
   import { untrack } from "svelte";
   import { SvelteSet } from "svelte/reactivity";
-  import type { DependencyGraphData, NodeViewState } from "../../services/Client";
+  import type { DependencyGraphData, NodeViewState, ViewportState } from "../../services/Client";
   import { ClientFactory } from "../../services/ClientFactory";
   import { buildDisplayGraph, type FlowNode, type FlowEdge, type FlowNodeData } from "./grouping";
   import { runElkLayout, LAYOUT_ALGORITHMS, type LayoutAlgorithm } from "./layout";
@@ -44,11 +44,19 @@
     LAYOUT_ALGORITHMS.some(o => o.value === savedLayoutAlgorithm) ? savedLayoutAlgorithm as LayoutAlgorithm : "layered"
   );
 
+  // Restored once on mount; when present it replaces fitView so reopening the panel shows
+  // exactly the same pan/zoom the user left it at.
+  const savedViewport = untrack(() => client.getViewport(resourceType, resourceId));
+
   let nodes = $state.raw<FlowNode[]>([]);
   let edges = $state.raw<FlowEdge[]>([]);
 
   function persistNodeViewStates() {
     client.setNodeViewStates(resourceType, resourceId, nodeViewStates);
+  }
+
+  function handleMoveEnd(_event: MouseEvent | TouchEvent | null, viewport: ViewportState) {
+    client.setViewport(resourceType, resourceId, viewport);
   }
 
   $effect(() => {
@@ -117,7 +125,8 @@
     {defaultEdgeOptions}
     {colorMode}
     {proOptions}
-    fitView
+    fitView={savedViewport === undefined}
+    initialViewport={savedViewport}
     nodesDraggable={true}
     nodesConnectable={false}
     elementsSelectable={true}
@@ -125,6 +134,7 @@
     onnodeclick={handleNodeClick}
     onnodedragstop={handleNodeDragStop}
     onpaneclick={handlePaneClick}
+    onmoveend={handleMoveEnd}
   >
     <Background />
     <Controls />
@@ -146,6 +156,13 @@
   .graph-view {
     width: 100%;
     height: 100%;
+  }
+
+  /* xyflow only ships hardcoded dark/light palettes selected via the `colorMode` class;
+     override the background var directly so it always follows the actual VS Code theme
+     instead of xyflow's built-in (and in practice always-dark) default. */
+  .graph-view :global(.svelte-flow) {
+    --xy-background-color: var(--vscode-editor-background);
   }
 
   .layout-select {

@@ -15,6 +15,8 @@ export interface DependencyNodeData {
     resourceId?: string;
     /** Extra key/values shown in the details panel */
     attributes?: Record<string, string>;
+    /** Raw underlying ISC object, shown as-is in the details panel's JSON tab */
+    data?: unknown;
 }
 
 export interface DependencyEdgeData {
@@ -40,10 +42,19 @@ export interface NodeViewState {
     expanded?: boolean;
 }
 
+/** Pan/zoom state of the graph view, so reopening a panel restores the exact same view. */
+export interface ViewportState {
+    x: number;
+    y: number;
+    zoom: number;
+}
+
 export interface Client {
-    getDependencyGraph(resourceType: string, resourceId: string, force: boolean): Promise<DependencyGraphData>
+    getDependencyGraph(resourceType: string, resourceId: string, resourceName: string, force: boolean): Promise<DependencyGraphData>
     getNodeViewStates(resourceType: string, resourceId: string): Record<string, NodeViewState> | undefined
     setNodeViewStates(resourceType: string, resourceId: string, states: Record<string, NodeViewState>): void
     getLayoutAlgorithm(resourceType: string, resourceId: string): string | undefined
     setLayoutAlgorithm(resourceType: string, resourceId: string, algorithm: string): void
+    getViewport(resourceType: string, resourceId: string): ViewportState | undefined
+    setViewport(resourceType: string, resourceId: string, viewport: ViewportState): void
 }
