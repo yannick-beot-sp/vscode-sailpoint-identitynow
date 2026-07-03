@@ -68,7 +68,15 @@ export class IdentityAttributeDependencyService extends DependencyService {
 
         for (const roleObject of roles) {
             const role = roleObject.object;
-            if (!role || !this.roleReferencesAttribute(role, attributeProperty)) {
+            if (!role) {
+                continue;
+            }
+
+            const dimensionAttributes = role.accessRequestConfig?.dimensionSchema?.dimensionAttributes ?? [];
+            const isDimensionAttribute = Boolean(role.dimensional) &&
+                dimensionAttributes.some((dimensionAttribute: any) => dimensionAttribute.name === this.resourceName);
+
+            if (!isDimensionAttribute && !this.roleReferencesAttribute(role, attributeProperty)) {
                 continue;
             }
 
@@ -80,7 +88,10 @@ export class IdentityAttributeDependencyService extends DependencyService {
                 resourceId: role.id,
                 attributes: {
                     enabled: String(role.enabled ?? false),
-                    requestable: String(role.requestable ?? false)
+                    requestable: String(role.requestable ?? false),
+                    ...(isDimensionAttribute
+                        ? { dimensionAttributes: dimensionAttributes.map((dimensionAttribute: any) => dimensionAttribute.name).join(", ") }
+                        : {})
                 },
                 data: role
             });
@@ -91,6 +102,31 @@ export class IdentityAttributeDependencyService extends DependencyService {
                 target: role.id,
                 label: "membership criteria"
             });
+
+            if (!isDimensionAttribute) {
+                continue;
+            }
+
+            const matchingDimensions = (role.dimensions ?? []).filter((dimension: any) =>
+                this.criteriaReferencesAttribute(dimension.membership?.criteria, attributeProperty));
+
+            for (const dimension of matchingDimensions) {
+                this.nodes.push({
+                    id: dimension.id,
+                    type: "dimension",
+                    label: dimension.name,
+                    description: dimension.description ?? undefined,
+                    resourceId: dimension.id,
+                    data: dimension
+                });
+
+                this.edges.push({
+                    id: `${role.id}-${dimension.id}`,
+                    source: role.id,
+                    target: dimension.id,
+                    label: "dimension membership criteria"
+                });
+            }
         }
     }
 
