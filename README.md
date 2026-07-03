@@ -295,6 +295,8 @@ The following table provides the expected column for the CSV to import Roles:
 
 `membershipCriteria` follows _kind of_ SCIM filters
 
+> NOTE: For **Dimensions**, membership criteria only supports identity attributes (no account attribute nor entitlement) and only the `eq` and `in` operators. Multiple values for the same attribute (via `or` or `in`) are grouped together, and multiple attributes are always combined with `and`. 
+
 ##### Attributes
 
 There are 3 kind of attributes:
@@ -342,6 +344,12 @@ Here are a few examples extracted from the unit tests:
 identity.department eq 'Customer Service' and identity.cloudLifecycleState eq 'active'
 'Active Directory'.entitlement.memberOf eq 'CN=Accounting,OU=Groups,OU=Demo,DC=seri,DC=sailpointdemo,DC=com' and 'Active Directory'.attribute.departmentNumber eq '1234'
 (identity.department eq 'Customer Service' and identity.cloudLifecycleState eq 'active') or (identity.cloudLifecycleState eq 'active' and identity.jobTitle co 'Accounts Payable Analyst')
+
+## For dimensions:
+identity.country eq 'FR'
+identity.country eq 'ES' or identity.country eq 'EN'
+identity.country eq 'BE' and identity.department eq 'Accounting'
+(identity.country eq 'DE' or identity.country eq 'SE') and (identity.department eq 'Accounting' or identity.department eq 'Finance')
 ```
 
 #### Metadata

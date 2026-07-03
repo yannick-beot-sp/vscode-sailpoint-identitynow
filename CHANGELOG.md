@@ -18,6 +18,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Fixed
 
+- Issue when importing dimension criteria with criteria on several identity attributes.
+
 ### Removed
 
 ## [1.3.29] - 2026-05-13
