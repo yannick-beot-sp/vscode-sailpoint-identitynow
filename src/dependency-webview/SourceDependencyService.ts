@@ -33,14 +33,18 @@ export class SourceDependencyService extends DependencyService {
             [
                 ExportPayloadV2025IncludeTypesV2025.Transform,
                 ExportPayloadV2025IncludeTypesV2025.IdentityProfile,
+                ExportPayloadV2025IncludeTypesV2025.Role,
             ]
         )
 
-        const data = await exporter.exportConfigWithProgression();
+        const [data, accessProfileIds] = await Promise.all([
+            exporter.exportConfigWithProgression(),
+            this.filterAccessProfile(),
+            this.filterApplication()
+        ]);
         this.filterTransform(data);
         this.filterIdentityProfile(data);
-        await this.filterAccessProfile();
-        await this.filterApplication();
+        this.filterRole(data, accessProfileIds);
 
         return {
             rootId: DependencyService.rootId,
@@ -170,14 +174,18 @@ export class SourceDependencyService extends DependencyService {
     }
 
     /**
-     * fetched through the access profiles endpoint instead.
+     * fetched through the access profiles endpoint instead. Returns the ids of the access
+     * profiles found, so filterRole can tell which roles use one of them without querying the
+     * access profiles endpoint again.
      */
-    private async filterAccessProfile() {
-        const response = await this.client.getAccessProfiles({
-            filters: `source.id eq "${this.resourceId}"`
-        });
+    private async filterAccessProfile(): Promise<Set<string>> {
+        const accessProfiles = await this.client.getAllAccessProfiles(`source.id eq "${this.resourceId}"`);
 
-        for (const accessProfile of response.data ?? []) {
+        const accessProfileIds = new Set<string>();
+
+        for (const accessProfile of accessProfiles) {
+            accessProfileIds.add(accessProfile.id!);
+
             this.nodes.push({
                 id: accessProfile.id!,
                 type: "access-profile",
@@ -198,15 +206,78 @@ export class SourceDependencyService extends DependencyService {
                 label: "access profile"
             });
         }
+
+        return accessProfileIds;
+    }
+
+    /**
+     * A role references this source either directly, through an entitlement of this source
+     * listed in its criteria, or indirectly, through an access profile of this source it grants.
+     * The access profile match reuses the ids collected by filterAccessProfile so the access
+     * profiles endpoint is only ever called once.
+     */
+    private filterRole(data: SpConfigExportResultsBeta | null, accessProfileIds: Set<string>) {
+        const roles = (data?.objects ?? []).filter(o => o.self?.type === "ROLE");
+
+        for (const roleObject of roles) {
+            const role = roleObject.object;
+            if (!role) {
+                continue;
+            }
+
+            const matchingEntitlements = (role.entitlements ?? [])
+                // The sp-config export encodes entitlement.sourceId as a dashed GUID
+                // (e.g. "da8b3d55-ba26-439b-90ca-abb9f3c4e6c1"), unlike the undashed source id
+                // used elsewhere (e.g. "da8b3d55ba26439b90caabb9f3c4e6c1"), so dashes must be
+                // stripped from both sides before comparing.
+                .filter((entitlement: any) => entitlement.sourceId?.replace(/-/g, "") === this.resourceId);
+            const matchingAccessProfiles = (role.accessProfiles ?? [])
+                .filter((accessProfile: any) => accessProfileIds.has(accessProfile.id));
+
+            if (matchingEntitlements.length === 0 && matchingAccessProfiles.length === 0) {
+                continue;
+            }
+
+            this.addNodeOnce({
+                id: role.id,
+                type: "role",
+                label: role.name,
+                description: role.description ?? undefined,
+                resourceId: role.id,
+                attributes: {
+                    enabled: String(role.enabled ?? false),
+                    requestable: String(role.requestable ?? false)
+                },
+                data: role
+            });
+
+            if (matchingEntitlements.length > 0) {
+                this.edges.push({
+                    id: `${DependencyService.rootId}-${role.id}`,
+                    source: DependencyService.rootId,
+                    target: role.id,
+                    label: "role entitlement"
+                });
+            }
+
+            for (const accessProfile of matchingAccessProfiles) {
+                this.edges.push({
+                    id: `${accessProfile.id}-${role.id}`,
+                    source: accessProfile.id,
+                    target: role.id,
+                    label: "role access profile"
+                });
+            }
+        }
     }
 
     /**
      * Applications referencing this source as their account source.
      */
     private async filterApplication() {
-        const response = await this.client.getPaginatedApplications(`accountSource.id eq "${this.resourceId}"`);
+        const applications = await this.client.getAllApplications(`accountSource.id eq "${this.resourceId}"`);
 
-        for (const application of response.data ?? []) {
+        for (const application of applications) {
             this.nodes.push({
                 id: application.id!,
                 type: "application",

@@ -1603,6 +1603,14 @@ export class ISCClient {
 		return response;
 	}
 
+	public async getAllAccessProfiles(filters: string): Promise<AccessProfileV2025[]> {
+		console.log("> getAllAccessProfiles", filters);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AccessProfilesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await Paginator.paginate(api, api.listAccessProfiles, { filters, sorters: "name" });
+		return result.data;
+	}
+
 	public async getAccessProfileByName(name: string): Promise<AccessProfileV2025> {
 		console.log("> getAccessProfileByName", name);
 		let filters = `name eq "${name}"`;
@@ -1922,6 +1930,14 @@ export class ISCClient {
 		return undefined
 	}
 
+
+	public async getAllApplications(filters: string): Promise<SourceAppBeta[]> {
+		console.log("> getAllApplications", filters);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AppsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await Paginator.paginate(this, this.getPaginatedApplications, { filters, sorters: "name" });
+		return result.data;
+	}
 
 	public async getPaginatedApplications(filters: string, limit?: number, offset?: number, count?: boolean): Promise<AxiosResponse<SourceAppBeta[]>> {
 		console.log("> getPaginatedApplications", filters, limit, offset);
