@@ -9,14 +9,13 @@ import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { AccessProfileNameToIdCacheService } from '../../services/cache/AccessProfileNameToIdCacheService';
 import { importMode, ImportModeType, openPreview } from '../../utils/vsCodeHelpers';
 import { isEmpty, isNotBlank } from '../../utils/stringUtils';
-import { Parser } from '../../parser/parser';
 import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService';
 import { EntitlementCacheService } from '../../services/cache/EntitlementCacheService';
 import { UserCancelledError } from '../../errors';
 import { DimensionCSVRecord } from '../../models/DimensionCsvRecord';
 import { ImportResult } from '../../models/ImportResult';
 import { RoleNameToIdCacheService } from '../../services/cache/RoleNameToIdCacheService';
-import { DimensionMembershipSelectorConverter } from '../../parser/DimensionMembershipSelectorConverter';
+import { DimensionMembershipCriteriaConverter } from '../../parser/DimensionMembershipCriteriaConverter';
 import { stringToEntitlementConverter } from '../../utils/entitlementUtils';
 
 /**
@@ -135,7 +134,7 @@ export class DimensionImporter {
         const accessProfileNameToIdCacheService = new AccessProfileNameToIdCacheService(this.client);
         const sourceCacheService = new SourceNameToIdCacheService(this.client);
         const entitlementCacheService = new EntitlementCacheService(this.client);
-        const parser = new Parser();
+        const membershipCriteriaConverter = new DimensionMembershipCriteriaConverter();
         try {
             await csvReader.processLine(async (data: DimensionCSVRecord) => {
                 if (token.isCancellationRequested) {
@@ -226,21 +225,14 @@ export class DimensionImporter {
                 let membership: DimensionMembershipSelectorV2025 | undefined = undefined;
                 if (isNotBlank(data.membershipCriteria)) {
                     try {
-                        const expression = parser.parse(data.membershipCriteria!);
-
-                        const converter = new DimensionMembershipSelectorConverter();
-                        await converter.visitExpression(expression, undefined);
+                        const criteria = membershipCriteriaConverter.convert(data.membershipCriteria!);
 
                         membership = {
                             type: RoleMembershipSelectorType.Standard,
-                            criteria: {
-                                operation: 'AND',
-                                children: [converter.root as DimensionCriteriaLevel1V2025]
-                            }
-
+                            criteria
                         };
 
-                        const usedIdentityAttributes = extractAllIdentityAttributes(converter.root as DimensionCriteriaLevel1V2025)
+                        const usedIdentityAttributes = extractAllIdentityAttributes(criteria)
                         const allowedIdentity = role.accessRequestConfig?.dimensionSchema?.dimensionAttributes?.map(x => x.name)
                         if (allowedIdentity === undefined || allowedIdentity.length === 0) {
                             result.error++;
