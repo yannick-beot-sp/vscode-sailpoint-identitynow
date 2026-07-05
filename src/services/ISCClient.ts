@@ -1935,7 +1935,7 @@ export class ISCClient {
 		console.log("> getAllApplications", filters);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new AppsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await Paginator.paginate(this, this.getPaginatedApplications, { filters, sorters: "name" });
+		const result = await Paginator.paginate(api, api.listAllSourceApp, { filters, sorters: "name" });
 		return result.data;
 	}
 
