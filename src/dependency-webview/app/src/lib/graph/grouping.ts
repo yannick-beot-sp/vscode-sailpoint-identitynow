@@ -60,6 +60,38 @@ export const OPEN_URL_DEPENDENCY_TYPES = new Set([
 ]);
 
 /**
+ * Resolves the set of node ids to display for a name filter: every node whose label contains
+ * the filter (case-insensitive) plus all of its ancestors, so each match stays connected to the
+ * root. Returns undefined when the filter is empty, meaning "show everything".
+ */
+function computeFilteredNodeIds(graph: DependencyGraphData, nameFilter?: string): Set<string> | undefined {
+    const filter = nameFilter?.trim().toLowerCase();
+    if (!filter) {
+        return undefined;
+    }
+
+    const sourcesByTarget = new Map<string, string[]>();
+    for (const edge of graph.edges) {
+        if (!sourcesByTarget.has(edge.target)) {
+            sourcesByTarget.set(edge.target, []);
+        }
+        sourcesByTarget.get(edge.target)!.push(edge.source);
+    }
+
+    const keep = new Set<string>([graph.rootId]);
+    const queue = graph.nodes.filter(n => n.label.toLowerCase().includes(filter)).map(n => n.id);
+    while (queue.length > 0) {
+        const id = queue.pop()!;
+        if (keep.has(id)) {
+            continue;
+        }
+        keep.add(id);
+        queue.push(...(sourcesByTarget.get(id) ?? []));
+    }
+    return keep;
+}
+
+/**
  * Builds the nodes/edges to render for the current expansion state.
  *
  * For every node in the graph, its outgoing neighbors are grouped by `type` into one group node
@@ -68,11 +100,17 @@ export const OPEN_URL_DEPENDENCY_TYPES = new Set([
  * additionally rendered (hanging off the group node, not the original source) and recursed into.
  * This is evaluated per-node (not hardcoded to the root) so deeper multi-hop graphs group/expand
  * the same way, even though phase-1 mock data is only one hop deep from the root.
+ *
+ * When `nameFilter` is set, only nodes whose label contains it (and their ancestors, so matches
+ * stay connected to the root) are rendered; groups on a path to a match are forced expanded and
+ * their count reflects the visible matches only.
  */
 export function buildDisplayGraph(
     graph: DependencyGraphData,
-    expandedGroupIds: ReadonlySet<string>
+    expandedGroupIds: ReadonlySet<string>,
+    nameFilter?: string
 ): { nodes: FlowNode[]; edges: FlowEdge[] } {
+    const keepIds = computeFilteredNodeIds(graph, nameFilter);
     const nodeById = new Map(graph.nodes.map(n => [n.id, n]));
     const outgoingBySource = new Map<string, DependencyEdgeData[]>();
     for (const edge of graph.edges) {
@@ -111,8 +149,13 @@ export function buildDisplayGraph(
         }
 
         for (const [type, edgesOfType] of byType) {
+            const visibleEdges = keepIds ? edgesOfType.filter(edge => keepIds.has(edge.target)) : edgesOfType;
+            if (visibleEdges.length === 0) {
+                continue;
+            }
+
             if (NO_GROUP_TYPES.has(type) || edgesOfType.every(edge => edge.noGroup)) {
-                for (const edge of edgesOfType) {
+                for (const edge of visibleEdges) {
                     edges.push({ id: edge.id, source: nodeId, target: edge.target, label: edge.label });
                     visit(edge.target);
                 }
@@ -121,8 +164,8 @@ export function buildDisplayGraph(
 
             const key = groupKey(nodeId, type);
             const groupNodeId = `group:${key}`;
-            const expanded = expandedGroupIds.has(groupNodeId);
-            const distinctTargetCount = new Set(edgesOfType.map(edge => edge.target)).size;
+            const expanded = keepIds !== undefined || expandedGroupIds.has(groupNodeId);
+            const distinctTargetCount = new Set(visibleEdges.map(edge => edge.target)).size;
 
             nodes.push({
                 id: groupNodeId,
@@ -133,7 +176,7 @@ export function buildDisplayGraph(
             edges.push({ id: `${nodeId}->${groupNodeId}`, source: nodeId, target: groupNodeId });
 
             if (expanded) {
-                for (const edge of edgesOfType) {
+                for (const edge of visibleEdges) {
                     edges.push({ id: edge.id, source: groupNodeId, target: edge.target, label: edge.label });
                     visit(edge.target);
                 }
