@@ -171,3 +171,68 @@ export function getUIUrl(tenantName: string, ...pathParts: string[]): Uri {
     );
     return targetUrl.with({ fragment });
 }
+
+/**
+ * Builds the Web UI url of an ISC resource, given its "kind" (source, workflow, role, etc.).
+ * Single source of truth for the per-resource-type path templates, consumed both by
+ * ISCTreeItem.ts's getUrl() overrides and by the dependency graph webview.
+ */
+export function getResourceWebUrl(
+    tenantName: string,
+    kind: string,
+    id: string,
+    options?: { parentId?: string; subtype?: string }
+): Uri | undefined {
+    switch (kind) {
+        case "source": return getUIUrl(tenantName, "ui/a/admin/connections/sources", id);
+        case "workflow": return getUIUrl(tenantName, "ui/wf/edit", id);
+        case "identity-profile": return getUIUrl(tenantName, "ui/ip/admin/identity-profiles", id);
+        case "lifecycle-state":
+            return options?.parentId
+                ? getUIUrl(tenantName, "ui/ip/admin/identity-profiles", options.parentId, "lifecycle-management", id)
+                : undefined;
+        case "service-desk-integration": return getUIUrl(tenantName, "ui/h/admin/connections/servicedesk", id, "edit");
+        case "access-profile": return getUIUrl(tenantName, "ui/a/admin/access/access-profiles/manage", id);
+        case "role": return getUIUrl(tenantName, "ui/a/admin/access/roles/manage", id);
+        case "dimension":
+            return options?.parentId
+                ? getUIUrl(tenantName, "ui/a/admin/access/roles/manage", options.parentId, "dimensions", id, "basic-config")
+                : undefined;
+        case "form-definition": return getUIUrl(tenantName, "ui/a/admin/globals/forms/edit", id);
+        case "identity": return getUIUrl(tenantName, "ui/a/admin/identities", id, "details/attributes");
+        case "machine-identity":
+            return getUIUrl(tenantName, `ui/a/admin/${options?.subtype === "AI Agent" ? "ai-agents" : "machine-identities"}`, id, "details");
+        case "application": return getUIUrl(tenantName, "ui/admin", `#admin:apps:${id}`);
+        case "campaign": return getUIUrl(tenantName, "ui/a/admin/certifications/campaigns-list/all-campaigns", id);
+        default: return undefined;
+    }
+}
+
+const IDN_RESOURCE_TYPE_BY_KIND: Record<string, string> = {
+    source: "sources", transform: "transforms", workflow: "workflows",
+    "identity-profile": "identity-profiles", role: "roles",
+    "access-profile": "access-profiles", application: "source-apps",
+    "identity-attribute": "identity-attributes",
+};
+
+/**
+ * Builds the internal idn:// Uri of an ISC resource, given its "kind". Single source of truth
+ * for resourceType/sub-resource path building, consumed by the dependency graph webview.
+ */
+export function getResourceUriByKind(
+    tenantName: string, kind: string, id: string, label: string,
+    options?: { parentId?: string; usageType?: string }
+): Uri | undefined {
+    if (kind === "dimension") {
+        if (!options?.parentId) return undefined;
+        const parentUri = getResourceUri(tenantName, "roles", options.parentId, label);
+        return parentUri.with({ path: posix.join(getPathByUri(parentUri) || "", "dimensions", id, label) });
+    }
+    if (kind === "provisioning-policy") {
+        if (!options?.parentId || !options?.usageType) return undefined;
+        const parentUri = getResourceUri(tenantName, "sources", options.parentId, label);
+        return parentUri.with({ path: posix.join(getPathByUri(parentUri) || "", "provisioning-policies", options.usageType, label) });
+    }
+    const resourceType = IDN_RESOURCE_TYPE_BY_KIND[kind];
+    return resourceType ? getResourceUri(tenantName, resourceType, id, label) : undefined;
+}

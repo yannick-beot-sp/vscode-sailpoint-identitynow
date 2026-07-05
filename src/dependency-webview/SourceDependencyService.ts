@@ -213,6 +213,9 @@ export class SourceDependencyService extends DependencyService {
     /**
      * A role references this source either directly, through an entitlement of this source
      * listed in its criteria, or indirectly, through an access profile of this source it grants.
+     * Either way the role is attached straight to the root, and any access profile it grants gets
+     * its own edge from the role, so a role reached only through an access profile still shows up
+     * as a direct child of the source instead of being nested under the access profile.
      * The access profile match reuses the ids collected by filterAccessProfile so the access
      * profiles endpoint is only ever called once.
      */
@@ -251,20 +254,18 @@ export class SourceDependencyService extends DependencyService {
                 data: role
             });
 
-            if (matchingEntitlements.length > 0) {
-                this.edges.push({
-                    id: `${DependencyService.rootId}-${role.id}`,
-                    source: DependencyService.rootId,
-                    target: role.id,
-                    label: "role entitlement"
-                });
-            }
+            this.edges.push({
+                id: `${DependencyService.rootId}-${role.id}`,
+                source: DependencyService.rootId,
+                target: role.id,
+                label: matchingEntitlements.length > 0 ? "role entitlement" : "role access profile"
+            });
 
             for (const accessProfile of matchingAccessProfiles) {
                 this.edges.push({
-                    id: `${accessProfile.id}-${role.id}`,
-                    source: accessProfile.id,
-                    target: role.id,
+                    id: `${role.id}-${accessProfile.id}`,
+                    source: role.id,
+                    target: accessProfile.id,
                     label: "role access profile"
                 });
             }

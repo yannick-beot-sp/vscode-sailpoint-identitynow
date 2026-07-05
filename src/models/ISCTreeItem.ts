@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import * as path from 'path';
 import { ISCClient, TOTAL_COUNT_HEADER } from "../services/ISCClient";
-import { getIdByUri, getPathByUri, getResourceUri, getUIUrl } from "../utils/UriUtils";
+import { getIdByUri, getPathByUri, getResourceUri, getResourceWebUrl, getUIUrl } from "../utils/UriUtils";
 import { compareByLabel, compareByName, compareByPriority } from "../utils";
 import { AxiosHeaders, AxiosResponse } from "axios";
 import { getConfigNumber } from '../utils/configurationUtils';
@@ -348,7 +348,7 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 	}
 
 	getUrl(): vscode.Uri | undefined {
-		return getUIUrl(this.tenantName, "ui/a/admin/connections/sources", this.id)
+		return getResourceWebUrl(this.tenantName, "source", this.id as string)
 	}
 }
 
@@ -658,7 +658,7 @@ export class WorkflowTreeItem extends ISCResourceTreeItem {
 	}
 
 	getUrl(): vscode.Uri | undefined {
-		return getUIUrl(this.tenantName, "ui/wf/edit", this.resourceId)
+		return getResourceWebUrl(this.tenantName, "workflow", this.resourceId)
 	}
 }
 
@@ -744,7 +744,7 @@ export class IdentityProfileTreeItem extends ISCResourceTreeItem {
 	}
 
 	getUrl(): vscode.Uri | undefined {
-		return getUIUrl(this.tenantName, "ui/ip/admin/identity-profiles", this.id)
+		return getResourceWebUrl(this.tenantName, "identity-profile", this.id as string)
 	}
 }
 
@@ -780,7 +780,7 @@ export class LifecycleStateTreeItem extends ISCResourceTreeItem {
 	contextValue = "lifecycle-state";
 
 	getUrl(): vscode.Uri | undefined {
-		return getUIUrl(this.tenantName, "ui/ip/admin/identity-profiles", this.parentId, "lifecycle-management", this.id)
+		return getResourceWebUrl(this.tenantName, "lifecycle-state", this.id as string, { parentId: this.parentId })
 	}
 }
 
@@ -834,7 +834,7 @@ export class ServiceDeskTreeItem extends ISCResourceTreeItem {
 	iconPath = new vscode.ThemeIcon("gear");
 
 	getUrl(): vscode.Uri | undefined {
-		return getUIUrl(this.tenantName, "ui/h/admin/connections/servicedesk", this.id, "edit")
+		return getResourceWebUrl(this.tenantName, "service-desk-integration", this.id as string)
 	}
 }
 
@@ -1030,7 +1030,7 @@ export class AccessProfileTreeItem extends ISCResourceTreeItem {
 	iconPath = new vscode.ThemeIcon("archive");
 
 	getUrl(): vscode.Uri | undefined {
-		return getUIUrl(this.tenantName, "ui/a/admin/access/access-profiles/manage", this.id)
+		return getResourceWebUrl(this.tenantName, "access-profile", this.id as string)
 	}
 }
 
@@ -1108,7 +1108,7 @@ export class RoleTreeItem extends PageableFolderTreeItem<DimensionV2025> {
 	iconPath = new vscode.ThemeIcon("account")
 
 	getUrl(): vscode.Uri | undefined {
-		return getUIUrl(this.tenantName, "ui/a/admin/access/roles/manage", this.id!)
+		return getResourceWebUrl(this.tenantName, "role", this.id!)
 	}
 
 	protected async loadNext(): Promise<AxiosResponse<DimensionV2025[]>> {
@@ -1167,13 +1167,7 @@ export class DimensionTreeItem extends ISCResourceTreeItem {
 	iconPath = new vscode.ThemeIcon("list-tree");
 
 	getUrl(): vscode.Uri | undefined {
-		return getUIUrl(this.tenantName,
-			"ui/a/admin/access/roles/manage",
-			this.parentId,
-			"dimensions",
-			this.id,
-			"basic-config",
-		)
+		return getResourceWebUrl(this.tenantName, "dimension", this.id as string, { parentId: this.parentId })
 	}
 
 }
@@ -1279,7 +1273,7 @@ export class FormTreeItem extends ISCResourceTreeItem {
 
 	iconPath = new vscode.ThemeIcon("preview");
 	getUrl(): vscode.Uri | undefined {
-		return getUIUrl(this.tenantName, "ui/a/admin/globals/forms/edit", this.resourceId)
+		return getResourceWebUrl(this.tenantName, "form-definition", this.resourceId)
 	}
 }
 
@@ -1454,7 +1448,7 @@ export class IdentityTreeItem extends ISCResourceTreeItem {
 	iconPath = new vscode.ThemeIcon("person");
 
 	getUrl(): vscode.Uri | undefined {
-		return getUIUrl(this.tenantName, "ui/a/admin/identities", this.id, "details/attributes")
+		return getResourceWebUrl(this.tenantName, "identity", this.id as string)
 	}
 }
 
@@ -1514,8 +1508,7 @@ export class MachineIdentityTreeItem extends ISCResourceTreeItem {
 	iconPath = new vscode.ThemeIcon("window");
 
 	getUrl(): vscode.Uri | undefined {
-		const segment = this.subtype === "AI Agent" ? "ai-agents" : "machine-identities";
-		return getUIUrl(this.tenantName, `ui/a/admin/${segment}`, this.resourceId, "details");
+		return getResourceWebUrl(this.tenantName, "machine-identity", this.resourceId, { subtype: this.subtype })
 	}
 
 	updateIcon(context: vscode.ExtensionContext): void {
@@ -1674,7 +1667,7 @@ export class ApplicationTreeItem extends ISCResourceTreeItem implements Pageable
 	}
 
 	getUrl(): vscode.Uri | undefined {
-		return getUIUrl(this.tenantName, "ui/admin", `#admin:apps:${this.id}`)
+		return getResourceWebUrl(this.tenantName, "application", this.id as string)
 	}
 }
 
@@ -1798,7 +1791,7 @@ export class CampaignTreeItem extends ISCResourceTreeItem {
 	}
 
 	getUrl(): vscode.Uri | undefined {
-		return getUIUrl(this.tenantName, "ui/a/admin/certifications/campaigns-list/all-campaigns", this.id)
+		return getResourceWebUrl(this.tenantName, "campaign", this.id as string)
 	}
 }
 
