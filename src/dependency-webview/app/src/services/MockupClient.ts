@@ -66,6 +66,14 @@ export class MockupClient implements Client {
         console.log(">viewNodeDependencies", { resourceType, resourceId, resourceName });
     }
 
+    openNodeResource(node: DependencyNodeData, parentId?: string): void {
+        console.log(">openNodeResource", { node, parentId });
+    }
+
+    openNodeResourceUrl(node: DependencyNodeData, parentId?: string): void {
+        console.log(">openNodeResourceUrl", { node, parentId });
+    }
+
     getNodeViewStates(resourceType: string, resourceId: string): Record<string, NodeViewState> | undefined {
         return this.nodeViewStates[cacheKey(resourceType, resourceId)];
     }

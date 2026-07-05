@@ -1,4 +1,4 @@
-import type { Client, DependencyGraphData, NodeViewState, ViewportState } from "./Client";
+import type { Client, DependencyGraphData, DependencyNodeData, NodeViewState, ViewportState } from "./Client";
 import * as commands from "./Commands";
 import { messageHandler } from "./MessageHandler";
 import { Messenger } from "./Messenger";
@@ -40,6 +40,14 @@ export class VsCodeClient implements Client {
 
     viewNodeDependencies(resourceType: string, resourceId: string, resourceName: string): void {
         messageHandler.send(commands.VIEW_NODE_DEPENDENCIES, { resourceType, resourceId, resourceName })
+    }
+
+    openNodeResource(node: DependencyNodeData, parentId?: string): void {
+        messageHandler.send(commands.OPEN_NODE_RESOURCE, { node, parentId })
+    }
+
+    openNodeResourceUrl(node: DependencyNodeData, parentId?: string): void {
+        messageHandler.send(commands.OPEN_NODE_RESOURCE_URL, { node, parentId })
     }
 
     getNodeViewStates(resourceType: string, resourceId: string): Record<string, NodeViewState> | undefined {

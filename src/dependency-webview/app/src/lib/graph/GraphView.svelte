@@ -5,11 +5,12 @@
   import { SvelteSet } from "svelte/reactivity";
   import type { DependencyGraphData, NodeViewState, ViewportState } from "../../services/Client";
   import { ClientFactory } from "../../services/ClientFactory";
-  import { buildDisplayGraph, VIEWABLE_DEPENDENCY_TYPES, type FlowNode, type FlowEdge, type FlowNodeData } from "./grouping";
+  import { buildDisplayGraph, VIEWABLE_DEPENDENCY_TYPES, OPEN_RESOURCE_DEPENDENCY_TYPES, OPEN_URL_DEPENDENCY_TYPES, type DependencyFlowNodeData, type FlowNode, type FlowEdge, type FlowNodeData } from "./grouping";
   import { runTreeLayout, LAYOUT_ALGORITHMS, type LayoutAlgorithm } from "./layout";
   import DependencyNode from "./DependencyNode.svelte";
   import GroupNode from "./GroupNode.svelte";
   import FloatingEdge from "./FloatingEdge.svelte";
+  import Search from "../svgs/search.svelte";
 
   let { graph, resourceType, resourceId, onSelectNode }: {
     graph: DependencyGraphData;
@@ -51,7 +52,23 @@
   let nodes = $state.raw<FlowNode[]>([]);
   let edges = $state.raw<FlowEdge[]>([]);
 
-  let contextMenu = $state<{ x: number; y: number; data: FlowNodeData } | undefined>(undefined);
+  let searchOpen = $state(false);
+  let nameFilter = $state("");
+
+  function toggleSearch() {
+    searchOpen = !searchOpen;
+    if (!searchOpen) {
+      nameFilter = "";
+    }
+  }
+
+  function focusOnMount(input: HTMLInputElement) {
+    input.focus();
+  }
+
+  // $state.raw (not deeply-proxied $state): `data.node` is forwarded as-is to postMessage when
+  // opening a resource, and a reactive Proxy cannot be structured-cloned across the webview bridge.
+  let contextMenu = $state.raw<{ x: number; y: number; data: DependencyFlowNodeData } | undefined>(undefined);
 
   function persistNodeViewStates() {
     client.setNodeViewStates(resourceType, resourceId, nodeViewStates);
@@ -66,7 +83,7 @@
   });
 
   $effect(() => {
-    const { nodes: rawNodes, edges: rawEdges } = buildDisplayGraph(graph, expandedGroupIds);
+    const { nodes: rawNodes, edges: rawEdges } = buildDisplayGraph(graph, expandedGroupIds, nameFilter);
 
     const decoratedNodes: FlowNode[] = rawNodes.map(n => {
       if (n.data.kind !== "group") {
@@ -111,9 +128,21 @@
     contextMenu = undefined;
   }
 
+  /** Resolves a node's parent id from the raw graph edges (dimensions/provisioning policies have exactly one owner). */
+  function findParentId(nodeId: string): string | undefined {
+    return graph.edges.find(edge => edge.target === nodeId)?.source;
+  }
+
   function handleNodeContextMenu({ event, node }: { event: MouseEvent; node: FlowNode }) {
     event.preventDefault();
-    if (node.data.kind !== "dependency" || !VIEWABLE_DEPENDENCY_TYPES.has(node.data.node.type)) {
+    if (node.data.kind !== "dependency") {
+      contextMenu = undefined;
+      return;
+    }
+    const { type } = node.data.node;
+    if (!VIEWABLE_DEPENDENCY_TYPES.has(type)
+      && !OPEN_RESOURCE_DEPENDENCY_TYPES.has(type)
+      && !OPEN_URL_DEPENDENCY_TYPES.has(type)) {
       contextMenu = undefined;
       return;
     }
@@ -121,9 +150,35 @@
   }
 
   function handleViewDependencies() {
-    if (contextMenu?.data.kind === "dependency") {
+    if (contextMenu) {
       const { type, resourceId, id, label } = contextMenu.data.node;
       client.viewNodeDependencies(type, resourceId ?? id, label);
+    }
+    contextMenu = undefined;
+  }
+
+  /**
+   * xyflow keeps its own reactive copy of the nodes it renders, so the `node` handed to us by its
+   * event handlers is wrapped in a Proxy we don't control (independent of our own `$state.raw`
+   * usage) — and a Proxy cannot be structured-cloned by `postMessage`. Round-tripping through
+   * JSON strips any such wrapper and guarantees a plain, cloneable object.
+   */
+  function toPlainNode(node: DependencyFlowNodeData["node"]): DependencyFlowNodeData["node"] {
+    return JSON.parse(JSON.stringify(node));
+  }
+
+  function handleOpenResource() {
+    if (contextMenu) {
+      const node = toPlainNode(contextMenu.data.node);
+      client.openNodeResource(node, findParentId(node.id));
+    }
+    contextMenu = undefined;
+  }
+
+  function handleOpenUrl() {
+    if (contextMenu) {
+      const node = toPlainNode(contextMenu.data.node);
+      client.openNodeResourceUrl(node, findParentId(node.id));
     }
     contextMenu = undefined;
   }
@@ -162,21 +217,59 @@
     <Controls />
     <MiniMap />
     <Panel position="top-left">
-      <label class="layout-select">
-        Layout:
-        <select bind:value={layoutAlgorithm}>
-          {#each LAYOUT_ALGORITHMS as option (option.value)}
-            <option value={option.value}>{option.label}</option>
-          {/each}
-        </select>
-      </label>
+      <div class="graph-toolbar">
+        <label class="layout-select">
+          Layout:
+          <select bind:value={layoutAlgorithm}>
+            {#each LAYOUT_ALGORITHMS as option (option.value)}
+              <option value={option.value}>{option.label}</option>
+            {/each}
+          </select>
+        </label>
+        <div class="search-bar">
+          <button
+            class="icon-button"
+            class:active={searchOpen}
+            onclick={toggleSearch}
+            title={searchOpen ? "Hide name filter" : "Filter nodes by name"}
+            aria-label={searchOpen ? "Hide name filter" : "Filter nodes by name"}
+          >
+            <Search />
+          </button>
+          {#if searchOpen}
+            <input
+              class="search-input"
+              type="text"
+              placeholder="Filter by name"
+              bind:value={nameFilter}
+              use:focusOnMount
+              onkeydown={(event) => { if (event.key === "Escape") toggleSearch(); }}
+            />
+            <button
+              class="icon-button"
+              onclick={() => (nameFilter = "")}
+              disabled={nameFilter === ""}
+              title="Clear filter"
+              aria-label="Clear filter"
+            >✕</button>
+          {/if}
+        </div>
+      </div>
     </Panel>
   </SvelteFlow>
 
   {#if contextMenu}
     <button class="context-menu-backdrop" aria-label="Close menu" onclick={() => (contextMenu = undefined)}></button>
     <ul class="context-menu" style="left: {contextMenu.x}px; top: {contextMenu.y}px">
-      <li><button onclick={handleViewDependencies}>View dependencies</button></li>
+      {#if VIEWABLE_DEPENDENCY_TYPES.has(contextMenu.data.node.type)}
+        <li><button onclick={handleViewDependencies}>View dependencies</button></li>
+      {/if}
+      {#if OPEN_RESOURCE_DEPENDENCY_TYPES.has(contextMenu.data.node.type)}
+        <li><button onclick={handleOpenResource}>Open</button></li>
+      {/if}
+      {#if OPEN_URL_DEPENDENCY_TYPES.has(contextMenu.data.node.type)}
+        <li><button onclick={handleOpenUrl}>Open in Web UI</button></li>
+      {/if}
     </ul>
   {/if}
 </div>
@@ -194,6 +287,13 @@
     --xy-background-color: var(--vscode-editor-background);
   }
 
+  .graph-toolbar {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
   .layout-select {
     display: flex;
     align-items: center;
@@ -204,6 +304,58 @@
     border-radius: 4px;
     padding: 4px 8px;
     font-size: 12px;
+  }
+
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--vscode-editorWidget-background, #252526);
+    color: var(--vscode-editorWidget-foreground, #ccc);
+    border: 1px solid var(--vscode-editorWidget-border, #454545);
+    border-radius: 4px;
+    padding: 3px 4px;
+    font-size: 12px;
+  }
+
+  .icon-button {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 12px;
+    padding: 3px 4px;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  .icon-button:hover:not(:disabled) {
+    background: var(--vscode-toolbar-hoverBackground, rgba(90, 93, 94, 0.31));
+  }
+
+  .icon-button:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  .icon-button.active {
+    background: var(--vscode-toolbar-activeBackground, rgba(99, 102, 103, 0.31));
+  }
+
+  .search-input {
+    width: 160px;
+    background: var(--vscode-input-background, #3c3c3c);
+    color: var(--vscode-input-foreground, #f0f0f0);
+    border: 1px solid var(--vscode-input-border, #3c3c3c);
+    border-radius: 2px;
+    padding: 2px 6px;
+    font-size: 12px;
+  }
+
+  .search-input:focus {
+    outline: 1px solid var(--vscode-focusBorder, #007fd4);
+    outline-offset: -1px;
   }
 
   select {
