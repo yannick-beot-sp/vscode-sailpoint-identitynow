@@ -215,7 +215,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 					JSON.stringify(jsonpatch)
 				);
 
-			} else if (resourcePath.match("identity-profiles|machine-identities|source-subtypes|access-profiles|roles|search-attribute-config|source-apps|campaigns|\/org-config")) {
+			} else if (resourcePath.match("identity-profiles|machine-identities|source-subtypes|access-profiles|roles|search-attribute-config|source-apps|campaigns|criteria-config\/privilege|\/org-config")) {
 				// special treatment to use PATCH method as PUT is not supported
 				let oldData
 				// special case for applications
@@ -280,6 +280,9 @@ export class ISCResourceProvider implements FileSystemProvider {
 					const campaignPatchableProperties = ["/name", "/description", "/recommendationsEnabled", "/deadline", "/emailNotificationEnabled", "/autoRevokeAllowed"]
 					// @ts-ignore
 					jsonpatch = jsonpatch.filter(p => campaignPatchableProperties.includes(p.path))
+				} else if (resourcePath.match("criteria-config\/privilege")) {
+					// Only the fields under /config are patchable
+					jsonpatch = jsonpatch.filter(p => p.path.startsWith("/config"))
 				}
 
 				await client.patchResource(

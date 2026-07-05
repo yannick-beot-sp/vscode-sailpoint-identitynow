@@ -1,0 +1,110 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://developer.sailpoint.com/schemas/privilege-classification.json",
+  "title": "Privilege Criteria Configuration",
+  "description": "The privilege criteria configuration applied to a source.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Id of the privilege criteria configuration. This is read-only.",
+      "example": "08f64b08-46e1-4ce7-8136-69b99b1b3ee1"
+    },
+    "sourceId": {
+      "type": "string",
+      "description": "The Id of the source that the criteria configuration is applied to. This is read-only.",
+      "minLength": 32,
+      "maxLength": 32,
+      "example": "c42c45d8d7c04d2da64d215cd8c32f21"
+    },
+    "config": {
+      "type": "object",
+      "description": "The configuration settings for privilege criteria evaluation.",
+      "additionalProperties": true,
+      "properties": {
+        "globalPrivilegeLevelEnabled": {
+          "type": "boolean",
+          "description": "Indicates whether the global privilege level is enabled.",
+          "example": true
+        },
+        "privilegeClassificationMode": {
+          "type": "string",
+          "description": "The privilege classification mode.",
+          "enum": [
+            "SINGLE_PRIVILEGE_LEVEL",
+            "CRITERIA_PRIVILEGE_LEVEL"
+          ],
+          "example": "CRITERIA_PRIVILEGE_LEVEL"
+        },
+        "singlePrivilegeLevel": {
+          "type": "object",
+          "description": "The privilege level applied when the classification mode is SINGLE_PRIVILEGE_LEVEL.",
+          "additionalProperties": true,
+          "properties": {
+            "privilegeLevel": {
+              "type": "string",
+              "description": "The privilege level.",
+              "enum": [
+                "LOW",
+                "MEDIUM",
+                "HIGH"
+              ],
+              "example": "LOW"
+            }
+          }
+        },
+        "criteriaPrivilegeLevel": {
+          "type": "object",
+          "description": "The criteria used to evaluate the privilege level when the classification mode is CRITERIA_PRIVILEGE_LEVEL.",
+          "additionalProperties": true,
+          "properties": {
+            "connectorHighEnabled": {
+              "type": "boolean",
+              "description": "Indicates whether the connector high privilege criteria are enabled.",
+              "example": true
+            },
+            "connectorMediumEnabled": {
+              "type": "boolean",
+              "description": "Indicates whether the connector medium privilege criteria are enabled.",
+              "example": true
+            },
+            "connectorLowEnabled": {
+              "type": "boolean",
+              "description": "Indicates whether the connector low privilege criteria are enabled.",
+              "example": true
+            },
+            "customHighEnabled": {
+              "type": "boolean",
+              "description": "Indicates whether the custom high privilege criteria are enabled.",
+              "example": false
+            },
+            "customMediumEnabled": {
+              "type": "boolean",
+              "description": "Indicates whether the custom medium privilege criteria are enabled.",
+              "example": false
+            },
+            "customLowEnabled": {
+              "type": "boolean",
+              "description": "Indicates whether the custom low privilege criteria are enabled.",
+              "example": false
+            }
+          }
+        }
+      }
+    },
+    "created": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The date and time when the privilege criteria configuration was created. This is read-only.",
+      "example": "2024-01-10T12:00:00Z"
+    },
+    "modified": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The date and time when the privilege criteria configuration was last modified. This is read-only.",
+      "example": "2024-01-15T12:00:00Z"
+    }
+  }
+}

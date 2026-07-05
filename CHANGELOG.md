@@ -10,6 +10,11 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- Add support for Machine Identities
+- Add support for Machine Account Subtypes
+- Add support for Privilege Classification and Criteria
+- Add dependency graph for Sources, Transforms, and Identity Attributes
+
 ### Changed
 
 - Order dimensions by name
