@@ -5,7 +5,7 @@
   import { SvelteSet } from "svelte/reactivity";
   import type { DependencyGraphData, NodeViewState, ViewportState } from "../../services/Client";
   import { ClientFactory } from "../../services/ClientFactory";
-  import { buildDisplayGraph, VIEWABLE_DEPENDENCY_TYPES, type FlowNode, type FlowEdge, type FlowNodeData } from "./grouping";
+  import { buildDisplayGraph, VIEWABLE_DEPENDENCY_TYPES, OPEN_RESOURCE_DEPENDENCY_TYPES, OPEN_URL_DEPENDENCY_TYPES, type DependencyFlowNodeData, type FlowNode, type FlowEdge, type FlowNodeData } from "./grouping";
   import { runTreeLayout, LAYOUT_ALGORITHMS, type LayoutAlgorithm } from "./layout";
   import DependencyNode from "./DependencyNode.svelte";
   import GroupNode from "./GroupNode.svelte";
@@ -51,7 +51,9 @@
   let nodes = $state.raw<FlowNode[]>([]);
   let edges = $state.raw<FlowEdge[]>([]);
 
-  let contextMenu = $state<{ x: number; y: number; data: FlowNodeData } | undefined>(undefined);
+  // $state.raw (not deeply-proxied $state): `data.node` is forwarded as-is to postMessage when
+  // opening a resource, and a reactive Proxy cannot be structured-cloned across the webview bridge.
+  let contextMenu = $state.raw<{ x: number; y: number; data: DependencyFlowNodeData } | undefined>(undefined);
 
   function persistNodeViewStates() {
     client.setNodeViewStates(resourceType, resourceId, nodeViewStates);
@@ -111,9 +113,21 @@
     contextMenu = undefined;
   }
 
+  /** Resolves a node's parent id from the raw graph edges (dimensions/provisioning policies have exactly one owner). */
+  function findParentId(nodeId: string): string | undefined {
+    return graph.edges.find(edge => edge.target === nodeId)?.source;
+  }
+
   function handleNodeContextMenu({ event, node }: { event: MouseEvent; node: FlowNode }) {
     event.preventDefault();
-    if (node.data.kind !== "dependency" || !VIEWABLE_DEPENDENCY_TYPES.has(node.data.node.type)) {
+    if (node.data.kind !== "dependency") {
+      contextMenu = undefined;
+      return;
+    }
+    const { type } = node.data.node;
+    if (!VIEWABLE_DEPENDENCY_TYPES.has(type)
+      && !OPEN_RESOURCE_DEPENDENCY_TYPES.has(type)
+      && !OPEN_URL_DEPENDENCY_TYPES.has(type)) {
       contextMenu = undefined;
       return;
     }
@@ -121,9 +135,35 @@
   }
 
   function handleViewDependencies() {
-    if (contextMenu?.data.kind === "dependency") {
+    if (contextMenu) {
       const { type, resourceId, id, label } = contextMenu.data.node;
       client.viewNodeDependencies(type, resourceId ?? id, label);
+    }
+    contextMenu = undefined;
+  }
+
+  /**
+   * xyflow keeps its own reactive copy of the nodes it renders, so the `node` handed to us by its
+   * event handlers is wrapped in a Proxy we don't control (independent of our own `$state.raw`
+   * usage) — and a Proxy cannot be structured-cloned by `postMessage`. Round-tripping through
+   * JSON strips any such wrapper and guarantees a plain, cloneable object.
+   */
+  function toPlainNode(node: DependencyFlowNodeData["node"]): DependencyFlowNodeData["node"] {
+    return JSON.parse(JSON.stringify(node));
+  }
+
+  function handleOpenResource() {
+    if (contextMenu) {
+      const node = toPlainNode(contextMenu.data.node);
+      client.openNodeResource(node, findParentId(node.id));
+    }
+    contextMenu = undefined;
+  }
+
+  function handleOpenUrl() {
+    if (contextMenu) {
+      const node = toPlainNode(contextMenu.data.node);
+      client.openNodeResourceUrl(node, findParentId(node.id));
     }
     contextMenu = undefined;
   }
@@ -176,7 +216,15 @@
   {#if contextMenu}
     <button class="context-menu-backdrop" aria-label="Close menu" onclick={() => (contextMenu = undefined)}></button>
     <ul class="context-menu" style="left: {contextMenu.x}px; top: {contextMenu.y}px">
-      <li><button onclick={handleViewDependencies}>View dependencies</button></li>
+      {#if VIEWABLE_DEPENDENCY_TYPES.has(contextMenu.data.node.type)}
+        <li><button onclick={handleViewDependencies}>View dependencies</button></li>
+      {/if}
+      {#if OPEN_RESOURCE_DEPENDENCY_TYPES.has(contextMenu.data.node.type)}
+        <li><button onclick={handleOpenResource}>Open</button></li>
+      {/if}
+      {#if OPEN_URL_DEPENDENCY_TYPES.has(contextMenu.data.node.type)}
+        <li><button onclick={handleOpenUrl}>Open in Web UI</button></li>
+      {/if}
     </ul>
   {/if}
 </div>

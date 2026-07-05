@@ -41,6 +41,25 @@ const NO_GROUP_TYPES = new Set(["public-identities-config"]);
 export const VIEWABLE_DEPENDENCY_TYPES = new Set(["identity-attribute", "transform", "source"]);
 
 /**
+ * Node types whose underlying ISC object can be opened in the editor (mirrors the tree items
+ * with a `.uri` in ISCTreeItem.ts). "dimension" and "provisioning-policy" additionally need
+ * their parent node's id to build a valid uri, resolved from the graph's edges by GraphView.
+ */
+export const OPEN_RESOURCE_DEPENDENCY_TYPES = new Set([
+  "source", "transform", "workflow", "identity-profile", "role", "dimension",
+  "access-profile", "application", "identity-attribute", "provisioning-policy"
+]);
+
+/**
+ * Node types whose underlying ISC object has a Web UI page, i.e. whose corresponding tree item
+ * overrides `getUrl()` in ISCTreeItem.ts. Notably excludes "transform", "identity-attribute" and
+ * "provisioning-policy", which have no Web UI page of their own.
+ */
+export const OPEN_URL_DEPENDENCY_TYPES = new Set([
+  "source", "workflow", "identity-profile", "role", "dimension", "access-profile", "application"
+]);
+
+/**
  * Builds the nodes/edges to render for the current expansion state.
  *
  * For every node in the graph, its outgoing neighbors are grouped by `type` into one group node

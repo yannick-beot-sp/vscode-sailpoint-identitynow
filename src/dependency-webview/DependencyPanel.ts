@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import * as commands from './app/src/services/Commands';
 import { BaseWebviewPanel } from '../webview/BaseWebviewPanel';
 import { DependencyServiceFactory } from './DependencyServiceFactory';
+import { getDependencyNodeUri, getDependencyNodeUrl } from './DependencyNodeResource';
+import { openPreview } from '../utils/vsCodeHelpers';
 
 function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
     return {
@@ -132,6 +134,20 @@ export class DependencyPanel extends BaseWebviewPanel {
                     payload.resourceName
                 );
                 return;
+            case commands.OPEN_NODE_RESOURCE: {
+                const uri = getDependencyNodeUri(this.tenantName, payload.node, payload.parentId);
+                if (uri) {
+                    await openPreview(uri);
+                }
+                return;
+            }
+            case commands.OPEN_NODE_RESOURCE_URL: {
+                const url = getDependencyNodeUrl(this.tenantName, payload.node, payload.parentId);
+                if (url) {
+                    await vscode.env.openExternal(url);
+                }
+                return;
+            }
         }
     }
 }

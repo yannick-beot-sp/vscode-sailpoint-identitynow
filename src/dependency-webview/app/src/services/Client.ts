@@ -55,6 +55,10 @@ export interface Client {
     getDependencyGraph(resourceType: string, resourceId: string, resourceName: string, force: boolean): Promise<DependencyGraphData>
     /** Opens a new dependency graph panel rooted on the given node. */
     viewNodeDependencies(resourceType: string, resourceId: string, resourceName: string): void
+    /** Opens the underlying ISC object of the given node in the editor. */
+    openNodeResource(node: DependencyNodeData, parentId?: string): void
+    /** Opens the underlying ISC object of the given node in the tenant's Web UI. */
+    openNodeResourceUrl(node: DependencyNodeData, parentId?: string): void
     getNodeViewStates(resourceType: string, resourceId: string): Record<string, NodeViewState> | undefined
     setNodeViewStates(resourceType: string, resourceId: string, states: Record<string, NodeViewState>): void
     getLayoutAlgorithm(resourceType: string, resourceId: string): string | undefined
