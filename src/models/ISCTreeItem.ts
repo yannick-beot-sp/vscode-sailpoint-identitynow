@@ -9,7 +9,7 @@ import * as commands from "../commands/constants";
 import * as configuration from '../configurationConstants';
 import { convertConstantToTitleCase, escapeFilter, isEmpty, isNotEmpty } from "../utils/stringUtils";
 import { TenantService } from "../services/TenantService";
-import { CampaignStatusV3, DimensionV2025, MachineIdentityResponseV2025, SourceSubtypeV2025, SourceSubtypeWithSourceV2026 } from "sailpoint-api-client";
+import { CampaignStatusV3, DimensionV2025, MachineIdentityResponseV2025, SourceSubtypeWithSourceV2026 } from "sailpoint-api-client";
 import { convertToBaseTreeItem } from "../views/utils";
 
 
@@ -327,7 +327,7 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 		this.contextValue = (features?.find(x => x === "MACHINE_IDENTITY_AGGREGATION") ?? "") + type.replaceAll(" ", "") + "source";
 	}
 
-	getChildren(): Promise<BaseTreeItem[]> {
+	async getChildren(): Promise<BaseTreeItem[]> {
 		const results: BaseTreeItem[] = [];
 		results.push(new SchemasTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, this.uri));
 		results.push(
@@ -337,7 +337,24 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 		results.push(
 			new MachineAccountSubtypesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, this.uri)
 		)
-		return new Promise((resolve) => resolve(results));
+		try {
+			const client = new ISCClient(this.tenantId, this.tenantName);
+			const privilegeCriteriaConfigs = await client.getPrivilegeCriteriaConfigs(this.id as string);
+			if (privilegeCriteriaConfigs && privilegeCriteriaConfigs.length > 0) {
+				results.push(new PrivilegeClassificationTreeItem(
+					this.tenantId,
+					this.tenantName,
+					this.tenantDisplayName,
+					privilegeCriteriaConfigs[0].id!,
+					this.id!
+				));
+			}
+		} catch (error) {
+			// The endpoint may return an error (403 or 500) if privilege classification is not available for the tenant
+			console.log("Privilege classification not available:", error);
+		}
+		
+		return results;
 	}
 
 	updateIcon(context: vscode.ExtensionContext): void {
@@ -588,6 +605,70 @@ export class MachineAccountSubtypeTreeItem extends ISCResourceTreeItem {
 }
 
 /**
+ * Privilege classification configuration of a source
+ */
+export class PrivilegeClassificationTreeItem extends ISCResourceTreeItem {
+	contextValue = "privilege-classification";
+
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		configId: string,
+		private readonly sourceId: string
+	) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label: "Privilege Classification",
+			resourceType: "criteria-config/privilege",
+			id: configId,
+			collapsible: vscode.TreeItemCollapsibleState.Collapsed
+		})
+	}
+
+	iconPath = new vscode.ThemeIcon("folder");
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		const client = new ISCClient(this.tenantId, this.tenantName);
+		const privilegeCriteria = await client.getPrivilegeCriteria(this.sourceId);
+		return privilegeCriteria.map((c) => new PrivilegeCriterionTreeItem(
+			this.tenantId,
+			this.tenantName,
+			this.tenantDisplayName,
+			c.id!,
+			c.type!,
+			c.privilegeLevel!
+		));
+	}
+}
+
+export class PrivilegeCriterionTreeItem extends ISCResourceTreeItem {
+	contextValue = "privilege-criterion";
+
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		id: string,
+		public readonly type: string,
+		public readonly privilegeLevel: string
+	) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label: `${type}-${privilegeLevel}`,
+			resourceType: "criteria/privilege",
+			id
+		})
+	}
+
+	iconPath = new vscode.ThemeIcon("tag");
+}
+
+/**
  * Containers for workflows
  */
 export class WorkflowsTreeItem extends FolderTreeItem {
@@ -608,8 +689,8 @@ export class WorkflowsTreeItem extends FolderTreeItem {
 					this.tenantId,
 					this.tenantName,
 					this.tenantDisplayName,
-					w.name,
-					w.id,
+					w.name!,
+					w.id!,
 					w.enabled
 				)
 		);

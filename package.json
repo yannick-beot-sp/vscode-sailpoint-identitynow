@@ -1215,7 +1215,7 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.refresh-forced",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|transforms|provisioning-policies|roles|roleDimensional|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions|search-attributes|identity-attributes|source-apps|source-app|campaigns|machine-identities|machine-account-subtypes/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|privilege-classification|transforms|provisioning-policies|roles|roleDimensional|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions|search-attributes|identity-attributes|source-apps|source-app|campaigns|machine-identities|machine-account-subtypes|privilege-criteria/",
           "group": "inline@50"
         },
         {
@@ -1824,6 +1824,14 @@
       {
         "fileMatch": "idn://**/machine-config/**/*",
         "url": "./schemas/machine-config.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/criteria-config/privilege/*/*",
+        "url": "./schemas/privilege-classification.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/criteria/privilege/*/*",
+        "url": "./schemas/privilege-criteria.schemas.json"
       }
     ],
     "configuration": {
@@ -1964,7 +1972,7 @@
     "fast-json-patch": "^3.1.1",
     "frontmcp": "^0.12.2",
     "lodash": "^4.17.21",
-    "sailpoint-api-client": "^1.8.60",
+    "sailpoint-api-client": "^1.8.69",
     "tmp": "^0.2.1",
     "vscode-sailpoint-identitynow": "file:"
   }
