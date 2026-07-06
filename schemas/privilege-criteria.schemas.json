@@ -1,0 +1,140 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://developer.sailpoint.com/schemas/privilege-criteria.json",
+  "title": "Privilege Criteria",
+  "description": "A privilege criteria applied to a source, used to determine the privilege level of accounts/entitlements.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "The Id of the criteria. This is read-only.",
+      "example": "2c9180867817ac4d017817c491119a20"
+    },
+    "tenantId": {
+      "type": "string",
+      "description": "The Id of the tenant. This is read-only.",
+      "example": "57bf20ca-2d97-4397-b193-8cdb3470fb45"
+    },
+    "sourceId": {
+      "type": "string",
+      "description": "The Id of the source that the criteria is applied to. This is read-only.",
+      "minLength": 32,
+      "maxLength": 32,
+      "example": "c42c45d8d7c04d2da64d215cd8c32f21"
+    },
+    "type": {
+      "type": "string",
+      "description": "The type of criteria.",
+      "enum": [
+        "CUSTOM",
+        "CONNECTOR",
+        "SINGLE_LEVEL"
+      ],
+      "example": "CUSTOM"
+    },
+    "operator": {
+      "type": "string",
+      "description": "The logical operator to apply between groups.",
+      "enum": [
+        "AND",
+        "OR"
+      ],
+      "example": "AND"
+    },
+    "groups": {
+      "type": "array",
+      "description": "The groups of criteria items evaluated to determine if this criteria applies.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "operator": {
+            "type": "string",
+            "description": "The logical operator to apply between criteria items in the group.",
+            "enum": [
+              "AND",
+              "OR"
+            ],
+            "example": "AND"
+          },
+          "criteriaItems": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "targetType": {
+                  "type": "string",
+                  "description": "The target type for the criteria item.",
+                  "example": "azureRoleAssignment"
+                },
+                "operator": {
+                  "type": "string",
+                  "description": "The operator to apply to the property and values.",
+                  "enum": [
+                    "IN",
+                    "EQUALS",
+                    "NOT_EQUALS",
+                    "CONTAINS",
+                    "DOES_NOT_CONTAIN",
+                    "STARTS_WITH",
+                    "ENDS_WITH"
+                  ],
+                  "example": "EQUALS"
+                },
+                "property": {
+                  "type": "string",
+                  "description": "The property to evaluate. Either displayName, description, value or a pattern starting with 'attributes.'.",
+                  "example": "displayName"
+                },
+                "values": {
+                  "type": "array",
+                  "description": "The values to evaluate the property against.",
+                  "minItems": 1,
+                  "maxItems": 50,
+                  "items": {
+                    "type": "string",
+                    "maxLength": 450
+                  },
+                  "example": [
+                    "admin",
+                    "superuser"
+                  ]
+                },
+                "ignoreCase": {
+                  "type": "boolean",
+                  "description": "Whether to ignore case when evaluating the property against the values.",
+                  "default": false,
+                  "example": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "privilegeLevel": {
+      "type": "string",
+      "description": "The privilege level assigned by this criteria.",
+      "enum": [
+        "HIGH",
+        "MEDIUM",
+        "LOW"
+      ],
+      "example": "HIGH"
+    },
+    "created": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The date and time when the criteria was created. This is read-only.",
+      "example": "2024-01-10T12:00:00Z"
+    },
+    "modified": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The date and time when the criteria was last modified. This is read-only.",
+      "example": "2024-01-15T12:00:00Z"
+    }
+  }
+}
