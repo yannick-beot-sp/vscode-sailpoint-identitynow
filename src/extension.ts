@@ -61,6 +61,7 @@ import { EditPasswordConfigCommand } from './commands/tenant/editPasswordConfigC
 import { GenerateDigitTokenCommand } from './commands/tenant/generateDigitTokenCommand';
 import { OpenScriptCommand } from './commands/rule/openScriptCommand';
 import { IdentityTreeViewCommand } from './commands/identity/IdentityTreeViewCommand';
+import { ReassignOwnershipCommand } from './commands/identity/ReassignOwnershipCommand';
 import { TenantReadOnlyConfigCommand } from './commands/tenant/tenantReadOnlyConfigCommand';
 import { NewIdentityAttributeCommand } from './commands/newIdentityAttributeCommand';
 import { EnableLoggingCommand } from './commands/source/enableLoggingCommand';
@@ -612,6 +613,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IDENTITIES_PROCESS,
 			newIdentityCommand.processIdentity, newIdentityCommand));
+	const reassignOwnershipCommand = new ReassignOwnershipCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IDENTITIES_REASSIGN_OWNERSHIP,
+			reassignOwnershipCommand.execute, reassignOwnershipCommand));
 
 	// Applications
 	const applicationSourceFilterCommand = new ApplicationSourceFilterCommand()

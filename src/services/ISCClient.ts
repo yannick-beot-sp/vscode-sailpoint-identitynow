@@ -8,7 +8,7 @@ import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { compareByName } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, IdentityAttributeTransform, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowExecutionBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, PublicIdentity, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApiListAccessProfilesRequest, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseV2025, CustomFormsV2025Api, CreateFormDefinitionRequestV2025, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, IdentityProfilesV2025Api, IdentityPreviewResponseV2025, IdentityAttributeTransformV2025, SourcesV2025Api, TaskManagementV2025Api, AttributeDTO, RolesV2025Api, AccessProfilesV2025Api, JsonPatchOperationV2025, DimensionsV2025Api, RolesV2025ApiListRolesRequest, DimensionV2025, DimensionsV2025ApiListDimensionsRequest, PasswordConfigurationV2025Api, PasswordOrgConfigV2025, WorkflowsV2025Api, WorkflowV2025, WorkflowBodyV2025, WorkflowExecutionEventV2025, CreateWorkflowRequestV2025, WorkflowExecutionV2025, ConnectorRuleManagementV2025Api, ConnectorRuleResponseV2025, EntitlementsV2025Api, EntitlementsV2025ApiListEntitlementsRequest, EntitlementV2025, PublicIdentitiesV2025Api, PublicIdentitiesV2025ApiGetPublicIdentitiesRequest, RoleV2025, TransformsV2025Api, TransformV2025, TransformReadV2025, SearchV2025Api, IndexV2025, AccessProfileDocumentV2025, EntitlementDocumentV2025, RoleDocumentV2025, EventDocumentV2025, AccountActivityDocumentV2025, AccessProfileV2025, SourceV2025, MachineIdentitiesV2025Api, MachineIdentitiesV2025ApiListMachineIdentitiesRequest, MachineIdentityResponseV2025, MachineAccountsV2025Api, MachineAccountsV2025ApiListMachineAccountSubtypesRequest, SourceSubtypeV2025, MachineAccountsV2026Api, MachineAccountSubtypesV2026Api, SourceSubtypeWithSourceV2026 } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, IdentityAttributeTransform, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowExecutionBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, PublicIdentity, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApiListAccessProfilesRequest, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseV2025, CustomFormsV2025Api, CreateFormDefinitionRequestV2025, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, IdentityProfilesV2025Api, IdentityPreviewResponseV2025, IdentityAttributeTransformV2025, SourcesV2025Api, TaskManagementV2025Api, AttributeDTO, RolesV2025Api, AccessProfilesV2025Api, JsonPatchOperationV2025, DimensionsV2025Api, RolesV2025ApiListRolesRequest, DimensionV2025, DimensionsV2025ApiListDimensionsRequest, PasswordConfigurationV2025Api, PasswordOrgConfigV2025, WorkflowsV2025Api, WorkflowV2025, WorkflowBodyV2025, WorkflowExecutionEventV2025, CreateWorkflowRequestV2025, WorkflowExecutionV2025, ConnectorRuleManagementV2025Api, ConnectorRuleResponseV2025, EntitlementsV2025Api, EntitlementsV2025ApiListEntitlementsRequest, EntitlementV2025, PublicIdentitiesV2025Api, PublicIdentitiesV2025ApiGetPublicIdentitiesRequest, RoleV2025, TransformsV2025Api, TransformV2025, TransformReadV2025, SearchV2025Api, IndexV2025, AccessProfileDocumentV2025, EntitlementDocumentV2025, RoleDocumentV2025, EventDocumentV2025, AccountActivityDocumentV2025, AccessProfileV2025, SourceV2025, MachineIdentitiesV2025Api, MachineIdentitiesV2025ApiListMachineIdentitiesRequest, MachineIdentityResponseV2025, MachineAccountsV2025Api, MachineAccountsV2025ApiListMachineAccountSubtypesRequest, SourceSubtypeV2025, MachineAccountsV2026Api, MachineAccountSubtypesV2026Api, SourceSubtypeWithSourceV2026, AppsV2025Api, SourceAppPatchDtoV2025, GovernanceGroupsV2025Api, WorkgroupDtoV2025, IdentityProfileV2025, AccessRequestApprovalsV2025Api, PendingApprovalV2025 } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -199,6 +199,22 @@ export class ISCClient {
 		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const result = await Paginator.paginate(api, api.listSources, { sorters: "name" });
 		return result.data;
+	}
+
+	public async getSourcesByOwner(ownerId: string): Promise<SourceV2025[]> {
+		console.log("> getSourcesByOwner", ownerId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await Paginator.paginate(api, api.listSources, { filters: `owner.id eq "${ownerId}"` });
+		return result.data;
+	}
+
+	public async updateSource(id: string, operations: Array<JsonPatchOperationV2025>): Promise<SourceV2025> {
+		console.log("> updateSource", id, operations);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.updateSource({ id, jsonPatchOperationV2025: operations });
+		return response.data;
 	}
 
 	public async getSourceById(id: string): Promise<Source> {
@@ -924,6 +940,14 @@ export class ISCClient {
 		return resp.data.sort(compareByName);
 	}
 
+	public async updateWorkflow(id: string, operations: Array<JsonPatchOperationV2025>): Promise<WorkflowV2025> {
+		console.log("> updateWorkflow", id, operations);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.patchWorkflow({ id, jsonPatchOperationV2025: operations });
+		return response.data;
+	}
+
 
 
 	/**
@@ -1210,6 +1234,14 @@ export class ISCClient {
 			}
 		})
 		return resp.data;
+	}
+
+	public async updateIdentityProfile(id: string, operations: Array<JsonPatchOperationV2025>): Promise<IdentityProfileV2025> {
+		console.log("> updateIdentityProfile", id, operations);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new IdentityProfilesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.updateIdentityProfile({ identityProfileId: id, jsonPatchOperationV2025: operations });
+		return response.data;
 	}
 
 	/////////////////////////////
@@ -1539,6 +1571,14 @@ export class ISCClient {
 		const workgroup = this.ensureOneBasedOnHeader(response, "workgroup", name);
 
 		return workgroup;
+	}
+
+	public async updateGovernanceGroup(id: string, operations: Array<JsonPatchOperationV2025>): Promise<WorkgroupDtoV2025> {
+		console.log("> updateGovernanceGroup", id, operations);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new GovernanceGroupsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.patchWorkgroup({ id, jsonPatchOperationV2025: operations });
+		return response.data;
 	}
 
 	//////////////////////////////
@@ -1899,6 +1939,14 @@ export class ISCClient {
 		return response;
 	}
 
+	public async updateApplication(id: string, operations: Array<JsonPatchOperationV2025>): Promise<SourceAppPatchDtoV2025> {
+		console.log("> updateApplication", id, operations);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AppsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.patchSourceApp({ id, jsonPatchOperationV2025: operations });
+		return response.data;
+	}
+
 	public async getPaginatedApplicationAccessProfiles(appId: string, limit?: number, offset?: number): Promise<AxiosResponse<any[]>> {
 		console.log("> getPaginatedApplicationAccessProfile", limit, offset);
 
@@ -2088,8 +2136,55 @@ export class ISCClient {
 		}
 	}
 
+	/**
+	 * Lists the pending (or completed) identity campaign certifications for which the given identity is the reviewer.
+	 */
+	public async getCertificationsByReviewer(reviewerIdentityId: string, completed = false): Promise<IdentityCertificationDtoV2025[]> {
+		console.log("> getCertificationsByReviewer", reviewerIdentityId, completed);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new CertificationsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await Paginator.paginate(api, api.listIdentityCertifications, {
+			reviewerIdentity: reviewerIdentityId,
+			filters: `completed eq ${completed}`,
+			sorters: "name"
+		});
+		return result.data;
+	}
+
 	//////////////////////////////
 	//#endregion Certification Campaigns
+	//////////////////////////////
+
+	//////////////////////////////
+	//#region Access Request Approvals
+	//////////////////////////////
+
+	/**
+	 * Lists the pending access request approvals owned by (assigned to) the given identity.
+	 */
+	public async getPendingApprovals(ownerId: string): Promise<PendingApprovalV2025[]> {
+		console.log("> getPendingApprovals", ownerId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AccessRequestApprovalsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await Paginator.paginate(api, api.listPendingApprovals, { ownerId });
+		return result.data;
+	}
+
+	/**
+	 * Forwards (reassigns) a pending access request approval to a different identity.
+	 */
+	public async forwardAccessRequestApproval(approvalId: string, newOwnerId: string, comment: string): Promise<void> {
+		console.log("> forwardAccessRequestApproval", approvalId, newOwnerId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AccessRequestApprovalsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		await api.forwardAccessRequest({
+			approvalId,
+			forwardApprovalDtoV2025: { newOwnerId, comment }
+		});
+	}
+
+	//////////////////////////////
+	//#endregion Access Request Approvals
 	//////////////////////////////
 
 	/////////////////////////

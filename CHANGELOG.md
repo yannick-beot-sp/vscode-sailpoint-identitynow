@@ -10,6 +10,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- Reassign ownership of artifacts to another identity
+
 ### Changed
 
 - Order dimensions by name

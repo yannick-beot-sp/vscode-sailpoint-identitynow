@@ -141,6 +141,7 @@ export const IDENTITIES_ICON_SEARCH = `${COMMAND_PREFIX}.identities.icon-search`
 export const IDENTITIES_DELETE = `${COMMAND_PREFIX}.identities.delete`;
 export const IDENTITIES_ATT_SYNC = `${COMMAND_PREFIX}.identities.att-sync`;
 export const IDENTITIES_PROCESS = `${COMMAND_PREFIX}.identities.process`;
+export const IDENTITIES_REASSIGN_OWNERSHIP = `${COMMAND_PREFIX}.identities.reassign-ownership`;
 
 // Applications
 export const APPLICATIONS_FILTER_SOURCE_VIEW = `${COMMAND_PREFIX}.applications.filter.source`;
