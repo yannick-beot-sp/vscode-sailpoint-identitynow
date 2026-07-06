@@ -12,6 +12,8 @@ The SailPoint Identity Security Cloud extension makes it easy to:
 - View, create, edit, delete, clone, and test transforms
 - View, create, edit, delete provisioning policies of a source
 - View, create, edit, delete schemas of a source
+- View, edit privilege classification and criteria of a source
+- View, edit machine account subtypes and their approval of a source
 - View, edit, enable, disable, export, import workflows and view execution history
 - View, create, edit, delete connector rules and export/import the script of a rule
 - View, edit, delete service desk integrations
@@ -651,7 +653,15 @@ The patterns defined above use the following tokens:
 
 ### Unreleased
 
+### 1.3.30
+
+- Reassign ownership of artifacts to another identity
+- Add support for Machine Identities
+- Add support for Machine Account Subtypes and Approvals
+- Add support for Privilege Classification and Criteria
+- Add dependency graph for Sources, Transforms, and Identity Attributes
 - Order dimensions by name
+- Issue when importing dimension criteria with criteria on several identity attributes.
 
 ### 1.3.29
 

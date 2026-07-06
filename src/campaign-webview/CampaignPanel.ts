@@ -94,6 +94,10 @@ export class CampaignPanel extends BaseWebviewPanel {
         private campaignService: CampaignConfigurationService) {
         super(panel, extensionUri);
         this.client = new ISCClient(this.tenantId, this.tenantName);
+        // BaseWebviewPanel's constructor renders the webview HTML (and sets the panel title)
+        // before the parameter properties above are assigned, so that first render happens
+        // with everything undefined. Re-render now that the fields are set.
+        this.update();
     }
 
     protected get webviewFolderName(): string {

@@ -10,9 +10,19 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Removed
+
+## [1.3.30] - 2026-07-06
+
+### Added
+
 - Reassign ownership of artifacts to another identity
 - Add support for Machine Identities
-- Add support for Machine Account Subtypes
+- Add support for Machine Account Subtypes and Approvals
 - Add support for Privilege Classification and Criteria
 - Add dependency graph for Sources, Transforms, and Identity Attributes
 
