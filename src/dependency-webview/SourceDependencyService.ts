@@ -34,6 +34,7 @@ export class SourceDependencyService extends DependencyService {
                 ExportPayloadV2025IncludeTypesV2025.Transform,
                 ExportPayloadV2025IncludeTypesV2025.IdentityProfile,
                 ExportPayloadV2025IncludeTypesV2025.Role,
+                ExportPayloadV2025IncludeTypesV2025.LifecycleState,
             ]
         )
 
@@ -45,6 +46,7 @@ export class SourceDependencyService extends DependencyService {
         this.filterTransform(data);
         this.filterIdentityProfile(data);
         this.filterRole(data, accessProfileIds);
+        this.filterLifecycleState(data, accessProfileIds);
 
         return {
             rootId: DependencyService.rootId,
@@ -267,6 +269,99 @@ export class SourceDependencyService extends DependencyService {
                     source: role.id,
                     target: accessProfile.id,
                     label: "role access profile"
+                });
+            }
+        }
+    }
+
+    /**
+     * A lifecycle state references this source either through an account action (enable/disable/
+     * delete), whose scope is either "all sources except..." or an explicit list of sources, or
+     * by granting an access profile of this source. A lifecycle state that removes all access
+     * always references this source too, regardless of its account actions, since that wipes
+     * access on every source including this one. The lifecycle state is itself attached to an
+     * identity profile through identityProfileRef, so that profile is linked off the lifecycle
+     * state node (rather than the root) unless it's already linked there via attribute mapping.
+     */
+    private filterLifecycleState(data: SpConfigExportResultsBeta | null, accessProfileIds: Set<string>) {
+        const lifecycleStates = (data?.objects ?? []).filter(o => o.self?.type === "LIFECYCLE_STATE");
+        const profiles = (data?.objects ?? []).filter(o => o.self?.type === "IDENTITY_PROFILE");
+
+        for (const lifecycleStateObject of lifecycleStates) {
+            const lifecycleState = lifecycleStateObject.object;
+            if (!lifecycleState) {
+                continue;
+            }
+
+            const removeAllAccessEnabled: boolean = lifecycleState.accessActionConfiguration?.removeAllAccessEnabled ?? false;
+
+            const matchingAccountActions = (lifecycleState.accountActionRefs ?? []).filter((accountAction: any) =>
+                accountAction.allSources
+                    ? !(accountAction.excludeSourceIdsRefs ?? []).some((ref: any) => ref.id === this.resourceId)
+                    : (accountAction.sourceIdsRefs ?? []).some((ref: any) => ref.id === this.resourceId));
+
+            const matchingAccessProfileIds = (lifecycleState.accessProfileIds ?? [])
+                .filter((accessProfileId: string) => accessProfileIds.has(accessProfileId));
+
+            if (matchingAccountActions.length === 0 && matchingAccessProfileIds.length === 0 && !removeAllAccessEnabled) {
+                continue;
+            }
+
+            this.addNodeOnce({
+                id: lifecycleState.id,
+                type: "lifecycle-state",
+                label: lifecycleState.name,
+                description: lifecycleState.description ?? undefined,
+                resourceId: lifecycleState.id,
+                attributes: {
+                    enabled: String(lifecycleState.enabled ?? false),
+                    technicalName: lifecycleState.technicalName ?? "",
+                    identityState: lifecycleState.identityState ?? "",
+                    removeAllAccessEnabled: String(removeAllAccessEnabled)
+                },
+                data: lifecycleState
+            });
+
+            const label = matchingAccountActions.length > 0
+                ? `${matchingAccountActions[0].action.toLowerCase()} account action`
+                : removeAllAccessEnabled
+                    ? "remove all access"
+                    : "access profile grant";
+
+            this.edges.push({
+                id: `${DependencyService.rootId}-${lifecycleState.id}`,
+                source: DependencyService.rootId,
+                target: lifecycleState.id,
+                label
+            });
+
+            for (const accessProfileId of matchingAccessProfileIds) {
+                this.edges.push({
+                    id: `${lifecycleState.id}-${accessProfileId}`,
+                    source: lifecycleState.id,
+                    target: accessProfileId,
+                    label: "access profile grant"
+                });
+            }
+
+            const profile = profiles.find(o => o.object?.id === lifecycleState.identityProfileRef?.id)?.object;
+            if (profile) {
+                this.addNodeOnce({
+                    id: profile.id,
+                    type: "identity-profile",
+                    label: profile.name,
+                    description: profile.description ?? undefined,
+                    resourceId: profile.id,
+                    data: profile
+                });
+
+                this.edges.push({
+                    id: `${lifecycleState.id}-${profile.id}`,
+                    source: lifecycleState.id,
+                    target: profile.id,
+                    label: "identity profile",
+                    // A lifecycle state belongs to exactly one identity profile.
+                    noGroup: true
                 });
             }
         }
