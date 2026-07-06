@@ -617,6 +617,10 @@
         "title": "Process"
       },
       {
+        "command": "vscode-sailpoint-identitynow.identities.reassign-ownership",
+        "title": "Reassign Ownership..."
+      },
+      {
         "command": "vscode-sailpoint-identitynow.applications.filter.source",
         "title": "Filter applications by source...",
         "icon": "$(filter)"
@@ -1075,6 +1079,10 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.identities.process",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.reassign-ownership",
           "when": "never"
         },
         {
@@ -1605,6 +1613,10 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.identities.process",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.reassign-ownership",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/"
         },
         {

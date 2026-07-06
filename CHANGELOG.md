@@ -10,6 +10,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- Reassign ownership of artifacts to another identity
 - Add support for Machine Identities
 - Add support for Machine Account Subtypes
 - Add support for Privilege Classification and Criteria

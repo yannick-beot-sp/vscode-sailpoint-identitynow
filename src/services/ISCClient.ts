@@ -201,6 +201,22 @@ export class ISCClient {
 		return result.data;
 	}
 
+	public async getSourcesByOwner(ownerId: string): Promise<SourceV2025[]> {
+		console.log("> getSourcesByOwner", ownerId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await Paginator.paginate(api, api.listSources, { filters: `owner.id eq "${ownerId}"` });
+		return result.data;
+	}
+
+	public async updateSource(id: string, operations: Array<JsonPatchOperationV2025>): Promise<SourceV2025> {
+		console.log("> updateSource", id, operations);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.updateSource({ id, jsonPatchOperationV2025: operations });
+		return response.data;
+	}
+
 	public async getSourceById(id: string): Promise<Source> {
 		console.log("> getSourceById", id);
 		const apiConfig = await this.getApiConfiguration();
@@ -924,6 +940,14 @@ export class ISCClient {
 		return resp.data.sort(compareByName);
 	}
 
+	public async updateWorkflow(id: string, operations: Array<JsonPatchOperationV2025>): Promise<WorkflowV2025> {
+		console.log("> updateWorkflow", id, operations);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.patchWorkflow({ id, jsonPatchOperationV2025: operations });
+		return response.data;
+	}
+
 
 
 	/**
@@ -1210,6 +1234,14 @@ export class ISCClient {
 			}
 		})
 		return resp.data;
+	}
+
+	public async updateIdentityProfile(id: string, operations: Array<JsonPatchOperationV2025>): Promise<IdentityProfileV2025> {
+		console.log("> updateIdentityProfile", id, operations);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new IdentityProfilesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.updateIdentityProfile({ identityProfileId: id, jsonPatchOperationV2025: operations });
+		return response.data;
 	}
 
 	/////////////////////////////
@@ -1539,6 +1571,14 @@ export class ISCClient {
 		const workgroup = this.ensureOneBasedOnHeader(response, "workgroup", name);
 
 		return workgroup;
+	}
+
+	public async updateGovernanceGroup(id: string, operations: Array<JsonPatchOperationV2025>): Promise<WorkgroupDtoV2025> {
+		console.log("> updateGovernanceGroup", id, operations);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new GovernanceGroupsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.patchWorkgroup({ id, jsonPatchOperationV2025: operations });
+		return response.data;
 	}
 
 	//////////////////////////////
@@ -1915,6 +1955,14 @@ export class ISCClient {
 		return response;
 	}
 
+	public async updateApplication(id: string, operations: Array<JsonPatchOperationV2025>): Promise<SourceAppPatchDtoV2025> {
+		console.log("> updateApplication", id, operations);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AppsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.patchSourceApp({ id, jsonPatchOperationV2025: operations });
+		return response.data;
+	}
+
 	public async getPaginatedApplicationAccessProfiles(appId: string, limit?: number, offset?: number): Promise<AxiosResponse<any[]>> {
 		console.log("> getPaginatedApplicationAccessProfile", limit, offset);
 
@@ -2104,8 +2152,55 @@ export class ISCClient {
 		}
 	}
 
+	/**
+	 * Lists the pending (or completed) identity campaign certifications for which the given identity is the reviewer.
+	 */
+	public async getCertificationsByReviewer(reviewerIdentityId: string, completed = false): Promise<IdentityCertificationDtoV2025[]> {
+		console.log("> getCertificationsByReviewer", reviewerIdentityId, completed);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new CertificationsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await Paginator.paginate(api, api.listIdentityCertifications, {
+			reviewerIdentity: reviewerIdentityId,
+			filters: `completed eq ${completed}`,
+			sorters: "name"
+		});
+		return result.data;
+	}
+
 	//////////////////////////////
 	//#endregion Certification Campaigns
+	//////////////////////////////
+
+	//////////////////////////////
+	//#region Access Request Approvals
+	//////////////////////////////
+
+	/**
+	 * Lists the pending access request approvals owned by (assigned to) the given identity.
+	 */
+	public async getPendingApprovals(ownerId: string): Promise<PendingApprovalV2025[]> {
+		console.log("> getPendingApprovals", ownerId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AccessRequestApprovalsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await Paginator.paginate(api, api.listPendingApprovals, { ownerId });
+		return result.data;
+	}
+
+	/**
+	 * Forwards (reassigns) a pending access request approval to a different identity.
+	 */
+	public async forwardAccessRequestApproval(approvalId: string, newOwnerId: string, comment: string): Promise<void> {
+		console.log("> forwardAccessRequestApproval", approvalId, newOwnerId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AccessRequestApprovalsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		await api.forwardAccessRequest({
+			approvalId,
+			forwardApprovalDtoV2025: { newOwnerId, comment }
+		});
+	}
+
+	//////////////////////////////
+	//#endregion Access Request Approvals
 	//////////////////////////////
 
 	/////////////////////////
