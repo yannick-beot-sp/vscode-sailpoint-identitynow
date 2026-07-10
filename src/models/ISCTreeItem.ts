@@ -178,7 +178,8 @@ export class SourcesTreeItem extends FolderTreeItem {
 					source.id!,
 					source.type!,
 					source.connectorAttributes?.["delimiter"],
-					source.features
+					source.features,
+					source.cluster !== null && source.cluster !== undefined
 				));
 		}
 		return results;
@@ -314,6 +315,7 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 		public readonly type: string,
 		public readonly delimiter: string,
 		public readonly features: Array<string> | undefined,
+		public readonly VABased: boolean,
 	) {
 		super({
 			tenantId,
@@ -324,7 +326,10 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 			id,
 			collapsible: vscode.TreeItemCollapsibleState.Collapsed
 		})
-		this.contextValue = (features?.find(x => x === "MACHINE_IDENTITY_AGGREGATION") ?? "") + type.replaceAll(" ", "") + "source";
+		this.contextValue = (features?.find(x => x === "MACHINE_IDENTITY_AGGREGATION") ?? "")
+			+ (type === "DelimitedFile" && VABased ? "VABased" : "")
+			+ type.replaceAll(" ", "")
+			+ "source"
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
@@ -353,7 +358,7 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 			// The endpoint may return an error (403 or 500) if privilege classification is not available for the tenant
 			console.log("Privilege classification not available:", error);
 		}
-		
+
 		return results;
 	}
 

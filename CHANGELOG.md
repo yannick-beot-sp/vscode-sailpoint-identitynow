@@ -14,6 +14,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Fixed
 
+- Could not aggregate VA-based delimited file
+
 ### Removed
 
 ## [1.3.30] - 2026-07-06
