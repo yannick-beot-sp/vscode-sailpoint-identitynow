@@ -49,15 +49,22 @@ export class CloneTransformCommand {
                     async (wizardContext) => {
                         client = new ISCClient(
                             wizardContext["tenant"].id, wizardContext["tenant"].tenantName);
-                    },
-                    "clone transform"),
+                    }),
 
                 new QuickPickTransformStep(() => { return client!; }),
+
+                new QuickPickTenantStep(
+                    this.tenantService,
+                    async (wizardContext) => { },
+                    "clone transform",
+                    "targetTenant"),
+
                 new InputPromptStep({
                     name: "newTransformName",
                     displayName: "new transform",
                     options: {
-                        validateInput: transformNameValidator
+                        validateInput: transformNameValidator,
+                        default: node?.label as string | undefined
                     }
                 }),
             ]
@@ -93,9 +100,9 @@ export class CloneTransformCommand {
         data.objects[0].object.name = newTransformName
 
         const importer = new SPConfigImporter(
-            values["tenant"].id,
-            values["tenant"].tenantName,
-            values["tenant"].name,
+            values["targetTenant"].id,
+            values["targetTenant"].tenantName,
+            values["targetTenant"].name,
             {},
             JSON.stringify(data));
         await importer.importConfig()
