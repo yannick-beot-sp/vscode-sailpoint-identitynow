@@ -8,7 +8,7 @@ import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep';
 import { runWizard } from '../../wizard/wizard';
 import { Validator } from '../../validator/validator';
 import { InputPromptStep } from '../../wizard/inputPromptStep';
-import { ExportPayloadBetaIncludeTypesBeta } from 'sailpoint-api-client';
+import { ExportPayloadBetaIncludeTypesBeta, SourceCluster } from 'sailpoint-api-client';
 import crypto = require('crypto');
 import { SPConfigImporter } from '../spconfig-import/SPConfigImporter';
 import * as commands from '../constants';
@@ -48,6 +48,7 @@ export class CloneSourceCommand {
         }
 
         let client: ISCClient | undefined = undefined;
+        let targetClient: ISCClient | undefined = undefined;
 
         const values = await runWizard({
             title: "Clone Source",
@@ -58,21 +59,33 @@ export class CloneSourceCommand {
                     async (wizardContext) => {
                         client = new ISCClient(
                             wizardContext["tenant"].id, wizardContext["tenant"].tenantName);
-                    },
-                    "clone source"),
+                    }),
 
                 new QuickPickSourceStep(() => { return client!; }),
+
+                new QuickPickTenantStep(
+                    this.tenantService,
+                    async (wizardContext) => {
+                        targetClient = new ISCClient(
+                            wizardContext["targetTenant"].id, wizardContext["targetTenant"].tenantName);
+                    },
+                    "clone source",
+                    "targetTenant"),
+
                 new InputPromptStep({
                     name: "newSourceName",
                     displayName: "new source",
                     options: {
-                        validateInput: (s: string) => { return sourceNameValidator.validate(s); }
+                        validateInput: sourceNameValidator,
+                        default: node?.label as string | undefined
                     }
                 }),
             ]
         }, context);
 
         if (values === undefined) { return; }
+
+        const sameTenant = values["tenant"].id === values["targetTenant"].id;
 
         const oldSource = await client.getSourceById(values["source"].id)
 
@@ -105,24 +118,48 @@ export class CloneSourceCommand {
         data.objects[0].object.connectorAttributes.cloudDisplayName = newSourceName
 
         const importer = new SPConfigImporter(
-            values["tenant"].id,
-            values["tenant"].tenantName,
-            values["tenant"].name,
+            values["targetTenant"].id,
+            values["targetTenant"].tenantName,
+            values["targetTenant"].name,
             {},
             JSON.stringify(data));
         await importer.importConfig()
-        const newSource = await client.getSourceByName(newSourceName)
+        const newSource = await targetClient!.getSourceByName(newSourceName)
 
-        const operations = [{
-            "op": "add",
-            "path": "/cluster",
-            "value": oldSource.cluster
-        }]
+        // The cluster is a tenant-specific resource: within the same tenant, the reference can be copied
+        // as-is. Across tenants, a cluster with the same name must exist in the target tenant.
+        let newCluster: SourceCluster | undefined = undefined;
+        if (oldSource.cluster) {
+            if (sameTenant) {
+                newCluster = oldSource.cluster;
+            } else {
+                const matchingCluster = await targetClient!.getClusterByName(oldSource.cluster.name);
+                if (matchingCluster) {
+                    newCluster = {
+                        type: oldSource.cluster.type,
+                        id: matchingCluster.id,
+                        name: matchingCluster.name ?? oldSource.cluster.name
+                    };
+                } else {
+                    vscode.window.showWarningMessage(
+                        `Could not find a cluster named "${oldSource.cluster.name}" in ${values["targetTenant"].name}. `
+                        + `"${newSourceName}" was created without a cluster assigned.`);
+                }
+            }
+        }
 
-        await client.patchResource(
-            join('v3', "sources", newSource.id),
-            JSON.stringify(operations)
-        )
+        if (newCluster) {
+            const operations = [{
+                "op": "add",
+                "path": "/cluster",
+                "value": newCluster
+            }]
+
+            await targetClient!.patchResource(
+                join('v3', "sources", newSource.id!),
+                JSON.stringify(operations)
+            )
+        }
 
         await vscode.commands.executeCommand(commands.REFRESH_FORCED);
     }
