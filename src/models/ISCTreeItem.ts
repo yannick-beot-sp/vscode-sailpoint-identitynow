@@ -816,7 +816,7 @@ export class IdentityProfileTreeItem extends ISCResourceTreeItem {
 
 	async getChildren(): Promise<BaseTreeItem[]> {
 		const client = new ISCClient(this.tenantId, this.tenantName);
-		const lifecycleStates = await client.getLifecycleStates(this.id);
+		const lifecycleStates = (await client.getLifecycleStates(this.id)).sort(compareByName);
 
 		const lifecycleStateItems = lifecycleStates.map((w) => new LifecycleStateTreeItem(
 			this.tenantId,
