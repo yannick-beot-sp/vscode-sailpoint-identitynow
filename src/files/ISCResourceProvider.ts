@@ -47,8 +47,8 @@ export class ISCResourceProvider implements FileSystemProvider {
 		const tenantName = uri.authority;
 		const tenantInfo = await this.tenantService.getTenantByTenantName(tenantName)
 		const isReadOnly = tenantInfo && tenantInfo.readOnly
-		const isFile = id !== "provisioning-policies" && id !== "schemas";
 		const isViewOnlyScript = resourcePath?.match(/\/cloud-rule-script\//) !== null;
+		const isFile = id !== "provisioning-policies" && id !== "schemas";
 		return {
 			type: (isFile ? FileType.File : FileType.Directory),
 			ctime: toTimestamp(data.created),
@@ -81,6 +81,9 @@ export class ISCResourceProvider implements FileSystemProvider {
 			throw Error("Invalid uri:" + uri);
 		}
 		const id = getIdByUri(uri);
+		if (!id) {
+			throw vscode.FileSystemError.FileNotFound(uri);
+		}
 		if (id === NEW_ID || id === "provisioning-policies" || id === "schemas") {
 			console.log("New file");
 			return "";

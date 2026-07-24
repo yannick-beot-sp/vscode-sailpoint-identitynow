@@ -7,7 +7,7 @@ import {
 } from 'sailpoint-api-client';
 import * as vscode from 'vscode';
 import { waitForImportJob } from '../commands/spconfig-import/utils';
-import { delay } from '../utils';
+import { compareByName, delay } from '../utils';
 import { ISCClient } from './ISCClient';
 
 export interface CloudRuleSummary {
@@ -30,6 +30,8 @@ export interface SpConfigObjectBeta {
         type: string;
     };
 }
+
+type SpConfigExportObject = NonNullable<SpConfigExportResultsBeta['objects']>[number];
 
 const RULE_OBJECT_TYPE = ExportPayloadBetaIncludeTypesBeta.Rule;
 
@@ -150,14 +152,21 @@ export class CloudRuleService {
 
     private mapExportToSummaries(data: SpConfigExportResultsBeta): CloudRuleSummary[] {
         return (data.objects ?? [])
-            .filter((entry) => entry.self?.type === 'RULE')
-            .map((entry) => ({
-                id: entry.self!.id!,
-                name: entry.self!.name!,
-                type: entry.object?.type,
-                description: entry.object?.description,
-            }))
-            .sort((a, b) => a.name.localeCompare(b.name));
+            .map((entry) => this.toCloudRuleSummary(entry))
+            .filter((rule): rule is CloudRuleSummary => rule !== undefined)
+            .sort(compareByName);
+    }
+
+    private toCloudRuleSummary(entry: SpConfigExportObject): CloudRuleSummary | undefined {
+        if (entry.self?.type !== 'RULE' || !entry.self.id || !entry.self.name) {
+            return undefined;
+        }
+        return {
+            id: entry.self.id,
+            name: entry.self.name,
+            type: entry.object?.type,
+            description: entry.object?.description,
+        };
     }
 
     private findCachedConfigObject(lookup: CloudRuleLookup): SpConfigObjectBeta | undefined {
@@ -171,18 +180,30 @@ export class CloudRuleService {
         data: SpConfigExportResultsBeta,
         lookup: CloudRuleLookup
     ): SpConfigObjectBeta | undefined {
-        return (data.objects ?? []).find((entry) => {
-            if (entry.self?.type !== 'RULE') {
+        const entry = (data.objects ?? []).find((obj) => {
+            if (obj.self?.type !== 'RULE') {
                 return false;
             }
-            if (lookup.name && entry.self.name === lookup.name) {
+            if (lookup.name && obj.self?.name === lookup.name) {
                 return true;
             }
-            if (lookup.id && entry.self.id === lookup.id) {
+            if (lookup.id && obj.self?.id === lookup.id) {
                 return true;
             }
             return false;
-        }) as SpConfigObjectBeta | undefined;
+        });
+        return entry ? this.asSpConfigObjectBeta(entry) : undefined;
+    }
+
+    private asSpConfigObjectBeta(entry: SpConfigExportObject): SpConfigObjectBeta | undefined {
+        const { self, object } = entry;
+        if (!self?.id || !self?.name || !self?.type) {
+            return undefined;
+        }
+        return {
+            object,
+            self: { id: self.id, name: self.name, type: self.type },
+        };
     }
 
     private buildImportPayload(configObjects: SpConfigObjectBeta[]): string {

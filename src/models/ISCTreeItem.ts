@@ -842,7 +842,7 @@ export class CloudRuleTreeItem extends ISCResourceTreeItem {
 			label,
 			resourceType: "cloud-rules",
 			id,
-		})
+		});
 	}
 
 	contextValue = "cloud-rule";
