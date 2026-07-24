@@ -12,6 +12,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Changed
 
+- Sort lifecycle states for an identity profile by name
+
 ### Fixed
 
 - Could not aggregate VA-based delimited file

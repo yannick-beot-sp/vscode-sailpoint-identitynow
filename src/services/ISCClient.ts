@@ -8,7 +8,7 @@ import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { compareByName } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, IdentityAttributeTransform, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowExecutionBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, PublicIdentity, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApiListAccessProfilesRequest, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseV2025, CustomFormsV2025Api, CreateFormDefinitionRequestV2025, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, ManagedClusterBeta, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, IdentityProfilesV2025Api, IdentityPreviewResponseV2025, IdentityAttributeTransformV2025, SourcesV2025Api, TaskManagementV2025Api, AttributeDTO, RolesV2025Api, AccessProfilesV2025Api, JsonPatchOperationV2025, DimensionsV2025Api, RolesV2025ApiListRolesRequest, DimensionV2025, DimensionsV2025ApiListDimensionsRequest, PasswordConfigurationV2025Api, PasswordOrgConfigV2025, WorkflowsV2025Api, WorkflowV2025, WorkflowBodyV2025, WorkflowExecutionEventV2025, CreateWorkflowRequestV2025, WorkflowExecutionV2025, ConnectorRuleManagementV2025Api, ConnectorRuleResponseV2025, EntitlementsV2025Api, EntitlementsV2025ApiListEntitlementsRequest, EntitlementV2025, PublicIdentitiesV2025Api, PublicIdentitiesV2025ApiGetPublicIdentitiesRequest, RoleV2025, TransformsV2025Api, TransformV2025, TransformReadV2025, SearchV2025Api, IndexV2025, AccessProfileDocumentV2025, EntitlementDocumentV2025, RoleDocumentV2025, EventDocumentV2025, AccountActivityDocumentV2025, AccessProfileV2025, SourceV2025, MachineIdentitiesV2025Api, MachineIdentitiesV2025ApiListMachineIdentitiesRequest, MachineIdentityResponseV2025, MachineAccountSubtypesV2026Api, SourceSubtypeWithSourceV2026, PrivilegeCriteriaV2026Api, PrivilegeCriteriaDTOV2026, PrivilegeCriteriaConfigDTOV2026, PrivilegeCriteriaConfigurationV2026Api, IdentityProfileV2025, WorkgroupDtoV2025, GovernanceGroupsV2025Api, AccessRequestApprovalsV2025Api, AppsV2025Api, PendingApprovalV2025, SourceAppPatchDtoV2025 } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, IdentityAttributeTransform, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowExecutionBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, PublicIdentity, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApiListAccessProfilesRequest, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseV2025, CustomFormsV2025Api, CreateFormDefinitionRequestV2025, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, ManagedClusterBeta, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, IdentityProfilesV2025Api, IdentityPreviewResponseV2025, IdentityAttributeTransformV2025, SourcesV2025Api, TaskManagementV2025Api, AttributeDTO, RolesV2025Api, AccessProfilesV2025Api, JsonPatchOperationV2025, DimensionsV2025Api, RolesV2025ApiListRolesRequest, DimensionV2025, DimensionsV2025ApiListDimensionsRequest, PasswordConfigurationV2025Api, PasswordOrgConfigV2025, WorkflowsV2025Api, WorkflowV2025, WorkflowBodyV2025, WorkflowExecutionEventV2025, CreateWorkflowRequestV2025, WorkflowExecutionV2025, ConnectorRuleManagementV2025Api, ConnectorRuleResponseV2025, EntitlementsV2025Api, EntitlementsV2025ApiListEntitlementsRequest, EntitlementV2025, PublicIdentitiesV2025Api, PublicIdentitiesV2025ApiGetPublicIdentitiesRequest, RoleV2025, TransformsV2025Api, TransformV2025, TransformReadV2025, SearchV2025Api, IndexV2025, AccessProfileDocumentV2025, EntitlementDocumentV2025, RoleDocumentV2025, EventDocumentV2025, AccountActivityDocumentV2025, AccessProfileV2025, SourceV2025, MachineIdentitiesV2025Api, MachineIdentitiesV2025ApiListMachineIdentitiesRequest, MachineIdentityResponseV2025, MachineAccountSubtypesV2026Api, SourceSubtypeWithSourceV2026, PrivilegeCriteriaV2026Api, PrivilegeCriteriaDTOV2026, PrivilegeCriteriaConfigDTOV2026, PrivilegeCriteriaConfigurationV2026Api, IdentityProfileV2025, WorkgroupDtoV2025, GovernanceGroupsV2025Api, AccessRequestApprovalsV2025Api, AppsV2025Api, PendingApprovalV2025, SourceAppPatchDtoV2025, PasswordPoliciesV2025Api, PasswordPolicyV3DtoV2025, PasswordSyncGroupsV2025Api, PasswordSyncGroupV2025, PasswordPolicyHoldersDtoInnerV2025, AttrSyncSourceConfigV2025, SourcesV2026Api, NativeChangeDetectionConfigV2026, AccountDeleteConfigDtoV2026, JsonPatchOperationV2026, MachineClassificationConfigV2026Api, MachineClassificationConfigV2026, CreateSourceSubtypeRequestV2026, CreatePrivilegeCriteriaRequestV2026 } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -340,7 +340,7 @@ export class ISCClient {
 		disableOptimization = false
 	): Promise<any> {
 		console.log("> ISCClient.startMachineIdentityAggregation");
-		
+
 		const apiConfig = await this.getApiConfiguration();
 		const api = new MachineIdentitiesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.startMachineIdentityAggregation({
@@ -419,6 +419,229 @@ export class ISCClient {
 		const api = new ManagedClustersBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.getManagedClusters({ filters: `name eq "${name}"` });
 		return response.data?.[0];
+	}
+
+	public async getPasswordPolicyHolders(sourceId: string): Promise<PasswordPolicyHoldersDtoInnerV2025[]> {
+		console.log("> getPasswordPolicyHolders", sourceId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.listPasswordPolicyHoldersOnSource({ sourceId });
+		return response.data;
+	}
+
+	public async updatePasswordPolicyHolders(
+		sourceId: string,
+		holders: PasswordPolicyHoldersDtoInnerV2025[]
+	): Promise<PasswordPolicyHoldersDtoInnerV2025[]> {
+		console.log("> updatePasswordPolicyHolders", sourceId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.updatePasswordPolicyHolders({
+			sourceId,
+			passwordPolicyHoldersDtoInnerV2025: holders
+		});
+		return response.data;
+	}
+
+	public async getPasswordPolicies(): Promise<PasswordPolicyV3DtoV2025[]> {
+		console.log("> getPasswordPolicies");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new PasswordPoliciesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.listPasswordPolicies();
+		return response.data;
+	}
+
+	public async getPasswordPolicyByName(name: string): Promise<PasswordPolicyV3DtoV2025 | undefined> {
+		console.log("> getPasswordPolicyByName", name);
+		const policies = await this.getPasswordPolicies();
+		return policies.find(p => p.name === name);
+	}
+
+	public async createPasswordPolicy(policy: PasswordPolicyV3DtoV2025): Promise<PasswordPolicyV3DtoV2025> {
+		console.log("> createPasswordPolicy", policy.name);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new PasswordPoliciesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.createPasswordPolicy({ passwordPolicyV3DtoV2025: policy });
+		return response.data;
+	}
+
+	public async getPasswordSyncGroups(): Promise<PasswordSyncGroupV2025[]> {
+		console.log("> getPasswordSyncGroups");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new PasswordSyncGroupsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getPasswordSyncGroups();
+		return response.data;
+	}
+
+	public async getPasswordSyncGroupByName(name: string): Promise<PasswordSyncGroupV2025 | undefined> {
+		console.log("> getPasswordSyncGroupByName", name);
+		const groups = await this.getPasswordSyncGroups();
+		return groups.find(g => g.name === name);
+	}
+
+	public async createPasswordSyncGroup(group: PasswordSyncGroupV2025): Promise<PasswordSyncGroupV2025> {
+		console.log("> createPasswordSyncGroup", group.name);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new PasswordSyncGroupsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.createPasswordSyncGroup({ passwordSyncGroupV2025: group });
+		return response.data;
+	}
+
+	public async updatePasswordSyncGroup(id: string, group: PasswordSyncGroupV2025): Promise<PasswordSyncGroupV2025> {
+		console.log("> updatePasswordSyncGroup", id);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new PasswordSyncGroupsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.updatePasswordSyncGroup({ id, passwordSyncGroupV2025: group });
+		return response.data;
+	}
+
+	public async uploadConnectorFile(sourceId: string, filePath: string): Promise<void> {
+		console.log("> uploadConnectorFile", sourceId, filePath);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const mimeType = 'application/octet-stream'
+		const fileBuffer = fs.readFileSync(filePath);
+		const blob = new Blob([fileBuffer], { type: mimeType });
+		const file = new File([blob], basename(filePath), {
+			type: mimeType,
+		})
+		await api.importConnectorFile({ sourceId, file });
+	}
+
+	public async getAttributeSyncConfig(sourceId: string): Promise<AttrSyncSourceConfigV2025> {
+		console.log("> getAttributeSyncConfig", sourceId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getSourceAttrSyncConfig({ id: sourceId });
+		return response.data;
+	}
+
+	public async updateAttributeSyncConfig(
+		sourceId: string,
+		config: AttrSyncSourceConfigV2025
+	): Promise<AttrSyncSourceConfigV2025> {
+		console.log("> updateAttributeSyncConfig", sourceId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.putSourceAttrSyncConfig({ id: sourceId, attrSyncSourceConfigV2025: config });
+		return response.data;
+	}
+
+	public async getNativeChangeDetectionConfig(sourceId: string): Promise<NativeChangeDetectionConfigV2026> {
+		console.log("> getNativeChangeDetectionConfig", sourceId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getNativeChangeDetectionConfig({ id: sourceId });
+		return response.data;
+	}
+
+	public async updateNativeChangeDetectionConfig(
+		sourceId: string,
+		config: NativeChangeDetectionConfigV2026
+	): Promise<NativeChangeDetectionConfigV2026> {
+		console.log("> updateNativeChangeDetectionConfig", sourceId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.putNativeChangeDetectionConfig({
+			id: sourceId,
+			nativeChangeDetectionConfigV2026: config
+		});
+		return response.data;
+	}
+
+	public async getAccountDeleteApprovalConfig(sourceId: string): Promise<AccountDeleteConfigDtoV2026> {
+		console.log("> getAccountDeleteApprovalConfig", sourceId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getAccountDeleteApprovalConfig({ sourceId });
+		return response.data;
+	}
+
+	public async updateAccountDeleteApprovalConfig(
+		sourceId: string,
+		config: AccountDeleteConfigDtoV2026
+	): Promise<AccountDeleteConfigDtoV2026> {
+		console.log("> updateAccountDeleteApprovalConfig", sourceId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const operations: JsonPatchOperationV2026[] = [
+			{ op: "replace", path: "/approvalRequired", value: config.approvalRequired },
+			{ op: "replace", path: "/approvalConfig", value: config.approvalConfig }
+		];
+		const response = await api.updateAccountDeletionApprovalConfig({
+			sourceId,
+			jsonPatchOperationV2026: operations
+		});
+		return response.data;
+	}
+
+	public async getMachineAccountDeleteApprovalConfig(sourceId: string): Promise<AccountDeleteConfigDtoV2026> {
+		console.log("> getMachineAccountDeleteApprovalConfig", sourceId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getMachineAccountDeletionApprovalConfigBySource({ sourceId });
+		return response.data;
+	}
+
+	public async updateMachineAccountDeleteApprovalConfig(
+		sourceId: string,
+		config: AccountDeleteConfigDtoV2026
+	): Promise<AccountDeleteConfigDtoV2026> {
+		console.log("> updateMachineAccountDeleteApprovalConfig", sourceId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const operations: JsonPatchOperationV2026[] = [
+			{ op: "replace", path: "/approvalRequired", value: config.approvalRequired },
+			{ op: "replace", path: "/approvalConfig", value: config.approvalConfig }
+		];
+		const response = await api.updateMachineAccountDeletionApprovalConfig({
+			sourceId,
+			jsonPatchOperationV2026: operations
+		});
+		return response.data;
+	}
+
+	public async getMachineClassificationConfig(sourceId: string): Promise<MachineClassificationConfigV2026 | undefined> {
+		console.log("> getMachineClassificationConfig", sourceId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new MachineClassificationConfigV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		try {
+			const response = await api.getMachineClassificationConfig({ id: sourceId });
+			return response.data;
+		} catch {
+			// No classification config defined for this source
+			return undefined;
+		}
+	}
+
+	public async updateMachineClassificationConfig(
+		sourceId: string,
+		config: MachineClassificationConfigV2026
+	): Promise<MachineClassificationConfigV2026> {
+		console.log("> updateMachineClassificationConfig", sourceId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new MachineClassificationConfigV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.setMachineClassificationConfig({
+			id: sourceId,
+			machineClassificationConfigV2026: config
+		});
+		return response.data;
+	}
+
+	public async createSourceSubtype(subtype: CreateSourceSubtypeRequestV2026): Promise<SourceSubtypeWithSourceV2026> {
+		console.log("> createSourceSubtype", subtype.sourceId, subtype.displayName);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new MachineAccountSubtypesV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.createSourceSubtype({ createSourceSubtypeRequestV2026: subtype });
+		return response.data;
+	}
+
+	public async createPrivilegeCriteria(criteria: CreatePrivilegeCriteriaRequestV2026): Promise<PrivilegeCriteriaDTOV2026> {
+		console.log("> createPrivilegeCriteria", criteria.sourceId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new PrivilegeCriteriaV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.createCustomPrivilegeCriteria({ createPrivilegeCriteriaRequestV2026: criteria });
+		return response.data;
 	}
 
 	////////////////////////
@@ -1133,7 +1356,10 @@ export class ISCClient {
 	): Promise<LifecycleState[]> {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new LifecycleStatesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.getLifecycleStates({ identityProfileId });
+		const resp = await api.getLifecycleStates({
+			identityProfileId,
+			sorters: "name"
+		});
 		return resp.data;
 	}
 
@@ -2372,7 +2598,7 @@ export class ISCClient {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new MachineAccountSubtypesV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		console.log(api.listSourceSubtypes);
-		const response =  await api.listSourceSubtypes({
+		const response = await api.listSourceSubtypes({
 			filters: `source.id eq "${sourceId}"`,
 			sorters: "displayName"
 		});
