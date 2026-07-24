@@ -48,12 +48,13 @@ export class ISCResourceProvider implements FileSystemProvider {
 		const tenantInfo = await this.tenantService.getTenantByTenantName(tenantName)
 		const isReadOnly = tenantInfo && tenantInfo.readOnly
 		const isFile = id !== "provisioning-policies" && id !== "schemas";
+		const isViewOnlyScript = resourcePath?.match(/\/cloud-rule-script\//) !== null;
 		return {
 			type: (isFile ? FileType.File : FileType.Directory),
 			ctime: toTimestamp(data.created),
 			mtime: toTimestamp(data.modified),
 			size: convertToText(data).length,
-			permissions: id !== NEW_ID && (isReadOnly || resourcePath?.match("\/identities\/")) ? vscode.FilePermission.Readonly : undefined
+			permissions: id !== NEW_ID && (isReadOnly || isViewOnlyScript || resourcePath?.match("\/identities\/")) ? vscode.FilePermission.Readonly : undefined
 		};
 	}
 	readDirectory(
@@ -186,6 +187,11 @@ export class ISCResourceProvider implements FileSystemProvider {
 
 			this._emitter.fire([{ type: vscode.FileChangeType.Created, uri }]);
 		} else {
+
+			if (resourcePath.match("cloud-rule-script")) {
+				// Cloud rule scripts are view-only; edits must be saved via the rule JSON editor.
+				return;
+			}
 
 			if (resourcePath.match("connector-rule-script")) {
 				const rule = await client.getConnectorRuleById(id)
