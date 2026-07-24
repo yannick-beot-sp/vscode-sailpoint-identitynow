@@ -9,6 +9,7 @@ import * as commands from "../commands/constants";
 import * as configuration from '../configurationConstants';
 import { convertConstantToTitleCase, escapeFilter, isEmpty, isNotEmpty } from "../utils/stringUtils";
 import { TenantService } from "../services/TenantService";
+import { CloudRuleService } from "../services/CloudRuleService";
 import { CampaignStatusV3, DimensionV2025, MachineIdentityResponseV2025, SourceSubtypeWithSourceV2026 } from "sailpoint-api-client";
 import { convertToBaseTreeItem } from "../views/utils";
 
@@ -75,6 +76,7 @@ export class TenantTreeItem extends BaseTreeItem {
 		results.push(new TransformsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new WorkflowsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new RulesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new CloudRulesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new ServiceDesksTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new IdentityProfilesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new AccessProfilesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
@@ -757,7 +759,7 @@ export class RulesTreeItem extends FolderTreeItem {
 		tenantName: string,
 		tenantDisplayName: string,
 	) {
-		super("Rules", "connector-rules", tenantId, tenantName, tenantDisplayName);
+		super("Connector Rules", "connector-rules", tenantId, tenantName, tenantDisplayName);
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
@@ -788,6 +790,62 @@ export class RuleTreeItem extends ISCResourceTreeItem {
 	}
 
 	contextValue = "connector-rule";
+	iconPath = new vscode.ThemeIcon("file-code");
+}
+
+/**
+ * Containers for cloud rules (SP-Config RULE objects)
+ */
+export class CloudRulesTreeItem extends FolderTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {
+		super("Cloud Rules", "cloud-rules", tenantId, tenantName, tenantDisplayName);
+	}
+
+	reset(): void {
+		CloudRuleService.getInstance(this.tenantId, this.tenantName, this.tenantDisplayName).resetCache();
+	}
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		const cloudRuleService = CloudRuleService.getInstance(
+			this.tenantId,
+			this.tenantName,
+			this.tenantDisplayName
+		);
+		const rules = await cloudRuleService.listCloudRules();
+		return rules.map(
+			(rule) => new CloudRuleTreeItem(
+				this.tenantId,
+				this.tenantName,
+				this.tenantDisplayName,
+				rule.name,
+				rule.id
+			)
+		);
+	}
+}
+
+export class CloudRuleTreeItem extends ISCResourceTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			resourceType: "cloud-rules",
+			id,
+		})
+	}
+
+	contextValue = "cloud-rule";
 	iconPath = new vscode.ThemeIcon("file-code");
 }
 

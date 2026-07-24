@@ -1,5 +1,5 @@
 import { ExportPayloadBetaIncludeTypesBeta } from 'sailpoint-api-client';
-import { FormTreeItem, ISCResourceTreeItem, IdentityProfileTreeItem, RuleTreeItem, ServiceDeskTreeItem, SourceTreeItem, TransformTreeItem } from '../../models/ISCTreeItem';
+import { CloudRuleTreeItem, FormTreeItem, ISCResourceTreeItem, IdentityProfileTreeItem, RuleTreeItem, ServiceDeskTreeItem, SourceTreeItem, TransformTreeItem } from '../../models/ISCTreeItem';
 import { PathProposer } from '../../services/PathProposer';
 import { askFile, openPreview } from '../../utils/vsCodeHelpers';
 import { SPConfigExporter } from './SPConfigExporter';
@@ -22,6 +22,8 @@ export class ExportConfigNodeTreeViewCommand {
                 return ExportPayloadBetaIncludeTypesBeta.IdentityProfile;
             case RuleTreeItem.name:
                 return ExportPayloadBetaIncludeTypesBeta.ConnectorRule;
+            case CloudRuleTreeItem.name:
+                return ExportPayloadBetaIncludeTypesBeta.Rule;
             case FormTreeItem.name:
                 return ExportPayloadBetaIncludeTypesBeta.FormDefinition;
             case ServiceDeskTreeItem.name:
@@ -66,7 +68,9 @@ export class ExportConfigNodeTreeViewCommand {
         const options: any = {};
         // FIXME
         // Issue while exporting FORM_DEFINITION: needs to rely on names instead of ids
-        if (ExportPayloadBetaIncludeTypesBeta.FormDefinition === objectType || ExportPayloadBetaIncludeTypesBeta.ConnectorRule === objectType) {
+        if (ExportPayloadBetaIncludeTypesBeta.FormDefinition === objectType
+            || ExportPayloadBetaIncludeTypesBeta.ConnectorRule === objectType
+            || ExportPayloadBetaIncludeTypesBeta.Rule === objectType) {
             options[objectType] = {
                 "includedNames": [
                     node.label

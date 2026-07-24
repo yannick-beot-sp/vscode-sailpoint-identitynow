@@ -42,6 +42,7 @@ export function buildResourceUri(params: {
     let beta = false
     switch (params.resourceType) {
         case RESOURCE_TYPES.connectorRule:
+        case RESOURCE_TYPES.cloudRule:
         case RESOURCE_TYPES.identityAttribute:
         case RESOURCE_TYPES.sourceApps:
             beta = true
