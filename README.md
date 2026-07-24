@@ -653,6 +653,9 @@ The patterns defined above use the following tokens:
 
 ### Unreleased
 
+- Could not aggregate VA-based delimited file
+- Sort lifecycle states for an identity profile by name
+
 ### 1.3.30
 
 - Reassign ownership of artifacts to another identity
