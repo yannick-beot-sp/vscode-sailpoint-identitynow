@@ -22,7 +22,7 @@ export const EXPORTABLE_OBJECT_TYPE_ITEMS: ExportableObjectTypeQuickPickItem[] =
     { objectType: ExportPayloadBetaExcludeTypesBeta.PublicIdentitiesConfig, label: "Public Identities Configuration", picked: true },
     { objectType: ExportPayloadBetaExcludeTypesBeta.Role, label: "Roles", picked: true },
     { objectType: ExportPayloadBetaExcludeTypesBeta.ConnectorRule, label: "Connector Rules", picked: true },
-    { objectType: ExportPayloadBetaExcludeTypesBeta.Rule, label: "Rules", picked: true },
+    { objectType: ExportPayloadBetaExcludeTypesBeta.Rule, label: "Cloud Rules", picked: true },
     { objectType: ExportPayloadBetaExcludeTypesBeta.Segment, label: "Segments", picked: true },
     { objectType: ExportPayloadBetaExcludeTypesBeta.SodPolicy, label: "Separation of Duties Policies", picked: true },
     { objectType: ExportPayloadBetaExcludeTypesBeta.ServiceDeskIntegration, label: "Service Desk Integrations", picked: true },
@@ -42,7 +42,7 @@ export const IMPORTABLE_OBJECT_TYPE_ITEMS: ImportableObjectTypeQuickPickItem[] =
     { objectType: ImportOptionsBetaIncludeTypesBeta.IdentityObjectConfig, label: "Identity Object Configuration", picked: true },
     { objectType: ImportOptionsBetaIncludeTypesBeta.IdentityProfile, label: "Identity Profiles", picked: true },
     { objectType: ImportOptionsBetaIncludeTypesBeta.ConnectorRule, label: "Connector Rules", picked: true },
-    { objectType: ImportOptionsBetaIncludeTypesBeta.Rule, label: "Rules", picked: true },
+    { objectType: ImportOptionsBetaIncludeTypesBeta.Rule, label: "Cloud Rules", picked: true },
     { objectType: ImportOptionsBetaIncludeTypesBeta.Source, label: "Sources", picked: true },
     { objectType: ImportOptionsBetaIncludeTypesBeta.Transform, label: "Transforms", picked: true },
 ];

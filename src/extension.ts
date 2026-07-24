@@ -60,6 +60,9 @@ import { NewAttributeSearchConfigCommand } from './commands/NewAttributeSearchCo
 import { EditPasswordConfigCommand } from './commands/tenant/editPasswordConfigCommand';
 import { GenerateDigitTokenCommand } from './commands/tenant/generateDigitTokenCommand';
 import { OpenScriptCommand } from './commands/rule/openScriptCommand';
+import { ImportCloudRuleConfigCommand } from './commands/rule/importCloudRuleConfigCommand';
+import { CloudRuleOpenScriptCommand } from './commands/rule/cloudRuleOpenScriptCommand';
+import { CloudRuleExportScriptCommand } from './commands/rule/cloudRuleExportScriptCommand';
 import { IdentityTreeViewCommand } from './commands/identity/IdentityTreeViewCommand';
 import { ReassignOwnershipCommand } from './commands/identity/ReassignOwnershipCommand';
 import { TenantReadOnlyConfigCommand } from './commands/tenant/tenantReadOnlyConfigCommand';
@@ -467,6 +470,24 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_CONNECTOR_RULE_SCRIPT_VIEW,
 			exportScriptFromRuleCommand.exportScriptView, exportScriptFromRuleCommand));
+
+	const importCloudRuleConfigCommand = new ImportCloudRuleConfigCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_CLOUD_RULE_CONFIG_VIEW,
+			importCloudRuleConfigCommand.execute, importCloudRuleConfigCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IMPORT_CLOUD_RULE_CONFIG_ICON_VIEW,
+			importCloudRuleConfigCommand.execute, importCloudRuleConfigCommand));
+
+	const cloudRuleOpenScriptCommand = new CloudRuleOpenScriptCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.VIEW_CLOUD_RULE_SCRIPT,
+			cloudRuleOpenScriptCommand.execute, cloudRuleOpenScriptCommand));
+
+	const cloudRuleExportScriptCommand = new CloudRuleExportScriptCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EXPORT_CLOUD_RULE_SCRIPT_VIEW,
+			cloudRuleExportScriptCommand.exportScriptView, cloudRuleExportScriptCommand));
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.REFRESH_IDENTITY_PROFILE,

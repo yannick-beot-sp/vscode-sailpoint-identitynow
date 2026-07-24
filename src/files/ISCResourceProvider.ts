@@ -11,6 +11,7 @@ import {
 } from "vscode";
 import { NEW_ID } from "../constants";
 import { ISCClient } from "../services/ISCClient";
+import { CloudRuleService } from "../services/CloudRuleService";
 import { TenantService } from "../services/TenantService";
 import {
 	convertToText,
@@ -18,7 +19,7 @@ import {
 	toTimestamp,
 	uint8Array2Str,
 } from "../utils";
-import { getIdByUri, getPathByUri } from "../utils/UriUtils";
+import { getIdByUri, getNameByUri, getPathByUri } from "../utils/UriUtils";
 import { Operation, compare } from "fast-json-patch";
 import { FormDefinitionResponseBeta, SlimCampaign } from "sailpoint-api-client";
 
@@ -95,6 +96,22 @@ export class ISCResourceProvider implements FileSystemProvider {
 		if (/\/connector-rule-script\//.test(resourcePath)) {
 			const rule = await client.getConnectorRuleById(id);
 			data = rule.sourceCode?.script
+		} else if (/\/cloud-rule-script\//.test(resourcePath)) {
+			const cloudRuleService = CloudRuleService.getInstance(
+				tenantInfo.id!,
+				tenantName,
+				tenantInfo.name ?? tenantName
+			);
+			const configObject = await cloudRuleService.getCloudRule({ id, name: getNameByUri(uri) ?? undefined });
+			data = cloudRuleService.getScriptFromConfigObject(configObject);
+		} else if (/\/cloud-rules\//.test(resourcePath)) {
+			const cloudRuleService = CloudRuleService.getInstance(
+				tenantInfo.id!,
+				tenantName,
+				tenantInfo.name ?? tenantName
+			);
+			const configObject = await cloudRuleService.getCloudRule({ id, name: getNameByUri(uri) ?? undefined });
+			data = configObject.object;
 		} else if (/\/identities\//.test(resourcePath)) {
 			const response = await client.paginatedSearchIdentities(
 				`id:${id}`,
@@ -174,6 +191,18 @@ export class ISCResourceProvider implements FileSystemProvider {
 				const rule = await client.getConnectorRuleById(id)
 				rule.sourceCode.script = data
 				await client.updateConnectorRule(rule)
+			} else if (resourcePath.match("cloud-rules")) {
+				const cloudRuleService = CloudRuleService.getInstance(
+					tenantInfo?.id ?? "",
+					tenantName,
+					tenantInfo?.name ?? tenantName
+				);
+				const ruleData = JSON.parse(data);
+				const configObject = cloudRuleService.buildConfigObjectFromRuleData(ruleData, {
+					id,
+					name: getNameByUri(uri) ?? ruleData.name,
+				});
+				await cloudRuleService.importCloudRuleConfig(configObject);
 			} else if (resourcePath.match("form-definitions")) {
 				// UI is pushing all data as a Patch. Doing the same for form definitions
 				const newData = JSON.parse(data) as FormDefinitionResponseBeta
