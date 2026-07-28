@@ -655,6 +655,7 @@ The patterns defined above use the following tokens:
 
 - Could not aggregate VA-based delimited file
 - Sort lifecycle states for an identity profile by name
+- Fix issue with role dimension pagination (cf. [#164](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/164))
 
 ### 1.3.30
 
