@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as commands from './constants';
 import { ProvisioningPoliciesTreeItem } from "../models/ISCTreeItem";
 import { compareByLabel } from '../utils';
-import { buildResourceUri, getIdByUri } from '../utils/UriUtils';
+import { getIdByUri, getProvisioningPolicyUri } from '../utils/UriUtils';
 import { UsageTypeBeta } from 'sailpoint-api-client';
 import { convertConstantToTitleCase, isEmpty } from '../utils/stringUtils';
 import { ExtendedQuickPickItem } from '../models/ExtendedQuickPickItem';
@@ -90,23 +90,20 @@ export class NewProvisioningPolicyCommand {
         }, async () => {
 
             const data = {
-                "name": provisioningPolicyName,
+                "name": isEmpty(provisioningPolicyName) ? usageType.value : provisioningPolicyName,
                 "description": null,
                 "usageType": usageType.value,
                 "fields": []
             };
 
             const sourceId = getIdByUri(node.parentUri)
-            const newUri = buildResourceUri({
-                tenantName: values["tenant"].tenantName,
-                resourceType: "sources",
-                id: sourceId,
-                subResourceType: "provisioning-policies",
-                subId: usageType.value,
-                name: isEmpty(provisioningPolicyName) ? usageType.value : provisioningPolicyName
-            })
-
-            await client.createProvisioningPolicy(sourceId, data)
+            const createdPolicy = await client.createProvisioningPolicy(sourceId, data)
+            const newUri = getProvisioningPolicyUri(
+                values["tenant"].tenantName,
+                sourceId,
+                createdPolicy.id,
+                createdPolicy.name
+            )
             vscode.commands.executeCommand(commands.REFRESH_FORCED);
             openPreview(newUri)
         });

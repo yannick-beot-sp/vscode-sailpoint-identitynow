@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import * as path from 'path';
 import { ISCClient, TOTAL_COUNT_HEADER } from "../services/ISCClient";
-import { getIdByUri, getPathByUri, getResourceUri, getResourceWebUrl, getUIUrl } from "../utils/UriUtils";
+import { getIdByUri, getPathByUri, getProvisioningPolicyUri, getResourceUri, getResourceWebUrl, getUIUrl } from "../utils/UriUtils";
 import { compareByLabel, compareByName, compareByPriority } from "../utils";
 import { AxiosHeaders, AxiosResponse } from "axios";
 import { getConfigNumber } from '../utils/configurationUtils';
@@ -254,12 +254,13 @@ export class ISCResourceTreeItem extends BaseTreeItem {
 		resourceType: string;
 		id: string;
 		resourceId?: string,
-		collapsible?: vscode.TreeItemCollapsibleState;
-		parentId?: string;
-		subId?: string;
-		subResourceType?: string;
-		resourceSubId?: string,
-	}) {
+			collapsible?: vscode.TreeItemCollapsibleState;
+			parentId?: string;
+			subId?: string;
+			subResourceType?: string;
+			resourceSubId?: string;
+			uri?: vscode.Uri;
+		}) {
 
 		options = {
 			...{
@@ -272,7 +273,10 @@ export class ISCResourceTreeItem extends BaseTreeItem {
 		this.id = options.id
 		this.parentId = options.parentId
 
-		if (options.subResourceType && options.subId) {
+		if (options.uri) {
+			this.uri = options.uri
+			this.resourceId = options.resourceId ?? options.id
+		} else if (options.subResourceType && options.subId) {
 			this.uri = getResourceUri(options.tenantName,
 				options.resourceType,
 				options.parentId,
@@ -516,7 +520,8 @@ export class ProvisioningPoliciesTreeItem extends FolderTreeItem {
 				tenantId: this.tenantId,
 				tenantName: this.tenantName,
 				tenantDisplayName: this.tenantDisplayName,
-				type: provisioningPolicy.usageType,
+				policyId: provisioningPolicy.id,
+				usageType: provisioningPolicy.usageType,
 				sourceId,
 				name: provisioningPolicy.name
 			})).sort(compareByLabel)
@@ -532,18 +537,24 @@ export class ProvisioningPolicyTreeItem extends ISCResourceTreeItem {
 		tenantName: string,
 		tenantDisplayName: string,
 		sourceId: string,
-		type: string,
+		policyId: string,
+		usageType: string,
 		name: string
 	}
 	) {
 		super({
 			...options,
 			parentId: options.sourceId,
-			label: isEmpty(options.name) ? convertConstantToTitleCase(options.type) : options.name,
+			label: isEmpty(options.name) ? convertConstantToTitleCase(options.usageType) : options.name,
 			resourceType: "sources",
-			id: `${options.sourceId}/provisioning-policies/${options.type}`,
-			subResourceType: "provisioning-policies",
-			subId: options.type,
+			id: `${options.sourceId}/provisioning-policies/${options.policyId}`,
+			resourceId: options.policyId,
+			uri: getProvisioningPolicyUri(
+				options.tenantName,
+				options.sourceId,
+				options.policyId,
+				isEmpty(options.name) ? convertConstantToTitleCase(options.usageType) : options.name
+			),
 		})
 	}
 

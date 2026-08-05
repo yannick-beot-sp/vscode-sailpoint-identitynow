@@ -10,7 +10,7 @@ import type { DependencyNodeData } from './app/src/services/Client';
 export function getDependencyNodeUri(tenantName: string, node: DependencyNodeData, parentId?: string): Uri | undefined {
     const resourceId = node.resourceId ?? node.id;
     return getResourceUriByKind(tenantName, node.type, resourceId, node.label, {
-        parentId, usageType: node.attributes?.usageType,
+        parentId,
     });
 }
 

@@ -1,6 +1,7 @@
 import { Uri } from "vscode";
 import { RESOURCE_TYPES, URL_PREFIX } from "../constants";
 import { posix } from "path";
+import { getProvisioningPoliciesPath } from "../models/ProvisioningPolicy";
 
 export function withQuery(baseUrl: string, params: any): string {
 
@@ -87,6 +88,23 @@ export function getResourceUri(tenantName: string, resourceType: string, id: str
         baseUri,
         ...pathParts
     );
+}
+
+/**
+ * Construct the internal URI for an ID-based Sources V2 provisioning policy.
+ */
+export function getProvisioningPolicyUri(
+    tenantName: string,
+    sourceId: string,
+    policyId: string,
+    label: string
+): Uri {
+    const encodedLabel = label?.replaceAll("/", "%2F");
+    return Uri.from({
+        scheme: URL_PREFIX,
+        authority: tenantName,
+        path: `${getProvisioningPoliciesPath(sourceId, policyId)}/${encodedLabel}`
+    });
 }
 
 
@@ -221,7 +239,7 @@ const IDN_RESOURCE_TYPE_BY_KIND: Record<string, string> = {
  */
 export function getResourceUriByKind(
     tenantName: string, kind: string, id: string, label: string,
-    options?: { parentId?: string; usageType?: string }
+    options?: { parentId?: string }
 ): Uri | undefined {
     if (kind === "dimension") {
         if (!options?.parentId) return undefined;
@@ -229,9 +247,8 @@ export function getResourceUriByKind(
         return parentUri.with({ path: posix.join(getPathByUri(parentUri) || "", "dimensions", id, label) });
     }
     if (kind === "provisioning-policy") {
-        if (!options?.parentId || !options?.usageType) return undefined;
-        const parentUri = getResourceUri(tenantName, "sources", options.parentId, label);
-        return parentUri.with({ path: posix.join(getPathByUri(parentUri) || "", "provisioning-policies", options.usageType, label) });
+        if (!options?.parentId) return undefined;
+        return getProvisioningPolicyUri(tenantName, options.parentId, id, label);
     }
     const resourceType = IDN_RESOURCE_TYPE_BY_KIND[kind];
     return resourceType ? getResourceUri(tenantName, resourceType, id, label) : undefined;

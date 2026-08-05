@@ -49,7 +49,7 @@ export class IdentityAttributeDependencyService extends DependencyService {
         this.filterRole(data);
         this.filterSegment(data);
         this.filterPublicIdentitiesConfig(data);
-        this.filterSource(data);
+        await this.filterSource(data);
         this.filterEventTrigger(data);
         this.filterTransform(data);
         this.filterIdentityProfile(data);
@@ -193,7 +193,7 @@ export class IdentityAttributeDependencyService extends DependencyService {
         }
     }
 
-    private filterSource(data: SpConfigExportResultsBeta | null) {
+    private async filterSource(data: SpConfigExportResultsBeta | null) {
 
         const sources = (data?.objects ?? []).filter(o => o.self?.type === "SOURCE");
         const syncConfigs = (data?.objects ?? []).filter(o => o.self?.type === "ATTR_SYNC_SOURCE_CONFIG");
@@ -204,11 +204,20 @@ export class IdentityAttributeDependencyService extends DependencyService {
                 continue;
             }
 
-            const matchingPolicies = (source.provisioningPolicies ?? []).filter((policy: any) =>
+            const embeddedMatchingPolicies = (source.provisioningPolicies ?? []).filter((policy: any) =>
                 (policy.fields ?? []).some((field: any) => this.fieldReferencesAttribute(field, this.resourceName)));
 
             const syncConfig = syncConfigs.find(o => o.object?.source?.id === source.id);
             const synchronized = syncConfig?.object?.attributes?.some((attr: any) => attr.name === this.resourceName && attr.enabled) ?? false;
+
+            if (embeddedMatchingPolicies.length === 0 && !synchronized) {
+                continue;
+            }
+
+            const matchingPolicies = embeddedMatchingPolicies.length === 0
+                ? []
+                : (await this.client.getProvisioningPolicies(source.id)).filter(policy =>
+                    (policy.fields ?? []).some(field => this.fieldReferencesAttribute(field, this.resourceName)));
 
             if (matchingPolicies.length === 0 && !synchronized) {
                 continue;
@@ -231,13 +240,13 @@ export class IdentityAttributeDependencyService extends DependencyService {
             });
 
             for (const policy of matchingPolicies) {
-                const policyId = `${source.id}::${policy.name}`;
-                this.nodes.push({
-                    id: policyId,
+                const nodeId = `${source.id}::${policy.id}`;
+                this.addNodeOnce({
+                    id: nodeId,
                     type: "provisioning-policy",
                     label: policy.usageType,
                     description: policy.description ?? undefined,
-                    resourceId: policyId,
+                    resourceId: policy.id,
                     attributes: {
                         usageType: policy.usageType
                     },
@@ -245,9 +254,9 @@ export class IdentityAttributeDependencyService extends DependencyService {
                 });
 
                 this.edges.push({
-                    id: `${source.id}-${policyId}`,
+                    id: `${source.id}-${nodeId}`,
                     source: source.id,
-                    target: policyId,
+                    target: nodeId,
                     label: "provisioning policy"
                 });
             }
