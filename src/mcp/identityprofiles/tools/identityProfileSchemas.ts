@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { IdentityAttributeTransform } from '../../../sailpointCompat';
+import { IdentityAttributeTransform } from "sailpoint-api-client";
+
 export const identityProfileIdOrNameField = z.string().min(1).describe(
     "Identity profile name or ID (32-char hex UUID, e.g. '200be07ae84f43a38d14f429cb4f9951')."
 );

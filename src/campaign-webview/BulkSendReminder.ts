@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
+import { IdentityCertificationDto } from "sailpoint-api-client";
 import { ISCClient } from "../services/ISCClient";
 import { BulkWorkflowCaller } from "./BulkWorkflowCaller";
 
 
-import { IdentityCertificationDto } from '../sailpointCompat';
 export class BulkSendReminder {
 
     private readonly caller: BulkWorkflowCaller

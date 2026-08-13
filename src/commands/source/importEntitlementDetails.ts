@@ -6,6 +6,7 @@ import { CSVReader } from '../../services/CSVReader';
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
 import { isNotEmpty } from '../../utils/stringUtils';
 import { chooseFile, openPreview } from '../../utils/vsCodeHelpers';
+import { AdditionalOwnerRefV2025, JsonPatchOperationBeta, JsonPatchOperationV2025 } from 'sailpoint-api-client';
 import { TenantService } from '../../services/TenantService';
 import { validateTenantReadonly } from '../validateTenantReadonly';
 import { IdentityUsernameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
@@ -14,7 +15,6 @@ import { truethy } from '../../utils/booleanUtils';
 import { metadataToString, stringToAttributeMetadata } from '../../utils/metadataUtils';
 import { resolveAdditionalOwners } from '../../utils/additionalOwners';
 
-import { AdditionalOwnerRefV2025, JsonPatchOperationBeta, JsonPatchOperationV2025 } from '../../sailpointCompat';
 function isSameAdditionalOwners(a: AdditionalOwnerRefV2025[] | null, b: AdditionalOwnerRefV2025[] | undefined | null): boolean {
     if (!a && !b) { return true; }
     if (!a || !b) { return false; }

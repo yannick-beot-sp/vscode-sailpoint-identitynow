@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { Schema } from 'sailpoint-api-client';
 import { SourceTreeItem } from '../../models/ISCTreeItem';
 import { ISCClient } from '../../services/ISCClient';
 import { TenantService } from '../../services/TenantService';
@@ -12,7 +13,6 @@ import { createNewUntitledFile } from '../../utils/vsCodeHelpers';
 
 
 
-import { Schema } from '../../sailpointCompat';
 export class PeekSourceCommand {
 
     constructor(private readonly tenantService: TenantService) { }

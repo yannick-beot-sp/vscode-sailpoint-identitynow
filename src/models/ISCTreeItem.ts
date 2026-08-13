@@ -9,11 +9,10 @@ import * as commands from "../commands/constants";
 import * as configuration from '../configurationConstants';
 import { convertConstantToTitleCase, escapeFilter, isEmpty, isNotEmpty } from "../utils/stringUtils";
 import { TenantService } from "../services/TenantService";
+import { CampaignStatusV3, DimensionV2025, MachineIdentityResponseV2025, SourceSubtypeWithSourceV2026 } from "sailpoint-api-client";
 import { convertToBaseTreeItem } from "../views/utils";
-import { isAccountRemovable } from "../commands/account/accountUtils";
 
 
-import { Account, CampaignStatusV3, DimensionV2025, MachineIdentityResponseV2025, SourceSubtypeWithSourceV2026 } from '../sailpointCompat';
 /**
  * Base class to expose getChildren and updateIcon methods
  */
@@ -69,41 +68,26 @@ export class TenantTreeItem extends BaseTreeItem {
 	}
 	iconPath = new vscode.ThemeIcon("organization");
 	contextValue = "tenant";
-	private cachedChildren?: BaseTreeItem[];
-
-	private buildChildren(): BaseTreeItem[] {
-		const children: BaseTreeItem[] = [
-			new SourcesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
-			new TransformsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
-			new WorkflowsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
-			new RulesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
-			new ServiceDesksTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
-			new IdentityProfilesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
-			new AccessProfilesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
-			new RolesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
-			new FormsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
-			new SearchAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
-			new IdentityAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
-			new IdentitiesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
-			new MachineIdentitiesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
-			new ApplicationsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
-			new CampaignsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
-		];
-
-		for (const child of children) {
-			if (child instanceof FolderTreeItem) {
-				child.parentNode = this;
-			}
-		}
-
-		return children;
-	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
-		if (!this.cachedChildren) {
-			this.cachedChildren = this.buildChildren();
-		}
-		return this.cachedChildren;
+		const results: BaseTreeItem[] = [];
+		results.push(new SourcesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new TransformsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new WorkflowsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new RulesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new ServiceDesksTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new IdentityProfilesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new AccessProfilesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new RolesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new FormsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new SearchAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new IdentityAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new IdentitiesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new MachineIdentitiesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new ApplicationsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new CampaignsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+
+		return results
 	}
 
 	get computedContextValue() {
@@ -162,7 +146,6 @@ export abstract class FolderTreeItem extends BaseTreeItem {
 			tenantDisplayName,
 			vscode.TreeItemCollapsibleState.Collapsed);
 	}
-	public parentNode?: BaseTreeItem;
 	// collapsibleState is not updated. It's only for initial state.
 	// Setting statically the icon
 	iconPath = new vscode.ThemeIcon("folder");
@@ -1478,8 +1461,6 @@ export class IdentityAttributeTreeItem extends ISCResourceTreeItem {
 
 /* Contain Identity Definition */
 export class IdentitiesTreeItem extends PageableFolderTreeItem<Document> {
-	filterType = FilterType.search;
-
 	constructor(
 		tenantId: string,
 		tenantName: string,
@@ -1494,7 +1475,6 @@ export class IdentitiesTreeItem extends PageableFolderTreeItem<Document> {
 				identity.id
 			))
 		);
-		this.id = `${tenantId}/identities`;
 	}
 	protected async loadNext(): Promise<AxiosResponse<Document[]>> {
 		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
@@ -1548,122 +1528,14 @@ export class IdentityTreeItem extends ISCResourceTreeItem {
 			label,
 			resourceType: "identities",
 			id,
-			collapsible: vscode.TreeItemCollapsibleState.Collapsed
 		})
 	}
 
 	iconPath = new vscode.ThemeIcon("person");
 
-	async getChildren(): Promise<BaseTreeItem[]> {
-		return [
-			new IdentityAccountsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, this.resourceId),
-			new IdentityAccessTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, this.resourceId, this.label as string),
-		];
-	}
-
 	getUrl(): vscode.Uri | undefined {
 		return getResourceWebUrl(this.tenantName, "identity", this.id as string)
 	}
-}
-
-export class IdentityAccountsTreeItem extends FolderTreeItem {
-	constructor(
-		tenantId: string,
-		tenantName: string,
-		tenantDisplayName: string,
-		private readonly identityId: string
-	) {
-		super("Accounts", "identity-accounts", tenantId, tenantName, tenantDisplayName);
-		this.id = `${identityId}/accounts`;
-	}
-
-	async getChildren(): Promise<BaseTreeItem[]> {
-		const client = new ISCClient(this.tenantId, this.tenantName);
-		const accounts = await client.getAccountsByIdentity(this.identityId);
-
-		if (accounts === undefined || accounts.length === 0) {
-			return [new MessageNode("No accounts found")];
-		}
-
-		const sourceIds = [...new Set(accounts.map(account => account.sourceId).filter(x => !!x))];
-		const featuresBySourceId = new Map<string, string[]>();
-		await Promise.all(sourceIds.map(async (sourceId) => {
-			try {
-				const source = await client.getSourceById(sourceId);
-				featuresBySourceId.set(sourceId, source.features ?? []);
-			} catch (error) {
-				// Without the source features, the account will simply not expose feature-based actions
-				console.log(`Could not load features of source ${sourceId}:`, error);
-			}
-		}));
-
-		return accounts
-			.map(account => new AccountTreeItem(
-				this.tenantId,
-				this.tenantName,
-				this.tenantDisplayName,
-				this.identityId,
-				account,
-				featuresBySourceId.get(account.sourceId),
-				isAccountRemovable(account),
-				this
-			))
-			.sort(compareByLabel);
-	}
-}
-
-export class IdentityAccessTreeItem extends BaseTreeItem {
-	constructor(
-		tenantId: string,
-		tenantName: string,
-		tenantDisplayName: string,
-		public readonly identityId: string,
-		public readonly identityName: string,
-	) {
-		super("Access", tenantId, tenantName, tenantDisplayName, vscode.TreeItemCollapsibleState.None);
-		this.id = `${identityId}/access`;
-		this.contextValue = "identity-access";
-		this.iconPath = new vscode.ThemeIcon("key");
-		this.command = {
-			title: "View access",
-			command: commands.IDENTITIES_VIEW_ACCESS,
-			arguments: [this],
-		};
-	}
-
-	async getChildren(): Promise<BaseTreeItem[]> {
-		return [];
-	}
-}
-
-export class AccountTreeItem extends ISCResourceTreeItem {
-	constructor(
-		tenantId: string,
-		tenantName: string,
-		tenantDisplayName: string,
-		identityId: string,
-		account: Account,
-		features: string[] | undefined,
-		public readonly removable: boolean,
-		public readonly parentNode: BaseTreeItem
-	) {
-		super({
-			tenantId,
-			tenantName,
-			tenantDisplayName,
-			label: account.name ?? account.nativeIdentity ?? account.id,
-			resourceType: "accounts",
-			id: `${identityId}/accounts/${account.id}`,
-			resourceId: account.id
-		})
-		this.description = account.sourceName ?? undefined
-		this.contextValue = "account"
-			+ (features?.includes("ENABLE") ? (account.disabled ? "-enable" : "-disable") : "")
-			+ (features?.includes("UNLOCK") && account.locked ? "-unlock" : "")
-			+ (removable ? "-remove" : "")
-	}
-
-	iconPath = new vscode.ThemeIcon("jersey");
 }
 
 export class MachineIdentitiesTreeItem extends PageableFolderTreeItem<MachineIdentityResponseV2025> {

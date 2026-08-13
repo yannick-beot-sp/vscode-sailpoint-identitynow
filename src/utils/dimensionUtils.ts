@@ -1,7 +1,7 @@
+import { DimensionSchemaV2025 } from "sailpoint-api-client";
 import { convertPascalCase2SpaceBased, isEmpty } from "./stringUtils";
 import { CSV_MULTIVALUE_SEPARATOR } from "../constants";
 
-import { DimensionSchemaV2025 } from '../sailpointCompat';
 export function dimensionSchemaToString(dimensionSchema: DimensionSchemaV2025 | undefined) {
     return dimensionSchema?.dimensionAttributes?.map(x => x.name).join(CSV_MULTIVALUE_SEPARATOR)
 }

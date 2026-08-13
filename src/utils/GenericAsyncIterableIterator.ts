@@ -1,8 +1,8 @@
-import { ExtraParams, PaginationParams } from '../sailpointCompat';
 /**
  * Inpsired by Paginator from saipoint-api-client
  */
 
+import { ExtraParams, PaginationParams } from "sailpoint-api-client";
 import { ISCClient, TOTAL_COUNT_HEADER } from "../services/ISCClient";
 import { AxiosResponse } from "axios";
 

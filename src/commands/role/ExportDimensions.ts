@@ -3,6 +3,7 @@ import { BaseCSVExporter } from "../BaseExporter";
 import { RolesTreeItem, RoleTreeItem } from '../../models/ISCTreeItem';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
+import { EntitlementRef, DimensionV2025, DimensionsV2025ApiListDimensionsRequest } from 'sailpoint-api-client';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { SourceIdToNameCacheService } from '../../services/cache/SourceIdToNameCacheService';
 import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator';
@@ -13,7 +14,6 @@ import { UserCancelledError } from '../../errors';
 import { addRoleName, DimensionWithRoleNameName, getAllDimensions } from './DimensionAsyncIterables';
 import { DimensionCSVRecord } from '../../models/DimensionCsvRecord';
 
-import { EntitlementRef, DimensionV2025, DimensionsV2025ApiListDimensionsRequest } from '../../sailpointCompat';
 export class DimensionExporterCommand {
 
     /**

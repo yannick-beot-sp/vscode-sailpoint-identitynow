@@ -1,9 +1,9 @@
+import { AccessProfileApprovalSchemeV2025, AccessProfileApprovalSchemeV2025ApproverTypeV2025, ApprovalSchemeForRoleV2025, ApprovalSchemeForRoleV2025ApproverTypeV2025 } from "sailpoint-api-client";
 import { CacheService } from "../services/cache/CacheService";
 import { CSV_MULTIVALUE_SEPARATOR } from "../constants";
 import { isEmpty } from "./stringUtils";
 
 
-import { AccessProfileApprovalSchemeV2025, AccessProfileApprovalSchemeV2025ApproverTypeV2025, ApprovalSchemeForRoleV2025, ApprovalSchemeForRoleV2025ApproverTypeV2025 } from '../sailpointCompat';
 /**
  * TODO Align once API updated with AccessProfileApprovalSchemeV2025ApproverTypeV2025
  * Note: approval scheme for access profile supersedes approval scheme for roles

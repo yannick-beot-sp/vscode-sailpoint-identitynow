@@ -1,7 +1,7 @@
+import { DimensionsV2025ApiListDimensionsRequest, DimensionV2025, Role, RolesApiListRolesRequest, RoleV2025 } from "sailpoint-api-client";
 import { ISCClient } from "../../services/ISCClient";
 import { GenericAsyncIterableIterator } from "../../utils/GenericAsyncIterableIterator";
 
-import { DimensionsV2025ApiListDimensionsRequest, DimensionV2025, Role, RolesApiListRolesRequest, RoleV2025 } from '../../sailpointCompat';
 export interface DimensionWithRoleNameName extends DimensionV2025 {
     roleName: string
 }

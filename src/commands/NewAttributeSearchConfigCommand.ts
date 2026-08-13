@@ -3,6 +3,7 @@ import { TenantService } from "../services/TenantService";
 import { SearchAttributesTreeItem } from '../models/ISCTreeItem';
 import { ISCClient } from '../services/ISCClient';
 import { getResourceUri } from '../utils/UriUtils';
+import { SearchAttributeConfigBeta } from 'sailpoint-api-client';
 import { runWizard } from '../wizard/wizard';
 import { InputPromptStep } from '../wizard/inputPromptStep';
 import { Validator } from '../validator/validator';
@@ -13,7 +14,6 @@ import { QuickPickSourceStep } from '../wizard/quickPickSourceStep';
 import { QuickPickAccountSchemaStep } from '../wizard/quickPickAccountSchemaStep';
 import * as commands from "../commands/constants";
 
-import { SearchAttributeConfigBeta } from '../sailpointCompat';
 const searchAttributeNameValidator = new Validator({
     required: true,
     maxLength: 128,

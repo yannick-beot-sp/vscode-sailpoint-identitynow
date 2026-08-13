@@ -5,9 +5,9 @@ import { askChosenItems, askFile, askFolder, askSelectObjectTypes, openPreview }
 import { PathProposer } from '../../services/PathProposer';
 import { ISCClient } from '../../services/ISCClient';
 import { SPConfigExporter } from './SPConfigExporter';
+import { ExportPayloadBetaIncludeTypesBeta, ObjectExportImportOptionsBeta } from 'sailpoint-api-client';
 import { SimpleSPConfigExporter } from './SimpleSPConfigExporter';
 
-import { ExportPayloadBetaIncludeTypesBeta, ObjectExportImportOptionsBeta } from '../../sailpointCompat';
 const ALL: vscode.QuickPickItem = {
     label: "Export everything",
     picked: true

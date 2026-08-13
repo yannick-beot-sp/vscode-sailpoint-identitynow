@@ -1,10 +1,10 @@
+import { ExportPayloadBetaIncludeTypesBeta } from 'sailpoint-api-client';
 import { FormTreeItem, ISCResourceTreeItem, IdentityProfileTreeItem, RuleTreeItem, ServiceDeskTreeItem, SourceTreeItem, TransformTreeItem } from '../../models/ISCTreeItem';
 import { PathProposer } from '../../services/PathProposer';
 import { askFile, openPreview } from '../../utils/vsCodeHelpers';
 import { SPConfigExporter } from './SPConfigExporter';
 
 
-import { ExportPayloadBetaIncludeTypesBeta } from '../../sailpointCompat';
 /**
  * Entrypoint to export a Node (Source, Rule, Identity Profile or transform). Tenant is known.
  */

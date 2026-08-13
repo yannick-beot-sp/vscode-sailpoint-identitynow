@@ -1,7 +1,7 @@
+import { AttributeDTO, AttributeDTOListV2025 } from "sailpoint-api-client";
 import { CSV_MULTIVALUE_SEPARATOR } from "../constants";
 import { isEmpty } from "./stringUtils";
 
-import { AttributeDTO, AttributeDTOListV2025 } from '../sailpointCompat';
 export function metadataToString(m: AttributeDTOListV2025 | undefined): string | undefined {
   return m?.attributes?.
     map(attribute => `${attribute.key}:${attribute.values?.map(v => v.value).join(",")}`)

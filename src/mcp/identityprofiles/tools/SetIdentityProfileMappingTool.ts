@@ -6,7 +6,8 @@ import { ErrorCodes, McpError } from "../../errors";
 import { tenantNameField } from "../../inputFields";
 import { identityProfileIdOrNameField, parseMapping } from "./identityProfileSchemas";
 import { isUuid } from "../../../utils/stringUtils";
-import { IdentityAttributeTransform } from '../../../sailpointCompat';
+import { IdentityAttributeTransform } from "sailpoint-api-client";
+
 const inputSchema = z.object({
     tenantName: tenantNameField,
     identityProfile: identityProfileIdOrNameField,

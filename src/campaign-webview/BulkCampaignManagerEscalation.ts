@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 
+import { AdminReviewReassignReassignToV2025, CertificationCampaignsV2025ApiMoveRequest, DtoTypeV2025, GetActiveCampaigns200ResponseInnerV2025StatusV2025, IdentityCertificationDtoV2025 } from "sailpoint-api-client";
 import { ISCClient } from "../services/ISCClient";
 
-import { AdminReviewReassignReassignToV2025, CertificationCampaignsV2025ApiMoveRequest, DtoTypeV2025, GetActiveCampaigns200ResponseInnerV2025StatusV2025, IdentityCertificationDtoV2025 } from '../sailpointCompat';
 const CERTIFICATIONS_REASSIGN_LIMIT = 250;
 const COMMENT = "Escalating to the Reviewer's Manager"
 
@@ -72,7 +72,7 @@ export class BulkCampaignManagerEscalation {
             const certificationIds = allCertificationIds.splice(0, CERTIFICATIONS_REASSIGN_LIMIT);
             const certificationMoveRequest: CertificationCampaignsV2025ApiMoveRequest = {
                 id: campaignId,
-                adminReviewReassign: {
+                adminReviewReassignV2025: {
                     certificationIds: certificationIds,
                     reassignTo: newReviewer,
                     reason: reassignReason

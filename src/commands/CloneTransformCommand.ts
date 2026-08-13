@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 
+import { ExportPayloadBetaIncludeTypesBeta } from 'sailpoint-api-client';
 import { TransformTreeItem } from '../models/ISCTreeItem';
 import { ISCClient } from '../services/ISCClient';
 import { TenantService } from '../services/TenantService';
@@ -14,7 +15,6 @@ import { SimpleSPConfigExporter } from './spconfig-export/SimpleSPConfigExporter
 import * as commands from './constants';
 import { QuickPickTransformStep } from '../wizard/quickPickTransformStep';
 
-import { ExportPayloadBetaIncludeTypesBeta } from '../sailpointCompat';
 export class CloneTransformCommand {
 
     constructor(private readonly tenantService: TenantService) { }

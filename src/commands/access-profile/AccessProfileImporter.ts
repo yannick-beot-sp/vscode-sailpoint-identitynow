@@ -18,7 +18,8 @@ import { stringToAttributeMetadata } from "../../utils/metadataUtils";
 import { ImportResult } from "../../models/ImportResult";
 import { resolveAdditionalOwners } from "../../utils/additionalOwners";
 import { formatMaxPermittedAccessDuration } from "../../utils/maxPermittedAccessDuration";
-import { AccessDurationV2025, AccessProfileV2025, AdditionalOwnerRefV2025, EntitlementV2025, JsonPatchOperationV2025OpV2025 } from '../../sailpointCompat';
+import { AccessDurationV2025, AccessProfileV2025, AdditionalOwnerRefV2025, EntitlementV2025, JsonPatchOperationV2025OpV2025 } from "sailpoint-api-client";
+
 interface AccessProfileCSVRecord {
     name: string
     description: string

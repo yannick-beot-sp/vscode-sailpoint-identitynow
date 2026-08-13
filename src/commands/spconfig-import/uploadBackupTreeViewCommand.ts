@@ -10,7 +10,8 @@ import { runWizard } from '../../wizard/wizard';
 import { InputPromptStep } from '../../wizard/inputPromptStep';
 import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
 import { ChooseFileStep } from '../../wizard/chooseFileStep';
-import { BackupResponseV2024StatusV2024 } from '../../sailpointCompat';
+import { BackupResponseV2024StatusV2024 } from 'sailpoint-api-client';
+
 /**
  * Entry point to import file from the tree view. Tenant is already known
  * @param node 

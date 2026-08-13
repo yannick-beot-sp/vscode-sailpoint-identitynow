@@ -1,4 +1,4 @@
-import { EntitlementRef } from '../sailpointCompat';
+import { EntitlementRef } from "sailpoint-api-client"
 import { CSV_MULTIVALUE_SEPARATOR } from "../constants"
 import { CacheService } from "../services/cache/CacheService"
 import { SourceNameToIdCacheService } from "../services/cache/SourceNameToIdCacheService"

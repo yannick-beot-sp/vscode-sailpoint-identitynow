@@ -3,6 +3,7 @@ import * as tmp from "tmp";
 
 import { ISCClient } from "../../services/ISCClient";
 import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
+import { AccessProfileRef, DimensionCriteriaLevel1V2025, DimensionMembershipSelectorV2025, DimensionV2025, EntitlementRef, JsonPatchOperationV2025OpV2025, RoleMembershipSelectorType, RoleV2025 } from 'sailpoint-api-client';
 import { CSVReader } from '../../services/CSVReader';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
 import { AccessProfileNameToIdCacheService } from '../../services/cache/AccessProfileNameToIdCacheService';
@@ -17,7 +18,6 @@ import { RoleNameToIdCacheService } from '../../services/cache/RoleNameToIdCache
 import { DimensionMembershipCriteriaConverter } from '../../parser/DimensionMembershipCriteriaConverter';
 import { stringToEntitlementConverter } from '../../utils/entitlementUtils';
 
-import { AccessProfileRef, DimensionCriteriaLevel1V2025, DimensionMembershipSelectorV2025, DimensionV2025, EntitlementRef, JsonPatchOperationV2025OpV2025, RoleMembershipSelectorType, RoleV2025 } from '../../sailpointCompat';
 /**
  * Go through membership criteria and extract the identity attributes
  * @param node 

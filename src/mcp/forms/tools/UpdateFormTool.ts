@@ -9,7 +9,8 @@ import { resolveIdentity } from "../../utils/identityUtils";
 import { getFormOwner } from "../formUtils";
 import { descriptionField, formConditionSchema, formDefinitionInputSchema, formDetailOutputSchema, formElementSchema } from "./formSchemas";
 import { formIdOrNameField } from "./formSchemas";
-import { JsonPatchOperationV2025 } from '../../../sailpointCompat';
+import { JsonPatchOperationV2025 } from "sailpoint-api-client";
+
 const inputSchema = z.object({
     tenantName: tenantNameField,
     idOrName: formIdOrNameField,

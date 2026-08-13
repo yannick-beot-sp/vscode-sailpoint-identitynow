@@ -1,5 +1,6 @@
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
+import { AccessProfileV2025, EntitlementRefV2025 } from "sailpoint-api-client";
 import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
 import { tenantNameField } from "../../inputFields";
@@ -7,7 +8,6 @@ import { resolveIdentity } from "../../utils/identityUtils";
 import { resolveSource } from "../../utils/sourceUtils";
 import { accessProfileOutputSchema } from "./accessProfileSchemas";
 
-import { AccessProfileV2025, EntitlementRefV2025 } from '../../../sailpointCompat';
 const inputSchema = z.object({
     tenantName: tenantNameField,
     name: z.string().min(1).describe("Name of the access profile."),

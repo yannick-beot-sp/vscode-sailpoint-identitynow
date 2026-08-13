@@ -4,9 +4,9 @@ import { PathProposer } from '../../services/PathProposer';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { BaseCSVExporter } from '../BaseExporter';
 import AccountPaginator from './AccountPaginator';
+import { Account, Schema } from 'sailpoint-api-client';
 import { isEmpty } from '../../utils/stringUtils';
 
-import { Account, Schema } from '../../sailpointCompat';
 export class AccountExporterCommand {
 
     /**

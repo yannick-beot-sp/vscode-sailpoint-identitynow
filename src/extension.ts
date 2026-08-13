@@ -61,9 +61,6 @@ import { EditPasswordConfigCommand } from './commands/tenant/editPasswordConfigC
 import { GenerateDigitTokenCommand } from './commands/tenant/generateDigitTokenCommand';
 import { OpenScriptCommand } from './commands/rule/openScriptCommand';
 import { IdentityTreeViewCommand } from './commands/identity/IdentityTreeViewCommand';
-import { ViewIdentityEventsCommand } from './commands/identity/viewIdentityEventsCommand';
-import { ViewIdentityAccessCommand } from './commands/identity/viewIdentityAccessCommand';
-import { AccountTreeViewCommand } from './commands/account/AccountTreeViewCommand';
 import { ReassignOwnershipCommand } from './commands/identity/ReassignOwnershipCommand';
 import { TenantReadOnlyConfigCommand } from './commands/tenant/tenantReadOnlyConfigCommand';
 import { NewIdentityAttributeCommand } from './commands/newIdentityAttributeCommand';
@@ -179,11 +176,11 @@ export function activate(context: vscode.ExtensionContext) {
 			emailSettingsCommand));
 
 	const iscTreeDataProvider = new ISCTreeDataProvider(context, tenantService);
-	const iscTreeView = vscode.window.createTreeView(
-		commands.TREE_VIEW,
-		{ treeDataProvider: iscTreeDataProvider, showCollapseAll: true, canSelectMany: false, dragAndDropController: iscTreeDataProvider });
-	iscTreeDataProvider.bindTreeView(iscTreeView);
-	context.subscriptions.push(iscTreeView);
+	context.subscriptions.push(
+		vscode.window.createTreeView(
+			commands.TREE_VIEW,
+			{ treeDataProvider: iscTreeDataProvider, showCollapseAll: true, canSelectMany: false, dragAndDropController: iscTreeDataProvider })
+	);
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.REFRESH_FORCED, iscTreeDataProvider.forceRefresh, iscTreeDataProvider),
@@ -601,7 +598,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Identity Definition Config
 	const newIdentityCommand = new IdentityTreeViewCommand()
-	const identityFilterCommand = new IdentityDefinitionFilterCommand(iscTreeDataProvider);
+	const identityFilterCommand = new IdentityDefinitionFilterCommand();
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IDENTITIES_SEARCH,
 			identityFilterCommand.execute, identityFilterCommand));
@@ -617,45 +614,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IDENTITIES_PROCESS,
 			newIdentityCommand.processIdentity, newIdentityCommand));
-	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.IDENTITIES_INVITE,
-			newIdentityCommand.inviteIdentity, newIdentityCommand));
-	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.IDENTITIES_SET_LIFECYCLE_STATE,
-			newIdentityCommand.setLifecycleState, newIdentityCommand));
-	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.IDENTITIES_SET_USER_LEVEL,
-			newIdentityCommand.setUserLevel, newIdentityCommand));
-	const viewIdentityEventsCommand = new ViewIdentityEventsCommand(context.extensionUri);
-	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.IDENTITIES_VIEW_EVENTS,
-			viewIdentityEventsCommand.execute, viewIdentityEventsCommand));
-	const viewIdentityAccessCommand = new ViewIdentityAccessCommand(context.extensionUri);
-	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.IDENTITIES_VIEW_ACCESS,
-			viewIdentityAccessCommand.execute, viewIdentityAccessCommand));
 	const reassignOwnershipCommand = new ReassignOwnershipCommand();
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IDENTITIES_REASSIGN_OWNERSHIP,
 			reassignOwnershipCommand.execute, reassignOwnershipCommand));
-
-	// Accounts
-	const accountTreeViewCommand = new AccountTreeViewCommand();
-	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.ACCOUNT_ENABLE,
-			accountTreeViewCommand.enable, accountTreeViewCommand));
-	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.ACCOUNT_DISABLE,
-			accountTreeViewCommand.disable, accountTreeViewCommand));
-	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.ACCOUNT_UNLOCK,
-			accountTreeViewCommand.unlock, accountTreeViewCommand));
-	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.ACCOUNT_AGGREGATE_ONE,
-			accountTreeViewCommand.aggregateOne, accountTreeViewCommand));
-	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.ACCOUNT_REMOVE,
-			accountTreeViewCommand.remove, accountTreeViewCommand));
 
 	// Applications
 	const applicationSourceFilterCommand = new ApplicationSourceFilterCommand()

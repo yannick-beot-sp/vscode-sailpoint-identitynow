@@ -1,10 +1,10 @@
+import { RoleCriteriaKeyType } from "sailpoint-api-client";
 import { ParseException } from "../errors";
 import { Attribute, ComparisonOperation, ComparisonOperator, Expression, Literal, LogicalOperation, LogicalOperator, isComparisonOperation, isLogicalOperation } from "./ast";
 import { END_OF_STRING, StringIterator, isSpace } from "./stringIterator";
 import { isNotEmpty } from "../utils/stringUtils";
 import { parse as parseSync } from 'csv-parse/sync';
 
-import { RoleCriteriaKeyType } from '../sailpointCompat';
 export class Parser {
 
     public parse(str: string): Expression {

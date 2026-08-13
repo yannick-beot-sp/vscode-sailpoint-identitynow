@@ -1,7 +1,7 @@
+import { RoleCriteriaKeyType, RoleCriteriaLevel1, RoleCriteriaLevel2, RoleCriteriaLevel3, RoleCriteriaOperation, RoleCriteriaOperationV2025 } from "sailpoint-api-client";
 import { CacheService } from "../services/cache/CacheService";
 import { ComparisonOperation, isLogicalOperation } from "./ast";
 
-import { RoleCriteriaKeyType, RoleCriteriaLevel1, RoleCriteriaLevel2, RoleCriteriaLevel3, RoleCriteriaOperation, RoleCriteriaOperationV2025 } from '../sailpointCompat';
 /**
  * Single quote is privileged as in the CSV export, long string are between double quotes. So a double quote should be properly escaped, resulting in a double double-quote.
  * As I support single quote for import, I'll use single quote for now

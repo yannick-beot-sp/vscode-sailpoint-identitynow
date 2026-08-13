@@ -3,6 +3,7 @@ import { WorkflowsTreeItem } from '../../models/ISCTreeItem';
 import { ISCClient } from '../../services/ISCClient';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
+import { CreateWorkflowRequestV2025 } from 'sailpoint-api-client';
 import { cleanUpWorkflow } from './utils';
 import { isBlank } from '../../utils/stringUtils';
 import * as commands from '../constants';
@@ -11,7 +12,6 @@ import { validateTenantReadonly } from '../validateTenantReadonly';
 
 
 
-import { CreateWorkflowRequestV2025 } from '../../sailpointCompat';
 async function askWorkflowName(defaultWorkflowName: string): Promise<string | undefined> {
     const result = await vscode.window.showInputBox({
         value: defaultWorkflowName,

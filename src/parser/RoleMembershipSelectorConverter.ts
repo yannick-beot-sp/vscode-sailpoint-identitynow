@@ -1,5 +1,5 @@
-import { RoleCriteriaKey, RoleCriteriaKeyType, RoleCriteriaLevel1, RoleCriteriaOperation } from '../sailpointCompat';
 
+import { RoleCriteriaKey, RoleCriteriaKeyType, RoleCriteriaLevel1, RoleCriteriaOperation } from "sailpoint-api-client";
 import { CacheService } from "../services/cache/CacheService";
 import { Attribute, ComparisonOperation, ComparisonOperator, Expression, Literal, LogicalOperator, Visitor } from "./ast";
 

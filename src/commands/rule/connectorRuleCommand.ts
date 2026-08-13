@@ -7,6 +7,7 @@ import { TenantService } from '../../services/TenantService';
 import { compareByName } from '../../utils';
 import { buildResourceUri } from '../../utils/UriUtils';
 import { chooseTenant, createNewFile, getSelectionContent, openPreview } from '../../utils/vsCodeHelpers';
+import { ConnectorRuleResponseBeta } from 'sailpoint-api-client';
 import { Validator } from '../../validator/validator';
 import { WizardContext } from '../../wizard/wizardContext';
 import { QuickPickPromptStep } from '../../wizard/quickPickPromptStep';
@@ -16,7 +17,6 @@ import { IWizardOptions } from '../../wizard/wizardOptions';
 import { WizardPromptStep } from '../../wizard/wizardPromptStep';
 import { InputPromptStep } from '../../wizard/inputPromptStep';
 
-import { ConnectorRuleResponseBeta } from '../../sailpointCompat';
 const ruleTypes: ConnectorRuleResponseBeta[] = require('../../../snippets/connector-rules.json')
 
 const ruleNameValidator = new Validator({

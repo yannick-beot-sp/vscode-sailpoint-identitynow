@@ -1,5 +1,6 @@
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
+import { EntitlementRefV2025 } from "sailpoint-api-client";
 import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
 import { tenantNameField } from "../../inputFields";
@@ -7,7 +8,6 @@ import { isUuid } from "../../../utils/stringUtils";
 import { resolveIdentity } from "../../utils/identityUtils";
 import { accessProfileOutputSchema } from "./accessProfileSchemas";
 
-import { EntitlementRefV2025 } from '../../../sailpointCompat';
 const inputSchema = z.object({
     tenantName: tenantNameField,
     idOrName: z.string().min(1).describe("ID (32-char hex) or current name of the access profile to update."),

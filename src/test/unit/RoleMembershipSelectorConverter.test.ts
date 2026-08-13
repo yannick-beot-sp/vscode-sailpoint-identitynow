@@ -2,11 +2,11 @@ import * as assert from 'assert';
 import { it, describe, suite } from 'mocha';
 import { Parser } from '../../parser/parser';
 import { Attribute, ComparisonOperator, Expression, Literal } from '../../parser/ast';
+import { RoleCriteriaLevel1 } from 'sailpoint-api-client';
 import { CacheService } from '../../services/cache/CacheService';
 import { RoleMembershipSelectorConverter } from '../../parser/RoleMembershipSelectorConverter';
 
 
-import { RoleCriteriaLevel1 } from '../../sailpointCompat';
 class MockupCache extends CacheService<string> {
 
     constructor() {
