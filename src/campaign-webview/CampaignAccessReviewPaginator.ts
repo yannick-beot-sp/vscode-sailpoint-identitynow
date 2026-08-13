@@ -1,7 +1,7 @@
-import { CampaignReference, AccessReviewItem, Reviewer } from "sailpoint-api-client";
 import { ISCClient } from "../services/ISCClient";
 
 
+import { CampaignReference, AccessReviewItem, Reviewer } from '../sailpointCompat';
 export interface CampaignAccessReviewData extends AccessReviewItem {
     reviewer: Reviewer
     campaign: CampaignReference

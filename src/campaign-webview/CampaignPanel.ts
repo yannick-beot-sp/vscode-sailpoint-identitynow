@@ -1,3 +1,4 @@
+import { IdentityCertificationDto } from '../sailpointCompat';
 
 import * as vscode from 'vscode';
 import * as commands from './app/src/services/Commands';
@@ -10,7 +11,6 @@ import { BulkSendReminder } from './BulkSendReminder';
 import { CampaignConfigurationService } from '../services/CampaignConfigurationService';
 import { CampaignsTreeItem } from '../models/ISCTreeItem';
 import { BulkCampaignManagerEscalation } from './BulkCampaignManagerEscalation';
-import { IdentityCertificationDto } from 'sailpoint-api-client';
 import { BulkCertificationDecision } from './BulkCertificationDecision';
 import { BaseWebviewPanel } from '../webview/BaseWebviewPanel';
 

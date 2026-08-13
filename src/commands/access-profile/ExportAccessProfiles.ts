@@ -3,7 +3,6 @@ import { BaseCSVExporter } from "../BaseExporter";
 import { AccessProfilesTreeItem } from '../../models/ISCTreeItem';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
-import { AccessProfileSourceRef, AccessProfilesApiListAccessProfilesRequest, Requestability, AccessProfileV2025 } from 'sailpoint-api-client';
 import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { WorkflowIdToNameCacheService } from '../../services/cache/WorkflowIdToNameCacheService';
@@ -14,6 +13,7 @@ import { entitlementToStringConverter } from '../../utils/entitlementUtils';
 import { getAdditionalOwners } from '../../utils/additionalOwners';
 import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
 
+import { AccessProfileSourceRef, AccessProfilesApiListAccessProfilesRequest, Requestability, AccessProfileV2025 } from '../../sailpointCompat';
 export class AccessProfileExporterCommand {
     /**
      * Entry point 

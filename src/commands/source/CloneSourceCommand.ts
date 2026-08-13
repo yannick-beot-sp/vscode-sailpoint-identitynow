@@ -8,13 +8,13 @@ import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep';
 import { runWizard } from '../../wizard/wizard';
 import { Validator } from '../../validator/validator';
 import { InputPromptStep } from '../../wizard/inputPromptStep';
-import { ExportPayloadBetaIncludeTypesBeta, SourceCluster } from 'sailpoint-api-client';
 import crypto = require('crypto');
 import { SPConfigImporter } from '../spconfig-import/SPConfigImporter';
 import * as commands from '../constants';
 import { join } from 'path';
 import { SimpleSPConfigExporter } from '../spconfig-export/SimpleSPConfigExporter';
 
+import { ExportPayloadBetaIncludeTypesBeta, SourceCluster } from '../../sailpointCompat';
 const sourceNameValidator = new Validator({
     required: true,
     maxLength: 128,

@@ -20,8 +20,7 @@ import {
 } from "../utils";
 import { getIdByUri, getPathByUri } from "../utils/UriUtils";
 import { Operation, compare } from "fast-json-patch";
-import { FormDefinitionResponseBeta, SlimCampaign } from "sailpoint-api-client";
-
+import { FormDefinitionResponseBeta, SlimCampaign } from '../sailpointCompat';
 export class ISCResourceProvider implements FileSystemProvider {
 	private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
 
@@ -52,7 +51,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 			ctime: toTimestamp(data.created),
 			mtime: toTimestamp(data.modified),
 			size: convertToText(data).length,
-			permissions: id !== NEW_ID && (isReadOnly || resourcePath?.match("\/identities\/")) ? vscode.FilePermission.Readonly : undefined
+			permissions: id !== NEW_ID && (isReadOnly || resourcePath?.match(/\/identities\/|\/accounts\/(?!search-attribute-config)/)) ? vscode.FilePermission.Readonly : undefined
 		};
 	}
 	readDirectory(

@@ -4,7 +4,6 @@ import { AccessProfilesTreeItem } from '../../models/ISCTreeItem';
 import { NEW_ID } from '../../constants';
 import { ISCClient } from '../../services/ISCClient';
 import { getResourceUri } from '../../utils/UriUtils';
-import { AccessProfile, Entitlement, EntitlementBeta } from 'sailpoint-api-client';
 import { runWizard } from '../../wizard/wizard';
 import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
 import { InputPromptStep } from '../../wizard/inputPromptStep';
@@ -16,6 +15,7 @@ import { createNewFile } from '../../utils/vsCodeHelpers';
 import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep';
 import { InputIdentityQueryStep } from '../../wizard/inputIdentityQueryStep';
 
+import { AccessProfile, Entitlement, EntitlementBeta } from '../../sailpointCompat';
 const accessProfileTemplate: AccessProfile = require('../../../snippets/access-profile.json');
 
 const accessProfileNameValidator = new Validator({

@@ -1,8 +1,8 @@
-import { ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesBeta, SpConfigExportResultsBeta } from 'sailpoint-api-client';
 import * as vscode from 'vscode';
 import { ISCClient } from '../../services/ISCClient';
 import { delay } from '../../utils';
 
+import { ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesBeta, SpConfigExportResultsBeta } from '../../sailpointCompat';
 /**
  * Simplified version of SPConfigExporter
  */

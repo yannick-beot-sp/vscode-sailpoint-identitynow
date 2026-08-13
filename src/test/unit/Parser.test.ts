@@ -2,9 +2,7 @@ import * as assert from 'assert';
 import { it, describe, suite } from 'mocha';
 import { Parser } from '../../parser/parser';
 import { Attribute, ComparisonOperator, Expression, Literal, LogicalOperator } from '../../parser/ast';
-import { RoleCriteriaKeyType } from 'sailpoint-api-client';
-
-
+import { RoleCriteriaKeyType } from '../../sailpointCompat';
 interface ParameterizedTest { should: string, input: string, expected?: Expression };
 
 suite('Parser Test Suite', () => {

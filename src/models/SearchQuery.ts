@@ -1,5 +1,4 @@
-import { SearchV2025 } from "sailpoint-api-client"
-
+import { SearchV2025 } from '../sailpointCompat';
 export interface BasePaginatedSearch {
     limit?: number
     offset?: number

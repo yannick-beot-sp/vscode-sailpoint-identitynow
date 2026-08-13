@@ -2,12 +2,12 @@ import * as vscode from 'vscode';
 import { CampaignTreeItem } from "../models/ISCTreeItem";
 import { ISCClient } from '../services/ISCClient';
 import { confirm } from '../utils/vsCodeHelpers';
-import { AccessReviewItem, DtoType } from 'sailpoint-api-client';
 import { BulkReviewItemReassignment } from './BulkReviewItemReassignment';
 import { TenantService } from '../services/TenantService';
 import { isTenantReadonly, validateTenantReadonly } from '../commands/validateTenantReadonly';
 import { SourceIdToOwnerIdCacheService } from '../services/cache/SourceIdToOwnerIdCacheService';
 
+import { AccessReviewItem, DtoType } from '../sailpointCompat';
 const OWNER_REVIEW_DEFAULT_COMMENT = "Reassigned to the Access Item Owner"
 
 /**

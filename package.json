@@ -33,6 +33,9 @@
   "activationEvents": [
     "onFileSystem:idn",
     "onWebviewPanel:campaignView",
+    "onWebviewPanel:identityEventsView",
+    "onWebviewPanel:identityAccessView",
+    "onWebviewPanel:accessRequestStatusView",
     "onUri"
   ],
   "license": "MIT",
@@ -605,6 +608,46 @@
         "title": "Search identities..."
       },
       {
+        "command": "vscode-sailpoint-identitynow.identities.invite",
+        "title": "Invite"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.identities.set-lifecycle-state",
+        "title": "Set lifecycle state"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.identities.set-user-level",
+        "title": "Set user level"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.identities.view-events",
+        "title": "Events"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.identities.view-access",
+        "title": "Access"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.account.enable",
+        "title": "Enable account"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.account.disable",
+        "title": "Disable account"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.account.unlock",
+        "title": "Unlock account"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.account.aggregate-one",
+        "title": "Aggregate one"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.account.remove",
+        "title": "Remove account"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.identities.delete",
         "title": "Delete"
       },
@@ -1067,6 +1110,42 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.identities.icon-search",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.invite",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.set-lifecycle-state",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.set-user-level",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.view-events",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.account.enable",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.account.disable",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.account.unlock",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.account.aggregate-one",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.account.remove",
           "when": "never"
         },
         {
@@ -1604,20 +1683,74 @@
           "group": "inline@1"
         },
         {
-          "command": "vscode-sailpoint-identitynow.identities.delete",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/"
+          "command": "vscode-sailpoint-identitynow.identities.invite",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/",
+          "group": "identity@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.set-lifecycle-state",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/",
+          "group": "identity@2"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.set-user-level",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/",
+          "group": "identity@3"
         },
         {
           "command": "vscode-sailpoint-identitynow.identities.att-sync",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/",
+          "group": "identity@4"
         },
         {
-          "command": "vscode-sailpoint-identitynow.identities.process",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/"
+          "command": "vscode-sailpoint-identitynow.identities.view-events",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/",
+          "group": "identityActions@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.view-access",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity-access$/",
+          "group": "identityActions@1"
         },
         {
           "command": "vscode-sailpoint-identitynow.identities.reassign-ownership",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/"
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/",
+          "group": "identityActions@2"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.process",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/",
+          "group": "identityActions@3"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.delete",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/",
+          "group": "identityActions@4"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.account.enable",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^account.*-enable/",
+          "group": "account@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.account.disable",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^account.*-disable/",
+          "group": "account@2"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.account.unlock",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^account.*-unlock/",
+          "group": "account@3"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.account.aggregate-one",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^account/",
+          "group": "account@4"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.account.remove",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^account.*-remove/",
+          "group": "account@5"
         },
         {
           "command": "vscode-sailpoint-identitynow.applications.filter.source",
@@ -1972,7 +2105,7 @@
     "fast-json-patch": "^3.1.1",
     "frontmcp": "^0.12.2",
     "lodash": "^4.17.21",
-    "sailpoint-api-client": "^1.8.69",
+    "sailpoint-api-client": "^2.1.18",
     "tmp": "^0.2.1",
     "vscode-sailpoint-identitynow": "file:"
   }

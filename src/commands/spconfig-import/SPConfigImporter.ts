@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 import { ISCClient } from '../../services/ISCClient';
 import { IMPORTABLE_OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
-import { ImportOptionsBeta } from 'sailpoint-api-client';
 import { ImportJobResults } from '../../models/JobStatus';
 import { waitForImportJob } from './utils';
 
+import { ImportOptionsBeta } from '../../sailpointCompat';
 /**
  * Base class for all importer
  */

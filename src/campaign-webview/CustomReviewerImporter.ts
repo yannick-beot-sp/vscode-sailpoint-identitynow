@@ -3,8 +3,7 @@ import * as vscode from 'vscode';
 import { ISCClient } from '../services/ISCClient';
 import { CSVReader } from '../services/CSVReader';
 import { UserCancelledError } from '../errors';
-import { Index, Search } from 'sailpoint-api-client';
-
+import { Index, Search } from '../sailpointCompat';
 const VALID_REVIEWER_ATTRIBUTES = ["id", "name", "email"]
 const VALID_ITEM_TYPES = ["IDENTITY", "ENTITLEMENT", "ACCESS_PROFILE", "ROLE", "ALL"]
 const VALID_ITEM_SELECTOR_TYPES = ["id", "name", "query", "all"]

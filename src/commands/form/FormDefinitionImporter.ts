@@ -4,8 +4,7 @@ import * as commands from '../constants';
 
 import { ISCClient } from "../../services/ISCClient";
 import { askChosenItems } from '../../utils/vsCodeHelpers';
-import { ImportFormDefinitionsRequestInnerBeta } from 'sailpoint-api-client';
-
+import { ImportFormDefinitionsRequestInnerBeta } from '../../sailpointCompat';
 export class FormDefinitionImporter {
     readonly client: ISCClient;
 

@@ -5,12 +5,12 @@ import { CampaignsTreeItem } from "../models/ISCTreeItem";
 import { WizardContext } from "../wizard/wizardContext";
 import { runWizard } from "../wizard/wizard";
 import { ExtendedQuickPickItem } from "../models/ExtendedQuickPickItem";
-import { CampaignStatusV3 } from "sailpoint-api-client";
 import { capitalizeFirstLetter } from "../utils/stringUtils";
 import { compareByLabel } from "../utils";
 import { QuickPickPromptStep } from "../wizard/quickPickPromptStep";
 
 
+import { CampaignStatusV3 } from '../sailpointCompat';
 function prepareStatusPickItems(statuses: string[]): ExtendedQuickPickItem[] {
     return Object.values(CampaignStatusV3).map(key => ({
         label: capitalizeFirstLetter(key),

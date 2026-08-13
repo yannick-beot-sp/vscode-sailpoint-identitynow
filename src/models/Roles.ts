@@ -1,5 +1,4 @@
-import { RolesV2025ApiListRolesRequest } from "sailpoint-api-client";
-
+import { RolesV2025ApiListRolesRequest } from '../sailpointCompat';
 export const DEFAULT_ROLES_QUERY_PARAMS: RolesV2025ApiListRolesRequest = {
     count: false,
     limit: 250,

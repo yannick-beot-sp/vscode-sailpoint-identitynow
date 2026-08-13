@@ -1,6 +1,6 @@
-import { IdentityCertDecisionSummary } from "sailpoint-api-client";
 import { ISCClient } from "../services/ISCClient";
 
+import { IdentityCertDecisionSummary } from '../sailpointCompat';
 export class KPIsAndReviewersQuery {
 
     constructor(private readonly client: ISCClient) { }

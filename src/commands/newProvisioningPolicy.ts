@@ -3,7 +3,6 @@ import * as commands from './constants';
 import { ProvisioningPoliciesTreeItem } from "../models/ISCTreeItem";
 import { compareByLabel } from '../utils';
 import { buildResourceUri, getIdByUri } from '../utils/UriUtils';
-import { UsageTypeBeta } from 'sailpoint-api-client';
 import { convertConstantToTitleCase, isEmpty } from '../utils/stringUtils';
 import { ExtendedQuickPickItem } from '../models/ExtendedQuickPickItem';
 import { openPreview } from '../utils/vsCodeHelpers';
@@ -18,6 +17,7 @@ import { ISCClient } from '../services/ISCClient';
 
 
 
+import { UsageTypeBeta } from '../sailpointCompat';
 const provisioningPolicyNameValidator = new Validator({
     required: false,
     maxLength: 50,

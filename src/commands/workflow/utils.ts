@@ -1,5 +1,4 @@
-import { WorkflowBeta } from "sailpoint-api-client";
-
+import { WorkflowBeta } from '../../sailpointCompat';
 export function cleanUpWorkflow(workflow: WorkflowBeta): WorkflowBeta {
     let w = removeUnwantedProperties(workflow)
     w = removeSecret(w)

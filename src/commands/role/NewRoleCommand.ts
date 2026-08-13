@@ -4,7 +4,6 @@ import { RolesTreeItem } from '../../models/ISCTreeItem';
 import { NEW_ID } from '../../constants';
 import { ISCClient } from '../../services/ISCClient';
 import { getResourceUri } from '../../utils/UriUtils';
-import { Role, RoleMembershipSelectorType } from 'sailpoint-api-client';
 import { runWizard } from '../../wizard/wizard';
 import { InputPromptStep } from '../../wizard/inputPromptStep';
 import { Validator } from '../../validator/validator';
@@ -20,6 +19,7 @@ import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdC
 import { QuickPickAccessProfileStep } from '../../wizard/quickPickAccessProfileStep';
 import { QuickPickEntitlementStep } from '../../wizard/quickPickEntitlementStep';
 
+import { Role, RoleMembershipSelectorType } from '../../sailpointCompat';
 const role: Role = require('../../../snippets/role.json');
 
 

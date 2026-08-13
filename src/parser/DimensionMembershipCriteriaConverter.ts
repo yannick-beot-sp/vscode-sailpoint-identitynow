@@ -1,8 +1,8 @@
-import { DimensionCriteriaKeyTypeV2025, DimensionCriteriaLevel1V2025, DimensionCriteriaOperationV2025, RoleCriteriaKeyType } from "sailpoint-api-client";
 import { ParseException } from "../errors";
 import { ComparisonOperator, Expression, LogicalOperator } from "./ast";
 import { Parser } from "./parser";
 
+import { DimensionCriteriaKeyTypeV2025, DimensionCriteriaLevel1V2025, DimensionCriteriaOperationV2025, RoleCriteriaKeyType } from '../sailpointCompat';
 /**
  * The Dimension API accepts more nesting levels than what DimensionCriteriaLevel1/2/3V2025
  * describe (an "or" group of values nested inside an "and" of attributes needs 4 levels),

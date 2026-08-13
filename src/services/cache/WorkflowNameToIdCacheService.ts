@@ -1,7 +1,6 @@
 import { ISCClient } from "../ISCClient";
 import { CacheService } from "./CacheService";
-import { WorkflowV2025 } from "sailpoint-api-client";
-
+import { WorkflowV2025 } from '../../sailpointCompat';
 /**
  * Cache the workflow ID by name
  */

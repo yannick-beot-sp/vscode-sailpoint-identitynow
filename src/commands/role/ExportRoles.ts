@@ -3,7 +3,6 @@ import { BaseCSVExporter } from "../BaseExporter";
 import { RolesTreeItem } from '../../models/ISCTreeItem';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { PathProposer } from '../../services/PathProposer';
-import { RequestabilityForRole, RevocabilityForRole, RoleMembershipSelectorType, RolesApiListRolesRequest, RoleV2025 } from 'sailpoint-api-client';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { WorkflowIdToNameCacheService } from '../../services/cache/WorkflowIdToNameCacheService';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
@@ -18,6 +17,7 @@ import { dimensionSchemaToString } from '../../utils/dimensionUtils';
 import { entitlementToStringConverter } from '../../utils/entitlementUtils';
 import { getAdditionalOwners } from '../../utils/additionalOwners';
 
+import { RequestabilityForRole, RevocabilityForRole, RoleMembershipSelectorType, RolesApiListRolesRequest, RoleV2025 } from '../../sailpointCompat';
 export class RoleExporterCommand {
 
     /**

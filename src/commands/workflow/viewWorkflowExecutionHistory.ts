@@ -2,9 +2,9 @@ import * as vscode from 'vscode';
 import { WorkflowTreeItem } from '../../models/ISCTreeItem';
 import { ISCClient } from '../../services/ISCClient';
 import { getWorkflowExecutionDetailUri } from '../../utils/UriUtils';
-import { WorkflowExecutionBeta } from 'sailpoint-api-client';
 import { openPreview } from '../../utils/vsCodeHelpers';
 
+import { WorkflowExecutionBeta } from '../../sailpointCompat';
 export async function viewWorkflowExecutionHistory(node: WorkflowTreeItem): Promise<void> {
 
     console.log("> viewWorkflowExecutionHistory", node);

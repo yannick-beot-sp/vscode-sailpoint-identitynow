@@ -2,12 +2,12 @@ import * as vscode from 'vscode';
 import { CampaignTreeItem } from "../models/ISCTreeItem";
 import { TenantService } from "../services/TenantService";
 import { ISCClient } from '../services/ISCClient';
-import { AccessReviewItem, ReassignReference, ReassignReferenceTypeV3 } from 'sailpoint-api-client';
 import { chooseFile, confirm } from '../utils/vsCodeHelpers';
 import { CustomReviewerCoverage, CustomReviewerImporter } from './CustomReviewerImporter';
 import { BulkReviewItemReassignment, getPendingCampaignItems } from './BulkReviewItemReassignment';
 import { isTenantReadonly, validateTenantReadonly } from '../commands/validateTenantReadonly';
 
+import { AccessReviewItem, ReassignReference, ReassignReferenceTypeV3 } from '../sailpointCompat';
 const CUSTOM_REVIEWERS_DEFAULT_COMMENT = "Reassigned to the defined reviewer"
 
 /**

@@ -1,6 +1,6 @@
-import { JsonPatchOperationV2025 } from "sailpoint-api-client";
 import { ISCClient } from "../services/ISCClient";
 
+import { JsonPatchOperationV2025 } from '../sailpointCompat';
 /**
  * Object types whose ownership (or, for the two "Pending..." types, assignment)
  * can be reassigned from one identity to another. Kept in alphabetical order:
@@ -154,7 +154,7 @@ export async function reassignOne(
             // access-review items within a certification someone else already reviews.
             await client.reassignCertificationReviewItemsSync({
                 id,
-                reviewReassignV2025: {
+                reviewReassign: {
                     reassign: [{ id, type: "IDENTITY_SUMMARY" }],
                     reassignTo: newOwnerId,
                     reason: reason!

@@ -1,8 +1,8 @@
-import { BackupResponseV2024, SpConfigJobBeta, SpConfigJobBetaStatusBeta } from "sailpoint-api-client";
 import { ISCClient } from "../../services/ISCClient";
 import * as vscode from 'vscode';
 import { delay } from "../../utils";
 
+import { BackupResponseV2024, SpConfigJobBeta, SpConfigJobBetaStatusBeta } from '../../sailpointCompat';
 export async function waitForImportJob(client: ISCClient, taskId: string, token: vscode.CancellationToken): Promise<SpConfigJobBeta | null> {
 
     return await waitFor(taskId,

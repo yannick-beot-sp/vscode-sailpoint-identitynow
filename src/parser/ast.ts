@@ -1,5 +1,4 @@
-import { RoleCriteriaKeyType } from "sailpoint-api-client";
-
+import { RoleCriteriaKeyType } from '../sailpointCompat';
 export interface Visitor<T> {
     visitComparisonOperator(val: ComparisonOperator, arg: T): void | Promise<void>;
     visitLogicalOperator(val: LogicalOperator, arg: T): void | Promise<void>;

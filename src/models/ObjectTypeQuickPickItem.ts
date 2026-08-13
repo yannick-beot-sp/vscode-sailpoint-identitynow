@@ -1,6 +1,6 @@
-import { ExportPayloadBetaExcludeTypesBeta, ImportOptionsBetaIncludeTypesBeta } from "sailpoint-api-client";
 import { QuickPickItem } from "vscode";
 
+import { ExportPayloadBetaExcludeTypesBeta, ImportOptionsBetaIncludeTypesBeta } from '../sailpointCompat';
 export interface ExportableObjectTypeQuickPickItem extends QuickPickItem {
     objectType: ExportPayloadBetaExcludeTypesBeta
 }

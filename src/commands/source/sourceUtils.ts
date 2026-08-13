@@ -1,8 +1,8 @@
-import { TaskStatusBeta, TaskStatusBetaCompletionStatusBeta } from "sailpoint-api-client";
 import { ISCClient } from "../../services/ISCClient";
 import * as vscode from 'vscode';
 import { delay, formatString } from "../../utils";
 
+import { TaskStatusBeta, TaskStatusBetaCompletionStatusBeta } from '../../sailpointCompat';
 export async function waifForJob(client: ISCClient, taskId: string, token: vscode.CancellationToken): Promise<TaskStatusBeta | null> {
     console.log("> waifForJob", taskId);
     let task: TaskStatusBeta | null = null;

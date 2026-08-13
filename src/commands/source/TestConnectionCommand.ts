@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 
-import { StatusResponseBeta, StatusResponseBetaStatusBeta } from 'sailpoint-api-client';
 import { SourceTreeItem } from '../../models/ISCTreeItem';
 import { ISCClient } from '../../services/ISCClient';
 import { TenantService } from '../../services/TenantService';
@@ -9,6 +8,7 @@ import { runWizard } from '../../wizard/wizard';
 import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
 import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep';
 
+import { StatusResponseBeta, StatusResponseBetaStatusBeta } from '../../sailpointCompat';
 export class TestConnectionCommand {
 
     constructor(private readonly tenantService: TenantService) { }

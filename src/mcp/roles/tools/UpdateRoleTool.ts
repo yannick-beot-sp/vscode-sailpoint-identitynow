@@ -1,6 +1,5 @@
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { AccessProfileRef, EntitlementRef, RoleMembershipSelector, RoleMembershipSelectorType } from "sailpoint-api-client";
 import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
 import { refSchema, tenantNameField } from "../../inputFields";
@@ -11,6 +10,7 @@ import { isUuid } from "../../../utils/stringUtils";
 import { resolveIdentity } from "../../utils/identityUtils";
 import { membershipCriteriaField, roleBaseOutputSchema } from "./roleSchemas";
 
+import { AccessProfileRef, EntitlementRef, RoleMembershipSelector, RoleMembershipSelectorType } from '../../../sailpointCompat';
 const inputSchema = z.object({
     tenantName: tenantNameField,
     idOrName: z.string().min(1).describe("ID (32-char hex) or current name of the role to update."),

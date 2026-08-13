@@ -5,12 +5,12 @@ import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { ISCClient } from "./ISCClient";
 import { TenantService } from "./TenantService";
 import { TransformEvaluator } from './TransformEvaluator';
-import { TaskStatusBeta, TaskStatusBetaCompletionStatusBeta } from 'sailpoint-api-client';
 import { confirm } from '../utils/vsCodeHelpers';
 import { formatTask, waifForJob } from '../commands/source/sourceUtils';
 import { isTenantReadonly, validateTenantReadonly } from '../commands/validateTenantReadonly';
 import { isEmpty } from '../utils/arrayUtils';
 
+import { TaskStatusBeta, TaskStatusBetaCompletionStatusBeta } from '../sailpointCompat';
 export class TreeManager {
 
     constructor(

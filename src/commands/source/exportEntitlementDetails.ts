@@ -3,7 +3,6 @@ import { SourceTreeItem } from '../../models/ISCTreeItem';
 import { PathProposer } from '../../services/PathProposer';
 import { askFile } from '../../utils/vsCodeHelpers';
 import { BaseCSVExporter } from '../BaseExporter';
-import { EntitlementV2025, EntitlementsV2025ApiListEntitlementsRequest } from 'sailpoint-api-client';
 import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
 import { getAdditionalOwners } from '../../utils/additionalOwners';
@@ -11,6 +10,7 @@ import { metadataToString } from '../../utils/metadataUtils';
 import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator';
 
 
+import { EntitlementV2025, EntitlementsV2025ApiListEntitlementsRequest } from '../../sailpointCompat';
 export class EntitlementExporterCommand {
     /**
      * Entry point

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { IdentityCertificationDtoV2025, AccessReviewItemV2025, ReviewDecisionV2025, CertificationDecisionV2025, CertificationsV2025ApiMakeIdentityDecisionRequest } from "sailpoint-api-client";
 import { ISCClient } from "../services/ISCClient";
 
+import { IdentityCertificationDtoV2025, AccessReviewItemV2025, ReviewDecisionV2025, CertificationDecisionV2025, CertificationsV2025ApiMakeIdentityDecisionRequest } from '../sailpointCompat';
 const DECIDE_CERTIFICATION_ITEM_LIMIT = 250;
 
 export interface DecisionReport {
@@ -130,7 +130,7 @@ export class BulkCertificationDecision {
         });
         const apiDecisionRequest: CertificationsV2025ApiMakeIdentityDecisionRequest = {
             id: certificationId,
-            reviewDecisionV2025: decisions
+            reviewDecision: decisions
         };
 
         await this.client.decideCertificationItems(apiDecisionRequest);

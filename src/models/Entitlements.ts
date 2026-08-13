@@ -1,5 +1,4 @@
-import { EntitlementsV2025ApiListEntitlementsRequest } from "sailpoint-api-client";
-
+import { EntitlementsV2025ApiListEntitlementsRequest } from '../sailpointCompat';
 export const DEFAULT_ENTITLEMENTS_QUERY_PARAMS: EntitlementsV2025ApiListEntitlementsRequest = {
     count: false,
     limit: 250,

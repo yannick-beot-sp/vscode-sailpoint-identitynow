@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 
-import { AccessReviewItem, GetActiveCampaigns200ResponseInnerV2025StatusV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, IdentityCertificationDtoV2025, ReassignReferenceV2025, ReassignReferenceV2025TypeV2025, AccessReviewItemV2025 } from "sailpoint-api-client";
 import { ISCClient } from "../services/ISCClient";
 
+import { AccessReviewItem, GetActiveCampaigns200ResponseInnerV2025StatusV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, IdentityCertificationDtoV2025, ReassignReferenceV2025, ReassignReferenceV2025TypeV2025, AccessReviewItemV2025 } from '../sailpointCompat';
 const ASYNC_REVIEW_ITEM_REASSIGN_LIMIT = 500
 const SYNC_REVIEW_ITEM_REASSIGN_LIMIT = 50
 const REASSIGN_GROUPING_KEY_DELIMITER = '__'
@@ -225,7 +225,7 @@ export class BulkReviewItemReassignment {
             const reassignReferences = allReassignReferences.splice(0, SYNC_REVIEW_ITEM_REASSIGN_LIMIT);
             const certificationReassignRequest: CertificationsV2025ApiReassignIdentityCertificationsRequest = {
                 id: certificationId,
-                reviewReassignV2025: {
+                reviewReassign: {
                     reassign: reassignReferences,
                     reassignTo: reviewerId,
                     reason: reassignReason
@@ -251,7 +251,7 @@ export class BulkReviewItemReassignment {
             const reassignReferences = allReassignReferences.splice(0, ASYNC_REVIEW_ITEM_REASSIGN_LIMIT);
             const certificationReassignRequest: CertificationsV2025ApiSubmitReassignCertsAsyncRequest = {
                 id: certificationId,
-                reviewReassignV2025: {
+                reviewReassign: {
                     reassign: reassignReferences,
                     reassignTo: reviewerId,
                     reason: reassignReason

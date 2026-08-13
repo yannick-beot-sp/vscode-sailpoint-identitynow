@@ -6,8 +6,7 @@ import { ISCClient } from '../../services/ISCClient';
 import { delay, sanitizeFilename } from '../../utils';
 import { ensureFolderExists } from '../../utils/fileutils';
 import { PathProposer } from '../../services/PathProposer';
-import { ExportPayloadBetaIncludeTypesBeta, ObjectExportImportOptionsBeta } from 'sailpoint-api-client';
-
+import { ExportPayloadBetaIncludeTypesBeta, ObjectExportImportOptionsBeta } from '../../sailpointCompat';
 /**
  * Class use to export SP-Config
  */

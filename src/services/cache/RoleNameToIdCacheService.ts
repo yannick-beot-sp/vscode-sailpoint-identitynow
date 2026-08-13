@@ -1,7 +1,7 @@
-import { RoleV2025 } from "sailpoint-api-client";
 import { ISCClient } from "../ISCClient";
 import { CacheService } from "./CacheService";
 
+import { RoleV2025 } from '../../sailpointCompat';
 /**
  * Cache the role name by id
  */

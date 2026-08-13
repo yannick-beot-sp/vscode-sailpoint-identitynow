@@ -1,17 +1,28 @@
 import * as vscode from "vscode";
-import { BaseTreeItem, FilterType, PageableNode } from "../models/ISCTreeItem";
+import { BaseTreeItem, FilterType, IdentitiesTreeItem, PageableNode } from "../models/ISCTreeItem";
 import * as commands from "../commands/constants";
 import { WizardContext } from "../wizard/wizardContext";
 import { InputPromptStep } from "../wizard/inputPromptStep";
 import { runWizard } from "../wizard/wizard";
 import { QuickPickPromptStep } from "../wizard/quickPickPromptStep";
+import { ISCTreeDataProvider } from "../views/ISCTreeDataProvider";
+import { isNotEmpty } from "../utils/stringUtils";
 
 
-const newFilter = (nodeFilterType: FilterType) => new QuickPickPromptStep({
+const newFilter = (nodeFilterType: FilterType, searchFirst = false) => new QuickPickPromptStep({
     name: "filterType",
     displayName: "filter type",
     project: x => x.value,
-    items: [{
+    items: searchFirst ? [{
+        label: FilterType.search,
+        value: FilterType.search,
+        picked: (nodeFilterType === FilterType.search)
+    },
+    {
+        label: FilterType.api,
+        value: FilterType.api,
+        picked: (nodeFilterType === FilterType.api)
+    }] : [{
         label: FilterType.api,
         value: FilterType.api,
         picked: (nodeFilterType === FilterType.api)
@@ -105,22 +116,48 @@ export class RoleFilterCommand extends FilterCommand {
 }
 
 export class IdentityDefinitionFilterCommand extends FilterCommand {
-    constructor() {
-        super();
-    }
+	constructor(
+		private readonly treeDataProvider?: ISCTreeDataProvider,
+	) {
+		super();
+	}
 
-    protected async runWizard(filterType: FilterType, wizardContext: WizardContext): Promise<WizardContext> {
+	public async execute(node: PageableNode & BaseTreeItem): Promise<void> {
+		const wizardContext: WizardContext = {};
+		wizardContext["filter" + node.filterType] = node.filters;
+		const values = await this.runWizard(node.filterType, wizardContext);
+
+		if (values === undefined) {
+			return;
+		}
+
+		const filterType = values["filterType"] as FilterType;
+		const filters = values["filter" + filterType] as string;
+
+		const identities = await this.treeDataProvider?.resolveIdentitiesTreeItem(node.tenantId)
+			?? (node as IdentitiesTreeItem);
+		identities.filterType = filterType;
+		identities.filters = filters;
+
+		vscode.commands.executeCommand(commands.REFRESH_FORCED, identities);
+
+		if (isNotEmpty(filters)) {
+			await this.treeDataProvider?.revealIdentities(identities);
+		}
+	}
+
+	protected async runWizard(filterType: FilterType, wizardContext: WizardContext): Promise<WizardContext> {
         return await runWizard({
             title: "Search identities",
             hideStepCount: true,
             promptSteps: [
-                newFilter(filterType),
+                newFilter(filterType, true),
                 new FilterInputStep("identities",
                     FilterType.search,
                     "https://documentation.sailpoint.com/saas/help/search/searchable-fields.html#searching-identity-data"),
                 new FilterInputStep("identities",
                     FilterType.api,
-                    "https://developer.sailpoint.com/docs/api/beta/list-identities")
+                    "https://developer.sailpoint.com/docs/api/identities/list-identities-v-1")
             ],
         }, wizardContext);
     }

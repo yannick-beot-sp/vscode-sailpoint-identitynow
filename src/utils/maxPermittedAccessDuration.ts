@@ -1,7 +1,7 @@
-import { AccessDurationV2025, AccessDurationV2025TimeUnitV2025 } from "sailpoint-api-client";
 import { isNotBlank } from "./stringUtils";
 import { isEmpty } from "lodash";
 
+import { AccessDurationV2025, AccessDurationV2025TimeUnitV2025 } from '../sailpointCompat';
 function isTimeUnit(type: string | undefined): type is AccessDurationV2025TimeUnitV2025 {
     if (type === undefined) return false;
     return Object.values(AccessDurationV2025TimeUnitV2025).includes(type as AccessDurationV2025TimeUnitV2025)

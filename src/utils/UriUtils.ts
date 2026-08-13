@@ -74,6 +74,11 @@ export function buildResourceUri(params: {
 export function getResourceUri(tenantName: string, resourceType: string, id: string, name: string): Uri {
     const baseUri = Uri.from({ scheme: URL_PREFIX, authority: tenantName, path: '/' });
     name = name?.replaceAll("/", "%2F")
+
+    if (resourceType === "accounts") {
+        return Uri.joinPath(baseUri, "accounts", "v1", id, name);
+    }
+
     // ensure all parts are not null
     const prefix = { "source-subtypes": "v2026" }[resourceType] ?? "v2025";
     const pathParts = [prefix,

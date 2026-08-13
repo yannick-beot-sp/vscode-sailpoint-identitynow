@@ -2,11 +2,11 @@ import * as vscode from 'vscode';
 import { IMPORTABLE_OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
 import { SPConfigImporter } from './SPConfigImporter';
 import { askChosenItems, askSelectObjectTypes, chooseTenant } from '../../utils/vsCodeHelpers';
-import { ImportOptionsBeta, ImportOptionsBetaIncludeTypesBeta } from 'sailpoint-api-client';
 import { TenantInfo } from '../../models/TenantInfo';
 import { TenantService } from '../../services/TenantService';
 import { validateTenantReadonly } from '../validateTenantReadonly';
 
+import { ImportOptionsBeta, ImportOptionsBetaIncludeTypesBeta } from '../../sailpointCompat';
 const ALL: vscode.QuickPickItem = {
     label: "Import everything",
     picked: true

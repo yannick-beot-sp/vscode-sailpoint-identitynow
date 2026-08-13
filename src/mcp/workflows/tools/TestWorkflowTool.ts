@@ -6,9 +6,9 @@ import { ErrorCodes, McpError } from "../../errors";
 import { tenantNameField } from "../../inputFields";
 import { workflowNameField } from "../workflowInputFields";
 import { isGuid } from "../../../utils/stringUtils";
-import { WorkflowExecutionV2025StatusV2025 } from "sailpoint-api-client";
 import { delay } from "../../../utils";
 
+import { WorkflowExecutionV2025StatusV2025 } from '../../../sailpointCompat';
 const POLL_INTERVAL_MS = 3_000;
 const MAX_WAIT_MS = 5 * 60 * 1_000; // 5 minutes
 

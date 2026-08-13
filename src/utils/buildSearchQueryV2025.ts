@@ -1,7 +1,6 @@
-import { IndexV2025, SearchV2025 } from "sailpoint-api-client"
-
+import { Index, Search } from '../sailpointCompat';
 export interface SearchQuery {
-	index: IndexV2025
+	index: Index
 	query: string
 	sort?: string | string[]
 	fields?: string[]
@@ -11,7 +10,7 @@ export interface SearchQuery {
 
 export function buildSearchQuery(
 	{ index, query, sort, fields, includeNested = false }: SearchQuery,
-): SearchV2025 {
+): Search {
 
 	const sortArray = Array.isArray(sort)
 		? sort

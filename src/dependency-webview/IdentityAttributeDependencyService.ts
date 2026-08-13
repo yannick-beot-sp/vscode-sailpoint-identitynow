@@ -1,8 +1,8 @@
-import { ExportPayloadV2025IncludeTypesV2025, SpConfigExportResultsBeta } from 'sailpoint-api-client';
 import { SimpleSPConfigExporter } from '../commands/spconfig-export/SimpleSPConfigExporter';
 import type { DependencyGraphData } from './app/src/services/Client';
 import { DependencyService } from './DependencyService';
 
+import { ExportPayloadV2025IncludeTypesV2025, SpConfigExportResultsBeta } from '../sailpointCompat';
 export class IdentityAttributeDependencyService extends DependencyService {
 
     constructor(
