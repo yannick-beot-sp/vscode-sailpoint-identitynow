@@ -20,7 +20,7 @@ import {
 } from "../utils";
 import { getIdByUri, getPathByUri } from "../utils/UriUtils";
 import { Operation, compare } from "fast-json-patch";
-import { FormDefinitionResponseBeta, SlimCampaign } from "sailpoint-api-client";
+import { FormDefinitionResponseBeta } from "sailpoint-api-client";
 
 export class ISCResourceProvider implements FileSystemProvider {
 	private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();

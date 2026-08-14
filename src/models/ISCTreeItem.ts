@@ -516,9 +516,9 @@ export class ProvisioningPoliciesTreeItem extends FolderTreeItem {
 				tenantId: this.tenantId,
 				tenantName: this.tenantName,
 				tenantDisplayName: this.tenantDisplayName,
-				type: provisioningPolicy.usageType,
+				type: provisioningPolicy.usageType!,
 				sourceId,
-				name: provisioningPolicy.name
+				name: provisioningPolicy.name!
 			})).sort(compareByLabel)
 		return results;
 	}
