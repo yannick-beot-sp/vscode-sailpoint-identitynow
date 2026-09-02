@@ -20,7 +20,7 @@ import {
 } from "../utils";
 import { getIdByUri, getPathByUri } from "../utils/UriUtils";
 import { Operation, compare } from "fast-json-patch";
-import { FormDefinitionResponseBeta } from "sailpoint-api-client";
+import { FormDefinitionResponseBeta, TemplateDtoBeta } from "sailpoint-api-client";
 
 export class ISCResourceProvider implements FileSystemProvider {
 	private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
@@ -47,18 +47,12 @@ export class ISCResourceProvider implements FileSystemProvider {
 		const tenantInfo = await this.tenantService.getTenantByTenantName(tenantName)
 		const isReadOnly = tenantInfo && tenantInfo.readOnly
 		const isFile = id !== "provisioning-policies" && id !== "schemas";
-		// Notification templates are read-only for now: the ISC API does not
-		// reliably return the full template body (see writeFile), so a save could
-		// truncate it.
-		const isForcedReadOnly = isReadOnly
-			|| resourcePath?.match("\/identities\/")
-			|| resourcePath?.match(/notification-template/)
 		return {
 			type: (isFile ? FileType.File : FileType.Directory),
 			ctime: toTimestamp(data.created),
 			mtime: toTimestamp(data.modified),
 			size: convertToText(data).length,
-			permissions: id !== NEW_ID && isForcedReadOnly ? vscode.FilePermission.Readonly : undefined
+			permissions: id !== NEW_ID && (isReadOnly || resourcePath?.match("\/identities\/")) ? vscode.FilePermission.Readonly : undefined
 		};
 	}
 	readDirectory(
@@ -189,19 +183,13 @@ export class ISCResourceProvider implements FileSystemProvider {
 				const rule = await client.getConnectorRuleById(id)
 				rule.sourceCode.script = data
 				await client.updateConnectorRule(rule)
-			} else if (resourcePath.match(/notification-template/)) {
-				// Saving is disabled for notification templates. The only read
-				// path that works everywhere today is the templates list, which
-				// truncates `body`, and GET /notification-templates/{id} comes
-				// back empty for many tenants - so a write could overwrite the
-				// stored body with a truncated copy.
-				// To re-enable: fetch the authoritative full template here, and
-				// after client.updateNotificationTemplate() refresh the tree and
-				// reconcile the id (the upsert by key/medium/locale can reassign
-				// the template id, leaving the open editor URI stale).
-				throw vscode.FileSystemError.NoPermissions(
-					"Saving notification templates is not supported yet: ISC does not reliably return the full template body, so a save could truncate it. This view is read-only for now."
-				);
+			} else if (resourcePath.match("notification-template-body")) {
+				const template = await client.getNotificationTemplateById(id);
+				template.body = data;
+				await client.updateNotificationTemplate(template);
+			} else if (resourcePath.match("notification-templates")) {
+				const newData = JSON.parse(data) as TemplateDtoBeta;
+				await client.updateNotificationTemplate(newData);
 			} else if (resourcePath.match("form-definitions")) {
 				// UI is pushing all data as a Patch. Doing the same for form definitions
 				const newData = JSON.parse(data) as FormDefinitionResponseBeta

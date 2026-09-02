@@ -79,11 +79,9 @@ The extension allows you to manage rules and upload the script to a new or exist
 
 ## Notification templates
 
-The extension lists the notification templates of a tenant in the tree view. Opening a template shows its JSON.
+The extension lists the notification templates of a tenant in the tree view. Opening a template shows its JSON; saving it updates the template in the tenant.
 
-For e-mail templates, the **Edit body (HTML)** action opens just the `body` as a standalone HTML document, auto-formatted (block structure only, so the rendered e-mail is never changed) with a live preview rendered beside the editor. Use **Preview body** to open the preview on its own.
-
-Notification templates are **read-only** for now: the ISC API does not reliably return the full template body, so saving is disabled to avoid truncating it.
+For e-mail templates, the **Edit body (HTML)** action opens just the `body` as a standalone HTML document, auto-formatted (block structure only, so the rendered e-mail is never changed) with a live preview rendered beside the editor. Saving writes the body back. Use **Preview body** to open the preview on its own.
 
 Related settings: `vscode-sailpoint-identitynow.notificationTemplates.formatBodyOnOpen`, `vscode-sailpoint-identitynow.notificationTemplates.previewBodyOnOpen`.
 

@@ -2453,14 +2453,11 @@ export class ISCClient {
 	 * Fetch a single notification template.
 	 *
 	 * `GET /notification-templates/{id}` is documented to return an array even
-	 * though the id is unique, but it can also come back empty or 404 for
-	 * templates that do exist. When `listFallback` is enabled we then look the
-	 * template up in the list - beware that the list response is known to
-	 * truncate the `body` field, so callers that need the full body (e.g. before
-	 * writing it back) must pass `listFallback = false`.
+	 * though the id is unique, but it can also come back empty or 404 for some
+	 * tenants, so we fall back to finding the template in the (full) list.
 	 */
-	public async getNotificationTemplateById(id: string, listFallback = true): Promise<TemplateDtoBeta> {
-		console.log("> getNotificationTemplateById", id, { listFallback });
+	public async getNotificationTemplateById(id: string): Promise<TemplateDtoBeta> {
+		console.log("> getNotificationTemplateById", id);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new NotificationsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		try {
@@ -2471,9 +2468,6 @@ export class ISCClient {
 			}
 		} catch (error) {
 			console.warn("> getNotificationTemplateById: GET by id failed", error);
-		}
-		if (!listFallback) {
-			throw new Error(`Could not load notification template ${id}: GET /notification-templates/{id} returned nothing`);
 		}
 		const templates = await this.getNotificationTemplates();
 		const match = templates.find(t => t.id === id);

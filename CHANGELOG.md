@@ -10,7 +10,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
-- Notification Templates: browse the notification templates of a tenant in the tree view (read-only for now). For e-mail templates, "Edit body (HTML)" opens the body as a standalone, formatted HTML document with a live rendered preview beside it (`vscode-sailpoint-identitynow.notificationTemplates.formatBodyOnOpen` / `.previewBodyOnOpen` to toggle).
+- Notification Templates: browse and edit the notification templates of a tenant in the tree view. For e-mail templates, "Edit body (HTML)" opens the body as a standalone, formatted HTML document with a live rendered preview beside it (`vscode-sailpoint-identitynow.notificationTemplates.formatBodyOnOpen` / `.previewBodyOnOpen` to toggle).
 
 ### Changed
 
