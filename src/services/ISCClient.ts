@@ -192,7 +192,6 @@ export class ISCClient {
 		return response.data;
 	}
 
-
 	public async getSources(): Promise<SourceV2025[]> {
 		console.log("> getSources");
 		const apiConfig = await this.getApiConfiguration();
@@ -2448,6 +2447,49 @@ export class ISCClient {
 		const api = new NotificationsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const result = await Paginator.paginate(api, api.listNotificationTemplates);
 		return result.data;
+	}
+
+	/**
+	 * Fetch a single notification template.
+	 *
+	 * `GET /notification-templates/{id}` is documented to return an array even
+	 * though the id is unique, but it can also come back empty or 404 for
+	 * templates that do exist. When `listFallback` is enabled we then look the
+	 * template up in the list - beware that the list response is known to
+	 * truncate the `body` field, so callers that need the full body (e.g. before
+	 * writing it back) must pass `listFallback = false`.
+	 */
+	public async getNotificationTemplateById(id: string, listFallback = true): Promise<TemplateDtoBeta> {
+		console.log("> getNotificationTemplateById", id, { listFallback });
+		const apiConfig = await this.getApiConfiguration();
+		const api = new NotificationsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		try {
+			const response = await api.getNotificationTemplate({ id });
+			const template = Array.isArray(response.data) ? response.data[0] : response.data;
+			if (template) {
+				return template;
+			}
+		} catch (error) {
+			console.warn("> getNotificationTemplateById: GET by id failed", error);
+		}
+		if (!listFallback) {
+			throw new Error(`Could not load notification template ${id}: GET /notification-templates/{id} returned nothing`);
+		}
+		const templates = await this.getNotificationTemplates();
+		const match = templates.find(t => t.id === id);
+		if (!match) {
+			throw new Error(`Could not find notification template ${id}`);
+		}
+		return match;
+	}
+
+	public async updateNotificationTemplate(template: TemplateDtoBeta): Promise<TemplateDtoBeta> {
+		console.log("> updateNotificationTemplate", template.key, template.medium, template.locale);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new NotificationsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		// Despite the name, this is an upsert-by-key/medium/locale - there's no PUT /{id}
+		const response = await api.createNotificationTemplate({ templateDtoBeta: template });
+		return response.data;
 	}
 	/////////////////////////
 	//#endregion Notification Templates

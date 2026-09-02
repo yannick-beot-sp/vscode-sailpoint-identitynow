@@ -86,6 +86,7 @@ export class TenantTreeItem extends BaseTreeItem {
 		results.push(new MachineIdentitiesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new ApplicationsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 		results.push(new CampaignsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
+		results.push(new NotificationTemplatesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName));
 
 		return results
 	}
@@ -429,6 +430,68 @@ export class TransformTreeItem extends ISCResourceTreeItem {
 			light: vscode.Uri.file(context.asAbsolutePath("resources/light/transform.svg")),
 			dark: vscode.Uri.file(context.asAbsolutePath("resources/dark/transform.svg")),
 		};
+	}
+}
+
+/**
+ * Containers for notification templates
+ */
+export class NotificationTemplatesTreeItem extends FolderTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {
+		super("Notification Templates", "notification-templates", tenantId, tenantName, tenantDisplayName);
+	}
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		const client = new ISCClient(this.tenantId, this.tenantName);
+		const templates = await client.getNotificationTemplates();
+		return templates
+			.map(t => new NotificationTemplateTreeItem(
+				this.tenantId,
+				this.tenantName,
+				this.tenantDisplayName,
+				// Avoid "/" in the label: it becomes a path separator in the resource
+				// URI and ends up double-encoded ("%252F") in the editor tab.
+				`${t.name ?? t.key} (${t.medium} - ${t.locale})`,
+				t.id!,
+				t.medium
+			))
+			.sort(compareByLabel);
+	}
+}
+
+const NOTIFICATION_TEMPLATE_MEDIUM_ICONS: Record<string, string> = {
+	EMAIL: "mail",
+	SLACK: "comment-discussion",
+	TEAMS: "organization",
+};
+
+export class NotificationTemplateTreeItem extends ISCResourceTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string,
+		private readonly medium: string) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			resourceType: "notification-templates",
+			id
+		})
+		// Medium-specific so the "Edit body (HTML)" / "Preview body" menu items
+		// only show for EMAIL - SLACK/TEAMS bodies are not HTML.
+		this.contextValue = `notification-template-${medium}`;
+	}
+
+	updateIcon(context: vscode.ExtensionContext): void {
+		this.iconPath = new vscode.ThemeIcon(NOTIFICATION_TEMPLATE_MEDIUM_ICONS[this.medium] ?? "mail");
 	}
 }
 

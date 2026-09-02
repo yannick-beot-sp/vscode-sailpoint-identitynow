@@ -444,6 +444,17 @@
         "title": "Edit script"
       },
       {
+        "command": "vscode-sailpoint-identitynow.notification-template.edit-body",
+        "title": "Edit body (HTML)",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.notification-template.preview-body",
+        "title": "Preview body",
+        "category": "SailPoint ISC",
+        "icon": "$(open-preview)"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.identity-profile.refresh",
         "title": "Refresh all identities"
       },
@@ -1094,6 +1105,14 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.notification-template.edit-body",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.notification-template.preview-body",
+          "when": "resourceScheme == idn && resourcePath =~ /notification-template-body/"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.applications.filter.source",
           "when": "never"
         },
@@ -1454,6 +1473,19 @@
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rule"
         },
         {
+          "command": "vscode-sailpoint-identitynow.notification-template.edit-body",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == notification-template-EMAIL",
+          "group": "inline"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.notification-template.edit-body",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == notification-template-EMAIL"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.notification-template.preview-body",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == notification-template-EMAIL"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.identity-profile.refresh",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-profile",
           "group": "identity-profile"
@@ -1713,7 +1745,18 @@
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == folder"
         }
       ],
+      "editor/title": [
+        {
+          "command": "vscode-sailpoint-identitynow.notification-template.preview-body",
+          "when": "resourceScheme == idn && resourcePath =~ /notification-template-body/",
+          "group": "navigation"
+        }
+      ],
       "editor/context": [
+        {
+          "command": "vscode-sailpoint-identitynow.notification-template.preview-body",
+          "when": "resourceScheme == idn && resourcePath =~ /notification-template-body/"
+        },
         {
           "command": "vscode-sailpoint-identitynow.transform.evaluate.editor",
           "when": "resourcePath =~ /transforms/"
@@ -1910,6 +1953,16 @@
           "type": "integer",
           "default": 0,
           "description": "Port for the MCP HTTP server. 0 = auto-assign a free port."
+        },
+        "vscode-sailpoint-identitynow.notificationTemplates.formatBodyOnOpen": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically format the HTML when opening a notification template body with \"Edit body (HTML)\"."
+        },
+        "vscode-sailpoint-identitynow.notificationTemplates.previewBodyOnOpen": {
+          "type": "boolean",
+          "default": true,
+          "description": "Open a live rendered preview beside the editor when opening a notification template body with \"Edit body (HTML)\"."
         }
       }
     },
@@ -1944,6 +1997,7 @@
     "@frontmcp/testing": "^0.12.2",
     "@types/glob": "^9.0.0",
     "@types/jest": "^30.0.0",
+    "@types/js-beautify": "^1.14.3",
     "@types/mocha": "^10.0.10",
     "@types/node": "^18.19.64",
     "@types/tmp": "^0.2.5",
@@ -1971,6 +2025,7 @@
     "csv-parse": "^6.1.0",
     "fast-json-patch": "^3.1.1",
     "frontmcp": "^0.12.2",
+    "js-beautify": "^1.15.4",
     "lodash": "^4.17.21",
     "sailpoint-api-client": "^1.8.69",
     "tmp": "^0.2.1",

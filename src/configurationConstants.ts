@@ -25,3 +25,6 @@ export const CAMPAIGN_REPORT_FILENAME_CONF = "report.campaigns.filename";
 
 export const MCP_ENABLED_CONF = "mCP.enabled";
 export const MCP_PORT_CONF = "mCP.port";
+
+export const NOTIFICATION_TEMPLATE_FORMAT_BODY_ON_OPEN_CONF = "notificationTemplates.formatBodyOnOpen";
+export const NOTIFICATION_TEMPLATE_PREVIEW_BODY_ON_OPEN_CONF = "notificationTemplates.previewBodyOnOpen";

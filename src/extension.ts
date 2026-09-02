@@ -60,6 +60,8 @@ import { NewAttributeSearchConfigCommand } from './commands/NewAttributeSearchCo
 import { EditPasswordConfigCommand } from './commands/tenant/editPasswordConfigCommand';
 import { GenerateDigitTokenCommand } from './commands/tenant/generateDigitTokenCommand';
 import { OpenScriptCommand } from './commands/rule/openScriptCommand';
+import { OpenNotificationTemplateBodyCommand } from './commands/notification-template/openBodyCommand';
+import { PreviewNotificationTemplateBodyCommand } from './commands/notification-template/previewBodyCommand';
 import { IdentityTreeViewCommand } from './commands/identity/IdentityTreeViewCommand';
 import { ReassignOwnershipCommand } from './commands/identity/ReassignOwnershipCommand';
 import { TenantReadOnlyConfigCommand } from './commands/tenant/tenantReadOnlyConfigCommand';
@@ -459,6 +461,18 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EDIT_CONNECTOR_RULE,
 			openScriptCommand.execute, openScriptCommand));
+
+	const openNotificationTemplateBodyCommand = new OpenNotificationTemplateBodyCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EDIT_NOTIFICATION_TEMPLATE_BODY,
+			openNotificationTemplateBodyCommand.execute, openNotificationTemplateBodyCommand));
+
+	const previewNotificationTemplateBodyCommand = new PreviewNotificationTemplateBodyCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.PREVIEW_NOTIFICATION_TEMPLATE_BODY,
+			previewNotificationTemplateBodyCommand.execute, previewNotificationTemplateBodyCommand),
+		previewNotificationTemplateBodyCommand.registerSerializer(),
+		new vscode.Disposable(() => previewNotificationTemplateBodyCommand.dispose()));
 
 	const exportScriptFromRuleCommand = new ExportScriptFromRuleCommand(tenantService);
 	context.subscriptions.push(

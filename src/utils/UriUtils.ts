@@ -75,7 +75,7 @@ export function getResourceUri(tenantName: string, resourceType: string, id: str
     const baseUri = Uri.from({ scheme: URL_PREFIX, authority: tenantName, path: '/' });
     name = name?.replaceAll("/", "%2F")
     // ensure all parts are not null
-    const prefix = { "source-subtypes": "v2026" }[resourceType] ?? "v2025";
+    const prefix = { "source-subtypes": "v2026", "notification-templates": "beta" }[resourceType] ?? "v2025";
     const pathParts = [prefix,
         resourceType,
         id,

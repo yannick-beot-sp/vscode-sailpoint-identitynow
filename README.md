@@ -77,6 +77,16 @@ The extension allows you to manage rules and upload the script to a new or exist
 
 ![Export config](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/rules-management.gif)
 
+## Notification templates
+
+The extension lists the notification templates of a tenant in the tree view. Opening a template shows its JSON.
+
+For e-mail templates, the **Edit body (HTML)** action opens just the `body` as a standalone HTML document, auto-formatted (block structure only, so the rendered e-mail is never changed) with a live preview rendered beside the editor. Use **Preview body** to open the preview on its own.
+
+Notification templates are **read-only** for now: the ISC API does not reliably return the full template body, so saving is disabled to avoid truncating it.
+
+Related settings: `vscode-sailpoint-identitynow.notificationTemplates.formatBodyOnOpen`, `vscode-sailpoint-identitynow.notificationTemplates.previewBodyOnOpen`.
+
 ## Workflow management
 
 Export and Import workflows automatically:
@@ -632,6 +642,10 @@ The extension supports the following settings:
   - Default value: `false`
 - `vscode-sailpoint-identitynow.mCP.port`: Port for the MCP HTTP server. 0 = auto-assign a free port.
   - Default value: `0`
+- `vscode-sailpoint-identitynow.notificationTemplates.formatBodyOnOpen`: Automatically format the HTML when opening a notification template body with "Edit body (HTML)".
+  - Default value: `true`
+- `vscode-sailpoint-identitynow.notificationTemplates.previewBodyOnOpen`: Open a live rendered preview beside the editor when opening a notification template body with "Edit body (HTML)".
+  - Default value: `true`
 
 The patterns defined above use the following tokens:
 
