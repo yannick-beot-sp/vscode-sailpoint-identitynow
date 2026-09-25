@@ -24,5 +24,8 @@
     "svelte-check": "^4.6.0",
     "typescript": "~6.0.2",
     "vite": "^8.1.0"
+  },
+  "allowScripts": {
+    "fsevents@2.3.3": true
   }
 }

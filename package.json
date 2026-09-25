@@ -2108,5 +2108,8 @@
     "sailpoint-api-client": "^1.8.69",
     "tmp": "^0.2.1",
     "vscode-sailpoint-identitynow": "file:"
+  },
+  "allowScripts": {
+    "fsevents@2.3.3": true
   }
 }
