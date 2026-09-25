@@ -128,6 +128,21 @@ export class CloudRuleService {
         return ruleObject?.sourceCode?.script ?? ruleObject?.body ?? ruleObject?.script ?? '';
     }
 
+    public getRuleXmlFields(configObject: SpConfigObjectBeta | any): {
+        name: string;
+        type: string;
+        description: string;
+        source: string;
+    } {
+        const ruleObject = configObject?.object ?? configObject;
+        return {
+            name: ruleObject?.name ?? configObject?.self?.name ?? '',
+            type: ruleObject?.type ?? '',
+            description: ruleObject?.description ?? '',
+            source: this.getScriptFromConfigObject(configObject),
+        };
+    }
+
     private mapExportToSummaries(data: SpConfigExportResultsBeta): CloudRuleSummary[] {
         return (data.objects ?? [])
             .map((entry) => this.toCloudRuleSummary(entry))

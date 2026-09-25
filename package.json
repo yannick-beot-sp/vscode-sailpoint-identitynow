@@ -452,6 +452,14 @@
         "title": "Export script..."
       },
       {
+        "command": "vscode-sailpoint-identitynow.cloud-rule.export-xml.view",
+        "title": "Export as XML..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.cloud-rule.export-xml.file",
+        "title": "ISC: Export as XML..."
+      },
+      {
         "command": "vscode-sailpoint-identitynow.identity-profile.refresh",
         "title": "Refresh all identities"
       },
@@ -1110,6 +1118,14 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.cloud-rule.export-xml.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.cloud-rule.export-xml.file",
+          "when": "resourceExtname == .java || resourceExtname == .bsh"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.applications.filter.source",
           "when": "never"
         },
@@ -1478,6 +1494,10 @@
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^cloud-rule$/"
         },
         {
+          "command": "vscode-sailpoint-identitynow.cloud-rule.export-xml.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^cloud-rule$/"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.identity-profile.refresh",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == identity-profile",
           "group": "identity-profile"
@@ -1759,12 +1779,22 @@
         {
           "command": "vscode-sailpoint-identitynow.import-config.palette",
           "when": "resourcePath =~ /\\.json/"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.cloud-rule.export-xml.file",
+          "when": "resourceExtname == .java || resourceExtname == .bsh",
+          "group": "idn"
         }
       ],
       "explorer/context": [
         {
           "when": "resourceLangId == json",
           "command": "vscode-sailpoint-identitynow.import-config.menu",
+          "group": "idn"
+        },
+        {
+          "when": "resourceExtname == .java || resourceExtname == .bsh",
+          "command": "vscode-sailpoint-identitynow.cloud-rule.export-xml.file",
           "group": "idn"
         },
         {
@@ -1916,6 +1946,10 @@
         "vscode-sailpoint-identitynow.export.workflow.filename": {
           "type": "string",
           "default": "%x/Workflows/Workflow-%t-%S-%y%M%d-%h%m%s.json"
+        },
+        "vscode-sailpoint-identitynow.export.cloudRule.filename": {
+          "type": "string",
+          "default": "%x/exportedObjects/cloud-rules/%t-%S-%y%M%d-%h%m%s.xml"
         },
         "vscode-sailpoint-identitynow.treeView.pagination": {
           "type": "number",

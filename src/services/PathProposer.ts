@@ -287,4 +287,16 @@ export class PathProposer {
             "WORKFLOW",
             objectName);
     }
+
+    public static getCloudRuleXmlFilename(
+        tenantName: string,
+        tenantDisplayName: string,
+        objectName: string
+    ): string {
+        return this.getObjectBasedReportFilename(configuration.CLOUD_RULE_XML_EXPORT_FILENAME_CONF,
+            tenantName,
+            tenantDisplayName,
+            "RULE",
+            objectName);
+    }
 }
