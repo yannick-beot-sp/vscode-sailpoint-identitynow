@@ -658,6 +658,8 @@ The patterns defined above use the following tokens:
 
 ### Unreleased
 
+### 1.3.31
+
 - Could not aggregate VA-based delimited file
 - Sort lifecycle states for an identity profile by name
 - Add support for cloud rules by [@animesh-tarodia-sp](https://github.com/animesh-tarodia-sp) (cf. [#163](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/163))
