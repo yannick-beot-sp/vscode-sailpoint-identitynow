@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { IdentityAccessTreeItem } from "../../models/ISCTreeItem";
+import { IdentityTreeItem } from "../../models/ISCTreeItem";
 import { IdentityAccessItem } from "../../models/IdentityAccessItem";
 import { ISCClient } from "../../services/ISCClient";
 import { buildAccessTableHtml, buildLoadingHtml } from "./identityAccessHtml";
@@ -19,7 +19,7 @@ export class IdentityAccessPanel implements vscode.Disposable {
 	private constructor(
 		private readonly extensionUri: vscode.Uri,
 		private readonly panel: vscode.WebviewPanel,
-		private readonly accessTreeItem: IdentityAccessTreeItem
+		private readonly identityTreeItem: IdentityTreeItem
 	) {
 		this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
 		this.panel.webview.onDidReceiveMessage(
@@ -29,14 +29,22 @@ export class IdentityAccessPanel implements vscode.Disposable {
 		);
 	}
 
-	private static panelKey(accessTreeItem: IdentityAccessTreeItem): string {
-		return `${accessTreeItem.tenantId}/${accessTreeItem.identityId}`;
+	private get identityId(): string {
+		return this.identityTreeItem.id!;
 	}
 
-	public static createOrShow(extensionUri: vscode.Uri, accessTreeItem: IdentityAccessTreeItem): void {
-		const identityName = accessTreeItem.identityName;
+	private get identityName(): string {
+		return this.identityTreeItem.label as string;
+	}
+
+	private static panelKey(identityTreeItem: IdentityTreeItem): string {
+		return `${identityTreeItem.tenantId}/${identityTreeItem.id}`;
+	}
+
+	public static createOrShow(extensionUri: vscode.Uri, identityTreeItem: IdentityTreeItem): void {
+		const identityName = identityTreeItem.label as string;
 		const column = vscode.window.activeTextEditor?.viewColumn;
-		const key = IdentityAccessPanel.panelKey(accessTreeItem);
+		const key = IdentityAccessPanel.panelKey(identityTreeItem);
 
 		const existing = IdentityAccessPanel.currentPanels.get(key);
 		if (existing) {
@@ -56,7 +64,7 @@ export class IdentityAccessPanel implements vscode.Disposable {
 			}
 		);
 
-		const identityAccessPanel = new IdentityAccessPanel(extensionUri, panel, accessTreeItem);
+		const identityAccessPanel = new IdentityAccessPanel(extensionUri, panel, identityTreeItem);
 		IdentityAccessPanel.currentPanels.set(key, identityAccessPanel);
 		void identityAccessPanel.loadAndRender();
 	}
@@ -67,7 +75,7 @@ export class IdentityAccessPanel implements vscode.Disposable {
 	 * previously loaded table so the user does not lose context.
 	 */
 	private async loadAndRender(options?: { keepOnError?: boolean }): Promise<void> {
-		const identityName = this.accessTreeItem.identityName;
+		const identityName = this.identityName;
 		this.panel.title = `Access: ${identityName}`;
 
 		if (!options?.keepOnError) {
@@ -82,8 +90,8 @@ export class IdentityAccessPanel implements vscode.Disposable {
 					cancellable: false
 				},
 				async () => {
-					const client = new ISCClient(this.accessTreeItem.tenantId, this.accessTreeItem.tenantName);
-					return client.getIdentityAccess(this.accessTreeItem.identityId);
+					const client = new ISCClient(this.identityTreeItem.tenantId, this.identityTreeItem.tenantName);
+					return client.getIdentityAccess(this.identityId);
 				}
 			);
 
@@ -97,7 +105,7 @@ export class IdentityAccessPanel implements vscode.Disposable {
 				return;
 			}
 
-			IdentityAccessPanel.currentPanels.delete(IdentityAccessPanel.panelKey(this.accessTreeItem));
+			IdentityAccessPanel.currentPanels.delete(IdentityAccessPanel.panelKey(this.identityTreeItem));
 			this.panel.dispose();
 			vscode.window.showErrorMessage(message);
 		}
@@ -142,7 +150,7 @@ export class IdentityAccessPanel implements vscode.Disposable {
 	}
 
 	private async requestAccess(): Promise<void> {
-		const identityName = this.accessTreeItem.identityName;
+		const identityName = this.identityName;
 		const accessItemId = await vscode.window.showInputBox({
 			title: "Request Access",
 			prompt: `Enter the ID of the role, access profile, or entitlement to grant to ${identityName}`,
@@ -155,10 +163,10 @@ export class IdentityAccessPanel implements vscode.Disposable {
 		}
 
 		const trimmedId = accessItemId.trim();
-		const client = new ISCClient(this.accessTreeItem.tenantId, this.accessTreeItem.tenantName);
+		const client = new ISCClient(this.identityTreeItem.tenantId, this.identityTreeItem.tenantName);
 		const tenantContext = {
-			tenantId: this.accessTreeItem.tenantId,
-			tenantName: this.accessTreeItem.tenantName,
+			tenantId: this.identityTreeItem.tenantId,
+			tenantName: this.identityTreeItem.tenantName,
 			identityName,
 		};
 
@@ -195,7 +203,7 @@ export class IdentityAccessPanel implements vscode.Disposable {
 					title: `Submitting access request for ${itemName}...`,
 					cancellable: false,
 				},
-				async () => client.grantIdentityAccess(this.accessTreeItem.identityId, resolvedItem)
+				async () => client.grantIdentityAccess(this.identityId, resolvedItem)
 			);
 
 			openAccessRequestStatusPanel(this.extensionUri, {
@@ -216,13 +224,13 @@ export class IdentityAccessPanel implements vscode.Disposable {
 		}
 
 		const itemName = item.displayName ?? item.name ?? item.id;
-		const identityName = this.accessTreeItem.identityName;
+		const identityName = this.identityName;
 
 		if (!(await confirm(`Revoke ${itemName} for ${identityName}?`))) {
 			return;
 		}
 
-		const client = new ISCClient(this.accessTreeItem.tenantId, this.accessTreeItem.tenantName);
+		const client = new ISCClient(this.identityTreeItem.tenantId, this.identityTreeItem.tenantName);
 
 		try {
 			const response = await vscode.window.withProgress(
@@ -231,7 +239,7 @@ export class IdentityAccessPanel implements vscode.Disposable {
 					title: `Requesting removal of ${itemName} for ${identityName}...`,
 					cancellable: false
 				},
-				async () => client.revokeIdentityAccess(this.accessTreeItem.identityId, item)
+				async () => client.revokeIdentityAccess(this.identityId, item)
 			);
 
 			const isExistingOnly = (response.newRequests?.length ?? 0) === 0
@@ -252,7 +260,7 @@ export class IdentityAccessPanel implements vscode.Disposable {
 	}
 
 	public dispose(): void {
-		IdentityAccessPanel.currentPanels.delete(IdentityAccessPanel.panelKey(this.accessTreeItem));
+		IdentityAccessPanel.currentPanels.delete(IdentityAccessPanel.panelKey(this.identityTreeItem));
 
 		while (this.disposables.length) {
 			const disposable = this.disposables.pop();

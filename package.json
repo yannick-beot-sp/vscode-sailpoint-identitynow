@@ -637,11 +637,11 @@
       },
       {
         "command": "vscode-sailpoint-identitynow.identities.view-events",
-        "title": "Events"
+        "title": "View events"
       },
       {
         "command": "vscode-sailpoint-identitynow.identities.view-access",
-        "title": "Access"
+        "title": "View access"
       },
       {
         "command": "vscode-sailpoint-identitynow.account.enable",
@@ -1753,23 +1753,23 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.identities.view-access",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity-access$/",
-          "group": "identityActions@1"
-        },
-        {
-          "command": "vscode-sailpoint-identitynow.identities.reassign-ownership",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/",
           "group": "identityActions@2"
         },
         {
-          "command": "vscode-sailpoint-identitynow.identities.process",
+          "command": "vscode-sailpoint-identitynow.identities.reassign-ownership",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/",
           "group": "identityActions@3"
         },
         {
-          "command": "vscode-sailpoint-identitynow.identities.delete",
+          "command": "vscode-sailpoint-identitynow.identities.process",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/",
           "group": "identityActions@4"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.delete",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/",
+          "group": "identityActions@5"
         },
         {
           "command": "vscode-sailpoint-identitynow.account.enable",

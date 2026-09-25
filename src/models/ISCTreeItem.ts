@@ -1267,7 +1267,7 @@ export class RoleTreeItem extends PageableFolderTreeItem<DimensionV2025> {
 
 	}
 
-	iconPath = new vscode.ThemeIcon("account")
+	iconPath = new vscode.ThemeIcon("combine")
 
 	getUrl(): vscode.Uri | undefined {
 		return getResourceWebUrl(this.tenantName, "role", this.id!)
@@ -1614,31 +1614,8 @@ export class IdentityTreeItem extends ISCResourceTreeItem {
 	iconPath = new vscode.ThemeIcon("person");
 
 	async getChildren(): Promise<BaseTreeItem[]> {
-		return [
-			new IdentityAccountsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, this.resourceId),
-			new IdentityAccessTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, this.resourceId, this.label as string),
-		];
-	}
-
-	getUrl(): vscode.Uri | undefined {
-		return getResourceWebUrl(this.tenantName, "identity", this.id as string)
-	}
-}
-
-export class IdentityAccountsTreeItem extends FolderTreeItem {
-	constructor(
-		tenantId: string,
-		tenantName: string,
-		tenantDisplayName: string,
-		private readonly identityId: string
-	) {
-		super("Accounts", "identity-accounts", tenantId, tenantName, tenantDisplayName);
-		this.id = `${identityId}/accounts`;
-	}
-
-	async getChildren(): Promise<BaseTreeItem[]> {
 		const client = new ISCClient(this.tenantId, this.tenantName);
-		const accounts = await client.getAccountsByIdentity(this.identityId);
+		const accounts = await client.getAccountsByIdentity(this.resourceId);
 
 		if (accounts === undefined || accounts.length === 0) {
 			return [new MessageNode("No accounts found")];
@@ -1656,42 +1633,24 @@ export class IdentityAccountsTreeItem extends FolderTreeItem {
 			}
 		}));
 
-		return accounts
+		const accountNodes = accounts
 			.map(account => new AccountTreeItem(
 				this.tenantId,
 				this.tenantName,
 				this.tenantDisplayName,
-				this.identityId,
+				this.resourceId,
 				account,
 				featuresBySourceId.get(account.sourceId),
 				isAccountRemovable(account),
 				this
 			))
 			.sort(compareByLabel);
-	}
-}
 
-export class IdentityAccessTreeItem extends BaseTreeItem {
-	constructor(
-		tenantId: string,
-		tenantName: string,
-		tenantDisplayName: string,
-		public readonly identityId: string,
-		public readonly identityName: string,
-	) {
-		super("Access", tenantId, tenantName, tenantDisplayName, vscode.TreeItemCollapsibleState.None);
-		this.id = `${identityId}/access`;
-		this.contextValue = "identity-access";
-		this.iconPath = new vscode.ThemeIcon("key");
-		this.command = {
-			title: "View access",
-			command: commands.IDENTITIES_VIEW_ACCESS,
-			arguments: [this],
-		};
+		return accountNodes;
 	}
 
-	async getChildren(): Promise<BaseTreeItem[]> {
-		return [];
+	getUrl(): vscode.Uri | undefined {
+		return getResourceWebUrl(this.tenantName, "identity", this.id as string)
 	}
 }
 
@@ -1722,7 +1681,7 @@ export class AccountTreeItem extends ISCResourceTreeItem {
 			+ (removable ? "-remove" : "")
 	}
 
-	iconPath = new vscode.ThemeIcon("jersey");
+	iconPath = new vscode.ThemeIcon("account");
 }
 
 export class MachineIdentitiesTreeItem extends PageableFolderTreeItem<MachineIdentityResponseV2025> {
