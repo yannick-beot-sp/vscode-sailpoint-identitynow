@@ -96,3 +96,12 @@ export function escapeFilter(input: string | undefined) {
     // .replaceAll("#", "%23")
     // .replaceAll("&", "%26")
 }
+
+export function escapeXml(input: string | undefined | null): string {
+    return (input ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&apos;');
+}

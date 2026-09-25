@@ -275,9 +275,10 @@ export class ISCClient {
 	public async getProvisioningPolicies(sourceId: string): Promise<ProvisioningPolicyDto[]> {
 		console.log("> listProvisioningPolicies", sourceId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const result = await api.listProvisioningPolicies({ sourceId })
 		return result.data;
+
 	}
 
 	public async getSourceId(sourceName: string): Promise<string> {

@@ -21,7 +21,7 @@ export class GenericAsyncIterableIterator<TResult, A extends PaginationParams & 
         let count = 0,
             first = true,
             nbResult = 0;
-        params.limit = 250;
+        params.limit = params.limit ?? 250;
         params.count = true;
         params.offset = params.offset ?? 0;
         console.log(`AsyncIterableIterator, maxLimit = ${maxLimit}`);

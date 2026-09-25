@@ -8,7 +8,7 @@ import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep';
 import { runWizard } from '../../wizard/wizard';
 import { Validator } from '../../validator/validator';
 import { InputPromptStep } from '../../wizard/inputPromptStep';
-import { ExportPayloadBetaIncludeTypesBeta, SourceCluster } from 'sailpoint-api-client';
+import { ExportPayloadBetaIncludeTypesBeta, SourceCluster, PasswordPolicyHoldersDtoInnerV2025 } from 'sailpoint-api-client';
 import crypto = require('crypto');
 import { SPConfigImporter } from '../spconfig-import/SPConfigImporter';
 import * as commands from '../constants';
@@ -161,7 +161,238 @@ export class CloneSourceCommand {
             )
         }
 
+        await this.copyPasswordPolicies(client!, targetClient!, oldSource.id!, newSource.id!, newSourceName);
+        await this.copyPasswordSyncGroups(client!, targetClient!, oldSource.id!, newSource.id!, newSourceName);
+        await this.copyAncillaryConfigs(client!, targetClient!, oldSource.id!, newSource.id!, newSourceName);
+        await this.copyMachineAccountSubtypes(client!, targetClient!, oldSource.id!, newSource.id!, newSourceName);
+        await this.copyPrivilegeCriteria(client!, targetClient!, oldSource.id!, newSource.id!, newSourceName);
+        await this.offerConnectorFileUpload(oldSource, targetClient!, newSource.id!, newSourceName);
+
         await vscode.commands.executeCommand(commands.REFRESH_FORCED);
+    }
+
+    /**
+     * Password Policies are not part of a SOURCE SP Config export: they reference the source
+     * from the "holders" side, so they have to be discovered and remapped separately.
+     */
+    private async copyPasswordPolicies(
+        client: ISCClient,
+        targetClient: ISCClient,
+        oldSourceId: string,
+        newSourceId: string,
+        newSourceName: string
+    ): Promise<void> {
+        try {
+            const holders = await client.getPasswordPolicyHolders(oldSourceId);
+            if (holders.length === 0) { return; }
+
+            const sourcePolicies = await client.getPasswordPolicies();
+            const newHolders: PasswordPolicyHoldersDtoInnerV2025[] = [];
+            for (const holder of holders) {
+                let targetPolicy = await targetClient.getPasswordPolicyByName(holder.policyName!);
+                if (!targetPolicy) {
+                    const sourcePolicy = sourcePolicies.find(p => p.id === holder.policyId);
+                    if (sourcePolicy) {
+                        targetPolicy = await targetClient.createPasswordPolicy({
+                            ...sourcePolicy,
+                            id: undefined,
+                            dateCreated: undefined,
+                            lastUpdated: undefined,
+                            sourceIds: []
+                        });
+                    }
+                }
+                if (targetPolicy) {
+                    newHolders.push({ policyId: targetPolicy.id, policyName: targetPolicy.name, selectors: holder.selectors });
+                }
+            }
+            if (newHolders.length > 0) {
+                await targetClient.updatePasswordPolicyHolders(newSourceId, newHolders);
+            }
+        } catch (error: any) {
+            vscode.window.showWarningMessage(`Could not copy password policies to "${newSourceName}": ${error.message}`);
+        }
+    }
+
+    /**
+     * Password Sync Groups reference their member sources by ID (sourceIds), so they are
+     * never included in a SOURCE SP Config export either.
+     */
+    private async copyPasswordSyncGroups(
+        client: ISCClient,
+        targetClient: ISCClient,
+        oldSourceId: string,
+        newSourceId: string,
+        newSourceName: string
+    ): Promise<void> {
+        try {
+            const oldSyncGroups = (await client.getPasswordSyncGroups())
+                .filter(g => g.sourceIds?.includes(oldSourceId));
+            if (oldSyncGroups.length === 0) { return; }
+
+            const sourcePolicies = await client.getPasswordPolicies();
+            for (const group of oldSyncGroups) {
+                const targetGroup = await targetClient.getPasswordSyncGroupByName(group.name!);
+                if (targetGroup) {
+                    const sourceIds = Array.from(new Set([...(targetGroup.sourceIds ?? []), newSourceId]));
+                    await targetClient.updatePasswordSyncGroup(targetGroup.id!, { ...targetGroup, sourceIds });
+                    continue;
+                }
+
+                const sourcePolicy = sourcePolicies.find(p => p.id === group.passwordPolicyId);
+                if (!sourcePolicy) { continue; }
+                const targetPolicy = (await targetClient.getPasswordPolicyByName(sourcePolicy.name!))
+                    ?? await targetClient.createPasswordPolicy({ ...sourcePolicy, id: undefined, sourceIds: [] });
+
+                await targetClient.createPasswordSyncGroup({
+                    name: group.name,
+                    passwordPolicyId: targetPolicy.id,
+                    sourceIds: [newSourceId]
+                });
+            }
+        } catch (error: any) {
+            vscode.window.showWarningMessage(`Could not copy password sync groups to "${newSourceName}": ${error.message}`);
+        }
+    }
+
+    /**
+     * Sub-resources hanging off the source ID that are not part of a SOURCE SP Config export.
+     * Each is copied independently so that a tenant missing one feature (e.g. no Machine Identity
+     * Security license) does not block the rest of the clone.
+     */
+    private async copyAncillaryConfigs(
+        client: ISCClient,
+        targetClient: ISCClient,
+        oldSourceId: string,
+        newSourceId: string,
+        newSourceName: string
+    ): Promise<void> {
+        const copyConfig = async <T>(
+            label: string,
+            getOld: () => Promise<T | undefined>,
+            setNew: (value: T) => Promise<unknown>
+        ): Promise<void> => {
+            try {
+                const value = await getOld();
+                if (value) {
+                    await setNew(value);
+                }
+            } catch (error: any) {
+                vscode.window.showWarningMessage(`Could not copy ${label} to "${newSourceName}": ${error.message}`);
+            }
+        };
+
+        await copyConfig(
+            "native change detection config",
+            () => client.getNativeChangeDetectionConfig(oldSourceId),
+            (config) => targetClient.updateNativeChangeDetectionConfig(newSourceId, config)
+        );
+        await copyConfig(
+            "attribute sync config",
+            () => client.getAttributeSyncConfig(oldSourceId),
+            (config) => targetClient.updateAttributeSyncConfig(newSourceId, config)
+        );
+        await copyConfig(
+            "account delete approval config",
+            () => client.getAccountDeleteApprovalConfig(oldSourceId),
+            (config) => targetClient.updateAccountDeleteApprovalConfig(newSourceId, config)
+        );
+        await copyConfig(
+            "machine account delete approval config",
+            () => client.getMachineAccountDeleteApprovalConfig(oldSourceId),
+            (config) => targetClient.updateMachineAccountDeleteApprovalConfig(newSourceId, config)
+        );
+        await copyConfig(
+            "machine classification config",
+            () => client.getMachineClassificationConfig(oldSourceId),
+            (config) => targetClient.updateMachineClassificationConfig(newSourceId, { ...config, created: undefined, modified: undefined })
+        );
+    }
+
+    private async copyMachineAccountSubtypes(
+        client: ISCClient,
+        targetClient: ISCClient,
+        oldSourceId: string,
+        newSourceId: string,
+        newSourceName: string
+    ): Promise<void> {
+        try {
+            const subtypes = (await client.listMachineAccountSubtypes(oldSourceId))
+                .filter(s => !s.systemManaged);
+            for (const subtype of subtypes) {
+                await targetClient.createSourceSubtype({
+                    sourceId: newSourceId,
+                    technicalName: subtype.technicalName!,
+                    displayName: subtype.displayName!,
+                    description: subtype.description ?? "",
+                    type: subtype.type
+                });
+            }
+        } catch (error: any) {
+            vscode.window.showWarningMessage(`Could not copy machine account subtypes to "${newSourceName}": ${error.message}`);
+        }
+    }
+
+    private async copyPrivilegeCriteria(
+        client: ISCClient,
+        targetClient: ISCClient,
+        oldSourceId: string,
+        newSourceId: string,
+        newSourceName: string
+    ): Promise<void> {
+        try {
+            const criteria = (await client.getPrivilegeCriteria(oldSourceId))
+                .filter(c => c.type === "CUSTOM");
+            for (const c of criteria) {
+                await targetClient.createPrivilegeCriteria({
+                    sourceId: newSourceId,
+                    type: "CUSTOM",
+                    operator: c.operator,
+                    groups: c.groups,
+                    privilegeLevel: c.privilegeLevel
+                });
+            }
+        } catch (error: any) {
+            vscode.window.showWarningMessage(`Could not copy privilege criteria to "${newSourceName}": ${error.message}`);
+        }
+    }
+
+    /**
+     * The API only ever exposes the *names* of previously uploaded connector files (e.g. JDBC
+     * driver jars), never their content, so an automatic tenant-to-tenant copy is not possible.
+     * This offers the user a chance to re-upload their local copy of the file(s) instead.
+     */
+    private async offerConnectorFileUpload(
+        oldSource: { connectorAttributes?: any, name?: string },
+        targetClient: ISCClient,
+        newSourceId: string,
+        newSourceName: string
+    ): Promise<void> {
+        const uploadHistory = oldSource.connectorAttributes?.connectorFileUploadHistory;
+        const uploadedFileNames = uploadHistory ? Object.keys(uploadHistory) : [];
+        if (uploadedFileNames.length === 0) { return; }
+
+        const choice = await vscode.window.showWarningMessage(
+            `"${oldSource.name}" has uploaded connector file(s) (${uploadedFileNames.join(", ")}) that cannot be copied automatically. `
+            + `Do you want to select local copies to upload to "${newSourceName}" now?`,
+            "Upload files...", "Skip"
+        );
+        if (choice !== "Upload files...") { return; }
+
+        const files = await vscode.window.showOpenDialog({
+            canSelectMany: true,
+            openLabel: `Upload to ${newSourceName}`,
+            title: "Select connector file(s) to upload"
+        });
+        if (!files) { return; }
+
+        for (const file of files) {
+            try {
+                await targetClient.uploadConnectorFile(newSourceId, file.fsPath);
+            } catch (error: any) {
+                vscode.window.showWarningMessage(`Could not upload "${file.fsPath}" to "${newSourceName}": ${error.message}`);
+            }
+        }
     }
 
 }

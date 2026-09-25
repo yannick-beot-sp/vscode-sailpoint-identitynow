@@ -9,11 +9,12 @@ import * as commands from "../commands/constants";
 import * as configuration from '../configurationConstants';
 import { convertConstantToTitleCase, escapeFilter, isEmpty, isNotEmpty } from "../utils/stringUtils";
 import { TenantService } from "../services/TenantService";
+import { CloudRuleService } from "../services/CloudRuleService";
 import { convertToBaseTreeItem } from "../views/utils";
 import { isAccountRemovable } from "../commands/account/accountUtils";
 
-
 import { Account, CampaignStatusV3, DimensionV2025, MachineIdentityResponseV2025, SourceSubtypeWithSourceV2026 } from "sailpoint-api-client";
+
 /**
  * Base class to expose getChildren and updateIcon methods
  */
@@ -88,6 +89,8 @@ export class TenantTreeItem extends BaseTreeItem {
 			new MachineIdentitiesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
 			new ApplicationsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
 			new CampaignsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
+		    new CloudRulesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName)
+
 		];
 
 		for (const child of children) {
@@ -533,9 +536,9 @@ export class ProvisioningPoliciesTreeItem extends FolderTreeItem {
 				tenantId: this.tenantId,
 				tenantName: this.tenantName,
 				tenantDisplayName: this.tenantDisplayName,
-				type: provisioningPolicy.usageType,
+				type: provisioningPolicy.usageType!,
 				sourceId,
-				name: provisioningPolicy.name
+				name: provisioningPolicy.name!
 			})).sort(compareByLabel)
 		return results;
 	}
@@ -774,7 +777,7 @@ export class RulesTreeItem extends FolderTreeItem {
 		tenantName: string,
 		tenantDisplayName: string,
 	) {
-		super("Rules", "connector-rules", tenantId, tenantName, tenantDisplayName);
+		super("Connector Rules", "connector-rules", tenantId, tenantName, tenantDisplayName);
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
@@ -805,6 +808,62 @@ export class RuleTreeItem extends ISCResourceTreeItem {
 	}
 
 	contextValue = "connector-rule";
+	iconPath = new vscode.ThemeIcon("file-code");
+}
+
+/**
+ * Containers for cloud rules (SP-Config RULE objects)
+ */
+export class CloudRulesTreeItem extends FolderTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {
+		super("Cloud Rules", "cloud-rules", tenantId, tenantName, tenantDisplayName);
+	}
+
+	reset(): void {
+		CloudRuleService.getInstance(this.tenantId, this.tenantName, this.tenantDisplayName).resetCache();
+	}
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		const cloudRuleService = CloudRuleService.getInstance(
+			this.tenantId,
+			this.tenantName,
+			this.tenantDisplayName
+		);
+		const rules = await cloudRuleService.listCloudRules();
+		return rules.map(
+			(rule) => new CloudRuleTreeItem(
+				this.tenantId,
+				this.tenantName,
+				this.tenantDisplayName,
+				rule.name,
+				rule.id
+			)
+		);
+	}
+}
+
+export class CloudRuleTreeItem extends ISCResourceTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			resourceType: "cloud-rules",
+			id,
+		});
+	}
+
+	contextValue = "cloud-rule";
 	iconPath = new vscode.ThemeIcon("file-code");
 }
 
