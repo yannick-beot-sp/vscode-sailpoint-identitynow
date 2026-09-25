@@ -8,7 +8,7 @@ import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { compareByName } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, IdentityAttributeTransform, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowExecutionBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, PublicIdentity, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApiListAccessProfilesRequest, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseV2025, CustomFormsV2025Api, CreateFormDefinitionRequestV2025, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, ManagedClusterBeta, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, IdentityProfilesV2025Api, IdentityPreviewResponseV2025, IdentityAttributeTransformV2025, SourcesV2025Api, TaskManagementV2025Api, AttributeDTO, RolesV2025Api, AccessProfilesV2025Api, JsonPatchOperationV2025, DimensionsV2025Api, RolesV2025ApiListRolesRequest, DimensionV2025, DimensionsV2025ApiListDimensionsRequest, PasswordConfigurationV2025Api, PasswordOrgConfigV2025, WorkflowsV2025Api, WorkflowV2025, WorkflowBodyV2025, WorkflowExecutionEventV2025, CreateWorkflowRequestV2025, WorkflowExecutionV2025, ConnectorRuleManagementV2025Api, ConnectorRuleResponseV2025, EntitlementsV2025Api, EntitlementsV2025ApiListEntitlementsRequest, EntitlementV2025, PublicIdentitiesV2025Api, PublicIdentitiesV2025ApiGetPublicIdentitiesRequest, RoleV2025, TransformsV2025Api, TransformV2025, TransformReadV2025, SearchV2025Api, IndexV2025, AccessProfileDocumentV2025, EntitlementDocumentV2025, RoleDocumentV2025, EventDocumentV2025, AccountActivityDocumentV2025, AccessProfileV2025, SourceV2025, MachineIdentitiesV2025Api, MachineIdentitiesV2025ApiListMachineIdentitiesRequest, MachineIdentityResponseV2025, MachineAccountSubtypesV2026Api, SourceSubtypeWithSourceV2026, PrivilegeCriteriaV2026Api, PrivilegeCriteriaDTOV2026, PrivilegeCriteriaConfigDTOV2026, PrivilegeCriteriaConfigurationV2026Api, IdentityProfileV2025, WorkgroupDtoV2025, GovernanceGroupsV2025Api, AccessRequestApprovalsV2025Api, AppsV2025Api, PendingApprovalV2025, SourceAppPatchDtoV2025, PasswordPoliciesV2025Api, PasswordPolicyV3DtoV2025, PasswordSyncGroupsV2025Api, PasswordSyncGroupV2025, PasswordPolicyHoldersDtoInnerV2025, AttrSyncSourceConfigV2025, SourcesV2026Api, NativeChangeDetectionConfigV2026, AccountDeleteConfigDtoV2026, JsonPatchOperationV2026, MachineClassificationConfigV2026Api, MachineClassificationConfigV2026, CreateSourceSubtypeRequestV2026, CreatePrivilegeCriteriaRequestV2026 } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, IdentityAttributeTransform, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowExecutionBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, PublicIdentity, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApiListAccessProfilesRequest, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseV2025, CustomFormsV2025Api, CreateFormDefinitionRequestV2025, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, ManagedClusterBeta, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, IdentityProfilesV2025Api, IdentityPreviewResponseV2025, IdentityAttributeTransformV2025, SourcesV2025Api, TaskManagementV2025Api, AttributeDTO, RolesV2025Api, AccessProfilesV2025Api, JsonPatchOperationV2025, DimensionsV2025Api, RolesV2025ApiListRolesRequest, DimensionV2025, DimensionsV2025ApiListDimensionsRequest, PasswordConfigurationV2025Api, PasswordOrgConfigV2025, WorkflowsV2025Api, WorkflowV2025, WorkflowBodyV2025, WorkflowExecutionEventV2025, CreateWorkflowRequestV2025, WorkflowExecutionV2025, ConnectorRuleManagementV2025Api, ConnectorRuleResponseV2025, EntitlementsV2025Api, EntitlementsV2025ApiListEntitlementsRequest, EntitlementV2025, PublicIdentitiesV2025Api, PublicIdentitiesV2025ApiGetPublicIdentitiesRequest, RoleV2025, TransformsV2025Api, TransformV2025, TransformReadV2025, SearchV2025Api, IndexV2025, AccessProfileDocumentV2025, EntitlementDocumentV2025, RoleDocumentV2025, EventDocumentV2025, AccountActivityDocumentV2025, AccessProfileV2025, SourceV2025, MachineIdentitiesV2025Api, MachineIdentitiesV2025ApiListMachineIdentitiesRequest, MachineIdentityResponseV2025, MachineAccountSubtypesV2026Api, SourceSubtypeWithSourceV2026, PrivilegeCriteriaV2026Api, PrivilegeCriteriaDTOV2026, PrivilegeCriteriaConfigDTOV2026, PrivilegeCriteriaConfigurationV2026Api, IdentityProfileV2025, WorkgroupDtoV2025, GovernanceGroupsV2025Api, AccessRequestApprovalsV2025Api, AppsV2025Api, PendingApprovalV2025, SourceAppPatchDtoV2025, PasswordPoliciesV2025Api, PasswordPolicyV3DtoV2025, PasswordSyncGroupsV2025Api, PasswordSyncGroupV2025, PasswordPolicyHoldersDtoInnerV2025, AttrSyncSourceConfigV2025, SourcesV2026Api, NativeChangeDetectionConfigV2026, AccountDeleteConfigDtoV2026, JsonPatchOperationV2026, MachineClassificationConfigV2026Api, MachineClassificationConfigV2026, CreateSourceSubtypeRequestV2026, CreatePrivilegeCriteriaRequestV2026, AccessRequestsApi, AccessRequestResponse, RequestedItemStatus, RequestedItemStatusRequestState, AccountActivitiesApi, AccountActivity, AuthUsersV2025Api, AuthUserV2025, CustomUserLevelsV2025Api, UserLevelSummaryDTOV2025, ListUserLevelsDetailLevelV2025, AccountsV2025Api, JsonPatchOperationV2025OpV2025, IdentityHistoryV2025Api, ListIdentityAccessItemsTypeV2025, ListIdentityAccessItems200ResponseInnerV2025 } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -21,7 +21,10 @@ import { onErrorResponse, onRequest, onResponse } from "./AxiosHandlers";
 import { EmailTestMode } from "../models/EmailTestMode";
 import { DEFAULT_PAGINATED_PARAMS, PaginatedSearch, PaginatedSearchRequest } from "../models/SearchQuery";
 import { buildSearchQuery } from "../utils/buildSearchQueryV2025";
-import { AccessProfile } from "../models/AccessProfiles"
+import { buildIdentityEventsSearchQuery, collectIdentityEventSearchTerms } from "../utils/identityEventsQuery";
+import { AccessProfile } from "../models/AccessProfiles";
+import { IdentityAccessItem, IdentityAccessItemType } from "../models/IdentityAccessItem";
+import { HecateJobStatus } from "../models/HecateJob";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const FormData = require('form-data');
@@ -42,6 +45,22 @@ const CONTENT_TYPE_FORM_DATA = "multipart/form-data";
 const CONTENT_TYPE_FORM_JSON_PATCH = "application/json-patch+json";
 
 const DEFAULT_PAGINATION = 250;
+
+const IDENTITY_ACCESS_FETCH_PAGE_SIZE = 250;
+const IDENTITY_ACCESS_TYPE_SOURCES: { apiType: ListIdentityAccessItemsTypeV2025; itemType: IdentityAccessItemType }[] = [
+	{ apiType: ListIdentityAccessItemsTypeV2025.Role, itemType: "ROLE" },
+	{ apiType: ListIdentityAccessItemsTypeV2025.AccessProfile, itemType: "ACCESS_PROFILE" },
+	{ apiType: ListIdentityAccessItemsTypeV2025.Entitlement, itemType: "ENTITLEMENT" },
+];
+const IDENTITY_ACCESS_TYPE_ORDER: Record<IdentityAccessItemType, number> = {
+	ROLE: 0,
+	ACCESS_PROFILE: 1,
+	ENTITLEMENT: 2,
+};
+
+function compareIdentityAccessType(a: IdentityAccessItemType, b: IdentityAccessItemType): number {
+	return IDENTITY_ACCESS_TYPE_ORDER[a] - IDENTITY_ACCESS_TYPE_ORDER[b];
+}
 
 export interface PaginatedData<T> {
 	data: T[],
@@ -902,6 +921,17 @@ export class ISCClient {
 		})
 	}
 
+	public async paginatedSearchEntitlements(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"], includeNested = false): Promise<AxiosResponse<EntitlementDocument[]>> {
+		console.log("> paginatedSearchEntitlements", query);
+
+		return await this.searchPost<EntitlementDocument>({
+			query: buildSearchQuery({ index: IndexV2025.Entitlements, query, sort: "name", fields, includeNested }),
+			count,
+			limit,
+			offset
+		})
+	}
+
 	public async paginatedSearchIdentities(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"], includeNested = false): Promise<AxiosResponse<IdentityDocument[]>> {
 		console.log("> paginatedSearchIdentities", query);
 		return await this.searchPost<IdentityDocument>({
@@ -972,6 +1002,326 @@ export class ISCClient {
 			...input,
 			query: buildSearchQuery({ ...input, index: IndexV2025.Events })
 		})
+	}
+
+	public async getIdentityAuditEvents(identityId: string, identityName: string, limit = 50): Promise<PaginatedResult<EventDocumentV2025>> {
+		console.log("> getIdentityAuditEvents", identityId, identityName, limit);
+
+		let identityDetails: { name?: string; displayName?: string; email?: string; alias?: string } | undefined;
+		try {
+			const identityResponse = await this.paginatedSearchIdentities(
+				`id:${identityId}`,
+				1,
+				0,
+				false,
+				["id", "name", "displayName", "email", "alias"]
+			);
+			identityDetails = identityResponse.data[0] as typeof identityDetails;
+		} catch (error) {
+			console.warn("Could not load identity details for event search", error);
+		}
+
+		const searchTerms = collectIdentityEventSearchTerms(identityId, identityName, identityDetails);
+		const query = buildIdentityEventsSearchQuery(searchTerms);
+
+		return this.paginatedSearchEventsV2025({
+			query,
+			sort: "-created",
+			limit,
+			offset: 0
+		});
+	}
+
+	public async getIdentityAccess(identityId: string): Promise<IdentityAccessItem[]> {
+		console.log("> getIdentityAccess", identityId);
+
+		try {
+			const results = await Promise.all(
+				IDENTITY_ACCESS_TYPE_SOURCES.map(({ apiType, itemType }) =>
+					this.getAllIdentityAccessItemsOfType(identityId, apiType, itemType)
+				)
+			);
+
+			return results.flat().sort((a, b) => {
+				const typeOrder = compareIdentityAccessType(a.type, b.type);
+				if (typeOrder !== 0) {
+					return typeOrder;
+				}
+				return (a.displayName ?? a.name ?? "").localeCompare(b.displayName ?? b.name ?? "", undefined, { sensitivity: "base" });
+			});
+		} catch (error) {
+			console.warn("getIdentityAccess: Identity History API failed, falling back to search API", error);
+			return this.getIdentityAccessFromSearch(identityId);
+		}
+	}
+
+	private async getAllIdentityAccessItemsOfType(
+		identityId: string,
+		apiType: ListIdentityAccessItemsTypeV2025,
+		itemType: IdentityAccessItemType,
+	): Promise<IdentityAccessItem[]> {
+		const items: IdentityAccessItem[] = [];
+		let offset = 0;
+		let total: number | undefined;
+
+		while (true) {
+			const response = await this.listIdentityAccessItemsPage(
+				identityId,
+				apiType,
+				IDENTITY_ACCESS_FETCH_PAGE_SIZE,
+				offset,
+				total === undefined
+			);
+
+			if (total === undefined) {
+				const headerTotal = response.headers?.[TOTAL_COUNT_HEADER];
+				total = headerTotal !== undefined ? Number(headerTotal) : response.data.length;
+			}
+
+			for (const entry of response.data) {
+				const normalized = this.normalizeListIdentityAccessItem(itemType, entry as unknown as Record<string, unknown>);
+				if (normalized) {
+					items.push(normalized);
+				}
+			}
+
+			offset += response.data.length;
+			if (response.data.length === 0 || offset >= total) {
+				break;
+			}
+		}
+
+		return items;
+	}
+
+	private async listIdentityAccessItemsPage(
+		identityId: string,
+		type: ListIdentityAccessItemsTypeV2025,
+		limit: number,
+		offset: number,
+		count: boolean,
+	): Promise<AxiosResponse<ListIdentityAccessItems200ResponseInnerV2025[]>> {
+		const apiConfig = await this.getApiConfiguration();
+		const api = new IdentityHistoryV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		return api.listIdentityAccessItems({
+			id: identityId,
+			type,
+			limit,
+			offset,
+			count,
+		});
+	}
+
+	private async getIdentityAccessFromSearch(identityId: string): Promise<IdentityAccessItem[]> {
+		const response = await this.paginatedSearchIdentities(
+			`id:${identityId}`,
+			1,
+			0,
+			false,
+			["id", "name", "access"],
+			true
+		);
+
+		const identity = response.data?.[0];
+		if (!identity?.access || !Array.isArray(identity.access)) {
+			return [];
+		}
+
+		const items = identity.access
+			.map((entry) => this.normalizeIdentityAccessItem(entry as unknown as Record<string, unknown>))
+			.filter((item): item is IdentityAccessItem => item !== undefined);
+
+		const skipped = identity.access.length - items.length;
+		if (skipped > 0) {
+			console.warn(`getIdentityAccessFromSearch: skipped ${skipped} of ${identity.access.length} access entries with an unsupported type or missing id`);
+		}
+
+		return items.sort((a, b) => {
+			const typeOrder = compareIdentityAccessType(a.type, b.type);
+			if (typeOrder !== 0) {
+				return typeOrder;
+			}
+			return (a.displayName ?? a.name ?? "").localeCompare(b.displayName ?? b.name ?? "", undefined, { sensitivity: "base" });
+		});
+	}
+
+	public async revokeIdentityAccess(identityId: string, item: IdentityAccessItem): Promise<AccessRequestResponse> {
+		console.log("> revokeIdentityAccess", identityId, item.id, item.type);
+
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AccessRequestsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.createAccessRequest({
+			accessRequest: {
+				requestType: "REVOKE_ACCESS",
+				requestedFor: [identityId],
+				requestedItems: [{
+					type: item.type,
+					id: item.id,
+					comment: "VSCode",
+					...(item.assignmentId ? { assignmentId: item.assignmentId } : {}),
+					...(item.nativeIdentity ? { nativeIdentity: item.nativeIdentity } : {}),
+				}],
+			}
+		});
+		return response.data;
+	}
+
+	public async resolveAccessItemById(accessItemId: string): Promise<IdentityAccessItem> {
+		console.log("> resolveAccessItemById", accessItemId);
+
+		const apiConfig = await this.getApiConfiguration();
+		const entitlementApi = new EntitlementsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const roleApi = new RolesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const accessProfileApi = new AccessProfilesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+
+		const attempts = await Promise.allSettled([
+			entitlementApi.getEntitlement({ id: accessItemId }).then(response => this.normalizeResolvedAccessItem("ENTITLEMENT", response.data)),
+			roleApi.getRole({ id: accessItemId }).then(response => this.normalizeResolvedAccessItem("ROLE", response.data)),
+			accessProfileApi.getAccessProfile({ id: accessItemId }).then(response => this.normalizeResolvedAccessItem("ACCESS_PROFILE", response.data)),
+		]);
+
+		const resolved = attempts.find((attempt): attempt is PromiseFulfilledResult<IdentityAccessItem> =>
+			attempt.status === "fulfilled"
+		);
+
+		if (resolved) {
+			return resolved.value;
+		}
+
+		const reasons = attempts
+			.filter((attempt): attempt is PromiseRejectedResult => attempt.status === "rejected")
+			.map(attempt => attempt.reason);
+
+		const unexpected = reasons.find(reason => (reason as { response?: { status?: number } })?.response?.status !== 404);
+		if (unexpected) {
+			throw unexpected;
+		}
+
+		throw new Error(`No role, access profile, or entitlement found with ID ${accessItemId}.`);
+	}
+
+	public async grantIdentityAccess(identityId: string, item: IdentityAccessItem): Promise<AccessRequestResponse> {
+		console.log("> grantIdentityAccess", identityId, item.id, item.type);
+
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AccessRequestsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.createAccessRequest({
+			accessRequest: {
+				requestType: "GRANT_ACCESS",
+				requestedFor: [identityId],
+				requestedItems: [{
+					type: item.type,
+					id: item.id,
+					comment: "VSCode",
+				}],
+			}
+		});
+		return response.data;
+	}
+
+	public extractAccessRequestIds(response: AccessRequestResponse): string[] {
+		const ids = [
+			...(response.newRequests ?? []).flatMap(request => request.accessRequestIds ?? []),
+			...(response.existingRequests ?? []).flatMap(request => request.accessRequestIds ?? []),
+		];
+		return [...new Set(ids.filter(Boolean))];
+	}
+
+	public async getAccessRequestStatus(accessRequestId: string): Promise<RequestedItemStatus | undefined> {
+		console.log("> getAccessRequestStatus", accessRequestId);
+
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AccessRequestsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.listAccessRequestStatus({
+			filters: `accessRequestId eq "${accessRequestId}"`,
+			limit: 1,
+		});
+		return response.data?.[0];
+	}
+
+	public isAccessRequestTerminal(state?: RequestedItemStatusRequestState | null): boolean {
+		return state === "REQUEST_COMPLETED"
+			|| state === "CANCELLED"
+			|| state === "TERMINATED"
+			|| state === "REJECTED"
+			|| state === "PROVISIONING_FAILED"
+			|| state === "NOT_ALL_ITEMS_PROVISIONED"
+			|| state === "ERROR";
+	}
+
+	private normalizeResolvedAccessItem(type: IdentityAccessItemType, entry: unknown): IdentityAccessItem {
+		const record = entry as Record<string, unknown>;
+		const id = record.id as string | undefined;
+		if (!id) {
+			throw new Error(`Resolved ${type} is missing an ID.`);
+		}
+
+		const source = record.source as { name?: string } | undefined;
+
+		return {
+			type,
+			id,
+			name: record.name as string | undefined,
+			displayName: record.displayName as string | undefined,
+			description: record.description as string | undefined,
+			sourceName: source?.name,
+			revocable: record.revocable as boolean | undefined,
+			standalone: record.standalone as boolean | undefined,
+			raw: record,
+		};
+	}
+
+	private normalizeListIdentityAccessItem(type: IdentityAccessItemType, entry: Record<string, unknown>): IdentityAccessItem | undefined {
+		const id = entry.id as string | undefined;
+		if (!id) {
+			return undefined;
+		}
+
+		const sourceName = entry.sourceName as string | null | undefined;
+
+		return {
+			type,
+			id,
+			name: entry.displayName as string | undefined,
+			displayName: entry.displayName as string | undefined,
+			description: entry.description as string | undefined,
+			sourceName: sourceName ?? undefined,
+			removeDate: entry.removeDate as string | undefined,
+			assignmentId: entry.assignmentId as string | undefined,
+			nativeIdentity: entry.nativeIdentity as string | undefined,
+			revocable: entry.revocable as boolean | undefined,
+			standalone: entry.standalone as boolean | undefined,
+			raw: entry,
+		};
+	}
+
+	private normalizeIdentityAccessItem(entry: Record<string, unknown>): IdentityAccessItem | undefined {
+		const type = entry.type as string | undefined;
+		if (type !== "ROLE" && type !== "ACCESS_PROFILE" && type !== "ENTITLEMENT") {
+			return undefined;
+		}
+
+		const id = entry.id as string | undefined;
+		if (!id) {
+			return undefined;
+		}
+
+		const source = entry.source as { name?: string } | undefined;
+
+		return {
+			type: type as IdentityAccessItemType,
+			id,
+			name: entry.name as string | undefined,
+			displayName: entry.displayName as string | undefined,
+			description: entry.description as string | undefined,
+			sourceName: source?.name,
+			removeDate: entry.removeDate as string | undefined,
+			assignmentId: entry.assignmentId as string | undefined,
+			nativeIdentity: entry.nativeIdentity as string | undefined,
+			revocable: entry.revocable as boolean | undefined,
+			standalone: entry.standalone as boolean | undefined,
+			raw: entry,
+		};
 	}
 
 	public async paginatedSearchAccountActivitiesV2025(input: PaginatedSearch): Promise<PaginatedResult<AccountActivityDocumentV2025>> {
@@ -1583,6 +1933,69 @@ export class ISCClient {
 			]
 		});
 		console.log("< patchAccount");
+	}
+
+	public async getAccountsByIdentity(identityId: string, limit = DEFAULT_PAGINATION): Promise<Account[]> {
+		console.log("> getAccountsByIdentity", identityId);
+		const resp = await this.getAccounts({
+			filters: `identityId eq "${identityId}"`,
+			sorters: "sourceId",
+			limit,
+			offset: 0
+		});
+		return resp.data;
+	}
+
+	public async enableAccount(accountId: string): Promise<string | undefined> {
+		console.log("> enableAccount", accountId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AccountsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.enableAccount({ id: accountId, accountToggleRequest: {} });
+		console.log("< enableAccount");
+		return response.data.id;
+	}
+
+	public async disableAccount(accountId: string): Promise<string | undefined> {
+		console.log("> disableAccount", accountId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AccountsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.disableAccount({ id: accountId, accountToggleRequest: {} });
+		console.log("< disableAccount");
+		return response.data.id;
+	}
+
+	public async unlockAccount(accountId: string): Promise<string | undefined> {
+		console.log("> unlockAccount", accountId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AccountsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.unlockAccount({ id: accountId, accountUnlockRequest: {} });
+		console.log("< unlockAccount");
+		return response.data.id;
+	}
+
+	public async deleteAccount(accountId: string): Promise<string | undefined> {
+		console.log("> deleteAccount", accountId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AccountsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.deleteAccountAsync({ id: accountId });
+		console.log("< deleteAccount");
+		return response.data.id;
+	}
+
+	public async reloadAccount(accountId: string): Promise<string | undefined> {
+		console.log("> reloadAccount", accountId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AccountsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.submitReloadAccount({ id: accountId });
+		console.log("< reloadAccount");
+		return response.data.id;
+	}
+
+	public async getHecateJobStatus(jobId: string): Promise<HecateJobStatus> {
+		console.log("> getHecateJobStatus", jobId);
+		const httpClient = await this.getAxios();
+		const response = await httpClient.get(`/hecate/message/client/qpoc/job/${jobId}`);
+		return response.data;
 	}
 
 	/////////////////////////
@@ -2636,6 +3049,105 @@ export class ISCClient {
 		const api = new IdentitiesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 
 		await api.deleteIdentity({ id: identityId });
+	}
+
+	public async inviteIdentity(identityId: string): Promise<void> {
+		console.log("> inviteIdentity");
+
+		const apiConfig = await this.getApiConfiguration();
+		const api = new IdentitiesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+
+		await api.startIdentitiesInvite({
+			inviteIdentitiesRequestBeta: { ids: [identityId] }
+		});
+	}
+
+	public async setIdentityLifecycleState(identityId: string, lifecycleStateId: string): Promise<string | undefined> {
+		console.log("> setIdentityLifecycleState");
+
+		const apiConfig = await this.getApiConfiguration();
+		const api = new LifecycleStatesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+
+		const resp = await api.setLifecycleState({
+			identityId,
+			setLifecycleStateRequest: { lifecycleStateId }
+		});
+		return resp.data.accountActivityId;
+	}
+
+	public async getAccountActivity(accountActivityId: string): Promise<AccountActivity> {
+		console.log("> getAccountActivity", accountActivityId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AccountActivitiesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getAccountActivity({ id: accountActivityId });
+		return response.data;
+	}
+
+	public async getIdentityProfileForIdentity(identityId: string): Promise<{ profileId: string; profileName?: string; currentLifecycleState?: string }> {
+		console.log("> getIdentityProfileForIdentity", identityId);
+
+		const results = await this.searchAllIdentities(
+			`id:${identityId}`,
+			1,
+			["id", "name", "identityProfile", "cloudLifecycleState"]
+		);
+		const identity = this.ensureOneElement(results, "identity", identityId) as IdentityDocument & {
+			identityProfile?: { id?: string; name?: string };
+			cloudLifecycleState?: string;
+		};
+		const profileId = identity.identityProfile?.id;
+		if (!profileId) {
+			throw new Error(`Identity ${identityId} has no identity profile.`);
+		}
+		return {
+			profileId,
+			profileName: identity.identityProfile?.name,
+			currentLifecycleState: identity.cloudLifecycleState
+		};
+	}
+
+	public async listCustomUserLevels(): Promise<UserLevelSummaryDTOV2025[]> {
+		console.log("> listCustomUserLevels");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new CustomUserLevelsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const limit = 50;
+		const levels: UserLevelSummaryDTOV2025[] = [];
+		let offset = 0;
+		let count: number;
+		do {
+			const response = await api.listUserLevels({
+				limit,
+				offset,
+				sorters: "name",
+				detailLevel: ListUserLevelsDetailLevelV2025.Full
+			});
+			count = response.data.length;
+			levels.push(...response.data);
+			offset += limit;
+		} while (count === limit);
+		return levels;
+	}
+
+	public async getAuthUser(identityId: string): Promise<AuthUserV2025> {
+		console.log("> getAuthUser", identityId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AuthUsersV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getAuthUser({ id: identityId });
+		return response.data;
+	}
+
+	public async setAuthUserCapabilities(identityId: string, capabilities: string[]): Promise<void> {
+		console.log("> setAuthUserCapabilities", identityId, capabilities);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AuthUsersV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		await api.patchAuthUser({
+			id: identityId,
+			jsonPatchOperationV2025: [{
+				op: JsonPatchOperationV2025OpV2025.Replace,
+				path: "/capabilities",
+				value: capabilities
+			}]
+		});
 	}
 
 	////////////////////////

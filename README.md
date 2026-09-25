@@ -19,12 +19,17 @@ The SailPoint Identity Security Cloud extension makes it easy to:
 - View, edit, delete service desk integrations
 - View, edit, delete identity profiles and lifecycle states, and refreshes all the identities under a profile
 - Import/Export Accounts (import for delimited files only), uncorrelated accounts, entitlement details
+- View, enable, disable, unlock, aggregate, or remove accounts
 - View, edit, create, delete, export, import access profiles
 - View, edit, create, delete, export, import roles, and dimensions
 - View, edit, create, delete, export, import forms
 - View, edit, create, delete search attribute config
 - View, edit, create, delete identity attribute
 - View, trigger attribute sync or process, delete identities
+- View identity access (roles, access profiles, entitlements), grant access, and revoke access
+- View identity audit events
+- Track access request status after grant or revoke
+- Reveal matching identity in the tree when filtering identities
 - View, edit, create, delete applications
 - View, report, escalate, send reminders, reassign to access item owners or reassign based on a file, approve in bulk certification campaigns
 - View, edit, delete Machine Identities
@@ -653,6 +658,13 @@ The patterns defined above use the following tokens:
 
 ### Unreleased
 
+- Add identity access panel to view roles, access profiles, and entitlements for an identity; grant access by ID and revoke access from the table
+- Identity access table with sortable and filterable Type, Name, and Source columns; Revocable and Standalone columns; resizable columns; 50-row pagination; raw JSON view per item
+- Paginated identity access API fetch for roles, access profiles, and entitlements (Identity History API with search fallback)
+- Add identity events panel to browse audit events (action, actor, target, status, created) for an identity
+- Add access request status panel with live polling after grant or revoke (5s interval, bounded tail timeout, phase history)
+- Add account tree commands: enable, disable, unlock, aggregate one, and remove (with guards for authoritative and system accounts)
+- Reveal and expand the matching identity node in the tree after an identity search
 - Could not aggregate VA-based delimited file
 - Sort lifecycle states for an identity profile by name
 - Fix issue with role dimension pagination (cf. [#164](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/164))
