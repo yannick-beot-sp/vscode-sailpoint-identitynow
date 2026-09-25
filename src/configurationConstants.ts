@@ -21,6 +21,9 @@ export const FORM_EXPORT_FILENAME_CONF = "export.form.filename";
 
 export const WORKFLOW_EXPORT_FILENAME_CONF = "export.workflow.filename";
 
+export const CLOUD_RULE_XML_EXPORT_FILENAME_CONF = "export.cloudRule.filename";
+export const CLOUD_RULE_SCRIPT_EXPORT_FILENAME_CONF = "export.cloudRule.script.filename";
+
 export const CAMPAIGN_REPORT_FILENAME_CONF = "report.campaigns.filename";
 
 export const MCP_ENABLED_CONF = "mCP.enabled";

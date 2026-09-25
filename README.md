@@ -16,6 +16,7 @@ The SailPoint Identity Security Cloud extension makes it easy to:
 - View, edit machine account subtypes and their approval of a source
 - View, edit, enable, disable, export, import workflows and view execution history
 - View, create, edit, delete connector rules and export/import the script of a rule
+- View, export cloud rules (JSON, script, or XML)
 - View, edit, delete service desk integrations
 - View, edit, delete identity profiles and lifecycle states, and refreshes all the identities under a profile
 - Import/Export Accounts (import for delimited files only), uncorrelated accounts, entitlement details
@@ -624,6 +625,10 @@ The extension supports the following settings:
   - Default value: `%x/Forms/Form-%t-%S-%y%M%d-%h%m%s.json`
 - `vscode-sailpoint-identitynow.export.workflow.filename`: Define the pattern to export a single workflow from a tenant
   - Default value: `%x/Workflows/Workflow-%t-%S-%y%M%d-%h%m%s.json`
+- `vscode-sailpoint-identitynow.export.cloudRule.filename`: Define the pattern to export a cloud rule as XML
+  - Default value: `%x/exportedObjects/cloud-rules/%t-%S-%y%M%d-%h%m%s.xml`
+- `vscode-sailpoint-identitynow.export.cloudRule.script.filename`: Define the pattern to export a cloud rule script
+  - Default value: `%x/exportedObjects/cloud-rule-scripts/%t-%S-%y%M%d-%h%m%s.bsh`
 - `vscode-sailpoint-identitynow.treeView.pagination`: Define the number of roles and access profiles that are displayed in the tree view
   - Default value: 100
 - `vscode-sailpoint-identitynow.report.campaigns.filename`: Define the pattern for the folder to export access profiles.
@@ -655,6 +660,8 @@ The patterns defined above use the following tokens:
 
 - Could not aggregate VA-based delimited file
 - Sort lifecycle states for an identity profile by name
+- Add support for cloud rules by [@animesh-tarodia-sp](https://github.com/animesh-tarodia-sp) (cf. [#163](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/163))
+- Export a cloud rule or a `.java`/`.bsh` file as XML
 - Fix issue with role dimension pagination (cf. [#164](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/164))
 - Issue when Importing Dimensions with bad entitlements (cf. [#160](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/160)). Fix issue with CacheService.
 

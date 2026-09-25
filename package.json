@@ -444,6 +444,22 @@
         "title": "Edit script"
       },
       {
+        "command": "vscode-sailpoint-identitynow.cloud-rule.view-script",
+        "title": "View script"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.cloud-rule.export-script.view",
+        "title": "Export script..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.cloud-rule.export-xml.view",
+        "title": "Export as XML..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.cloud-rule.export-xml.file",
+        "title": "ISC: Export as XML..."
+      },
+      {
         "command": "vscode-sailpoint-identitynow.identity-profile.refresh",
         "title": "Refresh all identities"
       },
@@ -1094,6 +1110,22 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.cloud-rule.view-script",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.cloud-rule.export-script.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.cloud-rule.export-xml.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.cloud-rule.export-xml.file",
+          "when": "resourceExtname == .java || resourceExtname == .bsh"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.applications.filter.source",
           "when": "never"
         },
@@ -1195,12 +1227,12 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.open-resource",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|source|schema|provisioning-policy|role|roleDimensional|dimension|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|identities|source-app|campaign)$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|source|schema|provisioning-policy|role|roleDimensional|dimension|access-profile|lifecycle-state|identity-profile|connector-rule|cloud-rule|service-desk-integration|form-definition|identities|source-app|campaign)$/",
           "group": "_@0"
         },
         {
           "command": "vscode-sailpoint-identitynow.export-node-config.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^(.*source|identity-profile|connector-rule|transform|service-desk-integration)$/i",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^(.*source|identity-profile|connector-rule|cloud-rule|transform|service-desk-integration)$/i",
           "group": "zzspconfig"
         },
         {
@@ -1215,7 +1247,7 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.refresh-forced",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|privilege-classification|transforms|provisioning-policies|roles|roleDimensional|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|form-definitions|search-attributes|identity-attributes|source-apps|source-app|campaigns|machine-identities|machine-account-subtypes|privilege-criteria/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|privilege-classification|transforms|provisioning-policies|roles|roleDimensional|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|cloud-rules|form-definitions|search-attributes|identity-attributes|source-apps|source-app|campaigns|machine-identities|machine-account-subtypes|privilege-criteria/",
           "group": "inline@50"
         },
         {
@@ -1452,6 +1484,18 @@
         {
           "command": "vscode-sailpoint-identitynow.connector-rule.edit",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == connector-rule"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.cloud-rule.view-script",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^cloud-rule$/"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.cloud-rule.export-script.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^cloud-rule$/"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.cloud-rule.export-xml.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^cloud-rule$/"
         },
         {
           "command": "vscode-sailpoint-identitynow.identity-profile.refresh",
@@ -1735,12 +1779,22 @@
         {
           "command": "vscode-sailpoint-identitynow.import-config.palette",
           "when": "resourcePath =~ /\\.json/"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.cloud-rule.export-xml.file",
+          "when": "resourceExtname == .java || resourceExtname == .bsh",
+          "group": "idn"
         }
       ],
       "explorer/context": [
         {
           "when": "resourceLangId == json",
           "command": "vscode-sailpoint-identitynow.import-config.menu",
+          "group": "idn"
+        },
+        {
+          "when": "resourceExtname == .java || resourceExtname == .bsh",
+          "command": "vscode-sailpoint-identitynow.cloud-rule.export-xml.file",
           "group": "idn"
         },
         {
@@ -1892,6 +1946,14 @@
         "vscode-sailpoint-identitynow.export.workflow.filename": {
           "type": "string",
           "default": "%x/Workflows/Workflow-%t-%S-%y%M%d-%h%m%s.json"
+        },
+        "vscode-sailpoint-identitynow.export.cloudRule.filename": {
+          "type": "string",
+          "default": "%x/exportedObjects/cloud-rules/%t-%S-%y%M%d-%h%m%s.xml"
+        },
+        "vscode-sailpoint-identitynow.export.cloudRule.script.filename": {
+          "type": "string",
+          "default": "%x/exportedObjects/cloud-rule-scripts/%t-%S-%y%M%d-%h%m%s.bsh"
         },
         "vscode-sailpoint-identitynow.treeView.pagination": {
           "type": "number",

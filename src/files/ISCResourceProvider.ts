@@ -11,6 +11,7 @@ import {
 } from "vscode";
 import { NEW_ID } from "../constants";
 import { ISCClient } from "../services/ISCClient";
+import { CloudRuleService } from "../services/CloudRuleService";
 import { TenantService } from "../services/TenantService";
 import {
 	convertToText,
@@ -18,9 +19,11 @@ import {
 	toTimestamp,
 	uint8Array2Str,
 } from "../utils";
-import { getIdByUri, getPathByUri } from "../utils/UriUtils";
+import { getIdByUri, getNameByUri, getPathByUri } from "../utils/UriUtils";
 import { Operation, compare } from "fast-json-patch";
-import { FormDefinitionResponseBeta } from "sailpoint-api-client";
+import { ConnectorRuleUpdateRequestBeta, FormDefinitionResponseBeta, SlimCampaign } from "sailpoint-api-client";
+
+const READONLY_RESOURCE_PATH = /\/cloud-rules\/|\/cloud-rule-script\/|\/identities\//;
 
 export class ISCResourceProvider implements FileSystemProvider {
 	private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
@@ -45,14 +48,15 @@ export class ISCResourceProvider implements FileSystemProvider {
 		const resourcePath = getPathByUri(uri);
 		const tenantName = uri.authority;
 		const tenantInfo = await this.tenantService.getTenantByTenantName(tenantName)
-		const isReadOnly = tenantInfo && tenantInfo.readOnly
+		const isTenantReadOnly = !!tenantInfo?.readOnly;
+		const isReadOnlyResource = READONLY_RESOURCE_PATH.test(resourcePath ?? '');
 		const isFile = id !== "provisioning-policies" && id !== "schemas";
 		return {
 			type: (isFile ? FileType.File : FileType.Directory),
 			ctime: toTimestamp(data.created),
 			mtime: toTimestamp(data.modified),
 			size: convertToText(data).length,
-			permissions: id !== NEW_ID && (isReadOnly || resourcePath?.match("\/identities\/")) ? vscode.FilePermission.Readonly : undefined
+			permissions: id !== NEW_ID && (isTenantReadOnly || isReadOnlyResource) ? vscode.FilePermission.Readonly : undefined
 		};
 	}
 	readDirectory(
@@ -79,6 +83,9 @@ export class ISCResourceProvider implements FileSystemProvider {
 			throw Error("Invalid uri:" + uri);
 		}
 		const id = getIdByUri(uri);
+		if (!id) {
+			throw vscode.FileSystemError.FileNotFound(uri);
+		}
 		if (id === NEW_ID || id === "provisioning-policies" || id === "schemas") {
 			console.log("New file");
 			return "";
@@ -95,13 +102,29 @@ export class ISCResourceProvider implements FileSystemProvider {
 		if (/\/connector-rule-script\//.test(resourcePath)) {
 			const rule = await client.getConnectorRuleById(id);
 			data = rule.sourceCode?.script
+		} else if (/\/cloud-rule-script\//.test(resourcePath)) {
+			const cloudRuleService = CloudRuleService.getInstance(
+				tenantInfo.id!,
+				tenantName,
+				tenantInfo.name ?? tenantName
+			);
+			const configObject = await cloudRuleService.getCloudRule({ id, name: getNameByUri(uri) ?? undefined });
+			data = cloudRuleService.getScriptFromConfigObject(configObject);
+		} else if (/\/cloud-rules\//.test(resourcePath)) {
+			const cloudRuleService = CloudRuleService.getInstance(
+				tenantInfo.id!,
+				tenantName,
+				tenantInfo.name ?? tenantName
+			);
+			const configObject = await cloudRuleService.getCloudRule({ id, name: getNameByUri(uri) ?? undefined });
+			data = configObject.object;
 		} else if (/\/identities\//.test(resourcePath)) {
 			const response = await client.paginatedSearchIdentities(
 				`id:${id}`,
 				2,
 				0,
 				false,
-				null,
+				undefined,
 				true
 			);
 			if (response.data.length === 1) {
@@ -170,10 +193,18 @@ export class ISCResourceProvider implements FileSystemProvider {
 			this._emitter.fire([{ type: vscode.FileChangeType.Created, uri }]);
 		} else {
 
+			if (READONLY_RESOURCE_PATH.test(resourcePath)) {
+				// View-only in the editor (cloud rules and identities cannot be modified directly).
+				throw vscode.FileSystemError.NoPermissions(uri);
+			}
+
 			if (resourcePath.match("connector-rule-script")) {
 				const rule = await client.getConnectorRuleById(id)
-				rule.sourceCode.script = data
-				await client.updateConnectorRule(rule)
+				await client.updateConnectorRule({
+					...rule,
+					sourceCode: { ...rule.sourceCode, script: data },
+					description: rule.description ?? undefined,
+				} as ConnectorRuleUpdateRequestBeta)
 			} else if (resourcePath.match("form-definitions")) {
 				// UI is pushing all data as a Patch. Doing the same for form definitions
 				const newData = JSON.parse(data) as FormDefinitionResponseBeta
@@ -290,9 +321,6 @@ export class ISCResourceProvider implements FileSystemProvider {
 					resourcePath,
 					JSON.stringify(jsonpatch)
 				);
-			} else if (resourcePath.match(/identities\//)) {
-				console.log("save identities - cant do this folks");
-				vscode.window.showErrorMessage("Identities cannot be modified directly");
 			} else {
 				// Need to update the content to remove id and internal properties from the payload
 				// to prevent a bad request error
