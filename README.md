@@ -16,7 +16,7 @@ The SailPoint Identity Security Cloud extension makes it easy to:
 - View, edit machine account subtypes and their approval of a source
 - View, edit, enable, disable, export, import workflows and view execution history
 - View, create, edit, delete connector rules and export/import the script of a rule
-- View, export/import cloud rules
+- View, export cloud rules
 - View, edit, delete service desk integrations
 - View, edit, delete identity profiles and lifecycle states, and refreshes all the identities under a profile
 - Import/Export Accounts (import for delimited files only), uncorrelated accounts, entitlement details

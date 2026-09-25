@@ -1,20 +1,13 @@
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 import { join } from 'path';
-import { ImportOptionsBetaIncludeTypesBeta } from 'sailpoint-api-client';
-import { CloudRuleTreeItem, CloudRulesTreeItem } from '../../models/ISCTreeItem';
+import { CloudRuleTreeItem } from '../../models/ISCTreeItem';
 import { CloudRuleService } from '../../services/CloudRuleService';
-import { TenantService } from '../../services/TenantService';
 import { toDateSuffix } from '../../utils';
 import { ensureFolderExists } from '../../utils/fileutils';
-import { chooseFile, confirmFileOverwrite, openPreview } from '../../utils/vsCodeHelpers';
-import { validateTenantReadonly } from '../validateTenantReadonly';
-import { SPConfigImporter } from '../spconfig-import/SPConfigImporter';
-import * as commands from '../constants';
+import { confirmFileOverwrite, openPreview } from '../../utils/vsCodeHelpers';
 
 export class CloudRuleCommand {
-
-    constructor(private readonly tenantService: TenantService) { }
 
     async openScript(node?: CloudRuleTreeItem): Promise<void> {
         console.log("> CloudRuleCommand.openScript", node);
@@ -36,36 +29,6 @@ export class CloudRuleCommand {
         }
 
         await this.exportScript(node.tenantId, node.tenantName, node.tenantDisplayName, node.label as string, node.id as string);
-    }
-
-    async importConfig(node: CloudRulesTreeItem): Promise<void> {
-        console.log("> CloudRuleCommand.importConfig");
-
-        if (!(await validateTenantReadonly(this.tenantService, node.tenantId, `import cloud rules`))) {
-            return;
-        }
-
-        const fileUri = await chooseFile('JSON', 'json');
-        if (fileUri === undefined) { return; }
-
-        const spConfig = JSON.parse(fs.readFileSync(fileUri.fsPath).toString());
-        const ruleObjects = (spConfig.objects ?? []).filter((x: any) => x.self?.type === 'RULE');
-        if (ruleObjects.length === 0) {
-            vscode.window.showErrorMessage('No RULE objects found in the selected file.');
-            return;
-        }
-
-        const importer = new SPConfigImporter(
-            node.tenantId,
-            node.tenantName,
-            node.tenantDisplayName,
-            { includeTypes: [ImportOptionsBetaIncludeTypesBeta.Rule] },
-            JSON.stringify({ ...spConfig, objects: ruleObjects })
-        );
-        await importer.importConfig();
-
-        CloudRuleService.getInstance(node.tenantId, node.tenantName, node.tenantDisplayName).resetCache();
-        vscode.commands.executeCommand(commands.REFRESH_FORCED, node);
     }
 
     private buildProposedFilePath(tenantName: string, ruleName: string): string {

@@ -469,13 +469,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.EXPORT_CONNECTOR_RULE_SCRIPT_VIEW,
 			exportScriptFromRuleCommand.exportScriptView, exportScriptFromRuleCommand));
 
-	const cloudRuleCommand = new CloudRuleCommand(tenantService);
-	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.IMPORT_CLOUD_RULE_CONFIG_VIEW,
-			cloudRuleCommand.importConfig, cloudRuleCommand));
-	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.IMPORT_CLOUD_RULE_CONFIG_ICON_VIEW,
-			cloudRuleCommand.importConfig, cloudRuleCommand));
+	const cloudRuleCommand = new CloudRuleCommand();
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.VIEW_CLOUD_RULE_SCRIPT,
 			cloudRuleCommand.openScript, cloudRuleCommand));

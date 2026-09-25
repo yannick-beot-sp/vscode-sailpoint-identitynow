@@ -69,8 +69,7 @@ export class ExportConfigNodeTreeViewCommand {
         // FIXME
         // Issue while exporting FORM_DEFINITION: needs to rely on names instead of ids
         if (ExportPayloadBetaIncludeTypesBeta.FormDefinition === objectType
-            || ExportPayloadBetaIncludeTypesBeta.ConnectorRule === objectType
-            || ExportPayloadBetaIncludeTypesBeta.Rule === objectType) {
+            || ExportPayloadBetaIncludeTypesBeta.ConnectorRule === objectType) {
             options[objectType] = {
                 "includedNames": [
                     node.label

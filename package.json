@@ -444,18 +444,6 @@
         "title": "Edit script"
       },
       {
-        "command": "vscode-sailpoint-identitynow.cloud-rule.import-config.view",
-        "title": "Import SP-Config..."
-      },
-      {
-        "command": "vscode-sailpoint-identitynow.cloud-rule.import-config.icon-view",
-        "title": "Import SP-Config...",
-        "icon": {
-          "light": "resources/light/import.svg",
-          "dark": "resources/dark/import.svg"
-        }
-      },
-      {
         "command": "vscode-sailpoint-identitynow.cloud-rule.view-script",
         "title": "View script"
       },
@@ -1114,14 +1102,6 @@
           "when": "never"
         },
         {
-          "command": "vscode-sailpoint-identitynow.cloud-rule.import-config.view",
-          "when": "never"
-        },
-        {
-          "command": "vscode-sailpoint-identitynow.cloud-rule.import-config.icon-view",
-          "when": "never"
-        },
-        {
           "command": "vscode-sailpoint-identitynow.cloud-rule.view-script",
           "when": "never"
         },
@@ -1440,16 +1420,6 @@
         {
           "command": "vscode-sailpoint-identitynow.workflow.import",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == workflows"
-        },
-        {
-          "command": "vscode-sailpoint-identitynow.cloud-rule.import-config.view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^cloud-rules$/",
-          "group": "config"
-        },
-        {
-          "command": "vscode-sailpoint-identitynow.cloud-rule.import-config.icon-view",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^cloud-rules$/",
-          "group": "inline@1"
         },
         {
           "command": "vscode-sailpoint-identitynow.workflow.enable",

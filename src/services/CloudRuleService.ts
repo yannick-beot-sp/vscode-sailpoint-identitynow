@@ -1,12 +1,10 @@
 import {
     ExportPayloadBetaIncludeTypesBeta,
-    ImportOptionsBetaIncludeTypesBeta,
     ObjectExportImportOptionsBeta,
     SpConfigExportResultsBeta,
     SpConfigJobBetaStatusBeta,
 } from 'sailpoint-api-client';
 import * as vscode from 'vscode';
-import { waitForImportJob } from '../commands/spconfig-import/utils';
 import { compareByName, delay } from '../utils';
 import { ISCClient } from './ISCClient';
 
@@ -130,30 +128,6 @@ export class CloudRuleService {
         return ruleObject?.sourceCode?.script ?? ruleObject?.body ?? ruleObject?.script ?? '';
     }
 
-    public async importCloudRule(configObject: SpConfigObjectBeta): Promise<void> {
-        await this.importCloudRuleConfig(configObject);
-    }
-
-    public async importCloudRuleConfig(configObject: SpConfigObjectBeta): Promise<void> {
-        const importData = this.buildImportPayload([configObject]);
-        await this.importWithProgress(importData);
-        this.resetCache();
-    }
-
-    public buildConfigObjectFromRuleData(
-        ruleData: any,
-        self?: { id?: string; name?: string }
-    ): SpConfigObjectBeta {
-        return {
-            object: ruleData,
-            self: {
-                id: self?.id ?? ruleData?.id ?? '',
-                name: self?.name ?? ruleData?.name ?? '',
-                type: 'RULE',
-            },
-        };
-    }
-
     private mapExportToSummaries(data: SpConfigExportResultsBeta): CloudRuleSummary[] {
         return (data.objects ?? [])
             .map((entry) => this.toCloudRuleSummary(entry))
@@ -210,10 +184,6 @@ export class CloudRuleService {
         };
     }
 
-    private buildImportPayload(configObjects: SpConfigObjectBeta[]): string {
-        return JSON.stringify({ objects: configObjects });
-    }
-
     private async exportRulesWithProgress(
         title: string,
         objectOptions: { [key: string]: ObjectExportImportOptionsBeta } = {}
@@ -251,37 +221,5 @@ export class CloudRuleService {
         }
 
         return await this.client.getExportJobResult(jobId);
-    }
-
-    private async importWithProgress(data: string): Promise<void> {
-        await vscode.window.withProgress({
-            location: vscode.ProgressLocation.Notification,
-            title: `Importing cloud rule to ${this.tenantDisplayName}...`,
-            cancellable: false,
-        }, async (_task, token) => {
-            const jobId = await this.client.startImportJob(data, {
-                includeTypes: [ImportOptionsBetaIncludeTypesBeta.Rule],
-            });
-            const jobStatus = await waitForImportJob(this.client, jobId, token);
-            const importJobResult = await this.client.getImportJobResult(jobId);
-            const result = { ...importJobResult, ...jobStatus };
-
-            const errors: string[] = [];
-            const ruleResults = result.results?.RULE;
-            ruleResults?.errors?.forEach((element: any) => {
-                errors.push(
-                    element.details?.exceptionMessage
-                    ?? element.detail?.exceptionMessage
-                    ?? element.text
-                );
-            });
-
-            if (errors.length > 0) {
-                throw new Error(errors.join('. '));
-            }
-            if (result.status === 'FAILED') {
-                throw new Error((result as any).message ?? 'Cloud rule import failed');
-            }
-        });
     }
 }

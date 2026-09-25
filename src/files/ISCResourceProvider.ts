@@ -194,7 +194,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 		} else {
 
 			if (READONLY_RESOURCE_PATH.test(resourcePath)) {
-				// View-only in the editor (cloud rules: use Import config; identities cannot be modified directly).
+				// View-only in the editor (cloud rules and identities cannot be modified directly).
 				throw vscode.FileSystemError.NoPermissions(uri);
 			}
 
