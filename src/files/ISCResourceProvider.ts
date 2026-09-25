@@ -124,7 +124,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 				2,
 				0,
 				false,
-				undefined,
+				[],
 				true
 			);
 			if (response.data.length === 1) {
