@@ -13,7 +13,8 @@ export class SimpleSPConfigExporter {
         private readonly options: {
             [key: string]: ObjectExportImportOptionsBeta;
         },
-        private objectTypes: ExportPayloadBetaIncludeTypesBeta[] = []
+        private objectTypes: ExportPayloadBetaIncludeTypesBeta[] = [],
+        private readonly progressTitle?: string
     ) {
     }
 
@@ -25,7 +26,7 @@ export class SimpleSPConfigExporter {
 
         const data = await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
-            title: `Exporting configuration from ${this.tenantDisplayName}...`,
+            title: this.progressTitle ?? `Exporting configuration from ${this.tenantDisplayName}...`,
             cancellable: false
         }, async (task, token) => {
             return await this.exportConfig(task, token);

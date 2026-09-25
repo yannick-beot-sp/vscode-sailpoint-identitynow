@@ -627,6 +627,8 @@ The extension supports the following settings:
   - Default value: `%x/Workflows/Workflow-%t-%S-%y%M%d-%h%m%s.json`
 - `vscode-sailpoint-identitynow.export.cloudRule.filename`: Define the pattern to export a cloud rule as XML
   - Default value: `%x/exportedObjects/cloud-rules/%t-%S-%y%M%d-%h%m%s.xml`
+- `vscode-sailpoint-identitynow.export.cloudRule.script.filename`: Define the pattern to export a cloud rule script
+  - Default value: `%x/exportedObjects/cloud-rule-scripts/%t-%S-%y%M%d-%h%m%s.bsh`
 - `vscode-sailpoint-identitynow.treeView.pagination`: Define the number of roles and access profiles that are displayed in the tree view
   - Default value: 100
 - `vscode-sailpoint-identitynow.report.campaigns.filename`: Define the pattern for the folder to export access profiles.

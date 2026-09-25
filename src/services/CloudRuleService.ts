@@ -2,10 +2,9 @@ import {
     ExportPayloadBetaIncludeTypesBeta,
     ObjectExportImportOptionsBeta,
     SpConfigExportResultsBeta,
-    SpConfigJobBetaStatusBeta,
 } from 'sailpoint-api-client';
-import * as vscode from 'vscode';
-import { compareByName, delay } from '../utils';
+import { SimpleSPConfigExporter } from '../commands/spconfig-export/SimpleSPConfigExporter';
+import { compareByName } from '../utils';
 import { ISCClient } from './ISCClient';
 
 export interface CloudRuleSummary {
@@ -203,38 +202,17 @@ export class CloudRuleService {
         title: string,
         objectOptions: { [key: string]: ObjectExportImportOptionsBeta } = {}
     ): Promise<SpConfigExportResultsBeta> {
-        return await vscode.window.withProgress({
-            location: vscode.ProgressLocation.Notification,
-            title,
-            cancellable: false,
-        }, async (_task, token) => {
-            return await this.executeExportJob([RULE_OBJECT_TYPE], objectOptions, token);
-        });
-    }
-
-    private async executeExportJob(
-        objectTypes: ExportPayloadBetaIncludeTypesBeta[],
-        objectOptions: { [key: string]: ObjectExportImportOptionsBeta },
-        token: vscode.CancellationToken
-    ): Promise<SpConfigExportResultsBeta> {
-        const jobId = await this.client.startExportJob(objectTypes, objectOptions);
-
-        let jobStatus;
-        do {
-            if (token.isCancellationRequested) {
-                throw new Error('Cloud rule export cancelled');
-            }
-            await delay(1000);
-            jobStatus = await this.client.getExportJobStatus(jobId);
-        } while (
-            jobStatus.status === SpConfigJobBetaStatusBeta.NotStarted
-            || jobStatus.status === SpConfigJobBetaStatusBeta.InProgress
+        const exporter = new SimpleSPConfigExporter(
+            this.client,
+            this.tenantDisplayName,
+            objectOptions,
+            [RULE_OBJECT_TYPE],
+            title
         );
-
-        if (jobStatus.status !== SpConfigJobBetaStatusBeta.Complete) {
-            throw new Error(`Could not export cloud rules: ${(jobStatus as any).message ?? jobStatus.status}`);
+        const data = await exporter.exportConfigWithProgression();
+        if (!data) {
+            throw new Error('Cloud rule export cancelled');
         }
-
-        return await this.client.getExportJobResult(jobId);
+        return data;
     }
 }

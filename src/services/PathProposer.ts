@@ -299,4 +299,16 @@ export class PathProposer {
             "RULE",
             objectName);
     }
+
+    public static getCloudRuleScriptFilename(
+        tenantName: string,
+        tenantDisplayName: string,
+        objectName: string
+    ): string {
+        return this.getObjectBasedReportFilename(configuration.CLOUD_RULE_SCRIPT_EXPORT_FILENAME_CONF,
+            tenantName,
+            tenantDisplayName,
+            "RULE",
+            objectName);
+    }
 }
