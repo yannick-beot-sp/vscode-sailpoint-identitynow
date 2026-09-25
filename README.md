@@ -16,6 +16,7 @@ The SailPoint Identity Security Cloud extension makes it easy to:
 - View, edit machine account subtypes and their approval of a source
 - View, edit, enable, disable, export, import workflows and view execution history
 - View, create, edit, delete connector rules and export/import the script of a rule
+- View, export/import cloud rules
 - View, edit, delete service desk integrations
 - View, edit, delete identity profiles and lifecycle states, and refreshes all the identities under a profile
 - Import/Export Accounts (import for delimited files only), uncorrelated accounts, entitlement details
@@ -655,6 +656,8 @@ The patterns defined above use the following tokens:
 
 - Could not aggregate VA-based delimited file
 - Sort lifecycle states for an identity profile by name
+- Add support for cloud rules by [@animesh-tarodia-sp](https://github.com/animesh-tarodia-sp) (cf. [#163](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/163))
+
 
 ### 1.3.30
 

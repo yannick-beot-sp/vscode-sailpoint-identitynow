@@ -10,6 +10,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- Add support for cloud rules by [@animesh-tarodia-sp](https://github.com/animesh-tarodia-sp) (cf. [#163](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/163))
+
 ### Changed
 
 - Sort lifecycle states for an identity profile by name
