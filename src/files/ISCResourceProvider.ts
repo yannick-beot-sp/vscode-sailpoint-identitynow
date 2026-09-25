@@ -23,6 +23,8 @@ import { getIdByUri, getNameByUri, getPathByUri } from "../utils/UriUtils";
 import { Operation, compare } from "fast-json-patch";
 import { ConnectorRuleUpdateRequestBeta, FormDefinitionResponseBeta, SlimCampaign } from "sailpoint-api-client";
 
+const READONLY_RESOURCE_PATH = /\/cloud-rules\/|\/cloud-rule-script\/|\/identities\//;
+
 export class ISCResourceProvider implements FileSystemProvider {
 	private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
 
@@ -46,15 +48,15 @@ export class ISCResourceProvider implements FileSystemProvider {
 		const resourcePath = getPathByUri(uri);
 		const tenantName = uri.authority;
 		const tenantInfo = await this.tenantService.getTenantByTenantName(tenantName)
-		const isReadOnly = tenantInfo && tenantInfo.readOnly
-		const isViewOnlyCloudRule = /\/cloud-rules\/|\/cloud-rule-script\//.test(resourcePath ?? '');
+		const isTenantReadOnly = !!tenantInfo?.readOnly;
+		const isReadOnlyResource = READONLY_RESOURCE_PATH.test(resourcePath ?? '');
 		const isFile = id !== "provisioning-policies" && id !== "schemas";
 		return {
 			type: (isFile ? FileType.File : FileType.Directory),
 			ctime: toTimestamp(data.created),
 			mtime: toTimestamp(data.modified),
 			size: convertToText(data).length,
-			permissions: id !== NEW_ID && (isReadOnly || isViewOnlyCloudRule || resourcePath?.match("\/identities\/")) ? vscode.FilePermission.Readonly : undefined
+			permissions: id !== NEW_ID && (isTenantReadOnly || isReadOnlyResource) ? vscode.FilePermission.Readonly : undefined
 		};
 	}
 	readDirectory(
@@ -191,13 +193,8 @@ export class ISCResourceProvider implements FileSystemProvider {
 			this._emitter.fire([{ type: vscode.FileChangeType.Created, uri }]);
 		} else {
 
-			if (resourcePath.match("cloud-rule-script")) {
-				// Cloud rule scripts are view-only; edits must be saved via Import config.
-				throw vscode.FileSystemError.NoPermissions(uri);
-			}
-
-			if (resourcePath.match("cloud-rules")) {
-				// Cloud rules are view-only in the editor; use Import config to update rules.
+			if (READONLY_RESOURCE_PATH.test(resourcePath)) {
+				// View-only in the editor (cloud rules: use Import config; identities cannot be modified directly).
 				throw vscode.FileSystemError.NoPermissions(uri);
 			}
 
@@ -324,9 +321,6 @@ export class ISCResourceProvider implements FileSystemProvider {
 					resourcePath,
 					JSON.stringify(jsonpatch)
 				);
-			} else if (resourcePath.match(/identities\//)) {
-				console.log("save identities - cant do this folks");
-				vscode.window.showErrorMessage("Identities cannot be modified directly");
 			} else {
 				// Need to update the content to remove id and internal properties from the payload
 				// to prevent a bad request error
