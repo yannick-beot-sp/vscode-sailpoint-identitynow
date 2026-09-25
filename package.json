@@ -2173,12 +2173,8 @@
     "vscode-sailpoint-identitynow": "file:"
   },
   "allowScripts": {
-<<<<<<< HEAD
-    "fsevents@2.3.3": true
-=======
     "esbuild@0.27.7": true,
     "fsevents@2.3.3": true,
     "@swc/core@1.15.18": true
->>>>>>> main
   }
 }
