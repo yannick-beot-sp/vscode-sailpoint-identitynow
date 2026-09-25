@@ -79,7 +79,7 @@ export class CloneTransformCommand {
             ]
         };
         const exporter = new SimpleSPConfigExporter(
-            client,
+            client!,
             values["tenant"].name,
             options,
             [ExportPayloadBetaIncludeTypesBeta.Transform]

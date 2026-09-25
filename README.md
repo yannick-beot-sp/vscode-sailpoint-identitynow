@@ -662,7 +662,8 @@ The patterns defined above use the following tokens:
 - Sort lifecycle states for an identity profile by name
 - Add support for cloud rules by [@animesh-tarodia-sp](https://github.com/animesh-tarodia-sp) (cf. [#163](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/163))
 - Export a cloud rule or a `.java`/`.bsh` file as XML
-
+- Fix issue with role dimension pagination (cf. [#164](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/164))
+- Issue when Importing Dimensions with bad entitlements (cf. [#160](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/160)). Fix issue with CacheService.
 
 ### 1.3.30
 

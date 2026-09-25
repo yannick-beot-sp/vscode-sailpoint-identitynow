@@ -81,7 +81,11 @@ export class TaskPool {
                     this.executing--
                     setImmediate(() => this.tryMove());
                 })
-                .catch(rejectProm);
+                .catch(error => {
+                    rejectProm(error);
+                    this.executing--
+                    setImmediate(() => this.tryMove());
+                });
         };
 
         this.queue.enqueue(funcToRun);

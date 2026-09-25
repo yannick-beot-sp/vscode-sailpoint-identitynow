@@ -20,6 +20,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 ### Fixed
 
 - Could not aggregate VA-based delimited file
+- Fix issue with role dimension pagination (cf. [#164](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/164))
+- Issue when Importing Dimensions with bad entitlements (cf. [#160](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/160)). Fix issue with CacheService.
 
 ### Removed
 
