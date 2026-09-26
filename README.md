@@ -663,13 +663,13 @@ The patterns defined above use the following tokens:
 
 ### Unreleased
 
-- Add identity panel to view roles, access profiles, and entitlements for an identity; grant access by ID and revoke access from the table
-- Identity access table with sortable and filterable Type, Name, and Source columns; Revocable and Standalone columns; resizable columns; 50-row pagination; raw JSON view per item
-- Paginated identity access API fetch for roles, access profiles, and entitlements (Identity History API with search fallback)
-- Add identity events panel to browse audit events (action, actor, target, status, created) for an identity
-- Add access request status panel with live polling after grant or revoke (5s interval, bounded tail timeout, phase history)
-- Add account tree commands: enable, disable, unlock, aggregate one, and remove (with guards for authoritative and system accounts)
+- Add identity panel to view roles, access profiles, and entitlements for an identity
+- Allow to request or revoke access from the identity panel and add access request status panel with live reload to monitor the request
+- Add identity events panel to browse audit events
+- Add account commands: enable, disable, unlock, aggregate one, and remove (with guards for authoritative and system accounts)
 - Reveal and expand the matching identity node in the tree after an identity search
+
+
 ### 1.3.31
 
 - Could not aggregate VA-based delimited file

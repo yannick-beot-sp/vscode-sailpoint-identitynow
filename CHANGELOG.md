@@ -11,9 +11,14 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- Add identity panel to view roles, access profiles, and entitlements for an identity
+- Allow to request or revoke access from the identity panel and add access request status panel with live reload to monitor the request
+- Add identity events panel to browse audit events
+- Add account commands: enable, disable, unlock, aggregate one, and remove (with guards for authoritative and system accounts)
 
 ### Changed
 
+- Reveal and expand the matching identity node in the tree after an identity search
 
 ### Fixed
 
