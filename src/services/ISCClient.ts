@@ -21,6 +21,12 @@ import { onErrorResponse, onRequest, onResponse } from "./AxiosHandlers";
 import { EmailTestMode } from "../models/EmailTestMode";
 import { DEFAULT_PAGINATED_PARAMS, PaginatedSearch, PaginatedSearchRequest } from "../models/SearchQuery";
 import { buildSearchQuery } from "../utils/buildSearchQueryV2025";
+import {
+	accessItemTypeFromSearchDocument,
+	buildRequestableAccessItemQuery,
+	REQUESTABLE_ACCESS_INDICES,
+	REQUESTABLE_ACCESS_SEARCH_FIELDS,
+} from "../utils/requestableAccessSearch";
 import { buildIdentityEventsSearchQuery, collectIdentityEventSearchTerms } from "../utils/identityEventsQuery";
 import { AccessProfile } from "../models/AccessProfiles";
 import { IdentityAccessItem, IdentityAccessItemType } from "../models/IdentityAccessItem";
@@ -1005,7 +1011,7 @@ export class ISCClient {
 		})
 	}
 
-	public async getIdentityAuditEvents(identityId: string, identityName: string, limit = 50): Promise<PaginatedResult<EventDocumentV2025>> {
+	public async getIdentityAuditEvents(identityId: string, identityName: string, limit = 250): Promise<PaginatedResult<EventDocumentV2025>> {
 		console.log("> getIdentityAuditEvents", identityId, identityName, limit);
 
 		let identityDetails: { name?: string; displayName?: string; email?: string; alias?: string } | undefined;
@@ -1167,38 +1173,24 @@ export class ISCClient {
 		return response.data;
 	}
 
-	public async resolveAccessItemById(accessItemId: string): Promise<IdentityAccessItem> {
-		console.log("> resolveAccessItemById", accessItemId);
+	public async searchRequestableAccessItems(term: string): Promise<IdentityAccessItem[]> {
+		console.log("> searchRequestableAccessItems", term);
 
-		const apiConfig = await this.getApiConfiguration();
-		const entitlementApi = new EntitlementsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const roleApi = new RolesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const accessProfileApi = new AccessProfilesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await this.searchPost<Record<string, unknown>>({
+			query: buildSearchQuery({
+				indices: REQUESTABLE_ACCESS_INDICES,
+				query: buildRequestableAccessItemQuery(term),
+				sort: "name",
+				fields: REQUESTABLE_ACCESS_SEARCH_FIELDS,
+			}),
+			limit: DEFAULT_PAGINATED_PARAMS.limit,
+			offset: 0,
+			count: false,
+		});
 
-		const attempts = await Promise.allSettled([
-			entitlementApi.getEntitlement({ id: accessItemId }).then(response => this.normalizeResolvedAccessItem("ENTITLEMENT", response.data)),
-			roleApi.getRole({ id: accessItemId }).then(response => this.normalizeResolvedAccessItem("ROLE", response.data)),
-			accessProfileApi.getAccessProfile({ id: accessItemId }).then(response => this.normalizeResolvedAccessItem("ACCESS_PROFILE", response.data)),
-		]);
-
-		const resolved = attempts.find((attempt): attempt is PromiseFulfilledResult<IdentityAccessItem> =>
-			attempt.status === "fulfilled"
+		return (response.data ?? []).map(entry =>
+			this.normalizeResolvedAccessItem(accessItemTypeFromSearchDocument(entry), entry)
 		);
-
-		if (resolved) {
-			return resolved.value;
-		}
-
-		const reasons = attempts
-			.filter((attempt): attempt is PromiseRejectedResult => attempt.status === "rejected")
-			.map(attempt => attempt.reason);
-
-		const unexpected = reasons.find(reason => (reason as { response?: { status?: number } })?.response?.status !== 404);
-		if (unexpected) {
-			throw unexpected;
-		}
-
-		throw new Error(`No role, access profile, or entitlement found with ID ${accessItemId}.`);
 	}
 
 	public async grantIdentityAccess(identityId: string, item: IdentityAccessItem): Promise<AccessRequestResponse> {

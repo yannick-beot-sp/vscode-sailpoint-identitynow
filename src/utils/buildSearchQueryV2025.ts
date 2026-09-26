@@ -1,7 +1,8 @@
 import { IndexV2025, SearchV2025 } from "sailpoint-api-client"
 
 export interface SearchQuery {
-	index: IndexV2025
+	index?: IndexV2025
+	indices?: IndexV2025[]
 	query: string
 	sort?: string | string[]
 	fields?: string[]
@@ -10,14 +11,18 @@ export interface SearchQuery {
 
 
 export function buildSearchQuery(
-	{ index, query, sort, fields, includeNested = false }: SearchQuery,
+	{ index, indices, query, sort, fields, includeNested = false }: SearchQuery,
 ): SearchV2025 {
+	const resolvedIndices = indices?.length ? indices : index ? [index] : [];
+	if (resolvedIndices.length === 0) {
+		throw new Error("Search query requires at least one index");
+	}
 
 	const sortArray = Array.isArray(sort)
 		? sort
 		: sort?.split(",").map(s => s.trim()).filter(Boolean);
 	return {
-		indices: [index],
+		indices: resolvedIndices,
 		query: { query },
 		sort: sortArray,
 		includeNested,

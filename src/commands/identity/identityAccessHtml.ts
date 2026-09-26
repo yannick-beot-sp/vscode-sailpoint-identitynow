@@ -1,4 +1,5 @@
 import { IdentityAccessItem } from "../../models/IdentityAccessItem";
+import { jsonDrawerCss, jsonDrawerMarkup, jsonDrawerScript } from "./jsonDrawerSnippet";
 
 function escapeHtml(value: string): string {
 	return value
@@ -43,7 +44,7 @@ interface AccessTableRow {
 	removeDate?: string;
 }
 
-function buildAccessTableRows(accessItems: IdentityAccessItem[]): AccessTableRow[] {
+export function buildAccessTableRows(accessItems: IdentityAccessItem[]): AccessTableRow[] {
 	return accessItems.map((item, index) => ({
 		index,
 		type: item.type,
@@ -138,21 +139,99 @@ export function buildAccessTableHtml(
 			font: inherit;
 		}
 
-		.filter-field input:focus {
+		.filter-field input:focus,
+		.multi-select-toggle:focus {
 			outline: 1px solid var(--vscode-focusBorder);
+		}
+
+		.multi-select {
+			position: relative;
+			min-width: 200px;
+		}
+
+		.multi-select-toggle {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 8px;
+			width: 100%;
+			text-align: left;
+			background: var(--vscode-input-background);
+			color: var(--vscode-input-foreground);
+			border: 1px solid var(--vscode-input-border, var(--vscode-panel-border));
+			border-radius: 4px;
+			padding: 4px 8px;
+			font: inherit;
+			cursor: pointer;
+		}
+
+		.multi-select-toggle .multi-select-label {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.multi-select-toggle .caret {
+			flex: none;
+			font-size: 0.7rem;
+			opacity: 0.8;
+		}
+
+		.multi-select-panel {
+			position: absolute;
+			top: calc(100% + 4px);
+			left: 0;
+			z-index: 5;
+			min-width: 100%;
+			max-width: 360px;
+			max-height: 240px;
+			overflow: auto;
+			background: var(--vscode-editorWidget-background, var(--vscode-editor-background));
+			color: var(--vscode-editorWidget-foreground, var(--vscode-foreground));
+			border: 1px solid var(--vscode-editorWidget-border, var(--vscode-panel-border));
+			border-radius: 4px;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+			padding: 4px 0;
+		}
+
+		.multi-select-panel[hidden] {
+			display: none;
+		}
+
+		.multi-select-option {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			padding: 4px 10px;
+			cursor: pointer;
+		}
+
+		.multi-select-option:hover {
+			background: var(--vscode-list-hoverBackground);
+		}
+
+		.multi-select-option span {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.multi-select-empty {
+			padding: 6px 10px;
+			color: var(--vscode-descriptionForeground);
 		}
 
 		.table-wrap {
 			overflow: auto;
+			scrollbar-gutter: stable;
 			border: 1px solid var(--vscode-panel-border);
 			border-radius: 6px;
 		}
 
 		table {
 			table-layout: fixed;
-			width: max-content;
-			min-width: 100%;
 			border-collapse: collapse;
+			width: auto;
 		}
 
 		thead th {
@@ -166,6 +245,7 @@ export function buildAccessTableHtml(
 			font-weight: 600;
 			white-space: nowrap;
 			overflow: hidden;
+			box-sizing: border-box;
 		}
 
 		th .th-label {
@@ -203,6 +283,14 @@ export function buildAccessTableHtml(
 			vertical-align: top;
 			word-break: break-word;
 			overflow: hidden;
+			box-sizing: border-box;
+		}
+
+		th.col-fixed,
+		td.col-fixed {
+			white-space: nowrap;
+			word-break: normal;
+			text-overflow: ellipsis;
 		}
 
 		th.sortable {
@@ -215,7 +303,10 @@ export function buildAccessTableHtml(
 		}
 
 		th.sortable .sort-indicator {
+			display: inline-block;
+			width: 1em;
 			margin-left: 4px;
+			text-align: center;
 			opacity: 0.85;
 		}
 
@@ -288,6 +379,7 @@ export function buildAccessTableHtml(
 			color: var(--vscode-descriptionForeground);
 			font-size: 0.92rem;
 		}
+		${jsonDrawerCss}
 	</style>
 </head>
 <body>
@@ -297,19 +389,34 @@ export function buildAccessTableHtml(
 	</header>
 	<div class="toolbar">
 		<button type="button" class="action-button" id="request-access-btn">Request Access</button>
+		<button type="button" class="action-button secondary" id="refresh-btn">Refresh</button>
 	</div>
 	<div class="filters">
-		<div class="filter-field">
-			<label for="filter-type">Filter type</label>
-			<input type="text" id="filter-type" placeholder="Role, Entitlement...">
+		<div class="filter-field multi-select">
+			<label id="filter-type-label">Type</label>
+			<button type="button" class="multi-select-toggle" id="type-filter-toggle" aria-haspopup="true" aria-expanded="false" aria-controls="type-filter-panel" aria-labelledby="filter-type-label">
+				<span class="multi-select-label">All</span>
+				<span class="caret" aria-hidden="true">▼</span>
+			</button>
+			<div class="multi-select-panel" id="type-filter-panel" role="group" aria-labelledby="filter-type-label" hidden>
+				<label class="multi-select-option"><input type="checkbox" value="ROLE"><span>Role</span></label>
+				<label class="multi-select-option"><input type="checkbox" value="ENTITLEMENT"><span>Entitlement</span></label>
+				<label class="multi-select-option"><input type="checkbox" value="ACCESS_PROFILE"><span>Access Profile</span></label>
+			</div>
 		</div>
 		<div class="filter-field">
 			<label for="filter-name">Filter name</label>
 			<input type="text" id="filter-name" placeholder="Name contains...">
 		</div>
-		<div class="filter-field">
-			<label for="filter-source">Filter source</label>
-			<input type="text" id="filter-source" placeholder="Source contains...">
+		<div class="filter-field multi-select">
+			<label id="filter-source-label">Source</label>
+			<button type="button" class="multi-select-toggle" id="source-filter-toggle" aria-haspopup="true" aria-expanded="false" aria-controls="source-filter-panel" aria-labelledby="filter-source-label">
+				<span class="multi-select-label">All</span>
+				<span class="caret" aria-hidden="true">▼</span>
+			</button>
+			<div class="multi-select-panel" id="source-filter-panel" role="group" aria-labelledby="filter-source-label" hidden>
+				<div id="source-filter-options"></div>
+			</div>
 		</div>
 		<button type="button" class="action-button secondary" id="clear-filters-btn">Clear filters</button>
 	</div>
@@ -327,14 +434,14 @@ export function buildAccessTableHtml(
 			</colgroup>
 			<thead>
 				<tr>
-					<th class="sortable" data-sort-key="typeLabel"><span class="th-label">Type<span class="sort-indicator"></span></span><div class="col-resizer"></div></th>
-					<th class="sortable" data-sort-key="name"><span class="th-label">Name<span class="sort-indicator"></span></span><div class="col-resizer"></div></th>
-					<th class="sortable" data-sort-key="source"><span class="th-label">Source<span class="sort-indicator"></span></span><div class="col-resizer"></div></th>
-					<th class="sortable" data-sort-key="revocable"><span class="th-label">Revocable<span class="sort-indicator"></span></span><div class="col-resizer"></div></th>
-					<th class="sortable" data-sort-key="standalone"><span class="th-label">Standalone<span class="sort-indicator"></span></span><div class="col-resizer"></div></th>
-					<th class="sortable" data-sort-key="removeDate"><span class="th-label">Expires<span class="sort-indicator"></span></span><div class="col-resizer"></div></th>
-					<th><span class="th-label">JSON</span><div class="col-resizer"></div></th>
-					<th><span class="th-label">Actions</span><div class="col-resizer"></div></th>
+					<th class="sortable" data-sort-key="typeLabel"><span class="th-label">Type<span class="sort-indicator"></span></span><div class="col-resizer" aria-hidden="true"></div></th>
+					<th class="sortable" data-sort-key="name"><span class="th-label">Name<span class="sort-indicator"></span></span><div class="col-resizer" aria-hidden="true"></div></th>
+					<th class="sortable" data-sort-key="source"><span class="th-label">Source<span class="sort-indicator"></span></span><div class="col-resizer" aria-hidden="true"></div></th>
+					<th class="sortable col-fixed" data-sort-key="revocable"><span class="th-label">Revocable<span class="sort-indicator"></span></span><div class="col-resizer" aria-hidden="true"></div></th>
+					<th class="sortable col-fixed" data-sort-key="standalone"><span class="th-label">Standalone<span class="sort-indicator"></span></span><div class="col-resizer" aria-hidden="true"></div></th>
+					<th class="sortable col-fixed" data-sort-key="removeDate"><span class="th-label">Expires<span class="sort-indicator"></span></span><div class="col-resizer" aria-hidden="true"></div></th>
+					<th class="col-fixed"><span class="th-label">JSON</span><div class="col-resizer" aria-hidden="true"></div></th>
+					<th class="col-fixed"><span class="th-label">Actions</span><div class="col-resizer" aria-hidden="true"></div></th>
 				</tr>
 			</thead>
 			<tbody id="access-table-body"></tbody>
@@ -345,29 +452,100 @@ export function buildAccessTableHtml(
 		<span class="pagination-info" id="page-info">Page 1 of 1</span>
 		<button type="button" class="action-button secondary" id="next-page-btn">Next</button>
 	</div>
+	${jsonDrawerMarkup}
 	<script nonce="${nonce}">
 		const vscode = acquireVsCodeApi();
-		const allRows = ${rowsJson};
-		const totalCount = allRows.length;
+		let allRows = ${rowsJson};
+		let totalCount = allRows.length;
 		const TABLE_PAGE_SIZE = 50;
+		const TYPE_OPTIONS = [
+			{ value: "ROLE", label: "Role" },
+			{ value: "ENTITLEMENT", label: "Entitlement" },
+			{ value: "ACCESS_PROFILE", label: "Access Profile" },
+		];
 
 		const state = {
 			sortKey: "typeLabel",
 			sortDirection: "asc",
-			typeFilter: "",
+			selectedTypes: [],
 			nameFilter: "",
-			sourceFilter: "",
+			selectedSources: [],
 			page: 0,
 		};
 
-		const columnWidths = [100, 180, 140, 90, 95, 140, 55, 90];
-		const MIN_COLUMN_WIDTH = 48;
+		// Name and Source absorb extra space. Revocable, Standalone, Expires, JSON, and Actions
+		// stay at a stable width because their values have a known format.
+		const columnMinWidths = [88, 120, 100, 108, 124, 188, 64, 100];
+		const columnWidths = [120, 220, 160, 112, 128, 200, 72, 108];
+		const flexColumnIndexes = [1, 2];
+		let columnsCustomized = false;
+
+		${jsonDrawerScript()}
+
+		function computeColumnWidths() {
+			const widths = columnWidths.slice();
+			if (columnsCustomized) {
+				return widths;
+			}
+
+			const wrap = document.querySelector(".table-wrap");
+			const available = wrap ? wrap.clientWidth : 0;
+			if (available <= 0 || flexColumnIndexes.length === 0) {
+				return widths;
+			}
+
+			const sum = widths.reduce((total, width) => total + width, 0);
+			const extra = available - sum;
+			if (extra > 1) {
+				const share = extra / flexColumnIndexes.length;
+				for (const index of flexColumnIndexes) {
+					widths[index] += share;
+				}
+				return widths;
+			}
+
+			if (extra >= -1) {
+				return widths;
+			}
+
+			const flexRoom = flexColumnIndexes.map((index) => Math.max(0, widths[index] - columnMinWidths[index]));
+			const roomSum = flexRoom.reduce((total, room) => total + room, 0);
+			if (roomSum <= 0) {
+				return widths;
+			}
+
+			const shrink = Math.min(-extra, roomSum);
+			for (let i = 0; i < flexColumnIndexes.length; i++) {
+				const index = flexColumnIndexes[i];
+				widths[index] -= (flexRoom[i] / roomSum) * shrink;
+			}
+			return widths;
+		}
 
 		function applyColumnWidths() {
+			const widths = computeColumnWidths();
 			const cols = document.querySelectorAll("#access-table-cols col");
-			cols.forEach((col, index) => {
-				col.style.width = columnWidths[index] + "px";
+			const headers = document.querySelectorAll("#access-table thead th");
+			let total = 0;
+			widths.forEach((width, index) => {
+				const px = width + "px";
+				if (cols[index]) {
+					cols[index].style.width = px;
+				}
+				if (headers[index]) {
+					headers[index].style.width = px;
+					headers[index].style.minWidth = px;
+					headers[index].style.maxWidth = px;
+				}
+				total += width;
 			});
+			const table = document.getElementById("access-table");
+			if (table) {
+				const px = total + "px";
+				table.style.width = px;
+				table.style.minWidth = px;
+				table.style.maxWidth = px;
+			}
 		}
 
 		function initColumnResizers() {
@@ -383,6 +561,12 @@ export function buildAccessTableHtml(
 					event.preventDefault();
 					event.stopPropagation();
 
+					const displayed = computeColumnWidths();
+					for (let i = 0; i < displayed.length; i++) {
+						columnWidths[i] = displayed[i];
+					}
+					columnsCustomized = true;
+
 					const startX = event.pageX;
 					const startWidth = columnWidths[index];
 					resizer.classList.add("active");
@@ -390,7 +574,7 @@ export function buildAccessTableHtml(
 
 					const onMouseMove = (moveEvent) => {
 						const delta = moveEvent.pageX - startX;
-						columnWidths[index] = Math.max(MIN_COLUMN_WIDTH, startWidth + delta);
+						columnWidths[index] = Math.max(columnMinWidths[index], startWidth + delta);
 						applyColumnWidths();
 					};
 
@@ -405,6 +589,16 @@ export function buildAccessTableHtml(
 					document.addEventListener("mouseup", onMouseUp);
 				});
 			});
+		}
+
+		function observeTableWrap() {
+			const wrap = document.querySelector(".table-wrap");
+			if (!wrap || typeof ResizeObserver === "undefined") {
+				window.addEventListener("resize", applyColumnWidths);
+				return;
+			}
+			const observer = new ResizeObserver(() => applyColumnWidths());
+			observer.observe(wrap);
 		}
 
 		function escapeHtml(value) {
@@ -481,18 +675,97 @@ export function buildAccessTableHtml(
 			return value.toLowerCase().includes(filterText.toLowerCase());
 		}
 
-		function matchesTypeFilter(row, filterText) {
-			if (!filterText) {
+		function matchesSelection(value, selected) {
+			if (selected.length === 0) {
 				return true;
 			}
-			return matchesFilter(row.typeLabel, filterText) || matchesFilter(row.type, filterText);
+			return selected.includes(value);
+		}
+
+		function formatSelectionLabel(labels) {
+			if (labels.length === 0) {
+				return "All";
+			}
+			return labels.join(", ");
+		}
+
+		function setToggleLabel(toggleId, label) {
+			const toggle = document.getElementById(toggleId);
+			const labelNode = toggle?.querySelector(".multi-select-label");
+			if (labelNode) {
+				labelNode.textContent = label;
+			}
+		}
+
+		function updateTypeToggleLabel() {
+			const labels = TYPE_OPTIONS
+				.filter((option) => state.selectedTypes.includes(option.value))
+				.map((option) => option.label);
+			setToggleLabel("type-filter-toggle", formatSelectionLabel(labels));
+		}
+
+		function updateSourceToggleLabel() {
+			setToggleLabel("source-filter-toggle", formatSelectionLabel(state.selectedSources));
+		}
+
+		function readCheckedValues(container) {
+			if (!container) {
+				return [];
+			}
+			return [...container.querySelectorAll("input[type='checkbox']:checked")].map((input) => input.value);
+		}
+
+		function collectSources() {
+			return [...new Set(allRows.map((row) => row.source).filter(Boolean))].sort((a, b) =>
+				String(a).localeCompare(String(b), undefined, { sensitivity: "base" })
+			);
+		}
+
+		function renderSourceOptions() {
+			const sources = collectSources();
+			const available = new Set(sources);
+			state.selectedSources = state.selectedSources.filter((source) => available.has(source));
+
+			const container = document.getElementById("source-filter-options");
+			if (!container) {
+				return;
+			}
+
+			if (sources.length === 0) {
+				container.innerHTML = '<div class="multi-select-empty">No sources</div>';
+			} else {
+				container.innerHTML = sources.map((source) => {
+					const checked = state.selectedSources.includes(source) ? " checked" : "";
+					return '<label class="multi-select-option"><input type="checkbox" value="'
+						+ escapeHtml(source) + '"' + checked + '><span>' + escapeHtml(source) + "</span></label>";
+				}).join("");
+			}
+
+			updateSourceToggleLabel();
+		}
+
+		function closeMultiSelects() {
+			for (const panel of document.querySelectorAll(".multi-select-panel")) {
+				panel.hidden = true;
+			}
+			for (const toggle of document.querySelectorAll(".multi-select-toggle")) {
+				toggle.setAttribute("aria-expanded", "false");
+			}
+		}
+
+		function setRefreshing(refreshing) {
+			const button = document.getElementById("refresh-btn");
+			if (button instanceof HTMLButtonElement) {
+				button.disabled = refreshing;
+				button.textContent = refreshing ? "Refreshing..." : "Refresh";
+			}
 		}
 
 		function getVisibleRows() {
 			let rows = allRows.filter((row) =>
-				matchesTypeFilter(row, state.typeFilter)
+				matchesSelection(row.type, state.selectedTypes)
 				&& matchesFilter(row.name, state.nameFilter)
-				&& matchesFilter(row.source, state.sourceFilter)
+				&& matchesSelection(row.source, state.selectedSources)
 			);
 
 			rows = rows.slice().sort((a, b) => {
@@ -610,11 +883,11 @@ export function buildAccessTableHtml(
 					<td>\${escapeHtml(row.typeLabel)}</td>
 					<td>\${escapeHtml(row.name)}</td>
 					<td>\${escapeHtml(row.source)}</td>
-					<td>\${escapeHtml(formatBoolean(row.revocable))}</td>
-					<td>\${escapeHtml(formatBoolean(row.standalone))}</td>
-					<td>\${escapeHtml(formatExpires(row.removeDate))}</td>
-					<td><a href="#" class="json-link" data-access-index="\${row.index}">JSON</a></td>
-					<td class="actions-cell">
+					<td class="col-fixed">\${escapeHtml(formatBoolean(row.revocable))}</td>
+					<td class="col-fixed">\${escapeHtml(formatBoolean(row.standalone))}</td>
+					<td class="col-fixed" title="\${escapeHtml(formatExpires(row.removeDate))}">\${escapeHtml(formatExpires(row.removeDate))}</td>
+					<td class="col-fixed"><a href="#" class="json-link" data-access-index="\${row.index}">JSON</a></td>
+					<td class="actions-cell col-fixed">
 						<button type="button" class="action-button remove-button" data-access-index="\${row.index}">Revoke</button>
 					</td>
 				</tr>
@@ -627,49 +900,115 @@ export function buildAccessTableHtml(
 			vscode.postMessage({ command: "requestAccess" });
 		});
 
-		document.getElementById("clear-filters-btn")?.addEventListener("click", () => {
-			state.typeFilter = "";
-			state.nameFilter = "";
-			state.sourceFilter = "";
+		document.getElementById("refresh-btn")?.addEventListener("click", () => {
 			state.page = 0;
-			const typeInput = document.getElementById("filter-type");
-			const nameInput = document.getElementById("filter-name");
-			const sourceInput = document.getElementById("filter-source");
-			if (typeInput instanceof HTMLInputElement) {
-				typeInput.value = "";
+			renderTable();
+			setRefreshing(true);
+			vscode.postMessage({ command: "refresh" });
+		});
+
+		document.getElementById("clear-filters-btn")?.addEventListener("click", () => {
+			state.selectedTypes = [];
+			state.selectedSources = [];
+			state.nameFilter = "";
+			state.page = 0;
+
+			for (const input of document.querySelectorAll("#type-filter-panel input, #source-filter-options input")) {
+				if (input instanceof HTMLInputElement) {
+					input.checked = false;
+				}
 			}
+
+			const nameInput = document.getElementById("filter-name");
 			if (nameInput instanceof HTMLInputElement) {
 				nameInput.value = "";
 			}
-			if (sourceInput instanceof HTMLInputElement) {
-				sourceInput.value = "";
-			}
+
+			updateTypeToggleLabel();
+			updateSourceToggleLabel();
 			renderTable();
 		});
 
-		for (const input of [
-			document.getElementById("filter-type"),
-			document.getElementById("filter-name"),
-			document.getElementById("filter-source"),
-		]) {
-			input?.addEventListener("input", (event) => {
-				const target = event.target;
-				if (!(target instanceof HTMLInputElement)) {
+		document.getElementById("filter-name")?.addEventListener("input", (event) => {
+			const target = event.target;
+			if (!(target instanceof HTMLInputElement)) {
+				return;
+			}
+
+			state.nameFilter = target.value.trim();
+			state.page = 0;
+			renderTable();
+		});
+
+		document.getElementById("type-filter-panel")?.addEventListener("change", () => {
+			state.selectedTypes = readCheckedValues(document.getElementById("type-filter-panel"));
+			updateTypeToggleLabel();
+			state.page = 0;
+			renderTable();
+		});
+
+		document.getElementById("source-filter-panel")?.addEventListener("change", () => {
+			state.selectedSources = readCheckedValues(document.getElementById("source-filter-options"));
+			updateSourceToggleLabel();
+			state.page = 0;
+			renderTable();
+		});
+
+		for (const toggle of document.querySelectorAll(".multi-select-toggle")) {
+			toggle.addEventListener("click", (event) => {
+				event.stopPropagation();
+				const panelId = toggle.getAttribute("aria-controls");
+				const panel = panelId ? document.getElementById(panelId) : null;
+				if (!panel) {
 					return;
 				}
 
-				if (target.id === "filter-type") {
-					state.typeFilter = target.value.trim();
-				} else if (target.id === "filter-name") {
-					state.nameFilter = target.value.trim();
-				} else if (target.id === "filter-source") {
-					state.sourceFilter = target.value.trim();
-				}
-
-				state.page = 0;
-				renderTable();
+				const willOpen = panel.hidden;
+				closeMultiSelects();
+				panel.hidden = !willOpen;
+				toggle.setAttribute("aria-expanded", willOpen ? "true" : "false");
 			});
 		}
+
+		document.addEventListener("click", (event) => {
+			const target = event.target;
+			if (target instanceof Element && target.closest(".multi-select")) {
+				return;
+			}
+			closeMultiSelects();
+		});
+
+		document.addEventListener("keydown", (event) => {
+			if (event.key === "Escape") {
+				closeMultiSelects();
+			}
+		});
+
+		window.addEventListener("message", (event) => {
+			const message = event.data;
+			if (!message || typeof message !== "object") {
+				return;
+			}
+
+			if (message.command === "accessLoaded" && Array.isArray(message.rows)) {
+				allRows = message.rows;
+				totalCount = allRows.length;
+				state.page = 0;
+				setRefreshing(false);
+				renderSourceOptions();
+				renderTable();
+				return;
+			}
+
+			if (message.command === "showAccessJson" && typeof message.json === "string") {
+				openJsonDrawer(typeof message.title === "string" ? message.title : "JSON", message.json);
+				return;
+			}
+
+			if (message.command === "refreshFailed") {
+				setRefreshing(false);
+			}
+		});
 
 		document.getElementById("prev-page-btn")?.addEventListener("click", () => {
 			if (state.page > 0) {
@@ -708,6 +1047,9 @@ export function buildAccessTableHtml(
 
 		applyColumnWidths();
 		initColumnResizers();
+		initJsonDrawer();
+		observeTableWrap();
+		renderSourceOptions();
 		renderTable();
 	</script>
 </body>

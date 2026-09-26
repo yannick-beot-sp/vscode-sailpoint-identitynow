@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { IdentityTreeItem } from "../../models/ISCTreeItem";
 import { IdentityAccessItem } from "../../models/IdentityAccessItem";
 import { ISCClient } from "../../services/ISCClient";
-import { buildAccessTableHtml, buildLoadingHtml } from "./identityAccessHtml";
+import { buildAccessTableHtml, buildAccessTableRows, buildLoadingHtml } from "./identityAccessHtml";
 import { confirm } from "../../utils/vsCodeHelpers";
 import {
 	openAccessRequestStatusPanel,
@@ -15,6 +15,9 @@ export class IdentityAccessPanel implements vscode.Disposable {
 
 	private readonly disposables: vscode.Disposable[] = [];
 	private accessItems: IdentityAccessItem[] = [];
+	private disposed = false;
+	private hasRenderedTable = false;
+	private loadInFlight?: Promise<void>;
 
 	private constructor(
 		private readonly extensionUri: vscode.Uri,
@@ -70,15 +73,28 @@ export class IdentityAccessPanel implements vscode.Disposable {
 	}
 
 	/**
-	 * A failure on the initial load leaves nothing to show, so the panel is closed.
-	 * A failure while refreshing after a grant or revoke keeps the panel and the
-	 * previously loaded table so the user does not lose context.
+	 * The first load replaces the webview. A later refresh posts the new rows so
+	 * the type, name, and source filters stay in place, and the webview resets
+	 * pagination itself. A failure on the initial load closes the panel. A failure
+	 * while refreshing keeps the previously loaded table.
 	 */
-	private async loadAndRender(options?: { keepOnError?: boolean }): Promise<void> {
+	private loadAndRender(): Promise<void> {
+		if (this.loadInFlight) {
+			return this.loadInFlight;
+		}
+
+		const refresh = this.hasRenderedTable;
+		this.loadInFlight = this.fetchAndRender(refresh).finally(() => {
+			this.loadInFlight = undefined;
+		});
+		return this.loadInFlight;
+	}
+
+	private async fetchAndRender(refresh: boolean): Promise<void> {
 		const identityName = this.identityName;
 		this.panel.title = `Access: ${identityName}`;
 
-		if (!options?.keepOnError) {
+		if (!refresh) {
 			this.panel.webview.html = buildLoadingHtml(identityName);
 		}
 
@@ -86,7 +102,7 @@ export class IdentityAccessPanel implements vscode.Disposable {
 			const accessItems = await vscode.window.withProgress(
 				{
 					location: vscode.ProgressLocation.Notification,
-					title: `Loading access for ${identityName}...`,
+					title: `${refresh ? "Refreshing" : "Loading"} access for ${identityName}...`,
 					cancellable: false
 				},
 				async () => {
@@ -95,12 +111,31 @@ export class IdentityAccessPanel implements vscode.Disposable {
 				}
 			);
 
+			if (this.disposed) {
+				return;
+			}
+
 			this.accessItems = accessItems;
+
+			if (refresh) {
+				await this.panel.webview.postMessage({
+					command: "accessLoaded",
+					rows: buildAccessTableRows(this.accessItems),
+				});
+				return;
+			}
+
 			this.panel.webview.html = buildAccessTableHtml(identityName, this.accessItems);
+			this.hasRenderedTable = true;
 		} catch (error: any) {
+			if (this.disposed) {
+				return;
+			}
+
 			const message = `Could not load identity access: ${error.message ?? error}`;
 
-			if (options?.keepOnError) {
+			if (refresh) {
+				await this.panel.webview.postMessage({ command: "refreshFailed" });
 				vscode.window.showErrorMessage(`${message}. The table may be out of date.`);
 				return;
 			}
@@ -112,6 +147,11 @@ export class IdentityAccessPanel implements vscode.Disposable {
 	}
 
 	private handleMessage(message: { command?: string; index?: number }): void {
+		if (message.command === "refresh") {
+			void this.loadAndRender();
+			return;
+		}
+
 		if (message.command === "openAccessJson" && typeof message.index === "number") {
 			void this.openAccessJson(message.index);
 			return;
@@ -133,36 +173,32 @@ export class IdentityAccessPanel implements vscode.Disposable {
 			return;
 		}
 
+		const title = item.displayName ?? item.name ?? item.id;
 		try {
-			const content = JSON.stringify(item.raw, null, 4);
-			const document = await vscode.workspace.openTextDocument({
-				content,
-				language: "json"
-			});
-
-			await vscode.window.showTextDocument(document, {
-				preview: false,
-				viewColumn: vscode.ViewColumn.Beside
+			await this.panel.webview.postMessage({
+				command: "showAccessJson",
+				title,
+				json: JSON.stringify(item.raw, null, 2),
 			});
 		} catch (error: any) {
-			vscode.window.showErrorMessage(`Could not open access item JSON: ${error.message ?? error}`);
+			vscode.window.showErrorMessage(`Could not show access item JSON: ${error.message ?? error}`);
 		}
 	}
 
 	private async requestAccess(): Promise<void> {
 		const identityName = this.identityName;
-		const accessItemId = await vscode.window.showInputBox({
+		const accessItemTerm = await vscode.window.showInputBox({
 			title: "Request Access",
-			prompt: `Enter the ID of the role, access profile, or entitlement to grant to ${identityName}`,
-			placeHolder: "Access item ID",
-			validateInput: (value) => value.trim() ? undefined : "Access item ID is required",
+			prompt: `Enter the name or ID of the role, access profile, or entitlement to grant to ${identityName}`,
+			placeHolder: "Access item name or ID",
+			validateInput: (value) => value.trim() ? undefined : "Access item name or ID is required",
 		});
 
-		if (!accessItemId?.trim()) {
+		if (!accessItemTerm?.trim()) {
 			return;
 		}
 
-		const trimmedId = accessItemId.trim();
+		const trimmedTerm = accessItemTerm.trim();
 		const client = new ISCClient(this.identityTreeItem.tenantId, this.identityTreeItem.tenantName);
 		const tenantContext = {
 			tenantId: this.identityTreeItem.tenantId,
@@ -170,22 +206,36 @@ export class IdentityAccessPanel implements vscode.Disposable {
 			identityName,
 		};
 
-		let resolvedItem: IdentityAccessItem;
+		let matches: IdentityAccessItem[];
 		try {
-			resolvedItem = await vscode.window.withProgress(
+			matches = await vscode.window.withProgress(
 				{
 					location: vscode.ProgressLocation.Notification,
-					title: `Looking up access item ${trimmedId}...`,
+					title: `Looking up access item ${trimmedTerm}...`,
 					cancellable: false,
 				},
-				async () => client.resolveAccessItemById(trimmedId)
+				async () => client.searchRequestableAccessItems(trimmedTerm)
 			);
 		} catch (error: unknown) {
 			openAccessRequestSubmitErrorPanel(
 				this.extensionUri,
-				{ ...tenantContext, accessItemName: trimmedId, accessItemType: "UNKNOWN" },
+				{ ...tenantContext, accessItemName: trimmedTerm, accessItemType: "UNKNOWN" },
 				error
 			);
+			return;
+		}
+
+		if (matches.length === 0) {
+			openAccessRequestSubmitErrorPanel(
+				this.extensionUri,
+				{ ...tenantContext, accessItemName: trimmedTerm, accessItemType: "UNKNOWN" },
+				new Error(`No requestable role, access profile, or entitlement found for "${trimmedTerm}".`)
+			);
+			return;
+		}
+
+		const resolvedItem = await this.pickAccessItem(matches, identityName);
+		if (!resolvedItem) {
 			return;
 		}
 
@@ -211,10 +261,30 @@ export class IdentityAccessPanel implements vscode.Disposable {
 				accessRequestIds: client.extractAccessRequestIds(response),
 			});
 
-			await this.loadAndRender({ keepOnError: true });
+			await this.loadAndRender();
 		} catch (error: unknown) {
 			openAccessRequestSubmitErrorPanel(this.extensionUri, statusContext, error);
 		}
+	}
+
+	private async pickAccessItem(matches: IdentityAccessItem[], identityName: string): Promise<IdentityAccessItem | undefined> {
+		if (matches.length === 1) {
+			return matches[0];
+		}
+
+		const picked = await vscode.window.showQuickPick(
+			matches.map(item => ({
+				label: item.displayName ?? item.name ?? item.id,
+				description: formatAccessItemType(item.type),
+				detail: item.sourceName,
+				item,
+			})),
+			{
+				title: "Request Access",
+				placeHolder: `Select the access item to grant to ${identityName}`,
+			}
+		);
+		return picked?.item;
 	}
 
 	private async requestRemoval(index: number): Promise<void> {
@@ -251,7 +321,7 @@ export class IdentityAccessPanel implements vscode.Disposable {
 					: `Access removal request submitted for ${itemName}.`
 			);
 
-			await this.loadAndRender({ keepOnError: true });
+			await this.loadAndRender();
 		} catch (error: any) {
 			vscode.window.showErrorMessage(
 				`Could not request access removal for ${itemName}: ${error.message ?? error}`
@@ -260,11 +330,23 @@ export class IdentityAccessPanel implements vscode.Disposable {
 	}
 
 	public dispose(): void {
+		this.disposed = true;
 		IdentityAccessPanel.currentPanels.delete(IdentityAccessPanel.panelKey(this.identityTreeItem));
 
 		while (this.disposables.length) {
 			const disposable = this.disposables.pop();
 			disposable?.dispose();
 		}
+	}
+}
+
+function formatAccessItemType(type: IdentityAccessItem["type"]): string {
+	switch (type) {
+		case "ROLE":
+			return "Role";
+		case "ACCESS_PROFILE":
+			return "Access Profile";
+		case "ENTITLEMENT":
+			return "Entitlement";
 	}
 }
