@@ -20,12 +20,17 @@ The SailPoint Identity Security Cloud extension makes it easy to:
 - View, edit, delete service desk integrations
 - View, edit, delete identity profiles and lifecycle states, and refreshes all the identities under a profile
 - Import/Export Accounts (import for delimited files only), uncorrelated accounts, entitlement details
+- View, enable, disable, unlock, aggregate, or remove accounts
 - View, edit, create, delete, export, import access profiles
 - View, edit, create, delete, export, import roles, and dimensions
 - View, edit, create, delete, export, import forms
 - View, edit, create, delete search attribute config
 - View, edit, create, delete identity attribute
 - View, trigger attribute sync or process, delete identities
+- View identity access (roles, access profiles, entitlements), grant access, and revoke access
+- View identity audit events
+- Track access request status after grant or revoke
+- Reveal matching identity in the tree when filtering identities
 - View, edit, create, delete applications
 - View, report, escalate, send reminders, reassign to access item owners or reassign based on a file, approve in bulk certification campaigns
 - View, edit, delete Machine Identities
@@ -657,6 +662,12 @@ The patterns defined above use the following tokens:
 ## Release Notes
 
 ### Unreleased
+
+- Add identity panel to view roles, access profiles, and entitlements for an identity by [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
+- Allow to request or revoke access from the identity panel and add access request status panel with live reload to monitor the request [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
+- Add identity events panel to browse audit events [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
+- Add account commands: enable, disable, unlock, aggregate one, and remove (with guards for authoritative and system accounts) [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
+- Reveal and expand the matching identity node in the tree after an identity search [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
 
 ### 1.3.31
 

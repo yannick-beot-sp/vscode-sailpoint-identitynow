@@ -146,6 +146,18 @@ export const IDENTITIES_DELETE = `${COMMAND_PREFIX}.identities.delete`;
 export const IDENTITIES_ATT_SYNC = `${COMMAND_PREFIX}.identities.att-sync`;
 export const IDENTITIES_PROCESS = `${COMMAND_PREFIX}.identities.process`;
 export const IDENTITIES_REASSIGN_OWNERSHIP = `${COMMAND_PREFIX}.identities.reassign-ownership`;
+export const IDENTITIES_INVITE = `${COMMAND_PREFIX}.identities.invite`;
+export const IDENTITIES_SET_LIFECYCLE_STATE = `${COMMAND_PREFIX}.identities.set-lifecycle-state`;
+export const IDENTITIES_SET_USER_LEVEL = `${COMMAND_PREFIX}.identities.set-user-level`;
+export const IDENTITIES_VIEW_EVENTS = `${COMMAND_PREFIX}.identities.view-events`;
+export const IDENTITIES_VIEW_ACCESS = `${COMMAND_PREFIX}.identities.view-access`;
+
+// Accounts
+export const ACCOUNT_ENABLE = `${COMMAND_PREFIX}.account.enable`;
+export const ACCOUNT_DISABLE = `${COMMAND_PREFIX}.account.disable`;
+export const ACCOUNT_UNLOCK = `${COMMAND_PREFIX}.account.unlock`;
+export const ACCOUNT_AGGREGATE_ONE = `${COMMAND_PREFIX}.account.aggregate-one`;
+export const ACCOUNT_REMOVE = `${COMMAND_PREFIX}.account.remove`;
 
 // Applications
 export const APPLICATIONS_FILTER_SOURCE_VIEW = `${COMMAND_PREFIX}.applications.filter.source`;

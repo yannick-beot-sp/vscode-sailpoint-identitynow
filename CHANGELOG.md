@@ -11,9 +11,15 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- Add identity panel to view roles, access profiles, and entitlements for an identity by [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
+
+- Allow to request or revoke access from the identity panel and add access request status panel with live reload to monitor the request [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
+- Add identity events panel to browse audit events [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
+- Add account commands: enable, disable, unlock, aggregate one, and remove (with guards for authoritative and system accounts) [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
 
 ### Changed
 
+- Reveal and expand the matching identity node in the tree after an identity search [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
 
 ### Fixed
 
