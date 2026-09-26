@@ -1,4 +1,6 @@
+import { spawn } from 'child_process';
 import {
+    env,
     window,
 } from 'vscode';
 import { AuthenticationMethod, TenantCredentials, TenantToken } from '../models/TenantInfo';
@@ -7,6 +9,13 @@ import { isEmpty } from '../utils/stringUtils';
 import { EndpointUtils } from '../utils/EndpointUtils';
 import { TenantService } from './TenantService';
 import { OAuth2Client } from './OAuth2Client';
+import {
+    completeOAuthCodeLogin,
+    parsePasteCode,
+    refreshOAuthCodeToken,
+    startOAuthCodeLogin,
+    tenantTokenFromOAuthResponse,
+} from './OAuthCodeClient';
 
 class SailPointISCPatSession {
     /**
@@ -74,6 +83,48 @@ async function askAccessToken(): Promise<string | undefined> {
     });
     return result;
 }
+
+/**
+ * Opens the authorize URL in the system browser, once.
+ *
+ * vscode.env.openExternal sends https URLs through window.open. On macOS the
+ * window-open handler then opens that same URL again, so the sign-in page
+ * appears twice. The URL is passed as one argument so the encoded redirect URI
+ * is left intact.
+ */
+function openSignInUrl(url: string): Promise<boolean> {
+    const { file, args } = signInOpener(process.platform, url);
+    return new Promise((resolve) => {
+        const child = spawn(file, args, {
+            detached: true,
+            stdio: "ignore",
+            windowsHide: true,
+        });
+        let settled = false;
+        const finish = (opened: boolean) => {
+            if (settled) {
+                return;
+            }
+            settled = true;
+            resolve(opened);
+        };
+        child.on("error", () => finish(false));
+        child.on("spawn", () => finish(true));
+        child.unref();
+    });
+}
+
+function signInOpener(platform: NodeJS.Platform, url: string): { file: string, args: string[] } {
+    if (platform === "darwin") {
+        return { file: "/usr/bin/open", args: [url] };
+    }
+    if (platform === "win32") {
+        // rundll32 does not pass the URL through cmd, so "&" in the query stays one argument.
+        return { file: "rundll32", args: ["url.dll,FileProtocolHandler", url] };
+    }
+    return { file: "xdg-open", args: [url] };
+}
+
 export class SailPointISCAuthenticationProvider {
 
     private static instance: SailPointISCAuthenticationProvider
@@ -93,7 +144,10 @@ export class SailPointISCAuthenticationProvider {
         // Check if an access token already exists
         let token = await this.tenantService.getTenantAccessToken(tenantId);
         const tenantInfo = this.tenantService.getTenant(tenantId);
-        if (token === undefined || token.expired()) {
+        const oauthExpiring = tenantInfo?.authenticationMethod === AuthenticationMethod.oauthCode
+            && token !== undefined
+            && this.oauthAccessTokenExpiring(token);
+        if (token === undefined || token.expired() || oauthExpiring) {
             console.log("INFO: accessToken is expired. Updating Access Token");
             if (tenantInfo?.authenticationMethod === AuthenticationMethod.accessToken) {
                 const accessToken = await askAccessToken() || "";
@@ -105,6 +159,8 @@ export class SailPointISCAuthenticationProvider {
                 this.tenantService.setTenantAccessToken(tenantId, token);
 
                 return new SailPointISCPatSession(accessToken)
+            } else if (tenantInfo?.authenticationMethod === AuthenticationMethod.oauthCode) {
+                return await this.refreshOrSignInWithOAuthCode(tenantId, tenantInfo.tenantName, token);
             } else {
                 // If no access token or expired => create one
                 const credentials = await this.tenantService.getTenantCredentials(tenantId);
@@ -150,6 +206,8 @@ export class SailPointISCAuthenticationProvider {
             const token = new TenantToken(accessToken, new Date(jwt.exp * 1000), {} as TenantCredentials);
             this.tenantService.setTenantAccessToken(tenantId, token);
             return new SailPointISCPatSession(accessToken);
+        } else if (tenantInfo?.authenticationMethod === AuthenticationMethod.oauthCode) {
+            return await this.signInWithOAuthCode(tenantId, tenantInfo.tenantName);
         } else {
             // Prompt for the PAT.
             const clientId = await askPATClientId() || "";
@@ -198,6 +256,83 @@ export class SailPointISCAuthenticationProvider {
             });
         this.tenantService.setTenantAccessToken(tenantName, token);
         return token;
+    }
+
+    /**
+     * OAuth access tokens are refreshed shortly before they expire.
+     */
+    private oauthAccessTokenExpiring(token: TenantToken): boolean {
+        const fiveMinutesMs = 5 * 60 * 1000;
+        return token.expires.getTime() - Date.now() <= fiveMinutesMs;
+    }
+
+    private async refreshOrSignInWithOAuthCode(tenantId: string, tenantName: string, token: TenantToken | undefined): Promise<SailPointISCPatSession> {
+        const refreshStillValid = token?.refreshExpires === undefined || token.refreshExpires.getTime() > Date.now();
+        if (token?.refreshToken && refreshStillValid) {
+            try {
+                const refreshed = await refreshOAuthCodeToken(EndpointUtils.getBaseUrl(tenantName), token.refreshToken);
+                const stored = tenantTokenFromOAuthResponse(refreshed);
+                await this.tenantService.setTenantAccessToken(tenantId, stored);
+                return new SailPointISCPatSession(stored.accessToken);
+            } catch (error) {
+                console.error("OAuth token refresh failed", error);
+            }
+        }
+        return await this.signInWithOAuthCode(tenantId, tenantName);
+    }
+
+    /**
+     * Opens the tenant sign-in page and exchanges the pasted one-time code.
+     * The PKCE verifier stays in memory for this attempt and is not stored.
+     */
+    private async signInWithOAuthCode(tenantId: string, tenantName: string): Promise<SailPointISCPatSession> {
+        const oauthSession = await startOAuthCodeLogin(EndpointUtils.getBaseUrl(tenantName));
+        const opened = await openSignInUrl(oauthSession.authUrl);
+        if (!opened) {
+            await env.clipboard.writeText(oauthSession.authUrl);
+            await window.showWarningMessage("Could not open the browser. The sign-in URL was copied to the clipboard.");
+        }
+
+        while (Date.now() < oauthSession.expiresAt) {
+            const pasted = await window.showInputBox({
+                title: "Identity Security Cloud",
+                prompt: `Confirmation code: ${oauthSession.confirmationCode}. Paste the one-time code from the SailPoint page.`,
+                placeHolder: "sp1....",
+                ignoreFocusOut: true,
+                validateInput: (text) => {
+                    if (isEmpty((text || "").trim())) {
+                        return "One-time code is required";
+                    }
+                    try {
+                        parsePasteCode(text, oauthSession.state);
+                        return null;
+                    } catch (error) {
+                        return error instanceof Error ? error.message : String(error);
+                    }
+                }
+            });
+            if (pasted === undefined || isEmpty(pasted.trim())) {
+                throw new Error("One-time code is required");
+            }
+
+            try {
+                parsePasteCode(pasted, oauthSession.state);
+            } catch (error) {
+                const message = error instanceof Error ? error.message : String(error);
+                const choice = await window.showErrorMessage(message, "Try again");
+                if (choice !== "Try again") {
+                    throw error instanceof Error ? error : new Error(message);
+                }
+                continue;
+            }
+
+            const tokenSet = await completeOAuthCodeLogin(oauthSession, pasted);
+            const stored = tenantTokenFromOAuthResponse(tokenSet);
+            await this.tenantService.setTenantAccessToken(tenantId, stored);
+            return new SailPointISCPatSession(stored.accessToken);
+        }
+
+        throw new Error("OAuth authentication timed out");
     }
 
     // This function is called when the end user signs out of the account.

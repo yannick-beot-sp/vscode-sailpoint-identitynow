@@ -16,6 +16,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 - Allow to request or revoke access from the identity panel and add access request status panel with live reload to monitor the request [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
 - Add identity events panel to browse audit events [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
 - Add account commands: enable, disable, unlock, aggregate one, and remove (with guards for authoritative and system accounts) [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
+- Add OAuth Code authentication when adding a tenant (cf. [#169](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/169))
 
 ### Changed
 

@@ -33,20 +33,22 @@ export class AddTenantCommand {
     }
     async askAuthenticationMethod(): Promise<AuthenticationMethod | undefined> {
 
-        const authMethodStr = await vscode.window.showQuickPick(
-            ["Personal Access Token", "Access Token"], {
+        const authMethod = await vscode.window.showQuickPick<vscode.QuickPickItem & { method: AuthenticationMethod }>(
+            [
+                { label: "Personal Access Token", method: AuthenticationMethod.personalAccessToken },
+                { label: "Access Token", method: AuthenticationMethod.accessToken },
+                {
+                    label: "OAuth Code",
+                    description: "Sign in with the browser, then paste the one-time code",
+                    method: AuthenticationMethod.oauthCode,
+                },
+            ], {
             ignoreFocusOut: true,
             placeHolder: "Authentication method",
             title: "Identity Security Cloud",
             canPickMany: false
         });
-        if (authMethodStr === undefined) {
-            return undefined;
-        } else if (authMethodStr === "Personal Access Token") {
-
-            return AuthenticationMethod.personalAccessToken;
-        }
-        return AuthenticationMethod.accessToken;
+        return authMethod?.method;
     }
 
 
