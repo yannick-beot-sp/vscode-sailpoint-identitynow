@@ -511,13 +511,16 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
         if (!isEmpty(tokenStr)) {
             try {
                 const tokenJson: any = JSON.parse(tokenStr);
+                const client = tokenJson.client ?? {};
                 token = new TenantToken(
                     tokenJson.accessToken,
                     tokenJson.expires,
                     {
-                        clientId: tokenJson.client.clientId,
-                        clientSecret: tokenJson.client.clientSecret
-                    });
+                        clientId: client.clientId,
+                        clientSecret: client.clientSecret
+                    },
+                    tokenJson.refreshToken,
+                    tokenJson.refreshExpires);
             } catch (err) {
                 console.log("WARNING: could not parse Token: ", err);
             }

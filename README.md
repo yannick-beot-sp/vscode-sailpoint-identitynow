@@ -49,7 +49,9 @@ Open the **Command Palette** with `Ctrl+Shift+P` (Windows or Linux) or `Cmd+Shif
 
 Alternatively, you can click on the `+` in the SailPoint view.
 
-You can add a tenant by using a Personal Access Token (PAT) or by using a short-lived access token (like one you can get from https://yourtenant.identitynow.com/ui/session).
+You can add a tenant by using a Personal Access Token (PAT), a short-lived access token (like one you can get from https://yourtenant.identitynow.com/ui/session), or **OAuth Code**.
+
+**OAuth Code** signs you in through the browser, the same way as the SailPoint CLI. The extension opens the tenant sign-in page. After you grant access, [developer.sailpoint.com/sailapps](https://developer.sailpoint.com/sailapps) shows a confirmation code and a one-time code. Check that the confirmation code matches the one in VS Code, then paste the one-time code. The extension exchanges that code for an access token and refreshes it automatically. No client ID or client secret is stored.
 
 ![Add tenant](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/add-tenant.gif)
 
