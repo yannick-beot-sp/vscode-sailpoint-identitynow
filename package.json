@@ -2303,14 +2303,14 @@
     "fast-json-patch": "^3.1.1",
     "frontmcp": "^1.8.0",
     "lodash": "^4.17.21",
-    "sailpoint-api-client": "^1.8.69",
+    "sailpoint-api-client": "^2.1.0",
     "tmp": "^0.2.1",
     "velocityjs": "^2.1.7",
     "vscode-sailpoint-identitynow": "file:"
   },
   "allowScripts": {
-    "fsevents@2.3.3": true,
-    "@swc/core@1.15.18": true,
-    "esbuild@0.28.2": true
+    "esbuild": true,
+    "fsevents": true,
+    "@swc/core@1.15.18": true
   }
 }

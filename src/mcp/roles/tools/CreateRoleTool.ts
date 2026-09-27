@@ -1,12 +1,6 @@
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import {
-    AccessProfileRef,
-    EntitlementRef,
-    RoleMembershipSelector,
-    RoleMembershipSelectorType,
-    RoleV2025,
-} from "sailpoint-api-client";
+import { AccessProfileRef, EntitlementRef, RoleMembershipSelector, RoleMembershipSelectorType, RoleV2025 } from "sailpoint-api-client";
 import { getIscClient } from "../../plugins/TenantResolverPlugin";
 import { ErrorCodes, McpError } from "../../errors";
 import { tenantNameField } from "../../inputFields";

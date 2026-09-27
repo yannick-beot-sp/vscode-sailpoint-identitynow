@@ -1,8 +1,4 @@
-import {
-    ExportPayloadBetaIncludeTypesBeta,
-    ObjectExportImportOptionsBeta,
-    SpConfigExportResultsBeta,
-} from 'sailpoint-api-client';
+import { ExportPayloadBetaIncludeTypesBeta, ObjectExportImportOptionsBeta, SpConfigExportResultsBeta } from 'sailpoint-api-client';
 import { SimpleSPConfigExporter } from '../commands/spconfig-export/SimpleSPConfigExporter';
 import { compareByName } from '../utils';
 import { ISCClient } from './ISCClient';
