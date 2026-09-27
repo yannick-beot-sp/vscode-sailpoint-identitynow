@@ -675,11 +675,14 @@ The patterns defined above use the following tokens:
 
 ### Unreleased
 
-- Add identity panel to view roles, access profiles, and entitlements for an identity by [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
-- Allow to request or revoke access from the identity panel and add access request status panel with live reload to monitor the request [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
-- Add identity events panel to browse audit events [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
-- Add account commands: enable, disable, unlock, aggregate one, and remove (with guards for authoritative and system accounts) [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
-- Reveal and expand the matching identity node in the tree after an identity search [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
+- Add identity panel to view roles, access profiles, and entitlements for an identity by [@henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
+- Allow to request or revoke access from the identity panel and add access request status panel with live reload to monitor the request [@henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
+- Add identity events panel to browse audit events [@henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
+- Add account commands: enable, disable, unlock, aggregate one, and remove (with guards for authoritative and system accounts) [@henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
+- Reveal and expand the matching identity node in the tree after an identity search [@henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
+- Notification Templates: browse and edit the notification templates of a tenant in the tree view, with preview and example values. Contribution of [@j-asper-a](https://github.com/j-asper-a) (cf. [#170](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/170))
+- Send a test e-mail for an e-mail notification template.
+
 
 ### 1.3.31
 
