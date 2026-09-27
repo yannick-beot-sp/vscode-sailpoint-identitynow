@@ -1,3 +1,5 @@
+import { escapeFilter } from "./stringUtils";
+
 /**
  * Client-side listing of notification templates.
  *
@@ -85,6 +87,40 @@ export function parseDefaultNotificationTemplateId(id: string): { key: string; m
 
 export function isDefaultNotificationTemplateId(id: string | undefined): boolean {
 	return !!id && parseDefaultNotificationTemplateId(id) !== undefined;
+}
+
+/**
+ * `GET /notification-template-defaults` filter.
+ * Product defaults have no id: `GET /notification-templates/{id}` does not return them,
+ * so a default is loaded by listing defaults with this filter on `key`.
+ * Spec: beta `listNotificationTemplateDefaults` (`key` supports `eq`).
+ */
+export function notificationTemplateKeyFilter(key: string): string {
+	return `key eq "${escapeFilter(key)}"`;
+}
+
+/**
+ * Admin Web UI path for an e-mail template.
+ * Customized templates are addressed by id
+ * (`/ui/a/admin/global/email-templates/customized/{id}`).
+ * Defaults are addressed by key
+ * (`/ui/a/admin/global/email-templates/default/{key}`).
+ * The synthetic tree id (`default.<base64>`) is not a valid segment there.
+ * Slack and Teams templates have no page in this UI.
+ */
+export function notificationTemplateWebUiSegments(template: {
+	medium?: string;
+	customized: boolean;
+	id: string;
+	key: string;
+}): [string, string] | undefined {
+	if (template.medium !== "EMAIL") {
+		return undefined;
+	}
+	if (template.customized) {
+		return ["ui/a/admin/global/email-templates/customized", template.id];
+	}
+	return ["ui/a/admin/global/email-templates/default", template.key];
 }
 
 function identityKey(template: { key: string; medium: string; locale: string }): string {

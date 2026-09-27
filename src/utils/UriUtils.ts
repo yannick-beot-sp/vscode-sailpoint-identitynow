@@ -205,6 +205,12 @@ export function getResourceWebUrl(
             return getUIUrl(tenantName, `ui/a/admin/${options?.subtype === "AI Agent" ? "ai-agents" : "machine-identities"}`, id, "details");
         case "application": return getUIUrl(tenantName, "ui/admin", `#admin:apps:${id}`);
         case "campaign": return getUIUrl(tenantName, "ui/a/admin/certifications/campaigns-list/all-campaigns", id);
+        case "notification-template":
+            // subtype "customized": `id` is the stored template id.
+            // subtype "default": `id` is the template key. Defaults have no API id.
+            return options?.subtype === "customized" || options?.subtype === "default"
+                ? getUIUrl(tenantName, "ui/a/admin/global/email-templates", options.subtype, id)
+                : undefined;
         default: return undefined;
     }
 }

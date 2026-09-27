@@ -31,7 +31,7 @@ import { buildIdentityEventsSearchQuery, collectIdentityEventSearchTerms } from 
 import { AccessProfile } from "../models/AccessProfiles";
 import { IdentityAccessItem, IdentityAccessItemType } from "../models/IdentityAccessItem";
 import { HecateJobStatus } from "../models/HecateJob";
-import { isDefaultNotificationTemplateId, parseDefaultNotificationTemplateId } from "../utils/notificationTemplateList";
+import { isDefaultNotificationTemplateId, notificationTemplateKeyFilter, parseDefaultNotificationTemplateId } from "../utils/notificationTemplateList";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const FormData = require('form-data');
@@ -2847,23 +2847,32 @@ export class ISCClient {
 	//#region Notification Templates
 	/////////////////////////
 
-	public async getNotificationTemplates(): Promise<TemplateDtoBeta[]> {
-		console.log("> getNotificationTemplates");
+	public async getNotificationTemplates(filters?: string): Promise<TemplateDtoBeta[]> {
+		console.log("> getNotificationTemplates", filters);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new NotificationsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await Paginator.paginate(api, api.listNotificationTemplates);
+		const result = await Paginator.paginate(
+			api,
+			api.listNotificationTemplates,
+			filters ? { filters } : undefined,
+		);
 		return result.data;
 	}
 
 	/**
 	 * Product defaults (`GET /beta/notification-template-defaults`).
 	 * A tenant customization is a separate object and is not returned here.
+	 * `filters` is the standard collection filter; `key` supports `eq`.
 	 */
-	public async getNotificationTemplateDefaults(): Promise<TemplateDtoDefaultBeta[]> {
-		console.log("> getNotificationTemplateDefaults");
+	public async getNotificationTemplateDefaults(filters?: string): Promise<TemplateDtoDefaultBeta[]> {
+		console.log("> getNotificationTemplateDefaults", filters);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new NotificationsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await Paginator.paginate(api, api.listNotificationTemplateDefaults);
+		const result = await Paginator.paginate(
+			api,
+			api.listNotificationTemplateDefaults,
+			filters ? { filters } : undefined,
+		);
 		return result.data;
 	}
 
@@ -2872,10 +2881,12 @@ export class ISCClient {
 	 *
 	 * `GET /notification-templates/{id}` is documented to return an array even
 	 * though the id is unique, but it can also come back empty or 404 for some
-	 * tenants, so we fall back to finding the template in the (full) list.
+	 * tenants, so we fall back to finding the template in the customized list.
 	 *
 	 * Defaults have no id. The tree addresses them with a synthetic id; a
 	 * customization of the same key, medium and locale wins when one exists.
+	 * `GET /notification-templates/{id}` does not return a product default, so
+	 * a default is loaded from `GET /notification-template-defaults` filtered by key.
 	 */
 	public async getNotificationTemplateById(id: string): Promise<TemplateDtoBeta> {
 		console.log("> getNotificationTemplateById", id);
@@ -2903,12 +2914,15 @@ export class ISCClient {
 	}
 
 	private async getNotificationTemplateByIdentity(key: string, medium: string, locale: string): Promise<TemplateDtoBeta> {
-		const custom = (await this.getNotificationTemplates())
+		// Same key can exist for several mediums and locales. The list is filtered
+		// on the key; medium and locale select the template in that result.
+		const filters = notificationTemplateKeyFilter(key);
+		const custom = (await this.getNotificationTemplates(filters))
 			.find(template => template.key === key && template.medium === medium && template.locale === locale);
 		if (custom) {
 			return custom;
 		}
-		const defaults = await this.getNotificationTemplateDefaults();
+		const defaults = await this.getNotificationTemplateDefaults(filters);
 		const match = defaults.find(template => template.key === key && template.medium === medium && template.locale === locale);
 		if (!match?.key || !match.medium || !match.locale) {
 			throw new Error(`Could not find notification template ${key}/${medium}/${locale}`);

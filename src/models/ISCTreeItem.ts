@@ -12,7 +12,7 @@ import { TenantService } from "../services/TenantService";
 import { CloudRuleService } from "../services/CloudRuleService";
 import { convertToBaseTreeItem } from "../views/utils";
 import { isAccountRemovable } from "../commands/account/accountUtils";
-import { filterNotificationTemplates, mergeNotificationTemplates, notificationTemplateDescription, NotificationTemplateListEntry } from "../utils/notificationTemplateList";
+import { filterNotificationTemplates, mergeNotificationTemplates, notificationTemplateDescription, notificationTemplateWebUiSegments, NotificationTemplateListEntry } from "../utils/notificationTemplateList";
 
 import { Account, CampaignStatusV3, DimensionV2025, MachineIdentityResponseV2025, SourceSubtypeWithSourceV2026 } from "sailpoint-api-client";
 
@@ -543,7 +543,7 @@ export class NotificationTemplateTreeItem extends ISCResourceTreeItem {
 		readonly templateKey: string,
 		readonly medium: string,
 		locale: string,
-		customized: boolean) {
+		readonly customized: boolean) {
 		super({
 			tenantId,
 			tenantName,
@@ -562,6 +562,20 @@ export class NotificationTemplateTreeItem extends ISCResourceTreeItem {
 
 	updateIcon(context: vscode.ExtensionContext): void {
 		this.iconPath = new vscode.ThemeIcon(NOTIFICATION_TEMPLATE_MEDIUM_ICONS[this.medium] ?? "mail");
+	}
+
+	getUrl(): vscode.Uri | undefined {
+		const segments = notificationTemplateWebUiSegments({
+			medium: this.medium,
+			customized: this.customized,
+			id: this.resourceId,
+			key: this.templateKey,
+		});
+		if (!segments) {
+			return undefined;
+		}
+		// Defaults are opened by key. `resourceId` is a synthetic id and is not a Web UI segment.
+		return getResourceWebUrl(this.tenantName, "notification-template", segments[1], { subtype: this.customized ? "customized" : "default" });
 	}
 }
 

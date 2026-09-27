@@ -1,42 +1,28 @@
+import { render as renderVelocity } from "velocityjs";
+import { attachGlobalTools } from "./templateTools";
 import { NotificationTemplateVariable, NotificationTemplateVariableExample } from "./templateVariables";
 
-const NOT_FOUND = Symbol("not-found");
+const BLOCKED_PATH_KEYS = new Set(["__proto__", "prototype", "constructor"]);
 
 /**
- * Replace Velocity references with catalog example values.
+ * Render a Velocity notification template with catalog example values.
  *
- * Formal (`${user.name}`, `$!{user.name}`) and informal (`$user.name`) references
- * are replaced when the catalog has a sample. Function calls (`$tool.method(...)`)
- * and directives (`#if`, `#foreach`) are left as written. An unknown reference
- * stays visible so the author can see it was not sampled.
+ * Template-specific entries precede global entries in the catalog and therefore
+ * win when both provide the same key. Usage snippets are not data. Global
+ * functions from the catalog are attached as executable tools.
  */
 export function applyNotificationTemplateExamples(
     body: string,
     variables: NotificationTemplateVariable[],
 ): string {
-    const catalog = catalogFrom(variables);
-    const identifier = "[A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)*";
-    const velocityReference = new RegExp(
-        `\\$!?\\{(${identifier})\\}|\\$!?(${identifier})(?![\\w(])(?!\\.[A-Za-z_])`,
-        "g",
-    );
-    return body.replace(velocityReference, (match, formal: string | undefined, informal: string | undefined) => {
-        const path = formal ?? informal;
-        if (!path) {
-            return match;
-        }
-        const value = lookup(path, catalog);
-        if (value === NOT_FOUND) {
-            return match;
-        }
-        return formatExample(value);
-    });
+    return renderVelocity(body, exampleContext(variables));
 }
 
-function catalogFrom(variables: NotificationTemplateVariable[]): Map<string, NotificationTemplateVariableExample> {
-    const catalog = new Map<string, NotificationTemplateVariableExample>();
-    // Template-specific entries are listed before globals. Applying from the
-    // end lets a template value replace a global one with the same key.
+export function exampleContext(variables: NotificationTemplateVariable[]): Record<string, unknown> {
+    const context = Object.create(null) as Record<string, unknown>;
+
+    // Applying from the end lets a template-specific value replace a global
+    // value with the same key.
     for (let index = variables.length - 1; index >= 0; index--) {
         const variable = variables[index];
         if (variable.type === "function") {
@@ -45,84 +31,73 @@ function catalogFrom(variables: NotificationTemplateVariable[]): Map<string, Not
         if (typeof variable.example === "string" && variable.example.trimStart().startsWith("$")) {
             continue;
         }
-        catalog.set(variable.key, variable.example);
+        setPath(context, variable.key, cloneExample(variable.example));
     }
-    return catalog;
+
+    attachGlobalTools(context);
+    return context;
 }
 
-function lookup(
-    path: string,
-    catalog: Map<string, NotificationTemplateVariableExample>,
-): NotificationTemplateVariableExample | typeof NOT_FOUND {
-    const remainder: string[] = [];
-    let candidate = path;
-    while (candidate.length > 0) {
-        if (catalog.has(candidate)) {
-            const base = catalog.get(candidate);
-            if (base === undefined) {
-                return NOT_FOUND;
+function setPath(target: Record<string, unknown>, path: string, value: unknown): void {
+    const segments = path.split(".");
+    if (segments.length === 0 || segments.some((segment) => !segment || BLOCKED_PATH_KEYS.has(segment))) {
+        return;
+    }
+
+    let current = target;
+    for (let index = 0; index < segments.length - 1; index++) {
+        const segment = segments[index];
+        const existing = current[segment];
+        if (!isRecord(existing)) {
+            current[segment] = Object.create(null) as Record<string, unknown>;
+        }
+        current = current[segment] as Record<string, unknown>;
+    }
+
+    const finalSegment = segments[segments.length - 1];
+    const existing = current[finalSegment];
+    if (isRecord(existing) && isRecord(value)) {
+        current[finalSegment] = mergeRecords(existing, value);
+    } else {
+        current[finalSegment] = value;
+    }
+}
+
+function cloneExample(value: NotificationTemplateVariableExample): unknown {
+    if (Array.isArray(value)) {
+        return value.map(cloneExample);
+    }
+    if (isRecord(value)) {
+        const cloned = Object.create(null) as Record<string, unknown>;
+        for (const [key, child] of Object.entries(value)) {
+            if (!BLOCKED_PATH_KEYS.has(key)) {
+                cloned[key] = cloneExample(child as NotificationTemplateVariableExample);
             }
-            return remainder.length === 0 ? base : walk(base, remainder);
         }
-        const dot = candidate.lastIndexOf(".");
-        if (dot <= 0) {
-            break;
-        }
-        remainder.unshift(candidate.slice(dot + 1));
-        candidate = candidate.slice(0, dot);
+        return cloned;
     }
-    return NOT_FOUND;
+    return value;
 }
 
-function walk(
-    value: NotificationTemplateVariableExample,
-    segments: string[],
-): NotificationTemplateVariableExample | typeof NOT_FOUND {
-    let current = value;
-    for (const segment of segments) {
-        if (segment === "__proto__" || segment === "prototype" || segment === "constructor") {
-            return NOT_FOUND;
+function mergeRecords(base: Record<string, unknown>, override: Record<string, unknown>): Record<string, unknown> {
+    const merged = Object.create(null) as Record<string, unknown>;
+    for (const [key, value] of Object.entries(base)) {
+        if (!BLOCKED_PATH_KEYS.has(key)) {
+            merged[key] = value;
         }
-        if (current === null || typeof current !== "object" || Array.isArray(current)) {
-            return NOT_FOUND;
-        }
-        if (!Object.prototype.hasOwnProperty.call(current, segment)) {
-            return NOT_FOUND;
-        }
-        const next = current[segment];
-        if (next === undefined) {
-            return NOT_FOUND;
-        }
-        current = next;
     }
-    return current;
+    for (const [key, value] of Object.entries(override)) {
+        if (BLOCKED_PATH_KEYS.has(key)) {
+            continue;
+        }
+        merged[key] = isRecord(merged[key]) && isRecord(value)
+            ? mergeRecords(merged[key] as Record<string, unknown>, value)
+            : value;
+    }
+    return merged;
 }
 
-function formatExample(value: NotificationTemplateVariableExample): string {
-    if (value === null) {
-        return "";
-    }
-    if (typeof value === "string") {
-        return escapeHtml(value);
-    }
-    if (typeof value === "number" || typeof value === "boolean") {
-        return String(value);
-    }
-    if (Array.isArray(value) && value.every(isPrimitiveExample)) {
-        return value.map((item) => (item === null ? "" : escapeHtml(String(item)))).join(", ");
-    }
-    return escapeHtml(JSON.stringify(value));
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return value !== null && typeof value === "object" && !Array.isArray(value) && !(value instanceof Date);
 }
 
-function isPrimitiveExample(value: NotificationTemplateVariableExample): boolean {
-    return value === null || typeof value === "string" || typeof value === "number" || typeof value === "boolean";
-}
-
-function escapeHtml(value: string): string {
-    return value
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-}

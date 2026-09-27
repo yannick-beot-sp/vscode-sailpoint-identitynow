@@ -118,6 +118,17 @@ suite('notification template security Test Suite', () => {
             assert.ok(html.includes('Ruby Requestee'));
         });
 
+        it('shows an escaped Velocity rendering error', () => {
+            const html = buildNotificationTemplatePreviewPage({
+                body: '<p>Template source</p>',
+                showExamples: true,
+                nonce: 'nonce-error',
+                error: '<script>alert("error")</script>',
+            });
+            assert.ok(html.includes('Velocity error: &lt;script&gt;alert(&quot;error&quot;)&lt;/script&gt;'));
+            assert.ok(!html.includes('<script>alert("error")</script>'));
+        });
+
         it('keeps a hostile fragment inside the escaped srcdoc', () => {
             const html = buildNotificationTemplatePreviewPage({
                 body: hostile,

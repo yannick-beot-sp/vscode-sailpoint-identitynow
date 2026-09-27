@@ -16,7 +16,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 - Allow to request or revoke access from the identity panel and add access request status panel with live reload to monitor the request [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
 - Add identity events panel to browse audit events [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
 - Add account commands: enable, disable, unlock, aggregate one, and remove (with guards for authoritative and system accounts) [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
-- Notification Templates: browse and edit the notification templates of a tenant in the tree view. For e-mail templates, "Edit body (HTML)" opens the body as a standalone, formatted HTML document with a live rendered preview beside it (`vscode-sailpoint-identitynow.notificationTemplates.formatBodyOnOpen` / `.previewBodyOnOpen` to toggle).
+- Notification Templates: browse and edit the notification templates of a tenant in the tree view. For e-mail templates, "Edit body (HTML)" opens the body as a standalone HTML document, formatted by the editor according to the user's formatter settings, with a live rendered preview beside it (`vscode-sailpoint-identitynow.notificationTemplates.formatBodyOnOpen` / `.previewBodyOnOpen` to toggle).
 - Send a test e-mail for an e-mail notification template (`sendTestNotification`).
 
 ### Changed

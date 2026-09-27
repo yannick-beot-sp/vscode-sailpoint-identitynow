@@ -6,6 +6,8 @@ import {
 	isDefaultNotificationTemplateId,
 	mergeNotificationTemplates,
 	notificationTemplateDescription,
+	notificationTemplateKeyFilter,
+	notificationTemplateWebUiSegments,
 	parseDefaultNotificationTemplateId,
 } from '../../utils/notificationTemplateList';
 
@@ -112,6 +114,59 @@ suite('notification template list Test Suite', () => {
 				medium: 'EMAIL',
 				locale: 'en',
 			});
+		});
+	});
+
+	describe('notificationTemplateKeyFilter', () => {
+		it('filters the default-template list on the key', () => {
+			assert.strictEqual(
+				notificationTemplateKeyFilter('access_profile_cleanup_notification'),
+				'key eq "access_profile_cleanup_notification"',
+			);
+		});
+
+		it('escapes quotes in the key', () => {
+			assert.strictEqual(notificationTemplateKeyFilter('a"b'), 'key eq "a\\"b"');
+		});
+	});
+
+	describe('notificationTemplateWebUiSegments', () => {
+		it('addresses a customized e-mail template by id', () => {
+			assert.deepStrictEqual(notificationTemplateWebUiSegments({
+				medium: 'EMAIL',
+				customized: true,
+				id: 'df32c059-59a8-4ac3-bec0-fed1ca64df7a',
+				key: 'access_profile_cleanup_notification',
+			}), [
+				'ui/a/admin/global/email-templates/customized',
+				'df32c059-59a8-4ac3-bec0-fed1ca64df7a',
+			]);
+		});
+
+		it('addresses a default e-mail template by key, not by the synthetic id', () => {
+			const syntheticId = defaultNotificationTemplateId({
+				key: 'access_profile_cleanup_notification',
+				medium: 'EMAIL',
+				locale: 'en',
+			});
+			assert.deepStrictEqual(notificationTemplateWebUiSegments({
+				medium: 'EMAIL',
+				customized: false,
+				id: syntheticId,
+				key: 'access_profile_cleanup_notification',
+			}), [
+				'ui/a/admin/global/email-templates/default',
+				'access_profile_cleanup_notification',
+			]);
+		});
+
+		it('has no Web UI page for other mediums', () => {
+			assert.strictEqual(notificationTemplateWebUiSegments({
+				medium: 'SLACK',
+				customized: false,
+				id: 'ignored',
+				key: 'access_request',
+			}), undefined);
 		});
 	});
 

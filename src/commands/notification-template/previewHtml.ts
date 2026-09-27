@@ -76,8 +76,9 @@ export function buildNotificationTemplatePreviewPage(options: {
     body: string;
     showExamples: boolean;
     nonce: string;
+    error?: string;
 }): string {
-    const { body, showExamples, nonce } = options;
+    const { body, showExamples, nonce, error } = options;
     const parentCsp = [
         "default-src 'none'",
         "img-src https: data:",
@@ -107,12 +108,14 @@ export function buildNotificationTemplatePreviewPage(options: {
     font-size: var(--vscode-font-size, 13px);
   }
   header label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .error { margin-left: 12px; color: var(--vscode-errorForeground); }
   iframe { flex: 1; width: 100%; border: 0; background: #ffffff; }
 </style>
 </head>
 <body>
 <header>
 <label><input id="example-values" type="checkbox"${showExamples ? " checked" : ""}> Example values</label>
+${error ? `<span class="error">Velocity error: ${escapeHtml(error)}</span>` : ""}
 </header>
 <iframe title="${showExamples ? "Example values" : "Template"}" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer" srcdoc="${escapeAttribute(srcdoc)}"></iframe>
 <script nonce="${nonce}">
@@ -155,4 +158,8 @@ function escapeAttribute(value: string): string {
         .replace(/"/g, "&quot;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
+}
+
+function escapeHtml(value: string): string {
+    return escapeAttribute(value).replace(/'/g, "&#39;");
 }

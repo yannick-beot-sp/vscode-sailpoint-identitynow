@@ -1369,7 +1369,7 @@
       "view/item/context": [
         {
           "command": "vscode-sailpoint-identitynow.open-url",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(tenantReadOnly|tenantWritable|.*source|disabledWorkflow|identity-profile|lifecycle-state|role|roleDimensional|dimension|access-profile|service-desk-integration|form-definition|source-app|campaign|identity)$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(tenantReadOnly|tenantWritable|.*source|disabledWorkflow|identity-profile|lifecycle-state|role|roleDimensional|dimension|access-profile|service-desk-integration|form-definition|source-app|campaign|identity|notification-template-EMAIL)$/",
           "group": "_@0"
         },
         {
@@ -2234,7 +2234,7 @@
         "vscode-sailpoint-identitynow.notificationTemplates.formatBodyOnOpen": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically format the HTML when opening a notification template body with \"Edit body (HTML)\"."
+          "description": "Automatically format the HTML with the editor's formatter when opening a notification template body with \"Edit body (HTML)\". Indentation and formatting rules follow your editor settings."
         },
         "vscode-sailpoint-identitynow.notificationTemplates.previewBodyOnOpen": {
           "type": "boolean",
@@ -2275,7 +2275,6 @@
     "@frontmcp/testing": "^1.8.0",
     "@types/glob": "^9.0.0",
     "@types/jest": "^30.0.0",
-    "@types/js-beautify": "^1.14.3",
     "@types/mocha": "^10.0.10",
     "@types/node": "^18.19.64",
     "@types/tmp": "^0.2.5",
@@ -2303,10 +2302,10 @@
     "csv-parse": "^7.0.3",
     "fast-json-patch": "^3.1.1",
     "frontmcp": "^1.8.0",
-    "js-beautify": "^1.15.4",
     "lodash": "^4.17.21",
     "sailpoint-api-client": "^1.8.69",
     "tmp": "^0.2.1",
+    "velocityjs": "^2.1.7",
     "vscode-sailpoint-identitynow": "file:"
   },
   "allowScripts": {

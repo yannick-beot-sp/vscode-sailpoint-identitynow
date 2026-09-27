@@ -87,7 +87,7 @@ The extension allows you to manage rules and upload the script to a new or exist
 
 The extension lists the notification templates of a tenant in the tree view: product defaults and tenant customizations, with a customization replacing the default that shares its key, medium and locale. The label is the template name; the medium (Email, Slack or Teams) is the item description. The folder can be refreshed, and the list can be filtered locally by text or by medium. Opening a template shows its JSON; saving it updates the template in the tenant.
 
-For e-mail templates, the **Edit body (HTML)** action opens just the `body` as a standalone HTML document, auto-formatted (block structure only, so the rendered e-mail is never changed) with a live preview rendered beside the editor. Saving writes the body back. Use **Preview body** to open the preview on its own. **Send test email** asks for a recipient and sends the stored template through `sendTestNotification`. Unsaved editor changes can be saved first so the test includes them.
+For e-mail templates, the **Edit body (HTML)** action opens just the `body` as a standalone HTML document. When format-on-open is enabled, the editor formats the HTML with your formatter and settings. A live preview is rendered beside the editor. Saving writes the body back. Use **Preview body** to open the preview on its own. **Send test email** asks for a recipient and sends the stored template through `sendTestNotification`. Unsaved editor changes can be saved first so the test includes them.
 
 Related settings: `vscode-sailpoint-identitynow.notificationTemplates.formatBodyOnOpen`, `vscode-sailpoint-identitynow.notificationTemplates.previewBodyOnOpen`.
 
@@ -650,7 +650,7 @@ The extension supports the following settings:
   - Default value: `false`
 - `vscode-sailpoint-identitynow.mCP.port`: Port for the MCP HTTP server. 0 = auto-assign a free port.
   - Default value: `0`
-- `vscode-sailpoint-identitynow.notificationTemplates.formatBodyOnOpen`: Automatically format the HTML when opening a notification template body with "Edit body (HTML)".
+- `vscode-sailpoint-identitynow.notificationTemplates.formatBodyOnOpen`: Automatically format the HTML with the editor's formatter when opening a notification template body with "Edit body (HTML)". Indentation and formatting rules follow your editor settings.
   - Default value: `true`
 - `vscode-sailpoint-identitynow.notificationTemplates.previewBodyOnOpen`: Open a live rendered preview beside the editor when opening a notification template body with "Edit body (HTML)".
   - Default value: `true`

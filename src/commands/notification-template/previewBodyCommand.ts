@@ -16,12 +16,13 @@ const RENDER_DEBOUNCE_MS = 200;
  * Shows a live-updating rendered preview of a notification template `body`
  * beside the editor. One webview panel per body URI, re-rendered on every edit.
  *
- * The header checkbox swaps the sandboxed body between the Velocity template
- * and catalog example values. The template itself is not modified.
+ * The header checkbox swaps the sandboxed body between the Velocity source and
+ * a rendered template populated with catalog example values. The template
+ * itself is not modified.
  *
  * Known limits (all inherent to previewing e-mail HTML in a browser engine):
- *  - Example values cover catalogued variables only. Function calls and
- *    directives (`#if`, `#foreach`) are left as written.
+ *  - Example values cover catalogued variables and the global template tools.
+ *    Identity lookups read those examples; they do not call the tenant.
  *  - Scripts in the template are blocked; remote images load over https only.
  *  - Outlook-only `<!--[if mso]>` blocks are treated as comments, i.e. hidden.
  */
@@ -175,11 +176,20 @@ export class PreviewNotificationTemplateBodyCommand {
         }
         const source = document.getText();
         const showExamples = this.exampleMode.get(document.uri.toString()) === true;
-        const body = showExamples ? this.withExampleValues(document, source) : source;
+        let body = source;
+        let error: string | undefined;
+        if (showExamples) {
+            try {
+                body = this.withExampleValues(document, source);
+            } catch (caught) {
+                error = caught instanceof Error ? caught.message : String(caught);
+            }
+        }
         panel.webview.html = buildNotificationTemplatePreviewPage({
             body,
             showExamples,
             nonce: createPreviewNonce(),
+            error,
         });
     }
 

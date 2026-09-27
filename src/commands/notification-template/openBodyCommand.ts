@@ -7,7 +7,6 @@ import {
     NOTIFICATION_TEMPLATE_PREVIEW_BODY_ON_OPEN_CONF,
 } from '../../configurationConstants';
 import { PREVIEW_NOTIFICATION_TEMPLATE_BODY } from '../constants';
-import { formatNotificationTemplateBody } from './formatBody';
 
 /**
  * Opens the `body` of a notification template as a standalone HTML document
@@ -52,10 +51,8 @@ export class OpenNotificationTemplateBodyCommand {
                 await formatDocument(document);
             }
 
-            // The body is left unwrapped (wrapping HTML risks shifting rendered
-            // whitespace), so turn on soft wrap for this editor to avoid the long
-            // inline lines forcing horizontal scroll - unless the user already
-            // wraps HTML.
+            // Turn on soft wrap for this editor so long lines do not force
+            // horizontal scroll, unless the user already wraps HTML.
             await enableSoftWrapIfNeeded(document);
 
             const previewOnOpen = vscode.workspace
@@ -80,24 +77,18 @@ async function enableSoftWrapIfNeeded(document: vscode.TextDocument): Promise<vo
 }
 
 /**
- * Pretty-print the body in place using js-beautify (the engine VS Code's own
- * HTML formatter is built on), with e-mail-safe options. Applied as a workspace
- * edit so it does not depend on the document being the focused editor.
+ * Format the body with the editor's formatter (`editor.action.formatDocument`),
+ * so the formatter, indentation and wrapping follow the user's settings
+ * (`editor.defaultFormatter`, `editor.tabSize`, `html.format.*`, …).
  */
 async function formatDocument(document: vscode.TextDocument): Promise<void> {
-    const original = document.getText();
-    let formatted: string;
     try {
-        formatted = formatNotificationTemplateBody(original);
+        const editor = await vscode.window.showTextDocument(document, { preview: true, preserveFocus: false });
+        if (vscode.window.activeTextEditor !== editor) {
+            return;
+        }
+        await vscode.commands.executeCommand('editor.action.formatDocument');
     } catch (error) {
         console.warn("> OpenNotificationTemplateBodyCommand: could not format body", error);
-        return;
     }
-    if (formatted === original) {
-        return;
-    }
-    const fullRange = new vscode.Range(document.positionAt(0), document.positionAt(original.length));
-    const workspaceEdit = new vscode.WorkspaceEdit();
-    workspaceEdit.replace(document.uri, fullRange, formatted);
-    await vscode.workspace.applyEdit(workspaceEdit);
 }
