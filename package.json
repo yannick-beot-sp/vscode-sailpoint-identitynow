@@ -463,6 +463,46 @@
         "title": "ISC: Export as XML..."
       },
       {
+        "command": "vscode-sailpoint-identitynow.notification-template.edit-body",
+        "title": "Edit body (HTML)",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.notification-template.preview-body",
+        "title": "Preview body",
+        "category": "SailPoint ISC",
+        "icon": "$(open-preview)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.notification-template.send-test",
+        "title": "Send test email",
+        "category": "SailPoint ISC",
+        "icon": "$(mail)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.notification-templates.filter",
+        "title": "Filter notification templates",
+        "icon": "$(search)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.notification-templates.update-filter",
+        "title": "Filter notification templates",
+        "icon": {
+          "light": "resources/light/search-filled.svg",
+          "dark": "resources/dark/search-filled.svg"
+        }
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.notification-templates.filter-medium",
+        "title": "Filter by medium",
+        "icon": "$(filter)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.notification-templates.update-filter-medium",
+        "title": "Filter by medium",
+        "icon": "$(filter-filled)"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.identity-profile.refresh",
         "title": "Refresh all identities"
       },
@@ -1205,6 +1245,34 @@
           "when": "resourceExtname == .java || resourceExtname == .bsh"
         },
         {
+          "command": "vscode-sailpoint-identitynow.notification-template.edit-body",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.notification-templates.filter",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.notification-templates.update-filter",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.notification-templates.filter-medium",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.notification-templates.update-filter-medium",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.notification-template.preview-body",
+          "when": "resourceScheme == idn && resourcePath =~ /notification-template-body/"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.notification-template.send-test",
+          "when": "resourceScheme == idn && resourcePath =~ /notification-template/"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.applications.filter.source",
           "when": "never"
         },
@@ -1301,7 +1369,7 @@
       "view/item/context": [
         {
           "command": "vscode-sailpoint-identitynow.open-url",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(tenantReadOnly|tenantWritable|.*source|disabledWorkflow|identity-profile|lifecycle-state|role|roleDimensional|dimension|access-profile|service-desk-integration|form-definition|source-app|campaign|identity)$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(tenantReadOnly|tenantWritable|.*source|disabledWorkflow|identity-profile|lifecycle-state|role|roleDimensional|dimension|access-profile|service-desk-integration|form-definition|source-app|campaign|identity|notification-template-EMAIL)$/",
           "group": "_@0"
         },
         {
@@ -1326,7 +1394,7 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.refresh-forced",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|privilege-classification|transforms|provisioning-policies|roles|roleDimensional|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|cloud-rules|form-definitions|search-attributes|identity-attributes|source-apps|source-app|campaigns|machine-identities|machine-account-subtypes|privilege-criteria/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|privilege-classification|transforms|provisioning-policies|roles|roleDimensional|access-profiles|service-desk-integrations|identity-profiles|schemas|workflows|connector-rules|cloud-rules|form-definitions|search-attributes|identity-attributes|source-apps|source-app|campaigns|machine-identities|machine-account-subtypes|privilege-criteria|notification-templates/",
           "group": "inline@50"
         },
         {
@@ -1575,6 +1643,43 @@
         {
           "command": "vscode-sailpoint-identitynow.cloud-rule.export-xml.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^cloud-rule$/"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.notification-templates.filter",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^notification-templates(MediumFiltered)?$/",
+          "group": "inline@0"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.notification-templates.update-filter",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^notification-templatesNameFiltered/",
+          "group": "inline@0"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.notification-templates.filter-medium",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^notification-templates(NameFiltered)?$/",
+          "group": "inline@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.notification-templates.update-filter-medium",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^notification-templates(NameFiltered)?MediumFiltered$/",
+          "group": "inline@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.notification-template.edit-body",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == notification-template-EMAIL",
+          "group": "inline"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.notification-template.edit-body",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == notification-template-EMAIL"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.notification-template.preview-body",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == notification-template-EMAIL"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.notification-template.send-test",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == notification-template-EMAIL"
         },
         {
           "command": "vscode-sailpoint-identitynow.identity-profile.refresh",
@@ -1890,7 +1995,27 @@
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == folder"
         }
       ],
+      "editor/title": [
+        {
+          "command": "vscode-sailpoint-identitynow.notification-template.preview-body",
+          "when": "resourceScheme == idn && resourcePath =~ /notification-template-body/",
+          "group": "navigation"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.notification-template.send-test",
+          "when": "resourceScheme == idn && resourcePath =~ /notification-template/",
+          "group": "navigation"
+        }
+      ],
       "editor/context": [
+        {
+          "command": "vscode-sailpoint-identitynow.notification-template.preview-body",
+          "when": "resourceScheme == idn && resourcePath =~ /notification-template-body/"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.notification-template.send-test",
+          "when": "resourceScheme == idn && resourcePath =~ /notification-template/"
+        },
         {
           "command": "vscode-sailpoint-identitynow.transform.evaluate.editor",
           "when": "resourcePath =~ /transforms/"
@@ -2105,6 +2230,16 @@
           "type": "integer",
           "default": 0,
           "description": "Port for the MCP HTTP server. 0 = auto-assign a free port."
+        },
+        "vscode-sailpoint-identitynow.notificationTemplates.formatBodyOnOpen": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically format the HTML with the editor's formatter when opening a notification template body with \"Edit body (HTML)\". Indentation and formatting rules follow your editor settings."
+        },
+        "vscode-sailpoint-identitynow.notificationTemplates.previewBodyOnOpen": {
+          "type": "boolean",
+          "default": true,
+          "description": "Open a live rendered preview beside the editor when opening a notification template body with \"Edit body (HTML)\"."
         }
       }
     },
@@ -2170,6 +2305,7 @@
     "lodash": "^4.17.21",
     "sailpoint-api-client": "^1.8.69",
     "tmp": "^0.2.1",
+    "velocityjs": "^2.1.7",
     "vscode-sailpoint-identitynow": "file:"
   },
   "allowScripts": {

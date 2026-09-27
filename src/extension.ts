@@ -62,6 +62,11 @@ import { GenerateDigitTokenCommand } from './commands/tenant/generateDigitTokenC
 import { OpenScriptCommand } from './commands/rule/openScriptCommand';
 import { CloudRuleCommand } from './commands/rule/cloudRuleCommand';
 import { ExportRuleXmlCommand } from './commands/rule/exportRuleXmlCommand';
+import { OpenNotificationTemplateBodyCommand } from './commands/notification-template/openBodyCommand';
+import { registerNotificationTemplateVariableCompletion } from './commands/notification-template/variableCompletionProvider';
+import { PreviewNotificationTemplateBodyCommand } from './commands/notification-template/previewBodyCommand';
+import { SendNotificationTemplateTestCommand } from './commands/notification-template/sendTestCommand';
+import { NotificationTemplateFilterCommand, NotificationTemplateMediumFilterCommand } from './commands/notification-template/filterCommand';
 import { IdentityTreeViewCommand } from './commands/identity/IdentityTreeViewCommand';
 import { ViewIdentityEventsCommand } from './commands/identity/viewIdentityEventsCommand';
 import { ViewIdentityAccessCommand } from './commands/identity/viewIdentityAccessCommand';
@@ -464,6 +469,39 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EDIT_CONNECTOR_RULE,
 			openScriptCommand.execute, openScriptCommand));
+
+	const openNotificationTemplateBodyCommand = new OpenNotificationTemplateBodyCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.EDIT_NOTIFICATION_TEMPLATE_BODY,
+			openNotificationTemplateBodyCommand.execute, openNotificationTemplateBodyCommand));
+	context.subscriptions.push(registerNotificationTemplateVariableCompletion());
+
+	const previewNotificationTemplateBodyCommand = new PreviewNotificationTemplateBodyCommand()
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.PREVIEW_NOTIFICATION_TEMPLATE_BODY,
+			previewNotificationTemplateBodyCommand.execute, previewNotificationTemplateBodyCommand),
+		previewNotificationTemplateBodyCommand.registerSerializer(),
+		new vscode.Disposable(() => previewNotificationTemplateBodyCommand.dispose()));
+
+	const sendNotificationTemplateTestCommand = new SendNotificationTemplateTestCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.SEND_NOTIFICATION_TEMPLATE_TEST,
+			sendNotificationTemplateTestCommand.execute, sendNotificationTemplateTestCommand));
+
+	const notificationTemplateFilterCommand = new NotificationTemplateFilterCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NOTIFICATION_TEMPLATES_FILTER,
+			notificationTemplateFilterCommand.execute, notificationTemplateFilterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NOTIFICATION_TEMPLATES_UPDATE_FILTER,
+			notificationTemplateFilterCommand.execute, notificationTemplateFilterCommand));
+	const notificationTemplateMediumFilterCommand = new NotificationTemplateMediumFilterCommand();
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NOTIFICATION_TEMPLATES_FILTER_MEDIUM,
+			notificationTemplateMediumFilterCommand.execute, notificationTemplateMediumFilterCommand));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.NOTIFICATION_TEMPLATES_UPDATE_FILTER_MEDIUM,
+			notificationTemplateMediumFilterCommand.execute, notificationTemplateMediumFilterCommand));
 
 	const exportScriptFromRuleCommand = new ExportScriptFromRuleCommand(tenantService);
 	context.subscriptions.push(

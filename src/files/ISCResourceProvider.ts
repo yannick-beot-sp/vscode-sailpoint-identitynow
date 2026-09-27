@@ -21,7 +21,7 @@ import {
 } from "../utils";
 import { getIdByUri, getNameByUri, getPathByUri } from "../utils/UriUtils";
 import { Operation, compare } from "fast-json-patch";
-import { ConnectorRuleUpdateRequestBeta, FormDefinitionResponseBeta, SlimCampaign } from "sailpoint-api-client";
+import { ConnectorRuleUpdateRequestBeta, FormDefinitionResponseBeta, SlimCampaign, TemplateDtoBeta } from "sailpoint-api-client";
 
 const READONLY_RESOURCE_PATH = /\/cloud-rules\/|\/cloud-rule-script\/|\/identities\//;
 
@@ -132,6 +132,15 @@ export class ISCResourceProvider implements FileSystemProvider {
 			}
 		} else if (/\/source-apps\//.test(resourcePath)) {
 			data = await client.getApplication(id)
+		} else if (/\/notification-template-body\//.test(resourcePath)) {
+			const template = await client.getNotificationTemplateById(id);
+			if (!template) {
+				throw vscode.FileSystemError.FileNotFound(uri);
+			}
+			// Return early so an (unlikely) empty body is not treated as "not found".
+			return template.body ?? "";
+		} else if (/\/notification-templates\//.test(resourcePath)) {
+			data = await client.getNotificationTemplateById(id);
 		} else {
 			if (/\/workflows\//.test(resourcePath)) {
 				/* 
@@ -205,6 +214,13 @@ export class ISCResourceProvider implements FileSystemProvider {
 					sourceCode: { ...rule.sourceCode, script: data },
 					description: rule.description ?? undefined,
 				} as ConnectorRuleUpdateRequestBeta)
+			} else if (resourcePath.match("notification-template-body")) {
+				const template = await client.getNotificationTemplateById(id);
+				template.body = data;
+				await client.updateNotificationTemplate(template);
+			} else if (resourcePath.match("notification-templates")) {
+				const newData = JSON.parse(data) as TemplateDtoBeta;
+				await client.updateNotificationTemplate(newData);
 			} else if (resourcePath.match("form-definitions")) {
 				// UI is pushing all data as a Patch. Doing the same for form definitions
 				const newData = JSON.parse(data) as FormDefinitionResponseBeta
