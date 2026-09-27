@@ -1,9 +1,20 @@
 import * as vscode from 'vscode';
 import { NotificationTemplateTreeItem } from "../../models/ISCTreeItem";
-import { applyNotificationTemplateExamples } from "./previewExamples";
+import { NotificationTemplateVariable } from "./templateVariables";
 import {
+    MAX_EXAMPLE_JSON_CHARS,
+    applyNotificationTemplateExamples,
+    exampleValueMap,
+    parseExampleValues,
+} from "./previewExamples";
+import {
+    PREVIEW_READY_MESSAGE,
+    PREVIEW_STATE_MESSAGE,
     SET_EXAMPLE_VALUES_MESSAGE,
+    UPDATE_EXAMPLE_VALUES_MESSAGE,
+    NotificationTemplatePreviewState,
     buildNotificationTemplatePreviewPage,
+    buildPreviewFrameSrcdoc,
     createPreviewNonce,
 } from "./previewHtml";
 import { completionVariables, resolveTemplateIdentity } from "./templateVariableCompletion";
@@ -17,8 +28,9 @@ const RENDER_DEBOUNCE_MS = 200;
  * beside the editor. One webview panel per body URI, re-rendered on every edit.
  *
  * The header checkbox swaps the sandboxed body between the Velocity source and
- * a rendered template populated with catalog example values. The template
- * itself is not modified.
+ * a rendered template populated with catalog example values. Checking it also
+ * opens a syntax-colored JSON editor of those data variables (functions excluded). Edited
+ * values are applied with Update preview and do not modify the template.
  *
  * Known limits (all inherent to previewing e-mail HTML in a browser engine):
  *  - Example values cover catalogued variables and the global template tools.
@@ -34,6 +46,11 @@ export class PreviewNotificationTemplateBodyCommand {
     private readonly messageListeners = new Map<string, vscode.Disposable>();
     private readonly renderTimers = new Map<string, NodeJS.Timeout>();
     private readonly exampleMode = new Map<string, boolean>();
+    private readonly exampleValues = new Map<string, Record<string, unknown>>();
+    private readonly jsonErrors = new Map<string, string>();
+    private readonly nonces = new Map<string, string>();
+    private readonly viewStates = new Map<string, NotificationTemplatePreviewState>();
+    private readonly pageReady = new Set<string>();
 
     /**
      * A preview panel is derived from an open body editor and keeps no
@@ -72,12 +89,31 @@ export class PreviewNotificationTemplateBodyCommand {
             this.panels.set(key, panel);
 
             const messageListener = panel.webview.onDidReceiveMessage(async (message: unknown) => {
-                if (!isExampleToggle(message)) {
+                if (isPreviewReady(message)) {
+                    this.postState(key);
                     return;
                 }
-                this.exampleMode.set(key, message.value);
-                const doc = await vscode.workspace.openTextDocument(vscode.Uri.parse(key));
-                this.render(this.panels.get(key), doc);
+                if (isExampleToggle(message)) {
+                    this.exampleMode.set(key, message.value);
+                    this.jsonErrors.delete(key);
+                    await this.refresh(key, { replaceExamples: message.value });
+                    return;
+                }
+                if (!isExampleUpdate(message)) {
+                    return;
+                }
+                if (message.value.length > MAX_EXAMPLE_JSON_CHARS) {
+                    this.reportJsonError(key, "Example values JSON is too large");
+                    return;
+                }
+                const parsed = parseExampleValues(message.value);
+                if (!parsed.ok) {
+                    this.reportJsonError(key, parsed.error);
+                    return;
+                }
+                this.jsonErrors.delete(key);
+                this.exampleValues.set(key, parsed.values);
+                await this.refresh(key, { replaceExamples: true });
             });
             this.messageListeners.set(key, messageListener);
 
@@ -99,6 +135,11 @@ export class PreviewNotificationTemplateBodyCommand {
             panel.onDidDispose(() => {
                 this.panels.delete(key);
                 this.exampleMode.delete(key);
+                this.exampleValues.delete(key);
+                this.jsonErrors.delete(key);
+                this.nonces.delete(key);
+                this.viewStates.delete(key);
+                this.pageReady.delete(key);
                 this.changeListeners.get(key)?.dispose();
                 this.changeListeners.delete(key);
                 this.messageListeners.get(key)?.dispose();
@@ -132,6 +173,11 @@ export class PreviewNotificationTemplateBodyCommand {
         this.changeListeners.clear();
         this.messageListeners.clear();
         this.exampleMode.clear();
+        this.exampleValues.clear();
+        this.jsonErrors.clear();
+        this.nonces.clear();
+        this.viewStates.clear();
+        this.pageReady.clear();
         this.panels.clear();
     }
 
@@ -170,39 +216,129 @@ export class PreviewNotificationTemplateBodyCommand {
         return `Preview: ${name}`;
     }
 
-    private render(panel: vscode.WebviewPanel | undefined, document: vscode.TextDocument): void {
+    private async refresh(key: string, options?: { replaceExamples?: boolean }): Promise<void> {
+        const panel = this.panels.get(key);
         if (!panel) {
             return;
         }
+        const document = await vscode.workspace.openTextDocument(vscode.Uri.parse(key));
+        this.render(panel, document, options);
+    }
+
+    private postState(key: string): void {
+        const panel = this.panels.get(key);
+        const state = this.viewStates.get(key);
+        if (!panel || !state) {
+            return;
+        }
+        void panel.webview.postMessage(state);
+    }
+
+    private reportJsonError(key: string, jsonError: string): void {
+        this.jsonErrors.set(key, jsonError);
+        const state = this.viewStates.get(key);
+        if (!state) {
+            return;
+        }
+        const next: NotificationTemplatePreviewState = {
+            ...state,
+            jsonError,
+            replaceExamples: false,
+        };
+        this.viewStates.set(key, next);
+        this.postState(key);
+    }
+
+    private render(
+        panel: vscode.WebviewPanel | undefined,
+        document: vscode.TextDocument,
+        options?: { replaceExamples?: boolean },
+    ): void {
+        if (!panel) {
+            return;
+        }
+        const key = document.uri.toString();
         const source = document.getText();
-        const showExamples = this.exampleMode.get(document.uri.toString()) === true;
+        const showExamples = this.exampleMode.get(key) === true;
         let body = source;
-        let error: string | undefined;
+        let error = "";
         if (showExamples) {
             try {
-                body = this.withExampleValues(document, source);
+                body = this.withExampleValues(document, source, key);
             } catch (caught) {
                 error = caught instanceof Error ? caught.message : String(caught);
             }
         }
-        panel.webview.html = buildNotificationTemplatePreviewPage({
-            body,
+        const state: NotificationTemplatePreviewState = {
+            command: PREVIEW_STATE_MESSAGE,
+            srcdoc: buildPreviewFrameSrcdoc(body),
             showExamples,
-            nonce: createPreviewNonce(),
             error,
-        });
+            jsonError: showExamples ? (this.jsonErrors.get(key) ?? "") : "",
+            examplesJson: showExamples ? this.examplesJsonFor(document, source, key) : "",
+            replaceExamples: options?.replaceExamples === true,
+        };
+        this.viewStates.set(key, state);
+        if (!this.pageReady.has(key)) {
+            panel.webview.html = buildNotificationTemplatePreviewPage({
+                body,
+                showExamples,
+                nonce: this.nonceFor(key),
+                error: error || undefined,
+                jsonError: state.jsonError || undefined,
+                examplesJson: state.examplesJson,
+            });
+            this.pageReady.add(key);
+            return;
+        }
+        void panel.webview.postMessage(state);
     }
 
-    private withExampleValues(document: vscode.TextDocument, source: string): string {
+    private nonceFor(key: string): string {
+        let nonce = this.nonces.get(key);
+        if (!nonce) {
+            nonce = createPreviewNonce();
+            this.nonces.set(key, nonce);
+        }
+        return nonce;
+    }
+
+    private examplesJsonFor(document: vscode.TextDocument, source: string, key: string): string {
+        const overrides = this.exampleValues.get(key);
+        const values = overrides ?? exampleValueMap(this.variablesFor(document, source));
+        return JSON.stringify(values, null, 2);
+    }
+
+    private withExampleValues(document: vscode.TextDocument, source: string, key: string): string {
+        return applyNotificationTemplateExamples(
+            source,
+            this.variablesFor(document, source),
+            this.exampleValues.get(key),
+        );
+    }
+
+    private variablesFor(document: vscode.TextDocument, source: string): NotificationTemplateVariable[] {
         const identity = resolveTemplateIdentity(document.uri.path, document.uri.query, source);
-        const variables = completionVariables(identity).map((item) => item.variable);
-        return applyNotificationTemplateExamples(source, variables);
+        return completionVariables(identity).map((item) => item.variable);
     }
 }
 
+function isPreviewReady(message: unknown): message is { command: typeof PREVIEW_READY_MESSAGE } {
+    return isCommand(message, PREVIEW_READY_MESSAGE);
+}
+
 function isExampleToggle(message: unknown): message is { command: typeof SET_EXAMPLE_VALUES_MESSAGE; value: boolean } {
+    return isCommand(message, SET_EXAMPLE_VALUES_MESSAGE)
+        && typeof (message as { value?: unknown }).value === "boolean";
+}
+
+function isExampleUpdate(message: unknown): message is { command: typeof UPDATE_EXAMPLE_VALUES_MESSAGE; value: string } {
+    return isCommand(message, UPDATE_EXAMPLE_VALUES_MESSAGE)
+        && typeof (message as { value?: unknown }).value === "string";
+}
+
+function isCommand(message: unknown, command: string): boolean {
     return !!message
         && typeof message === "object"
-        && (message as { command?: unknown }).command === SET_EXAMPLE_VALUES_MESSAGE
-        && typeof (message as { value?: unknown }).value === "boolean";
+        && (message as { command?: unknown }).command === command;
 }

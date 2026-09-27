@@ -237,6 +237,12 @@ export const globalVariables: NotificationTemplateVariable[] = [
         "example": "https://{tenant}.api.identitynow.com/ums/assets/custom-logos/00000000-0000-4000-8000-000000000000/00000000-0000-4000-8000-000000000000.png"
     },
     {
+        "key": "PRODUCT_NAME",
+        "type": "string",
+        "description": "The human-readable name of the product or application.",
+        "example": "SailPoint"
+    },
+    {
         "key": "__numberTool.currency()",
         "type": "function",
         "description": "Convenience method equivalent to format(\"currency\", obj). Formats numbers as currency for the current locale.",
@@ -432,14 +438,21 @@ export const templateVariables: Record<string, Record<string, NotificationTempla
                 "key": "accessProfileName",
                 "type": "string",
                 "description": "The access profile that was requested during this access request.",
-                "example": "Example Name"
+                "example": "Sales Access"
             },
             {
                 "key": "accessRequestMetadata",
                 "type": "object",
                 "description": "A map of dimension attributes. Contains both Requested Dimension attributes and Matched Dimension attributes. By default, we show Requested Dimension Attributes. To use the Matched Dimension Attributes, please take reference on how requested attributes are used. Use the key “matchedRolesInformation”",
                 "example": {
-                    "requestContextInformation": "Example"
+                    "requestContextInformation": {
+                        "department": "Finance",
+                        "location": "Austin"
+                    },
+                    "matchedRolesInformation": {
+                        "department": "Finance",
+                        "jobTitle": "Analyst"
+                    }
                 }
             },
             {
@@ -447,7 +460,8 @@ export const templateVariables: Record<string, Record<string, NotificationTempla
                 "type": "array",
                 "description": "A list of items the user can access as a result of their request being approved.",
                 "example": [
-                    "Example"
+                    "Sales Access",
+                    "Finance Reporting"
                 ]
             },
             {
@@ -466,13 +480,13 @@ export const templateVariables: Record<string, Record<string, NotificationTempla
                 "key": "approverName",
                 "type": "string",
                 "description": "The display name of the identity that approved the request.",
-                "example": "Example Name"
+                "example": "Alex Approver"
             },
             {
                 "key": "rejecterName",
                 "type": "string",
                 "description": "If applicable, the name of the reviewer who rejected this access request.",
-                "example": "Example Name"
+                "example": "Riley Reviewer"
             },
             {
                 "key": "removeDate",
@@ -484,31 +498,31 @@ export const templateVariables: Record<string, Record<string, NotificationTempla
                 "key": "requestedForIdentityName",
                 "type": "string",
                 "description": "The name of the user for whom access was requested.",
-                "example": "Example Name"
+                "example": "Ruby Requestee"
             },
             {
                 "key": "requestedObjectName",
                 "type": "string",
                 "description": "The name of item that was requested.",
-                "example": "Example Name"
+                "example": "Finance Analyst"
             },
             {
                 "key": "requestedObjectType",
                 "type": "string",
                 "description": "The type of item that was requested.",
-                "example": "Example"
+                "example": "Role"
             },
             {
                 "key": "requesterName",
                 "type": "string",
                 "description": "The display name of the identity that requested the app.",
-                "example": "Example Name"
+                "example": "Rebecca Requester"
             },
             {
                 "key": "reviewerComment",
                 "type": "string",
                 "description": "The comments the reviewer enters when they deny access, if applicable.",
-                "example": "Example"
+                "example": "This role is outside the current project."
             },
             {
                 "key": "roleRequestEnabled",
@@ -522,9 +536,9 @@ export const templateVariables: Record<string, Record<string, NotificationTempla
                 "description": "A list of mapping for account source information in case of multi account request. Map contains the following keys: - sourceAccountName - sourceAccountId - sourceName Note: This is only populated if supplied as part of the account request payload. The Request Center will always provide this, though the account name and ID may be null if the user did not already have an account on the source. This will only be blank for requests submitted through an API call that omits account selection, which is allowed when the user has one or no accounts.",
                 "example": [
                     {
-                        "sourceAccountName": "Example Name",
+                        "sourceAccountName": "ruby.requestee",
                         "sourceAccountId": "00000000-0000-4000-8000-000000000000",
-                        "sourceName": "Example Name"
+                        "sourceName": "Active Directory"
                     }
                 ]
             }

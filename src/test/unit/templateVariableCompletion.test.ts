@@ -99,6 +99,17 @@ suite('template variable completion Test Suite', () => {
             assert.ok(templateEntries.length > 0);
         });
 
+        it('offers PRODUCT_NAME with the same example as __global.productName', () => {
+            const productName = globalVariables.find((variable) => variable.key === '__global.productName');
+            const legacy = globalVariables.find((variable) => variable.key === 'PRODUCT_NAME');
+            assert.ok(productName);
+            assert.ok(legacy);
+            assert.strictEqual(legacy.type, productName.type);
+            assert.strictEqual(legacy.description, productName.description);
+            assert.strictEqual(legacy.example, productName.example);
+            assert.strictEqual(legacy.example, 'SailPoint');
+        });
+
         it('offers template variables before the global ones', () => {
             const identity = { key: Object.keys(templateVariables)[0], medium: 'EMAIL' };
             const mediums = Object.keys(templateVariables[identity.key]);

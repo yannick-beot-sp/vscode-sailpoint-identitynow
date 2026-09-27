@@ -1,5 +1,6 @@
 import * as assert from 'assert';
 import { it, describe } from 'mocha';
+import { highlightJson } from '../../commands/identity/jsonDrawerSnippet';
 import { buildNotificationTemplatePreviewHtml, buildNotificationTemplatePreviewPage } from '../../commands/notification-template/previewHtml';
 import {
     notificationTemplateIdentityConflict,
@@ -139,6 +140,66 @@ suite('notification template security Test Suite', () => {
             assert.ok(html.includes('&lt;script&gt;alert(1)&lt;/script&gt;'));
             assert.ok(!html.includes('src="https://evil.test/pixel.png"'));
             assert.strictEqual(html.match(/<script /g)?.length, 1);
+            assert.ok(html.includes('id="examples" hidden'));
+            assert.ok(html.includes('id="example-json"'));
+            assert.ok(html.includes('Update preview'));
+        });
+
+        it('shows escaped example JSON in the editor', () => {
+            const html = buildNotificationTemplatePreviewPage({
+                body: '<p>Ruby</p>',
+                showExamples: true,
+                nonce: 'nonce-json',
+                examplesJson: '{\n  "name": "Tom & <Jerry>"\n}',
+                jsonError: '</p><script>alert(1)</script>',
+            });
+            assert.ok(!html.includes('id="examples" hidden'));
+            assert.ok(html.includes('&quot;name&quot;: &quot;Tom &amp; &lt;Jerry&gt;&quot;'));
+            assert.ok(html.includes('&lt;/p&gt;&lt;script&gt;alert(1)&lt;/script&gt;'));
+            assert.ok(!html.includes('<script>alert(1)</script>'));
+            assert.strictEqual(html.match(/<script /g)?.length, 1);
+        });
+
+        it('colors example JSON with the shared highlighter', () => {
+            const sample = '{\n  "name": "a<b&c",\n  "ok": true,\n  "n": -2.5,\n  "z": null\n}';
+            const html = buildNotificationTemplatePreviewPage({
+                body: '<p>Ruby</p>',
+                showExamples: true,
+                nonce: 'nonce-color',
+                examplesJson: sample,
+            });
+            assert.ok(html.includes('id="example-editor"'));
+            assert.ok(html.includes('id="example-highlight" aria-hidden="true"'));
+            assert.ok(html.includes('.json-key'));
+            assert.ok(html.includes('.json-string'));
+            assert.ok(html.includes('function paintExamples'));
+            assert.strictEqual(html.match(/<script /g)?.length, 1);
+
+            const script = html.match(/<script nonce="nonce-color">([\s\S]*?)<\/script>/)?.[1] ?? '';
+            const start = script.indexOf('function highlightJson');
+            const end = script.indexOf('const vscode');
+            assert.ok(start >= 0 && end > start);
+            const run = new Function(`${script.slice(start, end)}\nreturn highlightJson;`) as () => (json: string) => string;
+            const colored = run()(sample);
+            assert.strictEqual(colored, highlightJson(sample));
+            assert.ok(colored.includes('<span class="json-key">"name"</span>:'));
+            assert.ok(colored.includes('<span class="json-string">"a&lt;b&amp;c"</span>'));
+            assert.ok(!colored.includes('<b'));
+            assert.ok(html.includes('&quot;name&quot;'));
+            assert.ok(!html.includes(colored));
+        });
+
+        it('keeps a textarea breakout inside the example JSON', () => {
+            const html = buildNotificationTemplatePreviewPage({
+                body: '<p>Hello</p>',
+                showExamples: true,
+                nonce: 'nonce-breakout',
+                examplesJson: '</textarea><script>alert(1)</script>',
+            });
+            assert.ok(html.includes('&lt;/textarea&gt;&lt;script&gt;alert(1)&lt;/script&gt;'));
+            assert.ok(!html.includes('</textarea><script>alert(1)</script>'));
+            assert.strictEqual(html.match(/<script /g)?.length, 1);
+            assert.strictEqual(html.match(/<iframe/g)?.length, 1);
         });
     });
 });

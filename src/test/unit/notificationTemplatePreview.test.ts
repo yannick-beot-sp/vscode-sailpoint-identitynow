@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { describe, it } from 'mocha';
-import { applyNotificationTemplateExamples } from '../../commands/notification-template/previewExamples';
+import { applyNotificationTemplateExamples, exampleValueMap, parseExampleValues } from '../../commands/notification-template/previewExamples';
 import { completionVariables } from '../../commands/notification-template/templateVariableCompletion';
 import { NotificationTemplateVariable } from '../../commands/notification-template/templateVariables';
 
@@ -231,6 +231,105 @@ suite('notification template preview examples Test Suite', () => {
             assert.ok(rendered.includes('Ruby Requestee'));
             assert.ok(rendered.includes('SailPoint'));
             assert.ok(!rendered.includes('$!{requestedFor.name}'));
+        });
+
+        it('renders edited example values and still provides the tools', () => {
+            const rendered = applyNotificationTemplateExamples(
+                '$owner|$!{requestedFor.name}|$__global.productName|$__esc.html("a&b")',
+                variables,
+                {
+                    owner: 'Edited Owner',
+                    requestedFor: { name: 'Ada' },
+                    '__global.productName': 'Acme',
+                },
+            );
+            assert.strictEqual(rendered, 'Edited Owner|Ada|Acme|a&amp;b');
+        });
+
+        it('renders the editable map the same way as the catalog', () => {
+            const body = '$!{requestedFor.name}|$__global.productName|$owner|$note|$__esc.html("a&b")';
+            assert.strictEqual(
+                applyNotificationTemplateExamples(body, variables, exampleValueMap(variables)),
+                applyNotificationTemplateExamples(body, variables),
+            );
+            const catalog = completionVariables({
+                key: 'access_request_reassignment',
+                medium: 'EMAIL',
+            }).map((item) => item.variable);
+            const catalogBody = '$!{requestedFor.name}|$accessProfileName|$__global.productName';
+            assert.strictEqual(
+                applyNotificationTemplateExamples(catalogBody, catalog, exampleValueMap(catalog)),
+                applyNotificationTemplateExamples(catalogBody, catalog),
+            );
+        });
+    });
+
+    describe('exampleValueMap', () => {
+        it('keeps data variables, skips functions and usage snippets, and lets the first key win', () => {
+            const values = exampleValueMap(variables);
+            assert.deepStrictEqual(Object.keys(values), [
+                'requestedForIdentityName',
+                'requestedFor',
+                'requesterComment',
+                'accessibleItems',
+                '__global',
+                'owner',
+                'note',
+            ]);
+            assert.deepStrictEqual({ ...(values.__global as object) }, {
+                emailOverride: null,
+                productName: 'SailPoint',
+            });
+            assert.strictEqual(values.owner, 'Template Owner');
+            assert.strictEqual(values['spTools.formatDate()'], undefined);
+            assert.strictEqual(values.nowDate, undefined);
+            const catalog = completionVariables({
+                key: 'access_request_reassignment',
+                medium: 'EMAIL',
+            }).map((item) => item.variable);
+            const catalogValues = exampleValueMap(catalog);
+            for (const key of Object.keys(catalogValues)) {
+                assert.ok(!key.endsWith('()'), key);
+                assert.ok(!key.includes('.'), key);
+            }
+            assert.strictEqual((catalogValues.__global as Record<string, unknown>).productName, 'SailPoint');
+        });
+
+        it('merges nested keys with whole objects and keeps the first value', () => {
+            const values = exampleValueMap([
+                { key: 'user.name', type: 'string', description: '', example: 'First' },
+                { key: 'user', type: 'object', description: '', example: { name: 'Second', id: 'u1' } },
+            ]);
+            assert.deepStrictEqual({ ...(values.user as object) }, { name: 'First', id: 'u1' });
+        });
+    });
+
+    describe('parseExampleValues', () => {
+        it('accepts a JSON object', () => {
+            const parsed = parseExampleValues('{\n  "owner": "Ada"\n}');
+            assert.strictEqual(parsed.ok, true);
+            if (parsed.ok) {
+                assert.strictEqual(parsed.values.owner, 'Ada');
+            }
+        });
+
+        it('rejects JSON that is not an object', () => {
+            assert.strictEqual(parseExampleValues('["owner"]').ok, false);
+            assert.strictEqual(parseExampleValues('null').ok, false);
+            const invalid = parseExampleValues('{');
+            assert.strictEqual(invalid.ok, false);
+            if (!invalid.ok) {
+                assert.ok(invalid.error.startsWith('Invalid JSON:'));
+            }
+        });
+
+        it('rejects prototype paths', () => {
+            delete (Object.prototype as { previewPolluted?: string }).previewPolluted;
+            const parsed = parseExampleValues('{"__proto__":{"previewPolluted":"yes"},"owner":"Ada"}');
+            assert.strictEqual(parsed.ok, false);
+            assert.strictEqual(parseExampleValues('{"user":{"constructor":{"x":1}}}').ok, false);
+            assert.strictEqual(parseExampleValues('{"a.constructor":1}').ok, false);
+            assert.strictEqual((Object.prototype as { previewPolluted?: string }).previewPolluted, undefined);
         });
     });
 });
