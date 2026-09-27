@@ -12,6 +12,7 @@ import { TenantService } from "../services/TenantService";
 import { CloudRuleService } from "../services/CloudRuleService";
 import { convertToBaseTreeItem } from "../views/utils";
 import { isAccountRemovable } from "../commands/account/accountUtils";
+import { filterNotificationTemplates, mergeNotificationTemplates, notificationTemplateDescription, NotificationTemplateListEntry } from "../utils/notificationTemplateList";
 
 import { Account, CampaignStatusV3, DimensionV2025, MachineIdentityResponseV2025, SourceSubtypeWithSourceV2026 } from "sailpoint-api-client";
 
@@ -89,7 +90,8 @@ export class TenantTreeItem extends BaseTreeItem {
 			new MachineIdentitiesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
 			new ApplicationsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
 			new CampaignsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
-		    new CloudRulesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName)
+		    new CloudRulesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
+			new NotificationTemplatesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
 
 		];
 
@@ -449,6 +451,117 @@ export class TransformTreeItem extends ISCResourceTreeItem {
 			light: vscode.Uri.file(context.asAbsolutePath("resources/light/transform.svg")),
 			dark: vscode.Uri.file(context.asAbsolutePath("resources/dark/transform.svg")),
 		};
+	}
+}
+
+/**
+ * Containers for notification templates
+ */
+export class NotificationTemplatesTreeItem extends FolderTreeItem {
+	/** Client-side text filter (name, key, description, locale). */
+	filters = "";
+	/** Selected mediums. Empty means every medium. */
+	mediums: string[] = [];
+	private templates?: NotificationTemplateListEntry[];
+
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {
+		super("Notification Templates", "notification-templates", tenantId, tenantName, tenantDisplayName);
+	}
+
+	override reset(): void {
+		this.templates = undefined;
+	}
+
+	get isNameFiltered(): boolean {
+		return isNotEmpty(this.filters);
+	}
+
+	get isMediumFiltered(): boolean {
+		return this.mediums.length > 0;
+	}
+
+	override get computedContextValue(): string {
+		return this.contextValue
+			+ (this.isNameFiltered ? "NameFiltered" : "")
+			+ (this.isMediumFiltered ? "MediumFiltered" : "");
+	}
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		if (!this.templates) {
+			const client = new ISCClient(this.tenantId, this.tenantName);
+			const [defaults, custom] = await Promise.all([
+				client.getNotificationTemplateDefaults(),
+				client.getNotificationTemplates(),
+			]);
+			this.templates = mergeNotificationTemplates(defaults, custom);
+		}
+
+		const visible = filterNotificationTemplates(this.templates, {
+			query: this.filters,
+			mediums: this.mediums,
+		});
+		if (visible.length === 0) {
+			const label = this.isNameFiltered || this.isMediumFiltered
+				? "No notification template matches the filter"
+				: "No notification template found";
+			return [new MessageNode(label)];
+		}
+
+		return visible
+			.map(t => new NotificationTemplateTreeItem(
+				this.tenantId,
+				this.tenantName,
+				this.tenantDisplayName,
+				t.name || t.key,
+				t.id,
+				t.key,
+				t.medium,
+				t.locale,
+				t.customized,
+			))
+			.sort(compareByLabel);
+	}
+}
+
+const NOTIFICATION_TEMPLATE_MEDIUM_ICONS: Record<string, string> = {
+	EMAIL: "mail",
+	SLACK: "comment-discussion",
+	TEAMS: "organization",
+};
+
+export class NotificationTemplateTreeItem extends ISCResourceTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string,
+		readonly templateKey: string,
+		readonly medium: string,
+		locale: string,
+		customized: boolean) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			resourceType: "notification-templates",
+			id
+		})
+		// Medium-specific so the "Edit body (HTML)" / "Preview body" menu items
+		// only show for EMAIL - SLACK/TEAMS bodies are not HTML.
+		this.contextValue = `notification-template-${medium}`;
+		this.description = notificationTemplateDescription(medium);
+		const origin = customized ? "Customized" : "Default";
+		this.tooltip = `${label}\n${locale}\n${origin}`;
+	}
+
+	updateIcon(context: vscode.ExtensionContext): void {
+		this.iconPath = new vscode.ThemeIcon(NOTIFICATION_TEMPLATE_MEDIUM_ICONS[this.medium] ?? "mail");
 	}
 }
 

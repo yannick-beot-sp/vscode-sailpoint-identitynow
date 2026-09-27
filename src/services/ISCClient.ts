@@ -8,7 +8,7 @@ import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
 import { compareByName } from "../utils";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, IdentityAttributeTransform, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowExecutionBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, PublicIdentity, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApiListAccessProfilesRequest, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseV2025, CustomFormsV2025Api, CreateFormDefinitionRequestV2025, NotificationsBetaApi, TemplateDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, ManagedClusterBeta, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, IdentityProfilesV2025Api, IdentityPreviewResponseV2025, IdentityAttributeTransformV2025, SourcesV2025Api, TaskManagementV2025Api, AttributeDTO, RolesV2025Api, AccessProfilesV2025Api, JsonPatchOperationV2025, DimensionsV2025Api, RolesV2025ApiListRolesRequest, DimensionV2025, DimensionsV2025ApiListDimensionsRequest, PasswordConfigurationV2025Api, PasswordOrgConfigV2025, WorkflowsV2025Api, WorkflowV2025, WorkflowBodyV2025, WorkflowExecutionEventV2025, CreateWorkflowRequestV2025, WorkflowExecutionV2025, ConnectorRuleManagementV2025Api, ConnectorRuleResponseV2025, EntitlementsV2025Api, EntitlementsV2025ApiListEntitlementsRequest, EntitlementV2025, PublicIdentitiesV2025Api, PublicIdentitiesV2025ApiGetPublicIdentitiesRequest, RoleV2025, TransformsV2025Api, TransformV2025, TransformReadV2025, SearchV2025Api, IndexV2025, AccessProfileDocumentV2025, EntitlementDocumentV2025, RoleDocumentV2025, EventDocumentV2025, AccountActivityDocumentV2025, AccessProfileV2025, SourceV2025, MachineIdentitiesV2025Api, MachineIdentitiesV2025ApiListMachineIdentitiesRequest, MachineIdentityResponseV2025, MachineAccountSubtypesV2026Api, SourceSubtypeWithSourceV2026, PrivilegeCriteriaV2026Api, PrivilegeCriteriaDTOV2026, PrivilegeCriteriaConfigDTOV2026, PrivilegeCriteriaConfigurationV2026Api, IdentityProfileV2025, WorkgroupDtoV2025, GovernanceGroupsV2025Api, AccessRequestApprovalsV2025Api, AppsV2025Api, PendingApprovalV2025, SourceAppPatchDtoV2025, PasswordPoliciesV2025Api, PasswordPolicyV3DtoV2025, PasswordSyncGroupsV2025Api, PasswordSyncGroupV2025, PasswordPolicyHoldersDtoInnerV2025, AttrSyncSourceConfigV2025, SourcesV2026Api, NativeChangeDetectionConfigV2026, AccountDeleteConfigDtoV2026, JsonPatchOperationV2026, MachineClassificationConfigV2026Api, MachineClassificationConfigV2026, CreateSourceSubtypeRequestV2026, CreatePrivilegeCriteriaRequestV2026, AccessRequestsApi, AccessRequestResponse, RequestedItemStatus, RequestedItemStatusRequestState, AccountActivitiesApi, AccountActivity, AuthUsersV2025Api, AuthUserV2025, CustomUserLevelsV2025Api, UserLevelSummaryDTOV2025, ListUserLevelsDetailLevelV2025, AccountsV2025Api, JsonPatchOperationV2025OpV2025, IdentityHistoryV2025Api, ListIdentityAccessItemsTypeV2025, ListIdentityAccessItems200ResponseInnerV2025 } from 'sailpoint-api-client';
+import { Configuration, IdentityProfilesApi, IdentityProfile, IdentityAttributeTransform, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowExecutionBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, PublicIdentity, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApiListAccessProfilesRequest, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseV2025, CustomFormsV2025Api, CreateFormDefinitionRequestV2025, NotificationsBetaApi, TemplateDtoBeta, TemplateDtoDefaultBeta, SendTestNotificationRequestDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, ManagedClusterBeta, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, IdentityProfilesV2025Api, IdentityPreviewResponseV2025, IdentityAttributeTransformV2025, SourcesV2025Api, TaskManagementV2025Api, AttributeDTO, RolesV2025Api, AccessProfilesV2025Api, JsonPatchOperationV2025, DimensionsV2025Api, RolesV2025ApiListRolesRequest, DimensionV2025, DimensionsV2025ApiListDimensionsRequest, PasswordConfigurationV2025Api, PasswordOrgConfigV2025, WorkflowsV2025Api, WorkflowV2025, WorkflowBodyV2025, WorkflowExecutionEventV2025, CreateWorkflowRequestV2025, WorkflowExecutionV2025, ConnectorRuleManagementV2025Api, ConnectorRuleResponseV2025, EntitlementsV2025Api, EntitlementsV2025ApiListEntitlementsRequest, EntitlementV2025, PublicIdentitiesV2025Api, PublicIdentitiesV2025ApiGetPublicIdentitiesRequest, RoleV2025, TransformsV2025Api, TransformV2025, TransformReadV2025, SearchV2025Api, IndexV2025, AccessProfileDocumentV2025, EntitlementDocumentV2025, RoleDocumentV2025, EventDocumentV2025, AccountActivityDocumentV2025, AccessProfileV2025, SourceV2025, MachineIdentitiesV2025Api, MachineIdentitiesV2025ApiListMachineIdentitiesRequest, MachineIdentityResponseV2025, MachineAccountSubtypesV2026Api, SourceSubtypeWithSourceV2026, PrivilegeCriteriaV2026Api, PrivilegeCriteriaDTOV2026, PrivilegeCriteriaConfigDTOV2026, PrivilegeCriteriaConfigurationV2026Api, IdentityProfileV2025, WorkgroupDtoV2025, GovernanceGroupsV2025Api, AccessRequestApprovalsV2025Api, AppsV2025Api, PendingApprovalV2025, SourceAppPatchDtoV2025, PasswordPoliciesV2025Api, PasswordPolicyV3DtoV2025, PasswordSyncGroupsV2025Api, PasswordSyncGroupV2025, PasswordPolicyHoldersDtoInnerV2025, AttrSyncSourceConfigV2025, SourcesV2026Api, NativeChangeDetectionConfigV2026, AccountDeleteConfigDtoV2026, JsonPatchOperationV2026, MachineClassificationConfigV2026Api, MachineClassificationConfigV2026, CreateSourceSubtypeRequestV2026, CreatePrivilegeCriteriaRequestV2026, AccessRequestsApi, AccessRequestResponse, RequestedItemStatus, RequestedItemStatusRequestState, AccountActivitiesApi, AccountActivity, AuthUsersV2025Api, AuthUserV2025, CustomUserLevelsV2025Api, UserLevelSummaryDTOV2025, ListUserLevelsDetailLevelV2025, AccountsV2025Api, JsonPatchOperationV2025OpV2025, IdentityHistoryV2025Api, ListIdentityAccessItemsTypeV2025, ListIdentityAccessItems200ResponseInnerV2025 } from 'sailpoint-api-client';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ImportEntitlementsResult } from '../models/JobStatus';
@@ -31,6 +31,7 @@ import { buildIdentityEventsSearchQuery, collectIdentityEventSearchTerms } from 
 import { AccessProfile } from "../models/AccessProfiles";
 import { IdentityAccessItem, IdentityAccessItemType } from "../models/IdentityAccessItem";
 import { HecateJobStatus } from "../models/HecateJob";
+import { isDefaultNotificationTemplateId, parseDefaultNotificationTemplateId } from "../utils/notificationTemplateList";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const FormData = require('form-data');
@@ -216,7 +217,6 @@ export class ISCClient {
 		})
 		return response.data;
 	}
-
 
 	public async getSources(): Promise<SourceV2025[]> {
 		console.log("> getSources");
@@ -2853,6 +2853,105 @@ export class ISCClient {
 		const api = new NotificationsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const result = await Paginator.paginate(api, api.listNotificationTemplates);
 		return result.data;
+	}
+
+	/**
+	 * Product defaults (`GET /beta/notification-template-defaults`).
+	 * A tenant customization is a separate object and is not returned here.
+	 */
+	public async getNotificationTemplateDefaults(): Promise<TemplateDtoDefaultBeta[]> {
+		console.log("> getNotificationTemplateDefaults");
+		const apiConfig = await this.getApiConfiguration();
+		const api = new NotificationsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await Paginator.paginate(api, api.listNotificationTemplateDefaults);
+		return result.data;
+	}
+
+	/**
+	 * Fetch a single notification template.
+	 *
+	 * `GET /notification-templates/{id}` is documented to return an array even
+	 * though the id is unique, but it can also come back empty or 404 for some
+	 * tenants, so we fall back to finding the template in the (full) list.
+	 *
+	 * Defaults have no id. The tree addresses them with a synthetic id; a
+	 * customization of the same key, medium and locale wins when one exists.
+	 */
+	public async getNotificationTemplateById(id: string): Promise<TemplateDtoBeta> {
+		console.log("> getNotificationTemplateById", id);
+		const identity = parseDefaultNotificationTemplateId(id);
+		if (identity) {
+			return await this.getNotificationTemplateByIdentity(identity.key, identity.medium, identity.locale);
+		}
+		const apiConfig = await this.getApiConfiguration();
+		const api = new NotificationsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		try {
+			const response = await api.getNotificationTemplate({ id });
+			const template = Array.isArray(response.data) ? response.data[0] : response.data;
+			if (template) {
+				return template;
+			}
+		} catch (error) {
+			console.warn("> getNotificationTemplateById: GET by id failed", error);
+		}
+		const templates = await this.getNotificationTemplates();
+		const match = templates.find(t => t.id === id);
+		if (!match) {
+			throw new Error(`Could not find notification template ${id}`);
+		}
+		return match;
+	}
+
+	private async getNotificationTemplateByIdentity(key: string, medium: string, locale: string): Promise<TemplateDtoBeta> {
+		const custom = (await this.getNotificationTemplates())
+			.find(template => template.key === key && template.medium === medium && template.locale === locale);
+		if (custom) {
+			return custom;
+		}
+		const defaults = await this.getNotificationTemplateDefaults();
+		const match = defaults.find(template => template.key === key && template.medium === medium && template.locale === locale);
+		if (!match?.key || !match.medium || !match.locale) {
+			throw new Error(`Could not find notification template ${key}/${medium}/${locale}`);
+		}
+		return {
+			key: match.key,
+			name: match.name,
+			medium: match.medium,
+			locale: match.locale,
+			subject: match.subject ?? undefined,
+			body: match.body,
+			from: match.from ?? undefined,
+			replyTo: match.replyTo ?? undefined,
+			description: match.description ?? undefined,
+			slackTemplate: match.slackTemplate ?? undefined,
+			teamsTemplate: match.teamsTemplate ?? undefined,
+		};
+	}
+
+	public async updateNotificationTemplate(template: TemplateDtoBeta): Promise<TemplateDtoBeta> {
+		console.log("> updateNotificationTemplate", template.key, template.medium, template.locale);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new NotificationsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const payload: TemplateDtoBeta = { ...template };
+		// Defaults are addressed with a synthetic id. The upsert keys off
+		// key + medium + locale and rejects an id that is not a stored template.
+		if (isDefaultNotificationTemplateId(payload.id)) {
+			delete payload.id;
+		}
+		// Despite the name, this is an upsert-by-key/medium/locale - there's no PUT /{id}
+		const response = await api.createNotificationTemplate({ templateDtoBeta: payload });
+		return response.data;
+	}
+
+	/**
+	 * Send a test notification for a stored template.
+	 * `POST /beta/send-test-notification` (`sendTestNotification`).
+	 */
+	public async sendTestNotification(request: SendTestNotificationRequestDtoBeta): Promise<void> {
+		console.log("> sendTestNotification", request.key, request.medium, request.locale);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new NotificationsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		await api.sendTestNotification({ sendTestNotificationRequestDtoBeta: request });
 	}
 	/////////////////////////
 	//#endregion Notification Templates

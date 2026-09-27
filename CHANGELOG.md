@@ -16,9 +16,12 @@ This changelog is following the recommended format by [keepachangelog](https://k
 - Allow to request or revoke access from the identity panel and add access request status panel with live reload to monitor the request [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
 - Add identity events panel to browse audit events [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
 - Add account commands: enable, disable, unlock, aggregate one, and remove (with guards for authoritative and system accounts) [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
+- Notification Templates: browse and edit the notification templates of a tenant in the tree view. For e-mail templates, "Edit body (HTML)" opens the body as a standalone, formatted HTML document with a live rendered preview beside it (`vscode-sailpoint-identitynow.notificationTemplates.formatBodyOnOpen` / `.previewBodyOnOpen` to toggle).
+- Send a test e-mail for an e-mail notification template (`sendTestNotification`).
 
 ### Changed
 
+- Notification templates list default and customized templates together. The folder can be refreshed, and the list can be filtered locally by text or by medium (Email, Slack, Teams). The medium is shown in the item description; the label is the template name.
 - Reveal and expand the matching identity node in the tree after an identity search [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
 
 ### Fixed
