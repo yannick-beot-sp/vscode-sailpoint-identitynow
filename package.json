@@ -2253,7 +2253,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run esbuild-base -- --minify",
-    "esbuild-base": "shx rm -rf out && cd ./src/campaign-webview/app && npm run build && cd ../../.. && cd ./src/dependency-webview/app && npm run build && cd ../../.. && shx mkdir -p out/node_modules/sailpoint-api-client && esbuild ./node_modules/sailpoint-api-client/dist/esm/index.js --bundle --outfile=out/node_modules/sailpoint-api-client/index.js --format=esm --platform=node --minify && esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --external:esbuild --external:@swc/core --external:@swc/wasm --external:sailpoint-api-client --format=esm --platform=node",
+    "esbuild-base": "shx rm -rf out && cd ./src/campaign-webview/app && npm run build && cd ../../.. && cd ./src/dependency-webview/app && npm run build && cd ../../.. && node ./scripts/esbuild-extension.mjs",
     "esbuild": "npm run esbuild-base -- --sourcemap",
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "test-compile": "shx rm -rf out/node_modules && tsc -p ./",
