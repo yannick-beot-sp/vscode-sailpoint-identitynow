@@ -11,7 +11,9 @@ export async function resolve(specifier, context, nextResolve) {
 	try {
 		return await nextResolve(specifier, context);
 	} catch (error) {
-		// sailpoint-api-client publishes ESM with extensionless relative imports.
+		// sailpoint-api-client's ESM build uses extensionless relative imports.
+		// This retry lets unit tests load that build. The extension host does not
+		// use this hook; sdkExtensionHostResolve.mjs checks the real resolution.
 		if (
 			error?.code === "ERR_MODULE_NOT_FOUND"
 			&& specifier.startsWith(".")

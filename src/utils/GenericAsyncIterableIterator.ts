@@ -2,7 +2,7 @@
  * Inpsired by Paginator from saipoint-api-client
  */
 
-import { ExtraParams, PaginationParams } from "sailpoint-api-client";
+import { ExtraParams, PaginationParams } from "sailpoint-api-client/dist/index.js";
 import { ISCClient, TOTAL_COUNT_HEADER } from "../services/ISCClient.js";
 import { AxiosResponse } from "axios";
 

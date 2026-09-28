@@ -2261,8 +2261,8 @@
     "watch": "shx rm -rf out/node_modules && tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js",
-    "test:unit": "npm run compile && mocha --node-option import=./src/test/registerHooks.mjs -u tdd ./out/test/unit/*.test.js",
+    "test": "node ./src/test/sdkExtensionHostResolve.mjs && node ./out/test/runTest.js",
+    "test:unit": "npm run compile && node ./src/test/sdkExtensionHostResolve.mjs && mocha --node-option import=./src/test/registerHooks.mjs -u tdd ./out/test/unit/*.test.js",
     "test:mcp": "jest --runInBand --config jest.mcp.config.cjs --runTestsByPath ./src/test/mcp/workflows/WorkflowTools.test.ts",
     "clean": "shx rm -rf out",
     "postinstall": "cd src/campaign-webview/app && npm install && cd ../../dependency-webview/app && npm install"

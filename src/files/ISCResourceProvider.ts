@@ -20,7 +20,7 @@ import {
 	uint8Array2Str,
 } from "../utils.js";
 import { getIdByUri, getNameByUri, getPathByUri } from "../utils/UriUtils.js";
-import { Operation, compare } from "fast-json-patch";
+import jsonpatch, { type Operation } from "fast-json-patch";
 import { SlimCampaign } from "sailpoint-api-client/dist/certification_campaigns/api.js";
 import { ConnectorRuleUpdateRequest } from "sailpoint-api-client/dist/connector_rule_management/api.js";
 import { FormDefinitionResponse } from "sailpoint-api-client/dist/custom_forms/api.js";
@@ -278,8 +278,8 @@ export class ISCResourceProvider implements FileSystemProvider {
 				if (!oldData) {
 					throw vscode.FileSystemError.FileNotFound(uri);
 				}
-				let jsonpatch = compare(oldData, newData);
-				jsonpatch = jsonpatch.filter((p) => p.path !== "/modified" && p.path !== "/identityRefreshRequired");
+				let patch = jsonpatch.compare(oldData, newData);
+				patch = patch.filter((p) => p.path !== "/modified" && p.path !== "/identityRefreshRequired");
 				let patchResourcePath;
 				// Patch support for identity profiles only in beta for now
 				// if (!resourcePath.match("lifecycle-states")) {
@@ -291,7 +291,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 				if (resourcePath.match("search-attribute-config")) {
 					// Supported patchable fields are: /displayName, /name, /applicationAttributes
 					// @ts-ignore
-					jsonpatch = jsonpatch.map(p => {
+					patch = patch.map(p => {
 						if (p.path.match("\/applicationAttributes")) {
 							const value: any = {};
 							const appId = path.posix.basename(p.path)
@@ -314,7 +314,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 					const patchableProperties = ["/name", "/description", "/enabled", "/owner", "/owner/id", "/provisionRequestEnabled", "/appCenterEnabled", "/accountSource", "/matchAllAccounts", "/accessProfiles"]
 					const notEmptyProperties = ["/name", "/description", "/owner", "/owner/id"]
 					// @ts-ignore
-					jsonpatch = jsonpatch.filter(p => patchableProperties.includes(p.path) && (!notEmptyProperties.includes(p.path) || p.value))
+					patch = patch.filter(p => patchableProperties.includes(p.path) && (!notEmptyProperties.includes(p.path) || p.value))
 				} else if (resourcePath.match("campaigns")) {
 					//The fields that can be patched differ based on the status of the campaign
 					// When the campaign is in the *STAGED* status, you can patch these fields: 
@@ -329,16 +329,16 @@ export class ISCResourceProvider implements FileSystemProvider {
 					// TODO: manage the actual status of the campaign?
 					const campaignPatchableProperties = ["/name", "/description", "/recommendationsEnabled", "/deadline", "/emailNotificationEnabled", "/autoRevokeAllowed"]
 					// @ts-ignore
-					jsonpatch = jsonpatch.filter(p => campaignPatchableProperties.includes(p.path))
+					patch = patch.filter(p => campaignPatchableProperties.includes(p.path))
 				} else if (resourcePath.match("criteria-config\/privilege")) {
 					// Only the fields under /config are patchable
-					jsonpatch = jsonpatch.filter(p => p.path.startsWith("/config"))
+					patch = patch.filter(p => p.path.startsWith("/config"))
 				}
 
 				await client.patchResource(
 					// patchResourcePath,
 					resourcePath,
-					JSON.stringify(jsonpatch)
+					JSON.stringify(patch)
 				);
 			} else {
 				// Need to update the content to remove id and internal properties from the payload

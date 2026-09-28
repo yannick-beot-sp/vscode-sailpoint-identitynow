@@ -1,5 +1,5 @@
 import * as assert from "assert";
-import { Configuration } from "sailpoint-api-client";
+import { Configuration } from "sailpoint-api-client/dist/index.js";
 
 suite("sailpoint-api-client Configuration", () => {
 	test("maps the tenant base URL and keeps a provided access token", () => {

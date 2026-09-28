@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import { config as loadEnv } from "dotenv";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { Configuration, ExtraParams, PaginationParams, Paginator, SearchApi } from "sailpoint-api-client";
+import { Configuration, ExtraParams, PaginationParams, Paginator, SearchApi } from "sailpoint-api-client/dist/index.js";
 import { Search } from "sailpoint-api-client/dist/search/api.js";
 import { EndpointUtils } from "../../utils/EndpointUtils.js";
 
