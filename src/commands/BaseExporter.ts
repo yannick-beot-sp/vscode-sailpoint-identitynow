@@ -39,7 +39,7 @@ export abstract class BaseCSVExporter<T> {
                 vscode.window.showInformationMessage(
                     `Successfully exported ${this.objectType} from ${this.tenantName}`
                 );
-                openPreview(this.filePath, "csv")
+                await openPreview(this.filePath, "csv")
             });
     }
 

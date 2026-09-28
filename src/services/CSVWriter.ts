@@ -53,6 +53,7 @@ export class CSVWriter<
 > {
     private initialized = false;
     private output!: WriteStream;
+    private pendingError?: Error;
     private parser: AsyncParser<TRaw, T>;
 
     constructor(private outputPath: string, private headers: string[], private paths: string[], unwindablePaths: string[] = [], private transforms: any[] = [], private delimiter = ",") {
@@ -81,6 +82,9 @@ export class CSVWriter<
         // TODO
         // Create Folders
         this.output = createWriteStream(this.outputPath, { encoding: 'utf8', autoClose: false });
+        this.output.on('error', (err: Error) => {
+            this.pendingError = err;
+        });
         let parser = new AsyncParser(opts);
         await this.pipeline(parser, []);
     }
@@ -112,7 +116,16 @@ export class CSVWriter<
             // ensure headers are written
             await this.initialize();
         }
-        this.output.end();
+        if (this.pendingError) {
+            throw this.pendingError;
+        }
+        // Wait until the file is opened and flushed. Callers such as openPreview
+        // stat the path as soon as export returns.
+        await new Promise<void>((resolve, reject) => {
+            this.output.once('error', reject);
+            this.output.once('finish', () => resolve());
+            this.output.end();
+        });
     }
 }
 

@@ -15,9 +15,36 @@ const TEST_PORT = parseInt(process.env.MCP_TEST_PORT ?? "47337", 10);
 const vscodeMock = {
     window: {
         showInputBox: async (_options: unknown) => undefined,
+        showQuickPick: async (_items: unknown, _options?: unknown) => undefined,
         showErrorMessage: async (_message: string, ..._items: string[]) => undefined,
         showInformationMessage: async (_message: string, ..._items: string[]) => undefined,
         showWarningMessage: async (_message: string, ..._items: string[]) => undefined,
+        showTextDocument: async (_document: unknown, _options?: unknown) => undefined,
+        withProgress: async (_options: unknown, task: (progress: unknown, token: unknown) => Promise<unknown>) =>
+            task(
+                { report: () => undefined },
+                { isCancellationRequested: false, onCancellationRequested: () => ({ dispose() { /* no-op */ } }) }
+            ),
+    },
+
+    ProgressLocation: {
+        SourceControl: 1,
+        Window: 10,
+        Notification: 15,
+    },
+
+    TreeItem: class TreeItem {
+        constructor(public label?: unknown, public collapsibleState?: number) { }
+    },
+
+    TreeItemCollapsibleState: {
+        None: 0,
+        Collapsed: 1,
+        Expanded: 2,
+    },
+
+    ThemeIcon: class ThemeIcon {
+        constructor(public id: string) { }
     },
 
     workspace: {
@@ -34,6 +61,13 @@ const vscodeMock = {
             inspect: (_key: string) => undefined,
         }),
         onDidChangeConfiguration: (_listener: unknown) => ({ dispose: () => { /* no-op */ } }),
+        openTextDocument: async (_uri: unknown) => ({ languageId: "plaintext" }),
+        workspaceFolders: undefined,
+    },
+
+    languages: {
+        getLanguages: async () => ["csv", "json", "plaintext"],
+        setTextDocumentLanguage: async (document: unknown, _languageId: string) => document,
     },
 
     /** Minimal EventEmitter used as a class (new vscode.EventEmitter<T>()) */
