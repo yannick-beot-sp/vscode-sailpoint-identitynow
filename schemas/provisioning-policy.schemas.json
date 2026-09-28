@@ -6,8 +6,24 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
+    "id": {
+      "type": "string",
+      "description": "System-generated unique ID of the provisioning policy.",
+      "example": "d7ae9ea3-507f-4d00-9d4f-b4464b344b88"
+    },
     "name": {
       "type": "string"
+    },
+    "subtypeId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Subtype ID used when usageType is CREATE_MACHINE_ACCOUNT."
     },
     "description": {
       "anyOf": [
@@ -41,7 +57,8 @@
         "ENABLE",
         "DISABLE",
         "UNLOCK",
-        "CHANGE_PASSWORD"
+        "CHANGE_PASSWORD",
+        "CREATE_MACHINE_ACCOUNT"
       ]
     },
     "fields": {

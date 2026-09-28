@@ -24,9 +24,13 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 - Notification templates list default and customized templates together. The folder can be refreshed, and the list can be filtered locally by text or by medium (Email, Slack, Teams). The medium is shown in the item description; the label is the template name.
 - Reveal and expand the matching identity node in the tree after an identity search [@ henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
+- Use ESM instead of CommonJS
+- Use sailpoint-api-client SDK 2.x
 
 ### Fixed
 
+- Error opening usageType 'CREATE_MACHINE_ACCOUNT' Provisioning Policies (cf. [#159](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/159))
+- Error loading the extension on Windows (cf. [#172](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/172))
 
 ### Removed
 

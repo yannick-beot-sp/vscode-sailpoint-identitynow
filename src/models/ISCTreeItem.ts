@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import * as path from 'path';
 import { ISCClient, TOTAL_COUNT_HEADER } from "../services/ISCClient.js";
-import { getIdByUri, getPathByUri, getResourceUri, getResourceWebUrl, getUIUrl } from "../utils/UriUtils.js";
+import { getIdByUri, getPathByUri, getProvisioningPolicyUri, getResourceUri, getResourceWebUrl, getUIUrl } from "../utils/UriUtils.js";
 import { compareByLabel, compareByName, compareByPriority } from "../utils.js";
 import { AxiosHeaders, AxiosResponse } from "axios";
 import { getConfigNumber } from '../utils/configurationUtils.js';
@@ -283,7 +283,8 @@ export class ISCResourceTreeItem extends BaseTreeItem {
 		parentId?: string;
 		subId?: string;
 		subResourceType?: string;
-		resourceSubId?: string,
+		resourceSubId?: string;
+		uri?: vscode.Uri;
 	}) {
 
 		options = {
@@ -297,7 +298,10 @@ export class ISCResourceTreeItem extends BaseTreeItem {
 		this.id = options.id
 		this.parentId = options.parentId
 
-		if (options.subResourceType && options.subId) {
+		if (options.uri) {
+			this.uri = options.uri
+			this.resourceId = options.resourceId ?? options.id
+		} else if (options.subResourceType && options.subId) {
 			this.uri = getResourceUri(options.tenantName,
 				options.resourceType,
 				options.parentId,
@@ -666,9 +670,10 @@ export class ProvisioningPoliciesTreeItem extends FolderTreeItem {
 				tenantId: this.tenantId,
 				tenantName: this.tenantName,
 				tenantDisplayName: this.tenantDisplayName,
-				type: provisioningPolicy.usageType!,
+				policyId: provisioningPolicy.id,
+				usageType: provisioningPolicy.usageType,
 				sourceId: sourceId!,
-				name: provisioningPolicy.name!
+				name: provisioningPolicy.name
 			})).sort(compareByLabel)
 		return results;
 	}
@@ -682,18 +687,25 @@ export class ProvisioningPolicyTreeItem extends ISCResourceTreeItem {
 		tenantName: string,
 		tenantDisplayName: string,
 		sourceId: string,
-		type: string,
+		policyId: string,
+		usageType: string,
 		name: string
 	}
 	) {
+		const label = isEmpty(options.name) ? convertConstantToTitleCase(options.usageType) : options.name
 		super({
 			...options,
 			parentId: options.sourceId,
-			label: isEmpty(options.name) ? convertConstantToTitleCase(options.type) : options.name,
+			label,
 			resourceType: "sources",
-			id: `${options.sourceId}/provisioning-policies/${options.type}`,
-			subResourceType: "provisioning-policies",
-			subId: options.type,
+			id: `${options.sourceId}/provisioning-policies/${options.policyId}`,
+			resourceId: options.policyId,
+			uri: getProvisioningPolicyUri(
+				options.tenantName,
+				options.sourceId,
+				options.policyId,
+				label
+			),
 		})
 	}
 

@@ -43,7 +43,8 @@ import { AccessProfileRead } from "../models/AccessProfiles.js";
 import { IdentityAccessItem, IdentityAccessItemType } from "../models/IdentityAccessItem.js";
 import { HecateJobStatus } from "../models/HecateJob.js";
 import { isDefaultNotificationTemplateId, notificationTemplateKeyFilter, parseDefaultNotificationTemplateId } from "../utils/notificationTemplateList.js";
-import { AccountDeleteConfigDto, AttrSyncSourceConfig, JsonPatchOperation, JsonPatchOperationOpEnum, NativeChangeDetectionConfig, PasswordPolicyHoldersDtoInner, ProvisioningPolicyDto, Schema, Source, StatusResponse, TransformRead } from "sailpoint-api-client/dist/sources/index.js";
+import { AccountDeleteConfigDto, AttrSyncSourceConfig, JsonPatchOperation, JsonPatchOperationOpEnum, NativeChangeDetectionConfig, PasswordPolicyHoldersDtoInner, Schema, Source, StatusResponse, TransformRead } from "sailpoint-api-client/dist/sources/index.js";
+import { CreateProvisioningPolicyV2, getProvisioningPoliciesPath, ProvisioningPolicyV2 } from "../models/ProvisioningPolicy.js";
 import { Search, AttributeDTO, Index } from "sailpoint-api-client/dist/access_model_metadata/api.js";
 import { AccessRequestResponse, RequestedItemStatus, RequestedItemStatusRequestState } from "sailpoint-api-client/dist/access_requests/api.js";
 import { AccountActivity } from "sailpoint-api-client/dist/account_activities/api.js";
@@ -318,25 +319,15 @@ export class ISCClient {
 	}
 
 	public async createProvisioningPolicy(sourceId: string,
-		provisioningPolicyDto: ProvisioningPolicyDto): Promise<ProvisioningPolicyDto> {
+		provisioningPolicyDto: CreateProvisioningPolicyV2): Promise<ProvisioningPolicyV2> {
 
 		console.log("> createProvisioningPolicy", sourceId, provisioningPolicyDto);
-		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await api.createProvisioningPolicyV1({
-			sourceId,
-			provisioningPolicyDto
-		})
-		return result.data;
+		return await this.createResource(getProvisioningPoliciesPath(sourceId), provisioningPolicyDto);
 	}
 
-	public async getProvisioningPolicies(sourceId: string): Promise<ProvisioningPolicyDto[]> {
+	public async getProvisioningPolicies(sourceId: string): Promise<ProvisioningPolicyV2[]> {
 		console.log("> listProvisioningPolicies", sourceId);
-		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await api.listProvisioningPoliciesV1({ sourceId })
-		return result.data;
-
+		return await this.getResource(getProvisioningPoliciesPath(sourceId));
 	}
 
 	public async getSourceId(sourceName: string): Promise<string> {

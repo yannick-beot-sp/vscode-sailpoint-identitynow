@@ -2,8 +2,8 @@ import * as vscode from 'vscode';
 import * as commands from './constants.js';
 import { ProvisioningPoliciesTreeItem } from "../models/ISCTreeItem.js";
 import { compareByLabel } from '../utils.js';
-import { buildResourceUri, getIdByUri } from '../utils/UriUtils.js';
-import { UsageType } from 'sailpoint-api-client/dist/sources/api.js';
+import { getIdByUri, getProvisioningPolicyUri } from '../utils/UriUtils.js';
+import { Usagetypev2 as UsageTypeV2 } from 'sailpoint-api-client/dist/sources/api.js';
 import { convertConstantToTitleCase, isEmpty } from '../utils/stringUtils.js';
 import { ExtendedQuickPickItem } from '../models/ExtendedQuickPickItem.js';
 import { openPreview } from '../utils/vsCodeHelpers.js';
@@ -26,8 +26,8 @@ const provisioningPolicyNameValidator = new Validator({
 
 
 function prepareUsageTypePickItems(): Array<ExtendedQuickPickItem> {
-    const FIRST = UsageType.Create;
-    return Object.values(UsageType).map(key => ({
+    const FIRST = UsageTypeV2.Create;
+    return Object.values(UsageTypeV2).map(key => ({
         label: convertConstantToTitleCase(key),
         description: (key === FIRST ? "(default)" : ""),
         value: key
@@ -90,23 +90,20 @@ export class NewProvisioningPolicyCommand {
         }, async () => {
 
             const data = {
-                "name": provisioningPolicyName,
+                "name": isEmpty(provisioningPolicyName) ? usageType.value : provisioningPolicyName,
                 "description": null,
                 "usageType": usageType.value,
                 "fields": []
             };
 
             const sourceId = getIdByUri(node.parentUri)
-            const newUri = buildResourceUri({
-                tenantName: values["tenant"].tenantName,
-                resourceType: "sources",
-                id: sourceId,
-                subResourceType: "provisioning-policies",
-                subId: usageType.value,
-                name: isEmpty(provisioningPolicyName) ? usageType.value : provisioningPolicyName
-            })
-
-            await client.createProvisioningPolicy(sourceId, data)
+            const createdPolicy = await client.createProvisioningPolicy(sourceId, data)
+            const newUri = getProvisioningPolicyUri(
+                values["tenant"].tenantName,
+                sourceId,
+                createdPolicy.id,
+                createdPolicy.name
+            )
             vscode.commands.executeCommand(commands.REFRESH_FORCED);
             openPreview(newUri)
         });
