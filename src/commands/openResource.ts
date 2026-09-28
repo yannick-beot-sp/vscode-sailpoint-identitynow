@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { ISCResourceTreeItem } from "../models/ISCTreeItem";
-import { openPreview } from '../utils/vsCodeHelpers';
+import { ISCResourceTreeItem } from "../models/ISCTreeItem.js";
+import { openPreview } from '../utils/vsCodeHelpers.js';
 
 /**
  * Command used to open a source or a transform

@@ -1,5 +1,5 @@
-import { ISCClient } from "../ISCClient";
-import { CacheService } from "./CacheService";
+import { ISCClient } from "../ISCClient.js";
+import { CacheService } from "./CacheService.js";
 
 /**
  * Cache the mapping name->id

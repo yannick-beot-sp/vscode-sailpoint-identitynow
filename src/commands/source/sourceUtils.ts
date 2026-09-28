@@ -1,11 +1,11 @@
-import { TaskStatusBeta, TaskStatusBetaCompletionStatusBeta } from "sailpoint-api-client";
-import { ISCClient } from "../../services/ISCClient";
+import { TaskStatus, TaskStatusCompletionStatusEnum as TaskStatusCompletionStatus } from "sailpoint-api-client/dist/task_management/api.js";
+import { ISCClient } from "../../services/ISCClient.js";
 import * as vscode from 'vscode';
-import { delay, formatString } from "../../utils";
+import { delay, formatString } from "../../utils.js";
 
-export async function waifForJob(client: ISCClient, taskId: string, token: vscode.CancellationToken): Promise<TaskStatusBeta | null> {
+export async function waifForJob(client: ISCClient, taskId: string, token: vscode.CancellationToken): Promise<TaskStatus | null> {
     console.log("> waifForJob", taskId);
-    let task: TaskStatusBeta | null = null;
+    let task: TaskStatus | null = null;
     do {
         if (token.isCancellationRequested) {
             return null
@@ -22,16 +22,16 @@ export async function waifForJob(client: ISCClient, taskId: string, token: vscod
     return task
 }
 
-export function formatTask(task: TaskStatusBeta, objectName: string,
+export function formatTask(task: TaskStatus, objectName: string,
     successMessage: string,
     warningMessage: string,
     errorMessage: string
 ) {
     if (task !== null) {
-        if (task.completionStatus === TaskStatusBetaCompletionStatusBeta.Success) {
+        if (task.completionStatus === TaskStatusCompletionStatus.Success) {
             vscode.window.showInformationMessage(
                 formatString(successMessage, objectName))
-        } else if (task.completionStatus === TaskStatusBetaCompletionStatusBeta.Warning) {
+        } else if (task.completionStatus === TaskStatusCompletionStatus.Warning) {
             vscode.window.showWarningMessage(
                 formatString(warningMessage, objectName, task.messages[0]?.key))
         } else {

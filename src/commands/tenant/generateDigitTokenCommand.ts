@@ -1,12 +1,12 @@
-import { TenantTreeItem } from "../../models/ISCTreeItem";
+import { TenantTreeItem } from "../../models/ISCTreeItem.js";
 import * as vscode from 'vscode';
-import { TenantService } from "../../services/TenantService";
-import { WizardContext } from "../../wizard/wizardContext";
-import { ISCClient } from "../../services/ISCClient";
-import { runWizard } from "../../wizard/wizard";
-import { QuickPickTenantStep } from "../../wizard/quickPickTenantStep";
-import { InputIdentityQueryStep } from "../../wizard/inputIdentityQueryStep";
-import { QuickPickIdentityStep } from "../../wizard/quickPickIdentityStep";
+import { TenantService } from "../../services/TenantService.js";
+import { WizardContext } from "../../wizard/wizardContext.js";
+import { ISCClient } from "../../services/ISCClient.js";
+import { runWizard } from "../../wizard/wizard.js";
+import { QuickPickTenantStep } from "../../wizard/quickPickTenantStep.js";
+import { InputIdentityQueryStep } from "../../wizard/inputIdentityQueryStep.js";
+import { QuickPickIdentityStep } from "../../wizard/quickPickIdentityStep.js";
 
 
 export class GenerateDigitTokenCommand {

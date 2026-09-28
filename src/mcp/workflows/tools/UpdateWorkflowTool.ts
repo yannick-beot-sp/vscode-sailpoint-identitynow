@@ -1,11 +1,11 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
-import { workflowNameField } from "../workflowInputFields";
-import { isGuid } from "../../../utils/stringUtils";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { tenantNameField } from "../../inputFields.js";
+import { workflowNameField } from "../workflowInputFields.js";
+import { isGuid } from "../../../utils/stringUtils.js";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -43,7 +43,7 @@ type Output = z.infer<typeof outputSchema>;
     description:
         "Update a workflow by name or ID using a full replacement (PUT). " +
         "Fetch the workflow first if you need to preserve existing fields.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Update Workflow",

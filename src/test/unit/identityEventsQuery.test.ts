@@ -3,7 +3,7 @@ import {
 	buildIdentityEventsSearchQuery,
 	collectIdentityEventSearchTerms,
 	quoteLuceneTerm,
-} from "../../utils/identityEventsQuery";
+} from "../../utils/identityEventsQuery.js";
 
 suite("identity event search", () => {
 	test("quotes lucene terms and escapes quotes and backslashes", () => {

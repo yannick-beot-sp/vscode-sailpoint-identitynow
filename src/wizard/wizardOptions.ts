@@ -1,5 +1,5 @@
-import { WizardContext } from "./wizardContext";
-import { WizardPromptStep } from "./wizardPromptStep";
+import { WizardContext } from "./wizardContext.js";
+import { WizardPromptStep } from "./wizardPromptStep.js";
 
 export interface IWizardOptions<T extends WizardContext> {
     /**

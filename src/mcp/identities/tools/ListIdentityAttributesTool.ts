@@ -1,9 +1,9 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { tenantNameField } from "../../inputFields.js";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -27,7 +27,7 @@ type Output = z.infer<typeof outputSchema>;
 @Tool({
     name: "listIdentityAttributes",
     description: "List all identity attributes defined in the tenant. Returns name and display name for each attribute.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "List Identity Attributes",

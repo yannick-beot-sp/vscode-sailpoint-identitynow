@@ -1,11 +1,11 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
-import { identityProfileIdOrNameField, identityProfileOutputSchema, parseMapping } from "./identityProfileSchemas";
-import { isUuid } from "../../../utils/stringUtils";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { tenantNameField } from "../../inputFields.js";
+import { identityProfileIdOrNameField, identityProfileOutputSchema, parseMapping } from "./identityProfileSchemas.js";
+import { isUuid } from "../../../utils/stringUtils.js";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -23,7 +23,7 @@ type Output = z.infer<typeof outputSchema>;
         "Get the details of a single identity profile by name or ID, including attribute mappings and lifecycle states. " +
         "Rule-based mappings return the rule name. " +
         "Use listIdentityProfiles to discover available profiles.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Get Identity Profile",

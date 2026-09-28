@@ -1,7 +1,8 @@
 
-import { RoleCriteriaKey, RoleCriteriaKeyType, RoleCriteriaLevel1, RoleCriteriaOperation } from "sailpoint-api-client";
-import { CacheService } from "../services/cache/CacheService";
-import { Attribute, ComparisonOperation, ComparisonOperator, Expression, Literal, LogicalOperator, Visitor } from "./ast";
+import { RoleCriteriaOperation, RoleCriteriaLevel1, RoleCriteriaKeyType, RoleCriteriaKey } from "sailpoint-api-client/dist/roles/api.js";
+
+import { CacheService } from "../services/cache/CacheService.js";
+import { Attribute, ComparisonOperation, ComparisonOperator, Expression, Literal, LogicalOperator, Visitor } from "./ast.js";
 
 function comparisonOperationMapper(op: ComparisonOperation): RoleCriteriaOperation {
     switch (op) {
@@ -17,20 +18,14 @@ function comparisonOperationMapper(op: ComparisonOperation): RoleCriteriaOperati
         case "ew":
             return "ENDS_WITH";
         case "nc":
-            /* Waiting for API update cf. https://github.com/sailpoint-oss/developer.sailpoint.com/issues/867
-            /* @ts-ignore */
             return "DOES_NOT_CONTAIN";
         case "ge":
-            /* @ts-ignore */
             return "GREATER_THAN_EQUALS";
         case "gt":
-            /* @ts-ignore */
             return "GREATER_THAN";
         case "lt":
-            /* @ts-ignore */
             return "LESS_THAN";
         case "le":
-            /* @ts-ignore */
             return "LESS_THAN_EQUALS";
         default:
             throw new Error("Invalid operation");
@@ -48,13 +43,13 @@ export class RoleMembershipSelectorConverter implements Visitor<RoleCriteriaLeve
     async visitExpression(val: Expression, arg: RoleCriteriaLevel1): Promise<void> {
         await val.accept(this, arg);
 
-        if (this.root?.children === undefined || this.root?.children.length === 0) {
+        if (this.root?.children === undefined || this.root?.children?.length === 0) {
             // We have only 1 level so far. Needs to create at least 2 levels artifically
             this.root = {
                 operation: "OR",
                 children: [this.root]
             };
-        } else if (this.root.children.every(x => x.children === undefined || x.children.length === 0)) {
+        } else if (this.root.children?.every(x => x.children === undefined || x.children?.length === 0)) {
             // We have already 2 level2. Needs to create 1 level artifically
             this.root = {
                 operation: this.root.operation === "AND" ? "OR" : "AND",
@@ -96,7 +91,7 @@ export class RoleMembershipSelectorConverter implements Visitor<RoleCriteriaLeve
         await val.attribute.accept(this, roleCriteriaValue);
 
         if (arg !== undefined) {
-            arg.children.push(roleCriteriaValue);
+            arg.children?.push(roleCriteriaValue);
         } else {
             this.root = roleCriteriaValue;
         }
@@ -112,7 +107,7 @@ export class RoleMembershipSelectorConverter implements Visitor<RoleCriteriaLeve
         }
 
         if (arg !== undefined) {
-            arg.children.push(roleCriteriaValue);
+            arg.children?.push(roleCriteriaValue);
         } else {
             this.root = roleCriteriaValue;
         }

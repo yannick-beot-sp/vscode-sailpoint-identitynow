@@ -1,12 +1,12 @@
 import * as vscode from "vscode";
-import { MachineIdentitiesTreeItem } from "../../models/ISCTreeItem";
-import { WizardContext } from "../../wizard/wizardContext";
-import { InputPromptStep } from "../../wizard/inputPromptStep";
-import { runWizard } from "../../wizard/wizard";
-import { QuickPickPromptStep } from "../../wizard/quickPickPromptStep";
-import { ISCClient } from "../../services/ISCClient";
-import { isNotEmpty } from "../../utils/stringUtils";
-import * as commands from "../constants";
+import { MachineIdentitiesTreeItem } from "../../models/ISCTreeItem.js";
+import { WizardContext } from "../../wizard/wizardContext.js";
+import { InputPromptStep } from "../../wizard/inputPromptStep.js";
+import { runWizard } from "../../wizard/wizard.js";
+import { QuickPickPromptStep } from "../../wizard/quickPickPromptStep.js";
+import { ISCClient } from "../../services/ISCClient.js";
+import { isNotEmpty } from "../../utils/stringUtils.js";
+import * as commands from "../constants.js";
 
 const ALL_TYPES = ['AI Agent', 'Application'];
 

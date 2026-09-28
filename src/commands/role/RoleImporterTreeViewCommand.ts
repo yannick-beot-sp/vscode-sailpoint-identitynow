@@ -1,8 +1,8 @@
-import { RoleImporter } from './RoleImporter';
-import { askCreateOrUpdate, chooseFile } from '../../utils/vsCodeHelpers';
-import { RolesTreeItem } from '../../models/ISCTreeItem';
-import { TenantService } from '../../services/TenantService';
-import { validateTenantReadonly } from '../validateTenantReadonly';
+import { RoleImporter } from './RoleImporter.js';
+import { askCreateOrUpdate, chooseFile } from '../../utils/vsCodeHelpers.js';
+import { RolesTreeItem } from '../../models/ISCTreeItem.js';
+import { TenantService } from '../../services/TenantService.js';
+import { validateTenantReadonly } from '../validateTenantReadonly.js';
 
 export class RoleImporterTreeViewCommand {
 

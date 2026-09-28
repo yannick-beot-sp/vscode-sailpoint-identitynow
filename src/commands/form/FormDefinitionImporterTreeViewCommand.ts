@@ -1,8 +1,8 @@
-import { chooseFile } from '../../utils/vsCodeHelpers';
-import { FormsTreeItem } from '../../models/ISCTreeItem';
-import { FormDefinitionImporter } from './FormDefinitionImporter';
-import { TenantService } from '../../services/TenantService';
-import { validateTenantReadonly } from '../validateTenantReadonly';
+import { chooseFile } from '../../utils/vsCodeHelpers.js';
+import { FormsTreeItem } from '../../models/ISCTreeItem.js';
+import { FormDefinitionImporter } from './FormDefinitionImporter.js';
+import { TenantService } from '../../services/TenantService.js';
+import { validateTenantReadonly } from '../validateTenantReadonly.js';
 
 export class FormDefinitionImporterTreeViewCommand {
 

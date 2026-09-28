@@ -1,15 +1,15 @@
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { AccessProfileRef, EntitlementRef, RoleMembershipSelector, RoleMembershipSelectorType } from "sailpoint-api-client";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { refSchema, tenantNameField } from "../../inputFields";
-import { Parser } from "../../../parser/parser";
-import { RoleMembershipSelectorConverter } from "../../../parser/RoleMembershipSelectorConverter";
-import { SourceNameToIdCacheService } from "../../../services/cache/SourceNameToIdCacheService";
-import { isUuid } from "../../../utils/stringUtils";
-import { resolveIdentity } from "../../utils/identityUtils";
-import { membershipCriteriaField, roleBaseOutputSchema } from "./roleSchemas";
+import { AccessProfileRef, EntitlementRef, RoleMembershipSelector, RoleMembershipSelectorType } from "sailpoint-api-client/dist/roles/api.js";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { refSchema, tenantNameField } from "../../inputFields.js";
+import { Parser } from "../../../parser/parser.js";
+import { RoleMembershipSelectorConverter } from "../../../parser/RoleMembershipSelectorConverter.js";
+import { SourceNameToIdCacheService } from "../../../services/cache/SourceNameToIdCacheService.js";
+import { isUuid } from "../../../utils/stringUtils.js";
+import { resolveIdentity } from "../../utils/identityUtils.js";
+import { membershipCriteriaField, roleBaseOutputSchema } from "./roleSchemas.js";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -45,7 +45,7 @@ type Output = z.infer<typeof outputSchema>;
         "Update an existing role in SailPoint ISC using JSON Patch. " +
         "Identify it by id or name, then specify only the fields to change. " +
         "Use searchRoles to find the id or name before calling this tool.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Update Role",

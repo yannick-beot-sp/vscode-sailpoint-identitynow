@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { App } from "@frontmcp/sdk";
-import { ListSourcesTool } from "./tools/ListSourcesTool";
-import { GetSourceSchemasTool } from "./tools/GetSourceSchemasTool";
+import { ListSourcesTool } from "./tools/ListSourcesTool.js";
+import { GetSourceSchemasTool } from "./tools/GetSourceSchemasTool.js";
 
 /**
  * FrontMCP application grouping all Source management tools and resources.

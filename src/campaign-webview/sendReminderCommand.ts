@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
-import * as commands from "../commands/constants";
-import { CampaignTreeItem } from "../models/ISCTreeItem";
-import { CampaignConfigurationService } from "../services/CampaignConfigurationService";
-import { TenantService } from "../services/TenantService";
-import { ISCClient } from '../services/ISCClient';
-import { BulkSendReminder } from './BulkSendReminder';
-import { confirm } from '../utils/vsCodeHelpers';
+import * as commands from "../commands/constants.js";
+import { CampaignTreeItem } from "../models/ISCTreeItem.js";
+import { CampaignConfigurationService } from "../services/CampaignConfigurationService.js";
+import { TenantService } from "../services/TenantService.js";
+import { ISCClient } from '../services/ISCClient.js';
+import { BulkSendReminder } from './BulkSendReminder.js';
+import { confirm } from '../utils/vsCodeHelpers.js';
 
 /**
  * Command used to open the campaign panel

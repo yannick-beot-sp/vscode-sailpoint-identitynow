@@ -1,11 +1,12 @@
-import { AccessProfileApprovalSchemeV2025, AccessProfileApprovalSchemeV2025ApproverTypeV2025, ApprovalSchemeForRoleV2025, ApprovalSchemeForRoleV2025ApproverTypeV2025 } from "sailpoint-api-client";
-import { CacheService } from "../services/cache/CacheService";
-import { CSV_MULTIVALUE_SEPARATOR } from "../constants";
-import { isEmpty } from "./stringUtils";
+import { AccessProfileApprovalScheme, AccessProfileApprovalSchemeApproverTypeEnum as AccessProfileApprovalSchemeApproverType } from "sailpoint-api-client/dist/access_profiles/api.js";
+import { ApprovalSchemeForRole, ApprovalSchemeForRoleApproverTypeEnum as ApprovalSchemeForRoleApproverType } from "sailpoint-api-client/dist/roles/api.js";
+import { CacheService } from "../services/cache/CacheService.js";
+import { CSV_MULTIVALUE_SEPARATOR } from "../constants.js";
+import { isEmpty } from "./stringUtils.js";
 
 
 /**
- * TODO Align once API updated with AccessProfileApprovalSchemeV2025ApproverTypeV2025
+ * TODO Align once API updated with AccessProfileApprovalSchemeApproverType
  * Note: approval scheme for access profile supersedes approval scheme for roles
  */
 const AccessProfileApprovalScheme = {
@@ -22,7 +23,7 @@ const AccessProfileApprovalScheme = {
 export type AccessProfileApprovalSchemeType = typeof AccessProfileApprovalScheme[keyof typeof AccessProfileApprovalScheme];
 
 /**
- * TODO Align once API updated with ApprovalSchemeForRoleV2025ApproverTypeV2025
+ * TODO Align once API updated with ApprovalSchemeForRoleApproverType
  */
 const RoleApprovalScheme = {
     Owner: "OWNER",
@@ -67,31 +68,31 @@ export async function approvalSchemeToStringConverter(
 export async function stringToAccessProfileApprovalSchemeConverter(
     schemes: string | undefined,
     governanceId2Name: CacheService<string>,
-    workflowId2Name: CacheService<string>): Promise<AccessProfileApprovalSchemeV2025[] | undefined> {
+    workflowId2Name: CacheService<string>): Promise<AccessProfileApprovalScheme[] | undefined> {
 
-    if (isEmpty(schemes)) { return new Array<AccessProfileApprovalSchemeV2025>; }
+    if (isEmpty(schemes)) { return new Array<AccessProfileApprovalScheme>; }
 
     return await Promise.all(schemes!.split(CSV_MULTIVALUE_SEPARATOR).map(async (approver) => {
 
-        let approverType: AccessProfileApprovalSchemeV2025ApproverTypeV2025;
+        let approverType: AccessProfileApprovalSchemeApproverType;
         let approverId: string | undefined = undefined;
 
         if (approver.startsWith("GOVERNANCE_GROUP:")) {
-            approverType = AccessProfileApprovalSchemeV2025ApproverTypeV2025.GovernanceGroup;
+            approverType = AccessProfileApprovalSchemeApproverType.GovernanceGroup;
             const name = approver.substring("GOVERNANCE_GROUP:".length);
             approverId = await governanceId2Name.get(name);
         } else if (approver.startsWith("WORKFLOW:")) {
-            approverType = AccessProfileApprovalSchemeV2025ApproverTypeV2025.Workflow;
+            approverType = AccessProfileApprovalSchemeApproverType.Workflow;
             const name = approver.substring("WORKFLOW:".length);
             approverId = await workflowId2Name.get(name);
         } else if (Object.values(AccessProfileApprovalScheme).includes(approver as AccessProfileApprovalSchemeType)) {
             /**
-             * TODO Align once API updated with AccessProfileApprovalSchemeV2025ApproverTypeV2025
+             * TODO Align once API updated with AccessProfileApprovalSchemeApproverType
             */
-            approverType = approver as AccessProfileApprovalSchemeV2025ApproverTypeV2025;
+            approverType = approver as AccessProfileApprovalSchemeApproverType;
         } else {
             // Backward compatibility: unprefixed names are governance groups
-            approverType = AccessProfileApprovalSchemeV2025ApproverTypeV2025.GovernanceGroup;
+            approverType = AccessProfileApprovalSchemeApproverType.GovernanceGroup;
             approverId = await governanceId2Name.get(approver);
         }
 
@@ -110,28 +111,28 @@ export async function stringToAccessProfileApprovalSchemeConverter(
 export async function stringToRoleApprovalSchemeConverter(
     schemes: string | undefined,
     governanceId2Name: CacheService<string>,
-    workflowId2Name: CacheService<string>): Promise<ApprovalSchemeForRoleV2025[] | undefined> {
+    workflowId2Name: CacheService<string>): Promise<ApprovalSchemeForRole[] | undefined> {
 
     if (!schemes) { return undefined }
 
     return await Promise.all(schemes.split(CSV_MULTIVALUE_SEPARATOR).map(async (approver) => {
 
-        let approverType: ApprovalSchemeForRoleV2025ApproverTypeV2025;
+        let approverType: ApprovalSchemeForRoleApproverType;
         let approverId: string | undefined = undefined;
 
         if (approver.startsWith("GOVERNANCE_GROUP:")) {
-            approverType = ApprovalSchemeForRoleV2025ApproverTypeV2025.GovernanceGroup;
+            approverType = ApprovalSchemeForRoleApproverType.GovernanceGroup;
             const name = approver.substring("GOVERNANCE_GROUP:".length);
             approverId = await governanceId2Name.get(name);
         } else if (approver.startsWith("WORKFLOW:")) {
-            approverType = ApprovalSchemeForRoleV2025ApproverTypeV2025.Workflow;
+            approverType = ApprovalSchemeForRoleApproverType.Workflow;
             const name = approver.substring("WORKFLOW:".length);
             approverId = await workflowId2Name.get(name);
         } else if (Object.values(RoleApprovalScheme).includes(approver as RoleApprovalSchemeType)) {
-            approverType = approver as ApprovalSchemeForRoleV2025ApproverTypeV2025;
+            approverType = approver as ApprovalSchemeForRoleApproverType;
         } else {
             // Backward compatibility: unprefixed names are governance groups
-            approverType = ApprovalSchemeForRoleV2025ApproverTypeV2025.GovernanceGroup;
+            approverType = ApprovalSchemeForRoleApproverType.GovernanceGroup;
             approverId = await governanceId2Name.get(approver);
         }
 

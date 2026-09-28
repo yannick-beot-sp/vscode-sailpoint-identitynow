@@ -1,7 +1,7 @@
-import { ExportPayloadV2025IncludeTypesV2025, SpConfigExportResultsBeta } from 'sailpoint-api-client';
-import { SimpleSPConfigExporter } from '../commands/spconfig-export/SimpleSPConfigExporter';
-import type { DependencyGraphData } from './app/src/services/Client';
-import { DependencyService } from './DependencyService';
+import { ExportPayloadIncludeTypesEnum as ExportPayloadIncludeTypes, SpConfigExportResults } from 'sailpoint-api-client/dist/sp_config/api.js';
+import { SimpleSPConfigExporter } from '../commands/spconfig-export/SimpleSPConfigExporter.js';
+import type { DependencyGraphData } from './app/src/services/Client.js';
+import { DependencyService } from './DependencyService.js';
 
 export class IdentityAttributeDependencyService extends DependencyService {
 
@@ -31,15 +31,15 @@ export class IdentityAttributeDependencyService extends DependencyService {
             this.tenantDisplayname,
             {},
             [
-                ExportPayloadV2025IncludeTypesV2025.Source,
-                ExportPayloadV2025IncludeTypesV2025.AttrSyncSourceConfig,
-                ExportPayloadV2025IncludeTypesV2025.Role,
-                ExportPayloadV2025IncludeTypesV2025.IdentityProfile,
-                ExportPayloadV2025IncludeTypesV2025.Transform,
-                ExportPayloadV2025IncludeTypesV2025.Workflow,
-                ExportPayloadV2025IncludeTypesV2025.PublicIdentitiesConfig,
-                ExportPayloadV2025IncludeTypesV2025.Segment,
-                ExportPayloadV2025IncludeTypesV2025.TriggerSubscription,
+                ExportPayloadIncludeTypes.Source,
+                ExportPayloadIncludeTypes.AttrSyncSourceConfig,
+                ExportPayloadIncludeTypes.Role,
+                ExportPayloadIncludeTypes.IdentityProfile,
+                ExportPayloadIncludeTypes.Transform,
+                ExportPayloadIncludeTypes.Workflow,
+                ExportPayloadIncludeTypes.PublicIdentitiesConfig,
+                ExportPayloadIncludeTypes.Segment,
+                ExportPayloadIncludeTypes.TriggerSubscription,
             ]
 
 
@@ -61,7 +61,7 @@ export class IdentityAttributeDependencyService extends DependencyService {
         };
     }
 
-    private filterRole(data: SpConfigExportResultsBeta | null) {
+    private filterRole(data: SpConfigExportResults | null) {
 
         const roles = (data?.objects ?? []).filter(o => o.self?.type === "ROLE");
         const attributeProperty = `attribute.${this.resourceName}`;
@@ -130,7 +130,7 @@ export class IdentityAttributeDependencyService extends DependencyService {
         }
     }
 
-    private filterSegment(data: SpConfigExportResultsBeta | null) {
+    private filterSegment(data: SpConfigExportResults | null) {
 
         const segments = (data?.objects ?? []).filter(o => o.self?.type === "SEGMENT");
 
@@ -161,7 +161,7 @@ export class IdentityAttributeDependencyService extends DependencyService {
         }
     }
 
-    private filterPublicIdentitiesConfig(data: SpConfigExportResultsBeta | null) {
+    private filterPublicIdentitiesConfig(data: SpConfigExportResults | null) {
 
         const configs = (data?.objects ?? []).filter(o => o.self?.type === "PUBLIC_IDENTITIES_CONFIG");
 
@@ -193,7 +193,7 @@ export class IdentityAttributeDependencyService extends DependencyService {
         }
     }
 
-    private filterSource(data: SpConfigExportResultsBeta | null) {
+    private filterSource(data: SpConfigExportResults | null) {
 
         const sources = (data?.objects ?? []).filter(o => o.self?.type === "SOURCE");
         const syncConfigs = (data?.objects ?? []).filter(o => o.self?.type === "ATTR_SYNC_SOURCE_CONFIG");
@@ -262,7 +262,7 @@ export class IdentityAttributeDependencyService extends DependencyService {
      * "workflow" node (joined against the workflow export for its description) instead of a
      * generic "event-trigger" node.
      */
-    private filterEventTrigger(data: SpConfigExportResultsBeta | null) {
+    private filterEventTrigger(data: SpConfigExportResults | null) {
 
         const triggers = (data?.objects ?? []).filter(o => o.self?.type === "TRIGGER_SUBSCRIPTION");
         const workflows = (data?.objects ?? []).filter(o => o.self?.type === "WORKFLOW");
@@ -315,7 +315,7 @@ export class IdentityAttributeDependencyService extends DependencyService {
         }
     }
 
-    private filterTransform(data: SpConfigExportResultsBeta | null) {
+    private filterTransform(data: SpConfigExportResults | null) {
 
         const transforms = (data?.objects ?? []).filter(o => o.self?.type === "TRANSFORM");
 
@@ -352,7 +352,7 @@ export class IdentityAttributeDependencyService extends DependencyService {
      * (the transform is what actually reads from the source); otherwise the profile links
      * straight to the source.
      */
-    private filterIdentityProfile(data: SpConfigExportResultsBeta | null) {
+    private filterIdentityProfile(data: SpConfigExportResults | null) {
 
         const profiles = (data?.objects ?? []).filter(o => o.self?.type === "IDENTITY_PROFILE");
         const sources = (data?.objects ?? []).filter(o => o.self?.type === "SOURCE");

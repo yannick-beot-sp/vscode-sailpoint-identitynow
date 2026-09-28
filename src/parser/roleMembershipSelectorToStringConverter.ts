@@ -1,6 +1,6 @@
-import { RoleCriteriaKeyType, RoleCriteriaLevel1, RoleCriteriaLevel2, RoleCriteriaLevel3, RoleCriteriaOperation, RoleCriteriaOperationV2025 } from "sailpoint-api-client";
-import { CacheService } from "../services/cache/CacheService";
-import { ComparisonOperation, isLogicalOperation } from "./ast";
+import { RoleCriteriaKeyType, RoleCriteriaLevel1, RoleCriteriaLevel2, RoleCriteriaLevel3, RoleCriteriaOperation } from "sailpoint-api-client/dist/roles/api.js";
+import { CacheService } from "../services/cache/CacheService.js";
+import { ComparisonOperation, isLogicalOperation } from "./ast.js";
 
 /**
  * Single quote is privileged as in the CSV export, long string are between double quotes. So a double quote should be properly escaped, resulting in a double double-quote.
@@ -82,7 +82,7 @@ async function convertRoleCriteriaLevel3(
     return `${left} ${operator} ${EXPORT_QUOTE}${value}${EXPORT_QUOTE}`;
 }
 
-function comparisonOperationMapper(op: RoleCriteriaOperationV2025): ComparisonOperation {
+function comparisonOperationMapper(op: RoleCriteriaOperation): ComparisonOperation {
     switch (op) {
         case "EQUALS":
             return "eq";

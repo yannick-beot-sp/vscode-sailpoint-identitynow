@@ -1,16 +1,19 @@
-import * as path from 'path';
+import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 
-import { runTests } from '@vscode/test-electron';
+import { runTests } from "@vscode/test-electron";
+
+const here = path.dirname(fileURLToPath(import.meta.url));
 
 async function main() {
 	try {
 		// The folder containing the Extension Manifest package.json
 		// Passed to `--extensionDevelopmentPath`
-		const extensionDevelopmentPath = path.resolve(__dirname, '../../');
+		const extensionDevelopmentPath = path.resolve(here, "../../");
 
 		// The path to test runner
 		// Passed to --extensionTestsPath
-		const extensionTestsPath = path.resolve(__dirname, './suite/index');
+		const extensionTestsPath = path.resolve(here, "./suite/index.js");
 
 		// Download VS Code, unzip it and run the integration test
 		await runTests({ extensionDevelopmentPath, extensionTestsPath });

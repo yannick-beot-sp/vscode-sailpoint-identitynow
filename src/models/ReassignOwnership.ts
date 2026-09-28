@@ -1,5 +1,5 @@
-import { JsonPatchOperationV2025 } from "sailpoint-api-client";
-import { ISCClient } from "../services/ISCClient";
+import { JsonPatchOperation } from "sailpoint-api-client/dist/access_profiles/api.js";
+import { ISCClient } from "../services/ISCClient.js";
 
 /**
  * Object types whose ownership (or, for the two "Pending..." types, assignment)
@@ -116,7 +116,7 @@ export async function reassignOne(
     newOwnerId: string,
     reason?: string
 ): Promise<void> {
-    const ownerPatch: Array<JsonPatchOperationV2025> = [{
+    const ownerPatch: Array<JsonPatchOperation> = [{
         op: "replace",
         path: "/owner",
         //@ts-ignore cf. https://github.com/sailpoint-oss/typescript-sdk/issues/18
@@ -154,7 +154,7 @@ export async function reassignOne(
             // access-review items within a certification someone else already reviews.
             await client.reassignCertificationReviewItemsSync({
                 id,
-                reviewReassignV2025: {
+                reviewReassign: {
                     reassign: [{ id, type: "IDENTITY_SUMMARY" }],
                     reassignTo: newOwnerId,
                     reason: reason!

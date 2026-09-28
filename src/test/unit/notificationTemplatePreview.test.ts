@@ -1,8 +1,8 @@
 import * as assert from 'assert';
 import { describe, it } from 'mocha';
-import { applyNotificationTemplateExamples, exampleValueMap, parseExampleValues } from '../../commands/notification-template/previewExamples';
-import { completionVariables } from '../../commands/notification-template/templateVariableCompletion';
-import { NotificationTemplateVariable } from '../../commands/notification-template/templateVariables';
+import { applyNotificationTemplateExamples, exampleValueMap, parseExampleValues } from '../../commands/notification-template/previewExamples.js';
+import { completionVariables } from '../../commands/notification-template/templateVariableCompletion.js';
+import { NotificationTemplateVariable } from '../../commands/notification-template/templateVariables.js';
 
 suite('notification template preview examples Test Suite', () => {
     const variables: NotificationTemplateVariable[] = [

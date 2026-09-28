@@ -1,6 +1,6 @@
-import { TenantService } from "../services/TenantService";
+import { TenantService } from "../services/TenantService.js";
 import * as vscode from 'vscode';
-import { confirm } from "../utils/vsCodeHelpers";
+import { confirm } from "../utils/vsCodeHelpers.js";
 
 /**
  * return true if OK to continue, false if execution MUST stop

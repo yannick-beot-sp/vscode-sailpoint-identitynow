@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { it, describe } from 'mocha';
-import { decomposeDiacriticalMarks } from '../../utils/stringUtils';
+import { decomposeDiacriticalMarks } from '../../utils/stringUtils.js';
 
 suite('decomposeDiacriticalMarks Test Suite', () => {
 	// vscode.window.showInformationMessage('Start all tests.');

@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { ISCClient } from "../../services/ISCClient";
-import { delay, formatString } from "../../utils";
+import { ISCClient } from "../../services/ISCClient.js";
+import { delay, formatString } from "../../utils.js";
 
-import { AccountActivity, CompletionStatus, ExecutionStatus, ProvisioningState } from 'sailpoint-api-client';
+import { AccountActivity, CompletionStatus, ExecutionStatus, ProvisioningState } from 'sailpoint-api-client/dist/account_activities/api.js';
 const TERMINAL_PROVISIONING_STATES = new Set<ProvisioningState>([
     ProvisioningState.Finished,
     ProvisioningState.Failed,

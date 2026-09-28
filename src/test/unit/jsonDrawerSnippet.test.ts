@@ -1,7 +1,7 @@
 import * as assert from "assert";
-import { highlightJson, jsonDrawerScript } from "../../commands/identity/jsonDrawerSnippet";
-import { buildAccessTableHtml } from "../../commands/identity/identityAccessHtml";
-import { buildEventsTableHtml } from "../../commands/identity/identityEventsHtml";
+import { highlightJson, jsonDrawerScript } from "../../commands/identity/jsonDrawerSnippet.js";
+import { buildAccessTableHtml } from "../../commands/identity/identityAccessHtml.js";
+import { buildEventsTableHtml } from "../../commands/identity/identityEventsHtml.js";
 
 suite("json drawer", () => {
 	test("highlights json tokens and escapes html", () => {

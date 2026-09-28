@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
-import { SourceTreeItem } from "../../models/ISCTreeItem";
-import { ISCClient } from '../../services/ISCClient';
-import { CSVReader } from '../../services/CSVReader';
-import { UncorrelatedAccount } from '../../models/UncorrelatedAccount';
-import { chooseFile } from '../../utils/vsCodeHelpers';
-import { isEmpty } from '../../utils/stringUtils';
-import { TenantService } from '../../services/TenantService';
-import { validateTenantReadonly } from '../validateTenantReadonly';
+import { SourceTreeItem } from "../../models/ISCTreeItem.js";
+import { ISCClient } from '../../services/ISCClient.js';
+import { CSVReader } from '../../services/CSVReader.js';
+import { UncorrelatedAccount } from '../../models/UncorrelatedAccount.js';
+import { chooseFile } from '../../utils/vsCodeHelpers.js';
+import { isEmpty } from '../../utils/stringUtils.js';
+import { TenantService } from '../../services/TenantService.js';
+import { validateTenantReadonly } from '../validateTenantReadonly.js';
 
 interface UncorrelatedAccountImportResult {
     correlated: number

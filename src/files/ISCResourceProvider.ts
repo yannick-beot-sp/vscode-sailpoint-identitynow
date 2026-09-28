@@ -9,19 +9,22 @@ import {
 	FileType,
 	Uri,
 } from "vscode";
-import { NEW_ID } from "../constants";
-import { ISCClient } from "../services/ISCClient";
-import { CloudRuleService } from "../services/CloudRuleService";
-import { TenantService } from "../services/TenantService";
+import { NEW_ID } from "../constants.js";
+import { ISCClient } from "../services/ISCClient.js";
+import { CloudRuleService } from "../services/CloudRuleService.js";
+import { TenantService } from "../services/TenantService.js";
 import {
 	convertToText,
 	str2Uint8Array,
 	toTimestamp,
 	uint8Array2Str,
-} from "../utils";
-import { getIdByUri, getNameByUri, getPathByUri } from "../utils/UriUtils";
+} from "../utils.js";
+import { getIdByUri, getNameByUri, getPathByUri } from "../utils/UriUtils.js";
 import { Operation, compare } from "fast-json-patch";
-import { ConnectorRuleUpdateRequestBeta, FormDefinitionResponseBeta, SlimCampaign, TemplateDtoBeta } from "sailpoint-api-client";
+import { SlimCampaign } from "sailpoint-api-client/dist/certification_campaigns/api.js";
+import { ConnectorRuleUpdateRequest } from "sailpoint-api-client/dist/connector_rule_management/api.js";
+import { FormDefinitionResponse } from "sailpoint-api-client/dist/custom_forms/api.js";
+import { TemplateDto } from "sailpoint-api-client/dist/notifications/api.js";
 
 const READONLY_RESOURCE_PATH = /\/cloud-rules\/|\/cloud-rule-script\/|\/identities\//;
 
@@ -213,17 +216,17 @@ export class ISCResourceProvider implements FileSystemProvider {
 					...rule,
 					sourceCode: { ...rule.sourceCode, script: data },
 					description: rule.description ?? undefined,
-				} as ConnectorRuleUpdateRequestBeta)
+				} as ConnectorRuleUpdateRequest)
 			} else if (resourcePath.match("notification-template-body")) {
 				const template = await client.getNotificationTemplateById(id);
 				template.body = data;
 				await client.updateNotificationTemplate(template);
 			} else if (resourcePath.match("notification-templates")) {
-				const newData = JSON.parse(data) as TemplateDtoBeta;
+				const newData = JSON.parse(data) as TemplateDto;
 				await client.updateNotificationTemplate(newData);
 			} else if (resourcePath.match("form-definitions")) {
 				// UI is pushing all data as a Patch. Doing the same for form definitions
-				const newData = JSON.parse(data) as FormDefinitionResponseBeta
+				const newData = JSON.parse(data) as FormDefinitionResponse
 				const jsonpatch: Operation[] = [
 					{
 						op: 'replace',

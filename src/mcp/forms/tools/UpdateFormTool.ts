@@ -1,15 +1,15 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
-import { isGuid } from "../../../utils/stringUtils";
-import { resolveIdentity } from "../../utils/identityUtils";
-import { getFormOwner } from "../formUtils";
-import { descriptionField, formConditionSchema, formDefinitionInputSchema, formDetailOutputSchema, formElementSchema } from "./formSchemas";
-import { formIdOrNameField } from "./formSchemas";
-import { JsonPatchOperationV2025 } from "sailpoint-api-client";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { tenantNameField } from "../../inputFields.js";
+import { isGuid } from "../../../utils/stringUtils.js";
+import { resolveIdentity } from "../../utils/identityUtils.js";
+import { getFormOwner } from "../formUtils.js";
+import { descriptionField, formConditionSchema, formDefinitionInputSchema, formDetailOutputSchema, formElementSchema } from "./formSchemas.js";
+import { formIdOrNameField } from "./formSchemas.js";
+import { JsonPatchOperation } from "sailpoint-api-client/dist/access_profiles/api.js";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -33,7 +33,7 @@ type Output = z.infer<typeof outputSchema>;
         "Identify it by GUID or name, then specify only the fields to change. " +
         "Providing formInput, formElements, or formConditions replaces the existing arrays entirely. " +
         "Use listForms to find the GUID or name before calling this tool.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Update Form",
@@ -57,7 +57,7 @@ export class UpdateFormTool extends ToolContext {
                 formId = form.id;
             }
 
-            const patches: Array<JsonPatchOperationV2025> = [];
+            const patches: Array<JsonPatchOperation> = [];
 
             if (input.description !== undefined) {
                 patches.push({ op: "replace", path: "/description", value: input.description });

@@ -1,15 +1,16 @@
 import * as vscode from 'vscode';
-import { IdentityTreeItem } from '../../models/ISCTreeItem';
-import { ISCClient } from '../../services/ISCClient';
-import { formatAccountActivity, waitForAccountActivity } from './identityUtils';
+import { IdentityTreeItem } from '../../models/ISCTreeItem.js';
+import { ISCClient } from '../../services/ISCClient.js';
+import { formatAccountActivity, waitForAccountActivity } from './identityUtils.js';
 import {
     compareUserLevels,
     getUserLevelCapabilityValue,
     isUserLevelAssigned,
     mergeUserLevels,
-} from './identityUserLevels';
+} from './identityUserLevels.js';
 
-import { LifecycleState, UserLevelSummaryDTOV2025 } from 'sailpoint-api-client';
+import { UserLevelSummaryDTO } from 'sailpoint-api-client/dist/custom_user_levels/api.js';
+import { LifecycleState } from 'sailpoint-api-client/dist/lifecycle_states/api.js';
 interface LifecycleStateQuickPickItem extends vscode.QuickPickItem {
     lifecycleStateId: string;
 }
@@ -171,7 +172,7 @@ export class IdentityTreeViewCommand {
                     const [customLevels, authUser] = await Promise.all([
                         client.listCustomUserLevels().catch(error => {
                             console.warn("Could not load custom user levels", error);
-                            return [] as UserLevelSummaryDTOV2025[];
+                            return [] as UserLevelSummaryDTO[];
                         }),
                         client.getAuthUser(identityTreeItem.id!)
                     ]);
@@ -217,7 +218,7 @@ export class IdentityTreeViewCommand {
     }
 
     private buildUserLevelQuickPickItems(
-        userLevels: UserLevelSummaryDTOV2025[],
+        userLevels: UserLevelSummaryDTO[],
         currentCapabilities: string[]
     ): UserLevelQuickPickItem[] {
         return userLevels

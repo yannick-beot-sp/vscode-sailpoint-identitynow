@@ -1,5 +1,5 @@
 import * as assert from "assert";
-import { dimensionSchemaToString, stringToDimensionAttributes } from "../../utils/dimensionUtils";
+import { dimensionSchemaToString, stringToDimensionAttributes } from "../../utils/dimensionUtils.js";
 
 suite("dimension schema", () => {
 	test("joins attribute names for export", () => {

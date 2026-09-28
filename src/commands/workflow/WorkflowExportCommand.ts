@@ -1,12 +1,12 @@
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 
-import { askFile, openPreview } from '../../utils/vsCodeHelpers';
-import { PathProposer } from '../../services/PathProposer';
-import { ISCClient } from '../../services/ISCClient';
-import { ensureFolderExists } from '../../utils/fileutils';
-import { WorkflowTreeItem } from '../../models/ISCTreeItem';
-import { cleanUpWorkflow } from './utils';
+import { askFile, openPreview } from '../../utils/vsCodeHelpers.js';
+import { PathProposer } from '../../services/PathProposer.js';
+import { ISCClient } from '../../services/ISCClient.js';
+import { ensureFolderExists } from '../../utils/fileutils.js';
+import { WorkflowTreeItem } from '../../models/ISCTreeItem.js';
+import { cleanUpWorkflow } from './utils.js';
 
 export class WorkflowExportCommand {
 

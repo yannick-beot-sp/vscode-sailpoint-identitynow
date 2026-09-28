@@ -1,20 +1,20 @@
 import * as vscode from 'vscode';
-import * as commands from './constants';
-import { ProvisioningPoliciesTreeItem } from "../models/ISCTreeItem";
-import { compareByLabel } from '../utils';
-import { buildResourceUri, getIdByUri } from '../utils/UriUtils';
-import { UsageTypeBeta } from 'sailpoint-api-client';
-import { convertConstantToTitleCase, isEmpty } from '../utils/stringUtils';
-import { ExtendedQuickPickItem } from '../models/ExtendedQuickPickItem';
-import { openPreview } from '../utils/vsCodeHelpers';
-import { TenantService } from '../services/TenantService';
-import { WizardContext } from '../wizard/wizardContext';
-import { runWizard } from '../wizard/wizard';
-import { QuickPickTenantStep } from '../wizard/quickPickTenantStep';
-import { Validator } from '../validator/validator';
-import { InputPromptStep } from '../wizard/inputPromptStep';
-import { QuickPickPromptStep } from '../wizard/quickPickPromptStep';
-import { ISCClient } from '../services/ISCClient';
+import * as commands from './constants.js';
+import { ProvisioningPoliciesTreeItem } from "../models/ISCTreeItem.js";
+import { compareByLabel } from '../utils.js';
+import { buildResourceUri, getIdByUri } from '../utils/UriUtils.js';
+import { UsageType } from 'sailpoint-api-client/dist/sources/api.js';
+import { convertConstantToTitleCase, isEmpty } from '../utils/stringUtils.js';
+import { ExtendedQuickPickItem } from '../models/ExtendedQuickPickItem.js';
+import { openPreview } from '../utils/vsCodeHelpers.js';
+import { TenantService } from '../services/TenantService.js';
+import { WizardContext } from '../wizard/wizardContext.js';
+import { runWizard } from '../wizard/wizard.js';
+import { QuickPickTenantStep } from '../wizard/quickPickTenantStep.js';
+import { Validator } from '../validator/validator.js';
+import { InputPromptStep } from '../wizard/inputPromptStep.js';
+import { QuickPickPromptStep } from '../wizard/quickPickPromptStep.js';
+import { ISCClient } from '../services/ISCClient.js';
 
 
 
@@ -26,8 +26,8 @@ const provisioningPolicyNameValidator = new Validator({
 
 
 function prepareUsageTypePickItems(): Array<ExtendedQuickPickItem> {
-    const FIRST = UsageTypeBeta.Create;
-    return Object.values(UsageTypeBeta).map(key => ({
+    const FIRST = UsageType.Create;
+    return Object.values(UsageType).map(key => ({
         label: convertConstantToTitleCase(key),
         description: (key === FIRST ? "(default)" : ""),
         value: key

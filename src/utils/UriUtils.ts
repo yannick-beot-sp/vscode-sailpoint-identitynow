@@ -1,5 +1,5 @@
 import { Uri } from "vscode";
-import { RESOURCE_TYPES, URL_PREFIX } from "../constants";
+import { RESOURCE_TYPES, URL_PREFIX } from "../constants.js";
 import { posix } from "path";
 
 export function withQuery(baseUrl: string, params: any): string {

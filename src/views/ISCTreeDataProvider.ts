@@ -1,9 +1,9 @@
 import { EventEmitter, ExtensionContext, TreeDataProvider, TreeItem, Event, TreeItemCollapsibleState, TreeDragAndDropController, DataTransfer, DataTransferItem, CancellationToken, TreeView, commands as vscodeCommands, ProviderResult } from 'vscode';
-import { BaseTreeItem, FolderTreeItem, IdentitiesTreeItem, TenantFolderTreeItem, TenantTreeItem } from '../models/ISCTreeItem';
-import { TenantService } from '../services/TenantService';
-import { convertToBaseTreeItem, getCachedTenantTreeItem, resolveIdentitiesTreeItem } from './utils';
-import * as commands from '../commands/constants';
-import { delay } from '../utils';
+import { BaseTreeItem, FolderTreeItem, IdentitiesTreeItem, TenantFolderTreeItem, TenantTreeItem } from '../models/ISCTreeItem.js';
+import { TenantService } from '../services/TenantService.js';
+import { convertToBaseTreeItem, getCachedTenantTreeItem, resolveIdentitiesTreeItem } from './utils.js';
+import * as commands from '../commands/constants.js';
+import { delay } from '../utils.js';
 
 
 const DROP_MIME_TYPE = 'application/vnd.code.tree.vscode-sailpoint-identitynow.view';

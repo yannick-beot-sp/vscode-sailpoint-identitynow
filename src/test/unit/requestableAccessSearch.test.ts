@@ -1,12 +1,12 @@
 import * as assert from "assert";
-import { IndexV2025 } from "sailpoint-api-client";
-import { buildSearchQuery } from "../../utils/buildSearchQueryV2025";
+import { Index } from "sailpoint-api-client/dist/search/api.js";
+import { buildSearchQuery } from "../../utils/buildSearchQuery.js";
 import {
 	accessItemTypeFromSearchDocument,
 	buildRequestableAccessItemQuery,
 	REQUESTABLE_ACCESS_INDICES,
 	REQUESTABLE_ACCESS_SEARCH_FIELDS,
-} from "../../utils/requestableAccessSearch";
+} from "../../utils/requestableAccessSearch.js";
 
 suite("requestable access search", () => {
 	test("quotes the term and filters requestable items", () => {
@@ -32,9 +32,9 @@ suite("requestable access search", () => {
 		});
 
 		assert.deepStrictEqual(search.indices, [
-			IndexV2025.Roles,
-			IndexV2025.Accessprofiles,
-			IndexV2025.Entitlements,
+			Index.Roles,
+			Index.Accessprofiles,
+			Index.Entitlements,
 		]);
 		assert.deepStrictEqual(search.queryResultFilter?.includes, REQUESTABLE_ACCESS_SEARCH_FIELDS);
 	});

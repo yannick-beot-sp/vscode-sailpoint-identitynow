@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { IdentityAttributeTreeItem, isIdentityAttributeTreeItem, isSourceTreeItem, isTransformTreeItem, SourceTreeItem, TransformTreeItem } from "../models/ISCTreeItem";
-import { DependencyPanel } from './DependencyPanel';
+import { IdentityAttributeTreeItem, isIdentityAttributeTreeItem, isSourceTreeItem, isTransformTreeItem, SourceTreeItem, TransformTreeItem } from "../models/ISCTreeItem.js";
+import { DependencyPanel } from './DependencyPanel.js';
 
 /**
  * Command used to open the dependency graph panel

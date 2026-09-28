@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
-import * as commands from '../commands/constants';
-import { URL_PREFIX } from '../constants';
-import { ISCClient } from '../services/ISCClient';
-import { TenantService } from '../services/TenantService';
-import { getIdByUri, getResourceUri } from '../utils/UriUtils';
-import { openPreview } from '../utils/vsCodeHelpers';
+import * as commands from '../commands/constants.js';
+import { URL_PREFIX } from '../constants.js';
+import { ISCClient } from '../services/ISCClient.js';
+import { TenantService } from '../services/TenantService.js';
+import { getIdByUri, getResourceUri } from '../utils/UriUtils.js';
+import { openPreview } from '../utils/vsCodeHelpers.js';
 
 enum FileHandlerObjectType {
     transform = "transforms",

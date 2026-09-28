@@ -1,25 +1,27 @@
 import * as vscode from 'vscode';
-import { TenantService } from "../../services/TenantService";
-import { RolesTreeItem } from '../../models/ISCTreeItem';
-import { NEW_ID } from '../../constants';
-import { ISCClient } from '../../services/ISCClient';
-import { getResourceUri } from '../../utils/UriUtils';
-import { Role, RoleMembershipSelectorType } from 'sailpoint-api-client';
-import { runWizard } from '../../wizard/wizard';
-import { InputPromptStep } from '../../wizard/inputPromptStep';
-import { Validator } from '../../validator/validator';
-import { WizardContext } from '../../wizard/wizardContext';
-import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
-import { InputIdentityQueryStep } from '../../wizard/inputIdentityQueryStep';
-import { QuickPickIdentityStep } from '../../wizard/quickPickIdentityStep';
-import { createNewFile } from '../../utils/vsCodeHelpers';
-import { isNotBlank } from '../../utils/stringUtils';
-import { Parser } from '../../parser/parser';
-import { RoleMembershipSelectorConverter } from '../../parser/RoleMembershipSelectorConverter';
-import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService';
-import { QuickPickAccessProfileStep } from '../../wizard/quickPickAccessProfileStep';
-import { QuickPickEntitlementStep } from '../../wizard/quickPickEntitlementStep';
+import { TenantService } from "../../services/TenantService.js";
+import { RolesTreeItem } from '../../models/ISCTreeItem.js';
+import { NEW_ID } from '../../constants.js';
+import { ISCClient } from '../../services/ISCClient.js';
+import { getResourceUri } from '../../utils/UriUtils.js';
+import { Role, RoleMembershipSelectorType } from 'sailpoint-api-client/dist/roles/api.js';
+import { runWizard } from '../../wizard/wizard.js';
+import { InputPromptStep } from '../../wizard/inputPromptStep.js';
+import { Validator } from '../../validator/validator.js';
+import { WizardContext } from '../../wizard/wizardContext.js';
+import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep.js';
+import { InputIdentityQueryStep } from '../../wizard/inputIdentityQueryStep.js';
+import { QuickPickIdentityStep } from '../../wizard/quickPickIdentityStep.js';
+import { createNewFile } from '../../utils/vsCodeHelpers.js';
+import { isNotBlank } from '../../utils/stringUtils.js';
+import { Parser } from '../../parser/parser.js';
+import { RoleMembershipSelectorConverter } from '../../parser/RoleMembershipSelectorConverter.js';
+import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService.js';
+import { QuickPickAccessProfileStep } from '../../wizard/quickPickAccessProfileStep.js';
+import { QuickPickEntitlementStep } from '../../wizard/quickPickEntitlementStep.js';
+import { createRequire } from "node:module";
 
+const require = createRequire(import.meta.url);
 const role: Role = require('../../../snippets/role.json');
 
 

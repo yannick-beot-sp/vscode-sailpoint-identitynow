@@ -1,7 +1,7 @@
-import { ExportPayloadV2025IncludeTypesV2025, SpConfigExportResultsBeta } from 'sailpoint-api-client';
-import { SimpleSPConfigExporter } from '../commands/spconfig-export/SimpleSPConfigExporter';
-import type { DependencyGraphData } from './app/src/services/Client';
-import { DependencyService } from './DependencyService';
+import { ExportPayloadIncludeTypesEnum as ExportPayloadIncludeTypes, SpConfigExportResults } from 'sailpoint-api-client/dist/sp_config/api.js';
+import { SimpleSPConfigExporter } from '../commands/spconfig-export/SimpleSPConfigExporter.js';
+import type { DependencyGraphData } from './app/src/services/Client.js';
+import { DependencyService } from './DependencyService.js';
 
 export class SourceDependencyService extends DependencyService {
 
@@ -31,10 +31,10 @@ export class SourceDependencyService extends DependencyService {
             this.tenantDisplayname,
             {},
             [
-                ExportPayloadV2025IncludeTypesV2025.Transform,
-                ExportPayloadV2025IncludeTypesV2025.IdentityProfile,
-                ExportPayloadV2025IncludeTypesV2025.Role,
-                ExportPayloadV2025IncludeTypesV2025.LifecycleState,
+                ExportPayloadIncludeTypes.Transform,
+                ExportPayloadIncludeTypes.IdentityProfile,
+                ExportPayloadIncludeTypes.Role,
+                ExportPayloadIncludeTypes.LifecycleState,
             ]
         )
 
@@ -60,7 +60,7 @@ export class SourceDependencyService extends DependencyService {
      * "sourceName" attribute holds this source's name rather than its id. The reference may be
      * nested inside other transforms (composite transforms).
      */
-    private filterTransform(data: SpConfigExportResultsBeta | null) {
+    private filterTransform(data: SpConfigExportResults | null) {
 
         const transforms = (data?.objects ?? []).filter(o => o.self?.type === "TRANSFORM");
 
@@ -98,7 +98,7 @@ export class SourceDependencyService extends DependencyService {
      * (rather than a single profile node listing every attribute name), so the named transform
      * applied on top of the source for that attribute, if any, can hang off the attribute node.
      */
-    private filterIdentityProfile(data: SpConfigExportResultsBeta | null) {
+    private filterIdentityProfile(data: SpConfigExportResults | null) {
 
         const profiles = (data?.objects ?? []).filter(o => o.self?.type === "IDENTITY_PROFILE");
         const transforms = (data?.objects ?? []).filter(o => o.self?.type === "TRANSFORM");
@@ -221,7 +221,7 @@ export class SourceDependencyService extends DependencyService {
      * The access profile match reuses the ids collected by filterAccessProfile so the access
      * profiles endpoint is only ever called once.
      */
-    private filterRole(data: SpConfigExportResultsBeta | null, accessProfileIds: Set<string>) {
+    private filterRole(data: SpConfigExportResults | null, accessProfileIds: Set<string>) {
         const roles = (data?.objects ?? []).filter(o => o.self?.type === "ROLE");
 
         for (const roleObject of roles) {
@@ -283,7 +283,7 @@ export class SourceDependencyService extends DependencyService {
      * identity profile through identityProfileRef, so that profile is linked off the lifecycle
      * state node (rather than the root) unless it's already linked there via attribute mapping.
      */
-    private filterLifecycleState(data: SpConfigExportResultsBeta | null, accessProfileIds: Set<string>) {
+    private filterLifecycleState(data: SpConfigExportResults | null, accessProfileIds: Set<string>) {
         const lifecycleStates = (data?.objects ?? []).filter(o => o.self?.type === "LIFECYCLE_STATE");
         const profiles = (data?.objects ?? []).filter(o => o.self?.type === "IDENTITY_PROFILE");
 

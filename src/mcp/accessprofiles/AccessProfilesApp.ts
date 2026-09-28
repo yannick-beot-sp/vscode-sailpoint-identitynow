@@ -1,8 +1,8 @@
 import "reflect-metadata";
 import { App } from "@frontmcp/sdk";
-import { SearchAccessProfilesTool } from "./tools/SearchAccessProfilesTool";
-import { CreateAccessProfileTool } from "./tools/CreateAccessProfileTool";
-import { UpdateAccessProfileTool } from "./tools/UpdateAccessProfileTool";
+import { SearchAccessProfilesTool } from "./tools/SearchAccessProfilesTool.js";
+import { CreateAccessProfileTool } from "./tools/CreateAccessProfileTool.js";
+import { UpdateAccessProfileTool } from "./tools/UpdateAccessProfileTool.js";
 
 @App({
     id: "accessprofiles",

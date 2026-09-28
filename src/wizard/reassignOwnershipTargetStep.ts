@@ -1,12 +1,12 @@
-import { WizardPromptStep } from "./wizardPromptStep";
-import { WizardContext } from "./wizardContext";
-import { IWizardOptions } from "./wizardOptions";
-import { InputPromptStep } from "./inputPromptStep";
-import { InputIdentityQueryStep } from "./inputIdentityQueryStep";
-import { QuickPickIdentityStep } from "./quickPickIdentityStep";
-import { ISCClient } from "../services/ISCClient";
-import { REASSIGN_MODE_CHOOSE } from "./quickPickReassignModeStep";
-import { requiredValidator } from "../validator/requiredValidator";
+import { WizardPromptStep } from "./wizardPromptStep.js";
+import { WizardContext } from "./wizardContext.js";
+import { IWizardOptions } from "./wizardOptions.js";
+import { InputPromptStep } from "./inputPromptStep.js";
+import { InputIdentityQueryStep } from "./inputIdentityQueryStep.js";
+import { QuickPickIdentityStep } from "./quickPickIdentityStep.js";
+import { ISCClient } from "../services/ISCClient.js";
+import { REASSIGN_MODE_CHOOSE } from "./quickPickReassignModeStep.js";
+import { requiredValidator } from "../validator/requiredValidator.js";
 import {
     ReassignableObjectType,
     TYPE_REQUIRES_REASON,
@@ -14,7 +14,7 @@ import {
     listOwnedObjects,
     normalizeToArray,
     objectsContextKey
-} from "../models/ReassignOwnership";
+} from "../models/ReassignOwnership.js";
 
 /**
  * Runs after all per-type pickers (in "choose" mode -- there are none to wait for in

@@ -1,9 +1,9 @@
 import * as vscode from "vscode";
-import { ApplicationsTreeItem } from "../../models/ISCTreeItem";
-import { WizardContext } from "../../wizard/wizardContext";
-import { runWizard } from "../../wizard/wizard";
-import { InputPromptStep } from "../../wizard/inputPromptStep";
-import * as commands from "../constants";
+import { ApplicationsTreeItem } from "../../models/ISCTreeItem.js";
+import { WizardContext } from "../../wizard/wizardContext.js";
+import { runWizard } from "../../wizard/wizard.js";
+import { InputPromptStep } from "../../wizard/inputPromptStep.js";
+import * as commands from "../constants.js";
 
 /**
  * Search apps by name

@@ -1,5 +1,6 @@
 import * as assert from "assert";
-import { AuthUserV2025CapabilitiesV2025, UserLevelSummaryDTOV2025 } from "sailpoint-api-client";
+import { AuthUserCapabilitiesEnum as AuthUserCapabilities } from "sailpoint-api-client/dist/auth_users/api.js";
+import { UserLevelSummaryDTO } from "sailpoint-api-client/dist/custom_user_levels/api.js";
 import {
 	compareUserLevels,
 	getOotbUserLevels,
@@ -7,14 +8,14 @@ import {
 	isAdminUserLevel,
 	isUserLevelAssigned,
 	mergeUserLevels,
-} from "../../commands/identity/identityUserLevels";
+} from "../../commands/identity/identityUserLevels.js";
 
 suite("identity user levels", () => {
 	test("labels every SDK capability and keeps the wire value as legacyGroup", () => {
 		const levels = getOotbUserLevels();
 		const byCapability = new Map(levels.map(level => [level.legacyGroup, level.name]));
 
-		assert.strictEqual(levels.length, Object.values(AuthUserV2025CapabilitiesV2025).length);
+		assert.strictEqual(levels.length, Object.values(AuthUserCapabilities).length);
 		assert.ok(levels.every(level => level.custom === false));
 		assert.strictEqual(byCapability.get("ORG_ADMIN"), "Admin");
 		assert.strictEqual(byCapability.get("HELPDESK"), "Helpdesk");
@@ -29,7 +30,7 @@ suite("identity user levels", () => {
 	});
 
 	test("sorts admins first, standard levels next, then custom levels by name", () => {
-		const levels: UserLevelSummaryDTOV2025[] = [
+		const levels: UserLevelSummaryDTO[] = [
 			{ name: "Zulu", legacyGroup: "HELPDESK", custom: false },
 			{ name: "Custom", legacyGroup: "custom-role", custom: true },
 			{ name: "Admin", legacyGroup: "ORG_ADMIN", custom: false },

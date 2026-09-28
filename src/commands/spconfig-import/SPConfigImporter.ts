@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
-import { ISCClient } from '../../services/ISCClient';
-import { IMPORTABLE_OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
-import { ImportOptionsBeta } from 'sailpoint-api-client';
-import { ImportJobResults } from '../../models/JobStatus';
-import { waitForImportJob } from './utils';
+import { ISCClient } from '../../services/ISCClient.js';
+import { IMPORTABLE_OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem.js';
+import { ImportOptions } from 'sailpoint-api-client/dist/sp_config/api.js';
+import { ImportJobResults } from '../../models/JobStatus.js';
+import { waitForImportJob } from './utils.js';
 
 /**
  * Base class for all importer
@@ -15,7 +15,7 @@ export class SPConfigImporter {
         private readonly tenantId: string,
         private readonly tenantName: string,
         private readonly tenantDisplayName: string,
-        private readonly importOptions: ImportOptionsBeta = {},
+        private readonly importOptions: ImportOptions = {},
         private data: string
 
     ) {

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import * as commands from '../constants';
-import { TenantService } from '../../services/TenantService';
-import { BaseTreeItem } from '../../models/ISCTreeItem';
+import * as commands from '../constants.js';
+import { TenantService } from '../../services/TenantService.js';
+import { BaseTreeItem } from '../../models/ISCTreeItem.js';
 import { randomUUID } from 'crypto';
 
 

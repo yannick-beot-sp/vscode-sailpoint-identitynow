@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
-import { WorkflowTreeItem } from '../../models/ISCTreeItem';
-import { ISCClient } from '../../services/ISCClient';
-import { getWorkflowExecutionDetailUri } from '../../utils/UriUtils';
-import { WorkflowExecutionBeta } from 'sailpoint-api-client';
-import { openPreview } from '../../utils/vsCodeHelpers';
+import { WorkflowTreeItem } from '../../models/ISCTreeItem.js';
+import { ISCClient } from '../../services/ISCClient.js';
+import { getWorkflowExecutionDetailUri } from '../../utils/UriUtils.js';
+import { WorkflowExecution } from 'sailpoint-api-client/dist/workflows/api.js';
+import { openPreview } from '../../utils/vsCodeHelpers.js';
 
 export async function viewWorkflowExecutionHistory(node: WorkflowTreeItem): Promise<void> {
 
@@ -14,7 +14,7 @@ export async function viewWorkflowExecutionHistory(node: WorkflowTreeItem): Prom
     }
     const client = new ISCClient(node.tenantId, node.tenantName);
 
-    let history = await vscode.window.withProgress<WorkflowExecutionBeta[]>({
+    let history = await vscode.window.withProgress<WorkflowExecution[]>({
         location: vscode.ProgressLocation.Notification,
         title: 'Listing workflow executions...',
         cancellable: false

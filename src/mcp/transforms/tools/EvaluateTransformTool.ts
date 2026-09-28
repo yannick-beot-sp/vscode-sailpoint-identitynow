@@ -1,11 +1,11 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
-import { transformNameField } from "../transformInputFields";
-import { resolveIdentity } from "../../utils/identityUtils";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { tenantNameField } from "../../inputFields.js";
+import { transformNameField } from "../transformInputFields.js";
+import { resolveIdentity } from "../../utils/identityUtils.js";
 
 const IDENTITY_ATTRIBUTE = "uid";
 
@@ -41,7 +41,7 @@ type Output = z.infer<typeof outputSchema>;
     description:
         "Evaluate a transform for a given identity. " +
         "Returns the computed value or error messages if the transform could not be evaluated.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Evaluate Transform",

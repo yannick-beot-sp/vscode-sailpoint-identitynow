@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { refSchema } from "../../inputFields";
+import { refSchema } from "../../inputFields.js";
 
 export const accessProfileOutputSchema = z.object({
     id: z.string(),

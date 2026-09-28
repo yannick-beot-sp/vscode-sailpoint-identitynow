@@ -1,10 +1,10 @@
 import * as vscode from "vscode";
-import { ApplicationAccessProfileTreeItem } from "../../models/ISCTreeItem";
-import * as commands from "../constants";
-import { ISCClient } from "../../services/ISCClient";
-import { TenantService } from "../../services/TenantService";
-import { isTenantReadonly, validateTenantReadonly } from "../validateTenantReadonly";
-import { confirm } from "../../utils/vsCodeHelpers";
+import { ApplicationAccessProfileTreeItem } from "../../models/ISCTreeItem.js";
+import * as commands from "../constants.js";
+import { ISCClient } from "../../services/ISCClient.js";
+import { TenantService } from "../../services/TenantService.js";
+import { isTenantReadonly, validateTenantReadonly } from "../validateTenantReadonly.js";
+import { confirm } from "../../utils/vsCodeHelpers.js";
 
 /**
  * Search apps by name

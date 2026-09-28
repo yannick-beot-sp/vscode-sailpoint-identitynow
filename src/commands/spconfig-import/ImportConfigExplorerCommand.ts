@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-import { TenantService } from "../../services/TenantService";
-import { WizardBasedImporterCommand } from './WizardBasedImporterCommand';
+import { TenantService } from "../../services/TenantService.js";
+import { WizardBasedImporterCommand } from './WizardBasedImporterCommand.js';
 
 /**
  * Entry point to import file from the explorer. Tenant is unknown. File is known.

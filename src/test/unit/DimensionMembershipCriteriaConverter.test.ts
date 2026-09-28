@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { it, describe, suite } from 'mocha';
-import { DimensionMembershipCriteriaConverter, DimensionCriteriaNode } from '../../parser/DimensionMembershipCriteriaConverter';
+import { DimensionMembershipCriteriaConverter, DimensionCriteriaNode } from '../../parser/DimensionMembershipCriteriaConverter.js';
 
 interface ParameterizedTest { should: string, input: string, expected: DimensionCriteriaNode };
 interface ParameterizedErrorTest { should: string, input: string };

@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { AccessProfileImporter } from './AccessProfileImporter';
-import { TenantService } from '../../services/TenantService';
-import { askCreateOrUpdate, chooseTenant } from '../../utils/vsCodeHelpers';
-import { validateTenantReadonly } from '../validateTenantReadonly';
+import { AccessProfileImporter } from './AccessProfileImporter.js';
+import { TenantService } from '../../services/TenantService.js';
+import { askCreateOrUpdate, chooseTenant } from '../../utils/vsCodeHelpers.js';
+import { validateTenantReadonly } from '../validateTenantReadonly.js';
 
 
 export class AccessProfileImporterExplorerCommand {

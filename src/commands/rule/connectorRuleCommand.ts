@@ -1,23 +1,25 @@
 import * as vscode from 'vscode';
-import * as commands from '../constants';
-import { NEW_ID, RESOURCE_TYPES } from '../../constants';
-import { RulesTreeItem } from "../../models/ISCTreeItem";
-import { ISCClient } from '../../services/ISCClient';
-import { TenantService } from '../../services/TenantService';
-import { compareByName } from '../../utils';
-import { buildResourceUri } from '../../utils/UriUtils';
-import { chooseTenant, createNewFile, getSelectionContent, openPreview } from '../../utils/vsCodeHelpers';
-import { ConnectorRuleResponseBeta } from 'sailpoint-api-client';
-import { Validator } from '../../validator/validator';
-import { WizardContext } from '../../wizard/wizardContext';
-import { QuickPickPromptStep } from '../../wizard/quickPickPromptStep';
-import { runWizard } from '../../wizard/wizard';
-import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
-import { IWizardOptions } from '../../wizard/wizardOptions';
-import { WizardPromptStep } from '../../wizard/wizardPromptStep';
-import { InputPromptStep } from '../../wizard/inputPromptStep';
+import * as commands from '../constants.js';
+import { NEW_ID, RESOURCE_TYPES } from '../../constants.js';
+import { RulesTreeItem } from "../../models/ISCTreeItem.js";
+import { ISCClient } from '../../services/ISCClient.js';
+import { TenantService } from '../../services/TenantService.js';
+import { compareByName } from '../../utils.js';
+import { buildResourceUri } from '../../utils/UriUtils.js';
+import { chooseTenant, createNewFile, getSelectionContent, openPreview } from '../../utils/vsCodeHelpers.js';
+import { ConnectorRuleResponse } from 'sailpoint-api-client/dist/connector_rule_management/api.js';
+import { Validator } from '../../validator/validator.js';
+import { WizardContext } from '../../wizard/wizardContext.js';
+import { QuickPickPromptStep } from '../../wizard/quickPickPromptStep.js';
+import { runWizard } from '../../wizard/wizard.js';
+import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep.js';
+import { IWizardOptions } from '../../wizard/wizardOptions.js';
+import { WizardPromptStep } from '../../wizard/wizardPromptStep.js';
+import { InputPromptStep } from '../../wizard/inputPromptStep.js';
+import { createRequire } from "node:module";
 
-const ruleTypes: ConnectorRuleResponseBeta[] = require('../../../snippets/connector-rules.json')
+const require = createRequire(import.meta.url);
+const ruleTypes: ConnectorRuleResponse[] = require('../../../snippets/connector-rules.json')
 
 const ruleNameValidator = new Validator({
     required: true,

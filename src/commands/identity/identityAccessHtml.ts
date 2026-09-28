@@ -1,5 +1,5 @@
-import { IdentityAccessItem } from "../../models/IdentityAccessItem";
-import { jsonDrawerCss, jsonDrawerMarkup, jsonDrawerScript } from "./jsonDrawerSnippet";
+import { IdentityAccessItem } from "../../models/IdentityAccessItem.js";
+import { jsonDrawerCss, jsonDrawerMarkup, jsonDrawerScript } from "./jsonDrawerSnippet.js";
 
 function escapeHtml(value: string): string {
 	return value

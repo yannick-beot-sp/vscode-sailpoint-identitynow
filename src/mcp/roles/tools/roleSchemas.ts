@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { refSchema } from "../../inputFields";
+import { refSchema } from "../../inputFields.js";
 
 
 export const membershipCriteriaField = z.string().optional().describe(

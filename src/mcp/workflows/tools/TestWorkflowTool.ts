@@ -1,13 +1,13 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
-import { workflowNameField } from "../workflowInputFields";
-import { isGuid } from "../../../utils/stringUtils";
-import { WorkflowExecutionV2025StatusV2025 } from "sailpoint-api-client";
-import { delay } from "../../../utils";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { tenantNameField } from "../../inputFields.js";
+import { workflowNameField } from "../workflowInputFields.js";
+import { isGuid } from "../../../utils/stringUtils.js";
+import { WorkflowExecutionStatusEnum as WorkflowExecutionStatus } from "sailpoint-api-client/dist/workflows/api.js";
+import { delay } from "../../../utils.js";
 
 const POLL_INTERVAL_MS = 3_000;
 const MAX_WAIT_MS = 5 * 60 * 1_000; // 5 minutes
@@ -49,7 +49,7 @@ type Output = z.infer<typeof outputSchema>;
         "Test a workflow by running it with an optional payload. " +
         "Waits for the execution to finish and returns a summary of all activities executed, " +
         "their status (completed / failed) and the final execution status.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Test Workflow",
@@ -86,7 +86,7 @@ export class TestWorkflowTool extends ToolContext {
 
         // 3. Poll until the execution finishes
         const deadline = Date.now() + MAX_WAIT_MS;
-        let executionStatus: WorkflowExecutionV2025StatusV2025 = WorkflowExecutionV2025StatusV2025.Running;
+        let executionStatus: WorkflowExecutionStatus = WorkflowExecutionStatus.Running;
         let startTime: string | undefined;
         let closeTime: string | undefined;
 
@@ -97,9 +97,9 @@ export class TestWorkflowTool extends ToolContext {
                 executionStatus = execution.status ?? executionStatus;
                 startTime = (execution as any).startTime;
                 closeTime = (execution as any).closeTime;
-                if (executionStatus == WorkflowExecutionV2025StatusV2025.Failed
-                    || executionStatus == WorkflowExecutionV2025StatusV2025.Canceled
-                    || executionStatus == WorkflowExecutionV2025StatusV2025.Completed
+                if (executionStatus == WorkflowExecutionStatus.Failed
+                    || executionStatus == WorkflowExecutionStatus.Canceled
+                    || executionStatus == WorkflowExecutionStatus.Completed
                 ) {
                     break;
                 }

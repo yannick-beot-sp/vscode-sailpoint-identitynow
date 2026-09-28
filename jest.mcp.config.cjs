@@ -5,6 +5,8 @@ module.exports = {
     setupFiles: ["dotenv/config"],
     moduleNameMapper: {
         "^vscode$": "<rootDir>/src/test/mcp/vscode-mock.ts",
+        // Source imports use ESM .js specifiers; Jest loads the TypeScript sources.
+        "^(\\.{1,2}/.*)\\.js$": "$1",
     },
     testTimeout: 60_000,
     transform: {
@@ -12,6 +14,11 @@ module.exports = {
             tsconfig: {
                 experimentalDecorators: true,
                 emitDecoratorMetadata: true,
+                // Jest still transforms the extension sources as CommonJS.
+                // The published extension itself is ESM (package.json "type": "module").
+                module: "commonjs",
+                moduleResolution: "node",
+                esModuleInterop: true,
             },
         }],
     },

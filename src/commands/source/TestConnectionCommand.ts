@@ -1,13 +1,13 @@
 import * as vscode from 'vscode';
 
-import { StatusResponseBeta, StatusResponseBetaStatusBeta } from 'sailpoint-api-client';
-import { SourceTreeItem } from '../../models/ISCTreeItem';
-import { ISCClient } from '../../services/ISCClient';
-import { TenantService } from '../../services/TenantService';
-import { WizardContext } from '../../wizard/wizardContext';
-import { runWizard } from '../../wizard/wizard';
-import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
-import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep';
+import { StatusResponse, StatusResponseStatusEnum as StatusResponseStatus } from 'sailpoint-api-client/dist/sources/api.js';
+import { SourceTreeItem } from '../../models/ISCTreeItem.js';
+import { ISCClient } from '../../services/ISCClient.js';
+import { TenantService } from '../../services/TenantService.js';
+import { WizardContext } from '../../wizard/wizardContext.js';
+import { runWizard } from '../../wizard/wizard.js';
+import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep.js';
+import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep.js';
 
 export class TestConnectionCommand {
 
@@ -55,8 +55,8 @@ export class TestConnectionCommand {
             title: `Testing  ${values["source"].name} from ${values["tenant"].name}...`,
             cancellable: false
         }, async (task, token) => { return await client.testSourceConnection(values["source"].id) })
-            .then(async (result: StatusResponseBeta) => {
-                if (StatusResponseBetaStatusBeta.Success === result.status) {
+            .then(async (result: StatusResponse) => {
+                if (StatusResponseStatus.Success === result.status) {
                     vscode.window.showInformationMessage(
                         `Connection test successfull for ${values["source"].name} from ${values["tenant"].name}`
                     );

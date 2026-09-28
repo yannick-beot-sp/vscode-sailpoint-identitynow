@@ -1,17 +1,17 @@
 import * as vscode from 'vscode';
-import { RESOURCE_TYPES } from '../constants';
-import { IdentityAttributesTreeItem } from "../models/ISCTreeItem";
-import { buildResourceUri } from '../utils/UriUtils';
-import { openPreview } from '../utils/vsCodeHelpers';
-import * as commands from "../commands/constants";
-import { WizardContext } from '../wizard/wizardContext';
-import { TenantService } from '../services/TenantService';
-import { runWizard } from '../wizard/wizard';
-import { QuickPickTenantStep } from '../wizard/quickPickTenantStep';
-import { Validator } from '../validator/validator';
-import { InputPromptStep } from '../wizard/inputPromptStep';
-import { toCamelCase } from '../utils/stringUtils';
-import { ISCClient } from '../services/ISCClient';
+import { RESOURCE_TYPES } from '../constants.js';
+import { IdentityAttributesTreeItem } from "../models/ISCTreeItem.js";
+import { buildResourceUri } from '../utils/UriUtils.js';
+import { openPreview } from '../utils/vsCodeHelpers.js';
+import * as commands from "../commands/constants.js";
+import { WizardContext } from '../wizard/wizardContext.js';
+import { TenantService } from '../services/TenantService.js';
+import { runWizard } from '../wizard/wizard.js';
+import { QuickPickTenantStep } from '../wizard/quickPickTenantStep.js';
+import { Validator } from '../validator/validator.js';
+import { InputPromptStep } from '../wizard/inputPromptStep.js';
+import { toCamelCase } from '../utils/stringUtils.js';
+import { ISCClient } from '../services/ISCClient.js';
 
 
 const identityAttributeNameValidator = new Validator({

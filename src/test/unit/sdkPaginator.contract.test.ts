@@ -1,6 +1,15 @@
 import * as assert from "assert";
-import { AxiosResponse } from "axios";
-import { Configuration, ExtraParams, PaginationParams, Paginator, Search, SearchApi, SearchV2025 } from "sailpoint-api-client";
+import axios, { AxiosResponse } from "axios";
+import { config as loadEnv } from "dotenv";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { Configuration, ExtraParams, PaginationParams, Paginator, SearchApi } from "sailpoint-api-client";
+import { Search } from "sailpoint-api-client/dist/search/api.js";
+import { EndpointUtils } from "../../utils/EndpointUtils.js";
+
+loadEnv({
+	path: path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../.env"),
+});
 
 function response<T>(data: T[]): AxiosResponse<T[]> {
 	return {
@@ -19,11 +28,33 @@ function httpError(status: number): Error & { response: { status: number } } {
 }
 
 function configuration(): Configuration {
+	const tenantName = process.env.ISC_TENANT_NAME ?? "";
+	const clientId = process.env.ISC_CLIENT_ID ?? "";
+	const clientSecret = process.env.ISC_CLIENT_SECRET ?? "";
+	if (!tenantName || !clientId || !clientSecret) {
+		throw new Error(
+			"Missing required environment variables. Copy .env.example to .env and set ISC_TENANT_NAME, ISC_CLIENT_ID, ISC_CLIENT_SECRET."
+		);
+	}
+
+	const tokenUrl = EndpointUtils.getAccessTokenUrl(tenantName);
 	return new Configuration({
-		baseurl: "https://acme.api.identitynow.com",
-		tokenUrl: "https://acme.api.identitynow.com/oauth/token",
-		accessToken: "pat-token",
+		baseurl: EndpointUtils.getBaseUrl(tenantName),
+		tokenUrl,
+		clientId,
+		clientSecret,
+		accessToken: () => accessToken(tokenUrl, clientId, clientSecret),
 	});
+}
+
+async function accessToken(tokenUrl: string, clientId: string, clientSecret: string): Promise<string> {
+	const body = new URLSearchParams({
+		grant_type: "client_credentials",
+		client_id: clientId,
+		client_secret: clientSecret,
+	});
+	const tokenResponse = await axios.post(tokenUrl, body);
+	return tokenResponse.data.access_token;
 }
 
 suite("sailpoint-api-client Paginator", () => {
@@ -118,7 +149,7 @@ suite("sailpoint-api-client Paginator", () => {
 			query: { query: "*" },
 			sort: ["-name"],
 		};
-		(api as unknown as { searchPost(request: { limit?: unknown; search?: Search }): Promise<AxiosResponse<Array<Record<string, string>>>> }).searchPost =
+		(api as unknown as { searchPostV1(request: { limit?: unknown; search?: Search }): Promise<AxiosResponse<Array<Record<string, string>>>> }).searchPostV1 =
 			async (request) => {
 				calls.push({
 					limit: request.limit,
@@ -140,15 +171,15 @@ suite("sailpoint-api-client Paginator", () => {
 		assert.deepStrictEqual(search.searchAfter, ["Yan"]);
 	});
 
-	test("paginates Search v2025 through the searchV2025 request field", async () => {
+	test("paginates Search v2025 through the search request field", async () => {
 		const api = new SearchApi(configuration());
-		const search: SearchV2025 = {
+		const search: Search = {
 			indices: ["roles"],
 			query: { query: "requestable:true" },
 			sort: ["name"],
 		};
 		let request: Record<string, unknown> | undefined;
-		(api as unknown as { searchPost(request: Record<string, unknown>): Promise<AxiosResponse<unknown[]>> }).searchPost =
+		(api as unknown as { searchPostV1(request: Record<string, unknown>): Promise<AxiosResponse<unknown[]>> }).searchPostV1 =
 			async (next) => {
 				request = next;
 				return response([{ name: "Helpdesk" }]);
@@ -158,21 +189,16 @@ suite("sailpoint-api-client Paginator", () => {
 
 		assert.deepStrictEqual(result.data, [{ name: "Helpdesk" }]);
 		assert.strictEqual(request?.limit, 10);
-		assert.strictEqual(request?.searchV2025, search);
+		assert.strictEqual(request?.search, search);
 	});
 
-	test("requires exactly one sort and a known search client", async () => {
+	test("requires exactly one sort", async () => {
 		const api = new SearchApi(configuration());
 		const search = { indices: ["identities"], query: { query: "*" }, sort: ["name", "id"] } as Search;
 
 		await assert.rejects(
 			() => Paginator.paginateSearchApi(api, search),
 			(error: unknown) => error === "search must include exactly one sort parameter to paginate properly"
-		);
-
-		await assert.rejects(
-			() => Paginator.paginateSearchApi({} as SearchApi, { ...search, sort: ["name"] }),
-			(error: unknown) => error instanceof Error && error.message === "Unsupported API type"
 		);
 	});
 });

@@ -1,12 +1,12 @@
-import "./vscodeStub";
+import "./vscodeStub.js";
 import * as assert from "assert";
-import { AdditionalOwnerRefV2025 } from "sailpoint-api-client";
-import { CacheService } from "../../services/cache/CacheService";
-import { GovernanceGroupIdToNameCacheService } from "../../services/cache/GovernanceGroupIdToNameCacheService";
-import { GovernanceGroupNameToIdCacheService } from "../../services/cache/GovernanceGroupNameToIdCacheService";
-import { IdentityIdToNameCacheService } from "../../services/cache/IdentityIdToNameCacheService";
-import { IdentityUsernameToIdCacheService } from "../../services/cache/IdentityNameToIdCacheService";
-import { getAdditionalOwners, resolveAdditionalOwners } from "../../utils/additionalOwners";
+import { AdditionalOwnerRef } from "sailpoint-api-client/dist/accounts/api.js";
+import { CacheService } from "../../services/cache/CacheService.js";
+import { GovernanceGroupIdToNameCacheService } from "../../services/cache/GovernanceGroupIdToNameCacheService.js";
+import { GovernanceGroupNameToIdCacheService } from "../../services/cache/GovernanceGroupNameToIdCacheService.js";
+import { IdentityIdToNameCacheService } from "../../services/cache/IdentityIdToNameCacheService.js";
+import { IdentityUsernameToIdCacheService } from "../../services/cache/IdentityNameToIdCacheService.js";
+import { getAdditionalOwners, resolveAdditionalOwners } from "../../utils/additionalOwners.js";
 
 function cache(entries: Record<string, string>): CacheService<string> {
 	return new CacheService(async (key: string) => {
@@ -41,7 +41,7 @@ suite("additional owners", () => {
 				{ type: "IDENTITY", id: "id-1", name: "Ada Lovelace" },
 				{ type: "IDENTITY" },
 				{ type: "IDENTITY", id: "id-2" },
-			] as AdditionalOwnerRefV2025[],
+			] as AdditionalOwnerRef[],
 			cache({ "id-1": "ada", "id-2": "grace" }) as IdentityIdToNameCacheService,
 			cache({}) as GovernanceGroupIdToNameCacheService
 		);

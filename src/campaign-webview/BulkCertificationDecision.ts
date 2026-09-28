@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { IdentityCertificationDtoV2025, AccessReviewItemV2025, ReviewDecisionV2025, CertificationDecisionV2025, CertificationsV2025ApiMakeIdentityDecisionRequest } from "sailpoint-api-client";
-import { ISCClient } from "../services/ISCClient";
+import { ISCClient } from "../services/ISCClient.js";
+import { AccessReviewItem, CertificationDecision, CertificationsApiMakeIdentityDecisionV1Request, IdentityCertificationDto, ReviewDecision } from 'sailpoint-api-client/dist/certifications/api.js';
 
 const DECIDE_CERTIFICATION_ITEM_LIMIT = 250;
 
@@ -14,7 +14,7 @@ export class BulkCertificationDecision {
     constructor(private readonly client: ISCClient) { }
 
     async processBulkDecision(
-        certifications: IdentityCertificationDtoV2025[]
+        certifications: IdentityCertificationDto[]
     ): Promise<DecisionReport> {
         const report: DecisionReport = {
             success: 0,
@@ -23,17 +23,14 @@ export class BulkCertificationDecision {
         };
 
         // Prompt for the decision
-        const decisionOptions: { label: string; value: CertificationDecisionV2025 }[] = [
-            { label: 'Approve', value: CertificationDecisionV2025.Approve },
-            { label: 'Revoke', value: CertificationDecisionV2025.Revoke },
+        const decisionOptions: (vscode.QuickPickItem & { value: CertificationDecision })[] = [
+            { label: 'Approve', value: CertificationDecision.Approve },
+            { label: 'Revoke', value: CertificationDecision.Revoke },
         ];
-        const selectedValue = await vscode.window.showQuickPick(
-            decisionOptions.map(option => option.label),
-            {
-                placeHolder: 'Select the bulk decision:',
-                canPickMany: false,
-            }
-        );
+        const selectedValue = await vscode.window.showQuickPick(decisionOptions, {
+            placeHolder: 'Select the bulk decision:',
+            canPickMany: false,
+        });
 
         if (!selectedValue) {
             // User canceled the QuickPick
@@ -42,8 +39,7 @@ export class BulkCertificationDecision {
             return report;
         }
 
-        // Map decision label back to the CertificationDecision
-        const certificaionDecision: CertificationDecisionV2025 | undefined = decisionOptions.find(o => o.label === selectedValue)?.value;
+        const certificationDecision = selectedValue.value;
 
         // Prompt for a comment
         const comment = await vscode.window.showInputBox({
@@ -76,7 +72,7 @@ export class BulkCertificationDecision {
             for (const certification of certifications) {
                 if (token.isCancellationRequested) { return }
                 // Get all review items for this certification
-                const reviewItems = await this.client.getCertificationReviewItems(certification.id, false);
+                const reviewItems = await this.client.getCertificationReviewItems(certification.id!, false);
                 const totalBatches = Math.ceil(reviewItems.length / DECIDE_CERTIFICATION_ITEM_LIMIT);
                 let processedBatches = 1;
 
@@ -90,7 +86,7 @@ export class BulkCertificationDecision {
                     const batch = reviewItems.splice(0, DECIDE_CERTIFICATION_ITEM_LIMIT);
 
                     try {
-                        await this.processBatch(certification.id, batch, certificaionDecision, comment);
+                        await this.processBatch(certification.id!, batch, certificationDecision, comment);
                         report.success += batch.length;
                     } catch (error) {
                         const errorMessage = error instanceof Error ? error.message : String(error);
@@ -120,17 +116,17 @@ export class BulkCertificationDecision {
 
     private async processBatch(
         certificationId: string,
-        batch: AccessReviewItemV2025[],
-        decision: CertificationDecisionV2025,
+        batch: AccessReviewItem[],
+        decision: CertificationDecision,
         comment: string
     ): Promise<void> {
-        let decisions: ReviewDecisionV2025[] = [];
+        let decisions: ReviewDecision[] = [];
         batch.forEach(accessReviewItem => {
-            decisions.push({ id: accessReviewItem.id, bulk: true, decision: decision, comments: comment })
+            decisions.push({ id: accessReviewItem.id!, bulk: true, decision: decision, comments: comment })
         });
-        const apiDecisionRequest: CertificationsV2025ApiMakeIdentityDecisionRequest = {
+        const apiDecisionRequest: CertificationsApiMakeIdentityDecisionV1Request = {
             id: certificationId,
-            reviewDecisionV2025: decisions
+            reviewDecision: decisions
         };
 
         await this.client.decideCertificationItems(apiDecisionRequest);

@@ -1,12 +1,12 @@
 import { SecretStorage } from "vscode";
-import { TenantToken } from "../models/TenantInfo";
-import { isNotEmpty } from '../utils/stringUtils';
-import { EndpointUtils } from "../utils/EndpointUtils";
-import { AccessToken, OAuth2Client } from "./OAuth2Client";
-import { CertificationCampaignInfo } from "../models/CertificationCampaignInfo";
-import { TenantService } from "./TenantService";
-import { TenantServiceEventType } from "./TenantServiceEventType";
-import { Observer } from "./Observer";
+import { TenantToken } from "../models/TenantInfo.js";
+import { isNotEmpty } from '../utils/stringUtils.js';
+import { EndpointUtils } from "../utils/EndpointUtils.js";
+import { AccessToken, OAuth2Client } from "./OAuth2Client.js";
+import { CertificationCampaignInfo } from "../models/CertificationCampaignInfo.js";
+import { TenantService } from "./TenantService.js";
+import { TenantServiceEventType } from "./TenantServiceEventType.js";
+import { Observer } from "./Observer.js";
 
 const CAMPAIGN_CONFIGURATION_PREFIX = "IDENTITYNOW_TENANT_CAMPAIGN_CONFIGURATION_";
 

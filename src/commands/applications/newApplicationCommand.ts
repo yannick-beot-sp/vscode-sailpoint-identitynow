@@ -1,17 +1,17 @@
 import * as vscode from 'vscode';
-import { TenantService } from "../../services/TenantService";
-import { AccessProfilesTreeItem, ApplicationTreeItem } from '../../models/ISCTreeItem';
-import { ISCClient } from '../../services/ISCClient';
-import { runWizard } from '../../wizard/wizard';
-import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
-import { InputPromptStep } from '../../wizard/inputPromptStep';
-import { Validator } from '../../validator/validator';
-import { WizardContext } from '../../wizard/wizardContext';
-import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep';
-import { requiredValidator } from '../../validator/requiredValidator';
-import * as commands from "../constants";
-import { buildResourceUri } from '../../utils/UriUtils';
-import { openPreview } from '../../utils/vsCodeHelpers';
+import { TenantService } from "../../services/TenantService.js";
+import { AccessProfilesTreeItem, ApplicationTreeItem } from '../../models/ISCTreeItem.js';
+import { ISCClient } from '../../services/ISCClient.js';
+import { runWizard } from '../../wizard/wizard.js';
+import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep.js';
+import { InputPromptStep } from '../../wizard/inputPromptStep.js';
+import { Validator } from '../../validator/validator.js';
+import { WizardContext } from '../../wizard/wizardContext.js';
+import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep.js';
+import { requiredValidator } from '../../validator/requiredValidator.js';
+import * as commands from "../constants.js";
+import { buildResourceUri } from '../../utils/UriUtils.js';
+import { openPreview } from '../../utils/vsCodeHelpers.js';
 
 const appNameValidator = new Validator({
     required: true,

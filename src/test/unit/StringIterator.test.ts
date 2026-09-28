@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { it, describe, suite } from 'mocha';
-import { StringIterator } from '../../parser/stringIterator';
+import { StringIterator } from '../../parser/stringIterator.js';
 
 
 suite('StringIterator Test Suite', () => {

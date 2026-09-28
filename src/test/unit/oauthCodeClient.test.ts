@@ -9,7 +9,7 @@ import {
 	confirmationCodeFromState,
 	parsePasteCode,
 	tokenEndpointFor,
-} from "../../services/OAuthCodeClient";
+} from "../../services/OAuthCodeClient.js";
 
 function encodePasteCode(code: string, state: string, version = 1): string {
 	const payload = JSON.stringify({ v: version, code, state });

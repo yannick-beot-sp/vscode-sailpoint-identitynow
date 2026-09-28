@@ -1,6 +1,6 @@
 import axios from "axios";
-import { onErrorResponse, onRequest, onResponse } from "./AxiosHandlers";
-import { USER_AGENT, USER_AGENT_HEADER } from "./ISCClient";
+import { onErrorResponse, onRequest, onResponse } from "./AxiosHandlers.js";
+import { USER_AGENT, USER_AGENT_HEADER } from "./ISCClient.js";
 
 export class AccessToken {
     // eslint-disable-next-line @typescript-eslint/naming-convention

@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
-import { IdentitiesTreeItem } from '../../models/ISCTreeItem';
-import { ISCClient } from '../../services/ISCClient';
-import { runWizard } from '../../wizard/wizard';
-import { WizardContext } from '../../wizard/wizardContext';
-import { QuickPickObjectTypeStep } from '../../wizard/quickPickObjectTypeStep';
-import { QuickPickReassignModeStep, REASSIGN_MODE_ALL } from '../../wizard/quickPickReassignModeStep';
-import { ReassignOwnershipPlanStep } from '../../wizard/reassignOwnershipPlanStep';
+import { IdentitiesTreeItem } from '../../models/ISCTreeItem.js';
+import { ISCClient } from '../../services/ISCClient.js';
+import { runWizard } from '../../wizard/wizard.js';
+import { WizardContext } from '../../wizard/wizardContext.js';
+import { QuickPickObjectTypeStep } from '../../wizard/quickPickObjectTypeStep.js';
+import { QuickPickReassignModeStep, REASSIGN_MODE_ALL } from '../../wizard/quickPickReassignModeStep.js';
+import { ReassignOwnershipPlanStep } from '../../wizard/reassignOwnershipPlanStep.js';
 import {
     allModeCacheKey,
     listOwnedObjects,
@@ -15,7 +15,7 @@ import {
     ReassignableObject,
     ReassignableObjectType,
     REASSIGNABLE_OBJECT_TYPES
-} from '../../models/ReassignOwnership';
+} from '../../models/ReassignOwnership.js';
 
 interface ReassignResult {
     type: ReassignableObjectType;

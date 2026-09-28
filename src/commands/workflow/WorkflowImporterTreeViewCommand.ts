@@ -1,14 +1,14 @@
-import { chooseFile } from '../../utils/vsCodeHelpers';
-import { WorkflowsTreeItem } from '../../models/ISCTreeItem';
-import { ISCClient } from '../../services/ISCClient';
+import { chooseFile } from '../../utils/vsCodeHelpers.js';
+import { WorkflowsTreeItem } from '../../models/ISCTreeItem.js';
+import { ISCClient } from '../../services/ISCClient.js';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
-import { CreateWorkflowRequestV2025 } from 'sailpoint-api-client';
-import { cleanUpWorkflow } from './utils';
-import { isBlank } from '../../utils/stringUtils';
-import * as commands from '../constants';
-import { TenantService } from '../../services/TenantService';
-import { validateTenantReadonly } from '../validateTenantReadonly';
+import { CreateWorkflowV1Request as CreateWorkflowRequest } from 'sailpoint-api-client/dist/workflows/api.js';
+import { cleanUpWorkflow } from './utils.js';
+import { isBlank } from '../../utils/stringUtils.js';
+import * as commands from '../constants.js';
+import { TenantService } from '../../services/TenantService.js';
+import { validateTenantReadonly } from '../validateTenantReadonly.js';
 
 
 
@@ -45,7 +45,7 @@ export class WorkflowImporterTreeViewCommand {
 
         const data = fs.readFileSync(fileUri.fsPath).toString();
 
-        const workflow = JSON.parse(data) as CreateWorkflowRequestV2025
+        const workflow = JSON.parse(data) as CreateWorkflowRequest
 
         const name = await askWorkflowName(workflow.name)
         if (isBlank(name)) {

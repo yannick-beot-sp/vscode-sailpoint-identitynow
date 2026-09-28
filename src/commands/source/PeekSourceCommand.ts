@@ -1,14 +1,14 @@
 import * as vscode from 'vscode';
-import { Schema } from 'sailpoint-api-client';
-import { SourceTreeItem } from '../../models/ISCTreeItem';
-import { ISCClient } from '../../services/ISCClient';
-import { TenantService } from '../../services/TenantService';
-import { WizardContext } from '../../wizard/wizardContext';
-import { runWizard } from '../../wizard/wizard';
-import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
-import { QuickPickPromptStep } from '../../wizard/quickPickPromptStep';
-import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep';
-import { createNewUntitledFile } from '../../utils/vsCodeHelpers';
+import { Schema } from 'sailpoint-api-client/dist/sources/api.js';
+import { SourceTreeItem } from '../../models/ISCTreeItem.js';
+import { ISCClient } from '../../services/ISCClient.js';
+import { TenantService } from '../../services/TenantService.js';
+import { WizardContext } from '../../wizard/wizardContext.js';
+import { runWizard } from '../../wizard/wizard.js';
+import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep.js';
+import { QuickPickPromptStep } from '../../wizard/quickPickPromptStep.js';
+import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep.js';
+import { createNewUntitledFile } from '../../utils/vsCodeHelpers.js';
 
 
 

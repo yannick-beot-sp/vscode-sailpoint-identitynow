@@ -1,8 +1,8 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { MachineAccountSubtypeTreeItem } from "../../models/ISCTreeItem";
-import { getPathByUri } from "../../utils/UriUtils";
-import { openPreview } from "../../utils/vsCodeHelpers";
+import { MachineAccountSubtypeTreeItem } from "../../models/ISCTreeItem.js";
+import { getPathByUri } from "../../utils/UriUtils.js";
+import { openPreview } from "../../utils/vsCodeHelpers.js";
 
 export class EditMachineAccountSubtypeApprovalConfigCommand {
 

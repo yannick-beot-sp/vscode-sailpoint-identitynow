@@ -1,20 +1,25 @@
 import * as vscode from "vscode";
 import * as path from 'path';
-import { ISCClient, TOTAL_COUNT_HEADER } from "../services/ISCClient";
-import { getIdByUri, getPathByUri, getResourceUri, getResourceWebUrl, getUIUrl } from "../utils/UriUtils";
-import { compareByLabel, compareByName, compareByPriority } from "../utils";
+import { ISCClient, TOTAL_COUNT_HEADER } from "../services/ISCClient.js";
+import { getIdByUri, getPathByUri, getResourceUri, getResourceWebUrl, getUIUrl } from "../utils/UriUtils.js";
+import { compareByLabel, compareByName, compareByPriority } from "../utils.js";
 import { AxiosHeaders, AxiosResponse } from "axios";
-import { getConfigNumber } from '../utils/configurationUtils';
-import * as commands from "../commands/constants";
-import * as configuration from '../configurationConstants';
-import { convertConstantToTitleCase, escapeFilter, isEmpty, isNotEmpty } from "../utils/stringUtils";
-import { TenantService } from "../services/TenantService";
-import { CloudRuleService } from "../services/CloudRuleService";
-import { convertToBaseTreeItem } from "../views/utils";
-import { isAccountRemovable } from "../commands/account/accountUtils";
-import { filterNotificationTemplates, mergeNotificationTemplates, notificationTemplateDescription, notificationTemplateWebUiSegments, NotificationTemplateListEntry } from "../utils/notificationTemplateList";
+import { getConfigNumber } from '../utils/configurationUtils.js';
+import * as commands from "../commands/constants.js";
+import * as configuration from '../configurationConstants.js';
+import { convertConstantToTitleCase, escapeFilter, isEmpty, isNotEmpty } from "../utils/stringUtils.js";
+import { TenantService } from "../services/TenantService.js";
+import { CloudRuleService } from "../services/CloudRuleService.js";
+import { convertToBaseTreeItem } from "../views/utils.js";
+import { isAccountRemovable } from "../commands/account/accountUtils.js";
+import { filterNotificationTemplates, mergeNotificationTemplates, notificationTemplateDescription, notificationTemplateWebUiSegments, NotificationTemplateListEntry } from "../utils/notificationTemplateList.js";
+import { Campaign2StatusEnum } from "sailpoint-api-client/dist/certification_campaigns/api.js";
+import { Account } from "sailpoint-api-client/dist/accounts/api.js";
+import { Dimension } from "sailpoint-api-client/dist/dimensions/api.js";
+import { SourceSubtypeWithSource } from "sailpoint-api-client/dist/machine_account_subtypes/api.js";
+import { MachineIdentityResponse } from "sailpoint-api-client/dist/machine_identities/api.js";
+import { truethy } from "../utils/booleanUtils.js";
 
-import { Account, CampaignStatusV3, DimensionV2025, MachineIdentityResponseV2025, SourceSubtypeWithSourceV2026 } from "sailpoint-api-client";
 
 /**
  * Base class to expose getChildren and updateIcon methods
@@ -42,7 +47,7 @@ export abstract class BaseTreeItem extends vscode.TreeItem {
 	}
 
 	get computedContextValue(): string {
-		return this.contextValue;
+		return this.contextValue ?? "";
 	}
 
 	getUrl(): vscode.Uri | undefined {
@@ -90,7 +95,7 @@ export class TenantTreeItem extends BaseTreeItem {
 			new MachineIdentitiesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
 			new ApplicationsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
 			new CampaignsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
-		    new CloudRulesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
+			new CloudRulesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
 			new NotificationTemplatesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
 
 		];
@@ -132,9 +137,7 @@ export class TenantFolderTreeItem extends BaseTreeItem {
 		private readonly tenantService: TenantService
 	) {
 		super(label,
-			undefined,
-			undefined,
-			undefined,
+			"", "", "",
 			vscode.TreeItemCollapsibleState.Collapsed);
 		this.id = id
 		this.resourceUri = vscode.Uri.parse(`${label}`)
@@ -143,7 +146,7 @@ export class TenantFolderTreeItem extends BaseTreeItem {
 	contextValue = "folder"
 
 	async getChildren(): Promise<BaseTreeItem[]> {
-		const children = this.tenantService.getChildren(this.id)
+		const children = this.tenantService.getChildren(this.id!)
 		let results: BaseTreeItem[] = children?.map(x => convertToBaseTreeItem(x, this.tenantService)) ?? []
 		return results
 	}
@@ -239,11 +242,11 @@ export class IdentityProfilesTreeItem extends FolderTreeItem {
 					this.tenantId,
 					this.tenantName,
 					this.tenantDisplayName,
-					`${w.name} (${w.authoritativeSource.name.replace(
+					`${w.name} (${w.authoritativeSource?.name?.replace(
 						/ \[source.*\]/,
 						""
 					)})`,
-					w.id
+					w.id!
 				)
 		);
 		return identityProfileItems;
@@ -656,7 +659,7 @@ export class ProvisioningPoliciesTreeItem extends FolderTreeItem {
 	async getChildren(): Promise<BaseTreeItem[]> {
 		const client = new ISCClient(this.tenantId, this.tenantName);
 		const sourceId = getIdByUri(this.parentUri)
-		const provisioningPolicies = await client.getProvisioningPolicies(sourceId)
+		const provisioningPolicies = await client.getProvisioningPolicies(sourceId!)
 
 		const results = provisioningPolicies?.map((provisioningPolicy) => new ProvisioningPolicyTreeItem(
 			{
@@ -664,7 +667,7 @@ export class ProvisioningPoliciesTreeItem extends FolderTreeItem {
 				tenantName: this.tenantName,
 				tenantDisplayName: this.tenantDisplayName,
 				type: provisioningPolicy.usageType!,
-				sourceId,
+				sourceId: sourceId!,
 				name: provisioningPolicy.name!
 			})).sort(compareByLabel)
 		return results;
@@ -721,7 +724,7 @@ export class MachineAccountSubtypesTreeItem extends FolderTreeItem {
 		// no pagination for now
 		const subtypes = await client.listMachineAccountSubtypes(sourceId);
 
-		return subtypes.map((subtype: SourceSubtypeWithSourceV2026) => new MachineAccountSubtypeTreeItem(
+		return subtypes.map((subtype: SourceSubtypeWithSource) => new MachineAccountSubtypeTreeItem(
 			this.tenantId,
 			this.tenantName,
 			this.tenantDisplayName,
@@ -843,7 +846,7 @@ export class WorkflowsTreeItem extends FolderTreeItem {
 					this.tenantDisplayName,
 					w.name!,
 					w.id!,
-					w.enabled
+					truethy(w.enabled)
 				)
 		);
 		return workflowTreeItems;
@@ -1019,15 +1022,15 @@ export class IdentityProfileTreeItem extends ISCResourceTreeItem {
 
 	async getChildren(): Promise<BaseTreeItem[]> {
 		const client = new ISCClient(this.tenantId, this.tenantName);
-		const lifecycleStates = await client.getLifecycleStates(this.id);
+		const lifecycleStates = await client.getLifecycleStates(this.id!);
 
 		const lifecycleStateItems = lifecycleStates.map((w) => new LifecycleStateTreeItem(
 			this.tenantId,
 			this.tenantName,
 			this.tenantDisplayName,
-			w.name,
+			w.name!,
 			this.id as string,
-			w.id
+			w.id!
 		))
 		return lifecycleStateItems;
 	}
@@ -1093,7 +1096,7 @@ export class ServiceDesksTreeItem extends FolderTreeItem {
 				this.tenantName,
 				this.tenantDisplayName,
 				w.name,
-				w.id,
+				w.id!,
 				w.type
 			)
 		);
@@ -1285,8 +1288,8 @@ export class AccessProfilesTreeItem extends PageableFolderTreeItem<Document> {
 				count: (this._total === 0)
 			}) as AxiosResponse<Document[]>;
 		}
-		const filters = isEmpty(this.filters) ? "*" : this.filters;
-		return await this.client.paginatedSearchAccessProfiles(
+		const filters = isNotEmpty(this.filters) ? this.filters : "*"
+		return await this.client.searchAccessProfiles(
 			filters,
 			limit,
 			this.currentOffset,
@@ -1354,19 +1357,21 @@ export class RolesTreeItem extends PageableFolderTreeItem<Document> {
 				count: (this._total === 0)
 			}) as AxiosResponse<Document[]>;
 		} else {
-			const filters = isEmpty(this.filters) ? "*" : this.filters;
-			return await this.client.paginatedSearchRoles(
+			const filters = isNotEmpty(this.filters) ? this.filters : "*";
+			return await this.client.searchRoles(
 				filters,
 				limit,
 				this.currentOffset,
 				(this._total === 0)
+
+
 			) as AxiosResponse<Document[]>;
 		}
 	}
 }
 
 
-export class RoleTreeItem extends PageableFolderTreeItem<DimensionV2025> {
+export class RoleTreeItem extends PageableFolderTreeItem<Dimension> {
 	public readonly uri: vscode.Uri
 	constructor(
 		tenantId: string,
@@ -1400,7 +1405,7 @@ export class RoleTreeItem extends PageableFolderTreeItem<DimensionV2025> {
 		return getResourceWebUrl(this.tenantName, "role", this.id!)
 	}
 
-	protected async loadNext(): Promise<AxiosResponse<DimensionV2025[]>> {
+	protected async loadNext(): Promise<AxiosResponse<Dimension[]>> {
 		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
 		return await this.client.getPaginatedDimensions({
 			roleId: this.id!,
@@ -1499,7 +1504,7 @@ export class LoadMoreNode extends BaseTreeItem {
 export class MessageNode extends BaseTreeItem {
 	contextValue = "message";
 
-	constructor(label) {
+	constructor(label: string) {
 		super(
 			label,
 			"", "", ""
@@ -1532,8 +1537,8 @@ export class FormsTreeItem extends FolderTreeItem {
 				this.tenantId,
 				this.tenantName,
 				this.tenantDisplayName,
-				form.name,
-				form.id
+				form.name!,
+				form.id!
 			))
 		}
 
@@ -1584,7 +1589,7 @@ export class SearchAttributesTreeItem extends FolderTreeItem {
 			this.tenantId,
 			this.tenantName,
 			this.tenantDisplayName,
-			x.name,
+			x.name!,
 		))
 
 	}
@@ -1694,7 +1699,7 @@ export class IdentitiesTreeItem extends PageableFolderTreeItem<Document> {
 					count: (this._total === 0)
 				}) as AxiosResponse<Document[]>;
 			} else {
-				const filters = isEmpty(this.filters) ? "*" : this.filters;
+				const filters = isNotEmpty(this.filters) ? this.filters : "*";
 				return await this.client.paginatedSearchIdentities(
 					filters,
 					limit,
@@ -1811,7 +1816,7 @@ export class AccountTreeItem extends ISCResourceTreeItem {
 	iconPath = new vscode.ThemeIcon("account");
 }
 
-export class MachineIdentitiesTreeItem extends PageableFolderTreeItem<MachineIdentityResponseV2025> {
+export class MachineIdentitiesTreeItem extends PageableFolderTreeItem<MachineIdentityResponse> {
 	filterTypes?: string[];
 	filterSourceIds?: string[];
 	filterAdditional?: string;
@@ -1833,7 +1838,7 @@ export class MachineIdentitiesTreeItem extends PageableFolderTreeItem<MachineIde
 		);
 	}
 
-	protected async loadNext(): Promise<AxiosResponse<MachineIdentityResponseV2025[]>> {
+	protected async loadNext(): Promise<AxiosResponse<MachineIdentityResponse[]>> {
 		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
 		return await this.client.listMachineIdentities({
 			filters: this.filters || undefined,
@@ -1935,7 +1940,7 @@ export class ApplicationTreeItem extends ISCResourceTreeItem implements Pageable
 	currentOffset = 0;
 	children: BaseTreeItem[] = [];
 	client: ISCClient;
-	filterType: FilterType; // unused
+	filterType = FilterType.api; // unused
 
 	constructor(
 		tenantId: string,
@@ -1965,7 +1970,7 @@ export class ApplicationTreeItem extends ISCResourceTreeItem implements Pageable
 	protected async loadNext(): Promise<AxiosResponse<any[]>> {
 		const limit = getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf();
 		return await this.client.getPaginatedApplicationAccessProfiles(
-			this.id,
+			this.id!,
 			limit,
 			this.currentOffset
 		) as AxiosResponse<any[]>;
@@ -1996,7 +2001,7 @@ export class ApplicationTreeItem extends ISCResourceTreeItem implements Pageable
 				this.tenantName,
 				this.tenantDisplayName,
 				ap.name,
-				this.id,
+				this.id!,
 				ap.id,
 				this
 			));
@@ -2041,7 +2046,7 @@ export class ApplicationAccessProfileTreeItem extends ISCResourceTreeItem {
 		label: string,
 		public readonly appId: string,
 		accessProfileId: string,
-		public readonly parentNode) {
+		public readonly parentNode: ApplicationTreeItem) {
 		super({
 			tenantId,
 			tenantName,
@@ -2077,7 +2082,7 @@ export class CampaignsTreeItem extends PageableFolderTreeItem<any> {
 			))
 		);
 		// all by default
-		this.status = Object.values(CampaignStatusV3)
+		this.status = Object.values(Campaign2StatusEnum)
 	}
 
 	protected async loadNext(): Promise<AxiosResponse<Document[]>> {
@@ -2113,9 +2118,6 @@ export class CampaignTreeItem extends ISCResourceTreeItem {
 
 	iconPath = new vscode.ThemeIcon("checklist");
 	client: ISCClient;
-	label: string;
-	id: string;
-
 
 	constructor(
 		tenantId: string,

@@ -1,10 +1,10 @@
 import * as vscode from "vscode";
 
-import * as commands from "../commands/constants";
-import { CampaignsTreeItem } from "../models/ISCTreeItem";
-import { WizardContext } from "../wizard/wizardContext";
-import { runWizard } from "../wizard/wizard";
-import { InputPromptStep } from "../wizard/inputPromptStep";
+import * as commands from "../commands/constants.js";
+import { CampaignsTreeItem } from "../models/ISCTreeItem.js";
+import { WizardContext } from "../wizard/wizardContext.js";
+import { runWizard } from "../wizard/wizard.js";
+import { InputPromptStep } from "../wizard/inputPromptStep.js";
 
 
 /**

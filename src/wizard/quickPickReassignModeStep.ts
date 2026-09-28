@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { QuickPickPromptStep } from "./quickPickPromptStep";
-import { WizardContext } from "./wizardContext";
+import { QuickPickPromptStep } from "./quickPickPromptStep.js";
+import { WizardContext } from "./wizardContext.js";
 
 export const REASSIGN_MODE_ALL = "all";
 export const REASSIGN_MODE_CHOOSE = "choose";

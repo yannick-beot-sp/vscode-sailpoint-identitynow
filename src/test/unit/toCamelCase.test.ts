@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { it, describe } from 'mocha';
-import { toCamelCase } from '../../utils/stringUtils';
+import { toCamelCase } from '../../utils/stringUtils.js';
 
 suite('toCamelCase Test Suite', () => {
 	// vscode.window.showInformationMessage('Start all tests.');

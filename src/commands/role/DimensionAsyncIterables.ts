@@ -1,14 +1,16 @@
-import { DimensionsV2025ApiListDimensionsRequest, DimensionV2025, Role, RolesApiListRolesRequest, RoleV2025 } from "sailpoint-api-client";
-import { ISCClient } from "../../services/ISCClient";
-import { GenericAsyncIterableIterator } from "../../utils/GenericAsyncIterableIterator";
+import { ISCClient } from "../../services/ISCClient.js";
+import { GenericAsyncIterableIterator } from "../../utils/GenericAsyncIterableIterator.js";
 
-export interface DimensionWithRoleNameName extends DimensionV2025 {
+import { Role, RolesApiListRolesV1Request } from "sailpoint-api-client/dist/roles/api.js";
+import { Dimension, DimensionsApiListDimensionsV1Request } from "sailpoint-api-client/dist/dimensions/api.js";
+
+export interface DimensionWithRoleNameName extends Dimension {
     roleName: string
 }
 
 
 export async function* addRoleName(
-    dimIterator: AsyncIterable<DimensionV2025[]>,
+    dimIterator: AsyncIterable<Dimension[]>,
     roleName: string
 ): AsyncIterable<DimensionWithRoleNameName[]> {
 
@@ -21,7 +23,7 @@ export async function* addRoleName(
 export async function* getAllDimensions(
     client: ISCClient
 ): AsyncIterable<DimensionWithRoleNameName[]> {
-    const roleIterator = new GenericAsyncIterableIterator<RoleV2025, RolesApiListRolesRequest>(
+    const roleIterator = new GenericAsyncIterableIterator<Role, RolesApiListRolesV1Request>(
         client,
         client.getRoles,
         {
@@ -31,7 +33,7 @@ export async function* getAllDimensions(
     let yieldEmpty = true
     for await (let roles of roleIterator) {
         for (let role of roles) {
-            const dimIterator = new GenericAsyncIterableIterator<DimensionV2025, DimensionsV2025ApiListDimensionsRequest>(
+            const dimIterator = new GenericAsyncIterableIterator<Dimension, DimensionsApiListDimensionsV1Request>(
                 client,
                 client.getPaginatedDimensions, { roleId: role.id!, sorters: "name" });
             for await (const dimensions of dimIterator) {

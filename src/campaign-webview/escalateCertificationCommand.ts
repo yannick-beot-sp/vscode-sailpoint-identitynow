@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
 
-import { CampaignTreeItem } from "../models/ISCTreeItem";
-import { ISCClient } from '../services/ISCClient';
-import { confirm } from '../utils/vsCodeHelpers';
-import { BulkCampaignManagerEscalation } from './BulkCampaignManagerEscalation';
+import { CampaignTreeItem } from "../models/ISCTreeItem.js";
+import { ISCClient } from '../services/ISCClient.js';
+import { confirm } from '../utils/vsCodeHelpers.js';
+import { BulkCampaignManagerEscalation } from './BulkCampaignManagerEscalation.js';
 
 /**
  * Command used to open the campaign panel

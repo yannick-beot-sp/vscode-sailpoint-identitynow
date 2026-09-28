@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { refSchema } from "../../inputFields";
+import { refSchema } from "../../inputFields.js";
 
 export const formIdOrNameField = z.string().min(1).describe(
     "GUID (e.g. '603d301c-a57b-4ec4-939b-263ec0407b95') or name of the form definition."

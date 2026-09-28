@@ -1,4 +1,4 @@
-const path = require('node:path');
+import * as path from "node:path";
 
 export function delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));

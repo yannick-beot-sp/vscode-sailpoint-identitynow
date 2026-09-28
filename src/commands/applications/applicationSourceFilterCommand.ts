@@ -1,11 +1,11 @@
 import * as vscode from "vscode";
-import { ApplicationsTreeItem } from "../../models/ISCTreeItem";
-import { WizardContext } from "../../wizard/wizardContext";
-import { runWizard } from "../../wizard/wizard";
-import { TenantService } from "../../services/TenantService";
-import { QuickPickSourceStep } from "../../wizard/quickPickSourceStep";
-import { ISCClient } from "../../services/ISCClient";
-import * as commands from "../constants";
+import { ApplicationsTreeItem } from "../../models/ISCTreeItem.js";
+import { WizardContext } from "../../wizard/wizardContext.js";
+import { runWizard } from "../../wizard/wizard.js";
+import { TenantService } from "../../services/TenantService.js";
+import { QuickPickSourceStep } from "../../wizard/quickPickSourceStep.js";
+import { ISCClient } from "../../services/ISCClient.js";
+import * as commands from "../constants.js";
 
 /**
  * Choose a source

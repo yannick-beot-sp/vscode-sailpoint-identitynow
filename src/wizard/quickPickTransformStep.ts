@@ -1,9 +1,9 @@
 
 import * as vscode from 'vscode';
-import { QuickPickPromptStep } from "./quickPickPromptStep";
-import { WizardContext } from "./wizardContext";
-import { ISCClient } from "../services/ISCClient";
-import { Transform } from 'sailpoint-api-client';
+import { QuickPickPromptStep } from "./quickPickPromptStep.js";
+import { WizardContext } from "./wizardContext.js";
+import { ISCClient } from "../services/ISCClient.js";
+import { Transform } from 'sailpoint-api-client/dist/transforms/api.js';
 
 export class QuickPickTransformStep extends QuickPickPromptStep<WizardContext, vscode.QuickPickItem> {
     constructor(

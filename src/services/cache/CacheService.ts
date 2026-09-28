@@ -1,4 +1,4 @@
-import EventEmitter = require("events");
+import { EventEmitter } from "node:events";
 
 export interface CacheStats {
     hits: number,

@@ -1,11 +1,11 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
-import { formBaseOutputSchema } from "./formSchemas";
-import { getFormOwner } from "../formUtils";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { tenantNameField } from "../../inputFields.js";
+import { formBaseOutputSchema } from "./formSchemas.js";
+import { getFormOwner } from "../formUtils.js";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -21,7 +21,7 @@ type Output = z.infer<typeof outputSchema>;
 @Tool({
     name: "listForms",
     description: "List all form definitions for a given tenant. Returns id, name, description, owner, created, and modified for each form.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "List Forms",

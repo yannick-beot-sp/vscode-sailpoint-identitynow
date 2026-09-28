@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
 
-import { HecateJobStatus } from '../../models/HecateJob';
-import { ISCClient } from '../../services/ISCClient';
-import { Account } from 'sailpoint-api-client';
-import { delay, formatString } from '../../utils';
+import { HecateJobStatus } from '../../models/HecateJob.js';
+import { ISCClient } from '../../services/ISCClient.js';
+import { Account } from 'sailpoint-api-client/dist/accounts/api.js';
+import { delay, formatString } from '../../utils.js';
 
 export function isAccountRemovable(account: Account): boolean {
 	return account.authoritative !== true && account.systemAccount !== true;

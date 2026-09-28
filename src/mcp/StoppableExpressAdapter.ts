@@ -1,3 +1,4 @@
+import express from "express";
 import * as http from "node:http";
 import { FrontMcpServer, HttpMethod, ServerRequestHandler } from "@frontmcp/sdk";
 
@@ -14,8 +15,7 @@ import { FrontMcpServer, HttpMethod, ServerRequestHandler } from "@frontmcp/sdk"
  * when the HTTP listener should be opened.
  */
 export class StoppableExpressAdapter extends FrontMcpServer {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    private readonly _express: any = require("express");
+    private readonly _express: typeof express = express;
     private readonly _app: any;
     private readonly _router: any;
     private _prepared = false;

@@ -1,8 +1,8 @@
-import { WizardPromptStep } from "./wizardPromptStep";
-import { capitalizeFirstLetter, convertPascalCase2SpaceBased, isEmpty } from "../utils/stringUtils";
-import { showInputBox } from "../utils/showInputBox";
-import { Wizard } from "./wizard";
-import { ExtInputBoxOptions } from "./ExtInputBoxOptions";
+import { WizardPromptStep } from "./wizardPromptStep.js";
+import { capitalizeFirstLetter, convertPascalCase2SpaceBased, isEmpty } from "../utils/stringUtils.js";
+import { showInputBox } from "../utils/showInputBox.js";
+import { Wizard } from "./wizard.js";
+import { ExtInputBoxOptions } from "./ExtInputBoxOptions.js";
 
 
 export interface InputPromptStepOptions<T> {

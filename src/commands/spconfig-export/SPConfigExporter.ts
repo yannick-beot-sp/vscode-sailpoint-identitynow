@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-import path = require('path');
+import * as path from "node:path";
 
-import { ISCClient } from '../../services/ISCClient';
-import { delay, sanitizeFilename } from '../../utils';
-import { ensureFolderExists } from '../../utils/fileutils';
-import { PathProposer } from '../../services/PathProposer';
-import { ExportPayloadBetaIncludeTypesBeta, ObjectExportImportOptionsBeta } from 'sailpoint-api-client';
+import { ISCClient } from '../../services/ISCClient.js';
+import { delay, sanitizeFilename } from '../../utils.js';
+import { ensureFolderExists } from '../../utils/fileutils.js';
+import { PathProposer } from '../../services/PathProposer.js';
+import { ExportPayloadIncludeTypesEnum as ExportPayloadIncludeTypes, ObjectExportImportOptions } from 'sailpoint-api-client/dist/sp_config/api.js';
 
 /**
  * Class use to export SP-Config
@@ -19,9 +19,9 @@ export class SPConfigExporter {
         private readonly tenantDisplayName: string,
         private target: string,
         private readonly options: {
-            [key: string]: ObjectExportImportOptionsBeta;
+            [key: string]: ObjectExportImportOptions;
         },
-        private objectTypes: ExportPayloadBetaIncludeTypesBeta[] = [],
+        private objectTypes: ExportPayloadIncludeTypes[] = [],
         private readonly exportSingle = true
     ) {
         this.client = new ISCClient(this.tenantId, this.tenantName);

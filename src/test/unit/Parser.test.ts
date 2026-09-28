@@ -1,8 +1,8 @@
 import * as assert from 'assert';
 import { it, describe, suite } from 'mocha';
-import { Parser } from '../../parser/parser';
-import { Attribute, ComparisonOperator, Expression, Literal, LogicalOperator } from '../../parser/ast';
-import { RoleCriteriaKeyType } from 'sailpoint-api-client';
+import { Parser } from '../../parser/parser.js';
+import { Attribute, ComparisonOperator, Expression, Literal, LogicalOperator } from '../../parser/ast.js';
+import { RoleCriteriaKeyType } from 'sailpoint-api-client/dist/roles/api.js';
 
 
 interface ParameterizedTest { should: string, input: string, expected?: Expression };

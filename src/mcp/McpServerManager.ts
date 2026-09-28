@@ -1,11 +1,11 @@
 import * as vscode from "vscode";
-import { isPortAvailable, McpServer } from "./McpServer";
-import { TenantService } from "../services/TenantService";
-import { TenantServiceEventType } from "../services/TenantServiceEventType";
-import * as configuration from '../configurationConstants';
-import { ISCMcpServerDefinitionProvider } from "./McpServerDefinitionProvider";
-import { MCP_ID } from "./constants";
-import { MCP_COPY_URL } from "../commands/constants";
+import { isPortAvailable, McpServer } from "./McpServer.js";
+import { TenantService } from "../services/TenantService.js";
+import { TenantServiceEventType } from "../services/TenantServiceEventType.js";
+import * as configuration from '../configurationConstants.js';
+import { ISCMcpServerDefinitionProvider } from "./McpServerDefinitionProvider.js";
+import { MCP_ID } from "./constants.js";
+import { MCP_COPY_URL } from "../commands/constants.js";
 
 /**
  * Check if MCP API is available in current VS Code version

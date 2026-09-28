@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { CSVWriter } from '../services/CSVWriter';
-import { ensureFolderExists } from '../utils/fileutils';
-import { openPreview } from '../utils/vsCodeHelpers';
+import { CSVWriter } from '../services/CSVWriter.js';
+import { ensureFolderExists } from '../utils/fileutils.js';
+import { openPreview } from '../utils/vsCodeHelpers.js';
 
 export class Exporter<T> {
     private unwindablePaths: string[] = []

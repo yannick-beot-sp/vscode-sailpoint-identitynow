@@ -1,6 +1,6 @@
-import { Wizard } from "./wizard";
-import { WizardContext } from "./wizardContext";
-import { IWizardOptions } from "./wizardOptions";
+import { Wizard } from "./wizard.js";
+import { WizardContext } from "./wizardContext.js";
+import { IWizardOptions } from "./wizardOptions.js";
 
 export abstract class WizardPromptStep<T extends WizardContext>  {
     public hideStepCount: boolean = false;

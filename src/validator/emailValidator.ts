@@ -1,4 +1,4 @@
-import { Validator } from "./validator";
+import { Validator } from "./validator.js";
 
 export const emailValidator = new Validator({
     required: true,

@@ -1,12 +1,13 @@
-import { AdditionalOwnerRefV2025 } from "sailpoint-api-client";
-import { IdentityIdToNameCacheService } from "../services/cache/IdentityIdToNameCacheService";
-import { GovernanceGroupIdToNameCacheService } from "../services/cache/GovernanceGroupIdToNameCacheService";
-import { CSV_MULTIVALUE_SEPARATOR } from "../constants";
-import { IdentityUsernameToIdCacheService } from "../services/cache/IdentityNameToIdCacheService";
-import { GovernanceGroupNameToIdCacheService } from "../services/cache/GovernanceGroupNameToIdCacheService";
+import { IdentityIdToNameCacheService } from "../services/cache/IdentityIdToNameCacheService.js";
+import { GovernanceGroupIdToNameCacheService } from "../services/cache/GovernanceGroupIdToNameCacheService.js";
+import { CSV_MULTIVALUE_SEPARATOR } from "../constants.js";
+import { IdentityUsernameToIdCacheService } from "../services/cache/IdentityNameToIdCacheService.js";
+import { GovernanceGroupNameToIdCacheService } from "../services/cache/GovernanceGroupNameToIdCacheService.js";
+
+import { AdditionalOwnerRef } from "sailpoint-api-client/dist/roles/api.js";
 
 export async function getAdditionalOwners(
-    additionalOwners: AdditionalOwnerRefV2025[] | undefined | null,
+    additionalOwners: AdditionalOwnerRef[] | undefined | null,
     identityCacheIdToName: IdentityIdToNameCacheService,
     governanceGroupCacheIdToName: GovernanceGroupIdToNameCacheService
 ): Promise<{ additionalOwners: string | null; additionalOwnerGovernanceGroup: string | null }> {
@@ -45,7 +46,7 @@ export async function resolveAdditionalOwners(
     additionalOwnerGovernanceGroupRaw: string | undefined,
     identityCacheService: IdentityUsernameToIdCacheService,
     governanceGroupCache: GovernanceGroupNameToIdCacheService
-): Promise<Array<AdditionalOwnerRefV2025> | null> {
+): Promise<Array<AdditionalOwnerRef> | null> {
     if (!additionalOwnersRaw && !additionalOwnerGovernanceGroupRaw) {
         return null;
     }

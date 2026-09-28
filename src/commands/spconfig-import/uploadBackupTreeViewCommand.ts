@@ -1,16 +1,16 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-import { TenantTreeItem } from "../../models/ISCTreeItem";
-import { TenantService } from "../../services/TenantService";
-import { ISCClient } from '../../services/ISCClient';
+import { TenantTreeItem } from "../../models/ISCTreeItem.js";
+import { TenantService } from "../../services/TenantService.js";
+import { ISCClient } from '../../services/ISCClient.js';
 import { basename } from 'path';
-import { waitForUploadJob } from './utils';
-import { WizardContext } from '../../wizard/wizardContext';
-import { runWizard } from '../../wizard/wizard';
-import { InputPromptStep } from '../../wizard/inputPromptStep';
-import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
-import { ChooseFileStep } from '../../wizard/chooseFileStep';
-import { BackupResponseV2024StatusV2024 } from 'sailpoint-api-client';
+import { waitForUploadJob } from './utils.js';
+import { WizardContext } from '../../wizard/wizardContext.js';
+import { runWizard } from '../../wizard/wizard.js';
+import { InputPromptStep } from '../../wizard/inputPromptStep.js';
+import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep.js';
+import { ChooseFileStep } from '../../wizard/chooseFileStep.js';
+import { BackupResponseStatusEnum as BackupResponseStatus } from 'sailpoint-api-client/dist/configuration_hub/api.js';
 
 /**
  * Entry point to import file from the tree view. Tenant is already known
@@ -91,7 +91,7 @@ export class UploadBackupTreeViewCommand {
             const jobStatus = await waitForUploadJob(client, job.jobId, token)
             return jobStatus;
         }).then((jobStatus) => {
-            if (jobStatus.status == BackupResponseV2024StatusV2024.Complete) {
+            if (jobStatus.status == BackupResponseStatus.Complete) {
                 vscode.window.showInformationMessage(`Configuration uploaded successfully to ${node.tenantDisplayName}`)
             } else {
                 // cf. https://github.com/sailpoint-oss/developer.sailpoint.com/issues/785

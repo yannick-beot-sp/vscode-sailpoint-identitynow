@@ -1,15 +1,15 @@
 import * as vscode from 'vscode';
-import { CampaignsTreeItem } from "../models/ISCTreeItem";
-import { ISCClient } from "../services/ISCClient";
-import { TenantService } from "../services/TenantService";
-import { QuickPickPromptStep } from "../wizard/quickPickPromptStep";
-import { QuickPickTenantStep } from "../wizard/quickPickTenantStep";
-import { runWizard } from "../wizard/wizard";
-import { WizardContext } from "../wizard/wizardContext";
-import { InputPromptStep } from '../wizard/inputPromptStep';
-import { TenantInfo } from '../models/TenantInfo';
-import { Validator } from '../validator/validator';
-import { CampaignConfigurationService } from '../services/CampaignConfigurationService';
+import { CampaignsTreeItem } from "../models/ISCTreeItem.js";
+import { ISCClient } from "../services/ISCClient.js";
+import { TenantService } from "../services/TenantService.js";
+import { QuickPickPromptStep } from "../wizard/quickPickPromptStep.js";
+import { QuickPickTenantStep } from "../wizard/quickPickTenantStep.js";
+import { runWizard } from "../wizard/wizard.js";
+import { WizardContext } from "../wizard/wizardContext.js";
+import { InputPromptStep } from '../wizard/inputPromptStep.js';
+import { TenantInfo } from '../models/TenantInfo.js';
+import { Validator } from '../validator/validator.js';
+import { CampaignConfigurationService } from '../services/CampaignConfigurationService.js';
 
 const clientIdValidator = new Validator({
     required: true,

@@ -1,9 +1,9 @@
-import { validateTenantReadonly } from "../commands/validateTenantReadonly";
-import { UserCancelledError } from "../errors";
-import { TenantInfoQuickPickItem } from "../models/TenantInfoQuickPickItem";
-import { TenantService } from "../services/TenantService";
-import { QuickPickPromptStep } from "./quickPickPromptStep";
-import { WizardContext } from "./wizardContext";
+import { validateTenantReadonly } from "../commands/validateTenantReadonly.js";
+import { UserCancelledError } from "../errors.js";
+import { TenantInfoQuickPickItem } from "../models/TenantInfoQuickPickItem.js";
+import { TenantService } from "../services/TenantService.js";
+import { QuickPickPromptStep } from "./quickPickPromptStep.js";
+import { WizardContext } from "./wizardContext.js";
 
 export class QuickPickTenantStep extends QuickPickPromptStep<WizardContext, TenantInfoQuickPickItem> {
     constructor(

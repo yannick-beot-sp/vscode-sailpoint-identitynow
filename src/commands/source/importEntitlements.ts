@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
-import { SourceTreeItem } from "../../models/ISCTreeItem";
-import { ISCClient } from '../../services/ISCClient';
-import { chooseFile } from '../../utils/vsCodeHelpers';
-import { formatTask, waifForJob } from './sourceUtils';
-import { TenantService } from '../../services/TenantService';
-import { validateTenantReadonly } from '../validateTenantReadonly';
+import { SourceTreeItem } from "../../models/ISCTreeItem.js";
+import { ISCClient } from '../../services/ISCClient.js';
+import { chooseFile } from '../../utils/vsCodeHelpers.js';
+import { formatTask, waifForJob } from './sourceUtils.js';
+import { TenantService } from '../../services/TenantService.js';
+import { validateTenantReadonly } from '../validateTenantReadonly.js';
 
 class EntitlementImporter {
     readonly client: ISCClient;

@@ -1,4 +1,4 @@
-import { escapeFilter } from "./stringUtils";
+import { escapeFilter } from "./stringUtils.js";
 
 /**
  * Client-side listing of notification templates.

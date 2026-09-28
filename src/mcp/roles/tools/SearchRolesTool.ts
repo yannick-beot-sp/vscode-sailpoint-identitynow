@@ -1,10 +1,10 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
-import { DEFAULT_SEARCH_LIMIT, paginationOutputFields, baseDocumentSchema, searchQueryField, offsetField, limitField, sortField } from "../../search/searchInputFields";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { tenantNameField } from "../../inputFields.js";
+import { DEFAULT_SEARCH_LIMIT, paginationOutputFields, baseDocumentSchema, searchQueryField, offsetField, limitField, sortField } from "../../search/searchInputFields.js";
 
 const DEFAULT_SORT = "name";
 
@@ -32,7 +32,7 @@ type Output = z.infer<typeof outputSchema>;
         "Supports offset-based pagination: use offset + limit to step through large result sets. " +
         "Query syntax: https://documentation.sailpoint.com/saas/help/search/building-query.html. " +
         "Searchable fields: https://documentation.sailpoint.com/saas/help/search/searchable-fields.html#roles.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Search Roles",
@@ -47,7 +47,7 @@ export class SearchRolesTool extends ToolContext {
         const sort = input.sort ?? DEFAULT_SORT;
 
         try {
-            const result = await client.paginatedSearchRolesV2025({
+            const result = await client.paginatedSearchRoles({
                 query: input.query,
                 sort,
                 limit,

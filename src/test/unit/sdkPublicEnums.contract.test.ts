@@ -1,9 +1,24 @@
 import * as assert from "assert";
-import { AccessDurationV2025TimeUnitV2025, AccessProfileApprovalSchemeV2025ApproverTypeV2025, ApprovalSchemeForRoleV2025ApproverTypeV2025, AuthUserV2025CapabilitiesV2025, BackupResponseV2024StatusV2024, CampaignStatusV3, CertificationDecisionV2025, CompletionStatus, DimensionCriteriaKeyTypeV2025, DimensionCriteriaOperationV2025, DtoType, ExecutionStatus, IndexV2025, JsonPatchOperationV2025OpV2025, ListIdentityAccessItemsTypeV2025, ProvisioningState, ReassignReferenceTypeV3, RequestedItemStatusRequestState, RoleCriteriaKeyType, RoleCriteriaOperation, RoleMembershipSelectorType, SpConfigJobBetaStatusBeta, StatusResponseBetaStatusBeta, TaskStatusBetaCompletionStatusBeta, UsageTypeBeta, WorkflowExecutionV2025StatusV2025 } from "sailpoint-api-client";
+import { AccessDurationTimeUnitEnum as AccessDurationTimeUnit, AccessProfileApprovalSchemeApproverTypeEnum as AccessProfileApprovalSchemeApproverType, JsonPatchOperationOpEnum as JsonPatchOperationOp } from "sailpoint-api-client/dist/access_profiles/api.js";
+import { RequestedItemStatusRequestState } from "sailpoint-api-client/dist/access_requests/api.js";
+import { CompletionStatus, ExecutionStatus, ProvisioningState } from "sailpoint-api-client/dist/account_activities/api.js";
+import { DtoType } from "sailpoint-api-client/dist/accounts/api.js";
+import { AuthUserCapabilitiesEnum as AuthUserCapabilities } from "sailpoint-api-client/dist/auth_users/api.js";
+import { Campaign2StatusEnum } from "sailpoint-api-client/dist/certification_campaigns/api.js";
+import { CertificationDecision, ReassignReferenceTypeEnum as ReassignReferenceTypeV3 } from "sailpoint-api-client/dist/certifications/api.js";
+import { BackupResponseStatusEnum as BackupResponseStatus } from "sailpoint-api-client/dist/configuration_hub/api.js";
+import { DimensionCriteriaKeyType, DimensionCriteriaOperation } from "sailpoint-api-client/dist/dimensions/api.js";
+import { ListIdentityAccessItemsV1TypeEnum } from "sailpoint-api-client/dist/identity_history/api.js";
+import { ApprovalSchemeForRoleApproverTypeEnum as ApprovalSchemeForRoleApproverType, RoleCriteriaKeyType, RoleCriteriaOperation, RoleMembershipSelectorType } from "sailpoint-api-client/dist/roles/api.js";
+import { Index } from "sailpoint-api-client/dist/search/api.js";
+import { StatusResponseStatusEnum as StatusResponseStatus, UsageType } from "sailpoint-api-client/dist/sources/api.js";
+import { SpConfigJobStatusEnum as SpConfigJobStatus } from "sailpoint-api-client/dist/sp_config/api.js";
+import { TaskStatusCompletionStatusEnum as TaskStatusCompletionStatus } from "sailpoint-api-client/dist/task_management/api.js";
+import { WorkflowExecutionStatusEnum as WorkflowExecutionStatus } from "sailpoint-api-client/dist/workflows/api.js";
 
 suite("sailpoint-api-client public wire values", () => {
 	test("search indexes and identity access item types", () => {
-		assert.deepStrictEqual(IndexV2025, {
+		assert.deepStrictEqual(Index, {
 			Accessprofiles: "accessprofiles",
 			Accountactivities: "accountactivities",
 			Entitlements: "entitlements",
@@ -12,7 +27,7 @@ suite("sailpoint-api-client public wire values", () => {
 			Roles: "roles",
 			Star: "*",
 		});
-		assert.deepStrictEqual(ListIdentityAccessItemsTypeV2025, {
+		assert.deepStrictEqual(ListIdentityAccessItemsV1TypeEnum, {
 			Account: "account",
 			Entitlement: "entitlement",
 			App: "app",
@@ -22,7 +37,7 @@ suite("sailpoint-api-client public wire values", () => {
 	});
 
 	test("access duration, provisioning, and access-request states", () => {
-		assert.deepStrictEqual(AccessDurationV2025TimeUnitV2025, {
+		assert.deepStrictEqual(AccessDurationTimeUnit, {
 			Hours: "HOURS",
 			Days: "DAYS",
 			Weeks: "WEEKS",
@@ -85,10 +100,10 @@ suite("sailpoint-api-client public wire values", () => {
 			Standard: "STANDARD",
 			IdentityList: "IDENTITY_LIST",
 		});
-		assert.deepStrictEqual(DimensionCriteriaKeyTypeV2025, {
+		assert.deepStrictEqual(DimensionCriteriaKeyType, {
 			Identity: "IDENTITY",
 		});
-		assert.deepStrictEqual(DimensionCriteriaOperationV2025, {
+		assert.deepStrictEqual(DimensionCriteriaOperation, {
 			Equals: "EQUALS",
 			And: "AND",
 			Or: "OR",
@@ -96,7 +111,7 @@ suite("sailpoint-api-client public wire values", () => {
 	});
 
 	test("approval schemes, user levels, and JSON patch operations", () => {
-		assert.deepStrictEqual(AccessProfileApprovalSchemeV2025ApproverTypeV2025, {
+		assert.deepStrictEqual(AccessProfileApprovalSchemeApproverType, {
 			AppOwner: "APP_OWNER",
 			Owner: "OWNER",
 			SourceOwner: "SOURCE_OWNER",
@@ -107,7 +122,7 @@ suite("sailpoint-api-client public wire values", () => {
 			AdditionalOwner: "ADDITIONAL_OWNER",
 			AdditionalGovernanceGroup: "ADDITIONAL_GOVERNANCE_GROUP",
 		});
-		assert.deepStrictEqual(ApprovalSchemeForRoleV2025ApproverTypeV2025, {
+		assert.deepStrictEqual(ApprovalSchemeForRoleApproverType, {
 			Owner: "OWNER",
 			Manager: "MANAGER",
 			GovernanceGroup: "GOVERNANCE_GROUP",
@@ -116,7 +131,7 @@ suite("sailpoint-api-client public wire values", () => {
 			AdditionalOwner: "ADDITIONAL_OWNER",
 			AdditionalGovernanceGroup: "ADDITIONAL_GOVERNANCE_GROUP",
 		});
-		assert.deepStrictEqual(AuthUserV2025CapabilitiesV2025, {
+		assert.deepStrictEqual(AuthUserCapabilities, {
 			CertAdmin: "CERT_ADMIN",
 			CloudGovAdmin: "CLOUD_GOV_ADMIN",
 			CloudGovUser: "CLOUD_GOV_USER",
@@ -138,8 +153,10 @@ suite("sailpoint-api-client public wire values", () => {
 			SpUiConfigHubAdmin: "sp:ui-config-hub-admin",
 			SpUiConfigHubBackupAdmin: "sp:ui-config-hub-backup-admin",
 			SpUiConfigHubRead: "sp:ui-config-hub-read",
+			Internal: "INTERNAL",
+			PolicyAdmin: "POLICY_ADMIN"
 		});
-		assert.deepStrictEqual(JsonPatchOperationV2025OpV2025, {
+		assert.deepStrictEqual(JsonPatchOperationOp, {
 			Add: "add",
 			Remove: "remove",
 			Replace: "replace",
@@ -150,7 +167,7 @@ suite("sailpoint-api-client public wire values", () => {
 	});
 
 	test("job, campaign, workflow, and certification status values", () => {
-		assert.deepStrictEqual(CampaignStatusV3, {
+		assert.deepStrictEqual(Campaign2StatusEnum, {
 			Pending: "PENDING",
 			Staged: "STAGED",
 			Canceling: "CANCELING",
@@ -161,39 +178,39 @@ suite("sailpoint-api-client public wire values", () => {
 			Error: "ERROR",
 			Archived: "ARCHIVED",
 		});
-		assert.deepStrictEqual(TaskStatusBetaCompletionStatusBeta, {
+		assert.deepStrictEqual(TaskStatusCompletionStatus, {
 			Success: "SUCCESS",
 			Warning: "WARNING",
 			Error: "ERROR",
 			Terminated: "TERMINATED",
 			Temperror: "TEMPERROR",
 		});
-		assert.deepStrictEqual(StatusResponseBetaStatusBeta, {
+		assert.deepStrictEqual(StatusResponseStatus, {
 			Success: "SUCCESS",
 			Failure: "FAILURE",
 		});
-		assert.deepStrictEqual(SpConfigJobBetaStatusBeta, {
+		assert.deepStrictEqual(SpConfigJobStatus, {
 			NotStarted: "NOT_STARTED",
 			InProgress: "IN_PROGRESS",
 			Complete: "COMPLETE",
 			Cancelled: "CANCELLED",
 			Failed: "FAILED",
 		});
-		assert.deepStrictEqual(BackupResponseV2024StatusV2024, {
+		assert.deepStrictEqual(BackupResponseStatus, {
 			NotStarted: "NOT_STARTED",
 			InProgress: "IN_PROGRESS",
 			Complete: "COMPLETE",
 			Cancelled: "CANCELLED",
 			Failed: "FAILED",
 		});
-		assert.deepStrictEqual(WorkflowExecutionV2025StatusV2025, {
+		assert.deepStrictEqual(WorkflowExecutionStatus, {
 			Completed: "Completed",
 			Failed: "Failed",
 			Canceled: "Canceled",
 			Running: "Running",
 			Queued: "Queued",
 		});
-		assert.deepStrictEqual(CertificationDecisionV2025, {
+		assert.deepStrictEqual(CertificationDecision, {
 			Approve: "APPROVE",
 			Revoke: "REVOKE",
 		});
@@ -204,7 +221,7 @@ suite("sailpoint-api-client public wire values", () => {
 		});
 		assert.deepStrictEqual(DtoType.Identity, "IDENTITY");
 		assert.deepStrictEqual(DtoType.GovernanceGroup, "GOVERNANCE_GROUP");
-		assert.deepStrictEqual(UsageTypeBeta.Create, "CREATE");
-		assert.strictEqual(UsageTypeBeta.ChangePassword, "CHANGE_PASSWORD");
+		assert.deepStrictEqual(UsageType.Create, "CREATE");
+		assert.strictEqual(UsageType.ChangePassword, "CHANGE_PASSWORD");
 	});
 });

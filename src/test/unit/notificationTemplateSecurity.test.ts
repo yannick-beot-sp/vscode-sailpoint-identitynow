@@ -1,12 +1,12 @@
 import * as assert from 'assert';
 import { it, describe } from 'mocha';
-import { highlightJson } from '../../commands/identity/jsonDrawerSnippet';
-import { buildNotificationTemplatePreviewHtml, buildNotificationTemplatePreviewPage } from '../../commands/notification-template/previewHtml';
+import { highlightJson } from '../../commands/identity/jsonDrawerSnippet.js';
+import { buildNotificationTemplatePreviewHtml, buildNotificationTemplatePreviewPage } from '../../commands/notification-template/previewHtml.js';
 import {
     notificationTemplateIdentityConflict,
     selectNotificationTemplate,
     wouldReplaceNonEmptyBody,
-} from '../../commands/notification-template/templateGuards';
+} from '../../commands/notification-template/templateGuards.js';
 
 suite('notification template security Test Suite', () => {
     describe('selectNotificationTemplate', () => {

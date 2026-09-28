@@ -1,8 +1,8 @@
 
 import * as vscode from 'vscode';
-import { QuickPickPromptStep } from "./quickPickPromptStep";
-import { WizardContext } from "./wizardContext";
-import { ISCClient } from "../services/ISCClient";
+import { QuickPickPromptStep } from "./quickPickPromptStep.js";
+import { WizardContext } from "./wizardContext.js";
+import { ISCClient } from "../services/ISCClient.js";
 
 export class QuickPickIdentityStep extends QuickPickPromptStep<WizardContext, vscode.QuickPickItem> {
     constructor(

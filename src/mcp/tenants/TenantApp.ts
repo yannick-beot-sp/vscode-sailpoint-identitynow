@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { App } from "@frontmcp/sdk";
-import { ListTenantsTool } from "./tools/ListTenantsTool";
-import { GetTenantInfoTool } from "./tools/GetTenantInfoTool";
+import { ListTenantsTool } from "./tools/ListTenantsTool.js";
+import { GetTenantInfoTool } from "./tools/GetTenantInfoTool.js";
 
 @App({
     id: "tenants",

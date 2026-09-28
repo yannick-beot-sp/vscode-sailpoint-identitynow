@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
-import { ISCClient } from "../../services/ISCClient";
-import { RequestedItemStatus } from "sailpoint-api-client";
-import { delay } from "../../utils";
+import { ISCClient } from "../../services/ISCClient.js";
+import { RequestedItemStatus } from "sailpoint-api-client/dist/access_requests/api.js";
+import { delay } from "../../utils.js";
 import {
 	AccessRequestStatusHistoryEntry,
 	AccessRequestStatusViewState,
@@ -15,8 +15,8 @@ import {
 	formatCapturedDate,
 	getLastAccessRequestPhase,
 	getLastPhaseTrackingKey,
-} from "./accessRequestStatusHtml";
-import { IdentityAccessItemType } from "../../models/IdentityAccessItem";
+} from "./accessRequestStatusHtml.js";
+import { IdentityAccessItemType } from "../../models/IdentityAccessItem.js";
 
 /**
  * Interval and cap for the status tail. The cap bounds the polling to roughly

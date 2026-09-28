@@ -1,7 +1,9 @@
 import * as vscode from 'vscode';
 
-import { AdminReviewReassignReassignToV2025, CertificationCampaignsV2025ApiMoveRequest, DtoTypeV2025, GetActiveCampaigns200ResponseInnerV2025StatusV2025, IdentityCertificationDtoV2025 } from "sailpoint-api-client";
-import { ISCClient } from "../services/ISCClient";
+import { ISCClient } from "../services/ISCClient.js";
+import { DtoType } from 'sailpoint-api-client/dist/accounts/api.js';
+import { AdminReviewReassignReassignTo, CertificationCampaignsApiMoveV1Request, GetCampaignV1200ResponseStatusEnum } from 'sailpoint-api-client/dist/certification_campaigns/api.js';
+import { IdentityCertificationDto } from 'sailpoint-api-client/dist/certifications/api.js';
 
 const CERTIFICATIONS_REASSIGN_LIMIT = 250;
 const COMMENT = "Escalating to the Reviewer's Manager"
@@ -13,7 +15,7 @@ export class BulkCampaignManagerEscalation {
         const campaign = await this.client.getCampaign(campaignId);
 
         // Ensure the campaign is not completed
-        if (campaign.status === GetActiveCampaigns200ResponseInnerV2025StatusV2025.Completed) {
+        if (campaign.status === GetCampaignV1200ResponseStatusEnum.Completed) {
             console.log(`< BulkCampaignManagerEscalation.execute: Campaign ${campaignId} is completed. Exiting script.`);
             vscode.window.showWarningMessage(`Campaign ${campaign.name} is already completed. Cannot reassign certifications.`)
             return;
@@ -29,12 +31,12 @@ export class BulkCampaignManagerEscalation {
         await this.escalateCertifications(campaignId, campaign.name, pendingCertifications)
     }
 
-    async escalateCertifications(campaignId: string, campaignName: string, pendingCertifications: IdentityCertificationDtoV2025[]) {
+    async escalateCertifications(campaignId: string, campaignName: string, pendingCertifications: IdentityCertificationDto[]) {
         let nbRreassignment = 0
         // Build campaign reassignments map (based on the current reviewer's manager)
         const campaignReassignments = new Map<string, string[]>();
         for (const pendingCertification of pendingCertifications) {
-            const reviewerId = pendingCertification.reviewer.id;
+            const reviewerId = pendingCertification?.reviewer?.id;
             if (reviewerId) {
                 const reviewerData = await this.client.getPublicIdentityById(reviewerId);
                 const reviewerManagerId = reviewerData.manager?.id
@@ -43,7 +45,7 @@ export class BulkCampaignManagerEscalation {
                     if (!managerCertifications) {
                         managerCertifications = [];
                     }
-                    managerCertifications.push(pendingCertification.id)
+                    managerCertifications.push(pendingCertification.id!)
                     campaignReassignments.set(reviewerManagerId, managerCertifications)
                     nbRreassignment++
                 }
@@ -62,17 +64,17 @@ export class BulkCampaignManagerEscalation {
 
 
     private async processReviewerReassignments(campaignId: string, reviewerId: string, allCertificationIds: string[], reassignReason: string) {
-        const newReviewer: AdminReviewReassignReassignToV2025 = {
+        const newReviewer: AdminReviewReassignReassignTo = {
             id: reviewerId,
-            type: DtoTypeV2025.Identity
+            type: DtoType.Identity
         }
 
         while (allCertificationIds.length > 0) {
             // Split the reassign references to not exceed the API limit
             const certificationIds = allCertificationIds.splice(0, CERTIFICATIONS_REASSIGN_LIMIT);
-            const certificationMoveRequest: CertificationCampaignsV2025ApiMoveRequest = {
+            const certificationMoveRequest: CertificationCampaignsApiMoveV1Request = {
                 id: campaignId,
-                adminReviewReassignV2025: {
+                adminReviewReassign: {
                     certificationIds: certificationIds,
                     reassignTo: newReviewer,
                     reason: reassignReason

@@ -1,22 +1,23 @@
-import { DimensionCriteriaKeyTypeV2025, DimensionCriteriaLevel1V2025, DimensionCriteriaOperationV2025, RoleCriteriaKeyType } from "sailpoint-api-client";
-import { ParseException } from "../errors";
-import { ComparisonOperator, Expression, LogicalOperator } from "./ast";
-import { Parser } from "./parser";
+import { DimensionCriteriaKeyType, DimensionCriteriaLevel1, DimensionCriteriaOperation } from "sailpoint-api-client/dist/dimensions/api.js";
+import { RoleCriteriaKeyType } from "sailpoint-api-client/dist/roles/api.js";
+import { ParseException } from "../errors.js";
+import { ComparisonOperator, Expression, LogicalOperator } from "./ast.js";
+import { Parser } from "./parser.js";
 
 /**
- * The Dimension API accepts more nesting levels than what DimensionCriteriaLevel1/2/3V2025
+ * The Dimension API accepts more nesting levels than what DimensionCriteriaLevel1/2/3
  * describe (an "or" group of values nested inside an "and" of attributes needs 4 levels),
  * so a local, self-referential type is used while building the tree and only cast to
- * DimensionCriteriaLevel1V2025 once fully built.
+ * DimensionCriteriaLevel1 once fully built.
  */
 export interface DimensionCriteriaKey {
-    type: DimensionCriteriaKeyTypeV2025;
+    type: DimensionCriteriaKeyType;
     property: string;
     sourceId: null;
 }
 
 export interface DimensionCriteriaNode {
-    operation: DimensionCriteriaOperationV2025;
+    operation: DimensionCriteriaOperation;
     key: DimensionCriteriaKey | null;
     stringValue: string | null;
     children: DimensionCriteriaNode[] | null;
@@ -38,7 +39,7 @@ export class DimensionMembershipCriteriaConverter {
 
     private readonly parser = new Parser();
 
-    public convert(input: string): DimensionCriteriaLevel1V2025 {
+    public convert(input: string): DimensionCriteriaLevel1 {
         const expression = this.parser.parse(input);
         const clauses = this.toClauses(expression);
 
@@ -56,7 +57,7 @@ export class DimensionMembershipCriteriaConverter {
             children: [inner]
         };
 
-        return root as unknown as DimensionCriteriaLevel1V2025;
+        return root as unknown as DimensionCriteriaLevel1;
     }
 
     /**

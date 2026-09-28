@@ -1,14 +1,14 @@
 
 import * as vscode from 'vscode';
-import * as commands from "../constants";
-import { TenantService } from "../../services/TenantService";
-import { ApplicationTreeItem } from '../../models/ISCTreeItem';
-import { ISCClient } from '../../services/ISCClient';
-import { runWizard } from '../../wizard/wizard';
-import { InputPromptStep } from '../../wizard/inputPromptStep';
-import { WizardContext } from '../../wizard/wizardContext';
-import { QuickPickAccessProfileStep } from '../../wizard/quickPickAccessProfileStep';
-import { isTenantReadonly, validateTenantReadonly } from '../validateTenantReadonly';
+import * as commands from "../constants.js";
+import { TenantService } from "../../services/TenantService.js";
+import { ApplicationTreeItem } from '../../models/ISCTreeItem.js';
+import { ISCClient } from '../../services/ISCClient.js';
+import { runWizard } from '../../wizard/wizard.js';
+import { InputPromptStep } from '../../wizard/inputPromptStep.js';
+import { WizardContext } from '../../wizard/wizardContext.js';
+import { QuickPickAccessProfileStep } from '../../wizard/quickPickAccessProfileStep.js';
+import { isTenantReadonly, validateTenantReadonly } from '../validateTenantReadonly.js';
 
 
 export class AddAccessProfileToApplication {

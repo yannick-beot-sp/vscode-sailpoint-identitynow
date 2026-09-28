@@ -1,5 +1,5 @@
-import { ISCClient } from '../services/ISCClient';
-import type { DependencyEdgeData, DependencyGraphData, DependencyNodeData } from './app/src/services/Client';
+import { ISCClient } from '../services/ISCClient.js';
+import type { DependencyEdgeData, DependencyGraphData, DependencyNodeData } from './app/src/services/Client.js';
 
 export abstract class DependencyService {
 

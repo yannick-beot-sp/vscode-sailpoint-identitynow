@@ -1,12 +1,12 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
-import { identityProfileIdOrNameField, parseMapping } from "./identityProfileSchemas";
-import { isUuid } from "../../../utils/stringUtils";
-import { IdentityAttributeTransform } from "sailpoint-api-client";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { tenantNameField } from "../../inputFields.js";
+import { identityProfileIdOrNameField, parseMapping } from "./identityProfileSchemas.js";
+import { isUuid } from "../../../utils/stringUtils.js";
+import { IdentityAttributeTransform } from "sailpoint-api-client/dist/identity_profiles/api.js";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -58,7 +58,7 @@ type Output = z.infer<typeof outputSchema>;
         "(2) account attribute with a named transform applied, " +
         "(3) rule-based mapping via ruleId. " +
         "Use getIdentityProfile to inspect current mappings including rule names and IDs.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Set Identity Profile Mapping",

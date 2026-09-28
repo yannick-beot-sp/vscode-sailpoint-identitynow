@@ -1,18 +1,18 @@
 
 import * as vscode from 'vscode';
-import * as commands from './app/src/services/Commands';
-import * as extensionCommands from "../commands/constants";
-import { ISCClient } from '../services/ISCClient';
-import { FetchOptions, PaginatedData } from './app/src/lib/datatable/Model';
-import { Reviewer } from './app/src/services/Client';
-import { KPIsAndReviewersQuery } from './KPIsAndReviewersQuery';
-import { BulkSendReminder } from './BulkSendReminder';
-import { CampaignConfigurationService } from '../services/CampaignConfigurationService';
-import { CampaignsTreeItem } from '../models/ISCTreeItem';
-import { BulkCampaignManagerEscalation } from './BulkCampaignManagerEscalation';
-import { IdentityCertificationDto } from 'sailpoint-api-client';
-import { BulkCertificationDecision } from './BulkCertificationDecision';
-import { BaseWebviewPanel } from '../webview/BaseWebviewPanel';
+import * as commands from './app/src/services/Commands.js';
+import * as extensionCommands from "../commands/constants.js";
+import { ISCClient } from '../services/ISCClient.js';
+import { FetchOptions, PaginatedData } from './app/src/lib/datatable/Model.js';
+import { Reviewer } from './app/src/services/Client.js';
+import { KPIsAndReviewersQuery } from './KPIsAndReviewersQuery.js';
+import { BulkSendReminder } from './BulkSendReminder.js';
+import { CampaignConfigurationService } from '../services/CampaignConfigurationService.js';
+import { CampaignsTreeItem } from '../models/ISCTreeItem.js';
+import { BulkCampaignManagerEscalation } from './BulkCampaignManagerEscalation.js';
+import { IdentityCertificationDto } from 'sailpoint-api-client/dist/certifications/api.js';
+import { BulkCertificationDecision } from './BulkCertificationDecision.js';
+import { BaseWebviewPanel } from '../webview/BaseWebviewPanel.js';
 
 function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
     return {
@@ -42,8 +42,8 @@ export class CampaignPanel extends BaseWebviewPanel {
             : undefined;
 
         // If we already have a panel, show it.
-        if (CampaignPanel.currentPanels[campaignId]) {
-            CampaignPanel.currentPanels[campaignId]._panel.reveal(column);
+        if (CampaignPanel.currentPanels.has(campaignId)) {
+            CampaignPanel.currentPanels.get(campaignId)!._panel.reveal(column);
             return;
         }
 
@@ -55,7 +55,7 @@ export class CampaignPanel extends BaseWebviewPanel {
             getWebviewOptions(extensionUri)
         );
 
-        CampaignPanel.currentPanels[campaignId] = new CampaignPanel(
+        CampaignPanel.currentPanels.set(campaignId,  new CampaignPanel(
             panel,
             extensionUri,
             tenantId,
@@ -63,7 +63,7 @@ export class CampaignPanel extends BaseWebviewPanel {
             campaignId,
             campaignName,
             campaignType,
-            campaignService);
+            campaignService))
     }
 
     public dispose() {

@@ -1,7 +1,7 @@
-import { ObjectExportImportOptionsBeta, ExportPayloadBetaIncludeTypesBeta, SpConfigExportResultsBeta } from 'sailpoint-api-client';
+import { ObjectExportImportOptions, ExportPayloadIncludeTypesEnum as ExportPayloadIncludeTypes, SpConfigExportResults } from 'sailpoint-api-client/dist/sp_config/api.js';
 import * as vscode from 'vscode';
-import { ISCClient } from '../../services/ISCClient';
-import { delay } from '../../utils';
+import { ISCClient } from '../../services/ISCClient.js';
+import { delay } from '../../utils.js';
 
 /**
  * Simplified version of SPConfigExporter
@@ -11,9 +11,9 @@ export class SimpleSPConfigExporter {
         private client: ISCClient,
         private readonly tenantDisplayName: string,
         private readonly options: {
-            [key: string]: ObjectExportImportOptionsBeta;
+            [key: string]: ObjectExportImportOptions;
         },
-        private objectTypes: ExportPayloadBetaIncludeTypesBeta[] = [],
+        private objectTypes: ExportPayloadIncludeTypes[] = [],
         private readonly progressTitle?: string
     ) {
     }
@@ -21,7 +21,7 @@ export class SimpleSPConfigExporter {
     /**
      * Will display a progress bar for the export
      */
-    public async exportConfigWithProgression(): Promise<SpConfigExportResultsBeta | null> {
+    public async exportConfigWithProgression(): Promise<SpConfigExportResults | null> {
 
 
         const data = await vscode.window.withProgress({
@@ -34,7 +34,7 @@ export class SimpleSPConfigExporter {
         return data;
     }
 
-    private async exportConfig(task: any, token: vscode.CancellationToken): Promise<SpConfigExportResultsBeta | null> {
+    private async exportConfig(task: any, token: vscode.CancellationToken): Promise<SpConfigExportResults | null> {
 
         const jobId = await this.client.startExportJob(
             this.objectTypes,

@@ -1,11 +1,11 @@
-import { WizardPromptStep } from "./wizardPromptStep";
-import { WizardContext } from "./wizardContext";
-import { IWizardOptions } from "./wizardOptions";
-import { QuickPickObjectsByTypeStep } from "./quickPickObjectsByTypeStep";
-import { ReassignOwnershipTargetStep } from "./reassignOwnershipTargetStep";
-import { ISCClient } from "../services/ISCClient";
-import { REASSIGN_MODE_CHOOSE } from "./quickPickReassignModeStep";
-import { ReassignableObjectType, REASSIGNABLE_OBJECT_TYPES } from "../models/ReassignOwnership";
+import { WizardPromptStep } from "./wizardPromptStep.js";
+import { WizardContext } from "./wizardContext.js";
+import { IWizardOptions } from "./wizardOptions.js";
+import { QuickPickObjectsByTypeStep } from "./quickPickObjectsByTypeStep.js";
+import { ReassignOwnershipTargetStep } from "./reassignOwnershipTargetStep.js";
+import { ISCClient } from "../services/ISCClient.js";
+import { REASSIGN_MODE_CHOOSE } from "./quickPickReassignModeStep.js";
+import { ReassignableObjectType, REASSIGNABLE_OBJECT_TYPES } from "../models/ReassignOwnership.js";
 
 /**
  * Orchestrator step with no UI of its own (shouldPrompt always returns false).

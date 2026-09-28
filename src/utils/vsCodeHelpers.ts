@@ -1,11 +1,11 @@
 import * as vscode from "vscode";
-import { TenantService } from "../services/TenantService";
+import { TenantService } from "../services/TenantService.js";
 import * as fs from 'fs';
-import { TenantInfo } from "../models/TenantInfo";
-import { TenantInfoQuickPickItem } from "../models/TenantInfoQuickPickItem";
-import { compareByLabel, compareByName } from "../utils";
-import { isBlank, isEmpty } from "./stringUtils";
-import { ObjectPickItem } from "../models/ObjectPickItem";
+import { TenantInfo } from "../models/TenantInfo.js";
+import { TenantInfoQuickPickItem } from "../models/TenantInfoQuickPickItem.js";
+import { compareByLabel, compareByName } from "../utils.js";
+import { isBlank, isEmpty } from "./stringUtils.js";
+import { ObjectPickItem } from "../models/ObjectPickItem.js";
 
 export async function chooseTenant(tenantService: TenantService, title: string): Promise<TenantInfo | undefined> {
 	console.log("> chooseTenant");

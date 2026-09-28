@@ -1,12 +1,12 @@
 import * as vscode from "vscode";
-import { URL_PREFIX } from "../../constants";
+import { URL_PREFIX } from "../../constants.js";
 import {
     completionVariables,
     resolveTemplateIdentity,
     velocityInsertText,
     velocityPrefixLength,
-} from "./templateVariableCompletion";
-import { NotificationTemplateVariable } from "./templateVariables";
+} from "./templateVariableCompletion.js";
+import { NotificationTemplateVariable } from "./templateVariables.js";
 
 /**
  * Suggests global and template-specific variables while editing a notification template.

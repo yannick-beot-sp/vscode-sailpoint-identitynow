@@ -1,7 +1,7 @@
-import { TenantTreeItem } from "../../models/ISCTreeItem";
+import { TenantTreeItem } from "../../models/ISCTreeItem.js";
 import * as vscode from 'vscode';
-import { buildResourceUri } from "../../utils/UriUtils";
-import { openPreview } from "../../utils/vsCodeHelpers";
+import { buildResourceUri } from "../../utils/UriUtils.js";
+import { openPreview } from "../../utils/vsCodeHelpers.js";
 
 export class EditServiceDeskTimeCheckConfiguration {
 

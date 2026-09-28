@@ -1,10 +1,10 @@
 import * as assert from "assert";
-import { CacheService } from "../../services/cache/CacheService";
+import { CacheService } from "../../services/cache/CacheService.js";
 import {
 	approvalSchemeToStringConverter,
 	stringToAccessProfileApprovalSchemeConverter,
 	stringToRoleApprovalSchemeConverter,
-} from "../../utils/approvalSchemeConverter";
+} from "../../utils/approvalSchemeConverter.js";
 
 function cache(entries: Record<string, string>): CacheService<string> {
 	return new CacheService(async (key: string) => {

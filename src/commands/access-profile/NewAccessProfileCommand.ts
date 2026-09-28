@@ -1,21 +1,24 @@
 import * as vscode from 'vscode';
-import { TenantService } from "../../services/TenantService";
-import { AccessProfilesTreeItem } from '../../models/ISCTreeItem';
-import { NEW_ID } from '../../constants';
-import { ISCClient } from '../../services/ISCClient';
-import { getResourceUri } from '../../utils/UriUtils';
-import { AccessProfile, Entitlement, EntitlementBeta } from 'sailpoint-api-client';
-import { runWizard } from '../../wizard/wizard';
-import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
-import { InputPromptStep } from '../../wizard/inputPromptStep';
-import { QuickPickIdentityStep } from '../../wizard/quickPickIdentityStep';
-import { Validator } from '../../validator/validator';
-import { WizardContext } from '../../wizard/wizardContext';
-import { QuickPickPromptStep } from '../../wizard/quickPickPromptStep';
-import { createNewFile } from '../../utils/vsCodeHelpers';
-import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep';
-import { InputIdentityQueryStep } from '../../wizard/inputIdentityQueryStep';
+import { TenantService } from "../../services/TenantService.js";
+import { AccessProfilesTreeItem } from '../../models/ISCTreeItem.js';
+import { NEW_ID } from '../../constants.js';
+import { ISCClient } from '../../services/ISCClient.js';
+import { getResourceUri } from '../../utils/UriUtils.js';
+import { AccessProfile } from 'sailpoint-api-client/dist/access_profiles/api.js';
+import { Entitlement } from 'sailpoint-api-client/dist/entitlements/api.js';
+import { runWizard } from '../../wizard/wizard.js';
+import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep.js';
+import { InputPromptStep } from '../../wizard/inputPromptStep.js';
+import { QuickPickIdentityStep } from '../../wizard/quickPickIdentityStep.js';
+import { Validator } from '../../validator/validator.js';
+import { WizardContext } from '../../wizard/wizardContext.js';
+import { QuickPickPromptStep } from '../../wizard/quickPickPromptStep.js';
+import { createNewFile } from '../../utils/vsCodeHelpers.js';
+import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep.js';
+import { InputIdentityQueryStep } from '../../wizard/inputIdentityQueryStep.js';
+import { createRequire } from "node:module";
 
+const require = createRequire(import.meta.url);
 const accessProfileTemplate: AccessProfile = require('../../../snippets/access-profile.json');
 
 const accessProfileNameValidator = new Validator({
@@ -115,7 +118,7 @@ export class NewAccessProfileCommand {
                 type: 'SOURCE'
             };
 
-            newAccessProfile.entitlements?.push(...values["entitlements"].map((x: EntitlementBeta) => ({
+            newAccessProfile.entitlements?.push(...values["entitlements"].map((x: Entitlement) => ({
                 id: x.id,
                 name: x.name,
                 type: 'ENTITLEMENT'

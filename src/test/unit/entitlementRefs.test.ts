@@ -1,9 +1,9 @@
-import "./vscodeStub";
+import "./vscodeStub.js";
 import * as assert from "assert";
-import { CacheService } from "../../services/cache/CacheService";
-import { EntitlementCacheService } from "../../services/cache/EntitlementCacheService";
-import { SourceNameToIdCacheService } from "../../services/cache/SourceNameToIdCacheService";
-import { entitlementToStringConverter, stringToEntitlementConverter } from "../../utils/entitlementUtils";
+import { CacheService } from "../../services/cache/CacheService.js";
+import { EntitlementCacheService } from "../../services/cache/EntitlementCacheService.js";
+import { SourceNameToIdCacheService } from "../../services/cache/SourceNameToIdCacheService.js";
+import { entitlementToStringConverter, stringToEntitlementConverter } from "../../utils/entitlementUtils.js";
 
 function cache(entries: Record<string, string>): CacheService<string> {
 	return new CacheService(async (key: string) => {

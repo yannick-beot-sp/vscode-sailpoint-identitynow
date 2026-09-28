@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { App } from "@frontmcp/sdk";
-import { SearchEntitlementsTool } from "./tools/SearchEntitlementsTool";
+import { SearchEntitlementsTool } from "./tools/SearchEntitlementsTool.js";
 
 @App({
     id: "entitlements",

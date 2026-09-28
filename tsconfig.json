@@ -1,6 +1,7 @@
 {
 	"compilerOptions": {
-		"module": "commonjs",
+		"module": "nodenext",
+		"moduleResolution": "nodenext",
 		"target": "ES2021",
 		"outDir": "out",
 		"lib": [
@@ -23,6 +24,7 @@
 		"node_modules",
 		".vscode-test",
 		"src/campaign-webview/app",
-		"src/dependency-webview/app"
+		"src/dependency-webview/app",
+		"src/test/mcp"
 	]
 }

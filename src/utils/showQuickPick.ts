@@ -4,8 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { Disposable, QuickPickOptions, QuickInputButton, QuickInputButtons, QuickPick, window, QuickPickItem } from 'vscode';
-import { Wizard } from '../wizard/wizard';
-import { GoBackError, UserCancelledError } from '../errors';
+import { Wizard } from '../wizard/wizard.js';
+import { GoBackError, UserCancelledError } from '../errors.js';
 
 // Picks are shown in given order, except higher priority items and recently used are moved to the top, and items are grouped if requiested
 export async function showQuickPick<TPick extends QuickPickItem, T>(

@@ -1,4 +1,4 @@
-import { SearchV2025 } from "sailpoint-api-client"
+import { Search } from "sailpoint-api-client/dist/search/api.js"
 
 export interface BasePaginatedSearch {
     limit?: number
@@ -15,7 +15,7 @@ export interface PaginatedSearch extends BasePaginatedSearch {
 }
 
 export interface PaginatedSearchRequest extends BasePaginatedSearch {
-    query: SearchV2025
+    query: Search
 }
 
 export const DEFAULT_PAGINATED_PARAMS = {

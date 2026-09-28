@@ -1,6 +1,6 @@
 import * as assert from "assert";
-import { AccessDurationV2025TimeUnitV2025 } from "sailpoint-api-client";
-import { formatMaxPermittedAccessDuration } from "../../utils/maxPermittedAccessDuration";
+import { AccessDurationTimeUnitEnum as AccessDurationTimeUnit } from "sailpoint-api-client/dist/access_profiles/api.js";
+import { formatMaxPermittedAccessDuration } from "../../utils/maxPermittedAccessDuration.js";
 
 suite("max permitted access duration", () => {
 	test("omits the duration when the value or the unit is missing", () => {
@@ -12,7 +12,7 @@ suite("max permitted access duration", () => {
 
 	test("builds the SDK duration for a known time unit", () => {
 		assert.deepStrictEqual(
-			formatMaxPermittedAccessDuration(12, AccessDurationV2025TimeUnitV2025.Hours),
+			formatMaxPermittedAccessDuration(12, AccessDurationTimeUnit.Hours),
 			{ value: 12, timeUnit: "HOURS" }
 		);
 	});

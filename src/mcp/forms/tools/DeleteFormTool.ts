@@ -1,11 +1,11 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
-import { isGuid } from "../../../utils/stringUtils";
-import { formIdOrNameField } from "./formSchemas";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { tenantNameField } from "../../inputFields.js";
+import { isGuid } from "../../../utils/stringUtils.js";
+import { formIdOrNameField } from "./formSchemas.js";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -24,7 +24,7 @@ type Output = z.infer<typeof outputSchema>;
     description:
         "Delete a form definition by GUID or name. " +
         "Use listForms to find the GUID or name before calling this tool.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Delete Form",

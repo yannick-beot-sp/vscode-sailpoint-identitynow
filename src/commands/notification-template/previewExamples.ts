@@ -1,6 +1,6 @@
 import { render as renderVelocity } from "velocityjs";
-import { attachGlobalTools } from "./templateTools";
-import { NotificationTemplateVariable, NotificationTemplateVariableExample } from "./templateVariables";
+import { attachGlobalTools } from "./templateTools.js";
+import { NotificationTemplateVariable, NotificationTemplateVariableExample } from "./templateVariables.js";
 
 const BLOCKED_PATH_KEYS = new Set(["__proto__", "prototype", "constructor"]);
 const MAX_EXAMPLE_DEPTH = 32;

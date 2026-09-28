@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import { IdentityTreeItem } from "../../models/ISCTreeItem";
-import { IdentityAccessPanel } from "./IdentityAccessPanel";
+import { IdentityTreeItem } from "../../models/ISCTreeItem.js";
+import { IdentityAccessPanel } from "./IdentityAccessPanel.js";
 
 export class ViewIdentityAccessCommand {
 	constructor(private readonly extensionUri: vscode.Uri) { }

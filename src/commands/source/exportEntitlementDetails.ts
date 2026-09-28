@@ -1,14 +1,14 @@
 import * as vscode from 'vscode';
-import { SourceTreeItem } from '../../models/ISCTreeItem';
-import { PathProposer } from '../../services/PathProposer';
-import { askFile } from '../../utils/vsCodeHelpers';
-import { BaseCSVExporter } from '../BaseExporter';
-import { EntitlementV2025, EntitlementsV2025ApiListEntitlementsRequest } from 'sailpoint-api-client';
-import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
-import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
-import { getAdditionalOwners } from '../../utils/additionalOwners';
-import { metadataToString } from '../../utils/metadataUtils';
-import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator';
+import { SourceTreeItem } from '../../models/ISCTreeItem.js';
+import { PathProposer } from '../../services/PathProposer.js';
+import { askFile } from '../../utils/vsCodeHelpers.js';
+import { BaseCSVExporter } from '../BaseExporter.js';
+import { Entitlement, EntitlementsApiListEntitlementsV1Request } from 'sailpoint-api-client/dist/entitlements/api.js';
+import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService.js';
+import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService.js';
+import { getAdditionalOwners } from '../../utils/additionalOwners.js';
+import { metadataToString } from '../../utils/metadataUtils.js';
+import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator.js';
 
 
 export class EntitlementExporterCommand {
@@ -108,7 +108,7 @@ interface EntitlementDto {
 
 }
 
-class EntitlementExporter extends BaseCSVExporter<EntitlementV2025> {
+class EntitlementExporter extends BaseCSVExporter<Entitlement> {
 
     constructor(
         tenantId: string,
@@ -156,7 +156,7 @@ class EntitlementExporter extends BaseCSVExporter<EntitlementV2025> {
         ];
         const unwindablePaths: string[] = [];
 
-        const iterator = new GenericAsyncIterableIterator<EntitlementV2025, EntitlementsV2025ApiListEntitlementsRequest>(
+        const iterator = new GenericAsyncIterableIterator<Entitlement, EntitlementsApiListEntitlementsV1Request>(
             this.client,
             this.client.getEntitlements,
             { filters: `source.id eq "${this.sourceId}"` }
@@ -165,7 +165,7 @@ class EntitlementExporter extends BaseCSVExporter<EntitlementV2025> {
         const governanceGroupCacheIdToName = new GovernanceGroupIdToNameCacheService(this.client);
 
         await this.writeData(headers, paths, unwindablePaths, iterator, task, token,
-            async (item: EntitlementV2025): Promise<EntitlementDto> => {
+            async (item: Entitlement): Promise<EntitlementDto> => {
                 const additionalOwnersInfo = await getAdditionalOwners(
                     item.additionalOwners,
                     identityCacheIdToName,

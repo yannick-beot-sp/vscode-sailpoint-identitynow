@@ -1,9 +1,9 @@
 import "reflect-metadata";
 import { FlowCtxOf, Plugin, ToolHook } from "@frontmcp/sdk";
-import { TenantService } from "../../services/TenantService";
-import { ISCClient } from "../../services/ISCClient";
-import { resolveTenant } from "../utils/tenantResolver";
-import { ErrorCodes, McpError } from "../errors";
+import { TenantService } from "../../services/TenantService.js";
+import { ISCClient } from "../../services/ISCClient.js";
+import { resolveTenant } from "../utils/tenantResolver.js";
+import { ErrorCodes, McpError } from "../errors.js";
 
 /**
  * Module-level WeakMap storing the resolved ISCClient for each tool execution

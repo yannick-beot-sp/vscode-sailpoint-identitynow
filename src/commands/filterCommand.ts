@@ -1,12 +1,12 @@
 import * as vscode from "vscode";
-import { BaseTreeItem, FilterType, IdentitiesTreeItem, PageableNode } from "../models/ISCTreeItem";
-import * as commands from "../commands/constants";
-import { WizardContext } from "../wizard/wizardContext";
-import { InputPromptStep } from "../wizard/inputPromptStep";
-import { runWizard } from "../wizard/wizard";
-import { QuickPickPromptStep } from "../wizard/quickPickPromptStep";
-import { ISCTreeDataProvider } from "../views/ISCTreeDataProvider";
-import { isNotEmpty } from "../utils/stringUtils";
+import { BaseTreeItem, FilterType, IdentitiesTreeItem, PageableNode } from "../models/ISCTreeItem.js";
+import * as commands from "../commands/constants.js";
+import { WizardContext } from "../wizard/wizardContext.js";
+import { InputPromptStep } from "../wizard/inputPromptStep.js";
+import { runWizard } from "../wizard/wizard.js";
+import { QuickPickPromptStep } from "../wizard/quickPickPromptStep.js";
+import { ISCTreeDataProvider } from "../views/ISCTreeDataProvider.js";
+import { isNotEmpty } from "../utils/stringUtils.js";
 
 
 const newFilter = (nodeFilterType: FilterType, searchFirst = false) => new QuickPickPromptStep({

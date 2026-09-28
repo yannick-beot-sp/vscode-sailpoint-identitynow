@@ -1,11 +1,11 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
-import { identityIdField } from "../identityInputFields";
-import { isGuid, isUuid } from "../../../utils/stringUtils";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { tenantNameField } from "../../inputFields.js";
+import { identityIdField } from "../identityInputFields.js";
+import { isGuid, isUuid } from "../../../utils/stringUtils.js";
 
 /** Fields requested from the search API for identity details. */
 const DETAIL_FIELDS = [
@@ -48,7 +48,7 @@ type Output = z.infer<typeof outputSchema>;
     description:
         "Get the full details of an identity by name or ID. " +
         "Returns attributes, accounts, entitlements, access profiles, and roles.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Get Identity",

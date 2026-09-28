@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { TenantService } from '../../services/TenantService';
-import { getFullContent } from '../../utils/vsCodeHelpers';
-import { WizardBasedImporterCommand } from './WizardBasedImporterCommand';
+import { TenantService } from '../../services/TenantService.js';
+import { getFullContent } from '../../utils/vsCodeHelpers.js';
+import { WizardBasedImporterCommand } from './WizardBasedImporterCommand.js';
 
 /**
  * Entry point to import file from the command palette. Tenant is unknown. File is known.

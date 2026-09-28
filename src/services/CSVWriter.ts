@@ -4,7 +4,7 @@ import { EOL } from 'os';
 
 import { createWriteStream, WriteStream } from 'fs';
 import { AsyncParser, ParserOptions } from '@json2csv/node';
-import { customUnwind } from '../utils/CSVTransform';
+import { customUnwind } from '../utils/CSVTransform.js';
 
 
 /**

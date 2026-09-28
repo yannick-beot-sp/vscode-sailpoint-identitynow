@@ -1,5 +1,5 @@
-import { ISCClient } from "../services/ISCClient";
-import { isEmpty } from "../utils/stringUtils";
+import { ISCClient } from "../services/ISCClient.js";
+import { isEmpty } from "../utils/stringUtils.js";
 
 export interface BulkResult {
     success: number;

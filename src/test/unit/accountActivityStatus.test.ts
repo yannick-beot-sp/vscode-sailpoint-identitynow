@@ -1,8 +1,9 @@
-import "./vscodeStub";
+import "./vscodeStub.js";
 import * as assert from "assert";
-import { Account, AccountActivity, CompletionStatus, ExecutionStatus, ProvisioningState } from "sailpoint-api-client";
-import { isAccountRemovable } from "../../commands/account/accountUtils";
-import { isAccountActivityInProgress } from "../../commands/identity/identityUtils";
+import { AccountActivity, CompletionStatus, ExecutionStatus, ProvisioningState } from "sailpoint-api-client/dist/account_activities/api.js";
+import { Account } from "sailpoint-api-client/dist/accounts/api.js";
+import { isAccountRemovable } from "../../commands/account/accountUtils.js";
+import { isAccountActivityInProgress } from "../../commands/identity/identityUtils.js";
 
 function activity(partial: Partial<AccountActivity>): AccountActivity {
 	return partial as AccountActivity;

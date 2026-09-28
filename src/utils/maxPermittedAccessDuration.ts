@@ -1,20 +1,19 @@
-import { AccessDurationV2025, AccessDurationV2025TimeUnitV2025 } from "sailpoint-api-client";
-import { isNotBlank } from "./stringUtils";
-import { isEmpty } from "lodash";
+import { AccessDuration, AccessDurationTimeUnitEnum as AccessDurationTimeUnit } from "sailpoint-api-client/dist/access_profiles/api.js";
+import { isNotBlank } from "./stringUtils.js";
 
-function isTimeUnit(type: string | undefined): type is AccessDurationV2025TimeUnitV2025 {
+function isTimeUnit(type: string | undefined): type is AccessDurationTimeUnit {
     if (type === undefined) return false;
-    return Object.values(AccessDurationV2025TimeUnitV2025).includes(type as AccessDurationV2025TimeUnitV2025)
+    return Object.values(AccessDurationTimeUnit).includes(type as AccessDurationTimeUnit)
 }
 
 
-export function formatMaxPermittedAccessDuration(value: number | undefined, timeUnit: string | undefined): AccessDurationV2025 | null {
+export function formatMaxPermittedAccessDuration(value: number | undefined, timeUnit: string | undefined): AccessDuration | null {
 
-    if (!value || isEmpty(timeUnit)) {
+    if (!value || !isNotBlank(timeUnit)) {
         return null
     }
     if (!isTimeUnit(timeUnit)) {
-        throw new Error("Invalid value for maxPermittedAccessDurationTimeUnit:" + timeUnit + ". Expecting one of " + Object.values(AccessDurationV2025TimeUnitV2025).join(", "))
+        throw new Error("Invalid value for maxPermittedAccessDurationTimeUnit:" + timeUnit + ". Expecting one of " + Object.values(AccessDurationTimeUnit).join(", "))
     }
 
     return {

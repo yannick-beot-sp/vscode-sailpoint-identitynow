@@ -1,7 +1,7 @@
-import "./vscodeStub";
+import "./vscodeStub.js";
 import * as assert from "assert";
-import { AccessRequestResponse, RequestedItemStatusRequestState } from "sailpoint-api-client";
-import { ISCClient } from "../../services/ISCClient";
+import { AccessRequestResponse, RequestedItemStatusRequestState } from "sailpoint-api-client/dist/access_requests/api.js";
+import { ISCClient } from "../../services/ISCClient.js";
 
 suite("access request outcome", () => {
 	const client = new ISCClient("tenant-id", "acme");

@@ -27,7 +27,7 @@ CHANGELOG.md
 IDEAS.md
 RELEASE.md
 webpack.config.js
-jest.mcp.config.js
+jest.mcp.config.cjs
 .cursor/**
 .claude/**
 .frontmcp/**

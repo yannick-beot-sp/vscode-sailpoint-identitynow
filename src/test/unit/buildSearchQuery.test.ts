@@ -1,6 +1,6 @@
 import * as assert from "assert";
-import { IndexV2025 } from "sailpoint-api-client";
-import { buildSearchQuery } from "../../utils/buildSearchQueryV2025";
+import { Index } from "sailpoint-api-client/dist/search/api.js";
+import { buildSearchQuery } from "../../utils/buildSearchQuery.js";
 
 suite("buildSearchQuery", () => {
 	test("requires at least one index", () => {
@@ -12,22 +12,22 @@ suite("buildSearchQuery", () => {
 
 	test("wraps a single index and prefers an explicit index list", () => {
 		assert.deepStrictEqual(
-			buildSearchQuery({ index: IndexV2025.Identities, query: "name:ada" }).indices,
-			[IndexV2025.Identities]
+			buildSearchQuery({ index: Index.Identities, query: "name:ada" }).indices,
+			[Index.Identities]
 		);
 		assert.deepStrictEqual(
 			buildSearchQuery({
-				index: IndexV2025.Identities,
-				indices: [IndexV2025.Roles, IndexV2025.Accessprofiles],
+				index: Index.Identities,
+				indices: [Index.Roles, Index.Accessprofiles],
 				query: "*",
 			}).indices,
-			[IndexV2025.Roles, IndexV2025.Accessprofiles]
+			[Index.Roles, Index.Accessprofiles]
 		);
 	});
 
 	test("splits a comma-separated sort and omits the result filter when no fields are requested", () => {
 		const search = buildSearchQuery({
-			index: IndexV2025.Events,
+			index: Index.Events,
 			query: "*",
 			sort: "name, -created",
 		});
@@ -40,7 +40,7 @@ suite("buildSearchQuery", () => {
 
 	test("keeps an array sort and requests nested documents and fields", () => {
 		const search = buildSearchQuery({
-			index: IndexV2025.Identities,
+			index: Index.Identities,
 			query: "id:1",
 			sort: ["displayName"],
 			fields: ["id", "name"],

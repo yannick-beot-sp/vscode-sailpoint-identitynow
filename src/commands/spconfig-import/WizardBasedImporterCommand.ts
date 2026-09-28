@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
-import { IMPORTABLE_OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
-import { SPConfigImporter } from './SPConfigImporter';
-import { askChosenItems, askSelectObjectTypes, chooseTenant } from '../../utils/vsCodeHelpers';
-import { ImportOptionsBeta, ImportOptionsBetaIncludeTypesBeta } from 'sailpoint-api-client';
-import { TenantInfo } from '../../models/TenantInfo';
-import { TenantService } from '../../services/TenantService';
-import { validateTenantReadonly } from '../validateTenantReadonly';
+import { IMPORTABLE_OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem.js';
+import { SPConfigImporter } from './SPConfigImporter.js';
+import { askChosenItems, askSelectObjectTypes, chooseTenant } from '../../utils/vsCodeHelpers.js';
+import { ImportOptions, ImportOptionsIncludeTypesEnum as ImportOptionsIncludeTypes } from 'sailpoint-api-client/dist/sp_config/api.js';
+import { TenantInfo } from '../../models/TenantInfo.js';
+import { TenantService } from '../../services/TenantService.js';
+import { validateTenantReadonly } from '../validateTenantReadonly.js';
 
 const ALL: vscode.QuickPickItem = {
     label: "Import everything",
@@ -65,7 +65,7 @@ export abstract class WizardBasedImporterCommand {
         tenantName: string,
         tenantDisplayName: string,
         data: string,
-        importOptions: ImportOptionsBeta = {}): Promise<void> {
+        importOptions: ImportOptions = {}): Promise<void> {
 
         const importer = new SPConfigImporter(tenantId, tenantName, tenantDisplayName, importOptions, data);
         await importer.importConfig();
@@ -109,7 +109,7 @@ export abstract class WizardBasedImporterCommand {
         const requestedObjectTypes = await askSelectObjectTypes("Object type to import", availableObjectTypeItems);
         if (requestedObjectTypes === undefined) { return; }
 
-        const options: ImportOptionsBeta = {
+        const options: ImportOptions = {
             includeTypes: [],
             excludeTypes: [],
             objectOptions: {}
@@ -129,7 +129,7 @@ export abstract class WizardBasedImporterCommand {
             const includeIds = await askChosenItems(requestedObjectType.label, "What do you want to import?", pickItems, x => x.id);
 
             if (includeIds === undefined) { continue; }
-            const includeType: ImportOptionsBetaIncludeTypesBeta = requestedObjectType.objectType;
+            const includeType: ImportOptionsIncludeTypes = requestedObjectType.objectType;
             options.includeTypes.push(includeType);
 
             if (pickItems.length !== includeIds.length) {

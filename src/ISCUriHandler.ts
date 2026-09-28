@@ -1,12 +1,19 @@
-import * as commands from './commands/constants';
+import * as commands from './commands/constants.js';
 import * as vscode from 'vscode';
-import { AddTenantQueryString } from './models/AddTenantQueryString';
-import { AuthenticationMethod, TenantCredentials, TenantToken } from './models/TenantInfo';
-import { TenantService } from './services/TenantService';
-import { normalizeTenant, parseJwt } from './utils';
-import { isEmpty } from './utils/stringUtils';
-import { randomUUID } from 'crypto';
-const querystring = require('querystring');
+import { AddTenantQueryString } from './models/AddTenantQueryString.js';
+import { AuthenticationMethod, TenantCredentials, TenantToken } from './models/TenantInfo.js';
+import { TenantService } from './services/TenantService.js';
+import { normalizeTenant, parseJwt } from './utils.js';
+import { isEmpty } from './utils/stringUtils.js';
+import { randomUUID } from "node:crypto";
+import * as querystring from "node:querystring";
+
+function firstQueryValue(value: string | string[] | undefined): string | undefined {
+    if (Array.isArray(value)) {
+        return value[0];
+    }
+    return value;
+}
 
 export class ISCUriHandler implements vscode.UriHandler {
 
@@ -23,7 +30,15 @@ export class ISCUriHandler implements vscode.UriHandler {
             vscode.window.showErrorMessage("Invalid Uri Path: unknown command");
             return;
         }
-        const q = querystring.parse(uri.query) as AddTenantQueryString;
+        const parsed = querystring.parse(uri.query);
+        const q: AddTenantQueryString = {
+            tenantName: firstQueryValue(parsed.tenantName) ?? "",
+            authenticationMethod: firstQueryValue(parsed.authenticationMethod) ?? "",
+            accessToken: firstQueryValue(parsed.accessToken),
+            clientId: firstQueryValue(parsed.clientId),
+            clientSecret: firstQueryValue(parsed.clientSecret),
+            displayName: firstQueryValue(parsed.displayName),
+        };
         if (isEmpty(q.authenticationMethod)) {
             vscode.window.showErrorMessage("Invalid Uri Query: authenticationMethod is missing");
             return;

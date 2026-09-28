@@ -1,16 +1,16 @@
 import * as vscode from 'vscode';
-import { TenantTreeItem } from "../models/ISCTreeItem";
-import { ISCClient } from '../services/ISCClient';
-import { TenantService } from '../services/TenantService';
+import { TenantTreeItem } from "../models/ISCTreeItem.js";
+import { ISCClient } from '../services/ISCClient.js';
+import { TenantService } from '../services/TenantService.js';
 
-import { WizardContext } from '../wizard/wizardContext';
-import { QuickPickPromptStep } from '../wizard/quickPickPromptStep';
-import { runWizard } from '../wizard/wizard';
-import { QuickPickTenantStep } from '../wizard/quickPickTenantStep';
-import { IWizardOptions } from '../wizard/wizardOptions';
-import { WizardPromptStep } from '../wizard/wizardPromptStep';
-import { InputPromptStep } from '../wizard/inputPromptStep';
-import { emailValidator } from '../validator/emailValidator';
+import { WizardContext } from '../wizard/wizardContext.js';
+import { QuickPickPromptStep } from '../wizard/quickPickPromptStep.js';
+import { runWizard } from '../wizard/wizard.js';
+import { QuickPickTenantStep } from '../wizard/quickPickTenantStep.js';
+import { IWizardOptions } from '../wizard/wizardOptions.js';
+import { WizardPromptStep } from '../wizard/wizardPromptStep.js';
+import { InputPromptStep } from '../wizard/inputPromptStep.js';
+import { emailValidator } from '../validator/emailValidator.js';
 
 type EmailSettingChoice = vscode.QuickPickItem & { emailTestMode: boolean }
 

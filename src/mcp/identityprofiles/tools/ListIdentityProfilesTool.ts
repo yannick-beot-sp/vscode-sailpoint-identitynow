@@ -1,10 +1,10 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
-import { identityProfileOutputSchema, parseMapping } from "./identityProfileSchemas";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { tenantNameField } from "../../inputFields.js";
+import { identityProfileOutputSchema, parseMapping } from "./identityProfileSchemas.js";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -22,7 +22,7 @@ type Output = z.infer<typeof outputSchema>;
     description:
         "List all identity profiles for a given tenant. " +
         "Returns id, name, priority, authoritative source name, attribute mappings, and lifecycle states for each profile.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "List Identity Profiles",

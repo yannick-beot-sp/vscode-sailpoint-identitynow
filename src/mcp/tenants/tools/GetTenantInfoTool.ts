@@ -1,11 +1,11 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getTenantService } from "../../plugins/TenantResolverPlugin";
-import { resolveTenant } from "../../utils/tenantResolver";
-import { EndpointUtils } from "../../../utils/EndpointUtils";
-import { tenantNameField } from "../../inputFields";
-import { ErrorCodes, McpError } from "../../errors";
+import { getTenantService } from "../../plugins/TenantResolverPlugin.js";
+import { resolveTenant } from "../../utils/tenantResolver.js";
+import { EndpointUtils } from "../../../utils/EndpointUtils.js";
+import { tenantNameField } from "../../inputFields.js";
+import { ErrorCodes, McpError } from "../../errors.js";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -23,7 +23,7 @@ type Output = z.infer<typeof outputSchema>;
 @Tool({
     name: "getTenantInfo",
     description: "Get the display name, domain name, and base API URL for a specific tenant.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Get Tenant Info",

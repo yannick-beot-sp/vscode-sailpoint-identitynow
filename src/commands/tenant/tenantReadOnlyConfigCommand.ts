@@ -1,7 +1,7 @@
-import { TenantTreeItem } from "../../models/ISCTreeItem";
+import { TenantTreeItem } from "../../models/ISCTreeItem.js";
 import * as vscode from 'vscode';
-import * as commands from '../constants';
-import { TenantService } from "../../services/TenantService";
+import * as commands from '../constants.js';
+import { TenantService } from "../../services/TenantService.js";
 
 export class TenantReadOnlyConfigCommand {
 

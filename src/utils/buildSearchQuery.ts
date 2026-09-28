@@ -1,8 +1,8 @@
-import { IndexV2025, SearchV2025 } from "sailpoint-api-client"
+import { Index, Search } from "sailpoint-api-client/dist/search/api.js"
 
 export interface SearchQuery {
-	index?: IndexV2025
-	indices?: IndexV2025[]
+	index?: Index
+	indices?: Index[]
 	query: string
 	sort?: string | string[]
 	fields?: string[]
@@ -12,7 +12,7 @@ export interface SearchQuery {
 
 export function buildSearchQuery(
 	{ index, indices, query, sort, fields, includeNested = false }: SearchQuery,
-): SearchV2025 {
+): Search {
 	const resolvedIndices = indices?.length ? indices : index ? [index] : [];
 	if (resolvedIndices.length === 0) {
 		throw new Error("Search query requires at least one index");

@@ -1,8 +1,8 @@
-import { askCreateOrUpdate, chooseFile } from '../../utils/vsCodeHelpers';
-import { AccessProfilesTreeItem } from '../../models/ISCTreeItem';
-import { AccessProfileImporter } from './AccessProfileImporter';
-import { validateTenantReadonly } from '../validateTenantReadonly';
-import { TenantService } from '../../services/TenantService';
+import { askCreateOrUpdate, chooseFile } from '../../utils/vsCodeHelpers.js';
+import { AccessProfilesTreeItem } from '../../models/ISCTreeItem.js';
+import { AccessProfileImporter } from './AccessProfileImporter.js';
+import { validateTenantReadonly } from '../validateTenantReadonly.js';
+import { TenantService } from '../../services/TenantService.js';
 
 export class AccessProfileImporterTreeViewCommand {
 
