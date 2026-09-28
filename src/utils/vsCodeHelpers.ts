@@ -191,7 +191,10 @@ export async function openPreview(uri: vscode.Uri | string, language = "json", p
 		vscode.window.showWarningMessage(`Could not open ${uri.fsPath} because its size exceed 50MB.`)
 	} else {
 		let document = await vscode.workspace.openTextDocument(uri);
-		document = await vscode.languages.setTextDocumentLanguage(document, language);
+
+		const supportedLanguages = await vscode.languages.getLanguages();
+		const languageId = supportedLanguages.includes(language) ? language : 'plaintext';
+		document = await vscode.languages.setTextDocumentLanguage(document, languageId);
 		vscode.window.showTextDocument(document, { preview: preview, preserveFocus: true });
 	}
 }
