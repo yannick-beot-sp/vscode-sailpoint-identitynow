@@ -677,6 +677,8 @@ The patterns defined above use the following tokens:
 
 ### Unreleased
 
+### 1.3.32
+
 - Add identity panel to view roles, access profiles, and entitlements for an identity by [@henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
 - Allow to request or revoke access from the identity panel and add access request status panel with live reload to monitor the request [@henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
 - Add identity events panel to browse audit events [@henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))
@@ -685,7 +687,10 @@ The patterns defined above use the following tokens:
 - Add OAuth Code authentication when adding a tenant (cf. [#169](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/169))
 - Notification Templates: browse and edit the notification templates of a tenant in the tree view, with preview and example values. Contribution of [@j-asper-a](https://github.com/j-asper-a) (cf. [#170](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/170))
 - Send a test e-mail for an e-mail notification template.
-
+- Use ESM instead of CommonJS
+- Use sailpoint-api-client SDK 2.x
+- Error opening usageType 'CREATE_MACHINE_ACCOUNT' Provisioning Policies (cf. [#159](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/159))
+- Error loading the extension on Windows (cf. [#172](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/172))
 
 ### 1.3.31
 
