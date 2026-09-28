@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
 
-import { EXPORTABLE_OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem';
-import { askChosenItems, askFile, askFolder, askSelectObjectTypes, openPreview } from '../../utils/vsCodeHelpers';
-import { PathProposer } from '../../services/PathProposer';
-import { ISCClient } from '../../services/ISCClient';
-import { SPConfigExporter } from './SPConfigExporter';
-import { ExportPayloadBetaIncludeTypesBeta, ObjectExportImportOptionsBeta } from 'sailpoint-api-client';
-import { SimpleSPConfigExporter } from './SimpleSPConfigExporter';
+import { EXPORTABLE_OBJECT_TYPE_ITEMS } from '../../models/ObjectTypeQuickPickItem.js';
+import { askChosenItems, askFile, askFolder, askSelectObjectTypes, openPreview } from '../../utils/vsCodeHelpers.js';
+import { PathProposer } from '../../services/PathProposer.js';
+import { ISCClient } from '../../services/ISCClient.js';
+import { SPConfigExporter } from './SPConfigExporter.js';
+import { ExportPayloadIncludeTypesEnum as ExportPayloadIncludeTypes, ObjectExportImportOptions } from 'sailpoint-api-client/dist/sp_config/api.js';
+import { SimpleSPConfigExporter } from './SimpleSPConfigExporter.js';
 
 const ALL: vscode.QuickPickItem = {
     label: "Export everything",
@@ -111,8 +111,8 @@ export abstract class WizardBasedExporterCommand {
         const objectTypeToExport = await askSelectObjectTypes("Object type to export", EXPORTABLE_OBJECT_TYPE_ITEMS);
         if (objectTypeToExport === undefined) { return; }
 
-        let objectTypes: ExportPayloadBetaIncludeTypesBeta[] = objectTypeToExport.map(x => x.objectType);
-        const options: { [key: string]: ObjectExportImportOptionsBeta } = {};
+        let objectTypes: ExportPayloadIncludeTypes[] = objectTypeToExport.map(x => x.objectType);
+        const options: { [key: string]: ObjectExportImportOptions } = {};
 
         //
         // Do we export all objects or just a subset?
@@ -132,30 +132,30 @@ export abstract class WizardBasedExporterCommand {
             for (const objectTypeItem of objectTypeToExport) {
                 let items: any[] = [];
                 switch (objectTypeItem.objectType) {
-                    case ExportPayloadBetaIncludeTypesBeta.FormDefinition:
+                    case ExportPayloadIncludeTypes.FormDefinition:
                         items = await client.listForms();
                         break;
-                    case ExportPayloadBetaIncludeTypesBeta.GovernanceGroup:
+                    case ExportPayloadIncludeTypes.GovernanceGroup:
                         items = await client.getGovernanceGroups()
                         break;
 
-                    case ExportPayloadBetaIncludeTypesBeta.IdentityProfile:
+                    case ExportPayloadIncludeTypes.IdentityProfile:
                         items = await client.getIdentityProfiles();
                         break;
-                    case ExportPayloadBetaIncludeTypesBeta.NotificationTemplate:
+                    case ExportPayloadIncludeTypes.NotificationTemplate:
                         items = await client.getNotificationTemplates();
                         break;
-                    case ExportPayloadBetaIncludeTypesBeta.ConnectorRule:
+                    case ExportPayloadIncludeTypes.ConnectorRule:
                         items = await client.getConnectorRules();
                         break;
-                    case ExportPayloadBetaIncludeTypesBeta.Rule:
+                    case ExportPayloadIncludeTypes.Rule:
                         // SP Config allows to export cloud rules
                         // Need to leverage SP Config API and not only "connector rules" endpoints
                         const exporter = new SimpleSPConfigExporter(
                             client,
                             tenantDisplayName,
                             {},
-                            [ExportPayloadBetaIncludeTypesBeta.Rule]
+                            [ExportPayloadIncludeTypes.Rule]
                         );
                         const data = await exporter.exportConfigWithProgression();
                         items = data.objects.map(x => ({
@@ -164,25 +164,25 @@ export abstract class WizardBasedExporterCommand {
                             id: x.self.id
                         }))
                         break;
-                    case ExportPayloadBetaIncludeTypesBeta.Segment:
+                    case ExportPayloadIncludeTypes.Segment:
                         items = await client.getSegments()
                         break;
-                    case ExportPayloadBetaIncludeTypesBeta.ServiceDeskIntegration:
+                    case ExportPayloadIncludeTypes.ServiceDeskIntegration:
                         items = await client.getServiceDesks()
                         break;
-                    case ExportPayloadBetaIncludeTypesBeta.Source:
+                    case ExportPayloadIncludeTypes.Source:
                         items = await client.getSources();
                         break;
-                    case ExportPayloadBetaIncludeTypesBeta.Transform:
+                    case ExportPayloadIncludeTypes.Transform:
                         items = await client.getTransforms();
                         break;
-                    case ExportPayloadBetaIncludeTypesBeta.Workflow:
+                    case ExportPayloadIncludeTypes.Workflow:
                         items = await client.getWorflows();
                         break;
-                    case ExportPayloadBetaIncludeTypesBeta.Role:
+                    case ExportPayloadIncludeTypes.Role:
                         items = await client.getAllRoles();
                         break;
-                    case ExportPayloadBetaIncludeTypesBeta.SodPolicy:
+                    case ExportPayloadIncludeTypes.SodPolicy:
                         items = await client.getSoDPolicies();
                         break;
                     default:
@@ -201,9 +201,9 @@ export abstract class WizardBasedExporterCommand {
                 // cf. SAASTRIAGE-2178 & SAASTRIAGE-2076
                 let selectedItems: string[] | undefined = undefined;
                 let propertyName = "includedIds";
-                if (objectTypeItem.objectType === ExportPayloadBetaIncludeTypesBeta.Segment
-                    || objectTypeItem.objectType === ExportPayloadBetaIncludeTypesBeta.FormDefinition
-                    || objectTypeItem.objectType === ExportPayloadBetaIncludeTypesBeta.ConnectorRule) {
+                if (objectTypeItem.objectType === ExportPayloadIncludeTypes.Segment
+                    || objectTypeItem.objectType === ExportPayloadIncludeTypes.FormDefinition
+                    || objectTypeItem.objectType === ExportPayloadIncludeTypes.ConnectorRule) {
                     // Need to select by name because it does not work by id
                     propertyName = "includedNames";
                     selectedItems = await askChosenItems(objectTypeItem.label, placeHolder, items, x => x.name);

@@ -22,7 +22,7 @@
 
 import * as assert from "assert";
 
-import { McpFixture, setupMcpFixture, teardownMcpFixture, TENANT_NAME, TEST_PORT } from "../mcpTestFixture";
+import { McpFixture, setupMcpFixture, teardownMcpFixture, TENANT_NAME, TEST_PORT } from "../mcpTestFixture.js";
 
 // ---------------------------------------------------------------------------
 // Identity-specific environment variables

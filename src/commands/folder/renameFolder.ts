@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import * as commands from '../constants';
-import { TenantService } from '../../services/TenantService';
-import { BaseTreeItem } from '../../models/ISCTreeItem';
-import { isBlank } from '../../utils/stringUtils';
+import * as commands from '../constants.js';
+import { TenantService } from '../../services/TenantService.js';
+import { BaseTreeItem } from '../../models/ISCTreeItem.js';
+import { isBlank } from '../../utils/stringUtils.js';
 
 
 export class RenameFolderCommand {

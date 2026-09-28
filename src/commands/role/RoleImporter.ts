@@ -1,31 +1,33 @@
 import * as vscode from 'vscode';
 import * as tmp from "tmp";
 
-import { ISCClient } from "../../services/ISCClient";
-import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
-import { AccessDurationV2025, AccessProfileRef, ApprovalSchemeForRole, EntitlementRef, JsonPatchOperationV2025OpV2025, RoleMembershipSelector, RoleMembershipSelectorType } from 'sailpoint-api-client';
-import { RoleV2025, AdditionalOwnerRefV2025 } from 'sailpoint-api-client';
-import { CSVReader } from '../../services/CSVReader';
-import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
-import { WorkflowNameToIdCacheService } from '../../services/cache/WorkflowNameToIdCacheService';
-import { IdentityUsernameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
-import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
-import { AccessProfileNameToIdCacheService } from '../../services/cache/AccessProfileNameToIdCacheService';
-import { stringToRoleApprovalSchemeConverter } from '../../utils/approvalSchemeConverter';
-import { importMode, ImportModeType, openPreview } from '../../utils/vsCodeHelpers';
-import { isEmpty, isNotBlank } from '../../utils/stringUtils';
-import { RoleMembershipSelectorConverter } from '../../parser/RoleMembershipSelectorConverter';
-import { Parser } from '../../parser/parser';
-import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService';
-import { EntitlementCacheService, KEY_SEPARATOR } from '../../services/cache/EntitlementCacheService';
-import { truethy } from '../../utils/booleanUtils';
-import { UserCancelledError } from '../../errors';
-import { stringToAttributeMetadata } from '../../utils/metadataUtils';
-import { stringToDimensionAttributes } from '../../utils/dimensionUtils';
-import { ImportResult } from '../../models/ImportResult';
-import { resolveAdditionalOwners } from '../../utils/additionalOwners';
-import { formatMaxPermittedAccessDuration } from '../../utils/maxPermittedAccessDuration';
-import { stringToEntitlementConverter } from '../../utils/entitlementUtils';
+import { ISCClient } from "../../services/ISCClient.js";
+import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter.js';
+import { AccessDuration, JsonPatchOperationOpEnum as JsonPatchOperationOp } from 'sailpoint-api-client/dist/access_profiles/api.js';
+import { AccessProfileRef, ApprovalSchemeForRole, EntitlementRef, RoleMembershipSelector, RoleMembershipSelectorType } from 'sailpoint-api-client/dist/roles/api.js';
+import { AdditionalOwnerRef } from 'sailpoint-api-client/dist/accounts/api.js';
+import { Role } from 'sailpoint-api-client/dist/roles/api.js';
+import { CSVReader } from '../../services/CSVReader.js';
+import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService.js';
+import { WorkflowNameToIdCacheService } from '../../services/cache/WorkflowNameToIdCacheService.js';
+import { IdentityUsernameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService.js';
+import { CSV_MULTIVALUE_SEPARATOR } from '../../constants.js';
+import { AccessProfileNameToIdCacheService } from '../../services/cache/AccessProfileNameToIdCacheService.js';
+import { stringToRoleApprovalSchemeConverter } from '../../utils/approvalSchemeConverter.js';
+import { importMode, ImportModeType, openPreview } from '../../utils/vsCodeHelpers.js';
+import { isEmpty, isNotBlank } from '../../utils/stringUtils.js';
+import { RoleMembershipSelectorConverter } from '../../parser/RoleMembershipSelectorConverter.js';
+import { Parser } from '../../parser/parser.js';
+import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService.js';
+import { EntitlementCacheService, KEY_SEPARATOR } from '../../services/cache/EntitlementCacheService.js';
+import { truethy } from '../../utils/booleanUtils.js';
+import { UserCancelledError } from '../../errors.js';
+import { stringToAttributeMetadata } from '../../utils/metadataUtils.js';
+import { stringToDimensionAttributes } from '../../utils/dimensionUtils.js';
+import { ImportResult } from '../../models/ImportResult.js';
+import { resolveAdditionalOwners } from '../../utils/additionalOwners.js';
+import { formatMaxPermittedAccessDuration } from '../../utils/maxPermittedAccessDuration.js';
+import { stringToEntitlementConverter } from '../../utils/entitlementUtils.js';
 
 interface RoleCSVRecord {
     name: string
@@ -149,7 +151,7 @@ export class RoleImporter {
                     return;
                 }
 
-                let additionalOwners: Array<AdditionalOwnerRefV2025> | null;
+                let additionalOwners: Array<AdditionalOwnerRef> | null;
                 try {
                     additionalOwners = await resolveAdditionalOwners(
                         data.additionalOwners,
@@ -255,7 +257,7 @@ export class RoleImporter {
                 }
                 const description = data.description ?? ""
 
-                let maxPermittedAccessDuration: AccessDurationV2025 | null = null
+                let maxPermittedAccessDuration: AccessDuration | null = null
                 try {
                     maxPermittedAccessDuration = formatMaxPermittedAccessDuration(
                         data.maxPermittedAccessDurationValue,
@@ -269,7 +271,7 @@ export class RoleImporter {
                     return;
                 }
 
-                const rolePayload: RoleV2025 = {
+                const rolePayload: Role = {
                     "name": roleName,
                     description,
                     "enabled": truethy(data.enabled),
@@ -350,7 +352,7 @@ export class RoleImporter {
                                 .filter(m => m.columns.some(col => headers.includes(col)))
                                 .filter(m => m.condition === undefined || m.condition())
                                 .map(m => ({
-                                    op: JsonPatchOperationV2025OpV2025.Replace,
+                                    op: JsonPatchOperationOp.Replace,
                                     path: `/${m.path}`,
                                     value: m.getValue()
                                 }))

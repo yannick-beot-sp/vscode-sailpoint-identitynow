@@ -1,4 +1,4 @@
-import { TenantCredentials } from "./TenantInfo";
+import { TenantCredentials } from "./TenantInfo.js";
 
 export interface CertificationCampaignInfo {
     tenantName: string;

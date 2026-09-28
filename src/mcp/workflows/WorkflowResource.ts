@@ -1,10 +1,10 @@
 import "reflect-metadata";
 import { ResourceContext, ResourceTemplate } from "@frontmcp/sdk";
-import { ISCClient } from "../../services/ISCClient";
-import { ErrorCodes, McpError } from "../errors";
-import { resolveTenant } from "../utils/tenantResolver";
-import { getTenantService } from "../plugins/TenantResolverPlugin";
-import { isGuid } from "../../utils/stringUtils";
+import { ISCClient } from "../../services/ISCClient.js";
+import { ErrorCodes, McpError } from "../errors.js";
+import { resolveTenant } from "../utils/tenantResolver.js";
+import { getTenantService } from "../plugins/TenantResolverPlugin.js";
+import { isGuid } from "../../utils/stringUtils.js";
 
 type WorkflowParams = { tenantName: string; workflowName: string };
 

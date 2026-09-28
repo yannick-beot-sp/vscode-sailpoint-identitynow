@@ -1,4 +1,4 @@
-import { TenantInfo } from "./TenantInfo";
+import { TenantInfo } from "./TenantInfo.js";
 
 // Helper function to check if an item is a TenantInfo
 export function isTenantInfo(item: FolderTreeNode | TenantInfo): item is TenantInfo {

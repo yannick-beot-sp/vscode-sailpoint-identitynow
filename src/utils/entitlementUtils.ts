@@ -1,9 +1,9 @@
-import { EntitlementRef } from "sailpoint-api-client"
-import { CSV_MULTIVALUE_SEPARATOR } from "../constants"
-import { CacheService } from "../services/cache/CacheService"
-import { SourceNameToIdCacheService } from "../services/cache/SourceNameToIdCacheService"
-import { isBlank } from "./stringUtils"
-import { EntitlementCacheService, KEY_SEPARATOR } from "../services/cache/EntitlementCacheService"
+import { EntitlementRef } from "sailpoint-api-client/dist/roles/api.js";
+import { CSV_MULTIVALUE_SEPARATOR } from "../constants.js"
+import { CacheService } from "../services/cache/CacheService.js"
+import { SourceNameToIdCacheService } from "../services/cache/SourceNameToIdCacheService.js"
+import { isBlank } from "./stringUtils.js"
+import { EntitlementCacheService, KEY_SEPARATOR } from "../services/cache/EntitlementCacheService.js"
 
 export async function entitlementToStringConverter(
     entitlementRefs: Array<EntitlementRef> | undefined,

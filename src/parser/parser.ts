@@ -1,8 +1,8 @@
-import { RoleCriteriaKeyType } from "sailpoint-api-client";
-import { ParseException } from "../errors";
-import { Attribute, ComparisonOperation, ComparisonOperator, Expression, Literal, LogicalOperation, LogicalOperator, isComparisonOperation, isLogicalOperation } from "./ast";
-import { END_OF_STRING, StringIterator, isSpace } from "./stringIterator";
-import { isNotEmpty } from "../utils/stringUtils";
+import { RoleCriteriaKeyType } from "sailpoint-api-client/dist/roles/api.js";
+import { ParseException } from "../errors.js";
+import { Attribute, ComparisonOperation, ComparisonOperator, Expression, Literal, LogicalOperation, LogicalOperator, isComparisonOperation, isLogicalOperation } from "./ast.js";
+import { END_OF_STRING, StringIterator, isSpace } from "./stringIterator.js";
+import { isNotEmpty } from "../utils/stringUtils.js";
 import { parse as parseSync } from 'csv-parse/sync';
 
 export class Parser {

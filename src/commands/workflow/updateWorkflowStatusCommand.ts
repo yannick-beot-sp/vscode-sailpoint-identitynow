@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
-import * as commands from '../constants';
-import { WorkflowTreeItem } from '../../models/ISCTreeItem';
-import { ISCClient } from '../../services/ISCClient';
-import { getResourceUri } from '../../utils/UriUtils';
-import { TenantService } from '../../services/TenantService';
-import { validateTenantReadonly } from '../validateTenantReadonly';
+import * as commands from '../constants.js';
+import { WorkflowTreeItem } from '../../models/ISCTreeItem.js';
+import { ISCClient } from '../../services/ISCClient.js';
+import { getResourceUri } from '../../utils/UriUtils.js';
+import { TenantService } from '../../services/TenantService.js';
+import { validateTenantReadonly } from '../validateTenantReadonly.js';
 
 export class UpdateWorkflowStatusCommand {
 

@@ -1,10 +1,10 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
-import { identityQueryField, identitySortField } from "../identityInputFields";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { tenantNameField } from "../../inputFields.js";
+import { identityQueryField, identitySortField } from "../identityInputFields.js";
 
 const DEFAULT_SORT = "name";
 
@@ -40,7 +40,7 @@ type Output = z.infer<typeof outputSchema>;
         "Returns id, name, and email for each matching identity. " +
         "Query syntax: https://documentation.sailpoint.com/saas/help/search/building-query.html. " +
         "Searchable fields: https://documentation.sailpoint.com/saas/help/search/searchable-fields.html.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Search Identities",

@@ -1,15 +1,15 @@
 import * as vscode from 'vscode';
-import * as commands from '../commands/constants';
-import { SourceTreeItem, TenantTreeItem } from "../models/ISCTreeItem";
-import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
-import { ISCClient } from "./ISCClient";
-import { TenantService } from "./TenantService";
-import { TransformEvaluator } from './TransformEvaluator';
-import { TaskStatusBeta, TaskStatusBetaCompletionStatusBeta } from 'sailpoint-api-client';
-import { confirm } from '../utils/vsCodeHelpers';
-import { formatTask, waifForJob } from '../commands/source/sourceUtils';
-import { isTenantReadonly, validateTenantReadonly } from '../commands/validateTenantReadonly';
-import { isEmpty } from '../utils/arrayUtils';
+import * as commands from '../commands/constants.js';
+import { SourceTreeItem, TenantTreeItem } from "../models/ISCTreeItem.js";
+import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider.js";
+import { ISCClient } from "./ISCClient.js";
+import { TenantService } from "./TenantService.js";
+import { TransformEvaluator } from './TransformEvaluator.js';
+import { TaskStatus, TaskStatusCompletionStatusEnum as TaskStatusCompletionStatus } from 'sailpoint-api-client/dist/task_management/api.js';
+import { confirm } from '../utils/vsCodeHelpers.js';
+import { formatTask, waifForJob } from '../commands/source/sourceUtils.js';
+import { isTenantReadonly, validateTenantReadonly } from '../commands/validateTenantReadonly.js';
+import { isEmpty } from '../utils/arrayUtils.js';
 
 export class TreeManager {
 
@@ -45,7 +45,7 @@ export class TreeManager {
         vscode.window.showInformationMessage(`Successfully deleted tenant ${tenantName}`);
     }
 
-    public async resetEntitlements(item: SourceTreeItem, doConfirm = true): Promise<TaskStatusBeta | undefined> {
+    public async resetEntitlements(item: SourceTreeItem, doConfirm = true): Promise<TaskStatus | undefined> {
         console.log("> resetEntitlements", item)
         if (doConfirm) {
             if (isTenantReadonly(this.tenantService, item.tenantId)) {
@@ -76,7 +76,7 @@ export class TreeManager {
         });
     }
 
-    public async resetAccounts(item: SourceTreeItem, doConfirm = true): Promise<TaskStatusBeta | undefined> {
+    public async resetAccounts(item: SourceTreeItem, doConfirm = true): Promise<TaskStatus | undefined> {
         console.log("> resetAccounts", item)
         if (doConfirm) {
             if (isTenantReadonly(this.tenantService, item.tenantId)) {
@@ -207,7 +207,7 @@ export class TreeManager {
         }
 
         const task = await this.resetAccounts(item, false)
-        if (task?.completionStatus === TaskStatusBetaCompletionStatusBeta.Success) {
+        if (task?.completionStatus === TaskStatusCompletionStatus.Success) {
             await this.resetEntitlements(item, false)
         }
     }

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { CampaignTreeItem } from "../models/ISCTreeItem";
-import { CampaignPanel } from './CampaignPanel';
-import { CampaignConfigurationService } from '../services/CampaignConfigurationService';
+import { CampaignTreeItem } from "../models/ISCTreeItem.js";
+import { CampaignPanel } from './CampaignPanel.js';
+import { CampaignConfigurationService } from '../services/CampaignConfigurationService.js';
 
 /**
  * Command used to open the campaign panel

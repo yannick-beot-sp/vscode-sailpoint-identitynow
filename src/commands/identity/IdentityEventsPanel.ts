@@ -1,16 +1,16 @@
 import * as vscode from "vscode";
-import { IdentityTreeItem } from "../../models/ISCTreeItem";
-import { ISCClient } from "../../services/ISCClient";
-import { buildEventTableRows, buildEventsTableHtml, buildLoadingHtml } from "./identityEventsHtml";
+import { IdentityTreeItem } from "../../models/ISCTreeItem.js";
+import { ISCClient } from "../../services/ISCClient.js";
+import { buildEventTableRows, buildEventsTableHtml, buildLoadingHtml } from "./identityEventsHtml.js";
 
-import { EventDocumentV2025 } from "sailpoint-api-client";
+import { EventDocument } from "../../models/SearchDocument.js";
 
 export class IdentityEventsPanel implements vscode.Disposable {
     public static readonly viewType = "identityEventsView";
     public static currentPanels: Map<string, IdentityEventsPanel> = new Map();
 
     private readonly disposables: vscode.Disposable[] = [];
-    private events: EventDocumentV2025[] = [];
+    private events: EventDocument[] = [];
     private disposed = false;
     private hasRenderedTable = false;
     private loadInFlight?: Promise<void>;

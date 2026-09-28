@@ -1,4 +1,4 @@
-import type { FetchOptions, PaginatedData } from "../lib/datatable/Model";
+import type { FetchOptions, PaginatedData } from "../lib/datatable/Model.js";
 
 export interface Totals {
     totalAccessReviews: number;

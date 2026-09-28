@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
-import { CampaignTreeItem } from "../models/ISCTreeItem";
-import { TenantService } from "../services/TenantService";
-import { ISCClient } from '../services/ISCClient';
-import { AccessReviewItem, ReassignReference, ReassignReferenceTypeV3 } from 'sailpoint-api-client';
-import { chooseFile, confirm } from '../utils/vsCodeHelpers';
-import { CustomReviewerCoverage, CustomReviewerImporter } from './CustomReviewerImporter';
-import { BulkReviewItemReassignment, getPendingCampaignItems } from './BulkReviewItemReassignment';
-import { isTenantReadonly, validateTenantReadonly } from '../commands/validateTenantReadonly';
+import { CampaignTreeItem } from "../models/ISCTreeItem.js";
+import { TenantService } from "../services/TenantService.js";
+import { ISCClient } from '../services/ISCClient.js';
+import { AccessReviewItem } from 'sailpoint-api-client/dist/certifications/api.js';
+import { chooseFile, confirm } from '../utils/vsCodeHelpers.js';
+import { CustomReviewerCoverage, CustomReviewerImporter } from './CustomReviewerImporter.js';
+import { BulkReviewItemReassignment, getPendingCampaignItems } from './BulkReviewItemReassignment.js';
+import { isTenantReadonly, validateTenantReadonly } from '../commands/validateTenantReadonly.js';
 
 const CUSTOM_REVIEWERS_DEFAULT_COMMENT = "Reassigned to the defined reviewer"
 
@@ -41,7 +41,7 @@ export class CustomReassignCommand {
             const customReviewerImporter = new CustomReviewerImporter(
                 node.tenantId,
                 node.tenantName,
-                node.label,
+                node.label as string,
                 fileUri
             );
             const customReviewerCoverageRecords = await customReviewerImporter.readFileWithProgression();
@@ -55,7 +55,7 @@ export class CustomReassignCommand {
             const report = await bulkReviewItemReassigner.reassignCampaign(
                 campaignId,
                 `Reassigning items of ${node.label} based on ${fileUri.fsPath}`,
-                node.label,
+                node.label as string,
                 CUSTOM_REVIEWERS_DEFAULT_COMMENT,
                 `Successfully reassigned items for campaign ${node.label} to the defined reviewers.`,
                 async (pendingReviewItem: AccessReviewItem) => {
@@ -66,7 +66,7 @@ export class CustomReassignCommand {
             console.log(`< CustomReassignCommand.execute: Finished reassigning access review items to the defined reviewers for campaign ${node.label}`, report)
         }
         catch (error) {
-            const errorMessage = (error instanceof Error) ? error.message : error.toString();
+            const errorMessage = error instanceof Error ? error.message : String(error);
             console.log(`< CustomReassignCommand.execute: Error processing custom reassignment for campaign ${node.label}: ${errorMessage}`);
             vscode.window.showErrorMessage(`Error processing custom reassignment for campaign ${node.label}: ${errorMessage}`)
         }

@@ -2,40 +2,93 @@
 import * as vscode from "vscode";
 import * as os from 'os';
 import * as fs from 'fs';
+import FormData from "form-data";
 import { File } from 'node:buffer';
-import { EndpointUtils } from "../utils/EndpointUtils";
-import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider";
-import { compareByName } from "../utils";
-import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account";
-import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements";
-import { Configuration, IdentityProfilesApi, IdentityProfile, IdentityAttributeTransform, LifecycleState, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, ServiceDeskIntegrationDto, Source, SourcesApi, TransformsApi, WorkflowsBetaApi, WorkflowExecutionBeta, ConnectorRuleManagementBetaApi, ConnectorRuleResponseBeta, ConnectorRuleValidationResponseBeta, AccountsApi, AccountsApiListAccountsRequest, Account, EntitlementsBetaApi, PublicIdentity, SPConfigBetaApi, SpConfigImportResultsBeta, SpConfigJobBeta, ImportOptionsBeta, SpConfigExportResultsBeta, ObjectExportImportOptionsBeta, TransformRead, GovernanceGroupsBetaApi, WorkgroupDtoBeta, AccessProfilesApiListAccessProfilesRequest, RolesApi, Role, RolesApiListRolesRequest, Search, SearchApi, IdentityDocument, SearchDocument, AccessProfileDocument, EntitlementDocument, RoleDocument, SourcesBetaApi, StatusResponseBeta, Schema, CustomFormsBetaApi, ExportFormDefinitionsByTenant200ResponseInnerBeta, FormDefinitionResponseV2025, CustomFormsV2025Api, CreateFormDefinitionRequestV2025, NotificationsBetaApi, TemplateDtoBeta, TemplateDtoDefaultBeta, SendTestNotificationRequestDtoBeta, SegmentsApi, Segment, SearchAttributeConfigurationBetaApi, SearchAttributeConfigBeta, IdentityAttributesBetaApi, IdentityAttributeBeta, PasswordManagementBetaApi, ConnectorRuleUpdateRequestBeta, IdentitiesBetaApi, IdentitiesBetaApiListIdentitiesRequest, IdentityBeta, IdentitySyncJobBeta, TaskResultResponseBeta, LoadEntitlementTaskBeta, TaskStatusBeta, EntitlementSourceResetBaseReferenceDtoBeta, TaskResultDtoBeta, ProvisioningPolicyDto, ImportFormDefinitionsRequestInnerBeta, ManagedClustersBetaApi, ManagedClusterBeta, StandardLevelBeta, CertificationCampaignsV2025Api, CertificationsV2025Api, CertificationCampaignsV2025ApiMoveRequest, CertificationSummariesV2025Api, IdentityCertDecisionSummaryV2025, AccessReviewItemV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiMakeIdentityDecisionRequest, IdentityCertificationDtoV2025, GetActiveCampaigns200ResponseInnerV2025, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, WorkflowsApi, ExportPayloadBetaIncludeTypesBeta, SODPoliciesV2024Api, SodPolicyV2024, CertificationTask, AppsBetaApi, SourceAppBeta, ConfigurationHubV2024Api, BackupResponseV2024, IdentityProfilesV2025Api, IdentityPreviewResponseV2025, IdentityAttributeTransformV2025, SourcesV2025Api, TaskManagementV2025Api, AttributeDTO, RolesV2025Api, AccessProfilesV2025Api, JsonPatchOperationV2025, DimensionsV2025Api, RolesV2025ApiListRolesRequest, DimensionV2025, DimensionsV2025ApiListDimensionsRequest, PasswordConfigurationV2025Api, PasswordOrgConfigV2025, WorkflowsV2025Api, WorkflowV2025, WorkflowBodyV2025, WorkflowExecutionEventV2025, CreateWorkflowRequestV2025, WorkflowExecutionV2025, ConnectorRuleManagementV2025Api, ConnectorRuleResponseV2025, EntitlementsV2025Api, EntitlementsV2025ApiListEntitlementsRequest, EntitlementV2025, PublicIdentitiesV2025Api, PublicIdentitiesV2025ApiGetPublicIdentitiesRequest, RoleV2025, TransformsV2025Api, TransformV2025, TransformReadV2025, SearchV2025Api, IndexV2025, AccessProfileDocumentV2025, EntitlementDocumentV2025, RoleDocumentV2025, EventDocumentV2025, AccountActivityDocumentV2025, AccessProfileV2025, SourceV2025, MachineIdentitiesV2025Api, MachineIdentitiesV2025ApiListMachineIdentitiesRequest, MachineIdentityResponseV2025, MachineAccountSubtypesV2026Api, SourceSubtypeWithSourceV2026, PrivilegeCriteriaV2026Api, PrivilegeCriteriaDTOV2026, PrivilegeCriteriaConfigDTOV2026, PrivilegeCriteriaConfigurationV2026Api, IdentityProfileV2025, WorkgroupDtoV2025, GovernanceGroupsV2025Api, AccessRequestApprovalsV2025Api, AppsV2025Api, PendingApprovalV2025, SourceAppPatchDtoV2025, PasswordPoliciesV2025Api, PasswordPolicyV3DtoV2025, PasswordSyncGroupsV2025Api, PasswordSyncGroupV2025, PasswordPolicyHoldersDtoInnerV2025, AttrSyncSourceConfigV2025, SourcesV2026Api, NativeChangeDetectionConfigV2026, AccountDeleteConfigDtoV2026, JsonPatchOperationV2026, MachineClassificationConfigV2026Api, MachineClassificationConfigV2026, CreateSourceSubtypeRequestV2026, CreatePrivilegeCriteriaRequestV2026, AccessRequestsApi, AccessRequestResponse, RequestedItemStatus, RequestedItemStatusRequestState, AccountActivitiesApi, AccountActivity, AuthUsersV2025Api, AuthUserV2025, CustomUserLevelsV2025Api, UserLevelSummaryDTOV2025, ListUserLevelsDetailLevelV2025, AccountsV2025Api, JsonPatchOperationV2025OpV2025, IdentityHistoryV2025Api, ListIdentityAccessItemsTypeV2025, ListIdentityAccessItems200ResponseInnerV2025 } from 'sailpoint-api-client';
-import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity';
+import { EndpointUtils } from "../utils/EndpointUtils.js";
+import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider.js";
+import { compareByName } from "../utils.js";
+import { Account, AccountsApi, AccountsApiListAccountsV1Request, Entitlement, TaskResultDto } from "sailpoint-api-client/dist/accounts/api.js";
+import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account.js";
+import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements.js";
+import { Configuration, IdentityProfilesApi, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, SourcesApi, TransformsApi, RolesApi, SearchApi, EntitlementsApi, AccessProfilesApi, AccessRequestApprovalsApi, AccessRequestsApi, AccountActivitiesApi, AppsApi, AuthUsersApi, CertificationCampaignsApi, CertificationsApi, CertificationSummariesApi, ConfigurationHubApi, ConnectorRuleManagementApi, CustomFormsApi, CustomUserLevelsApi, DimensionsApi, GovernanceGroupsApi, IdentitiesApi, IdentityAttributesApi, IdentityHistoryApi, MachineAccountSubtypesApi, MachineClassificationConfigApi, MachineIdentitiesApi, ManagedClustersApi, PasswordConfigurationApi, PasswordManagementApi, PasswordPoliciesApi, PasswordSyncGroupsApi, PrivilegeCriteriaApi, PrivilegeCriteriaConfigurationApi, PublicIdentitiesApi, SearchAttributeConfigurationApi, SegmentsApi, SODPoliciesApi, SPConfigApi, TaskManagementApi, WorkflowsApi, NotificationsApi } from 'sailpoint-api-client/dist/index.js';
+import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity.js';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { ImportEntitlementsResult } from '../models/JobStatus';
+import { ImportEntitlementsResult } from '../models/JobStatus.js';
 import { basename } from 'path';
 import { createReadStream } from 'fs';
-import { DEFAULT_ACCESSPROFILES_QUERY_PARAMS } from "../models/AccessProfiles";
-import { DEFAULT_ROLES_QUERY_PARAMS } from "../models/Roles";
-import { addQueryParams } from "../utils/UriUtils";
-import { onErrorResponse, onRequest, onResponse } from "./AxiosHandlers";
-import { EmailTestMode } from "../models/EmailTestMode";
-import { DEFAULT_PAGINATED_PARAMS, PaginatedSearch, PaginatedSearchRequest } from "../models/SearchQuery";
-import { buildSearchQuery } from "../utils/buildSearchQueryV2025";
+import { DEFAULT_ACCESSPROFILES_QUERY_PARAMS } from "../models/AccessProfiles.js";
+import { DEFAULT_ROLES_QUERY_PARAMS } from "../models/Roles.js";
+import { addQueryParams } from "../utils/UriUtils.js";
+import { onErrorResponse, onRequest, onResponse } from "./AxiosHandlers.js";
+import { EmailTestMode } from "../models/EmailTestMode.js";
+import { DEFAULT_PAGINATED_PARAMS, PaginatedSearch, PaginatedSearchRequest } from "../models/SearchQuery.js";
+import {
+	AccessProfileDocument,
+	AccountActivityDocument,
+	EntitlementDocument,
+	EventDocument,
+	IdentityDocument,
+	RoleDocument,
+	SearchDocument,
+} from "../models/SearchDocument.js";
+import { buildSearchQuery } from "../utils/buildSearchQuery.js";
 import {
 	accessItemTypeFromSearchDocument,
 	buildRequestableAccessItemQuery,
 	REQUESTABLE_ACCESS_INDICES,
 	REQUESTABLE_ACCESS_SEARCH_FIELDS,
-} from "../utils/requestableAccessSearch";
-import { buildIdentityEventsSearchQuery, collectIdentityEventSearchTerms } from "../utils/identityEventsQuery";
-import { AccessProfile } from "../models/AccessProfiles";
-import { IdentityAccessItem, IdentityAccessItemType } from "../models/IdentityAccessItem";
-import { HecateJobStatus } from "../models/HecateJob";
-import { isDefaultNotificationTemplateId, notificationTemplateKeyFilter, parseDefaultNotificationTemplateId } from "../utils/notificationTemplateList";
+} from "../utils/requestableAccessSearch.js";
+import { buildIdentityEventsSearchQuery, collectIdentityEventSearchTerms } from "../utils/identityEventsQuery.js";
+import { AccessProfileRead } from "../models/AccessProfiles.js";
+import { IdentityAccessItem, IdentityAccessItemType } from "../models/IdentityAccessItem.js";
+import { HecateJobStatus } from "../models/HecateJob.js";
+import { isDefaultNotificationTemplateId, notificationTemplateKeyFilter, parseDefaultNotificationTemplateId } from "../utils/notificationTemplateList.js";
+import { AccountDeleteConfigDto, AttrSyncSourceConfig, JsonPatchOperation, JsonPatchOperationOpEnum, NativeChangeDetectionConfig, PasswordPolicyHoldersDtoInner, Schema, Source, StatusResponse, TransformRead } from "sailpoint-api-client/dist/sources/index.js";
+import { CreateProvisioningPolicyV2, getProvisioningPoliciesPath, ProvisioningPolicyV2 } from "../models/ProvisioningPolicy.js";
+import { Search, AttributeDTO, Index } from "sailpoint-api-client/dist/access_model_metadata/api.js";
+import { AccessRequestResponse, RequestedItemStatus, RequestedItemStatusRequestState } from "sailpoint-api-client/dist/access_requests/api.js";
+import { AccountActivity } from "sailpoint-api-client/dist/account_activities/api.js";
+import { CertificationCampaignsApiMoveV1Request, CertificationTask, GetCampaignV1200Response } from "sailpoint-api-client/dist/certification_campaigns/api.js";
+import { ListUserLevelsV1DetailLevelEnum, PublicIdentity, UserLevelSummaryDTO } from "sailpoint-api-client/dist/custom_user_levels/api.js";
+import { IdentityProfile, IdentityAttributeTransform, IdentityPreviewResponse } from "sailpoint-api-client/dist/identity_profiles/api.js";
+import { LifecycleState } from "sailpoint-api-client/dist/lifecycle_states/api.js";
+import { Role, RolesApiListRolesV1Request } from "sailpoint-api-client/dist/roles/api.js";
+import { Segment } from "sailpoint-api-client/dist/segments/api.js";
+import { ServiceDeskIntegrationDto } from "sailpoint-api-client/dist/service_desk_integration/api.js";
+import { EntitlementsApiListEntitlementsV1Request, EntitlementSourceResetBaseReferenceDto, LoadEntitlementTask } from "sailpoint-api-client/dist/entitlements/api.js";
+import { TaskStatus } from "sailpoint-api-client/dist/task_management/index.js";
+import { ManagedCluster, StandardLevel } from "sailpoint-api-client/dist/managed_clusters/index.js";
+import { PasswordPolicyV3Dto } from "sailpoint-api-client/dist/password_policies/index.js";
+import { PasswordSyncGroup } from "sailpoint-api-client/dist/password_sync_groups/index.js";
+import { PendingApproval } from "sailpoint-api-client/dist/access_request_approvals/api.js";
+import { SourceApp, SourceAppPatchDto } from "sailpoint-api-client/dist/apps/api.js";
+import { AuthUser } from "sailpoint-api-client/dist/auth_users/api.js";
+import { IdentityCertDecisionSummary } from "sailpoint-api-client/dist/certification_summaries/api.js";
+import { IdentityCertificationDto, AccessReviewItem, CertificationsApiMakeIdentityDecisionV1Request, CertificationsApiReassignIdentityCertificationsV1Request, CertificationsApiSubmitReassignCertsAsyncV1Request } from "sailpoint-api-client/dist/certifications/api.js";
+import { ConnectorRuleResponse, ConnectorRuleUpdateRequest, ConnectorRuleValidationResponse } from "sailpoint-api-client/dist/connector_rule_management/api.js";
+import { FormDefinitionResponse, CreateFormDefinitionRequest, ExportFormDefinitionsByTenantV1200ResponseInner, ImportFormDefinitionsV1RequestInner } from "sailpoint-api-client/dist/custom_forms/api.js";
+import { Dimension, DimensionsApiListDimensionsV1Request } from "sailpoint-api-client/dist/dimensions/api.js";
+import { WorkgroupDto } from "sailpoint-api-client/dist/governance_groups/api.js";
+import { CreateSourceSubtypeV1Request, SourceSubtypeWithSource } from "sailpoint-api-client/dist/machine_account_subtypes/api.js";
+import { MachineClassificationConfig } from "sailpoint-api-client/dist/machine_classification_config/api.js";
+import { MachineIdentitiesApiListMachineIdentitiesV1Request, MachineIdentityResponse } from "sailpoint-api-client/dist/machine_identities/api.js";
+import { PasswordOrgConfig } from "sailpoint-api-client/dist/password_configuration/api.js";
+import { CreatePrivilegeCriteriaRequest, PrivilegeCriteriaDTO } from "sailpoint-api-client/dist/privilege_criteria/api.js";
+import { PrivilegeCriteriaConfigDTO } from "sailpoint-api-client/dist/privilege_criteria_configuration/api.js";
+import { WorkflowBody, Workflow, WorkflowExecution, WorkflowExecutionEvent, CreateWorkflowV1Request } from "sailpoint-api-client/dist/workflows/api.js";
+import { SendTestNotificationRequestDto, TemplateDto, TemplateDtoDefault } from "sailpoint-api-client/dist/notifications/api.js";
+import { BackupResponse } from "sailpoint-api-client/dist/configuration_hub/api.js";
+import { Identity, TaskResultResponse, IdentitySyncJob, IdentitiesApiListIdentitiesV1Request } from "sailpoint-api-client/dist/identities/api.js";
+import { SearchAttributeConfig } from "sailpoint-api-client/dist/search_attribute_configuration/api.js";
+import { SodPolicy } from "sailpoint-api-client/dist/sod_policies/api.js";
+import { ObjectExportImportOptions, SpConfigJob, SpConfigExportResults, ImportOptions, SpConfigImportResults, ExportPayloadIncludeTypesEnum } from "sailpoint-api-client/dist/sp_config/api.js";
+import { IdentityAttribute2 } from "sailpoint-api-client/dist/identity_attributes/api.js";
+import { ListIdentityAccessItemsV1200ResponseInner, ListIdentityAccessItemsV1TypeEnum } from "sailpoint-api-client/dist/identity_history/api.js";
+import { PublicIdentitiesApiGetPublicIdentitiesV1Request } from "sailpoint-api-client/dist/public_identities/api.js";
+import { AccessProfile, AccessProfilesApiListAccessProfilesV1Request } from "sailpoint-api-client/dist/access_profiles/api.js";
+import { Transform } from "sailpoint-api-client/dist/transforms/api.js";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const FormData = require('form-data');
-
 // cf. https://axios-http.com/docs/res_schema
 // All header names are lower cased.
 const CONTENT_TYPE_HEADER = "Content-Type";
@@ -54,10 +107,10 @@ const CONTENT_TYPE_FORM_JSON_PATCH = "application/json-patch+json";
 const DEFAULT_PAGINATION = 250;
 
 const IDENTITY_ACCESS_FETCH_PAGE_SIZE = 250;
-const IDENTITY_ACCESS_TYPE_SOURCES: { apiType: ListIdentityAccessItemsTypeV2025; itemType: IdentityAccessItemType }[] = [
-	{ apiType: ListIdentityAccessItemsTypeV2025.Role, itemType: "ROLE" },
-	{ apiType: ListIdentityAccessItemsTypeV2025.AccessProfile, itemType: "ACCESS_PROFILE" },
-	{ apiType: ListIdentityAccessItemsTypeV2025.Entitlement, itemType: "ENTITLEMENT" },
+const IDENTITY_ACCESS_TYPE_SOURCES: { apiType: ListIdentityAccessItemsV1TypeEnum; itemType: IdentityAccessItemType }[] = [
+	{ apiType: ListIdentityAccessItemsV1TypeEnum.Role, itemType: "ROLE" },
+	{ apiType: ListIdentityAccessItemsV1TypeEnum.AccessProfile, itemType: "ACCESS_PROFILE" },
+	{ apiType: ListIdentityAccessItemsV1TypeEnum.Entitlement, itemType: "ENTITLEMENT" },
 ];
 const IDENTITY_ACCESS_TYPE_ORDER: Record<IdentityAccessItemType, number> = {
 	ROLE: 0,
@@ -188,29 +241,29 @@ export class ISCClient {
 	//#region Sources
 	/////////////////////
 
-	public async pingCluster(sourceId: string): Promise<StatusResponseBeta> {
+	public async pingCluster(sourceId: string): Promise<StatusResponse> {
 		console.log("> pingClusterConnection")
 		const apiConfig = await this.getApiConfiguration()
-		const api = new SourcesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors())
-		const response = await api.pingCluster({ sourceId })
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		const response = await api.pingClusterV1({ sourceId })
 		return response.data;
 	}
 
-	public async testSourceConnection(sourceId: string): Promise<StatusResponseBeta> {
+	public async testSourceConnection(sourceId: string): Promise<StatusResponse> {
 		console.log("> testSourceConnection")
 		const apiConfig = await this.getApiConfiguration()
-		const api = new SourcesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors())
-		const response = await api.testSourceConnection({ sourceId })
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		const response = await api.testSourceConnectionV1({ sourceId })
 		return response.data;
 	}
 
-	public async peekSourceConnection(sourceId: string, objectType: string, maxCount: number): Promise<StatusResponseBeta> {
+	public async peekSourceConnection(sourceId: string, objectType: string, maxCount: number): Promise<StatusResponse> {
 		console.log("> peekSourceConnection")
 		const apiConfig = await this.getApiConfiguration()
-		const api = new SourcesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors())
-		const response = await api.peekResourceObjects({
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		const response = await api.searchResourceObjectsV1({
 			sourceId,
-			resourceObjectsRequestBeta: {
+			resourceObjectsRequest: {
 				objectType,
 				maxCount
 			}
@@ -218,27 +271,27 @@ export class ISCClient {
 		return response.data;
 	}
 
-	public async getSources(): Promise<SourceV2025[]> {
+	public async getSources(): Promise<Source[]> {
 		console.log("> getSources");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await Paginator.paginate(api, api.listSources, { sorters: "name" });
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await Paginator.paginate(api, api.listSourcesV1, { sorters: "name" });
 		return result.data;
 	}
 
-	public async getSourcesByOwner(ownerId: string): Promise<SourceV2025[]> {
+	public async getSourcesByOwner(ownerId: string): Promise<Source[]> {
 		console.log("> getSourcesByOwner", ownerId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await Paginator.paginate(api, api.listSources, { filters: `owner.id eq "${ownerId}"` });
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await Paginator.paginate(api, api.listSourcesV1, { filters: `owner.id eq "${ownerId}"` });
 		return result.data;
 	}
 
-	public async updateSource(id: string, operations: Array<JsonPatchOperationV2025>): Promise<SourceV2025> {
+	public async updateSource(id: string, operations: Array<JsonPatchOperation>): Promise<Source> {
 		console.log("> updateSource", id, operations);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.updateSource({ id, jsonPatchOperationV2025: operations });
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.updateSourceV1({ id, jsonPatchOperation: operations });
 		return response.data;
 	}
 
@@ -246,7 +299,7 @@ export class ISCClient {
 		console.log("> getSourceById", id);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await api.getSource({ id });
+		const result = await api.getSourceV1({ id });
 		return result.data;
 	}
 
@@ -254,7 +307,7 @@ export class ISCClient {
 		console.log("> getSourceByName", name);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await api.listSources({
+		const result = await api.listSourcesV1({
 			filters: `name eq "${name}"`,
 			limit: 2
 		})
@@ -266,32 +319,22 @@ export class ISCClient {
 	}
 
 	public async createProvisioningPolicy(sourceId: string,
-		provisioningPolicyDto: ProvisioningPolicyDto): Promise<ProvisioningPolicyDto> {
+		provisioningPolicyDto: CreateProvisioningPolicyV2): Promise<ProvisioningPolicyV2> {
 
 		console.log("> createProvisioningPolicy", sourceId, provisioningPolicyDto);
-		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await api.createProvisioningPolicy({
-			sourceId,
-			provisioningPolicyDto
-		})
-		return result.data;
+		return await this.createResource(getProvisioningPoliciesPath(sourceId), provisioningPolicyDto);
 	}
 
-	public async getProvisioningPolicies(sourceId: string): Promise<ProvisioningPolicyDto[]> {
+	public async getProvisioningPolicies(sourceId: string): Promise<ProvisioningPolicyV2[]> {
 		console.log("> listProvisioningPolicies", sourceId);
-		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await api.listProvisioningPolicies({ sourceId })
-		return result.data;
-
+		return await this.getResource(getProvisioningPoliciesPath(sourceId));
 	}
 
 	public async getSourceId(sourceName: string): Promise<string> {
 		console.log("> getSourceId", sourceName);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.listSources({
+		const response = await api.listSourcesV1({
 			filters: `name eq "${sourceName}" or id eq "${sourceName}"`,
 			count: true
 		});
@@ -303,7 +346,7 @@ export class ISCClient {
 		console.log("> getSchemas", sourceId);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.getSourceSchemas({ sourceId });
+		const response = await api.getSourceSchemasV1({ sourceId });
 
 		return response.data;
 	}
@@ -312,7 +355,7 @@ export class ISCClient {
 		console.log("> createSchema", sourceId);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.createSourceSchema({ sourceId, schema });
+		const response = await api.createSourceSchemaV1({ sourceId, schema });
 		return response.data;
 	}
 
@@ -320,10 +363,10 @@ export class ISCClient {
 	public async startEntitlementAggregation(
 		sourceId: string,
 		filePath?: string
-	): Promise<LoadEntitlementTaskBeta> {
+	): Promise<LoadEntitlementTask> {
 		console.log("> ISCClient.startEntitlementAggregation");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 
 		let file: File | undefined = undefined
 		if (filePath) {
@@ -336,27 +379,27 @@ export class ISCClient {
 		}
 
 
-		const response = await api.importEntitlements({ sourceId, file })
+		const response = await api.importEntitlementsV1({ sourceId, file })
 		return response.data
 	}
 
 	public async startEntitlementReset(
 		sourceId: string
-	): Promise<EntitlementSourceResetBaseReferenceDtoBeta> {
+	): Promise<EntitlementSourceResetBaseReferenceDto> {
 		console.log("> ISCClient.startEntitlementReset");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new EntitlementsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.resetSourceEntitlements({ sourceId })
+		const api = new EntitlementsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.resetSourceEntitlementsV1({ id: sourceId })
 		return response.data
 	}
 
 	public async startAccountReset(
 		sourceId: string
-	): Promise<TaskResultDtoBeta> {
+	): Promise<TaskResultDto> {
 		console.log("> ISCClient.startAccountReset");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.deleteAccountsAsync({ sourceId })
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.deleteAccountsAsyncV1({ id: sourceId })
 		return response.data
 	}
 
@@ -368,10 +411,10 @@ export class ISCClient {
 		console.log("> ISCClient.startMachineIdentityAggregation");
 
 		const apiConfig = await this.getApiConfiguration();
-		const api = new MachineIdentitiesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.startMachineIdentityAggregation({
+		const api = new MachineIdentitiesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.startMachineIdentityAggregationV1({
 			sourceId,
-			machineIdentityAggregationRequestV2025: {
+			machineIdentityAggregationRequest: {
 				disableOptimization, datasetIds
 			}
 		})
@@ -387,7 +430,7 @@ export class ISCClient {
 		console.log("> ISCClient.startAccountAggregation");
 
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 
 		let f: File | undefined = undefined
 		if (filePath) {
@@ -399,7 +442,7 @@ export class ISCClient {
 			})
 		}
 
-		const response = await api.importAccounts({
+		const response = await api.importAccountsV1({
 			id: sourceID,
 			disableOptimization: disableOptimization ? "true" : undefined,
 			file: f
@@ -410,11 +453,11 @@ export class ISCClient {
 
 	public async getTaskStatus(
 		taskId: string,
-	): Promise<TaskStatusBeta> {
+	): Promise<TaskStatus> {
 		console.log("> getTaskStatus", taskId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new TaskManagementV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.getTaskStatus({
+		const api = new TaskManagementApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getTaskStatusV1({
 			id: taskId
 		})
 		return response.data;
@@ -422,15 +465,15 @@ export class ISCClient {
 
 	public async updateLogConfiguration(
 		clusterId: string, duration: number, logLevels: {
-			[key: string]: StandardLevelBeta;
+			[key: string]: StandardLevel;
 		}
 	): Promise<void> {
 		console.log("> updateLogConfiguration", clusterId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new ManagedClustersBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.putClientLogConfiguration({
+		const api = new ManagedClustersApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.putClientLogConfigurationV1({
 			id: clusterId,
-			clientLogConfigurationBeta: {
+			putClientLogConfigurationV1Request: {
 				durationMinutes: duration,
 				clientId: "VSCode",
 				logLevels,
@@ -439,200 +482,200 @@ export class ISCClient {
 		})
 	}
 
-	public async getClusterByName(name: string): Promise<ManagedClusterBeta | undefined> {
+	public async getClusterByName(name: string): Promise<ManagedCluster | undefined> {
 		console.log("> getClusterByName", name);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new ManagedClustersBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.getManagedClusters({ filters: `name eq "${name}"` });
+		const api = new ManagedClustersApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getManagedClustersV1({ filters: `name eq "${name}"` });
 		return response.data?.[0];
 	}
 
-	public async getPasswordPolicyHolders(sourceId: string): Promise<PasswordPolicyHoldersDtoInnerV2025[]> {
+	public async getPasswordPolicyHolders(sourceId: string): Promise<PasswordPolicyHoldersDtoInner[]> {
 		console.log("> getPasswordPolicyHolders", sourceId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.listPasswordPolicyHoldersOnSource({ sourceId });
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.listPasswordPolicyHoldersOnSourceV1({ sourceId });
 		return response.data;
 	}
 
 	public async updatePasswordPolicyHolders(
 		sourceId: string,
-		holders: PasswordPolicyHoldersDtoInnerV2025[]
-	): Promise<PasswordPolicyHoldersDtoInnerV2025[]> {
+		holders: PasswordPolicyHoldersDtoInner[]
+	): Promise<PasswordPolicyHoldersDtoInner[]> {
 		console.log("> updatePasswordPolicyHolders", sourceId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.updatePasswordPolicyHolders({
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.updatePasswordPolicyHoldersV1({
 			sourceId,
-			passwordPolicyHoldersDtoInnerV2025: holders
+			passwordPolicyHoldersDtoInner: holders
 		});
 		return response.data;
 	}
 
-	public async getPasswordPolicies(): Promise<PasswordPolicyV3DtoV2025[]> {
+	public async getPasswordPolicies(): Promise<PasswordPolicyV3Dto[]> {
 		console.log("> getPasswordPolicies");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new PasswordPoliciesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.listPasswordPolicies();
+		const api = new PasswordPoliciesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.listPasswordPoliciesV1();
 		return response.data;
 	}
 
-	public async getPasswordPolicyByName(name: string): Promise<PasswordPolicyV3DtoV2025 | undefined> {
+	public async getPasswordPolicyByName(name: string): Promise<PasswordPolicyV3Dto | undefined> {
 		console.log("> getPasswordPolicyByName", name);
 		const policies = await this.getPasswordPolicies();
 		return policies.find(p => p.name === name);
 	}
 
-	public async createPasswordPolicy(policy: PasswordPolicyV3DtoV2025): Promise<PasswordPolicyV3DtoV2025> {
+	public async createPasswordPolicy(policy: PasswordPolicyV3Dto): Promise<PasswordPolicyV3Dto> {
 		console.log("> createPasswordPolicy", policy.name);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new PasswordPoliciesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.createPasswordPolicy({ passwordPolicyV3DtoV2025: policy });
+		const api = new PasswordPoliciesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.createPasswordPolicyV1({ passwordPolicyV3Dto: policy });
 		return response.data;
 	}
 
-	public async getPasswordSyncGroups(): Promise<PasswordSyncGroupV2025[]> {
+	public async getPasswordSyncGroups(): Promise<PasswordSyncGroup[]> {
 		console.log("> getPasswordSyncGroups");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new PasswordSyncGroupsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.getPasswordSyncGroups();
+		const api = new PasswordSyncGroupsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getPasswordSyncGroupsV1();
 		return response.data;
 	}
 
-	public async getPasswordSyncGroupByName(name: string): Promise<PasswordSyncGroupV2025 | undefined> {
+	public async getPasswordSyncGroupByName(name: string): Promise<PasswordSyncGroup | undefined> {
 		console.log("> getPasswordSyncGroupByName", name);
 		const groups = await this.getPasswordSyncGroups();
 		return groups.find(g => g.name === name);
 	}
 
-	public async createPasswordSyncGroup(group: PasswordSyncGroupV2025): Promise<PasswordSyncGroupV2025> {
+	public async createPasswordSyncGroup(group: PasswordSyncGroup): Promise<PasswordSyncGroup> {
 		console.log("> createPasswordSyncGroup", group.name);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new PasswordSyncGroupsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.createPasswordSyncGroup({ passwordSyncGroupV2025: group });
+		const api = new PasswordSyncGroupsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.createPasswordSyncGroupV1({ passwordSyncGroup: group });
 		return response.data;
 	}
 
-	public async updatePasswordSyncGroup(id: string, group: PasswordSyncGroupV2025): Promise<PasswordSyncGroupV2025> {
+	public async updatePasswordSyncGroup(id: string, group: PasswordSyncGroup): Promise<PasswordSyncGroup> {
 		console.log("> updatePasswordSyncGroup", id);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new PasswordSyncGroupsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.updatePasswordSyncGroup({ id, passwordSyncGroupV2025: group });
+		const api = new PasswordSyncGroupsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.updatePasswordSyncGroupV1({ id, passwordSyncGroup: group });
 		return response.data;
 	}
 
 	public async uploadConnectorFile(sourceId: string, filePath: string): Promise<void> {
 		console.log("> uploadConnectorFile", sourceId, filePath);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const mimeType = 'application/octet-stream'
 		const fileBuffer = fs.readFileSync(filePath);
 		const blob = new Blob([fileBuffer], { type: mimeType });
 		const file = new File([blob], basename(filePath), {
 			type: mimeType,
 		})
-		await api.importConnectorFile({ sourceId, file });
+		await api.importConnectorFileV1({ sourceId, file });
 	}
 
-	public async getAttributeSyncConfig(sourceId: string): Promise<AttrSyncSourceConfigV2025> {
+	public async getAttributeSyncConfig(sourceId: string): Promise<AttrSyncSourceConfig> {
 		console.log("> getAttributeSyncConfig", sourceId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.getSourceAttrSyncConfig({ id: sourceId });
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getSourceAttrSyncConfigV1({ id: sourceId });
 		return response.data;
 	}
 
 	public async updateAttributeSyncConfig(
 		sourceId: string,
-		config: AttrSyncSourceConfigV2025
-	): Promise<AttrSyncSourceConfigV2025> {
+		config: AttrSyncSourceConfig
+	): Promise<AttrSyncSourceConfig> {
 		console.log("> updateAttributeSyncConfig", sourceId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.putSourceAttrSyncConfig({ id: sourceId, attrSyncSourceConfigV2025: config });
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.putSourceAttrSyncConfigV1({ id: sourceId, attrSyncSourceConfig: config });
 		return response.data;
 	}
 
-	public async getNativeChangeDetectionConfig(sourceId: string): Promise<NativeChangeDetectionConfigV2026> {
+	public async getNativeChangeDetectionConfig(sourceId: string): Promise<NativeChangeDetectionConfig> {
 		console.log("> getNativeChangeDetectionConfig", sourceId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.getNativeChangeDetectionConfig({ id: sourceId });
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getNativeChangeDetectionConfigV1({ sourceId });
 		return response.data;
 	}
 
 	public async updateNativeChangeDetectionConfig(
 		sourceId: string,
-		config: NativeChangeDetectionConfigV2026
-	): Promise<NativeChangeDetectionConfigV2026> {
+		config: NativeChangeDetectionConfig
+	): Promise<NativeChangeDetectionConfig> {
 		console.log("> updateNativeChangeDetectionConfig", sourceId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.putNativeChangeDetectionConfig({
-			id: sourceId,
-			nativeChangeDetectionConfigV2026: config
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.putNativeChangeDetectionConfigV1({
+			sourceId,
+			nativeChangeDetectionConfig: config
 		});
 		return response.data;
 	}
 
-	public async getAccountDeleteApprovalConfig(sourceId: string): Promise<AccountDeleteConfigDtoV2026> {
+	public async getAccountDeleteApprovalConfig(sourceId: string): Promise<AccountDeleteConfigDto> {
 		console.log("> getAccountDeleteApprovalConfig", sourceId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.getAccountDeleteApprovalConfig({ sourceId });
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getAccountDeleteApprovalConfigV1({ sourceId });
 		return response.data;
 	}
 
 	public async updateAccountDeleteApprovalConfig(
 		sourceId: string,
-		config: AccountDeleteConfigDtoV2026
-	): Promise<AccountDeleteConfigDtoV2026> {
+		config: AccountDeleteConfigDto
+	): Promise<AccountDeleteConfigDto> {
 		console.log("> updateAccountDeleteApprovalConfig", sourceId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const operations: JsonPatchOperationV2026[] = [
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const operations: JsonPatchOperation[] = [
 			{ op: "replace", path: "/approvalRequired", value: config.approvalRequired },
 			{ op: "replace", path: "/approvalConfig", value: config.approvalConfig }
 		];
-		const response = await api.updateAccountDeletionApprovalConfig({
+		const response = await api.updateAccountDeletionApprovalConfigV1({
 			sourceId,
-			jsonPatchOperationV2026: operations
+			jsonPatchOperation: operations
 		});
 		return response.data;
 	}
 
-	public async getMachineAccountDeleteApprovalConfig(sourceId: string): Promise<AccountDeleteConfigDtoV2026> {
+	public async getMachineAccountDeleteApprovalConfig(sourceId: string): Promise<AccountDeleteConfigDto> {
 		console.log("> getMachineAccountDeleteApprovalConfig", sourceId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.getMachineAccountDeletionApprovalConfigBySource({ sourceId });
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getMachineAccountDeletionApprovalConfigBySourceV1({ sourceId });
 		return response.data;
 	}
 
 	public async updateMachineAccountDeleteApprovalConfig(
 		sourceId: string,
-		config: AccountDeleteConfigDtoV2026
-	): Promise<AccountDeleteConfigDtoV2026> {
+		config: AccountDeleteConfigDto
+	): Promise<AccountDeleteConfigDto> {
 		console.log("> updateMachineAccountDeleteApprovalConfig", sourceId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SourcesV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const operations: JsonPatchOperationV2026[] = [
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const operations: JsonPatchOperation[] = [
 			{ op: "replace", path: "/approvalRequired", value: config.approvalRequired },
 			{ op: "replace", path: "/approvalConfig", value: config.approvalConfig }
 		];
-		const response = await api.updateMachineAccountDeletionApprovalConfig({
+		const response = await api.updateMachineAccountDeletionApprovalConfigV1({
 			sourceId,
-			jsonPatchOperationV2026: operations
+			jsonPatchOperation: operations
 		});
 		return response.data;
 	}
 
-	public async getMachineClassificationConfig(sourceId: string): Promise<MachineClassificationConfigV2026 | undefined> {
+	public async getMachineClassificationConfig(sourceId: string): Promise<MachineClassificationConfig | undefined> {
 		console.log("> getMachineClassificationConfig", sourceId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new MachineClassificationConfigV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new MachineClassificationConfigApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		try {
-			const response = await api.getMachineClassificationConfig({ id: sourceId });
+			const response = await api.getMachineClassificationConfigV1({ sourceId });
 			return response.data;
 		} catch {
 			// No classification config defined for this source
@@ -642,31 +685,30 @@ export class ISCClient {
 
 	public async updateMachineClassificationConfig(
 		sourceId: string,
-		config: MachineClassificationConfigV2026
-	): Promise<MachineClassificationConfigV2026> {
+		config: MachineClassificationConfig
+	): Promise<MachineClassificationConfig> {
 		console.log("> updateMachineClassificationConfig", sourceId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new MachineClassificationConfigV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.setMachineClassificationConfig({
-			id: sourceId,
-			machineClassificationConfigV2026: config
+		const api = new MachineClassificationConfigApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.setMachineClassificationConfigV1({sourceId,
+			machineClassificationConfig: config
 		});
 		return response.data;
 	}
 
-	public async createSourceSubtype(subtype: CreateSourceSubtypeRequestV2026): Promise<SourceSubtypeWithSourceV2026> {
+	public async createSourceSubtype(subtype: CreateSourceSubtypeV1Request): Promise<SourceSubtypeWithSource> {
 		console.log("> createSourceSubtype", subtype.sourceId, subtype.displayName);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new MachineAccountSubtypesV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.createSourceSubtype({ createSourceSubtypeRequestV2026: subtype });
+		const api = new MachineAccountSubtypesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.createSourceSubtypeV1({ createSourceSubtypeV1Request: subtype });
 		return response.data;
 	}
 
-	public async createPrivilegeCriteria(criteria: CreatePrivilegeCriteriaRequestV2026): Promise<PrivilegeCriteriaDTOV2026> {
+	public async createPrivilegeCriteria(criteria: CreatePrivilegeCriteriaRequest): Promise<PrivilegeCriteriaDTO> {
 		console.log("> createPrivilegeCriteria", criteria.sourceId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new PrivilegeCriteriaV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.createCustomPrivilegeCriteria({ createPrivilegeCriteriaRequestV2026: criteria });
+		const api = new PrivilegeCriteriaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.createCustomPrivilegeCriteriaV1({ createPrivilegeCriteriaRequest: criteria });
 		return response.data;
 	}
 
@@ -687,7 +729,7 @@ export class ISCClient {
 		console.log("> getTransforms");
 		const apiConfig = await this.getApiConfiguration();
 		const api = new TransformsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await Paginator.paginate(api, api.listTransforms);
+		const result = await Paginator.paginate(api, api.listTransformsV1);
 		const transforms = result.data;
 		if (transforms !== undefined && transforms instanceof Array) {
 			transforms.sort(compareByName);
@@ -695,12 +737,12 @@ export class ISCClient {
 		return transforms;
 	}
 
-	public async createTransform(transform: TransformV2025): Promise<TransformReadV2025> {
+	public async createTransform(transform: Transform): Promise<TransformRead> {
 		console.log("> createTransform");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new TransformsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors())
-		const response = await api.createTransform({
-			transformV2025: transform
+		const api = new TransformsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		const response = await api.createTransformV1({
+			transform: transform
 		})
 		return response.data
 
@@ -709,17 +751,17 @@ export class ISCClient {
 	public async deleteTransformById(id: string): Promise<void> {
 		console.log("> deleteTransformById", id);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new TransformsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors())
-		await api.deleteTransform({
+		const api = new TransformsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		await api.deleteTransformV1({
 			id
 		})
 
 	}
-	public async getTransformByName(name: string): Promise<TransformReadV2025> {
+	public async getTransformByName(name: string): Promise<TransformRead> {
 		console.log("> getTransformByName", name);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new TransformsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.listTransforms({
+		const api = new TransformsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.listTransformsV1({
 			filters: `name eq "${name}"`,
 			limit: 1,
 			count: true
@@ -728,11 +770,11 @@ export class ISCClient {
 		const transform = this.ensureOneBasedOnHeader(response, "transform", name);
 		return transform;
 	}
-	public async getTransformById(id: string): Promise<TransformReadV2025> {
+	public async getTransformById(id: string): Promise<TransformRead> {
 		console.log("> getTransformById", id);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new TransformsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.getTransform({
+		const api = new TransformsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getTransformV1({
 			id
 		});
 
@@ -740,13 +782,13 @@ export class ISCClient {
 	}
 
 
-	public async updateTransform(id: string, transform: TransformV2025): Promise<TransformReadV2025> {
+	public async updateTransform(id: string, transform: Transform): Promise<TransformRead> {
 		console.log("> updateTransform", id, transform);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new TransformsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.updateTransform({
+		const api = new TransformsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.updateTransformV1({
 			id,
-			transformV2025: transform
+			transform: transform
 		});
 		return response.data
 	}
@@ -759,7 +801,7 @@ export class ISCClient {
 	//#region Configuration Hub
 	/////////////////////
 
-	public async uploadBackup(data: string, fileName: string, name: string): Promise<BackupResponseV2024> {
+	public async uploadBackup(data: string, fileName: string, name: string): Promise<BackupResponse> {
 		console.log("> uploadBackup");
 
 
@@ -772,9 +814,9 @@ export class ISCClient {
 
 
 		const apiConfig = await this.getApiConfiguration()
-		const api = new ConfigurationHubV2024Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new ConfigurationHubApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 
-		const result = await api.createUploadedConfiguration({
+		const result = await api.createUploadedConfigurationV1({
 			data: file,
 			name
 		})
@@ -787,11 +829,11 @@ export class ISCClient {
 	 * @param jobId
 	 * @returns
 	 */
-	public async getUploadConfigurationJobStatus(jobId: string): Promise<BackupResponseV2024> {
+	public async getUploadConfigurationJobStatus(jobId: string): Promise<BackupResponse> {
 		console.log("> getUploadConfigurationJobStatus", jobId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new ConfigurationHubV2024Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.getUploadedConfiguration({ id: jobId })
+		const api = new ConfigurationHubApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getUploadedConfigurationV1({ id: jobId })
 		return response.data;
 	}
 
@@ -877,20 +919,20 @@ export class ISCClient {
 	}
 
 	public async searchAllAccessProfiles(query: string, limit?: number, fields?: string[], includeNested = false): Promise<AccessProfileDocument[]> {
-		console.log("> searchAccessProfiles", query);
-		const search = buildSearchQuery({ index: IndexV2025.Accessprofiles, query, sort: "name", fields, includeNested })
-		return await this.searchAll(search, limit) as IdentityDocument[];
+		console.log("> searchAllAccessProfiles", query);
+		const search = buildSearchQuery({ index: Index.Accessprofiles, query, sort: "name", fields, includeNested })
+		return await this.searchAll(search, limit) as AccessProfileDocument[];
 	}
 
 	public async searchAllEntitlements(query: string, limit?: number, fields?: string[], includeNested = false): Promise<EntitlementDocument[]> {
-		console.log("> searchEntitlements", query);
-		const search = buildSearchQuery({ index: IndexV2025.Entitlements, query, sort: "name", fields, includeNested })
+		console.log("> searchAllEntitlements", query);
+		const search = buildSearchQuery({ index: Index.Entitlements, query, sort: "name", fields, includeNested })
 		return await this.searchAll(search, limit) as EntitlementDocument[];
 	}
 
 	public async searchAllIdentities(query: string, limit?: number, fields?: string[], sort = "name"): Promise<IdentityDocument[]> {
-		console.log("> searchIdentity", query);
-		const search = buildSearchQuery({ index: IndexV2025.Identities, query, sort, fields, includeNested: false })
+		console.log("> searchAllIdentities", query);
+		const search = buildSearchQuery({ index: Index.Identities, query, sort, fields, includeNested: false })
 		return await this.searchAll(search, limit) as IdentityDocument[];
 	}
 
@@ -902,37 +944,37 @@ export class ISCClient {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SearchApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const resp = await Paginator.paginateSearchApi(api, query, increment, limit);
-		return resp.data;
+		return resp.data as SearchDocument[];
 	}
 
 
-	public async paginatedSearchRoles(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"]): Promise<AxiosResponse<RoleDocument[]>> {
+	public async searchRoles(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"]): Promise<AxiosResponse<RoleDocument[]>> {
 		console.log("> paginatedSearchRoles", query);
 
-		return await this.searchPost<AccessProfileDocument>({
-			query: buildSearchQuery({ index: IndexV2025.Roles, query, sort: "name", fields }),
+		return await this.searchPost<RoleDocument>({
+			query: buildSearchQuery({ index: Index.Roles, query, sort: "name", fields }),
 			count,
 			limit,
 			offset
 		})
 	}
 
-	public async paginatedSearchAccessProfiles(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"], includeNested = false): Promise<AxiosResponse<AccessProfileDocument[]>> {
+	public async searchAccessProfiles(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"], includeNested = false): Promise<AxiosResponse<AccessProfileDocument[]>> {
 		console.log("> paginatedSearchAccessProfiles", query);
 
 		return await this.searchPost<AccessProfileDocument>({
-			query: buildSearchQuery({ index: IndexV2025.Accessprofiles, query, sort: "name", fields, includeNested }),
+			query: buildSearchQuery({ index: Index.Accessprofiles, query, sort: "name", fields, includeNested }),
 			count,
 			limit,
 			offset
 		})
 	}
 
-	public async paginatedSearchEntitlements(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"], includeNested = false): Promise<AxiosResponse<EntitlementDocument[]>> {
+	public async searchEntitlements(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"], includeNested = false): Promise<AxiosResponse<EntitlementDocument[]>> {
 		console.log("> paginatedSearchEntitlements", query);
 
 		return await this.searchPost<EntitlementDocument>({
-			query: buildSearchQuery({ index: IndexV2025.Entitlements, query, sort: "name", fields, includeNested }),
+			query: buildSearchQuery({ index: Index.Entitlements, query, sort: "name", fields, includeNested }),
 			count,
 			limit,
 			offset
@@ -942,7 +984,7 @@ export class ISCClient {
 	public async paginatedSearchIdentities(query: string, limit?: number, offset?: number, count = false, fields = ["id", "name"], includeNested = false): Promise<AxiosResponse<IdentityDocument[]>> {
 		console.log("> paginatedSearchIdentities", query);
 		return await this.searchPost<IdentityDocument>({
-			query: buildSearchQuery({ index: IndexV2025.Identities, query, sort: "name", fields, includeNested }),
+			query: buildSearchQuery({ index: Index.Identities, query, sort: "name", fields, includeNested }),
 			count,
 			limit,
 			offset
@@ -960,9 +1002,9 @@ export class ISCClient {
 		const cappedLimit = Math.min(limit, 10000)
 
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SearchV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.searchPost({
-			searchV2025: query,
+		const api = new SearchApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.searchPostV1({
+			search: query,
 			limit: cappedLimit,
 			offset,
 			count
@@ -983,35 +1025,35 @@ export class ISCClient {
 		return { data, total, count: data.length, limit: input.limit, offset: input.offset };
 	}
 
-	public async paginatedSearchAccessProfilesV2025(input: PaginatedSearch): Promise<PaginatedResult<AccessProfileDocumentV2025>> {
-		return this.paginatedSearch<AccessProfileDocumentV2025>({
+	public async paginatedSearchAccessProfiles(input: PaginatedSearch): Promise<PaginatedResult<AccessProfileDocument>> {
+		return this.paginatedSearch<AccessProfileDocument>({
 			...input,
-			query: buildSearchQuery({ ...input, sort: input.sort ?? "name", index: IndexV2025.Accessprofiles })
+			query: buildSearchQuery({ ...input, sort: input.sort ?? "name", index: Index.Accessprofiles })
 		});
 	}
 
-	public async paginatedSearchEntitlementsV2025(input: PaginatedSearch): Promise<PaginatedResult<EntitlementDocumentV2025>> {
-		return this.paginatedSearch<EntitlementDocumentV2025>({
+	public async paginatedSearchEntitlements(input: PaginatedSearch): Promise<PaginatedResult<EntitlementDocument>> {
+		return this.paginatedSearch<EntitlementDocument>({
 			...input,
-			query: buildSearchQuery({ ...input, index: IndexV2025.Entitlements })
+			query: buildSearchQuery({ ...input, index: Index.Entitlements })
 		});
 	}
 
-	public async paginatedSearchRolesV2025(input: PaginatedSearch): Promise<PaginatedResult<RoleDocumentV2025>> {
-		return this.paginatedSearch<RoleDocumentV2025>({
+	public async paginatedSearchRoles(input: PaginatedSearch): Promise<PaginatedResult<RoleDocument>> {
+		return this.paginatedSearch<RoleDocument>({
 			...input,
-			query: buildSearchQuery({ ...input, index: IndexV2025.Roles })
+			query: buildSearchQuery({ ...input, index: Index.Roles })
 		})
 	}
 
-	public async paginatedSearchEventsV2025(input: PaginatedSearch): Promise<PaginatedResult<EventDocumentV2025>> {
-		return this.paginatedSearch<EventDocumentV2025>({
+	public async paginatedSearchEvents(input: PaginatedSearch): Promise<PaginatedResult<EventDocument>> {
+		return this.paginatedSearch<EventDocument>({
 			...input,
-			query: buildSearchQuery({ ...input, index: IndexV2025.Events })
+			query: buildSearchQuery({ ...input, index: Index.Events })
 		})
 	}
 
-	public async getIdentityAuditEvents(identityId: string, identityName: string, limit = 250): Promise<PaginatedResult<EventDocumentV2025>> {
+	public async getIdentityAuditEvents(identityId: string, identityName: string, limit = 250): Promise<PaginatedResult<EventDocument>> {
 		console.log("> getIdentityAuditEvents", identityId, identityName, limit);
 
 		let identityDetails: { name?: string; displayName?: string; email?: string; alias?: string } | undefined;
@@ -1031,7 +1073,7 @@ export class ISCClient {
 		const searchTerms = collectIdentityEventSearchTerms(identityId, identityName, identityDetails);
 		const query = buildIdentityEventsSearchQuery(searchTerms);
 
-		return this.paginatedSearchEventsV2025({
+		return this.paginatedSearchEvents({
 			query,
 			sort: "-created",
 			limit,
@@ -1064,7 +1106,7 @@ export class ISCClient {
 
 	private async getAllIdentityAccessItemsOfType(
 		identityId: string,
-		apiType: ListIdentityAccessItemsTypeV2025,
+		apiType: ListIdentityAccessItemsV1TypeEnum,
 		itemType: IdentityAccessItemType,
 	): Promise<IdentityAccessItem[]> {
 		const items: IdentityAccessItem[] = [];
@@ -1103,14 +1145,14 @@ export class ISCClient {
 
 	private async listIdentityAccessItemsPage(
 		identityId: string,
-		type: ListIdentityAccessItemsTypeV2025,
+		type: ListIdentityAccessItemsV1TypeEnum,
 		limit: number,
 		offset: number,
 		count: boolean,
-	): Promise<AxiosResponse<ListIdentityAccessItems200ResponseInnerV2025[]>> {
+	): Promise<AxiosResponse<ListIdentityAccessItemsV1200ResponseInner[]>> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new IdentityHistoryV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		return api.listIdentityAccessItems({
+		const api = new IdentityHistoryApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		return api.listIdentityAccessItemsV1({
 			id: identityId,
 			type,
 			limit,
@@ -1157,7 +1199,7 @@ export class ISCClient {
 
 		const apiConfig = await this.getApiConfiguration();
 		const api = new AccessRequestsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.createAccessRequest({
+		const response = await api.createAccessRequestV1({
 			accessRequest: {
 				requestType: "REVOKE_ACCESS",
 				requestedFor: [identityId],
@@ -1198,7 +1240,7 @@ export class ISCClient {
 
 		const apiConfig = await this.getApiConfiguration();
 		const api = new AccessRequestsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.createAccessRequest({
+		const response = await api.createAccessRequestV1({
 			accessRequest: {
 				requestType: "GRANT_ACCESS",
 				requestedFor: [identityId],
@@ -1225,7 +1267,7 @@ export class ISCClient {
 
 		const apiConfig = await this.getApiConfiguration();
 		const api = new AccessRequestsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.listAccessRequestStatus({
+		const response = await api.listAccessRequestStatusV1({
 			filters: `accessRequestId eq "${accessRequestId}"`,
 			limit: 1,
 		});
@@ -1317,10 +1359,10 @@ export class ISCClient {
 		};
 	}
 
-	public async paginatedSearchAccountActivitiesV2025(input: PaginatedSearch): Promise<PaginatedResult<AccountActivityDocumentV2025>> {
-		return this.paginatedSearch<AccountActivityDocumentV2025>({
+	public async paginatedSearchAccountActivities(input: PaginatedSearch): Promise<PaginatedResult<AccountActivityDocument>> {
+		return this.paginatedSearch<AccountActivityDocument>({
 			...input,
-			query: buildSearchQuery({ ...input, index: IndexV2025.Accountactivities })
+			query: buildSearchQuery({ ...input, index: Index.Accountactivities })
 		})
 	}
 
@@ -1338,17 +1380,17 @@ export class ISCClient {
 	 */
 
 	public async startExportJob(
-		objectTypes: ExportPayloadBetaIncludeTypesBeta[],
+		objectTypes: ExportPayloadIncludeTypesEnum[],
 		objectOptions: {
-			[key: string]: ObjectExportImportOptionsBeta;
+			[key: string]: ObjectExportImportOptions;
 		} = {}
 	): Promise<string> {
 		console.log("> startExportJob", objectTypes, objectOptions);
 
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SPConfigBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.exportSpConfig({
-			exportPayloadBeta: {
+		const api = new SPConfigApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.exportSpConfigV1({
+			exportPayload: {
 				description: `Export Job vscode ${new Date().toISOString()}`,
 				includeTypes: objectTypes,
 				objectOptions: objectOptions
@@ -1364,11 +1406,11 @@ export class ISCClient {
 	 * @param jobId
 	 * @returns
 	 */
-	public async getExportJobStatus(jobId: string): Promise<SpConfigJobBeta> {
+	public async getExportJobStatus(jobId: string): Promise<SpConfigJob> {
 		console.log("> getExportJobStatus", jobId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SPConfigBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.getSpConfigExportStatus({ id: jobId });
+		const api = new SPConfigApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getSpConfigExportStatusV1({ id: jobId });
 		return response.data;
 	}
 
@@ -1377,11 +1419,11 @@ export class ISCClient {
 	 * @param jobId
 	 * @returns
 	 */
-	public async getExportJobResult(jobId: string): Promise<SpConfigExportResultsBeta> {
+	public async getExportJobResult(jobId: string): Promise<SpConfigExportResults> {
 		console.log("> getExportJobResult", jobId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SPConfigBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.getSpConfigExport({ id: jobId });
+		const api = new SPConfigApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getSpConfigExportV1({ id: jobId });
 		return response.data;
 	}
 
@@ -1392,19 +1434,19 @@ export class ISCClient {
 	 */
 	public async startImportJob(
 		data: string,
-		options: ImportOptionsBeta = {}
+		options: ImportOptions = {}
 	): Promise<string> {
 		console.log("> startImportJob", options);
 		/*
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SPConfigBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new SPConfigApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		// const readable = Readable.from([data]);
 		// const file = await blob(readable);
 		// const buffer = Buffer.from(data);
 		const formData = new FormData();
 		let fileData = Buffer.from(data);
 		formData.append("data", fileData, "import.json");
-		const response = await api.importSpConfig(formData);
+		const response = await api.importSpConfigV1(formData);
 		const jobId = response.data.jobId;
 		console.log("< startImportJob. jobId =", jobId);
 		return jobId;
@@ -1439,11 +1481,11 @@ export class ISCClient {
 	 * @param jobId
 	 * @returns
 	 */
-	public async getImportJobStatus(jobId: string): Promise<SpConfigJobBeta> {
+	public async getImportJobStatus(jobId: string): Promise<SpConfigJob> {
 		console.log("> getImportJobStatus", jobId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SPConfigBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.getSpConfigImportStatus({ id: jobId });
+		const api = new SPConfigApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getSpConfigImportStatusV1({ id: jobId });
 		return response.data;
 	}
 
@@ -1452,12 +1494,12 @@ export class ISCClient {
 	 * @param jobId
 	 * @returns
 	 */
-	public async getImportJobResult(jobId: string): Promise<SpConfigImportResultsBeta> {
+	public async getImportJobResult(jobId: string): Promise<SpConfigImportResults> {
 		console.log("> getImportJobResult", jobId);
 
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SPConfigBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.getSpConfigImport({ id: jobId });
+		const api = new SPConfigApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getSpConfigImportV1({ id: jobId });
 		return response.data;
 	}
 	/////////////////////////////
@@ -1470,35 +1512,35 @@ export class ISCClient {
 
 	public async deleteWorkflow(id: string): Promise<void> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		await api.deleteWorkflow({ id });
+		const api = new WorkflowsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		await api.deleteWorkflowV1({ id });
 	}
 
-	public async putWorkflow(id: string, body: WorkflowBodyV2025): Promise<WorkflowV2025> {
+	public async putWorkflow(id: string, body: WorkflowBody): Promise<Workflow> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.putWorkflow({ id, workflowBodyV2025: body });
+		const api = new WorkflowsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const resp = await api.putWorkflowV1({ id, workflowBody: body });
 		return resp.data;
 	}
 
-	public async createWorflow(workflow: CreateWorkflowRequestV2025): Promise<WorkflowV2025> {
+	public async createWorflow(workflow: CreateWorkflowV1Request): Promise<Workflow> {
 		const apiConfig = await this.getApiConfiguration()
-		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors())
-		const resp = await api.createWorkflow({
-			createWorkflowRequestV2025: workflow
+		const api = new WorkflowsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		const resp = await api.createWorkflowV1({
+			createWorkflowV1Request: workflow
 		})
 		return resp.data;
 	}
 
 
-	public async getWorflowById(id: string): Promise<WorkflowV2025> {
+	public async getWorflowById(id: string): Promise<Workflow> {
 		const apiConfig = await this.getApiConfiguration()
-		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors())
-		const resp = await api.getWorkflow({ id })
+		const api = new WorkflowsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		const resp = await api.getWorkflowV1({ id })
 		return resp.data;
 	}
 
-	public async getWorkflowByName(name: string): Promise<WorkflowV2025> {
+	public async getWorkflowByName(name: string): Promise<Workflow> {
 		const workflows = await this.getWorflows();
 		const found = workflows.find(w => w.name === name);
 		if (!found) {
@@ -1507,18 +1549,18 @@ export class ISCClient {
 		return found;
 	}
 
-	public async getWorflows(): Promise<WorkflowV2025[]> {
+	public async getWorflows(): Promise<Workflow[]> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.listWorkflows();
+		const api = new WorkflowsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const resp = await api.listWorkflowsV1();
 		return resp.data.sort(compareByName);
 	}
 
-	public async updateWorkflow(id: string, operations: Array<JsonPatchOperationV2025>): Promise<WorkflowV2025> {
+	public async updateWorkflow(id: string, operations: Array<JsonPatchOperation>): Promise<Workflow> {
 		console.log("> updateWorkflow", id, operations);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.patchWorkflow({ id, jsonPatchOperationV2025: operations });
+		const api = new WorkflowsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.patchWorkflowV1({ id, jsonPatchOperation: operations });
 		return response.data;
 	}
 
@@ -1534,9 +1576,9 @@ export class ISCClient {
 	): Promise<void> {
 		console.log("> updateWorkflowStatus", id, status);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new WorkflowsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.patchWorkflow({
-			id, jsonPatchOperationBeta: [
+		const api = new WorkflowsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const resp = await api.patchWorkflowV1({
+			id, jsonPatchOperation: [
 				{
 					op: "replace",
 					path: "/enabled",
@@ -1554,12 +1596,11 @@ export class ISCClient {
 	 * @param id
 	 * @returns
 	 */
-	public async getWorkflowExecutionHistory(id: string
-	): Promise<WorkflowExecutionBeta[]> {
+	public async getWorkflowExecutionHistory(id: string): Promise<WorkflowExecution[]> {
 		console.log("> getWorkflowExecutionHistory", id);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new WorkflowsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.getWorkflowExecutions({ id });
+		const api = new WorkflowsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const resp = await api.getWorkflowExecutionsV1({ id });
 		return resp.data;
 	}
 	/**
@@ -1567,32 +1608,33 @@ export class ISCClient {
 	 * @param workflowExecutionId
 	 * @returns
 	 */
-	public async getWorkflowExecution(workflowExecutionId: string): Promise<WorkflowExecutionV2025> {
+	public async getWorkflowExecution(workflowExecutionId: string): Promise<WorkflowExecution> {
 		console.log("> getWorkflowExecution", workflowExecutionId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.getWorkflowExecution({ id: workflowExecutionId });
-		return resp.data;
+		const api = new WorkflowsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const resp = await api.getWorkflowExecutionV1({ id: workflowExecutionId });
+		// TODO test this particularly. Not consistent with Beta endpoint
+		return resp.data[0];
 	}
 
 	public async testWorkflow(id: string, payload: any): Promise<string> {
 		console.log("> testWorkflow", id, payload);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.testWorkflow({
+		const api = new WorkflowsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const resp = await api.testWorkflowV1({
 			id,
-			testWorkflowRequestV2025: {
+			testWorkflowV1Request: {
 				input: payload
 			}
 		});
 		return resp.data.workflowExecutionId!;
 	}
 
-	public async getWorkflowExecutionEvents(executionId: string): Promise<WorkflowExecutionEventV2025[]> {
+	public async getWorkflowExecutionEvents(executionId: string): Promise<WorkflowExecutionEvent[]> {
 		console.log("> getWorkflowExecutionEvents", executionId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new WorkflowsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.getWorkflowExecutionHistory({ id: executionId });
+		const api = new WorkflowsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const resp = await api.getWorkflowExecutionHistoryV1({ id: executionId });
 		return resp.data;
 	}
 
@@ -1600,9 +1642,9 @@ export class ISCClient {
 		console.log("> callWorkflowExternalTrigger", id, payload);
 		const apiConfig = await this.getApiConfiguration(accessToken);
 		const api = new WorkflowsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.createExternalExecuteWorkflow({
+		const resp = await api.createExternalExecuteWorkflowV1({
 			id,
-			createExternalExecuteWorkflowRequest: {
+			createExternalExecuteWorkflowV1Request: {
 				input: payload
 			}
 		});
@@ -1619,19 +1661,19 @@ export class ISCClient {
 	//#region Connector Rules
 	/////////////////////////////
 
-	public async getConnectorRules(): Promise<ConnectorRuleResponseV2025[]> {
+	public async getConnectorRules(): Promise<ConnectorRuleResponse[]> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new ConnectorRuleManagementV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.getConnectorRuleList();
+		const api = new ConnectorRuleManagementApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const resp = await api.getConnectorRuleListV1();
 		const rules = resp.data;
 		rules.sort(compareByName);
 		return rules;
 	}
 
-	public async getConnectorRuleById(id: string): Promise<ConnectorRuleResponseV2025> {
+	public async getConnectorRuleById(id: string): Promise<ConnectorRuleResponse> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new ConnectorRuleManagementV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.getConnectorRule({ id });
+		const api = new ConnectorRuleManagementApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const resp = await api.getConnectorRuleV1({ id });
 		return resp.data;
 	}
 
@@ -1643,7 +1685,7 @@ export class ISCClient {
 	 */
 	public async getConnectorRuleByName(
 		name: string
-	): Promise<ConnectorRuleResponseV2025 | undefined> {
+	): Promise<ConnectorRuleResponse | undefined> {
 		console.log("> getConnectorRuleByName", name);
 		const rules = await this.getConnectorRules();
 		return rules.find((r) => r.name === name);
@@ -1651,7 +1693,7 @@ export class ISCClient {
 
 	public async validateConnectorRule(
 		script: string
-	): Promise<ConnectorRuleValidationResponseBeta> {
+	): Promise<ConnectorRuleValidationResponse> {
 		console.log("> validateConnectorRule", script);
 
 		const payload = {
@@ -1660,21 +1702,21 @@ export class ISCClient {
 		};
 
 		const apiConfig = await this.getApiConfiguration();
-		const api = new ConnectorRuleManagementBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.validateConnectorRule({
-			sourceCodeBeta: payload
+		const api = new ConnectorRuleManagementApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const resp = await api.testConnectorRuleV1({
+			sourceCode: payload
 		});
 		const jsonBody = resp.data;
 		console.log("< validateConnectorRule", jsonBody);
 		return jsonBody;
 	}
 
-	public async updateConnectorRule(rule: ConnectorRuleUpdateRequestBeta): Promise<ConnectorRuleResponseBeta> {
+	public async updateConnectorRule(rule: ConnectorRuleUpdateRequest): Promise<ConnectorRuleResponse> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new ConnectorRuleManagementBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.updateConnectorRule({
+		const api = new ConnectorRuleManagementApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const resp = await api.putConnectorRuleV1({
 			id: rule.id,
-			connectorRuleUpdateRequestBeta: rule
+			connectorRuleUpdateRequest: rule
 		});
 		return resp.data;
 	}
@@ -1690,7 +1732,7 @@ export class ISCClient {
 	public async getIdentityProfiles(): Promise<IdentityProfile[]> {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new IdentityProfilesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.listIdentityProfiles({});
+		const resp = await api.listIdentityProfilesV1({});
 		return resp.data;
 	}
 
@@ -1699,7 +1741,7 @@ export class ISCClient {
 	): Promise<LifecycleState[]> {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new LifecycleStatesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.getLifecycleStates({
+		const resp = await api.getLifecycleStatesV1({
 			identityProfileId,
 			sorters: "name"
 		});
@@ -1710,7 +1752,7 @@ export class ISCClient {
 		console.log("> getIdentityProfileById", id);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new IdentityProfilesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.getIdentityProfile({ identityProfileId: id });
+		const resp = await api.getIdentityProfileV1({ identityProfileId: id });
 		return resp.data;
 	}
 
@@ -1718,7 +1760,7 @@ export class ISCClient {
 		console.log("> getIdentityProfileByName", name);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new IdentityProfilesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.listIdentityProfiles({
+		const resp = await api.listIdentityProfilesV1({
 			filters: `name eq "${name}"`,
 			limit: 2,
 		});
@@ -1737,7 +1779,7 @@ export class ISCClient {
 		const apiConfig = await this.getApiConfiguration();
 		const axios = await this.getAxios(CONTENT_TYPE_FORM_JSON_PATCH);
 		const api = new IdentityProfilesApi(apiConfig, undefined, axios);
-		const resp = await api.updateIdentityProfile({
+		const resp = await api.updateIdentityProfileV1({
 			identityProfileId,
 			jsonPatchOperation: [
 				{
@@ -1777,7 +1819,7 @@ export class ISCClient {
 				value: mapping as any,
 			};
 
-		const resp = await api.updateIdentityProfile({
+		const resp = await api.updateIdentityProfileV1({
 			identityProfileId,
 			jsonPatchOperation: [op],
 		});
@@ -1788,22 +1830,22 @@ export class ISCClient {
 		console.log("> refreshIdentityProfile", identityProfileId);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new IdentityProfilesApi(apiConfig, undefined, (await this.getAxios()));
-		const resp = await api.syncIdentityProfile({ identityProfileId });
+		const resp = await api.syncIdentityProfileV1({ identityProfileId });
 	}
 
 	public async createIdentityProfile(payload: IdentityProfile): Promise<IdentityProfile> {
 		console.log("> createIdentityProfile", payload.name);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new IdentityProfilesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.createIdentityProfile({ identityProfile: payload });
+		const resp = await api.createIdentityProfileV1({ identityProfile: payload });
 		return resp.data;
 	}
 
-	public async getIdentityPreview(identityId: string, config: Array<IdentityAttributeTransformV2025>): Promise<IdentityPreviewResponseV2025> {
+	public async getIdentityPreview(identityId: string, config: Array<IdentityAttributeTransform>): Promise<IdentityPreviewResponse> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new IdentityProfilesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.generateIdentityPreview({
-			identityPreviewRequestV2025: {
+		const api = new IdentityProfilesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const resp = await api.generateIdentityPreviewV1({
+			identityPreviewRequest: {
 				identityId,
 				identityAttributeConfig: {
 					attributeTransforms: config
@@ -1813,11 +1855,11 @@ export class ISCClient {
 		return resp.data;
 	}
 
-	public async updateIdentityProfile(id: string, operations: Array<JsonPatchOperationV2025>): Promise<IdentityProfileV2025> {
+	public async updateIdentityProfile(id: string, operations: Array<JsonPatchOperation>): Promise<IdentityProfile> {
 		console.log("> updateIdentityProfile", id, operations);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new IdentityProfilesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.updateIdentityProfile({ identityProfileId: id, jsonPatchOperationV2025: operations });
+		const api = new IdentityProfilesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.updateIdentityProfileV1({ identityProfileId: id, jsonPatchOperation: operations });
 		return response.data;
 	}
 
@@ -1833,7 +1875,7 @@ export class ISCClient {
 		console.log("> getServiceDesks");
 		const apiConfig = await this.getApiConfiguration();
 		const api = new ServiceDeskIntegrationApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.getServiceDeskIntegrations({ sorters: "name" });
+		const response = await api.getServiceDeskIntegrationsV1({ sorters: "name" });
 		return response.data;
 	}
 
@@ -1846,7 +1888,7 @@ export class ISCClient {
 	/////////////////////////
 
 	private async getAccounts(
-		query: AccountsApiListAccountsRequest = DEFAULT_ACCOUNTS_QUERY_PARAMS
+		query: AccountsApiListAccountsV1Request = DEFAULT_ACCOUNTS_QUERY_PARAMS
 	): Promise<AxiosResponse<Account[], any>> {
 		console.log("> getAccounts", query);
 		const queryValues = {
@@ -1855,7 +1897,7 @@ export class ISCClient {
 		};
 		const apiConfig = await this.getApiConfiguration();
 		const api = new AccountsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.listAccounts(queryValues);
+		const response = await api.listAccountsV1(queryValues);
 		return response;
 	}
 
@@ -1915,7 +1957,7 @@ export class ISCClient {
 		console.log("> patchAccount", accountId, identityId);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new AccountsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.updateAccount({
+		const response = await api.updateAccountV1({
 			id: accountId,
 			requestBody: [
 				{
@@ -1943,7 +1985,7 @@ export class ISCClient {
 		console.log("> enableAccount", accountId);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new AccountsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.enableAccount({ id: accountId, accountToggleRequest: {} });
+		const response = await api.enableAccountV1({ id: accountId, accountToggleRequest: {} });
 		console.log("< enableAccount");
 		return response.data.id;
 	}
@@ -1952,7 +1994,7 @@ export class ISCClient {
 		console.log("> disableAccount", accountId);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new AccountsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.disableAccount({ id: accountId, accountToggleRequest: {} });
+		const response = await api.disableAccountV1({ id: accountId, accountToggleRequest: {} });
 		console.log("< disableAccount");
 		return response.data.id;
 	}
@@ -1961,7 +2003,7 @@ export class ISCClient {
 		console.log("> unlockAccount", accountId);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new AccountsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.unlockAccount({ id: accountId, accountUnlockRequest: {} });
+		const response = await api.unlockAccountV1({ id: accountId, accountUnlockRequest: {} });
 		console.log("< unlockAccount");
 		return response.data.id;
 	}
@@ -1969,8 +2011,8 @@ export class ISCClient {
 	public async deleteAccount(accountId: string): Promise<string | undefined> {
 		console.log("> deleteAccount", accountId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new AccountsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.deleteAccountAsync({ id: accountId });
+		const api = new AccountsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.deleteAccountAsyncV1({ id: accountId });
 		console.log("< deleteAccount");
 		return response.data.id;
 	}
@@ -1979,7 +2021,7 @@ export class ISCClient {
 		console.log("> reloadAccount", accountId);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new AccountsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.submitReloadAccount({ id: accountId });
+		const response = await api.submitReloadAccountV1({ id: accountId });
 		console.log("< reloadAccount");
 		return response.data.id;
 	}
@@ -1999,19 +2041,19 @@ export class ISCClient {
 	//#region Entitlements
 	/////////////////////////
 
-	public async getEntitlement(id: string): Promise<EntitlementV2025> {
+	public async getEntitlement(id: string): Promise<Entitlement> {
 		console.log("> getEntitlement");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new EntitlementsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.getEntitlement({ id })
+		const api = new EntitlementsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getEntitlementV1({ id })
 		return response.data
 	}
-	public async getAllEntitlements(query: string): Promise<EntitlementV2025[]> {
+	public async getAllEntitlements(query: string): Promise<Entitlement[]> {
 		console.log("> getAllEntitlements");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new EntitlementsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new EntitlementsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const result = await Paginator.paginate(api,
-			api.listEntitlements,
+			api.listEntitlementsV1,
 			{ filters: query, sorters: "name" });
 		return result.data;
 	}
@@ -2022,17 +2064,17 @@ export class ISCClient {
 	 * @returns list of entitlements
 	 */
 	public async getEntitlements(
-		query: EntitlementsV2025ApiListEntitlementsRequest = DEFAULT_ENTITLEMENTS_QUERY_PARAMS
+		query: EntitlementsApiListEntitlementsV1Request = DEFAULT_ENTITLEMENTS_QUERY_PARAMS
 		// @ts-ignore 
-	): Promise<AxiosResponse<EntitlementV2025[], any>> {
+	): Promise<AxiosResponse<Entitlement[], any>> {
 		console.log("> getEntitlements", query);
-		const queryValues: EntitlementsV2025ApiListEntitlementsRequest = {
+		const queryValues: EntitlementsApiListEntitlementsV1Request = {
 			...DEFAULT_ENTITLEMENTS_QUERY_PARAMS,
 			...query
 		};
 		const apiConfig = await this.getApiConfiguration();
-		const api = new EntitlementsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.listEntitlements(queryValues);
+		const api = new EntitlementsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.listEntitlementsV1(queryValues);
 		return response;
 	}
 
@@ -2048,7 +2090,7 @@ export class ISCClient {
 		return Number(resp.headers[TOTAL_COUNT_HEADER]);
 	}
 
-	public async getEntitlementByName(sourceId: string, entitlementName: string, attribute: string | undefined = undefined): Promise<EntitlementV2025> {
+	public async getEntitlementByName(sourceId: string, entitlementName: string, attribute: string | undefined = undefined): Promise<Entitlement> {
 		console.log("> getEntitlementByName", sourceId, entitlementName);
 
 		let filters = `source.id eq "${sourceId}" and name eq "${entitlementName}"`;
@@ -2065,7 +2107,7 @@ export class ISCClient {
 		return entitlement;
 	}
 
-	public async getAllEntitlementsBySource(sourceId: string): Promise<EntitlementV2025[]> {
+	public async getAllEntitlementsBySource(sourceId: string): Promise<Entitlement[]> {
 		console.log("> getAllEntitlementsBySource", sourceId);
 		const filters = `source.id eq "${sourceId}"`;
 		const resp = await this.getAllEntitlements(filters);
@@ -2079,14 +2121,14 @@ export class ISCClient {
 	  */
 	public async updateEntitlement(
 		id: string,
-		payload: Array<JsonPatchOperationV2025>
+		payload: Array<JsonPatchOperation>
 	): Promise<void> {
 		console.log("> updateEntitlement", id, payload);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new EntitlementsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.patchEntitlement({
+		const api = new EntitlementsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.patchEntitlementV1({
 			id,
-			jsonPatchOperationV2025: payload
+			jsonPatchOperation: payload
 		});
 		console.log("< updateEntitlement");
 	}
@@ -2118,17 +2160,17 @@ export class ISCClient {
 	//////////////////////////////
 
 	public async getPublicIdentities(
-		query: PublicIdentitiesV2025ApiGetPublicIdentitiesRequest = DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS
+		query: PublicIdentitiesApiGetPublicIdentitiesV1Request = DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS
 	): Promise<AxiosResponse<PublicIdentity[], any>> {
 		console.log("> getPublicIdentities", query);
-		const queryValues: PublicIdentitiesV2025ApiGetPublicIdentitiesRequest = {
+		const queryValues: PublicIdentitiesApiGetPublicIdentitiesV1Request = {
 			...DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS,
 			...query
 		};
 
 		const apiConfig = await this.getApiConfiguration();
-		const api = new PublicIdentitiesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.getPublicIdentities(queryValues);
+		const api = new PublicIdentitiesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getPublicIdentitiesV1(queryValues);
 		return response;
 	}
 
@@ -2184,26 +2226,26 @@ export class ISCClient {
 	//#region Governance Groups
 	//////////////////////////////
 
-	public async getGovernanceGroups(): Promise<WorkgroupDtoBeta[]> {
+	public async getGovernanceGroups(): Promise<WorkgroupDto[]> {
 		console.log("> getGovernanceGroups");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new GovernanceGroupsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await Paginator.paginate(api, api.listWorkgroups, { sorters: "name" }, 50);
+		const api = new GovernanceGroupsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await Paginator.paginate(api, api.listWorkgroupsV1, { sorters: "name" }, 50);
 		return result.data;
 	}
 
-	public async getGovernanceGroupById(id: string): Promise<WorkgroupDtoBeta> {
+	public async getGovernanceGroupById(id: string): Promise<WorkgroupDto> {
 		console.log("> getGovernanceGroupById", id);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new GovernanceGroupsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await api.getWorkgroup({ id });
+		const api = new GovernanceGroupsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await api.getWorkgroupV1({ id });
 		return result.data;
 	}
-	public async getGovernanceGroupByName(name: string): Promise<WorkgroupDtoBeta> {
+	public async getGovernanceGroupByName(name: string): Promise<WorkgroupDto> {
 		console.log("> getGovernanceGroupByName", name);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new GovernanceGroupsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.listWorkgroups({
+		const api = new GovernanceGroupsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.listWorkgroupsV1({
 			filters: `name eq "${name}"`,
 			limit: 1,
 			count: true
@@ -2213,11 +2255,11 @@ export class ISCClient {
 		return workgroup;
 	}
 
-	public async updateGovernanceGroup(id: string, operations: Array<JsonPatchOperationV2025>): Promise<WorkgroupDtoV2025> {
+	public async updateGovernanceGroup(id: string, operations: Array<JsonPatchOperation>): Promise<WorkgroupDto> {
 		console.log("> updateGovernanceGroup", id, operations);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new GovernanceGroupsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.patchWorkgroup({ id, jsonPatchOperationV2025: operations });
+		const api = new GovernanceGroupsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.patchWorkgroupV1({ id, jsonPatchOperation: operations });
 		return response.data;
 	}
 
@@ -2230,28 +2272,28 @@ export class ISCClient {
 	//////////////////////////////
 
 	public async getAccessProfiles(
-		query: AccessProfilesApiListAccessProfilesRequest = DEFAULT_ACCESSPROFILES_QUERY_PARAMS
-	): Promise<AxiosResponse<AccessProfileV2025[], any>> {
+		query: AccessProfilesApiListAccessProfilesV1Request = DEFAULT_ACCESSPROFILES_QUERY_PARAMS
+	): Promise<AxiosResponse<AccessProfileRead[], any>> {
 		console.log("> getAccessProfiles", query);
-		const queryValues: AccessProfilesApiListAccessProfilesRequest = {
+		const queryValues: AccessProfilesApiListAccessProfilesV1Request = {
 			...DEFAULT_ACCESSPROFILES_QUERY_PARAMS,
 			...query
 		};
 		const apiConfig = await this.getApiConfiguration();
-		const api = new AccessProfilesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.listAccessProfiles(queryValues);
-		return response;
+		const api = new AccessProfilesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.listAccessProfilesV1(queryValues);
+		return response as AxiosResponse<AccessProfileRead[], any>;
 	}
 
-	public async getAllAccessProfiles(filters: string): Promise<AccessProfileV2025[]> {
+	public async getAllAccessProfiles(filters: string): Promise<AccessProfileRead[]> {
 		console.log("> getAllAccessProfiles", filters);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new AccessProfilesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await Paginator.paginate(api, api.listAccessProfiles, { filters, sorters: "name" });
-		return result.data;
+		const api = new AccessProfilesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await Paginator.paginate(api, api.listAccessProfilesV1, { filters, sorters: "name" });
+		return result.data as AccessProfileRead[];
 	}
 
-	public async getAccessProfileByName(name: string): Promise<AccessProfileV2025> {
+	public async getAccessProfileByName(name: string): Promise<AccessProfileRead> {
 		console.log("> getAccessProfileByName", name);
 		let filters = `name eq "${name}"`;
 		const response = await this.getAccessProfiles({
@@ -2264,31 +2306,31 @@ export class ISCClient {
 		return accessProfile;
 	}
 
-	public async createAccessProfile(ap: AccessProfileV2025): Promise<AccessProfile> {
+	public async createAccessProfile(ap: AccessProfile): Promise<AccessProfileRead> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new AccessProfilesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.createAccessProfile({
-			accessProfileV2025: ap
+		const api = new AccessProfilesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.createAccessProfileV1({
+			accessProfile: ap
 		})
-		return response.data as AccessProfile
+		return response.data as AccessProfileRead
 	}
 
-	public async updateAccessProfile(id: string, operations: Array<JsonPatchOperationV2025>): Promise<AccessProfile> {
+	public async updateAccessProfile(id: string, operations: Array<JsonPatchOperation>): Promise<AccessProfileRead> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new AccessProfilesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.patchAccessProfile({
+		const api = new AccessProfilesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.patchAccessProfileV1({
 			id,
-			jsonPatchOperationV2025: operations
+			jsonPatchOperation: operations
 		})
-		return response.data as AccessProfile
+		return response.data as AccessProfileRead
 	}
 
 	public async updateAccessProfileMetadata(id: string, attributes: Array<AttributeDTO>) {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new AccessProfilesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.patchAccessProfile({
+		const api = new AccessProfilesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.patchAccessProfileV1({
 			id,
-			jsonPatchOperationV2025: [{
+			jsonPatchOperation: [{
 				op: "replace",
 				path: "/accessModelMetadata/attributes",
 				value: attributes
@@ -2305,7 +2347,7 @@ export class ISCClient {
 	//#region Roles
 	//////////////////////////////
 
-	public async getRoleByName(name: string): Promise<RoleV2025> {
+	public async getRoleByName(name: string): Promise<Role> {
 		console.log("> getRoleByName", name);
 		const result = await this.getRoles({
 			filters: `name eq "${name}"`,
@@ -2321,48 +2363,48 @@ export class ISCClient {
 		console.log("> getAllRoles");
 		const apiConfig = await this.getApiConfiguration();
 		const api = new RolesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await Paginator.paginate(api, api.listRoles, { sorters: "name" });
+		const result = await Paginator.paginate(api, api.listRolesV1, { sorters: "name" });
 		return result.data;
 	}
 
 	public async getRoles(
-		query: RolesV2025ApiListRolesRequest = DEFAULT_ROLES_QUERY_PARAMS
-	): Promise<AxiosResponse<RoleV2025[], any>> {
+		query: RolesApiListRolesV1Request = DEFAULT_ROLES_QUERY_PARAMS
+	): Promise<AxiosResponse<Role[], any>> {
 		console.log("> getRoles", query);
-		const queryValues: RolesApiListRolesRequest = {
+		const queryValues: RolesApiListRolesV1Request = {
 			...DEFAULT_ROLES_QUERY_PARAMS,
 			...query
 		};
 		const apiConfig = await this.getApiConfiguration();
-		const api = new RolesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.listRoles(queryValues);
+		const api = new RolesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.listRolesV1(queryValues);
 		return response;
 	}
 
-	public async createRole(roleV2025: RoleV2025): Promise<RoleV2025> {
-		console.log("> createRole", roleV2025);
+	public async createRole(role: Role): Promise<Role> {
+		console.log("> createRole", role);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new RolesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.createRole({ roleV2025 });
+		const api = new RolesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.createRoleV1({ role });
 		return response.data;
 	}
 
-	public async updateRole(id: string, ops: Array<JsonPatchOperationV2025>) {
+	public async updateRole(id: string, ops: Array<JsonPatchOperation>) {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new RolesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.patchRole({
+		const api = new RolesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.patchRoleV1({
 			id,
-			jsonPatchOperationV2025: ops
+			jsonPatchOperation: ops
 		})
 		return response.data
 	}
 
 	public async updateRoleMetadata(id: string, attributes: Array<AttributeDTO>) {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new RolesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.patchRole({
+		const api = new RolesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.patchRoleV1({
 			id,
-			jsonPatchOperationV2025: [{
+			jsonPatchOperation: [{
 				op: "replace",
 				path: "/accessModelMetadata/attributes",
 				value: attributes
@@ -2371,37 +2413,37 @@ export class ISCClient {
 		return response.data
 	}
 
-	public async getPaginatedDimensions(query: DimensionsV2025ApiListDimensionsRequest
+	public async getPaginatedDimensions(query: DimensionsApiListDimensionsV1Request
 		//	roleId:string, filters?: string, limit?: number, offset?: number, count = false
-	): Promise<AxiosResponse<DimensionV2025[]>> {
+	): Promise<AxiosResponse<Dimension[]>> {
 
 		const apiConfig = await this.getApiConfiguration();
-		const api = new DimensionsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.listDimensions(query)
+		const api = new DimensionsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.listDimensionsV1(query)
 		return response
 	}
 
-	public async createDimension(roleId: string, dim: DimensionV2025): Promise<DimensionV2025> {
+	public async createDimension(roleId: string, dim: Dimension): Promise<Dimension> {
 		console.log("> createDimension", dim);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new DimensionsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.createDimension({ roleId, dimensionV2025: dim });
+		const api = new DimensionsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.createDimensionV1({ roleId, dimension: dim });
 		return response.data;
 	}
 
-	public async updateDimension(roleId: string, dimensionId: string, ops: Array<JsonPatchOperationV2025>) {
+	public async updateDimension(roleId: string, dimensionId: string, ops: Array<JsonPatchOperation>) {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new DimensionsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.patchDimension({
+		const api = new DimensionsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.patchDimensionV1({
 			roleId,
 			dimensionId,
-			jsonPatchOperationV2025: ops
+			jsonPatchOperation: ops
 		})
 		return response.data
 	}
 
 
-	public async getDimensionByName(roleId: string, name: string): Promise<DimensionV2025> {
+	public async getDimensionByName(roleId: string, name: string): Promise<Dimension> {
 		console.log("> getDimensionByName", roleId, name);
 		const result = await this.getPaginatedDimensions({
 			roleId,
@@ -2422,15 +2464,15 @@ export class ISCClient {
 	//////////////////////////////
 
 
-	public async *getForms(filters?: string): AsyncGenerator<FormDefinitionResponseV2025> {
+	public async *getForms(filters?: string): AsyncGenerator<FormDefinitionResponse> {
 		console.log("> getForms");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CustomFormsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new CustomFormsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		let offset = 0;
 		const limit = DEFAULT_PAGINATION;
 		let count = -1;
 		do {
-			const response = await api.searchFormDefinitionsByTenant({ offset, limit, filters });
+			const response = await api.searchFormDefinitionsByTenantV1({ offset, limit, filters });
 			count = response.data.count ?? 0;
 			if (response.data.results) {
 				for (const f of response.data.results) {
@@ -2443,28 +2485,28 @@ export class ISCClient {
 		} while (count === limit);
 	}
 
-	public async listForms(): Promise<FormDefinitionResponseV2025[]> {
+	public async listForms(): Promise<FormDefinitionResponse[]> {
 		console.log("> listForms");
-		const forms: FormDefinitionResponseV2025[] = [];
+		const forms: FormDefinitionResponse[] = [];
 		for await (const form of this.getForms()) {
 			forms.push(form);
 		}
 		return forms;
 	}
 
-	public async getFormById(id: string): Promise<FormDefinitionResponseV2025> {
+	public async getFormById(id: string): Promise<FormDefinitionResponse> {
 		console.log("> getFormById", id);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CustomFormsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.getFormDefinitionByKey({ formDefinitionID: id });
+		const api = new CustomFormsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getFormDefinitionByKeyV1({ formDefinitionID: id });
 		return response.data;
 	}
 
-	public async getFormByName(name: string): Promise<FormDefinitionResponseV2025> {
+	public async getFormByName(name: string): Promise<FormDefinitionResponse> {
 		console.log("> getFormByName", name);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CustomFormsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.searchFormDefinitionsByTenant({
+		const api = new CustomFormsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.searchFormDefinitionsByTenantV1({
 			filters: `name eq "${name}"`,
 			limit: 1,
 		});
@@ -2475,42 +2517,42 @@ export class ISCClient {
 		return results[0];
 	}
 
-	public async createForm(payload: CreateFormDefinitionRequestV2025): Promise<FormDefinitionResponseV2025> {
+	public async createForm(payload: CreateFormDefinitionRequest): Promise<FormDefinitionResponse> {
 		console.log("> createForm");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CustomFormsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.createFormDefinition({ body: payload });
+		const api = new CustomFormsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.createFormDefinitionV1({ body: payload });
 		return response.data;
 	}
 
-	public async patchForm(id: string, patches: Array<{ [key: string]: object }>): Promise<FormDefinitionResponseV2025> {
+	public async patchForm(id: string, patches: Array<{ [key: string]: object }>): Promise<FormDefinitionResponse> {
 		console.log("> patchForm", id);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CustomFormsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.patchFormDefinition({ formDefinitionID: id, body: patches });
+		const api = new CustomFormsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.patchFormDefinitionV1({ formDefinitionID: id, body: patches });
 		return response.data;
 	}
 
 	public async deleteFormById(id: string): Promise<void> {
 		console.log("> deleteFormById", id);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CustomFormsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		await api.deleteFormDefinition({ formDefinitionID: id });
+		const api = new CustomFormsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		await api.deleteFormDefinitionV1({ formDefinitionID: id });
 	}
 
-	public async exportForms(filters: string | undefined = undefined): Promise<ExportFormDefinitionsByTenant200ResponseInnerBeta[]> {
+	public async exportForms(filters: string | undefined = undefined): Promise<ExportFormDefinitionsByTenantV1200ResponseInner[]> {
 		console.log("> exportForms");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CustomFormsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new CustomFormsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		let args = {
 			offset: 0,
 			limit: DEFAULT_PAGINATION,
 			filters
 		}
 		let count = -1
-		const result: ExportFormDefinitionsByTenant200ResponseInnerBeta[] = []
+		const result: ExportFormDefinitionsByTenantV1200ResponseInner[] = []
 		do {
-			const response = await api.exportFormDefinitionsByTenant(args)
+			const response = await api.exportFormDefinitionsByTenantV1(args)
 			count = response.data.length
 			if (response.data && response.data.length > 0) {
 				result.push(...response.data)
@@ -2521,11 +2563,11 @@ export class ISCClient {
 		return result
 	}
 
-	public async importForms(forms: ImportFormDefinitionsRequestInnerBeta[]) {
+	public async importForms(forms: ImportFormDefinitionsV1RequestInner[]) {
 		console.log("> importForms");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CustomFormsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.importFormDefinitions({
+		const api = new CustomFormsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.importFormDefinitionsV1({
 			body: forms
 		})
 		return response.data
@@ -2558,7 +2600,7 @@ export class ISCClient {
 	 * @param count 
 	 * @returns 
 	 */
-	public async getApplication(applicationId: string): Promise<SourceAppBeta | undefined> {
+	public async getApplication(applicationId: string): Promise<SourceApp | undefined> {
 		console.log("> getApplication", applicationId);
 		const response = await this.getPaginatedApplications(
 			`id eq "${applicationId}"`,
@@ -2571,21 +2613,21 @@ export class ISCClient {
 	}
 
 
-	public async getAllApplications(filters: string): Promise<SourceAppBeta[]> {
+	public async getAllApplications(filters: string): Promise<SourceApp[]> {
 		console.log("> getAllApplications", filters);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new AppsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await Paginator.paginate(api, api.listAllSourceApp, { filters, sorters: "name" });
+		const api = new AppsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await Paginator.paginate(api, api.listAllSourceAppV1, { filters, sorters: "name" });
 		return result.data;
 	}
 
-	public async getPaginatedApplications(filters: string, limit?: number, offset?: number, count?: boolean): Promise<AxiosResponse<SourceAppBeta[]>> {
+	public async getPaginatedApplications(filters: string, limit?: number, offset?: number, count?: boolean): Promise<AxiosResponse<SourceApp[]>> {
 		console.log("> getPaginatedApplications", filters, limit, offset);
 
 		limit = limit ? Math.min(DEFAULT_PAGINATION, limit) : DEFAULT_PAGINATION;
 		const apiConfig = await this.getApiConfiguration();
-		const api = new AppsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.listAllSourceApp({
+		const api = new AppsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.listAllSourceAppV1({
 			offset,
 			limit,
 			filters,
@@ -2595,11 +2637,11 @@ export class ISCClient {
 		return response;
 	}
 
-	public async updateApplication(id: string, operations: Array<JsonPatchOperationV2025>): Promise<SourceAppPatchDtoV2025> {
+	public async updateApplication(id: string, operations: Array<JsonPatchOperation>): Promise<SourceAppPatchDto> {
 		console.log("> updateApplication", id, operations);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new AppsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.patchSourceApp({ id, jsonPatchOperationV2025: operations });
+		const api = new AppsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.patchSourceAppV1({ id, jsonPatchOperation: operations });
 		return response.data;
 	}
 
@@ -2664,11 +2706,11 @@ export class ISCClient {
 		return response;
 	}
 
-	public async getCampaign(campaignId: string): Promise<GetActiveCampaigns200ResponseInnerV2025> {
+	public async getCampaign(campaignId: string): Promise<GetCampaignV1200Response> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CertificationCampaignsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new CertificationCampaignsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 
-		const val = await api.getCampaign({ id: campaignId });
+		const val = await api.getCampaignV1({ id: campaignId });
 
 		if (val.status !== 200) {
 			throw new Error(`Failed to fetch campaign with ID [${campaignId}]. Status: ${val.status}.`);
@@ -2677,7 +2719,7 @@ export class ISCClient {
 		return val.data;
 	}
 
-	public async getCampaignCertifications(campaignId: string, completed?: boolean): Promise<IdentityCertificationDtoV2025[]> {
+	public async getCampaignCertifications(campaignId: string, completed?: boolean): Promise<IdentityCertificationDto[]> {
 		let filters = `campaign.id eq "${campaignId}"`
 		if (completed !== undefined) {
 			filters += ` and completed eq ${completed}`
@@ -2685,13 +2727,13 @@ export class ISCClient {
 		return this.getCampaignCertificationsByFilter(filters);
 	}
 
-	public async getCampaignCertificationsByFilter(filters: string): Promise<IdentityCertificationDtoV2025[]> {
+	public async getCampaignCertificationsByFilter(filters: string): Promise<IdentityCertificationDto[]> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CertificationsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 
 		const val = await Paginator.paginate(
 			api,
-			api.listIdentityCertifications,
+			api.listIdentityCertificationsV1,
 			{
 				filters,
 				sorters: "name"
@@ -2705,9 +2747,9 @@ export class ISCClient {
 		return val.data;
 	}
 
-	public async getCertificationReviewItems(certificationId: string, completed?: boolean): Promise<AccessReviewItemV2025[]> {
+	public async getCertificationReviewItems(certificationId: string, completed?: boolean): Promise<AccessReviewItem[]> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CertificationsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 
 		let filters
 		if (completed !== undefined) {
@@ -2716,7 +2758,7 @@ export class ISCClient {
 
 		const val = await Paginator.paginate(
 			api,
-			api.listIdentityAccessReviewItems,
+			api.listIdentityAccessReviewItemsV1,
 			{
 				id: certificationId,
 				filters: filters
@@ -2735,11 +2777,11 @@ export class ISCClient {
 		offset: number,
 		sorters?: string,
 		limit?: number
-	}): Promise<PaginatedData<IdentityCertificationDtoV2025>> {
+	}): Promise<PaginatedData<IdentityCertificationDto>> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CertificationsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		let filters = `campaign.id eq "${campaignId}"`
-		const resp = await api.listIdentityCertifications({
+		const resp = await api.listIdentityCertificationsV1({
 			filters,
 			offset,
 			limit,
@@ -2756,37 +2798,37 @@ export class ISCClient {
 		}
 	}
 
-	public async getSummaryCertificationDecisions(certificationId: string): Promise<IdentityCertDecisionSummaryV2025> {
+	public async getSummaryCertificationDecisions(certificationId: string): Promise<IdentityCertDecisionSummary> {
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CertificationSummariesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const resp = await api.getIdentityDecisionSummary({ id: certificationId })
+		const api = new CertificationSummariesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const resp = await api.getIdentityDecisionSummaryV1({ id: certificationId })
 		return resp.data
 	}
 
-	public async reassignCampaignCertifications(certificationMoveRequest: CertificationCampaignsV2025ApiMoveRequest): Promise<void> {
+	public async reassignCampaignCertifications(certificationMoveRequest: CertificationCampaignsApiMoveV1Request): Promise<void> {
 		const apiConfig = await this.getApiConfiguration();
-		const campaignApi = new CertificationCampaignsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors())
-		await campaignApi.move(certificationMoveRequest);
+		const campaignApi = new CertificationCampaignsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		await campaignApi.moveV1(certificationMoveRequest);
 	}
 
-	public async reassignCertificationReviewItemsSync(certificationReassignRequestSync: CertificationsV2025ApiReassignIdentityCertificationsRequest): Promise<CertificationTask> {
+	public async reassignCertificationReviewItemsSync(certificationReassignRequestSync: CertificationsApiReassignIdentityCertificationsV1Request): Promise<CertificationTask> {
 		const apiConfig = await this.getApiConfiguration();
-		const certificationsApi = new CertificationsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors())
-		const resp = await certificationsApi.reassignIdentityCertifications(certificationReassignRequestSync)
+		const certificationsApi = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		const resp = await certificationsApi.reassignIdentityCertificationsV1(certificationReassignRequestSync)
 		return resp.data
 	}
 
-	public async reassignCertificationReviewItemsAsync(certificationReassignRequestAsync: CertificationsV2025ApiSubmitReassignCertsAsyncRequest): Promise<CertificationTask> {
+	public async reassignCertificationReviewItemsAsync(certificationReassignRequestAsync: CertificationsApiSubmitReassignCertsAsyncV1Request): Promise<CertificationTask> {
 		const apiConfig = await this.getApiConfiguration();
-		const certificationsApi = new CertificationsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors())
-		const resp = await certificationsApi.submitReassignCertsAsync(certificationReassignRequestAsync)
+		const certificationsApi = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		const resp = await certificationsApi.submitReassignCertsAsyncV1(certificationReassignRequestAsync)
 		return resp.data
 	}
 
-	public async decideCertificationItems(certificationsApiMakeIdentityDecisionRequest: CertificationsV2025ApiMakeIdentityDecisionRequest): Promise<{ IdentityCertificationDto: IdentityCertificationDtoV2025 }> {
+	public async decideCertificationItems(certificationsApiMakeIdentityDecisionRequest: CertificationsApiMakeIdentityDecisionV1Request): Promise<{ IdentityCertificationDto: IdentityCertificationDto }> {
 		const apiConfig = await this.getApiConfiguration();
-		const certificationsApi = new CertificationsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors())
-		const resp = await certificationsApi.makeIdentityDecision(certificationsApiMakeIdentityDecisionRequest)
+		const certificationsApi = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		const resp = await certificationsApi.makeIdentityDecisionV1(certificationsApiMakeIdentityDecisionRequest)
 		return {
 			IdentityCertificationDto: resp.data
 		}
@@ -2795,11 +2837,11 @@ export class ISCClient {
 	/**
 	 * Lists the pending (or completed) identity campaign certifications for which the given identity is the reviewer.
 	 */
-	public async getCertificationsByReviewer(reviewerIdentityId: string, completed = false): Promise<IdentityCertificationDtoV2025[]> {
+	public async getCertificationsByReviewer(reviewerIdentityId: string, completed = false): Promise<IdentityCertificationDto[]> {
 		console.log("> getCertificationsByReviewer", reviewerIdentityId, completed);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CertificationsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await Paginator.paginate(api, api.listIdentityCertifications, {
+		const api = new CertificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await Paginator.paginate(api, api.listIdentityCertificationsV1, {
 			reviewerIdentity: reviewerIdentityId,
 			filters: `completed eq ${completed}`,
 			sorters: "name"
@@ -2818,11 +2860,11 @@ export class ISCClient {
 	/**
 	 * Lists the pending access request approvals owned by (assigned to) the given identity.
 	 */
-	public async getPendingApprovals(ownerId: string): Promise<PendingApprovalV2025[]> {
+	public async getPendingApprovals(ownerId: string): Promise<PendingApproval[]> {
 		console.log("> getPendingApprovals", ownerId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new AccessRequestApprovalsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await Paginator.paginate(api, api.listPendingApprovals, { ownerId });
+		const api = new AccessRequestApprovalsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await Paginator.paginate(api, api.listPendingApprovalsV1, { ownerId });
 		return result.data;
 	}
 
@@ -2832,10 +2874,10 @@ export class ISCClient {
 	public async forwardAccessRequestApproval(approvalId: string, newOwnerId: string, comment: string): Promise<void> {
 		console.log("> forwardAccessRequestApproval", approvalId, newOwnerId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new AccessRequestApprovalsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		await api.forwardAccessRequest({
+		const api = new AccessRequestApprovalsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		await api.forwardAccessRequestV1({
 			approvalId,
-			forwardApprovalDtoV2025: { newOwnerId, comment }
+			forwardApprovalDto: { newOwnerId, comment }
 		});
 	}
 
@@ -2847,13 +2889,13 @@ export class ISCClient {
 	//#region Notification Templates
 	/////////////////////////
 
-	public async getNotificationTemplates(filters?: string): Promise<TemplateDtoBeta[]> {
+	public async getNotificationTemplates(filters?: string): Promise<TemplateDto[]> {
 		console.log("> getNotificationTemplates", filters);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new NotificationsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new NotificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const result = await Paginator.paginate(
 			api,
-			api.listNotificationTemplates,
+			api.listNotificationTemplatesV1,
 			filters ? { filters } : undefined,
 		);
 		return result.data;
@@ -2864,13 +2906,13 @@ export class ISCClient {
 	 * A tenant customization is a separate object and is not returned here.
 	 * `filters` is the standard collection filter; `key` supports `eq`.
 	 */
-	public async getNotificationTemplateDefaults(filters?: string): Promise<TemplateDtoDefaultBeta[]> {
+	public async getNotificationTemplateDefaults(filters?: string): Promise<TemplateDtoDefault[]> {
 		console.log("> getNotificationTemplateDefaults", filters);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new NotificationsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new NotificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const result = await Paginator.paginate(
 			api,
-			api.listNotificationTemplateDefaults,
+			api.listNotificationTemplateDefaultsV1,
 			filters ? { filters } : undefined,
 		);
 		return result.data;
@@ -2888,16 +2930,16 @@ export class ISCClient {
 	 * `GET /notification-templates/{id}` does not return a product default, so
 	 * a default is loaded from `GET /notification-template-defaults` filtered by key.
 	 */
-	public async getNotificationTemplateById(id: string): Promise<TemplateDtoBeta> {
+	public async getNotificationTemplateById(id: string): Promise<TemplateDto> {
 		console.log("> getNotificationTemplateById", id);
 		const identity = parseDefaultNotificationTemplateId(id);
 		if (identity) {
 			return await this.getNotificationTemplateByIdentity(identity.key, identity.medium, identity.locale);
 		}
 		const apiConfig = await this.getApiConfiguration();
-		const api = new NotificationsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new NotificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		try {
-			const response = await api.getNotificationTemplate({ id });
+			const response = await api.getNotificationTemplateV1({ id });
 			const template = Array.isArray(response.data) ? response.data[0] : response.data;
 			if (template) {
 				return template;
@@ -2913,7 +2955,7 @@ export class ISCClient {
 		return match;
 	}
 
-	private async getNotificationTemplateByIdentity(key: string, medium: string, locale: string): Promise<TemplateDtoBeta> {
+	private async getNotificationTemplateByIdentity(key: string, medium: string, locale: string): Promise<TemplateDto> {
 		// Same key can exist for several mediums and locales. The list is filtered
 		// on the key; medium and locale select the template in that result.
 		const filters = notificationTemplateKeyFilter(key);
@@ -2942,18 +2984,18 @@ export class ISCClient {
 		};
 	}
 
-	public async updateNotificationTemplate(template: TemplateDtoBeta): Promise<TemplateDtoBeta> {
+	public async updateNotificationTemplate(template: TemplateDto): Promise<TemplateDto> {
 		console.log("> updateNotificationTemplate", template.key, template.medium, template.locale);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new NotificationsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const payload: TemplateDtoBeta = { ...template };
+		const api = new NotificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const payload: TemplateDto = { ...template };
 		// Defaults are addressed with a synthetic id. The upsert keys off
 		// key + medium + locale and rejects an id that is not a stored template.
 		if (isDefaultNotificationTemplateId(payload.id)) {
 			delete payload.id;
 		}
 		// Despite the name, this is an upsert-by-key/medium/locale - there's no PUT /{id}
-		const response = await api.createNotificationTemplate({ templateDtoBeta: payload });
+		const response = await api.createNotificationTemplateV1({ templateDto: payload });
 		return response.data;
 	}
 
@@ -2961,11 +3003,11 @@ export class ISCClient {
 	 * Send a test notification for a stored template.
 	 * `POST /beta/send-test-notification` (`sendTestNotification`).
 	 */
-	public async sendTestNotification(request: SendTestNotificationRequestDtoBeta): Promise<void> {
+	public async sendTestNotification(request: SendTestNotificationRequestDto): Promise<void> {
 		console.log("> sendTestNotification", request.key, request.medium, request.locale);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new NotificationsBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		await api.sendTestNotification({ sendTestNotificationRequestDtoBeta: request });
+		const api = new NotificationsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		await api.sendTestNotificationV1({ sendTestNotificationRequestDto: request });
 	}
 	/////////////////////////
 	//#endregion Notification Templates
@@ -2979,7 +3021,7 @@ export class ISCClient {
 		console.log("> getSegments");
 		const apiConfig = await this.getApiConfiguration();
 		const api = new SegmentsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await Paginator.paginate(api, api.listSegments);
+		const result = await Paginator.paginate(api, api.listSegmentsV1);
 		return result.data;
 	}
 
@@ -2991,11 +3033,11 @@ export class ISCClient {
 	//#region SoD Policies
 	/////////////////////////
 
-	public async getSoDPolicies(): Promise<SodPolicyV2024[]> {
+	public async getSoDPolicies(): Promise<SodPolicy[]> {
 		console.log("> getSoDPolicies");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SODPoliciesV2024Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await Paginator.paginate(api, api.listSodPolicies, { sorters: "name" });
+		const api = new SODPoliciesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await Paginator.paginate(api, api.listSodPoliciesV1, { sorters: "name" });
 		return result.data;
 	}
 
@@ -3007,19 +3049,19 @@ export class ISCClient {
 	//#region Search attributes
 	/////////////////////////
 
-	public async getSearchAttributes(): Promise<SearchAttributeConfigBeta[]> {
+	public async getSearchAttributes(): Promise<SearchAttributeConfig[]> {
 		console.log("> getSearchAttributes");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SearchAttributeConfigurationBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors())
-		const result = await api.getSearchAttributeConfig()
+		const api = new SearchAttributeConfigurationApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		const result = await api.getSearchAttributeConfigV1()
 		return result.data.sort(compareByName)
 	}
 
-	public async createSearchAttribute(searchAttributeConfigBeta: SearchAttributeConfigBeta): Promise<void> {
+	public async createSearchAttribute(searchAttributeConfig: SearchAttributeConfig): Promise<void> {
 		console.log("> createSearchAttribute");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new SearchAttributeConfigurationBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		await api.createSearchAttributeConfig({ searchAttributeConfigBeta })
+		const api = new SearchAttributeConfigurationApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		await api.createSearchAttributeConfigV1({ searchAttributeConfig })
 	}
 
 	/////////////////////////
@@ -3030,19 +3072,19 @@ export class ISCClient {
 	//#region Identity attributes
 	/////////////////////////
 
-	public async getIdentityAttributes(): Promise<IdentityAttributeBeta[]> {
+	public async getIdentityAttributes(): Promise<IdentityAttribute2[]> {
 		console.log("> getIdentityAttributes");
 		const apiConfig = await this.getApiConfiguration()
-		const api = new IdentityAttributesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors())
-		const result = await api.listIdentityAttributes({})
+		const api = new IdentityAttributesApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		const result = await api.listIdentityAttributesV1({})
 		return result.data
 	}
 
-	public async createIdentityAttribute(identityAttribute: IdentityAttributeBeta): Promise<IdentityAttributeBeta> {
+	public async createIdentityAttribute(identityAttribute: IdentityAttribute2): Promise<IdentityAttribute2> {
 		console.log("> createIdentityAttribute");
 		const apiConfig = await this.getApiConfiguration()
-		const api = new IdentityAttributesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors())
-		const result = await api.createIdentityAttribute({ identityAttributeBeta: identityAttribute })
+		const api = new IdentityAttributesApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		const result = await api.createIdentityAttributeV1({ identityAttribute2: identityAttribute })
 		return result.data
 	}
 
@@ -3055,20 +3097,20 @@ export class ISCClient {
 	//#region Password Management
 	/////////////////////////
 
-	public async getPasswordOrgConfig(): Promise<PasswordOrgConfigV2025> {
+	public async getPasswordOrgConfig(): Promise<PasswordOrgConfig> {
 		console.log("> getPasswordOrgConfig");
 		const apiConfig = await this.getApiConfiguration()
-		const api = new PasswordConfigurationV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors())
-		const result = await api.getPasswordOrgConfig()
+		const api = new PasswordConfigurationApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		const result = await api.getPasswordOrgConfigV1()
 		return result.data
 	}
 
 	public async generateDigitToken(identityId: string, durationMinutes: number, length: number): Promise<string> {
 		console.log("> generateDigitToken");
 		const apiConfig = await this.getApiConfiguration()
-		const api = new PasswordManagementBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors())
-		const result = await api.createDigitToken({
-			passwordDigitTokenResetBeta: {
+		const api = new PasswordManagementApi(apiConfig, undefined, this.getAxiosWithInterceptors())
+		const result = await api.createDigitTokenV1({
+			passwordDigitTokenReset: {
 				userId: identityId,
 				durationMinutes,
 				length
@@ -3088,7 +3130,7 @@ export class ISCClient {
 	//#region Identity Management
 	////////////////////////
 
-	public async getIdentityByName(identityName: string): Promise<IdentityBeta | undefined> {
+	public async getIdentityByName(identityName: string): Promise<Identity | undefined> {
 		// Can only ever be one ID
 		const result = await this.listIdentities({ filters: `alias eq "${identityName}"` })
 		if (result && result.data) {
@@ -3097,54 +3139,54 @@ export class ISCClient {
 		return undefined
 	}
 
-	public async listIdentities(identityFilter: IdentitiesBetaApiListIdentitiesRequest): Promise<AxiosResponse<IdentityBeta[]>> {
+	public async listIdentities(identityFilter: IdentitiesApiListIdentitiesV1Request): Promise<AxiosResponse<Identity[]>> {
 		console.log("> listIdentities");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new IdentitiesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const result = await api.listIdentities(identityFilter);
+		const api = new IdentitiesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await api.listIdentitiesV1(identityFilter);
 		return result;
 	}
 
-	public async listMachineIdentities(params: MachineIdentitiesV2025ApiListMachineIdentitiesRequest): Promise<AxiosResponse<MachineIdentityResponseV2025[]>> {
+	public async listMachineIdentities(params: MachineIdentitiesApiListMachineIdentitiesV1Request): Promise<AxiosResponse<MachineIdentityResponse[]>> {
 		console.log("> listMachineIdentities");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new MachineIdentitiesV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		return await api.listMachineIdentities(params);
+		const api = new MachineIdentitiesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		return await api.listMachineIdentitiesV1(params);
 	}
 
-	public async listMachineAccountSubtypes(sourceId: string): Promise<SourceSubtypeWithSourceV2026[]> {
+	public async listMachineAccountSubtypes(sourceId: string): Promise<SourceSubtypeWithSource[]> {
 		console.log("> listMachineAccountSubtypes");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new MachineAccountSubtypesV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		console.log(api.listSourceSubtypes);
-		const response = await api.listSourceSubtypes({
+		const api = new MachineAccountSubtypesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		console.log(api.listSourceSubtypesV1);
+		const response = await api.listSourceSubtypesV1({
 			filters: `source.id eq "${sourceId}"`,
 			sorters: "displayName"
 		});
 		return response.data
 	}
 
-	public async processIdentity(identityId: string): Promise<AxiosResponse<TaskResultResponseBeta, any>> {
+	public async processIdentity(identityId: string): Promise<AxiosResponse<TaskResultResponse, any>> {
 		console.log("> processIdentity");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new IdentitiesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new IdentitiesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const requestParameters = {
-			processIdentitiesRequestBeta:
+			processIdentitiesRequest:
 			{
 				identityIds: [identityId]
 			}
 		};
-		return await api.startIdentityProcessing(requestParameters);
+		return await api.startIdentityProcessingV1(requestParameters);
 	}
 
-	public async syncIdentityAttributes(identityId: string): Promise<AxiosResponse<IdentitySyncJobBeta, any>> {
+	public async syncIdentityAttributes(identityId: string): Promise<AxiosResponse<IdentitySyncJob, any>> {
 		console.log("> syncIdentityAttributes");
 
 		const apiConfig = await this.getApiConfiguration();
-		const api = new IdentitiesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new IdentitiesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 
-		//IdentitiesBetaApiSynchronizeAttributesForIdentityRequest
-		return await api.synchronizeAttributesForIdentity(
+		//IdentitiesApiSynchronizeAttributesForIdentityRequest
+		return await api.synchronizeAttributesForIdentityV1(
 			{ identityId: identityId });
 	}
 
@@ -3152,19 +3194,19 @@ export class ISCClient {
 		console.log("> deleteIdentity");
 
 		const apiConfig = await this.getApiConfiguration();
-		const api = new IdentitiesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new IdentitiesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 
-		await api.deleteIdentity({ id: identityId });
+		await api.deleteIdentityV1({ id: identityId });
 	}
 
 	public async inviteIdentity(identityId: string): Promise<void> {
 		console.log("> inviteIdentity");
 
 		const apiConfig = await this.getApiConfiguration();
-		const api = new IdentitiesBetaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new IdentitiesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 
-		await api.startIdentitiesInvite({
-			inviteIdentitiesRequestBeta: { ids: [identityId] }
+		await api.startIdentitiesInviteV1({
+			inviteIdentitiesRequest: { ids: [identityId] }
 		});
 	}
 
@@ -3174,9 +3216,9 @@ export class ISCClient {
 		const apiConfig = await this.getApiConfiguration();
 		const api = new LifecycleStatesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 
-		const resp = await api.setLifecycleState({
+		const resp = await api.setLifecycleStateV1({
 			identityId,
-			setLifecycleStateRequest: { lifecycleStateId }
+			setLifecycleStateV1Request: { lifecycleStateId }
 		});
 		return resp.data.accountActivityId;
 	}
@@ -3185,7 +3227,7 @@ export class ISCClient {
 		console.log("> getAccountActivity", accountActivityId);
 		const apiConfig = await this.getApiConfiguration();
 		const api = new AccountActivitiesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.getAccountActivity({ id: accountActivityId });
+		const response = await api.getAccountActivityV1({ id: accountActivityId });
 		return response.data;
 	}
 
@@ -3212,20 +3254,20 @@ export class ISCClient {
 		};
 	}
 
-	public async listCustomUserLevels(): Promise<UserLevelSummaryDTOV2025[]> {
+	public async listCustomUserLevels(): Promise<UserLevelSummaryDTO[]> {
 		console.log("> listCustomUserLevels");
 		const apiConfig = await this.getApiConfiguration();
-		const api = new CustomUserLevelsV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const api = new CustomUserLevelsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const limit = 50;
-		const levels: UserLevelSummaryDTOV2025[] = [];
+		const levels: UserLevelSummaryDTO[] = [];
 		let offset = 0;
 		let count: number;
 		do {
-			const response = await api.listUserLevels({
+			const response = await api.listUserLevelsV1({
 				limit,
 				offset,
 				sorters: "name",
-				detailLevel: ListUserLevelsDetailLevelV2025.Full
+				detailLevel: ListUserLevelsV1DetailLevelEnum.Full
 			});
 			count = response.data.length;
 			levels.push(...response.data);
@@ -3234,22 +3276,22 @@ export class ISCClient {
 		return levels;
 	}
 
-	public async getAuthUser(identityId: string): Promise<AuthUserV2025> {
+	public async getAuthUser(identityId: string): Promise<AuthUser> {
 		console.log("> getAuthUser", identityId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new AuthUsersV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.getAuthUser({ id: identityId });
+		const api = new AuthUsersApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getAuthUserV1({ id: identityId });
 		return response.data;
 	}
 
 	public async setAuthUserCapabilities(identityId: string, capabilities: string[]): Promise<void> {
 		console.log("> setAuthUserCapabilities", identityId, capabilities);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new AuthUsersV2025Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		await api.patchAuthUser({
+		const api = new AuthUsersApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		await api.patchAuthUserV1({
 			id: identityId,
-			jsonPatchOperationV2025: [{
-				op: JsonPatchOperationV2025OpV2025.Replace,
+			jsonPatchOperation: [{
+				op: JsonPatchOperationOpEnum.Replace,
 				path: "/capabilities",
 				value: capabilities
 			}]
@@ -3265,11 +3307,11 @@ export class ISCClient {
 	 * @param sourceId Id of the source
 	 * @returns the privilege criteria configurations defined for the source
 	 */
-	public async getPrivilegeCriteriaConfigs(sourceId: string): Promise<PrivilegeCriteriaConfigDTOV2026[]> {
+	public async getPrivilegeCriteriaConfigs(sourceId: string): Promise<PrivilegeCriteriaConfigDTO[]> {
 		console.log("> getPrivilegeCriteriaConfigs", sourceId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new PrivilegeCriteriaConfigurationV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.listPrivilegeCriteriaConfig({
+		const api = new PrivilegeCriteriaConfigurationApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.listPrivilegeCriteriaConfigV1({
 			filters: `sourceId eq "${sourceId}"`
 		})
 		return response.data;
@@ -3280,11 +3322,11 @@ export class ISCClient {
 	 * @param sourceId Id of the source
 	 * @returns the privilege criteria defined for the source
 	 */
-	public async getPrivilegeCriteria(sourceId: string): Promise<PrivilegeCriteriaDTOV2026[]> {
+	public async getPrivilegeCriteria(sourceId: string): Promise<PrivilegeCriteriaDTO[]> {
 		console.log("> getPrivilegeCriteria", sourceId);
 		const apiConfig = await this.getApiConfiguration();
-		const api = new PrivilegeCriteriaV2026Api(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.listPrivilegeCriteria({
+		const api = new PrivilegeCriteriaApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.listPrivilegeCriteriaV1({
 			filters: `sourceId eq "${sourceId}"`
 		})
 		return response.data;

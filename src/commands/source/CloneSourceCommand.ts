@@ -1,19 +1,21 @@
 import * as vscode from 'vscode';
-import { TenantService } from '../../services/TenantService';
-import { SourceTreeItem } from '../../models/ISCTreeItem';
-import { WizardContext } from '../../wizard/wizardContext';
-import { ISCClient } from '../../services/ISCClient';
-import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
-import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep';
-import { runWizard } from '../../wizard/wizard';
-import { Validator } from '../../validator/validator';
-import { InputPromptStep } from '../../wizard/inputPromptStep';
-import { ExportPayloadBetaIncludeTypesBeta, SourceCluster, PasswordPolicyHoldersDtoInnerV2025 } from 'sailpoint-api-client';
-import crypto = require('crypto');
-import { SPConfigImporter } from '../spconfig-import/SPConfigImporter';
-import * as commands from '../constants';
+import { TenantService } from '../../services/TenantService.js';
+import { SourceTreeItem } from '../../models/ISCTreeItem.js';
+import { WizardContext } from '../../wizard/wizardContext.js';
+import { ISCClient } from '../../services/ISCClient.js';
+import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep.js';
+import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep.js';
+import { runWizard } from '../../wizard/wizard.js';
+import { Validator } from '../../validator/validator.js';
+import { InputPromptStep } from '../../wizard/inputPromptStep.js';
+import { SourceCluster, PasswordPolicyHoldersDtoInner } from 'sailpoint-api-client/dist/sources/api.js';
+import type { CreatePrivilegeCriteriaRequest } from 'sailpoint-api-client/dist/privilege_criteria/api.js';
+import { ExportPayloadIncludeTypesEnum as ExportPayloadIncludeTypes } from 'sailpoint-api-client/dist/sp_config/api.js';
+import * as crypto from "node:crypto";
+import { SPConfigImporter } from '../spconfig-import/SPConfigImporter.js';
+import * as commands from '../constants.js';
 import { join } from 'path';
-import { SimpleSPConfigExporter } from '../spconfig-export/SimpleSPConfigExporter';
+import { SimpleSPConfigExporter } from '../spconfig-export/SimpleSPConfigExporter.js';
 
 const sourceNameValidator = new Validator({
     required: true,
@@ -90,7 +92,7 @@ export class CloneSourceCommand {
         const oldSource = await client.getSourceById(values["source"].id)
 
         const options: any = {};
-        options[ExportPayloadBetaIncludeTypesBeta.Source] = {
+        options[ExportPayloadIncludeTypes.Source] = {
             "includedIds": [
                 values["source"].id
             ]
@@ -99,13 +101,13 @@ export class CloneSourceCommand {
             client,
             values["tenant"].name,
             options,
-            [ExportPayloadBetaIncludeTypesBeta.Source]
+            [ExportPayloadIncludeTypes.Source]
         );
 
         const data = await exporter.exportConfigWithProgression();
         const newid = crypto.randomUUID().replaceAll("-", "")
 
-        data.options.objectOptions[ExportPayloadBetaIncludeTypesBeta.Source].includedIds = [newid];
+        data.options.objectOptions[ExportPayloadIncludeTypes.Source].includedIds = [newid];
 
         const newSourceName = values["newSourceName"];
         data.objects[0].self = {
@@ -187,7 +189,7 @@ export class CloneSourceCommand {
             if (holders.length === 0) { return; }
 
             const sourcePolicies = await client.getPasswordPolicies();
-            const newHolders: PasswordPolicyHoldersDtoInnerV2025[] = [];
+            const newHolders: PasswordPolicyHoldersDtoInner[] = [];
             for (const holder of holders) {
                 let targetPolicy = await targetClient.getPasswordPolicyByName(holder.policyName!);
                 if (!targetPolicy) {
@@ -348,6 +350,7 @@ export class CloneSourceCommand {
                     sourceId: newSourceId,
                     type: "CUSTOM",
                     operator: c.operator,
+                    //@ts-ignore
                     groups: c.groups,
                     privilegeLevel: c.privilegeLevel
                 });

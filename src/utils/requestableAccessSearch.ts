@@ -1,10 +1,10 @@
-import { IndexV2025 } from "sailpoint-api-client";
-import { IdentityAccessItemType } from "../models/IdentityAccessItem";
+import { Index } from "sailpoint-api-client/dist/search/api.js";
+import { IdentityAccessItemType } from "../models/IdentityAccessItem.js";
 
-export const REQUESTABLE_ACCESS_INDICES: IndexV2025[] = [
-	IndexV2025.Roles,
-	IndexV2025.Accessprofiles,
-	IndexV2025.Entitlements,
+export const REQUESTABLE_ACCESS_INDICES: Index[] = [
+	Index.Roles,
+	Index.Accessprofiles,
+	Index.Entitlements,
 ];
 
 export const REQUESTABLE_ACCESS_SEARCH_FIELDS = [

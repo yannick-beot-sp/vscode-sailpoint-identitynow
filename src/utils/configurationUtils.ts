@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
-import { isEmpty } from "./stringUtils";
-import { titleCase } from "./titleCase";
-import * as configuration from '../configurationConstants';
+import { isEmpty } from "./stringUtils.js";
+import { titleCase } from "./titleCase.js";
+import * as configuration from '../configurationConstants.js';
 
 const isNumber = (val: any) => typeof val === "number" && val === val;
 

@@ -1,4 +1,4 @@
-import { NotificationTemplateVariableExample } from "./templateVariables";
+import { NotificationTemplateVariableExample } from "./templateVariables.js";
 
 type DateInput = Date | string | number | PreviewCalendar | undefined | null;
 type AddUnit = "seconds" | "minutes" | "hours" | "days" | "months" | "years";

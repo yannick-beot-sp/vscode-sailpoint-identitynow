@@ -1,13 +1,13 @@
 import * as vscode from "vscode";
-import { IdentityTreeItem } from "../../models/ISCTreeItem";
-import { IdentityAccessItem } from "../../models/IdentityAccessItem";
-import { ISCClient } from "../../services/ISCClient";
-import { buildAccessTableHtml, buildAccessTableRows, buildLoadingHtml } from "./identityAccessHtml";
-import { confirm } from "../../utils/vsCodeHelpers";
+import { IdentityTreeItem } from "../../models/ISCTreeItem.js";
+import { IdentityAccessItem } from "../../models/IdentityAccessItem.js";
+import { ISCClient } from "../../services/ISCClient.js";
+import { buildAccessTableHtml, buildAccessTableRows, buildLoadingHtml } from "./identityAccessHtml.js";
+import { confirm } from "../../utils/vsCodeHelpers.js";
 import {
 	openAccessRequestStatusPanel,
 	openAccessRequestSubmitErrorPanel,
-} from "./AccessRequestStatusPanel";
+} from "./AccessRequestStatusPanel.js";
 
 export class IdentityAccessPanel implements vscode.Disposable {
 	public static readonly viewType = "identityAccessView";

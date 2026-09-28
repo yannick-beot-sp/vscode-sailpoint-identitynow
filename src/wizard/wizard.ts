@@ -1,7 +1,7 @@
-import { GoBackError, isUserCancelledError } from "../errors";
-import { WizardContext } from "./wizardContext";
-import { IWizardOptions } from "./wizardOptions";
-import { WizardPromptStep } from "./wizardPromptStep";
+import { GoBackError, isUserCancelledError } from "../errors.js";
+import { WizardContext } from "./wizardContext.js";
+import { IWizardOptions } from "./wizardOptions.js";
+import { WizardPromptStep } from "./wizardPromptStep.js";
 
 
 /**

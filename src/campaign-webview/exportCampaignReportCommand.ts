@@ -1,9 +1,9 @@
-import { CampaignTreeItem } from "../models/ISCTreeItem";
-import { PathProposer } from '../services/PathProposer';
-import { askFile } from '../utils/vsCodeHelpers';
-import { ISCClient } from '../services/ISCClient';
-import { ExporterBuilder } from '../utils/ExporterBuilder';
-import { CampaignAccessReviewData, CampaignAccessReviewPaginator } from './CampaignAccessReviewPaginator';
+import { CampaignTreeItem } from "../models/ISCTreeItem.js";
+import { PathProposer } from '../services/PathProposer.js';
+import { askFile } from '../utils/vsCodeHelpers.js';
+import { ISCClient } from '../services/ISCClient.js';
+import { ExporterBuilder } from '../utils/ExporterBuilder.js';
+import { CampaignAccessReviewData, CampaignAccessReviewPaginator } from './CampaignAccessReviewPaginator.js';
 
 /**
  * Command used to open the campaign panel

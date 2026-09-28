@@ -1,4 +1,5 @@
-import { AuthUserV2025CapabilitiesV2025, UserLevelSummaryDTOV2025 } from 'sailpoint-api-client';
+import { AuthUserCapabilitiesEnum as AuthUserCapabilities } from 'sailpoint-api-client/dist/auth_users/api.js';
+import { UserLevelSummaryDTO } from 'sailpoint-api-client/dist/custom_user_levels/api.js';
 const OOTB_USER_LEVEL_NAMES: Record<string, string> = {
     ORG_ADMIN: "Admin",
     HELPDESK: "Helpdesk",
@@ -23,19 +24,19 @@ const OOTB_USER_LEVEL_NAMES: Record<string, string> = {
     "sp:ui-config-hub-read": "Config Hub Read",
 };
 
-export function getUserLevelCapabilityValue(level: UserLevelSummaryDTOV2025): string {
+export function getUserLevelCapabilityValue(level: UserLevelSummaryDTO): string {
     return level.legacyGroup ?? level.id ?? "";
 }
 
-export function isAdminUserLevel(level: UserLevelSummaryDTOV2025): boolean {
+export function isAdminUserLevel(level: UserLevelSummaryDTO): boolean {
     return level.legacyGroup === "ORG_ADMIN" || level.name?.toLowerCase() === "admin";
 }
 
-export function isCustomUserLevel(level: UserLevelSummaryDTOV2025): boolean {
+export function isCustomUserLevel(level: UserLevelSummaryDTO): boolean {
     return level.custom === true;
 }
 
-export function compareUserLevels(a: UserLevelSummaryDTOV2025, b: UserLevelSummaryDTOV2025): number {
+export function compareUserLevels(a: UserLevelSummaryDTO, b: UserLevelSummaryDTO): number {
     const aIsAdmin = isAdminUserLevel(a);
     const bIsAdmin = isAdminUserLevel(b);
     if (aIsAdmin && !bIsAdmin) {
@@ -57,7 +58,7 @@ export function compareUserLevels(a: UserLevelSummaryDTOV2025, b: UserLevelSumma
     return (a.name ?? "").localeCompare(b.name ?? "");
 }
 
-export function isUserLevelAssigned(level: UserLevelSummaryDTOV2025, capabilities: string[]): boolean {
+export function isUserLevelAssigned(level: UserLevelSummaryDTO, capabilities: string[]): boolean {
     const capabilityValue = getUserLevelCapabilityValue(level);
     return capabilities.includes(capabilityValue)
         || (level.id !== undefined && capabilities.includes(level.id));
@@ -75,8 +76,8 @@ function formatCapabilityLabel(capability: string): string {
         .join(" ");
 }
 
-export function getOotbUserLevels(): UserLevelSummaryDTOV2025[] {
-    return Object.values(AuthUserV2025CapabilitiesV2025).map(capability => ({
+export function getOotbUserLevels(): UserLevelSummaryDTO[] {
+    return Object.values(AuthUserCapabilities).map(capability => ({
         name: OOTB_USER_LEVEL_NAMES[capability] ?? formatCapabilityLabel(capability),
         legacyGroup: capability,
         custom: false,
@@ -84,10 +85,10 @@ export function getOotbUserLevels(): UserLevelSummaryDTOV2025[] {
 }
 
 export function mergeUserLevels(
-    customLevels: UserLevelSummaryDTOV2025[],
+    customLevels: UserLevelSummaryDTO[],
     currentCapabilities: string[] = []
-): UserLevelSummaryDTOV2025[] {
-    const byCapability = new Map<string, UserLevelSummaryDTOV2025>();
+): UserLevelSummaryDTO[] {
+    const byCapability = new Map<string, UserLevelSummaryDTO>();
 
     for (const level of getOotbUserLevels()) {
         byCapability.set(getUserLevelCapabilityValue(level), level);

@@ -1,12 +1,12 @@
-import * as vscode from 'vscode';
-import { CampaignTreeItem } from "../models/ISCTreeItem";
-import { ISCClient } from '../services/ISCClient';
-import { confirm } from '../utils/vsCodeHelpers';
-import { AccessReviewItem, DtoType } from 'sailpoint-api-client';
-import { BulkReviewItemReassignment } from './BulkReviewItemReassignment';
-import { TenantService } from '../services/TenantService';
-import { isTenantReadonly, validateTenantReadonly } from '../commands/validateTenantReadonly';
-import { SourceIdToOwnerIdCacheService } from '../services/cache/SourceIdToOwnerIdCacheService';
+import { CampaignTreeItem } from "../models/ISCTreeItem.js";
+import { ISCClient } from '../services/ISCClient.js';
+import { confirm } from '../utils/vsCodeHelpers.js';
+import { DtoType } from 'sailpoint-api-client/dist/accounts/api.js';
+import { AccessReviewItem } from 'sailpoint-api-client/dist/certifications/api.js';
+import { BulkReviewItemReassignment } from './BulkReviewItemReassignment.js';
+import { TenantService } from '../services/TenantService.js';
+import { isTenantReadonly, validateTenantReadonly } from '../commands/validateTenantReadonly.js';
+import { SourceIdToOwnerIdCacheService } from '../services/cache/SourceIdToOwnerIdCacheService.js';
 
 const OWNER_REVIEW_DEFAULT_COMMENT = "Reassigned to the Access Item Owner"
 
@@ -36,7 +36,7 @@ export class ReassignOwnersCommand {
         const report = await bulkReviewItemReassigner.reassignCampaign(
             campaignId,
             `Reassigning items of ${node.label} to access owner`,
-            node.label,
+            node.label as string,
             OWNER_REVIEW_DEFAULT_COMMENT,
             `Successfully reassigned items for campaign ${node.label} to access owners.`,
             async (pendingReviewItem: AccessReviewItem) => {

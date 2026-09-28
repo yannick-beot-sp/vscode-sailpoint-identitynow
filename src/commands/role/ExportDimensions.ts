@@ -1,18 +1,19 @@
 import * as vscode from 'vscode';
-import { BaseCSVExporter } from "../BaseExporter";
-import { RolesTreeItem, RoleTreeItem } from '../../models/ISCTreeItem';
-import { askFile } from '../../utils/vsCodeHelpers';
-import { PathProposer } from '../../services/PathProposer';
-import { EntitlementRef, DimensionV2025, DimensionsV2025ApiListDimensionsRequest } from 'sailpoint-api-client';
-import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
-import { SourceIdToNameCacheService } from '../../services/cache/SourceIdToNameCacheService';
-import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator';
-import { CacheService } from '../../services/cache/CacheService';
-import { EntitlementIdToSourceNameCacheService } from '../../services/cache/EntitlementIdToSourceNameCacheService';
-import { roleMembershipSelectorToStringConverter } from '../../parser/roleMembershipSelectorToStringConverter';
-import { UserCancelledError } from '../../errors';
-import { addRoleName, DimensionWithRoleNameName, getAllDimensions } from './DimensionAsyncIterables';
-import { DimensionCSVRecord } from '../../models/DimensionCsvRecord';
+import { BaseCSVExporter } from "../BaseExporter.js";
+import { RolesTreeItem, RoleTreeItem } from '../../models/ISCTreeItem.js';
+import { askFile } from '../../utils/vsCodeHelpers.js';
+import { PathProposer } from '../../services/PathProposer.js';
+import { Dimension, DimensionsApiListDimensionsV1Request } from 'sailpoint-api-client/dist/dimensions/api.js';
+import { EntitlementRef } from 'sailpoint-api-client/dist/roles/api.js';
+import { CSV_MULTIVALUE_SEPARATOR } from '../../constants.js';
+import { SourceIdToNameCacheService } from '../../services/cache/SourceIdToNameCacheService.js';
+import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator.js';
+import { CacheService } from '../../services/cache/CacheService.js';
+import { EntitlementIdToSourceNameCacheService } from '../../services/cache/EntitlementIdToSourceNameCacheService.js';
+import { roleMembershipSelectorToStringConverter } from '../../parser/roleMembershipSelectorToStringConverter.js';
+import { UserCancelledError } from '../../errors.js';
+import { addRoleName, DimensionWithRoleNameName, getAllDimensions } from './DimensionAsyncIterables.js';
+import { DimensionCSVRecord } from '../../models/DimensionCsvRecord.js';
 
 export class DimensionExporterCommand {
 
@@ -108,7 +109,7 @@ class DimensionExporter extends BaseCSVExporter<DimensionWithRoleNameName> {
 
 
         if (this.singleRole) {
-            const iterator = new GenericAsyncIterableIterator<DimensionV2025, DimensionsV2025ApiListDimensionsRequest>(
+            const iterator = new GenericAsyncIterableIterator<Dimension, DimensionsApiListDimensionsV1Request>(
                 this.client,
                 this.client.getPaginatedDimensions, { roleId: this.roleId!, sorters: "name" });
             await this.exportData(addRoleName(iterator, this.roleName!), task, token)

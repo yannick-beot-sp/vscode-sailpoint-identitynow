@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
-import { WizardPromptStep } from "./wizardPromptStep";
-import { Wizard } from "./wizard";
-import { WizardContext } from "./wizardContext";
-import { chooseFileExtended } from "../utils/vsCodeHelpers";
+import { WizardPromptStep } from "./wizardPromptStep.js";
+import { Wizard } from "./wizard.js";
+import { WizardContext } from "./wizardContext.js";
+import { chooseFileExtended } from "../utils/vsCodeHelpers.js";
 
 
 export interface ChooseFileStepOptions {

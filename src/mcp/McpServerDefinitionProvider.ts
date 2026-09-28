@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import { McpServer } from "./McpServer";
-import { MCP_NAME } from "./constants";
+import { McpServer } from "./McpServer.js";
+import { MCP_NAME } from "./constants.js";
 
 /**
  * VS Code MCP Server Definition Provider for SailPoint Identity Security Cloud.

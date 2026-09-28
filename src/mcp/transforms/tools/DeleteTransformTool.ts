@@ -1,10 +1,10 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
-import { transformNameField } from "../transformInputFields";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { tenantNameField } from "../../inputFields.js";
+import { transformNameField } from "../transformInputFields.js";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -27,7 +27,7 @@ type Output = z.infer<typeof outputSchema>;
     description:
         "Delete an existing transform by name. " +
         "Fails if the transform is still referenced by an Identity Profile mapping.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Delete Transform",

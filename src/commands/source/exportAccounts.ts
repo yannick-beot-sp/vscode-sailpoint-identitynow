@@ -1,11 +1,12 @@
 import * as vscode from 'vscode';
-import { ISCResourceTreeItem, SourceTreeItem } from '../../models/ISCTreeItem';
-import { PathProposer } from '../../services/PathProposer';
-import { askFile } from '../../utils/vsCodeHelpers';
-import { BaseCSVExporter } from '../BaseExporter';
-import AccountPaginator from './AccountPaginator';
-import { Account, Schema } from 'sailpoint-api-client';
-import { isEmpty } from '../../utils/stringUtils';
+import { ISCResourceTreeItem, SourceTreeItem } from '../../models/ISCTreeItem.js';
+import { PathProposer } from '../../services/PathProposer.js';
+import { askFile } from '../../utils/vsCodeHelpers.js';
+import { BaseCSVExporter } from '../BaseExporter.js';
+import AccountPaginator from './AccountPaginator.js';
+import { Account } from 'sailpoint-api-client/dist/accounts/api.js';
+import { Schema } from 'sailpoint-api-client/dist/sources/api.js';
+import { isEmpty } from '../../utils/stringUtils.js';
 
 export class AccountExporterCommand {
 

@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { QuickPickPromptStep } from "./quickPickPromptStep";
-import { WizardContext } from "./wizardContext";
-import { ISCClient } from "../services/ISCClient";
-import { ReassignableObject, ReassignableObjectType, listOwnedObjects, objectsContextKey } from "../models/ReassignOwnership";
+import { QuickPickPromptStep } from "./quickPickPromptStep.js";
+import { WizardContext } from "./wizardContext.js";
+import { ISCClient } from "../services/ISCClient.js";
+import { ReassignableObject, ReassignableObjectType, listOwnedObjects, objectsContextKey } from "../models/ReassignOwnership.js";
 
 /**
  * "Choose what to reassign" mode: one instance of this step per selected object type,

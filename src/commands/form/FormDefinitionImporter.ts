@@ -1,10 +1,10 @@
 import * as fs from 'fs';
 import * as vscode from 'vscode';
-import * as commands from '../constants';
+import * as commands from '../constants.js';
 
-import { ISCClient } from "../../services/ISCClient";
-import { askChosenItems } from '../../utils/vsCodeHelpers';
-import { ImportFormDefinitionsRequestInnerBeta } from 'sailpoint-api-client';
+import { ISCClient } from "../../services/ISCClient.js";
+import { askChosenItems } from '../../utils/vsCodeHelpers.js';
+import { ImportFormDefinitionsV1RequestInner } from 'sailpoint-api-client/dist/custom_forms/api.js';
 
 export class FormDefinitionImporter {
     readonly client: ISCClient;
@@ -21,7 +21,7 @@ export class FormDefinitionImporter {
     async chooseAndImport(): Promise<void> {
         console.log("> FormDefinitionImporter.chooseAndImport");
         const data = fs.readFileSync(this.fileUri.fsPath).toString();
-        let json = JSON.parse(data) as ImportFormDefinitionsRequestInnerBeta[]
+        let json = JSON.parse(data) as ImportFormDefinitionsV1RequestInner[]
         // Cleaning "data" by removing usedBy
         const pickItems = json.map(item => ({
             ...item,
@@ -47,7 +47,7 @@ export class FormDefinitionImporter {
         await this.importFileWithProgression(items);
     }
 
-    protected async importFileWithProgression(data: ImportFormDefinitionsRequestInnerBeta[]): Promise<void> {
+    protected async importFileWithProgression(data: ImportFormDefinitionsV1RequestInner[]): Promise<void> {
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Importing forms to ${this.tenantDisplayName}...`,
@@ -57,7 +57,7 @@ export class FormDefinitionImporter {
         );
     }
 
-    protected async importFile(forms: ImportFormDefinitionsRequestInnerBeta[], task: any, token: vscode.CancellationToken): Promise<void> {
+    protected async importFile(forms: ImportFormDefinitionsV1RequestInner[], task: any, token: vscode.CancellationToken): Promise<void> {
         const result = await this.client.importForms(forms)
 
         if (result.errors !== undefined && result.errors.length > 0) {

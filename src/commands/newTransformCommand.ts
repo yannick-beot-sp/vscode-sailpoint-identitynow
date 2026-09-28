@@ -1,17 +1,20 @@
 import * as vscode from 'vscode';
-import { NEW_ID } from '../constants';
-import { TransformsTreeItem } from "../models/ISCTreeItem";
-import { getResourceUri } from '../utils/UriUtils';
-import { createNewFile } from '../utils/vsCodeHelpers';
-import { compareByLabel } from '../utils';
-import { WizardContext } from '../wizard/wizardContext';
-import { TenantService } from '../services/TenantService';
-import { runWizard } from '../wizard/wizard';
-import { QuickPickTenantStep } from '../wizard/quickPickTenantStep';
-import { Validator } from '../validator/validator';
-import { InputPromptStep } from '../wizard/inputPromptStep';
-import { QuickPickPromptStep } from '../wizard/quickPickPromptStep';
-import { TenantInfo } from '../models/TenantInfo';
+import { NEW_ID } from '../constants.js';
+import { TransformsTreeItem } from "../models/ISCTreeItem.js";
+import { getResourceUri } from '../utils/UriUtils.js';
+import { createNewFile } from '../utils/vsCodeHelpers.js';
+import { compareByLabel } from '../utils.js';
+import { WizardContext } from '../wizard/wizardContext.js';
+import { TenantService } from '../services/TenantService.js';
+import { runWizard } from '../wizard/wizard.js';
+import { QuickPickTenantStep } from '../wizard/quickPickTenantStep.js';
+import { Validator } from '../validator/validator.js';
+import { InputPromptStep } from '../wizard/inputPromptStep.js';
+import { QuickPickPromptStep } from '../wizard/quickPickPromptStep.js';
+import { TenantInfo } from '../models/TenantInfo.js';
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
 const transforms = require('../../snippets/transforms.json');
 
 /**

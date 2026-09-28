@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { it, describe } from 'mocha';
-import path = require('node:path');
-import { CSVReader } from '../../services/CSVReader';
-import * as assert from 'assert';
-import { UncorrelatedAccount } from '../../models/UncorrelatedAccount';
+import { it, describe } from "mocha";
+import * as path from "node:path";
+import { fileURLToPath } from "node:url";
+import { CSVReader } from "../../services/CSVReader.js";
+import * as assert from "assert";
+import { UncorrelatedAccount } from "../../models/UncorrelatedAccount.js";
 
-const dataFolder = path.join(path.dirname(__filename).replace(path.sep + "out" + path.sep, path.sep + "src" + path.sep), 'data');
+const dataFolder = path.join(path.dirname(fileURLToPath(import.meta.url)).replace(path.sep + "out" + path.sep, path.sep + "src" + path.sep), "data");
 
 suite('CSVReader Test Suite', () => {
     const inputPath = path.join(dataFolder, 'testcsv1.csv');

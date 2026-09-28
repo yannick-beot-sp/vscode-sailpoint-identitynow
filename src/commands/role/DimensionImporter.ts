@@ -1,29 +1,31 @@
 import * as vscode from 'vscode';
 import * as tmp from "tmp";
 
-import { ISCClient } from "../../services/ISCClient";
-import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
-import { AccessProfileRef, DimensionCriteriaLevel1V2025, DimensionMembershipSelectorV2025, DimensionV2025, EntitlementRef, JsonPatchOperationV2025OpV2025, RoleMembershipSelectorType, RoleV2025 } from 'sailpoint-api-client';
-import { CSVReader } from '../../services/CSVReader';
-import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
-import { AccessProfileNameToIdCacheService } from '../../services/cache/AccessProfileNameToIdCacheService';
-import { importMode, ImportModeType, openPreview } from '../../utils/vsCodeHelpers';
-import { isEmpty, isNotBlank } from '../../utils/stringUtils';
-import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService';
-import { EntitlementCacheService } from '../../services/cache/EntitlementCacheService';
-import { UserCancelledError } from '../../errors';
-import { DimensionCSVRecord } from '../../models/DimensionCsvRecord';
-import { ImportResult } from '../../models/ImportResult';
-import { RoleNameToIdCacheService } from '../../services/cache/RoleNameToIdCacheService';
-import { DimensionMembershipCriteriaConverter } from '../../parser/DimensionMembershipCriteriaConverter';
-import { stringToEntitlementConverter } from '../../utils/entitlementUtils';
+import { ISCClient } from "../../services/ISCClient.js";
+import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter.js';
+import { JsonPatchOperationOpEnum as JsonPatchOperationOp } from 'sailpoint-api-client/dist/access_profiles/api.js';
+import { DimensionCriteriaLevel1, DimensionMembershipSelector, Dimension } from 'sailpoint-api-client/dist/dimensions/api.js';
+import { AccessProfileRef, EntitlementRef, RoleMembershipSelectorType, Role } from 'sailpoint-api-client/dist/roles/api.js';
+import { CSVReader } from '../../services/CSVReader.js';
+import { CSV_MULTIVALUE_SEPARATOR } from '../../constants.js';
+import { AccessProfileNameToIdCacheService } from '../../services/cache/AccessProfileNameToIdCacheService.js';
+import { importMode, ImportModeType, openPreview } from '../../utils/vsCodeHelpers.js';
+import { isEmpty, isNotBlank } from '../../utils/stringUtils.js';
+import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService.js';
+import { EntitlementCacheService } from '../../services/cache/EntitlementCacheService.js';
+import { UserCancelledError } from '../../errors.js';
+import { DimensionCSVRecord } from '../../models/DimensionCsvRecord.js';
+import { ImportResult } from '../../models/ImportResult.js';
+import { RoleNameToIdCacheService } from '../../services/cache/RoleNameToIdCacheService.js';
+import { DimensionMembershipCriteriaConverter } from '../../parser/DimensionMembershipCriteriaConverter.js';
+import { stringToEntitlementConverter } from '../../utils/entitlementUtils.js';
 
 /**
  * Go through membership criteria and extract the identity attributes
  * @param node 
  * @param uniqueProperties 
  */
-function extractAllIdentityAttributes(node: DimensionCriteriaLevel1V2025, uniqueProperties = new Set<string>): Set<string> {
+function extractAllIdentityAttributes(node: DimensionCriteriaLevel1, uniqueProperties = new Set<string>): Set<string> {
     /**
      * membership criteria is like: {
         "type": "STANDARD",
@@ -159,7 +161,7 @@ export class DimensionImporter {
                     return;
                 }
 
-                let role: RoleV2025;
+                let role: Role;
                 try {
                     role = await roleCache.get(data.roleName);
                 } catch (error) {
@@ -222,7 +224,7 @@ export class DimensionImporter {
                     throw new UserCancelledError();
                 }
 
-                let membership: DimensionMembershipSelectorV2025 | undefined = undefined;
+                let membership: DimensionMembershipSelector | undefined = undefined;
                 if (isNotBlank(data.membershipCriteria)) {
                     try {
                         const criteria = membershipCriteriaConverter.convert(data.membershipCriteria!);
@@ -256,7 +258,7 @@ export class DimensionImporter {
                 }
                 const description = data.description
 
-                const dimensionPayload: DimensionV2025 = {
+                const dimensionPayload: Dimension = {
                     "name": dimensionName,
                     description,
                     accessProfiles,
@@ -303,7 +305,7 @@ export class DimensionImporter {
                                 },
 
                             ].map((item) => ({
-                                "op": JsonPatchOperationV2025OpV2025.Replace,
+                                "op": JsonPatchOperationOp.Replace,
                                 "path": `/${item.property}`,
                                 "value": item.value
                             }))

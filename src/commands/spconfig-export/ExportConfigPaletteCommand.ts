@@ -1,6 +1,6 @@
-import { TenantService } from "../../services/TenantService";
-import { chooseTenant } from "../../utils/vsCodeHelpers";
-import { WizardBasedExporterCommand } from "./WizardBasedExporterCommand";
+import { TenantService } from "../../services/TenantService.js";
+import { chooseTenant } from "../../utils/vsCodeHelpers.js";
+import { WizardBasedExporterCommand } from "./WizardBasedExporterCommand.js";
 
 /**
  * Entrypoint for full export configuration from the command palette. Tenant is unknown.

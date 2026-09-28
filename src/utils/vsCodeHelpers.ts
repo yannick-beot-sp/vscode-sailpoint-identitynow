@@ -1,11 +1,11 @@
 import * as vscode from "vscode";
-import { TenantService } from "../services/TenantService";
+import { TenantService } from "../services/TenantService.js";
 import * as fs from 'fs';
-import { TenantInfo } from "../models/TenantInfo";
-import { TenantInfoQuickPickItem } from "../models/TenantInfoQuickPickItem";
-import { compareByLabel, compareByName } from "../utils";
-import { isBlank, isEmpty } from "./stringUtils";
-import { ObjectPickItem } from "../models/ObjectPickItem";
+import { TenantInfo } from "../models/TenantInfo.js";
+import { TenantInfoQuickPickItem } from "../models/TenantInfoQuickPickItem.js";
+import { compareByLabel, compareByName } from "../utils.js";
+import { isBlank, isEmpty } from "./stringUtils.js";
+import { ObjectPickItem } from "../models/ObjectPickItem.js";
 
 export async function chooseTenant(tenantService: TenantService, title: string): Promise<TenantInfo | undefined> {
 	console.log("> chooseTenant");
@@ -191,7 +191,10 @@ export async function openPreview(uri: vscode.Uri | string, language = "json", p
 		vscode.window.showWarningMessage(`Could not open ${uri.fsPath} because its size exceed 50MB.`)
 	} else {
 		let document = await vscode.workspace.openTextDocument(uri);
-		document = await vscode.languages.setTextDocumentLanguage(document, language);
+
+		const supportedLanguages = await vscode.languages.getLanguages();
+		const languageId = supportedLanguages.includes(language) ? language : 'plaintext';
+		document = await vscode.languages.setTextDocumentLanguage(document, languageId);
 		vscode.window.showTextDocument(document, { preview: preview, preserveFocus: true });
 	}
 }

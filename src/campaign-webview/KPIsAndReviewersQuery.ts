@@ -1,5 +1,5 @@
-import { IdentityCertDecisionSummary } from "sailpoint-api-client";
-import { ISCClient } from "../services/ISCClient";
+import { IdentityCertDecisionSummary } from "sailpoint-api-client/dist/certification_summaries/api.js";
+import { ISCClient } from "../services/ISCClient.js";
 
 export class KPIsAndReviewersQuery {
 
@@ -34,7 +34,7 @@ export class KPIsAndReviewersQuery {
 
         const summaryCertificationDecisions = await Promise.all(
             allreviews.map(async (cert): Promise<IdentityCertDecisionSummary> => {
-                return await this.client.getSummaryCertificationDecisions(cert.id)
+                return await this.client.getSummaryCertificationDecisions(cert.id!)
             })
         )
 

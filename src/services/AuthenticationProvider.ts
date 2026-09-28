@@ -3,19 +3,19 @@ import {
     env,
     window,
 } from 'vscode';
-import { AuthenticationMethod, TenantCredentials, TenantToken } from '../models/TenantInfo';
-import { parseJwt } from '../utils';
-import { isEmpty } from '../utils/stringUtils';
-import { EndpointUtils } from '../utils/EndpointUtils';
-import { TenantService } from './TenantService';
-import { OAuth2Client } from './OAuth2Client';
+import { AuthenticationMethod, TenantCredentials, TenantToken } from '../models/TenantInfo.js';
+import { parseJwt } from '../utils.js';
+import { isEmpty } from '../utils/stringUtils.js';
+import { EndpointUtils } from '../utils/EndpointUtils.js';
+import { TenantService } from './TenantService.js';
+import { OAuth2Client } from './OAuth2Client.js';
 import {
     completeOAuthCodeLogin,
     parsePasteCode,
     refreshOAuthCodeToken,
     startOAuthCodeLogin,
     tenantTokenFromOAuthResponse,
-} from './OAuthCodeClient';
+} from './OAuthCodeClient.js';
 
 class SailPointISCPatSession {
     /**

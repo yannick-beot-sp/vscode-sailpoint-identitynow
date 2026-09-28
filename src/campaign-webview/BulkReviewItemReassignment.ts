@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 
-import { AccessReviewItem, GetActiveCampaigns200ResponseInnerV2025StatusV2025, CertificationsV2025ApiReassignIdentityCertificationsRequest, CertificationsV2025ApiSubmitReassignCertsAsyncRequest, IdentityCertificationDtoV2025, ReassignReferenceV2025, ReassignReferenceV2025TypeV2025, AccessReviewItemV2025 } from "sailpoint-api-client";
-import { ISCClient } from "../services/ISCClient";
+import { ISCClient } from "../services/ISCClient.js";
+import { IdentityCertificationDto, ReassignReference, AccessReviewItem, ReassignReferenceTypeEnum, CertificationsApiReassignIdentityCertificationsV1Request, CertificationsApiSubmitReassignCertsAsyncV1Request } from 'sailpoint-api-client/dist/certifications/api.js';
+import { GetCampaignV1200ResponseStatusEnum } from 'sailpoint-api-client/dist/certification_campaigns/api.js';
 
 const ASYNC_REVIEW_ITEM_REASSIGN_LIMIT = 500
 const SYNC_REVIEW_ITEM_REASSIGN_LIMIT = 50
@@ -15,10 +16,10 @@ interface ReassignmentReport {
     errorMessages: string[]
 }
 
-export async function getPendingCampaignItems(client: ISCClient, campaignId: string): Promise<IdentityCertificationDtoV2025[] | undefined> {
+export async function getPendingCampaignItems(client: ISCClient, campaignId: string): Promise<IdentityCertificationDto[] | undefined> {
     // Ensure the campaign is not completed
     const campaign = await client.getCampaign(campaignId);
-    if (campaign.status === GetActiveCampaigns200ResponseInnerV2025StatusV2025.Completed) {
+    if (campaign.status === GetCampaignV1200ResponseStatusEnum.Completed) {
         console.warn(`< BulkReviewItemReassignment.execute: Campaign ${campaignId} is completed. Exiting script.`);
         return;
     }
@@ -44,12 +45,12 @@ function getCertReassignGroupObjectId(reassignGroupKey: string): string {
     return reassignGroupKey.split(REASSIGN_GROUPING_KEY_DELIMITER)[1]
 }
 
-function updateReassignmentMap(map: Map<string, ReassignReferenceV2025[]>, key: string, pendingReviewItem: AccessReviewItemV2025): Map<string, ReassignReferenceV2025[]> {
+function updateReassignmentMap(map: Map<string, ReassignReference[]>, key: string, pendingReviewItem: AccessReviewItem): Map<string, ReassignReference[]> {
     let reviewItems = map.get(key)
     if (!reviewItems) {
         reviewItems = []
     }
-    reviewItems.push({ id: pendingReviewItem.id, type: ReassignReferenceV2025TypeV2025.Item })
+    reviewItems.push({ id: pendingReviewItem.id!, type: ReassignReferenceTypeEnum.Item })
     map.set(key, reviewItems)
     return map
 }
@@ -103,13 +104,13 @@ export class BulkReviewItemReassignment {
 
                 if (token.isCancellationRequested) { return }
                 // Build campaign reassignments map (based on the access item owner)
-                let campaignReassignmentsByIdentity = new Map<string, ReassignReferenceV2025[]>()
-                let campaignReassignmentsByAccess = new Map<string, ReassignReferenceV2025[]>()
+                let campaignReassignmentsByIdentity = new Map<string, ReassignReference[]>()
+                let campaignReassignmentsByAccess = new Map<string, ReassignReference[]>()
                 let pendingReassignmentCount = 0 // count the number of reassignment to do
                 progress.report({
                     message: `Analysing review items in pending certification ${processedCertifications}/${totalCertifications} against reassignment logic ...`
                 });
-                const pendingReviewItems = await this.client.getCertificationReviewItems(pendingCertification.id, false)
+                const pendingReviewItems = await this.client.getCertificationReviewItems(pendingCertification.id!, false)
 
                 for (const pendingReviewItem of pendingReviewItems) {
 
@@ -146,10 +147,10 @@ export class BulkReviewItemReassignment {
                 // Process reassignments for this Certification
                 if (campaignReassignments.size > 0) {
                     try {
-                        await bulkReviewItemReassigner.reassignAccessReviewItems(pendingCertification.id, campaignReassignments, reassignmentComment, processedCertifications, totalCertifications, progress, token)
+                        await bulkReviewItemReassigner.reassignAccessReviewItems(pendingCertification.id!, campaignReassignments, reassignmentComment, processedCertifications, totalCertifications, progress, token)
                         reassignmentReport.success += pendingReassignmentCount
                     } catch (error) {
-                        const errorMessage = (error instanceof Error) ? error.message : error.toString();
+                        const errorMessage = error instanceof Error ? error.message : String(error);
                         console.error(errorMessage);
                         reassignmentReport.error += pendingReassignmentCount
                         reassignmentReport.errorMessages.push(errorMessage)
@@ -160,23 +161,23 @@ export class BulkReviewItemReassignment {
             return reassignmentReport
         }).then(report => {
             let messages: string[] = []
-            if (report.success > 0) {
+            if (report && report.success > 0) {
                 messages.push(`${report.success} access review(s) reassigned.`)
             }
 
-            if (report.skip > 0) {
+            if (report && report.skip > 0) {
                 messages.push(`${report.skip} reassignment(s) skipped.`)
             }
 
-            if (report.selfassignment > 0) {
+            if (report && report.selfassignment > 0) {
                 messages.push(`${report.selfassignment} review(s) could not be self-assigned.`)
             }
 
-            if (report.error > 0) {
+            if (report && report.error > 0) {
                 messages.push(`${report.error} access reviews failed:` + report.errorMessages.join(", "))
                 messages.unshift(`Reassignment for campaign ${campaignName} ended with error.`)
                 vscode.window.showErrorMessage(messages.join(" "))
-            } else if (report.skip > 0 || report.selfassignment > 0) {
+            } else if (report && (report.skip > 0 || report.selfassignment > 0)) {
                 messages.unshift(`Reassignment for campaign ${campaignName} ended with unchanged items.`)
                 vscode.window.showWarningMessage(messages.join(" "))
             } else {
@@ -186,7 +187,7 @@ export class BulkReviewItemReassignment {
         })
     }
 
-    async reassignAccessReviewItems(certificationId: string, campaignReassignments: Map<string, ReassignReferenceV2025[]>, comment: string, processedCertifications: number, totalCertifications: number, progress: vscode.Progress<{ message?: string; increment?: number; }>, token: vscode.CancellationToken): Promise<number> {
+    async reassignAccessReviewItems(certificationId: string, campaignReassignments: Map<string, ReassignReference[]>, comment: string, processedCertifications: number, totalCertifications: number, progress: vscode.Progress<{ message?: string; increment?: number; }>, token: vscode.CancellationToken): Promise<number> {
 
         const totalReviewers = campaignReassignments.size
         let reassignmentCount = 0
@@ -194,7 +195,7 @@ export class BulkReviewItemReassignment {
         // Process campaign reassignments
         // Using a for-loop instead of forEach + async code to prevent hammering API resulting in 429
         for (const [reviewerKey, allReassignReferences] of campaignReassignments.entries()) {
-            if (token.isCancellationRequested) { return }
+            if (token.isCancellationRequested) { return reassignmentCount }
             await this.processReviewItemReassignments(certificationId, getCertReassignGroupReviewerId(reviewerKey), allReassignReferences, comment, processedCertifications, totalCertifications, processedReviewers, totalReviewers, progress, token)
             reassignmentCount += allReassignReferences.length
             processedReviewers++
@@ -202,7 +203,7 @@ export class BulkReviewItemReassignment {
         return reassignmentCount;
     }
 
-    public async processReviewItemReassignments(certificationId: string, reviewerId: string, allReassignReferences: ReassignReferenceV2025[], reassignReason: string, processedCertifications: number, totalCertifications: number, processedReviewers: number, totalReviewers: number, progress: vscode.Progress<{ message?: string; increment?: number; }>, token: vscode.CancellationToken, sync?: boolean) {
+    public async processReviewItemReassignments(certificationId: string, reviewerId: string, allReassignReferences: ReassignReference[], reassignReason: string, processedCertifications: number, totalCertifications: number, processedReviewers: number, totalReviewers: number, progress: vscode.Progress<{ message?: string; increment?: number; }>, token: vscode.CancellationToken, sync?: boolean) {
         if (sync) {
             await this.processReviewItemReassignmentsSync(certificationId, reviewerId, allReassignReferences, reassignReason, processedCertifications, totalCertifications, processedReviewers, totalReviewers, progress, token)
         } else {
@@ -210,7 +211,7 @@ export class BulkReviewItemReassignment {
         }
     }
 
-    public async processReviewItemReassignmentsSync(certificationId: string, reviewerId: string, allReassignReferences: ReassignReferenceV2025[], reassignReason: string, processedCertifications: number, totalCertifications: number, processedReviewers: number, totalReviewers: number, progress: vscode.Progress<{ message?: string; increment?: number; }>, token: vscode.CancellationToken) {
+    public async processReviewItemReassignmentsSync(certificationId: string, reviewerId: string, allReassignReferences: ReassignReference[], reassignReason: string, processedCertifications: number, totalCertifications: number, processedReviewers: number, totalReviewers: number, progress: vscode.Progress<{ message?: string; increment?: number; }>, token: vscode.CancellationToken) {
 
         const totalBatches = Math.ceil(allReassignReferences.length / SYNC_REVIEW_ITEM_REASSIGN_LIMIT);
         let processedBatches = 1
@@ -223,9 +224,9 @@ export class BulkReviewItemReassignment {
             });
             // Split the reassign references to not exceed the API limit
             const reassignReferences = allReassignReferences.splice(0, SYNC_REVIEW_ITEM_REASSIGN_LIMIT);
-            const certificationReassignRequest: CertificationsV2025ApiReassignIdentityCertificationsRequest = {
+            const certificationReassignRequest: CertificationsApiReassignIdentityCertificationsV1Request = {
                 id: certificationId,
-                reviewReassignV2025: {
+                reviewReassign: {
                     reassign: reassignReferences,
                     reassignTo: reviewerId,
                     reason: reassignReason
@@ -236,7 +237,7 @@ export class BulkReviewItemReassignment {
         }
     }
 
-    public async processReviewItemReassignmentsAsync(certificationId: string, reviewerId: string, allReassignReferences: ReassignReferenceV2025[], reassignReason: string, processedCertifications: number, totalCertifications: number, processedReviewers: number, totalReviewers: number, progress: vscode.Progress<{ message?: string; increment?: number; }>, token: vscode.CancellationToken) {
+    public async processReviewItemReassignmentsAsync(certificationId: string, reviewerId: string, allReassignReferences: ReassignReference[], reassignReason: string, processedCertifications: number, totalCertifications: number, processedReviewers: number, totalReviewers: number, progress: vscode.Progress<{ message?: string; increment?: number; }>, token: vscode.CancellationToken) {
 
         const totalBatches = Math.ceil(allReassignReferences.length / ASYNC_REVIEW_ITEM_REASSIGN_LIMIT);
         let processedBatches = 1
@@ -249,9 +250,9 @@ export class BulkReviewItemReassignment {
             });
             // Split the reassign references to not exceed the API limit
             const reassignReferences = allReassignReferences.splice(0, ASYNC_REVIEW_ITEM_REASSIGN_LIMIT);
-            const certificationReassignRequest: CertificationsV2025ApiSubmitReassignCertsAsyncRequest = {
+            const certificationReassignRequest: CertificationsApiSubmitReassignCertsAsyncV1Request = {
                 id: certificationId,
-                reviewReassignV2025: {
+                reviewReassign: {
                     reassign: reassignReferences,
                     reassignTo: reviewerId,
                     reason: reassignReason

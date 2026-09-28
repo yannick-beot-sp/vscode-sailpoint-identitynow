@@ -19,8 +19,8 @@
 
 import * as assert from "assert";
 
-import { McpFixture, setupMcpFixture, teardownMcpFixture, TENANT_NAME, TEST_PORT } from "../mcpTestFixture";
-import { isEmpty } from "../../../utils/stringUtils";
+import { McpFixture, setupMcpFixture, teardownMcpFixture, TENANT_NAME, TEST_PORT } from "../mcpTestFixture.js";
+import { isEmpty } from "../../../utils/stringUtils.js";
 
 // ---------------------------------------------------------------------------
 // Test suite

@@ -1,11 +1,11 @@
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { IdentityProfile } from "sailpoint-api-client";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
-import { resolveIdentity } from "../../utils/identityUtils";
-import { resolveSource } from "../../utils/sourceUtils";
+import { IdentityProfile } from "sailpoint-api-client/dist/identity_profiles/api.js";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { tenantNameField } from "../../inputFields.js";
+import { resolveIdentity } from "../../utils/identityUtils.js";
+import { resolveSource } from "../../utils/sourceUtils.js";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -43,7 +43,7 @@ type Output = z.infer<typeof outputSchema>;
         "Specify the profile name, authoritative source (name or ID), and owner (identity alias or display name). " +
         "Optionally provide a description and priority. " +
         "Use listSources to find authoritative sources.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Create Identity Profile",

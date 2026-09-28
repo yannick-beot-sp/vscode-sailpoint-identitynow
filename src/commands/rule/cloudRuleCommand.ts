@@ -1,10 +1,10 @@
 import * as fs from 'fs';
 import * as vscode from 'vscode';
-import { CloudRuleTreeItem } from '../../models/ISCTreeItem';
-import { CloudRuleService } from '../../services/CloudRuleService';
-import { PathProposer } from '../../services/PathProposer';
-import { ensureFolderExists } from '../../utils/fileutils';
-import { askFile, openPreview } from '../../utils/vsCodeHelpers';
+import { CloudRuleTreeItem } from '../../models/ISCTreeItem.js';
+import { CloudRuleService } from '../../services/CloudRuleService.js';
+import { PathProposer } from '../../services/PathProposer.js';
+import { ensureFolderExists } from '../../utils/fileutils.js';
+import { askFile, openPreview } from '../../utils/vsCodeHelpers.js';
 
 export class CloudRuleCommand {
 

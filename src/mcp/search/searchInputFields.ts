@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { refSchema, tenantNameField } from "../inputFields";
+import { refSchema, tenantNameField } from "../inputFields.js";
 
 export const DEFAULT_SEARCH_LIMIT = 250;
 
@@ -47,5 +47,5 @@ export const baseDocumentSchema = z.object({
     enabled: z.boolean().optional(),
     requestable: z.boolean().optional(),
     owner: refSchema.optional(),
-    tags: z.array(z.string()).optional(),
+    tags: z.array(z.string()).optional().nullable(),
 });

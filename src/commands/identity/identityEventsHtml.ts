@@ -1,5 +1,5 @@
-import { EventDocumentV2025 } from "sailpoint-api-client";
-import { jsonDrawerCss, jsonDrawerMarkup, jsonDrawerScript } from "./jsonDrawerSnippet";
+import { EventDocument } from "../../models/SearchDocument.js";
+import { jsonDrawerCss, jsonDrawerMarkup, jsonDrawerScript } from "./jsonDrawerSnippet.js";
 
 function escapeHtml(value: string): string {
     return value
@@ -29,7 +29,7 @@ export interface EventTableRow {
     created: string;
 }
 
-export function buildEventTableRows(events: EventDocumentV2025[]): EventTableRow[] {
+export function buildEventTableRows(events: EventDocument[]): EventTableRow[] {
     return events.map((event, index) => ({
         index,
         name: event.name ?? "",
@@ -43,7 +43,7 @@ export function buildEventTableRows(events: EventDocumentV2025[]): EventTableRow
 
 export function buildEventsTableHtml(
     identityName: string,
-    events: EventDocumentV2025[],
+    events: EventDocument[],
     total?: number
 ): string {
     const nonce = getNonce();

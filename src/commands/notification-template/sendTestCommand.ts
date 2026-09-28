@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
-import { SendTestNotificationRequestDtoBetaMediumBeta, TemplateDtoBetaMediumBeta } from 'sailpoint-api-client';
-import { NotificationTemplateTreeItem } from '../../models/ISCTreeItem';
-import { ISCClient } from '../../services/ISCClient';
-import { TenantService } from '../../services/TenantService';
-import { getIdByUri } from '../../utils/UriUtils';
-import { emailValidator } from '../../validator/emailValidator';
-import { validateTenantReadonly } from '../validateTenantReadonly';
+import { SendTestNotificationRequestDtoMediumEnum as SendTestNotificationRequestDtoMedium, TemplateDtoMediumEnum as TemplateDtoMedium } from 'sailpoint-api-client/dist/notifications/api.js';
+import { NotificationTemplateTreeItem } from '../../models/ISCTreeItem.js';
+import { ISCClient } from '../../services/ISCClient.js';
+import { TenantService } from '../../services/TenantService.js';
+import { getIdByUri } from '../../utils/UriUtils.js';
+import { emailValidator } from '../../validator/emailValidator.js';
+import { validateTenantReadonly } from '../validateTenantReadonly.js';
 
 const TEMPLATE_PATH = /\/notification-template(?:s|-body)\//;
 
@@ -17,7 +17,7 @@ interface TemplateTarget {
 
 /**
  * Sends a test e-mail for a notification template through
- * `NotificationsBetaApi.sendTestNotification` (`POST /beta/send-test-notification`).
+ * `NotificationsApi.sendTestNotification` (`POST /beta/send-test-notification`).
  * The tenant renders the stored template (key, medium, locale) and delivers it
  * to the address entered here.
  */
@@ -38,7 +38,7 @@ export class SendNotificationTemplateTestCommand {
 
         const client = new ISCClient(target.tenantId, target.tenantName);
         const template = await client.getNotificationTemplateById(target.templateId);
-        if (template.medium !== TemplateDtoBetaMediumBeta.Email) {
+        if (template.medium !== TemplateDtoMedium.Email) {
             vscode.window.showErrorMessage("Send test is available for e-mail templates only.");
             return;
         }
@@ -79,7 +79,7 @@ export class SendNotificationTemplateTestCommand {
                 cancellable: false,
             }, () => client.sendTestNotification({
                 key: template.key,
-                medium: SendTestNotificationRequestDtoBetaMediumBeta.Email,
+                medium: SendTestNotificationRequestDtoMedium.Email,
                 locale: template.locale,
                 recipientEmailList: [recipient.trim()],
             }));

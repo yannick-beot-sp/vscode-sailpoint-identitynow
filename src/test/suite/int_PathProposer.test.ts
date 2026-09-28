@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { it, describe } from 'mocha';
-import { PathProposer } from '../../services/PathProposer';
+import { PathProposer } from '../../services/PathProposer.js';
 import * as os from 'os';
 /**
  * PathProposer requires VSCode module

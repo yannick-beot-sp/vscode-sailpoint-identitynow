@@ -1,8 +1,8 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { bypassTenantResolver, getTenantService } from "../../plugins/TenantResolverPlugin";
-import { EndpointUtils } from "../../../utils/EndpointUtils";
+import { bypassTenantResolver, getTenantService } from "../../plugins/TenantResolverPlugin.js";
+import { EndpointUtils } from "../../../utils/EndpointUtils.js";
 
 bypassTenantResolver("listTenants");
 
@@ -24,7 +24,7 @@ type Output = z.infer<typeof outputSchema>;
 @Tool({
     name: "listTenants",
     description: "List all configured tenants with their display name, domain name, and base API URL.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "List Tenants",

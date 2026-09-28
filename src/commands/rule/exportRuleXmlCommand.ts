@@ -1,16 +1,16 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { CloudRuleTreeItem } from '../../models/ISCTreeItem';
-import { CloudRuleService } from '../../services/CloudRuleService';
-import { PathProposer } from '../../services/PathProposer';
-import { ensureFolderExists } from '../../utils/fileutils';
+import { CloudRuleTreeItem } from '../../models/ISCTreeItem.js';
+import { CloudRuleService } from '../../services/CloudRuleService.js';
+import { PathProposer } from '../../services/PathProposer.js';
+import { ensureFolderExists } from '../../utils/fileutils.js';
 import {
     CLOUD_RULE_XML_TYPES,
     DEFAULT_RULE_XML_DESCRIPTION,
     buildRuleXml,
-} from '../../utils/ruleXml';
-import { askFile, openPreview } from '../../utils/vsCodeHelpers';
+} from '../../utils/ruleXml.js';
+import { askFile, openPreview } from '../../utils/vsCodeHelpers.js';
 
 export class ExportRuleXmlCommand {
 

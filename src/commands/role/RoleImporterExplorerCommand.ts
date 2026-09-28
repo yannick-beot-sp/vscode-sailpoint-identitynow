@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { TenantService } from '../../services/TenantService';
-import { askCreateOrUpdate, chooseTenant } from '../../utils/vsCodeHelpers';
-import { RoleImporter } from './RoleImporter';
-import { validateTenantReadonly } from '../validateTenantReadonly';
+import { TenantService } from '../../services/TenantService.js';
+import { askCreateOrUpdate, chooseTenant } from '../../utils/vsCodeHelpers.js';
+import { RoleImporter } from './RoleImporter.js';
+import { validateTenantReadonly } from '../validateTenantReadonly.js';
 
 
 export class RoleImporterExplorerCommand {

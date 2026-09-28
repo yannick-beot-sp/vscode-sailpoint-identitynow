@@ -1,8 +1,8 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { tenantNameField } from "../../inputFields";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { tenantNameField } from "../../inputFields.js";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -28,7 +28,7 @@ type Output = z.infer<typeof outputSchema>;
 @Tool({
     name: "listTransforms",
     description: "List all transforms for a given tenant.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title:        "List Transforms",

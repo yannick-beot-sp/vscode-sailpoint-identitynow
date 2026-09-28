@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { App } from "@frontmcp/sdk";
-import { SearchAuditEventsTool } from "./tools/SearchAuditEventsTool";
-import { SearchAccountActivitiesTool } from "./tools/SearchAccountActivitiesTool";
+import { SearchAuditEventsTool } from "./tools/SearchAuditEventsTool.js";
+import { SearchAccountActivitiesTool } from "./tools/SearchAccountActivitiesTool.js";
 
 /**
  * FrontMCP application grouping all Search API tools (audit events, account activities).

@@ -1,8 +1,8 @@
 import "reflect-metadata";
 import { App } from "@frontmcp/sdk";
-import { SearchRolesTool } from "./tools/SearchRolesTool";
-import { CreateRoleTool } from "./tools/CreateRoleTool";
-import { UpdateRoleTool } from "./tools/UpdateRoleTool";
+import { SearchRolesTool } from "./tools/SearchRolesTool.js";
+import { CreateRoleTool } from "./tools/CreateRoleTool.js";
+import { UpdateRoleTool } from "./tools/UpdateRoleTool.js";
 
 @App({
     id: "roles",

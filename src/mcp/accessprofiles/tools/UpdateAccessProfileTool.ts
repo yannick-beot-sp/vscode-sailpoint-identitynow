@@ -1,12 +1,12 @@
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { EntitlementRefV2025 } from "sailpoint-api-client";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
-import { isUuid } from "../../../utils/stringUtils";
-import { resolveIdentity } from "../../utils/identityUtils";
-import { accessProfileOutputSchema } from "./accessProfileSchemas";
+import { EntitlementRef } from "sailpoint-api-client/dist/roles/api.js";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { tenantNameField } from "../../inputFields.js";
+import { isUuid } from "../../../utils/stringUtils.js";
+import { resolveIdentity } from "../../utils/identityUtils.js";
+import { accessProfileOutputSchema } from "./accessProfileSchemas.js";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -31,7 +31,7 @@ type Output = z.infer<typeof outputSchema>;
         "Update an existing access profile in SailPoint ISC using JSON Patch. " +
         "Identify it by id or name, then specify only the fields to change. " +
         "Use searchAccessProfiles to find the id or name before calling this tool.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Update Access Profile",
@@ -68,7 +68,7 @@ export class UpdateAccessProfileTool extends ToolContext {
                 patches.push({ op: "replace", path: "/owner", value: { id: ownerId, type: "IDENTITY" } });
             }
             if (input.entitlements !== undefined) {
-                const entitlementRefs: EntitlementRefV2025[] = input.entitlements.map(id => ({
+                const entitlementRefs: EntitlementRef[] = input.entitlements.map(id => ({
                     id,
                     type: "ENTITLEMENT",
                 }));

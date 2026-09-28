@@ -1,18 +1,18 @@
 import * as vscode from 'vscode';
-import { BaseCSVExporter } from "../BaseExporter";
-import { AccessProfilesTreeItem } from '../../models/ISCTreeItem';
-import { askFile } from '../../utils/vsCodeHelpers';
-import { PathProposer } from '../../services/PathProposer';
-import { AccessProfileSourceRef, AccessProfilesApiListAccessProfilesRequest, Requestability, AccessProfileV2025 } from 'sailpoint-api-client';
-import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator';
-import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
-import { WorkflowIdToNameCacheService } from '../../services/cache/WorkflowIdToNameCacheService';
-import { approvalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
-import { metadataToString } from '../../utils/metadataUtils';
-import { EntitlementIdToAttributeNameCacheService } from '../../services/cache/EntitlementIdToSourceNameCacheService';
-import { entitlementToStringConverter } from '../../utils/entitlementUtils';
-import { getAdditionalOwners } from '../../utils/additionalOwners';
-import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
+import { BaseCSVExporter } from "../BaseExporter.js";
+import { AccessProfilesTreeItem } from '../../models/ISCTreeItem.js';
+import { askFile } from '../../utils/vsCodeHelpers.js';
+import { PathProposer } from '../../services/PathProposer.js';
+import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator.js';
+import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService.js';
+import { WorkflowIdToNameCacheService } from '../../services/cache/WorkflowIdToNameCacheService.js';
+import { approvalSchemeToStringConverter } from '../../utils/approvalSchemeConverter.js';
+import { metadataToString } from '../../utils/metadataUtils.js';
+import { EntitlementIdToAttributeNameCacheService } from '../../services/cache/EntitlementIdToSourceNameCacheService.js';
+import { entitlementToStringConverter } from '../../utils/entitlementUtils.js';
+import { getAdditionalOwners } from '../../utils/additionalOwners.js';
+import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService.js';
+import { AccessProfile, AccessProfilesApiListAccessProfilesV1Request, AccessProfileSourceRef, Requestability } from 'sailpoint-api-client/dist/access_profiles/api.js';
 
 export class AccessProfileExporterCommand {
     /**
@@ -126,7 +126,7 @@ interface AccessProfileDto {
 }
 
 
-class AccessProfileExporter extends BaseCSVExporter<AccessProfileV2025> {
+class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
     constructor(
         tenantId: string,
         tenantName: string,
@@ -191,12 +191,12 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfileV2025> {
         const identityCacheIdToName = new IdentityIdToNameCacheService(this.client);
         const entitlementIdToSourceNameCacheService = new EntitlementIdToAttributeNameCacheService(this.client);
 
-        const iterator = new GenericAsyncIterableIterator<AccessProfileV2025, AccessProfilesApiListAccessProfilesRequest>(
+        const iterator = new GenericAsyncIterableIterator<AccessProfile, AccessProfilesApiListAccessProfilesV1Request>(
             this.client,
             this.client.getAccessProfiles);
 
         await this.writeData(headers, paths, unwindablePaths, iterator, task, token,
-            async (item: AccessProfileV2025): Promise<AccessProfileDto> => {
+            async (item: AccessProfile): Promise<AccessProfileDto> => {
                 let owner: string | null = null
                 try {
                     owner = item.owner ? (await identityCacheIdToName.get(item.owner?.id!)) : null

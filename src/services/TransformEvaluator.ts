@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
-import { isEmpty } from '../utils/stringUtils';
-import { OpenResourceCommand } from "../commands/openResource";
-import { ATTRIBUTES } from '../models/TransformAttributes';
-import { COUNTRYCODES } from '../models/CountryCodes';
-import { ISCClient } from './ISCClient';
-import { VALID_OPERATORS } from '../constants';
-import { TenantService } from './TenantService';
-import { normalizeNames } from './transforms';
+import { isEmpty } from '../utils/stringUtils.js';
+import { OpenResourceCommand } from "../commands/openResource.js";
+import { ATTRIBUTES } from '../models/TransformAttributes.js';
+import { COUNTRYCODES } from '../models/CountryCodes.js';
+import { ISCClient } from './ISCClient.js';
+import { VALID_OPERATORS } from '../constants.js';
+import { TenantService } from './TenantService.js';
+import { normalizeNames } from './transforms.js';
 
 export class TransformEvaluator {
     private input: any;

@@ -1,12 +1,12 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
-import { resolveIdentity } from "../../utils/identityUtils";
-import { getFormOwner } from "../formUtils";
-import { descriptionField, formConditionSchema, formDefinitionInputSchema, formDetailOutputSchema, formElementSchema } from "./formSchemas";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { tenantNameField } from "../../inputFields.js";
+import { resolveIdentity } from "../../utils/identityUtils.js";
+import { getFormOwner } from "../formUtils.js";
+import { descriptionField, formConditionSchema, formDefinitionInputSchema, formDetailOutputSchema, formElementSchema } from "./formSchemas.js";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -29,7 +29,7 @@ type Output = z.infer<typeof outputSchema>;
         "Create a new form definition in SailPoint ISC. " +
         "Specify the form name, owner (identity alias or ID), and optionally a description, formInput, formElements, and formConditions. " +
         "Use searchIdentities to find the owner before calling this tool.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Create Form",

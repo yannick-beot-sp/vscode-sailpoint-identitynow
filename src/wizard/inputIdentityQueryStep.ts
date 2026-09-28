@@ -1,6 +1,6 @@
-import { requiredValidator } from "../validator/requiredValidator";
-import { InputPromptStep } from "./inputPromptStep";
-import { WizardContext } from "./wizardContext";
+import { requiredValidator } from "../validator/requiredValidator.js";
+import { InputPromptStep } from "./inputPromptStep.js";
+import { WizardContext } from "./wizardContext.js";
 
 export class InputIdentityQueryStep extends InputPromptStep<WizardContext> {
     constructor(name = "ownerQuery", displayName = "owner",) {

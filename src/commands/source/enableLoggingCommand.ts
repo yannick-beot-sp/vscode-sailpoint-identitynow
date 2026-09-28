@@ -1,16 +1,16 @@
 import * as vscode from 'vscode';
 
-import { ServiceDeskTreeItem, SourceTreeItem } from '../../models/ISCTreeItem';
-import { ISCClient } from '../../services/ISCClient';
-import { TenantService } from '../../services/TenantService';
-import { WizardContext } from '../../wizard/wizardContext';
-import { runWizard } from '../../wizard/wizard';
-import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep';
-import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep';
-import { QuickPickPromptStep } from '../../wizard/quickPickPromptStep';
-import { LOG_LEVELS, LOGGING_CLASSES } from '../../models/Logging';
-import { InputPromptStep } from '../../wizard/inputPromptStep';
-import { Validator } from '../../validator/validator';
+import { ServiceDeskTreeItem, SourceTreeItem } from '../../models/ISCTreeItem.js';
+import { ISCClient } from '../../services/ISCClient.js';
+import { TenantService } from '../../services/TenantService.js';
+import { WizardContext } from '../../wizard/wizardContext.js';
+import { runWizard } from '../../wizard/wizard.js';
+import { QuickPickTenantStep } from '../../wizard/quickPickTenantStep.js';
+import { QuickPickSourceStep } from '../../wizard/quickPickSourceStep.js';
+import { QuickPickPromptStep } from '../../wizard/quickPickPromptStep.js';
+import { LOG_LEVELS, LOGGING_CLASSES } from '../../models/Logging.js';
+import { InputPromptStep } from '../../wizard/inputPromptStep.js';
+import { Validator } from '../../validator/validator.js';
 
 const durationValidator = new Validator({
     required: true,

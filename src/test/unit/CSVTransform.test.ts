@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { it, describe } from 'mocha';
-import { transformNewlines } from '../../utils/CSVTransform';
+import { transformNewlines } from '../../utils/CSVTransform.js';
 
 
 function runTests(tests: Array<{ input: any, expected: any, it: string }>) {

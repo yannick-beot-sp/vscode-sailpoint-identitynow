@@ -1,4 +1,4 @@
-import { AccessRequestPhases, RequestedItemStatus } from "sailpoint-api-client";
+import { AccessRequestPhases, RequestedItemStatus } from "sailpoint-api-client/dist/access_requests/api.js";
 
 export interface AccessRequestStatusHistoryEntry {
 	status: RequestedItemStatus;

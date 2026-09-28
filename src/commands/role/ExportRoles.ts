@@ -1,22 +1,22 @@
 import * as vscode from 'vscode';
-import { BaseCSVExporter } from "../BaseExporter";
-import { RolesTreeItem } from '../../models/ISCTreeItem';
-import { askFile } from '../../utils/vsCodeHelpers';
-import { PathProposer } from '../../services/PathProposer';
-import { RequestabilityForRole, RevocabilityForRole, RoleMembershipSelectorType, RolesApiListRolesRequest, RoleV2025 } from 'sailpoint-api-client';
-import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService';
-import { WorkflowIdToNameCacheService } from '../../services/cache/WorkflowIdToNameCacheService';
-import { CSV_MULTIVALUE_SEPARATOR } from '../../constants';
-import { approvalSchemeToStringConverter } from '../../utils/approvalSchemeConverter';
-import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService';
-import { roleMembershipSelectorToStringConverter } from '../../parser/roleMembershipSelectorToStringConverter';
-import { SourceIdToNameCacheService } from '../../services/cache/SourceIdToNameCacheService';
-import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator';
-import { EntitlementIdToSourceNameCacheService } from '../../services/cache/EntitlementIdToSourceNameCacheService';
-import { metadataToString } from '../../utils/metadataUtils';
-import { dimensionSchemaToString } from '../../utils/dimensionUtils';
-import { entitlementToStringConverter } from '../../utils/entitlementUtils';
-import { getAdditionalOwners } from '../../utils/additionalOwners';
+import { BaseCSVExporter } from "../BaseExporter.js";
+import { RolesTreeItem } from '../../models/ISCTreeItem.js';
+import { askFile } from '../../utils/vsCodeHelpers.js';
+import { PathProposer } from '../../services/PathProposer.js';
+import { RequestabilityForRole, RevocabilityForRole, RoleMembershipSelectorType, RolesApiListRolesV1Request, Role } from 'sailpoint-api-client/dist/roles/api.js';
+import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService.js';
+import { WorkflowIdToNameCacheService } from '../../services/cache/WorkflowIdToNameCacheService.js';
+import { CSV_MULTIVALUE_SEPARATOR } from '../../constants.js';
+import { approvalSchemeToStringConverter } from '../../utils/approvalSchemeConverter.js';
+import { IdentityIdToNameCacheService } from '../../services/cache/IdentityIdToNameCacheService.js';
+import { roleMembershipSelectorToStringConverter } from '../../parser/roleMembershipSelectorToStringConverter.js';
+import { SourceIdToNameCacheService } from '../../services/cache/SourceIdToNameCacheService.js';
+import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator.js';
+import { EntitlementIdToSourceNameCacheService } from '../../services/cache/EntitlementIdToSourceNameCacheService.js';
+import { metadataToString } from '../../utils/metadataUtils.js';
+import { dimensionSchemaToString } from '../../utils/dimensionUtils.js';
+import { entitlementToStringConverter } from '../../utils/entitlementUtils.js';
+import { getAdditionalOwners } from '../../utils/additionalOwners.js';
 
 export class RoleExporterCommand {
 
@@ -136,7 +136,7 @@ export interface RoleDto {
 
 }
 
-class RoleExporter extends BaseCSVExporter<RoleV2025> {
+class RoleExporter extends BaseCSVExporter<Role> {
     constructor(
         tenantId: string,
         tenantName: string,
@@ -208,12 +208,12 @@ class RoleExporter extends BaseCSVExporter<RoleV2025> {
         const sourceIdToNameCacheService = new SourceIdToNameCacheService(this.client);
         const entitlementIdToSourceNameCacheService = new EntitlementIdToSourceNameCacheService(this.client);
 
-        const iterator = new GenericAsyncIterableIterator<RoleV2025, RolesApiListRolesRequest>(
+        const iterator = new GenericAsyncIterableIterator<Role, RolesApiListRolesV1Request>(
             this.client,
             this.client.getRoles);
 
         await this.writeData(headers, paths, unwindablePaths, iterator, task, token,
-            async (item: RoleV2025): Promise<RoleDto> => {
+            async (item: Role): Promise<RoleDto> => {
                 let membershipCriteria: string | undefined = undefined;
                 if (item.membership !== undefined && item.membership !== null
                     && RoleMembershipSelectorType.Standard === item.membership.type

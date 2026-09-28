@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { ISCResourceTreeItem } from "../models/ISCTreeItem";
+import { ISCResourceTreeItem } from "../models/ISCTreeItem.js";
 
 /**
  * Command used to open the URL

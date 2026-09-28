@@ -1,10 +1,10 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
-import { DEFAULT_SEARCH_LIMIT, paginationOutputFields, searchQueryField, offsetField, limitField, sortField } from "../searchInputFields";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { tenantNameField } from "../../inputFields.js";
+import { DEFAULT_SEARCH_LIMIT, paginationOutputFields, searchQueryField, offsetField, limitField, sortField } from "../searchInputFields.js";
 
 const DEFAULT_SORT = "-created";
 
@@ -50,7 +50,7 @@ type Output = z.infer<typeof outputSchema>;
         "Supports offset-based pagination: use offset + limit to step through large result sets. " +
         "Query syntax: https://documentation.sailpoint.com/saas/help/search/building-query.html. " +
         "Event types: https://documentation.sailpoint.com/saas/help/search/index.html#event-types.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Search Audit Events",
@@ -64,7 +64,7 @@ export class SearchAuditEventsTool extends ToolContext {
         const limit = input.limit ?? DEFAULT_SEARCH_LIMIT;
 
         try {
-            const result = await client.paginatedSearchEventsV2025({
+            const result = await client.paginatedSearchEvents({
                 query: input.query,
                 sort: input.sort ?? DEFAULT_SORT,
                 limit,

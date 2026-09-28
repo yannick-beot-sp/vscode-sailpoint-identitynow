@@ -1,10 +1,10 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { DEFAULT_SEARCH_LIMIT, paginationOutputFields, baseDocumentSchema, paginationInputFields } from "../../search/searchInputFields";
-import { refSchema } from "../../inputFields";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { DEFAULT_SEARCH_LIMIT, paginationOutputFields, baseDocumentSchema, paginationInputFields } from "../../search/searchInputFields.js";
+import { refSchema } from "../../inputFields.js";
 
 const DEFAULT_SORT = "name";
 
@@ -47,7 +47,7 @@ type Output = z.infer<typeof outputSchema>;
         "Supports offset-based pagination: use offset + limit to step through large result sets. " +
         "Query syntax: https://documentation.sailpoint.com/saas/help/search/building-query.html. " +
         "Searchable fields: https://documentation.sailpoint.com/saas/help/search/searchable-fields.html#access-profiles.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Search Access Profiles",
@@ -62,7 +62,7 @@ export class SearchAccessProfilesTool extends ToolContext {
         const sort = input.sort ?? DEFAULT_SORT;
 
         try {
-            const result = await client.paginatedSearchAccessProfilesV2025({
+            const result = await client.paginatedSearchAccessProfiles({
                 query: input.query,
                 sort,
                 limit,

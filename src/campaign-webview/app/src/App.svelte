@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-
   import ProgressIndicator from "./lib/ProgressIndicator.svelte";
   import SearchCampaignPieCharts from "./lib/SearchCampaignPieCharts.svelte";
   import SourceOwnerPieCharts from "./lib/SourceOwnerPieCharts.svelte";
@@ -87,9 +85,9 @@
     promiseStatus = client.getStatus(window.data.campaignId, force);
   }
 
-  onMount(async () => {
-    updateKPIsAndStatus(false);
-  });
+  // Start the requests before the first render. `{#await}` treats a missing promise as
+  // already resolved, so waiting for onMount made `data.totals` throw and blank the page.
+  updateKPIsAndStatus(false);
 
   let reviewerColumns: Column[] = $state([
     // {

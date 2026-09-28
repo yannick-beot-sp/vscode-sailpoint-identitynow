@@ -1,6 +1,6 @@
-import { ISCClient } from "../../services/ISCClient";
-import { isUuid } from "../../utils/stringUtils";
-import { ErrorCodes, McpError } from "../errors";
+import { ISCClient } from "../../services/ISCClient.js";
+import { isUuid } from "../../utils/stringUtils.js";
+import { ErrorCodes, McpError } from "../errors.js";
 
 /**
  * Resolves a source name or ID to its ISC source ID.

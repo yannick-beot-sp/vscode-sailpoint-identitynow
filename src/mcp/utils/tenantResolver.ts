@@ -1,4 +1,4 @@
-import { TenantInfo } from "../../models/TenantInfo";
+import { TenantInfo } from "../../models/TenantInfo.js";
 
 /**
  * Resolves a tenant using a best-match algorithm.

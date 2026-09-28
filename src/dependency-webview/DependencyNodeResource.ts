@@ -1,6 +1,6 @@
 import { Uri } from 'vscode';
-import { getResourceUriByKind, getResourceWebUrl } from '../utils/UriUtils';
-import type { DependencyNodeData } from './app/src/services/Client';
+import { getResourceUriByKind, getResourceWebUrl } from '../utils/UriUtils.js';
+import type { DependencyNodeData } from './app/src/services/Client.js';
 
 /**
  * Builds the uri to open the underlying ISC object of a dependency graph node in the editor.
@@ -10,7 +10,7 @@ import type { DependencyNodeData } from './app/src/services/Client';
 export function getDependencyNodeUri(tenantName: string, node: DependencyNodeData, parentId?: string): Uri | undefined {
     const resourceId = node.resourceId ?? node.id;
     return getResourceUriByKind(tenantName, node.type, resourceId, node.label, {
-        parentId, usageType: node.attributes?.usageType,
+        parentId,
     });
 }
 

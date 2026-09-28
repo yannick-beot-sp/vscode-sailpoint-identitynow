@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { ISCClient } from '../services/ISCClient';
-import { CSVWriter } from '../services/CSVWriter';
-import { ensureFolderExists } from '../utils/fileutils';
-import { openPreview } from '../utils/vsCodeHelpers';
+import { ISCClient } from '../services/ISCClient.js';
+import { CSVWriter } from '../services/CSVWriter.js';
+import { ensureFolderExists } from '../utils/fileutils.js';
+import { openPreview } from '../utils/vsCodeHelpers.js';
 
 /**
  * Base class for all importer
@@ -39,7 +39,7 @@ export abstract class BaseCSVExporter<T> {
                 vscode.window.showInformationMessage(
                     `Successfully exported ${this.objectType} from ${this.tenantName}`
                 );
-                openPreview(this.filePath, "csv")
+                await openPreview(this.filePath, "csv")
             });
     }
 

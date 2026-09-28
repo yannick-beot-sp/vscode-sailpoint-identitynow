@@ -1,7 +1,7 @@
-import { ExportPayloadV2025IncludeTypesV2025, SpConfigExportResultsBeta } from 'sailpoint-api-client';
-import { SimpleSPConfigExporter } from '../commands/spconfig-export/SimpleSPConfigExporter';
-import type { DependencyGraphData } from './app/src/services/Client';
-import { DependencyService } from './DependencyService';
+import { ExportPayloadIncludeTypesEnum as ExportPayloadIncludeTypes, SpConfigExportResults } from 'sailpoint-api-client/dist/sp_config/api.js';
+import { SimpleSPConfigExporter } from '../commands/spconfig-export/SimpleSPConfigExporter.js';
+import type { DependencyGraphData } from './app/src/services/Client.js';
+import { DependencyService } from './DependencyService.js';
 
 export class TransformDependencyService extends DependencyService {
 
@@ -31,9 +31,9 @@ export class TransformDependencyService extends DependencyService {
             this.tenantDisplayname,
             {},
             [
-                ExportPayloadV2025IncludeTypesV2025.Transform,
-                ExportPayloadV2025IncludeTypesV2025.IdentityProfile,
-                ExportPayloadV2025IncludeTypesV2025.Source,
+                ExportPayloadIncludeTypes.Transform,
+                ExportPayloadIncludeTypes.IdentityProfile,
+                ExportPayloadIncludeTypes.Source,
             ]
         )
 
@@ -52,7 +52,7 @@ export class TransformDependencyService extends DependencyService {
      * Other transforms reference this one through a "reference" transform whose "id"
      * attribute holds this transform's name rather than its id.
      */
-    private filterTransform(data: SpConfigExportResultsBeta | null) {
+    private filterTransform(data: SpConfigExportResults | null) {
 
         const transforms = (data?.objects ?? []).filter(o => o.self?.type === "TRANSFORM");
 
@@ -90,7 +90,7 @@ export class TransformDependencyService extends DependencyService {
      * profile node listing every attribute name) so the source feeding that attribute, if any,
      * can in turn hang off the attribute node.
      */
-    private filterIdentityProfile(data: SpConfigExportResultsBeta | null) {
+    private filterIdentityProfile(data: SpConfigExportResults | null) {
 
         const profiles = (data?.objects ?? []).filter(o => o.self?.type === "IDENTITY_PROFILE");
         const sources = (data?.objects ?? []).filter(o => o.self?.type === "SOURCE");

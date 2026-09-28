@@ -4,12 +4,12 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { Disposable, InputBox, InputBoxOptions, QuickInputButton, QuickInputButtons, Uri, env, window } from 'vscode';
-import { GoBackError, UserCancelledError } from '../errors';
-import { Wizard } from '../wizard/wizard';
-import { LearnMore } from '../wizard/LearnMoreButton';
-import { ExtInputBoxOptions } from '../wizard/ExtInputBoxOptions';
-import { isNotEmpty } from './stringUtils';
-import { Validator } from '../validator/validator';
+import { GoBackError, UserCancelledError } from '../errors.js';
+import { Wizard } from '../wizard/wizard.js';
+import { LearnMore } from '../wizard/LearnMoreButton.js';
+import { ExtInputBoxOptions } from '../wizard/ExtInputBoxOptions.js';
+import { isNotEmpty } from './stringUtils.js';
+import { Validator } from '../validator/validator.js';
 
 export type InputBoxValidationResult = Awaited<ReturnType<Required<InputBoxOptions>['validateInput']>>;
 

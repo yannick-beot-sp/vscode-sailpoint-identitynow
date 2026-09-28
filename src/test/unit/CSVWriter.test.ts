@@ -3,7 +3,7 @@ import * as os from 'os';
 import { it, describe } from 'mocha';
 import * as assert from 'assert';
 import * as path from 'path'
-import { CSVWriter, stringFormatter } from '../../services/CSVWriter';
+import { CSVWriter, stringFormatter } from '../../services/CSVWriter.js';
 
 const data = [
     {

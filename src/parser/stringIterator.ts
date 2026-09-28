@@ -1,5 +1,5 @@
-import { ParseException } from "../errors";
-import { isEmpty } from "../utils/stringUtils";
+import { ParseException } from "../errors.js";
+import { isEmpty } from "../utils/stringUtils.js";
 
 
 export const END_OF_STRING = '\0';

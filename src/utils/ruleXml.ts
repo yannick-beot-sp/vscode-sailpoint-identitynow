@@ -1,4 +1,4 @@
-import { escapeXml } from './stringUtils';
+import { escapeXml } from './stringUtils.js';
 
 export const CLOUD_RULE_XML_TYPES = [
     'AttributeGenerator',

@@ -1,14 +1,14 @@
 import * as vscode from 'vscode';
-import { TransformTreeItem } from "../models/ISCTreeItem";
-import { ISCClient } from "../services/ISCClient";
-import { requiredValidator } from "../validator/requiredValidator";
-import { InputPromptStep } from "../wizard/inputPromptStep";
-import { QuickPickIdentityStep } from "../wizard/quickPickIdentityStep";
-import { runWizard } from "../wizard/wizard";
-import { WizardContext } from "../wizard/wizardContext";
-import * as commands from "./constants";
-import { TenantService } from '../services/TenantService';
-import { getIdByUri, getNameByUri } from '../utils/UriUtils';
+import { TransformTreeItem } from "../models/ISCTreeItem.js";
+import { ISCClient } from "../services/ISCClient.js";
+import { requiredValidator } from "../validator/requiredValidator.js";
+import { InputPromptStep } from "../wizard/inputPromptStep.js";
+import { QuickPickIdentityStep } from "../wizard/quickPickIdentityStep.js";
+import { runWizard } from "../wizard/wizard.js";
+import { WizardContext } from "../wizard/wizardContext.js";
+import * as commands from "./constants.js";
+import { TenantService } from '../services/TenantService.js';
+import { getIdByUri, getNameByUri } from '../utils/UriUtils.js';
 
 
 class CachedInputIdentityQueryStep extends InputPromptStep<WizardContext> {

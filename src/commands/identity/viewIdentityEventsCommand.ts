@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import { IdentityTreeItem } from "../../models/ISCTreeItem";
-import { IdentityEventsPanel } from "./IdentityEventsPanel";
+import { IdentityTreeItem } from "../../models/ISCTreeItem.js";
+import { IdentityEventsPanel } from "./IdentityEventsPanel.js";
 
 export class ViewIdentityEventsCommand {
     constructor(private readonly extensionUri: vscode.Uri) { }

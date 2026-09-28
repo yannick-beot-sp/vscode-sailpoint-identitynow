@@ -1,4 +1,4 @@
-import path = require('path');
+import * as path from "node:path";
 import * as fs from 'fs';
 import * as readline from 'readline';
 import * as os from 'os';

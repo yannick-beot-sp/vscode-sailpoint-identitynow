@@ -1,21 +1,21 @@
 import "reflect-metadata";
 import * as net from "net";
 import { FrontMcpInstance } from "@frontmcp/sdk";
-import { TenantService } from "../services/TenantService";
-import { setTenantService, TenantResolverPlugin } from "./plugins/TenantResolverPlugin";
-import { IdentityApp } from "./identities/IdentityApp";
-import { TransformApp } from "./transforms/TransformApp";
-import { WorkflowApp } from "./workflows/WorkflowApp";
-import { SourcesApp } from "./sources/SourcesApp";
-import { SearchApp } from "./search/SearchApp";
-import { EntitlementsApp } from "./entitlements/EntitlementsApp";
-import { AccessProfilesApp } from "./accessprofiles/AccessProfilesApp";
-import { RolesApp } from "./roles/RolesApp";
-import { TenantApp } from "./tenants/TenantApp";
-import { FormsApp } from "./forms/FormsApp";
-import { IdentityProfilesApp } from "./identityprofiles/IdentityProfilesApp";
-import { MCP_NAME, MCP_VERSION } from "./constants";
-import { StoppableExpressAdapter } from "./StoppableExpressAdapter";
+import { TenantService } from "../services/TenantService.js";
+import { setTenantService, TenantResolverPlugin } from "./plugins/TenantResolverPlugin.js";
+import { IdentityApp } from "./identities/IdentityApp.js";
+import { TransformApp } from "./transforms/TransformApp.js";
+import { WorkflowApp } from "./workflows/WorkflowApp.js";
+import { SourcesApp } from "./sources/SourcesApp.js";
+import { SearchApp } from "./search/SearchApp.js";
+import { EntitlementsApp } from "./entitlements/EntitlementsApp.js";
+import { AccessProfilesApp } from "./accessprofiles/AccessProfilesApp.js";
+import { RolesApp } from "./roles/RolesApp.js";
+import { TenantApp } from "./tenants/TenantApp.js";
+import { FormsApp } from "./forms/FormsApp.js";
+import { IdentityProfilesApp } from "./identityprofiles/IdentityProfilesApp.js";
+import { MCP_NAME, MCP_VERSION } from "./constants.js";
+import { StoppableExpressAdapter } from "./StoppableExpressAdapter.js";
 
 /**
  * Pure HTTP MCP server — no VS Code dependency.

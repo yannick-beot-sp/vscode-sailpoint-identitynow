@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { it, describe } from 'mocha';
-import { normalizeNames } from '../../services/transforms';
+import { normalizeNames } from '../../services/transforms.js';
 
 suite('Transforms Test Suite', () => {
 	describe('normalizeNames', () => {

@@ -1,9 +1,9 @@
 import "reflect-metadata";
 import { App } from "@frontmcp/sdk";
-import { SearchIdentityTool } from "./tools/SearchIdentityTool";
-import { GetIdentityTool } from "./tools/GetIdentityTool";
-import { ListIdentityAttributesTool } from "./tools/ListIdentityAttributesTool";
-import { IdentityResource } from "./IdentityResource";
+import { SearchIdentityTool } from "./tools/SearchIdentityTool.js";
+import { GetIdentityTool } from "./tools/GetIdentityTool.js";
+import { ListIdentityAttributesTool } from "./tools/ListIdentityAttributesTool.js";
+import { IdentityResource } from "./IdentityResource.js";
 
 /**
  * FrontMCP application grouping all Identity management tools and resources.

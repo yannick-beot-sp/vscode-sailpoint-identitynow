@@ -1,10 +1,10 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { sourceNameOrIdField, tenantNameField } from "../../inputFields";
-import { resolveSource } from "../../utils/sourceUtils";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { sourceNameOrIdField, tenantNameField } from "../../inputFields.js";
+import { resolveSource } from "../../utils/sourceUtils.js";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -40,7 +40,7 @@ type Output = z.infer<typeof outputSchema>;
 @Tool({
     name: "getSourceSchemas",
     description: "Get the schemas of a source by name or ID.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Get Source Schemas",

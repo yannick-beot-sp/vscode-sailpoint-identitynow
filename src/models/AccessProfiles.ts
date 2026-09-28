@@ -1,6 +1,6 @@
-import { AccessProfilesV2025ApiListAccessProfilesRequest, AccessProfileV2025 } from "sailpoint-api-client";
+import { AccessProfilesApiListAccessProfilesV1Request, AccessProfile as SdkAccessProfile } from "sailpoint-api-client/dist/access_profiles/api.js";
 
-export const DEFAULT_ACCESSPROFILES_QUERY_PARAMS: AccessProfilesV2025ApiListAccessProfilesRequest = {
+export const DEFAULT_ACCESSPROFILES_QUERY_PARAMS: AccessProfilesApiListAccessProfilesV1Request = {
     count: false,
     limit: 250,
     offset: 0,
@@ -10,9 +10,9 @@ export const DEFAULT_ACCESSPROFILES_QUERY_PARAMS: AccessProfilesV2025ApiListAcce
 
 
 /**
- * Work on AccessProfileV2025 returned by ISClient AccessProfileV2025
+ * Work on AccessProfile returned by ISClient AccessProfile
  */
-export type AccessProfile = AccessProfileV2025 & Required<Pick<AccessProfileV2025, 'id'>> & {
-  owner: NonNullable<AccessProfileV2025['owner']>;
+export type AccessProfileRead = SdkAccessProfile & Required<Pick<SdkAccessProfile, 'id'>> & {
+  owner: NonNullable<SdkAccessProfile['owner']>;
 };
 

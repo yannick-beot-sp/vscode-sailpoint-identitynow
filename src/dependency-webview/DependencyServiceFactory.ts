@@ -1,7 +1,7 @@
-import { DependencyService } from "./DependencyService"
-import { IdentityAttributeDependencyService } from "./IdentityAttributeDependencyService"
-import { SourceDependencyService } from "./SourceDependencyService"
-import { TransformDependencyService } from "./TransformDependencyService"
+import { DependencyService } from "./DependencyService.js"
+import { IdentityAttributeDependencyService } from "./IdentityAttributeDependencyService.js"
+import { SourceDependencyService } from "./SourceDependencyService.js"
+import { TransformDependencyService } from "./TransformDependencyService.js"
 
 export class DependencyServiceFactory {
     constructor(

@@ -1,7 +1,7 @@
-import { BaseTreeItem, IdentitiesTreeItem, TenantFolderTreeItem, TenantTreeItem } from "../models/ISCTreeItem";
-import { TenantInfo } from "../models/TenantInfo";
-import { FolderTreeNode, isTenantInfo } from "../models/TreeNode";
-import { TenantService } from "../services/TenantService";
+import { BaseTreeItem, IdentitiesTreeItem, TenantFolderTreeItem, TenantTreeItem } from "../models/ISCTreeItem.js";
+import { TenantInfo } from "../models/TenantInfo.js";
+import { FolderTreeNode, isTenantInfo } from "../models/TreeNode.js";
+import { TenantService } from "../services/TenantService.js";
 
 const tenantTreeItems = new Map<string, TenantTreeItem>();
 

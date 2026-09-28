@@ -1,19 +1,19 @@
 import * as vscode from 'vscode';
 
-import { ExportPayloadBetaIncludeTypesBeta } from 'sailpoint-api-client';
-import { TransformTreeItem } from '../models/ISCTreeItem';
-import { ISCClient } from '../services/ISCClient';
-import { TenantService } from '../services/TenantService';
-import { InputPromptStep } from '../wizard/inputPromptStep';
-import { QuickPickTenantStep } from '../wizard/quickPickTenantStep';
-import { runWizard } from '../wizard/wizard';
-import { WizardContext } from '../wizard/wizardContext';
-import { SPConfigImporter } from './spconfig-import/SPConfigImporter';
-import { transformNameValidator } from './newTransformCommand';
-import crypto = require('crypto');
-import { SimpleSPConfigExporter } from './spconfig-export/SimpleSPConfigExporter';
-import * as commands from './constants';
-import { QuickPickTransformStep } from '../wizard/quickPickTransformStep';
+import { ExportPayloadIncludeTypesEnum as ExportPayloadIncludeTypes } from 'sailpoint-api-client/dist/sp_config/api.js';
+import { TransformTreeItem } from '../models/ISCTreeItem.js';
+import { ISCClient } from '../services/ISCClient.js';
+import { TenantService } from '../services/TenantService.js';
+import { InputPromptStep } from '../wizard/inputPromptStep.js';
+import { QuickPickTenantStep } from '../wizard/quickPickTenantStep.js';
+import { runWizard } from '../wizard/wizard.js';
+import { WizardContext } from '../wizard/wizardContext.js';
+import { SPConfigImporter } from './spconfig-import/SPConfigImporter.js';
+import { transformNameValidator } from './newTransformCommand.js';
+import * as crypto from "node:crypto";
+import { SimpleSPConfigExporter } from './spconfig-export/SimpleSPConfigExporter.js';
+import * as commands from './constants.js';
+import { QuickPickTransformStep } from '../wizard/quickPickTransformStep.js';
 
 export class CloneTransformCommand {
 
@@ -73,7 +73,7 @@ export class CloneTransformCommand {
         if (values === undefined) { return; }
 
         const options: any = {};
-        options[ExportPayloadBetaIncludeTypesBeta.Transform] = {
+        options[ExportPayloadIncludeTypes.Transform] = {
             "includedIds": [
                 values["transform"].id
             ]
@@ -82,18 +82,18 @@ export class CloneTransformCommand {
             client!,
             values["tenant"].name,
             options,
-            [ExportPayloadBetaIncludeTypesBeta.Transform]
+            [ExportPayloadIncludeTypes.Transform]
         );
 
         const data = await exporter.exportConfigWithProgression();
         const newid = crypto.randomUUID().replaceAll("-", "")
 
-        data.options.objectOptions[ExportPayloadBetaIncludeTypesBeta.Transform].includedIds = [newid];
+        data.options.objectOptions[ExportPayloadIncludeTypes.Transform].includedIds = [newid];
 
         const newTransformName = values["newTransformName"];
         data.objects[0].self = {
             "id": newid,
-            "type": ExportPayloadBetaIncludeTypesBeta.Transform,
+            "type": ExportPayloadIncludeTypes.Transform,
             "name": newTransformName
         }
         data.objects[0].object.id = newid

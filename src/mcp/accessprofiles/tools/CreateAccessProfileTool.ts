@@ -1,12 +1,13 @@
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { AccessProfileV2025, EntitlementRefV2025 } from "sailpoint-api-client";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
-import { resolveIdentity } from "../../utils/identityUtils";
-import { resolveSource } from "../../utils/sourceUtils";
-import { accessProfileOutputSchema } from "./accessProfileSchemas";
+import { AccessProfile } from "sailpoint-api-client/dist/access_profiles/api.js";
+import { EntitlementRef } from "sailpoint-api-client/dist/roles/api.js";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { tenantNameField } from "../../inputFields.js";
+import { resolveIdentity } from "../../utils/identityUtils.js";
+import { resolveSource } from "../../utils/sourceUtils.js";
+import { accessProfileOutputSchema } from "./accessProfileSchemas.js";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -34,7 +35,7 @@ type Output = z.infer<typeof outputSchema>;
         "Specify the access profile name, source (name or ID), owner (identity alias), and optionally a description, " +
         "enabled flag, requestable flag, and entitlement IDs. " +
         "Use listSources to find sources, searchEntitlements to discover entitlement IDs.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Create Access Profile",
@@ -51,12 +52,12 @@ export class CreateAccessProfileTool extends ToolContext {
 
             const sourceId = await resolveSource(input.source, client);
 
-            const entitlements: EntitlementRefV2025[] | undefined = input.entitlements?.map(id => ({
+            const entitlements: EntitlementRef[] | undefined = input.entitlements?.map(id => ({
                 id,
                 type: "ENTITLEMENT",
             })) ?? [];
 
-            const accessProfilePayload: AccessProfileV2025 = {
+            const accessProfilePayload: AccessProfile = {
                 name: input.name,
                 description: input.description,
                 enabled: input.enabled ?? true,

@@ -1,13 +1,13 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
-import { isGuid } from "../../../utils/stringUtils";
-import { formDetailOutputSchema } from "./formSchemas";
-import { formIdOrNameField } from "./formSchemas";
-import { getFormOwner } from "../formUtils";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { tenantNameField } from "../../inputFields.js";
+import { isGuid } from "../../../utils/stringUtils.js";
+import { formDetailOutputSchema } from "./formSchemas.js";
+import { formIdOrNameField } from "./formSchemas.js";
+import { getFormOwner } from "../formUtils.js";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -24,7 +24,7 @@ type Output = z.infer<typeof outputSchema>;
     description:
         "Get the details of a form definition by GUID or name, including formInput, formElements, and formConditions. " +
         "Use listForms to discover form names and IDs.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Get Form",

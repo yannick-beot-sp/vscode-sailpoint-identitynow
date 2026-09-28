@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { it, describe } from 'mocha';
-import { buildRuleXml, wrapCdata } from '../../utils/ruleXml';
+import { buildRuleXml, wrapCdata } from '../../utils/ruleXml.js';
 
 suite('ruleXml Test Suite', () => {
 	describe('buildRuleXml', () => {

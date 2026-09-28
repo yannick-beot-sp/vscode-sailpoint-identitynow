@@ -1,11 +1,11 @@
 import * as vscode from "vscode";
-import { NotificationTemplatesTreeItem } from "../../models/ISCTreeItem";
-import { runWizard } from "../../wizard/wizard";
-import { InputPromptStep } from "../../wizard/inputPromptStep";
-import { QuickPickPromptStep } from "../../wizard/quickPickPromptStep";
-import { ExtendedQuickPickItem } from "../../models/ExtendedQuickPickItem";
-import { NOTIFICATION_TEMPLATE_MEDIUMS, notificationTemplateMediumLabel } from "../../utils/notificationTemplateList";
-import * as commands from "../constants";
+import { NotificationTemplatesTreeItem } from "../../models/ISCTreeItem.js";
+import { runWizard } from "../../wizard/wizard.js";
+import { InputPromptStep } from "../../wizard/inputPromptStep.js";
+import { QuickPickPromptStep } from "../../wizard/quickPickPromptStep.js";
+import { ExtendedQuickPickItem } from "../../models/ExtendedQuickPickItem.js";
+import { NOTIFICATION_TEMPLATE_MEDIUMS, notificationTemplateMediumLabel } from "../../utils/notificationTemplateList.js";
+import * as commands from "../constants.js";
 
 /**
  * Filters the cached template list by name, key, description or locale.

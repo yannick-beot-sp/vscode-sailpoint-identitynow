@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { it, describe } from 'mocha';
-import { escapeFilter } from '../../utils/stringUtils';
+import { escapeFilter } from '../../utils/stringUtils.js';
 
 suite('escapeFilter Test Suite', () => {
 	describe('escapeFilter', () => {

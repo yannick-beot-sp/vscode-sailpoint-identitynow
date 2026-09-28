@@ -1,18 +1,18 @@
 import * as vscode from "vscode";
 
-import * as commands from "../commands/constants";
-import { CampaignsTreeItem } from "../models/ISCTreeItem";
-import { WizardContext } from "../wizard/wizardContext";
-import { runWizard } from "../wizard/wizard";
-import { ExtendedQuickPickItem } from "../models/ExtendedQuickPickItem";
-import { CampaignStatusV3 } from "sailpoint-api-client";
-import { capitalizeFirstLetter } from "../utils/stringUtils";
-import { compareByLabel } from "../utils";
-import { QuickPickPromptStep } from "../wizard/quickPickPromptStep";
+import * as commands from "../commands/constants.js";
+import { CampaignsTreeItem } from "../models/ISCTreeItem.js";
+import { WizardContext } from "../wizard/wizardContext.js";
+import { runWizard } from "../wizard/wizard.js";
+import { ExtendedQuickPickItem } from "../models/ExtendedQuickPickItem.js";
+import { Campaign2StatusEnum } from "sailpoint-api-client/dist/certification_campaigns/api.js";
+import { capitalizeFirstLetter } from "../utils/stringUtils.js";
+import { compareByLabel } from "../utils.js";
+import { QuickPickPromptStep } from "../wizard/quickPickPromptStep.js";
 
 
 function prepareStatusPickItems(statuses: string[]): ExtendedQuickPickItem[] {
-    return Object.values(CampaignStatusV3).map(key => ({
+    return Object.values(Campaign2StatusEnum).map(key => ({
         label: capitalizeFirstLetter(key),
         value: key,
         picked: statuses.includes(key)

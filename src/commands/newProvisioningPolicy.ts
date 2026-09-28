@@ -1,20 +1,20 @@
 import * as vscode from 'vscode';
-import * as commands from './constants';
-import { ProvisioningPoliciesTreeItem } from "../models/ISCTreeItem";
-import { compareByLabel } from '../utils';
-import { buildResourceUri, getIdByUri } from '../utils/UriUtils';
-import { UsageTypeBeta } from 'sailpoint-api-client';
-import { convertConstantToTitleCase, isEmpty } from '../utils/stringUtils';
-import { ExtendedQuickPickItem } from '../models/ExtendedQuickPickItem';
-import { openPreview } from '../utils/vsCodeHelpers';
-import { TenantService } from '../services/TenantService';
-import { WizardContext } from '../wizard/wizardContext';
-import { runWizard } from '../wizard/wizard';
-import { QuickPickTenantStep } from '../wizard/quickPickTenantStep';
-import { Validator } from '../validator/validator';
-import { InputPromptStep } from '../wizard/inputPromptStep';
-import { QuickPickPromptStep } from '../wizard/quickPickPromptStep';
-import { ISCClient } from '../services/ISCClient';
+import * as commands from './constants.js';
+import { ProvisioningPoliciesTreeItem } from "../models/ISCTreeItem.js";
+import { compareByLabel } from '../utils.js';
+import { getIdByUri, getProvisioningPolicyUri } from '../utils/UriUtils.js';
+import { Usagetypev2 as UsageTypeV2 } from 'sailpoint-api-client/dist/sources/api.js';
+import { convertConstantToTitleCase, isEmpty } from '../utils/stringUtils.js';
+import { ExtendedQuickPickItem } from '../models/ExtendedQuickPickItem.js';
+import { openPreview } from '../utils/vsCodeHelpers.js';
+import { TenantService } from '../services/TenantService.js';
+import { WizardContext } from '../wizard/wizardContext.js';
+import { runWizard } from '../wizard/wizard.js';
+import { QuickPickTenantStep } from '../wizard/quickPickTenantStep.js';
+import { Validator } from '../validator/validator.js';
+import { InputPromptStep } from '../wizard/inputPromptStep.js';
+import { QuickPickPromptStep } from '../wizard/quickPickPromptStep.js';
+import { ISCClient } from '../services/ISCClient.js';
 
 
 
@@ -26,8 +26,8 @@ const provisioningPolicyNameValidator = new Validator({
 
 
 function prepareUsageTypePickItems(): Array<ExtendedQuickPickItem> {
-    const FIRST = UsageTypeBeta.Create;
-    return Object.values(UsageTypeBeta).map(key => ({
+    const FIRST = UsageTypeV2.Create;
+    return Object.values(UsageTypeV2).map(key => ({
         label: convertConstantToTitleCase(key),
         description: (key === FIRST ? "(default)" : ""),
         value: key
@@ -90,23 +90,20 @@ export class NewProvisioningPolicyCommand {
         }, async () => {
 
             const data = {
-                "name": provisioningPolicyName,
+                "name": isEmpty(provisioningPolicyName) ? usageType.value : provisioningPolicyName,
                 "description": null,
                 "usageType": usageType.value,
                 "fields": []
             };
 
             const sourceId = getIdByUri(node.parentUri)
-            const newUri = buildResourceUri({
-                tenantName: values["tenant"].tenantName,
-                resourceType: "sources",
-                id: sourceId,
-                subResourceType: "provisioning-policies",
-                subId: usageType.value,
-                name: isEmpty(provisioningPolicyName) ? usageType.value : provisioningPolicyName
-            })
-
-            await client.createProvisioningPolicy(sourceId, data)
+            const createdPolicy = await client.createProvisioningPolicy(sourceId, data)
+            const newUri = getProvisioningPolicyUri(
+                values["tenant"].tenantName,
+                sourceId,
+                createdPolicy.id,
+                createdPolicy.name
+            )
             vscode.commands.executeCommand(commands.REFRESH_FORCED);
             openPreview(newUri)
         });

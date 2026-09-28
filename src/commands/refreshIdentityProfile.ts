@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { IdentityProfileTreeItem } from '../models/ISCTreeItem';
-import { ISCClient } from '../services/ISCClient';
+import { IdentityProfileTreeItem } from '../models/ISCTreeItem.js';
+import { ISCClient } from '../services/ISCClient.js';
 
 
 export async function refreshIdentityProfile(node?: IdentityProfileTreeItem): Promise<void> {

@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
-import * as commands from './constants';
-import { SailPointISCAuthenticationProvider } from '../services/AuthenticationProvider';
-import { TenantService } from '../services/TenantService';
-import { normalizeTenant } from '../utils';
-import { askDisplayName } from '../utils/vsCodeHelpers';
-import { AuthenticationMethod } from '../models/TenantInfo';
+import * as commands from './constants.js';
+import { SailPointISCAuthenticationProvider } from '../services/AuthenticationProvider.js';
+import { TenantService } from '../services/TenantService.js';
+import { normalizeTenant } from '../utils.js';
+import { askDisplayName } from '../utils/vsCodeHelpers.js';
+import { AuthenticationMethod } from '../models/TenantInfo.js';
 import { randomUUID } from 'crypto';
-import { isEmpty } from '../utils/stringUtils';
+import { isEmpty } from '../utils/stringUtils.js';
 
 
 export class AddTenantCommand {

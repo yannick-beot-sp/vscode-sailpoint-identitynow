@@ -1,6 +1,6 @@
 import { InputBoxOptions } from "vscode";
-import { WizardContext } from "./wizardContext";
-import { Validator } from "../validator/validator";
+import { WizardContext } from "./wizardContext.js";
+import { Validator } from "../validator/validator.js";
 
 /**
  * Provides additional options for input boxes used in Azure Extensions

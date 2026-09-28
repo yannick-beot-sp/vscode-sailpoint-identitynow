@@ -1,7 +1,7 @@
 import * as os from 'os';
-import * as configuration from '../configurationConstants';
-import { getConfigKey, getWorkspaceFolder } from '../utils/configurationUtils';
-import { sanitizePath } from '../utils';
+import * as configuration from '../configurationConstants.js';
+import { getConfigKey, getWorkspaceFolder } from '../utils/configurationUtils.js';
+import { sanitizePath } from '../utils.js';
 
 interface ContextValues {
     /**

@@ -1,5 +1,5 @@
-import { TenantTreeItem } from "../../models/ISCTreeItem";
-import { WizardBasedExporterCommand } from "./WizardBasedExporterCommand";
+import { TenantTreeItem } from "../../models/ISCTreeItem.js";
+import { WizardBasedExporterCommand } from "./WizardBasedExporterCommand.js";
 
 /**
  * Entrypoint for full export configuration from the tree view. Tenant is known.

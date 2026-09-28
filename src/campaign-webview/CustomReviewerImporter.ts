@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
 
-import { ISCClient } from '../services/ISCClient';
-import { CSVReader } from '../services/CSVReader';
-import { UserCancelledError } from '../errors';
-import { Index, Search } from 'sailpoint-api-client';
+import { ISCClient } from '../services/ISCClient.js';
+import { CSVReader } from '../services/CSVReader.js';
+import { UserCancelledError } from '../errors.js';
+import { Index, Search } from 'sailpoint-api-client/dist/search/api.js';
 
 const VALID_REVIEWER_ATTRIBUTES = ["id", "name", "email"]
 const VALID_ITEM_TYPES = ["IDENTITY", "ENTITLEMENT", "ACCESS_PROFILE", "ROLE", "ALL"]

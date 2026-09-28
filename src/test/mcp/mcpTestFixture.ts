@@ -14,10 +14,10 @@
 import "reflect-metadata";
 import * as assert from "assert";
 import { McpTestClient } from "@frontmcp/testing";
-import { McpServer } from "../../mcp/McpServer";
-import { SailPointISCAuthenticationProvider } from "../../services/AuthenticationProvider";
-import { AuthenticationMethod, TenantInfo, TenantToken } from "../../models/TenantInfo";
-import { TenantServiceEventType } from "../../services/TenantServiceEventType";
+import { McpServer } from "../../mcp/McpServer.js";
+import { SailPointISCAuthenticationProvider } from "../../services/AuthenticationProvider.js";
+import { AuthenticationMethod, TenantInfo, TenantToken } from "../../models/TenantInfo.js";
+import { TenantServiceEventType } from "../../services/TenantServiceEventType.js";
 
 // ---------------------------------------------------------------------------
 // Environment variables (populated from .env by dotenv/config)

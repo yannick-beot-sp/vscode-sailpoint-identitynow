@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { QuickPickPromptStep } from "./quickPickPromptStep";
-import { WizardContext } from "./wizardContext";
-import { REASSIGNABLE_OBJECT_TYPES } from "../models/ReassignOwnership";
+import { QuickPickPromptStep } from "./quickPickPromptStep.js";
+import { WizardContext } from "./wizardContext.js";
+import { REASSIGNABLE_OBJECT_TYPES } from "../models/ReassignOwnership.js";
 
 /**
  * Step 1 of the Reassign Ownership wizard: pick which object types to consider.

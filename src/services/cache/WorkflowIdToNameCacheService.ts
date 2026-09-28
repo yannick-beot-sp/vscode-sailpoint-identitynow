@@ -1,25 +1,25 @@
-import { WorkflowV2025 } from "sailpoint-api-client";
-import { ISCClient } from "../ISCClient";
-import { CacheService } from "./CacheService";
+import { ISCClient } from "../ISCClient.js";
+import { CacheService } from "./CacheService.js";
+import { Workflow } from "sailpoint-api-client/dist/workflows/api.js";
 
 /**
  * Cache the workflow name by id
  */
 export class WorkflowIdToNameCacheService extends CacheService<string> {
 
-    private workflows: WorkflowV2025[]
+    private workflows: Workflow[] = [];
 
     constructor(readonly client: ISCClient) {
 
         super(
-            async (key: string) => {
+            async (key: string): Promise<string> => {
                 const workflow = this.workflows.find(x => x.id === key)
                 if (workflow === undefined) {
                     const message = `Could not find workflow with id ${key}.`;
                     console.error(message);
                     throw new Error(message);
                 }
-                return workflow.name
+                return workflow.name!
             }
         )
 

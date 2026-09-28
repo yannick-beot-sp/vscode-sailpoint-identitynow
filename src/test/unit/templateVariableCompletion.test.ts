@@ -1,14 +1,14 @@
 import * as assert from 'assert';
 import { describe, it } from 'mocha';
-import { defaultNotificationTemplateId } from '../../utils/notificationTemplateList';
+import { defaultNotificationTemplateId } from '../../utils/notificationTemplateList.js';
 import {
     completionVariables,
     resolveTemplateIdentity,
     templateVariablesFor,
     velocityInsertText,
     velocityPrefixLength,
-} from '../../commands/notification-template/templateVariableCompletion';
-import { globalVariables, templateVariables } from '../../commands/notification-template/templateVariables';
+} from '../../commands/notification-template/templateVariableCompletion.js';
+import { globalVariables, templateVariables } from '../../commands/notification-template/templateVariables.js';
 
 suite('template variable completion Test Suite', () => {
     describe('velocityInsertText', () => {

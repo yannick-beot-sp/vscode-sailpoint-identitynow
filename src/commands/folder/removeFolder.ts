@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import * as commands from '../constants';
-import { TenantService } from '../../services/TenantService';
-import { TenantFolderTreeItem } from '../../models/ISCTreeItem';
-import { confirm } from '../../utils/vsCodeHelpers';
+import * as commands from '../constants.js';
+import { TenantService } from '../../services/TenantService.js';
+import { TenantFolderTreeItem } from '../../models/ISCTreeItem.js';
+import { confirm } from '../../utils/vsCodeHelpers.js';
 
 
 export class RemoveFolderCommand {

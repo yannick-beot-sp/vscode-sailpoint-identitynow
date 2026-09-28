@@ -1,11 +1,11 @@
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 
-import { askChosenItems, askFile, openPreview } from '../../utils/vsCodeHelpers';
-import { FormTreeItem, FormsTreeItem } from '../../models/ISCTreeItem';
-import { PathProposer } from '../../services/PathProposer';
-import { ISCClient } from '../../services/ISCClient';
-import { ensureFolderExists } from '../../utils/fileutils';
+import { askChosenItems, askFile, openPreview } from '../../utils/vsCodeHelpers.js';
+import { FormTreeItem, FormsTreeItem } from '../../models/ISCTreeItem.js';
+import { PathProposer } from '../../services/PathProposer.js';
+import { ISCClient } from '../../services/ISCClient.js';
+import { ensureFolderExists } from '../../utils/fileutils.js';
 
 export class FormDefinitionExportCommand {
 

@@ -1,4 +1,4 @@
-import { Exporter } from "./Exporter";
+import { Exporter } from "./Exporter.js";
 
 export class ExporterBuilder<T,O> {
 

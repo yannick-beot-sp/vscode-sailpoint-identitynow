@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
-import * as commands from './constants';
-import { ISCResourceTreeItem } from '../models/ISCTreeItem';
-import { ISCClient } from '../services/ISCClient';
-import { getPathByUri } from '../utils/UriUtils';
-import { TenantService } from '../services/TenantService';
-import { isTenantReadonly, validateTenantReadonly } from './validateTenantReadonly';
-import { confirm } from '../utils/vsCodeHelpers';
+import * as commands from './constants.js';
+import { ISCResourceTreeItem } from '../models/ISCTreeItem.js';
+import { ISCClient } from '../services/ISCClient.js';
+import { getPathByUri } from '../utils/UriUtils.js';
+import { TenantService } from '../services/TenantService.js';
+import { isTenantReadonly, validateTenantReadonly } from './validateTenantReadonly.js';
+import { confirm } from '../utils/vsCodeHelpers.js';
 
 
 export class DeleteResourceCommand {

@@ -1,8 +1,8 @@
-import { ExportPayloadBetaIncludeTypesBeta } from 'sailpoint-api-client';
-import { CloudRuleTreeItem, FormTreeItem, ISCResourceTreeItem, IdentityProfileTreeItem, RuleTreeItem, ServiceDeskTreeItem, SourceTreeItem, TransformTreeItem } from '../../models/ISCTreeItem';
-import { PathProposer } from '../../services/PathProposer';
-import { askFile, openPreview } from '../../utils/vsCodeHelpers';
-import { SPConfigExporter } from './SPConfigExporter';
+import { ExportPayloadIncludeTypesEnum as ExportPayloadIncludeTypes } from 'sailpoint-api-client/dist/sp_config/api.js';
+import { CloudRuleTreeItem, FormTreeItem, ISCResourceTreeItem, IdentityProfileTreeItem, RuleTreeItem, ServiceDeskTreeItem, SourceTreeItem, TransformTreeItem } from '../../models/ISCTreeItem.js';
+import { PathProposer } from '../../services/PathProposer.js';
+import { askFile, openPreview } from '../../utils/vsCodeHelpers.js';
+import { SPConfigExporter } from './SPConfigExporter.js';
 
 
 /**
@@ -12,22 +12,22 @@ export class ExportConfigNodeTreeViewCommand {
     constructor() { }
 
 
-    private getObjectType(node: ISCResourceTreeItem): ExportPayloadBetaIncludeTypesBeta {
+    private getObjectType(node: ISCResourceTreeItem): ExportPayloadIncludeTypes {
         switch (node.constructor.name) {
             case SourceTreeItem.name:
-                return ExportPayloadBetaIncludeTypesBeta.Source;
+                return ExportPayloadIncludeTypes.Source;
             case TransformTreeItem.name:
-                return ExportPayloadBetaIncludeTypesBeta.Transform;
+                return ExportPayloadIncludeTypes.Transform;
             case IdentityProfileTreeItem.name:
-                return ExportPayloadBetaIncludeTypesBeta.IdentityProfile;
+                return ExportPayloadIncludeTypes.IdentityProfile;
             case RuleTreeItem.name:
-                return ExportPayloadBetaIncludeTypesBeta.ConnectorRule;
+                return ExportPayloadIncludeTypes.ConnectorRule;
             case CloudRuleTreeItem.name:
-                return ExportPayloadBetaIncludeTypesBeta.Rule;
+                return ExportPayloadIncludeTypes.Rule;
             case FormTreeItem.name:
-                return ExportPayloadBetaIncludeTypesBeta.FormDefinition;
+                return ExportPayloadIncludeTypes.FormDefinition;
             case ServiceDeskTreeItem.name:
-                return ExportPayloadBetaIncludeTypesBeta.ServiceDeskIntegration;
+                return ExportPayloadIncludeTypes.ServiceDeskIntegration;
             default:
                 throw new Error("Invalid node type:" + node.label);
 
@@ -68,8 +68,8 @@ export class ExportConfigNodeTreeViewCommand {
         const options: any = {};
         // FIXME
         // Issue while exporting FORM_DEFINITION: needs to rely on names instead of ids
-        if (ExportPayloadBetaIncludeTypesBeta.FormDefinition === objectType
-            || ExportPayloadBetaIncludeTypesBeta.ConnectorRule === objectType) {
+        if (ExportPayloadIncludeTypes.FormDefinition === objectType
+            || ExportPayloadIncludeTypes.ConnectorRule === objectType) {
             options[objectType] = {
                 "includedNames": [
                     node.label

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import * as commands from '../commands/constants';
-import { ISCResourceTreeItem, IdentityProfileSorting, IdentityProfilesTreeItem } from "../models/ISCTreeItem";
+import * as commands from '../commands/constants.js';
+import { ISCResourceTreeItem, IdentityProfileSorting, IdentityProfilesTreeItem } from "../models/ISCTreeItem.js";
 
 /**
  * Command used to open a source or a transform

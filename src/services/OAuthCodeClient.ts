@@ -1,8 +1,8 @@
 import axios from "axios";
 import { createHash, randomBytes, randomUUID, timingSafeEqual } from "crypto";
 import * as os from "os";
-import { TenantCredentials, TenantToken } from "../models/TenantInfo";
-import { parseJwt } from "../utils";
+import { TenantCredentials, TenantToken } from "../models/TenantInfo.js";
+import { parseJwt } from "../utils.js";
 
 /**
  * Public OAuth client registered for the SailPoint developer tools.

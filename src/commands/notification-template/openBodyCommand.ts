@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
-import { NotificationTemplateTreeItem } from "../../models/ISCTreeItem";
-import { openPreview } from '../../utils/vsCodeHelpers';
+import { NotificationTemplateTreeItem } from "../../models/ISCTreeItem.js";
+import { openPreview } from '../../utils/vsCodeHelpers.js';
 import {
     SECTION_CONF,
     NOTIFICATION_TEMPLATE_FORMAT_BODY_ON_OPEN_CONF,
     NOTIFICATION_TEMPLATE_PREVIEW_BODY_ON_OPEN_CONF,
-} from '../../configurationConstants';
-import { PREVIEW_NOTIFICATION_TEMPLATE_BODY } from '../constants';
+} from '../../configurationConstants.js';
+import { PREVIEW_NOTIFICATION_TEMPLATE_BODY } from '../constants.js';
 
 /**
  * Opens the `body` of a notification template as a standalone HTML document

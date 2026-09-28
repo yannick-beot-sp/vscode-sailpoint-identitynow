@@ -1,4 +1,4 @@
-import { highlightJson } from "../identity/jsonDrawerSnippet";
+import { highlightJson } from "../identity/jsonDrawerSnippet.js";
 
 const PARENT_CSP = [
     "default-src 'none'",

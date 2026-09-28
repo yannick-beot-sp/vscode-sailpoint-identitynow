@@ -1,9 +1,9 @@
-import { parseDefaultNotificationTemplateId } from "../../utils/notificationTemplateList";
+import { parseDefaultNotificationTemplateId } from "../../utils/notificationTemplateList.js";
 import {
     NotificationTemplateVariable,
     globalVariables,
     templateVariables,
-} from "./templateVariables";
+} from "./templateVariables.js";
 
 export interface TemplateVariableIdentity {
     key?: string;

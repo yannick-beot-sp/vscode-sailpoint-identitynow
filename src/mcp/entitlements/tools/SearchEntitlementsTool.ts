@@ -1,9 +1,9 @@
 import "reflect-metadata";
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { DEFAULT_SEARCH_LIMIT, paginationOutputFields, paginationInputFields, baseDocumentSchema } from "../../search/searchInputFields";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { DEFAULT_SEARCH_LIMIT, paginationOutputFields, paginationInputFields, baseDocumentSchema } from "../../search/searchInputFields.js";
 
 const DEFAULT_SORT = "source.name,displayName";
 
@@ -36,7 +36,7 @@ type Output = z.infer<typeof outputSchema>;
         "Supports offset-based pagination: use offset + limit to step through large result sets. " +
         "Query syntax: https://documentation.sailpoint.com/saas/help/search/building-query.html. " +
         "Searchable fields: https://documentation.sailpoint.com/saas/help/search/searchable-fields.html#entitlements.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Search Entitlements",
@@ -51,7 +51,7 @@ export class SearchEntitlementsTool extends ToolContext {
         const sort = input.sort ?? DEFAULT_SORT;
 
         try {
-            const result = await client.paginatedSearchEntitlementsV2025({
+            const result = await client.paginatedSearchEntitlements({
                 query: input.query,
                 sort,
                 limit,

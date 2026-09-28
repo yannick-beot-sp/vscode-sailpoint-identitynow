@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 
-import { AccountTreeItem } from '../../models/ISCTreeItem';
-import { ISCClient } from '../../services/ISCClient';
-import * as commands from '../constants';
-import { formatTask, waifForJob } from '../source/sourceUtils';
-import { formatHecateAggregateJob, waitForHecateJob } from './accountUtils';
+import { AccountTreeItem } from '../../models/ISCTreeItem.js';
+import { ISCClient } from '../../services/ISCClient.js';
+import * as commands from '../constants.js';
+import { formatTask, waifForJob } from '../source/sourceUtils.js';
+import { formatHecateAggregateJob, waitForHecateJob } from './accountUtils.js';
 
 export class AccountTreeViewCommand {
 

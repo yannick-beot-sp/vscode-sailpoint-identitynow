@@ -9,7 +9,7 @@ import {
 	notificationTemplateKeyFilter,
 	notificationTemplateWebUiSegments,
 	parseDefaultNotificationTemplateId,
-} from '../../utils/notificationTemplateList';
+} from '../../utils/notificationTemplateList.js';
 
 suite('notification template list Test Suite', () => {
 	const accessRequestEmail = {

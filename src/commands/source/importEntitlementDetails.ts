@@ -1,21 +1,22 @@
 import * as vscode from 'vscode';
 import * as tmp from "tmp";
-import { SourceTreeItem } from "../../models/ISCTreeItem";
-import { ISCClient } from '../../services/ISCClient';
-import { CSVReader } from '../../services/CSVReader';
-import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter';
-import { isNotEmpty } from '../../utils/stringUtils';
-import { chooseFile, openPreview } from '../../utils/vsCodeHelpers';
-import { AdditionalOwnerRefV2025, JsonPatchOperationBeta, JsonPatchOperationV2025 } from 'sailpoint-api-client';
-import { TenantService } from '../../services/TenantService';
-import { validateTenantReadonly } from '../validateTenantReadonly';
-import { IdentityUsernameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService';
-import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService';
-import { truethy } from '../../utils/booleanUtils';
-import { metadataToString, stringToAttributeMetadata } from '../../utils/metadataUtils';
-import { resolveAdditionalOwners } from '../../utils/additionalOwners';
+import { SourceTreeItem } from "../../models/ISCTreeItem.js";
+import { ISCClient } from '../../services/ISCClient.js';
+import { CSVReader } from '../../services/CSVReader.js';
+import { CSVLogWriter, CSVLogWriterLogType } from '../../services/CSVLogWriter.js';
+import { isNotEmpty } from '../../utils/stringUtils.js';
+import { chooseFile, openPreview } from '../../utils/vsCodeHelpers.js';
+import { JsonPatchOperation } from 'sailpoint-api-client/dist/access_profiles/api.js';
+import { AdditionalOwnerRef } from 'sailpoint-api-client/dist/accounts/api.js';
+import { TenantService } from '../../services/TenantService.js';
+import { validateTenantReadonly } from '../validateTenantReadonly.js';
+import { IdentityUsernameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService.js';
+import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService.js';
+import { truethy } from '../../utils/booleanUtils.js';
+import { metadataToString, stringToAttributeMetadata } from '../../utils/metadataUtils.js';
+import { resolveAdditionalOwners } from '../../utils/additionalOwners.js';
 
-function isSameAdditionalOwners(a: AdditionalOwnerRefV2025[] | null, b: AdditionalOwnerRefV2025[] | undefined | null): boolean {
+function isSameAdditionalOwners(a: AdditionalOwnerRef[] | null, b: AdditionalOwnerRef[] | undefined | null): boolean {
     if (!a && !b) { return true; }
     if (!a || !b) { return false; }
     if (a.length !== b.length) { return false; }
@@ -222,7 +223,7 @@ class EntitlementDetailsImporter {
                 }
             }
 
-            let additionalOwners: AdditionalOwnerRefV2025[] | null = null;
+            let additionalOwners: AdditionalOwnerRef[] | null = null;
             if (headers.includes('additionalOwners') || headers.includes('additionalOwnerGovernanceGroup')) {
                 try {
                     additionalOwners = await resolveAdditionalOwners(
@@ -246,7 +247,7 @@ class EntitlementDetailsImporter {
                 { columns: ['metadata'], path: 'accessModelMetadata', getValue: () => ({ attributes: stringToAttributeMetadata(data.metadata!) }), condition: () => isNotEmpty(data.metadata), isSame: () => metadataToString({ attributes: stringToAttributeMetadata(data.metadata!) }) === metadataToString(entitlement.accessModelMetadata) },
             ];
 
-            const payload: JsonPatchOperationV2025[] = updateMappings
+            const payload: JsonPatchOperation[] = updateMappings
                 .filter(m => m.columns.some(col => headers.includes(col)) && m.condition() && !m.isSame())
                 .map(m => ({
                     op: "replace",

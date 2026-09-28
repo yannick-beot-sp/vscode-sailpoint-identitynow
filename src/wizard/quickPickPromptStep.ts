@@ -1,9 +1,9 @@
 import { QuickPickItem, QuickPickItemKind, QuickPickOptions } from "vscode";
-import { WizardPromptStep } from "./wizardPromptStep";
-import { Wizard } from "./wizard";
-import { convertPascalCase2SpaceBased, isEmpty } from "../utils/stringUtils";
-import { showQuickPick } from "../utils/showQuickPick";
-import { GoBackError } from "../errors";
+import { WizardPromptStep } from "./wizardPromptStep.js";
+import { Wizard } from "./wizard.js";
+import { convertPascalCase2SpaceBased, isEmpty } from "../utils/stringUtils.js";
+import { showQuickPick } from "../utils/showQuickPick.js";
+import { GoBackError } from "../errors.js";
 
 
 export interface QuickPickPromptStepOptions<WizardContext, T extends QuickPickItem> {

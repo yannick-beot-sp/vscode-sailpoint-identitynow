@@ -1,21 +1,15 @@
 import { Tool, ToolContext } from "@frontmcp/sdk";
 import { z } from "zod";
-import {
-    AccessProfileRef,
-    EntitlementRef,
-    RoleMembershipSelector,
-    RoleMembershipSelectorType,
-    RoleV2025,
-} from "sailpoint-api-client";
-import { getIscClient } from "../../plugins/TenantResolverPlugin";
-import { ErrorCodes, McpError } from "../../errors";
-import { tenantNameField } from "../../inputFields";
-import { Parser } from "../../../parser/parser";
-import { RoleMembershipSelectorConverter } from "../../../parser/RoleMembershipSelectorConverter";
-import { SourceNameToIdCacheService } from "../../../services/cache/SourceNameToIdCacheService";
-import { isUuid } from "../../../utils/stringUtils";
-import { resolveIdentity } from "../../utils/identityUtils";
-import { membershipCriteriaField, roleBaseOutputSchema } from "./roleSchemas";
+import { AccessProfileRef, EntitlementRef, RoleMembershipSelector, RoleMembershipSelectorType, Role } from "sailpoint-api-client/dist/roles/api.js";
+import { getIscClient } from "../../plugins/TenantResolverPlugin.js";
+import { ErrorCodes, McpError } from "../../errors.js";
+import { tenantNameField } from "../../inputFields.js";
+import { Parser } from "../../../parser/parser.js";
+import { RoleMembershipSelectorConverter } from "../../../parser/RoleMembershipSelectorConverter.js";
+import { SourceNameToIdCacheService } from "../../../services/cache/SourceNameToIdCacheService.js";
+import { isUuid } from "../../../utils/stringUtils.js";
+import { resolveIdentity } from "../../utils/identityUtils.js";
+import { membershipCriteriaField, roleBaseOutputSchema } from "./roleSchemas.js";
 
 const inputSchema = z.object({
     tenantName: tenantNameField,
@@ -47,7 +41,7 @@ type Output = z.infer<typeof outputSchema>;
         "Specify the role name, owner (identity alias), and optionally a description, requestable flag, " +
         "entitlement IDs, access profile names or IDs, and membership criteria. " +
         "Use searchEntitlements and searchAccessProfiles to discover IDs and names before calling this tool.",
-    inputSchema,
+    inputSchema: inputSchema.shape,
     outputSchema,
     annotations: {
         title: "Create Role",
@@ -108,7 +102,7 @@ export class CreateRoleTool extends ToolContext {
                 }
             }
 
-            const rolePayload: RoleV2025 = {
+            const rolePayload: Role = {
                 name: input.name,
                 description: input.description ?? "",
                 enabled: true,

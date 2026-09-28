@@ -1,16 +1,16 @@
-import path = require('path');
+import * as path from "node:path";
 import * as vscode from 'vscode';
-import { SchemasTreeItem } from "../models/ISCTreeItem";
-import { getIdByUri, getPathByUri } from '../utils/UriUtils';
-import { openPreview } from '../utils/vsCodeHelpers';
-import { ISCClient } from '../services/ISCClient';
-import * as commands from './constants';
-import { validateTenantReadonly } from './validateTenantReadonly';
-import { TenantService } from '../services/TenantService';
-import { Validator } from '../validator/validator';
-import { WizardContext } from '../wizard/wizardContext';
-import { runWizard } from '../wizard/wizard';
-import { InputPromptStep } from '../wizard/inputPromptStep';
+import { SchemasTreeItem } from "../models/ISCTreeItem.js";
+import { getIdByUri, getPathByUri } from '../utils/UriUtils.js';
+import { openPreview } from '../utils/vsCodeHelpers.js';
+import { ISCClient } from '../services/ISCClient.js';
+import * as commands from './constants.js';
+import { validateTenantReadonly } from './validateTenantReadonly.js';
+import { TenantService } from '../services/TenantService.js';
+import { Validator } from '../validator/validator.js';
+import { WizardContext } from '../wizard/wizardContext.js';
+import { runWizard } from '../wizard/wizard.js';
+import { InputPromptStep } from '../wizard/inputPromptStep.js';
 
 const schemaNameValidator = new Validator({
     required: true,

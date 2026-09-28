@@ -1,18 +1,18 @@
 import * as vscode from 'vscode';
-import { TenantService } from "../services/TenantService";
-import { SearchAttributesTreeItem } from '../models/ISCTreeItem';
-import { ISCClient } from '../services/ISCClient';
-import { getResourceUri } from '../utils/UriUtils';
-import { SearchAttributeConfigBeta } from 'sailpoint-api-client';
-import { runWizard } from '../wizard/wizard';
-import { InputPromptStep } from '../wizard/inputPromptStep';
-import { Validator } from '../validator/validator';
-import { WizardContext } from '../wizard/wizardContext';
-import { QuickPickTenantStep } from '../wizard/quickPickTenantStep';
-import { openPreview } from '../utils/vsCodeHelpers';
-import { QuickPickSourceStep } from '../wizard/quickPickSourceStep';
-import { QuickPickAccountSchemaStep } from '../wizard/quickPickAccountSchemaStep';
-import * as commands from "../commands/constants";
+import { TenantService } from "../services/TenantService.js";
+import { SearchAttributesTreeItem } from '../models/ISCTreeItem.js';
+import { ISCClient } from '../services/ISCClient.js';
+import { getResourceUri } from '../utils/UriUtils.js';
+import { SearchAttributeConfig } from 'sailpoint-api-client/dist/search_attribute_configuration/api.js';
+import { runWizard } from '../wizard/wizard.js';
+import { InputPromptStep } from '../wizard/inputPromptStep.js';
+import { Validator } from '../validator/validator.js';
+import { WizardContext } from '../wizard/wizardContext.js';
+import { QuickPickTenantStep } from '../wizard/quickPickTenantStep.js';
+import { openPreview } from '../utils/vsCodeHelpers.js';
+import { QuickPickSourceStep } from '../wizard/quickPickSourceStep.js';
+import { QuickPickAccountSchemaStep } from '../wizard/quickPickAccountSchemaStep.js';
+import * as commands from "../commands/constants.js";
 
 const searchAttributeNameValidator = new Validator({
     required: true,
@@ -64,7 +64,7 @@ export class NewAttributeSearchConfigCommand {
         if (values === undefined) { return; }
 
         const name = values["searchAttribute"].trim()
-        const searchAttribute: SearchAttributeConfigBeta = {
+        const searchAttribute: SearchAttributeConfig = {
             name: name,
             displayName: name,
             applicationAttributes: {}

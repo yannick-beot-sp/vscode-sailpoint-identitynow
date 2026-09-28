@@ -1,8 +1,8 @@
 import * as fs from 'fs';
-import { TenantTreeItem } from "../../models/ISCTreeItem";
-import { TenantService } from "../../services/TenantService";
-import { WizardBasedImporterCommand } from "./WizardBasedImporterCommand";
-import { chooseFile } from '../../utils/vsCodeHelpers';
+import { TenantTreeItem } from "../../models/ISCTreeItem.js";
+import { TenantService } from "../../services/TenantService.js";
+import { WizardBasedImporterCommand } from "./WizardBasedImporterCommand.js";
+import { chooseFile } from '../../utils/vsCodeHelpers.js';
 
 /**
  * Entry point to import file from the tree view. Tenant is already known

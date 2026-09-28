@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
-import * as commands from './app/src/services/Commands';
-import { BaseWebviewPanel } from '../webview/BaseWebviewPanel';
-import { DependencyServiceFactory } from './DependencyServiceFactory';
-import { getDependencyNodeUri, getDependencyNodeUrl } from './DependencyNodeResource';
-import { openPreview } from '../utils/vsCodeHelpers';
+import * as commands from './app/src/services/Commands.js';
+import { BaseWebviewPanel } from '../webview/BaseWebviewPanel.js';
+import { DependencyServiceFactory } from './DependencyServiceFactory.js';
+import { getDependencyNodeUri, getDependencyNodeUrl } from './DependencyNodeResource.js';
+import { openPreview } from '../utils/vsCodeHelpers.js';
 
 function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
     return {

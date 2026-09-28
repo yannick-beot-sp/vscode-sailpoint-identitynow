@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
-import { NotificationTemplateTreeItem } from "../../models/ISCTreeItem";
-import { NotificationTemplateVariable } from "./templateVariables";
+import { NotificationTemplateTreeItem } from "../../models/ISCTreeItem.js";
+import { NotificationTemplateVariable } from "./templateVariables.js";
 import {
     MAX_EXAMPLE_JSON_CHARS,
     applyNotificationTemplateExamples,
     exampleValueMap,
     parseExampleValues,
-} from "./previewExamples";
+} from "./previewExamples.js";
 import {
     PREVIEW_READY_MESSAGE,
     PREVIEW_STATE_MESSAGE,
@@ -16,8 +16,8 @@ import {
     buildNotificationTemplatePreviewPage,
     buildPreviewFrameSrcdoc,
     createPreviewNonce,
-} from "./previewHtml";
-import { completionVariables, resolveTemplateIdentity } from "./templateVariableCompletion";
+} from "./previewHtml.js";
+import { completionVariables, resolveTemplateIdentity } from "./templateVariableCompletion.js";
 
 const TEMPLATES_SEGMENT = "/notification-templates/";
 const BODY_SEGMENT = "/notification-template-body/";
@@ -107,7 +107,7 @@ export class PreviewNotificationTemplateBodyCommand {
                     return;
                 }
                 const parsed = parseExampleValues(message.value);
-                if (!parsed.ok) {
+                if (parsed.ok === false) {
                     this.reportJsonError(key, parsed.error);
                     return;
                 }

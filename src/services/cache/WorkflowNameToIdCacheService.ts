@@ -1,12 +1,12 @@
-import { ISCClient } from "../ISCClient";
-import { CacheService } from "./CacheService";
-import { WorkflowV2025 } from "sailpoint-api-client";
+import { ISCClient } from "../ISCClient.js";
+import { CacheService } from "./CacheService.js";
+import { Workflow } from "sailpoint-api-client/dist/workflows/api.js";
 
 /**
  * Cache the workflow ID by name
  */
 export class WorkflowNameToIdCacheService extends CacheService<string>{
-    private workflows: WorkflowV2025[]
+    private workflows: Workflow[]
     constructor(readonly client: ISCClient) {
         super(
             async (key: string) => {

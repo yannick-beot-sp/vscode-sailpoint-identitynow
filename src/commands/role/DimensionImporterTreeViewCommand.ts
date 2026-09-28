@@ -1,8 +1,8 @@
-import { askCreateOrUpdate, chooseFile } from '../../utils/vsCodeHelpers';
-import { RolesTreeItem } from '../../models/ISCTreeItem';
-import { TenantService } from '../../services/TenantService';
-import { validateTenantReadonly } from '../validateTenantReadonly';
-import { DimensionImporter } from './DimensionImporter';
+import { askCreateOrUpdate, chooseFile } from '../../utils/vsCodeHelpers.js';
+import { RolesTreeItem } from '../../models/ISCTreeItem.js';
+import { TenantService } from '../../services/TenantService.js';
+import { validateTenantReadonly } from '../validateTenantReadonly.js';
+import { DimensionImporter } from './DimensionImporter.js';
 
 export class DimensionImporterTreeViewCommand {
 

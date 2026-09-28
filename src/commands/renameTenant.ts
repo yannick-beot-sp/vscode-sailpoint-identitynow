@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
-import * as commands from './constants';
-import { TenantService } from '../services/TenantService';
-import { isEmpty } from '../utils/stringUtils';
-import { TenantTreeItem } from '../models/ISCTreeItem';
-import { askDisplayName } from '../utils/vsCodeHelpers';
+import * as commands from './constants.js';
+import { TenantService } from '../services/TenantService.js';
+import { isEmpty } from '../utils/stringUtils.js';
+import { TenantTreeItem } from '../models/ISCTreeItem.js';
+import { askDisplayName } from '../utils/vsCodeHelpers.js';
 
 
 export class RenameTenantCommand {
