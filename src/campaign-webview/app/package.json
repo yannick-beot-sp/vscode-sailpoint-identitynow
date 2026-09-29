@@ -26,7 +26,7 @@
     "certification-campaign-webview": "file:"
   },
   "allowScripts": {
-    "fsevents@2.3.3": true,
-    "esbuild@0.25.3": true
+    "fsevents": true,
+    "esbuild": true
   }
 }
