@@ -65,6 +65,128 @@ const sailpointEsmPlugin = {
 	},
 };
 
+// @frontmcp/sdk references these packages from code paths this extension never
+// runs (MCP UI widgets, the built-in Express host). Aliasing them keeps the
+// real packages out of the bundle. Calling the stubs throws.
+const UIPACK_STUB = `
+function notBundled(name) {
+	throw new Error("@frontmcp/uipack is not bundled (" + name + ")");
+}
+const fn = (name) => () => notBundled(name);
+export const MCP_APPS_MIME_TYPE = "text/html;profile=mcp-app";
+export const MCP_APPS_EXTENSION_ID = "mcp-app";
+export const renderToolTemplate = fn("renderToolTemplate");
+export const detectUIType = fn("detectUIType");
+export const createDefaultBaseTemplate = fn("createDefaultBaseTemplate");
+export const buildCDNInfoForUIType = fn("buildCDNInfoForUIType");
+export const buildToolResponseContent = fn("buildToolResponseContent");
+export const isUIRenderFailure = fn("isUIRenderFailure");
+export const resolveServingMode = fn("resolveServingMode");
+export const detectContentType = fn("detectContentType");
+export const buildChartHtml = fn("buildChartHtml");
+export const buildMermaidHtml = fn("buildMermaidHtml");
+export const buildPdfHtml = fn("buildPdfHtml");
+export const wrapDetectedContent = fn("wrapDetectedContent");
+export const escapeHtml = fn("escapeHtml");
+export const createTemplateHelpers = fn("createTemplateHelpers");
+export const createResolverWithOverrides = fn("createResolverWithOverrides");
+export const renderComponent = fn("renderComponent");
+export const isUIType = fn("isUIType");
+export const buildShell = fn("buildShell");
+export default notBundled;
+`;
+
+const EXPRESS_STUB = `
+function express() {
+	throw new Error("express is not bundled; the MCP server uses node:http");
+}
+express.json = () => express;
+express.urlencoded = () => express;
+express.Router = express;
+express.static = express;
+export default express;
+`;
+
+const CORS_STUB = `
+export default function cors() {
+	throw new Error("cors is not bundled; the MCP server does not enable CORS");
+}
+`;
+
+// raw-body (imported by @frontmcp/sdk) require()s iconv-lite for every body.
+// The MCP server only accepts UTF-8 JSON, so the CJK encoding tables can go.
+const ICONV_STUB = `
+var UTF8 = { "utf8": 1, "utf-8": 1, "unicode-1-1-utf-8": 1 };
+function normalize(encoding) {
+	return String(encoding == null ? "" : encoding).trim().toLowerCase();
+}
+function assertUtf8(encoding) {
+	if (!UTF8[normalize(encoding)]) {
+		throw new Error("Encoding not recognized: '" + encoding + "'");
+	}
+}
+function decode(buffer, encoding) {
+	assertUtf8(encoding);
+	return Buffer.from(buffer).toString("utf8");
+}
+function encode(content, encoding) {
+	assertUtf8(encoding);
+	return Buffer.from(String(content), "utf8");
+}
+function getDecoder(encoding) {
+	assertUtf8(encoding);
+	return {
+		write: function (chunk) { return Buffer.from(chunk).toString("utf8"); },
+		end: function () { return ""; }
+	};
+}
+module.exports = {
+	decode: decode,
+	encode: encode,
+	encodingExists: function (encoding) { return !!UTF8[normalize(encoding)]; },
+	getDecoder: getDecoder,
+	toEncoding: encode,
+	fromEncoding: decode
+};
+`;
+
+const bundleDietPlugin = {
+	name: "bundle-diet",
+	setup(build) {
+		build.onResolve({ filter: /^@frontmcp\/uipack($|\/)/ }, () => ({
+			path: "uipack",
+			namespace: "bundle-stub",
+		}));
+		build.onResolve({ filter: /^express$/ }, () => ({
+			path: "express",
+			namespace: "bundle-stub",
+		}));
+		build.onResolve({ filter: /^cors$/ }, () => ({
+			path: "cors",
+			namespace: "bundle-stub",
+		}));
+		build.onResolve({ filter: /^iconv-lite$/ }, () => ({
+			path: "iconv-lite",
+			namespace: "bundle-stub",
+		}));
+		// express, send, type-is and accepts each ship their own mime-db.
+		build.onResolve({ filter: /(?:^|\/)db\.json$/ }, (args) => {
+			const importer = args.importer ?? "";
+			if (!importer.includes(`${path.sep}mime-db${path.sep}`)) {
+				return null;
+			}
+			return { path: path.join(root, "node_modules/mime-db/db.json") };
+		});
+		build.onLoad({ filter: /.*/, namespace: "bundle-stub" }, (args) => {
+			const contents = args.path === "uipack" ? UIPACK_STUB
+				: args.path === "express" ? EXPRESS_STUB
+					: args.path === "iconv-lite" ? ICONV_STUB
+						: CORS_STUB;
+			return { contents, loader: "js" };
+		});
+	},
+};
+
 const args = new Set(process.argv.slice(2));
 
 const options = {
@@ -77,7 +199,7 @@ const options = {
 	platform: "node",
 	minify: args.has("--minify"),
 	sourcemap: args.has("--sourcemap"),
-	plugins: [inlineSnippetJsonPlugin, sailpointEsmPlugin],
+	plugins: [inlineSnippetJsonPlugin, sailpointEsmPlugin, bundleDietPlugin],
 	logLevel: "info",
 	// CJS deps (tmp, and others) keep require("fs") inside esbuild's CommonJS
 	// wrapper. In an ESM bundle that becomes a dynamic require, which throws
