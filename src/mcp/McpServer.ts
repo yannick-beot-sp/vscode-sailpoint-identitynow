@@ -15,7 +15,7 @@ import { TenantApp } from "./tenants/TenantApp.js";
 import { FormsApp } from "./forms/FormsApp.js";
 import { IdentityProfilesApp } from "./identityprofiles/IdentityProfilesApp.js";
 import { MCP_NAME, MCP_VERSION } from "./constants.js";
-import { StoppableExpressAdapter } from "./StoppableExpressAdapter.js";
+import { StoppableHttpAdapter } from "./StoppableHttpAdapter.js";
 
 /**
  * Pure HTTP MCP server — no VS Code dependency.
@@ -24,7 +24,7 @@ import { StoppableExpressAdapter } from "./StoppableExpressAdapter.js";
  */
 export class McpServer {
     private _instance?: FrontMcpInstance;
-    private _adapter?: StoppableExpressAdapter;
+    private _adapter?: StoppableHttpAdapter;
     private _port = 0;
 
     constructor(private readonly tenantService: TenantService) { }
@@ -40,7 +40,7 @@ export class McpServer {
         setTenantService(this.tenantService);
 
         const resolvedPort = port > 0 ? port : await findFreePort();
-        const adapter = new StoppableExpressAdapter();
+        const adapter = new StoppableHttpAdapter();
 
         this._instance = await FrontMcpInstance.createForGraph({
             info: { name: MCP_NAME, version: MCP_VERSION },
