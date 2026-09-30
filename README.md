@@ -677,6 +677,9 @@ The patterns defined above use the following tokens:
 
 ### Unreleased
 
+- URI Path changed to display the tenant name
+
+
 ### 1.3.32
 
 - Add identity panel to view roles, access profiles, and entitlements for an identity by [@henrique-quintino-sp](https://github.com/henrique-quintino-sp) (cf. [#168](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/pull/168))

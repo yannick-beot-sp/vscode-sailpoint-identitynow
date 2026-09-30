@@ -1,7 +1,6 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { MachineAccountSubtypeTreeItem } from "../../models/ISCTreeItem.js";
-import { getPathByUri } from "../../utils/UriUtils.js";
 import { openPreview } from "../../utils/vsCodeHelpers.js";
 
 export class EditMachineAccountSubtypeApprovalConfigCommand {
@@ -10,7 +9,7 @@ export class EditMachineAccountSubtypeApprovalConfigCommand {
         console.log("> EditMachineAccountSubtypeApprovalConfigCommand.execute", node);
 
         const approvalConfigUri = node.uri.with({
-            path: path.posix.join(getPathByUri(node.uri) || "", "machine-config", "Approval Configuration")
+            path: path.posix.join(path.posix.dirname(node.uri.path), "machine-config", "Approval Configuration")
         });
 
         await vscode.window.withProgress({

@@ -12,6 +12,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Changed
 
+- URI Path changed to display the tenant name
+
 ### Fixed
 
 ### Removed

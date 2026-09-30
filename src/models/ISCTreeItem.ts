@@ -308,7 +308,7 @@ export class ISCResourceTreeItem extends BaseTreeItem {
 				options.label)
 			this.uri = this.uri.with({
 				path: path.posix.join(
-					getPathByUri(this.uri) || "",
+					path.posix.dirname(this.uri.path),
 					options.subResourceType,
 					options.resourceSubId ?? options.subId,
 					options.label

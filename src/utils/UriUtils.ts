@@ -1,5 +1,5 @@
 import { Uri } from "vscode";
-import { RESOURCE_TYPES, URL_PREFIX } from "../constants.js";
+import { URL_PREFIX } from "../constants.js";
 import { posix } from "path";
 import { getProvisioningPoliciesPath } from "../models/ProvisioningPolicy.js";
 
@@ -32,6 +32,25 @@ export function addQueryParams(path: string, params: Record<string, any>): strin
 }
 
 
+function apiVersionFor(resourceType: string): string {
+    const service = resourceType.split("/")[0];
+    // v1 is deprecated. The current get/update contract is v2.
+    if (resourceType === "access-request-config" || service === "access-request-config") {
+        return "v2";
+    }
+    return "v1";
+}
+
+/**
+ * `{service}/vN/.../{id}` with the version after the service name.
+ * A resource type that already contains slashes (`accounts/search-attribute-config`,
+ * `criteria-config/privilege`) keeps those segments after the version.
+ */
+function versionedResourceSegments(resourceType: string, ...segments: Array<string | null | undefined>): string[] {
+    const [service, ...tail] = resourceType.split("/").filter(part => !!part);
+    return [service, apiVersionFor(resourceType), ...tail, ...segments].filter((part): part is string => !!part);
+}
+
 export function buildResourceUri(params: {
     tenantName: string;
     resourceType: string;
@@ -40,55 +59,66 @@ export function buildResourceUri(params: {
     subResourceType?: string;
     subId?: string;
 }) {
-    let beta = false
-    switch (params.resourceType) {
-        case RESOURCE_TYPES.connectorRule:
-        case RESOURCE_TYPES.cloudRule:
-        case RESOURCE_TYPES.identityAttribute:
-        case RESOURCE_TYPES.sourceApps:
-            beta = true
-            break;
-    }
-
     const name = params.name?.replaceAll("/", "%2F")
-
-    const pathParts = [(beta ? 'beta' : 'v3'),
-    params.resourceType,
-    params.id,
-    params.subResourceType,
-    params.subId,
-        name].filter(x => !!x)
+    const pathParts = versionedResourceSegments(
+        params.resourceType,
+        params.id,
+        params.subResourceType,
+        params.subId,
+        name
+    )
 
     return Uri.from({
         scheme: URL_PREFIX,
         authority: params.tenantName,
-        path: "/" + pathParts?.join("/")
+        path: editorPath(params.tenantName, pathParts)
     })
 }
+
 /**
- * Construct the Uri for an ISC resource
- * @param tenantName 
- * @param resourceType 
- * @param id 
- * @param name 
- * @returns 
+ * VS Code does not show the authority of a custom scheme in the breadcrumb,
+ * tab description, or path label. Repeat the tenant hostname as the first
+ * path segment so the open file shows which tenant it belongs to.
+ * The object name stays last so it is the editor tab title.
+ * Authority remains the hostname used by the extension to resolve the tenant.
+ */
+function editorPath(tenantName: string, segments: string[]): string {
+    const parts = [tenantName, ...segments].filter(part => !!part);
+    return "/" + parts.join("/");
+}
+
+/**
+ * Drop the visible tenant segment. The remainder is the API path.
+ * URIs opened before that segment existed are left unchanged.
+ */
+function pathWithoutTenant(uri?: Uri): string {
+    const path = uri?.path ?? "";
+    const tenant = uri?.authority;
+    if (!tenant) {
+        return path;
+    }
+    const prefix = `/${tenant}`;
+    if (path.length < prefix.length || path.slice(0, prefix.length).toLowerCase() !== prefix.toLowerCase()) {
+        return path;
+    }
+    const rest = path.slice(prefix.length);
+    if (rest === "") {
+        return "/";
+    }
+    if (!rest.startsWith("/")) {
+        return path;
+    }
+    return rest;
+}
+
+/**
+ * Construct the Uri for an ISC resource.
+ * Authority is the tenant hostname (unique in the tenant list), never the tenant id.
+ * The same hostname is the first path segment so the editor shows the tenant.
+ * The object name stays last so it is the editor tab title.
  */
 export function getResourceUri(tenantName: string, resourceType: string, id: string, name: string): Uri {
-    const baseUri = Uri.from({ scheme: URL_PREFIX, authority: tenantName, path: '/' });
-    name = name?.replaceAll("/", "%2F")
-    // ensure all parts are not null
-    const prefix = { "source-subtypes": "v2026", "notification-templates": "beta" }[resourceType] ?? "v2025";
-    const pathParts = [prefix,
-        resourceType,
-        id,
-        name].filter(x => !!x)
-
-    // You can pass an array to a rest parameter by using the spread operator
-    // cf. https://stackoverflow.com/a/43897911
-    return Uri.joinPath(
-        baseUri,
-        ...pathParts
-    );
+    return buildResourceUri({ tenantName, resourceType, id, name });
 }
 
 /**
@@ -104,7 +134,10 @@ export function getProvisioningPolicyUri(
     return Uri.from({
         scheme: URL_PREFIX,
         authority: tenantName,
-        path: `${getProvisioningPoliciesPath(sourceId, policyId)}/${encodedLabel}`
+        path: editorPath(tenantName, [
+            ...getProvisioningPoliciesPath(sourceId, policyId).split("/").filter(part => !!part),
+            encodedLabel
+        ])
     });
 }
 
@@ -118,16 +151,15 @@ export function getProvisioningPolicyUri(
 export function getWorkflowExecutionDetailUri(tenantName: string, executionId: string): Uri {
     // NOTE: the returned URI must end with a "label". 
     // In this case, I will use the executionId as this information is not present in the detail itself in contrary to time info
-    const baseUri = Uri.from({
+    return Uri.from({
         scheme: URL_PREFIX,
         authority: tenantName,
-        path: `/beta/workflow-executions/${executionId}/history/${executionId}`
+        path: editorPath(tenantName, ["workflow-executions", "v1", executionId, "history", executionId])
     });
-    return baseUri;
 }
 
 export function getIdByUri(uri?: Uri): string | null {
-    const path = uri?.path || "";
+    const path = pathWithoutTenant(uri);
     const found = path.match(/^\/.+\/(.*?)\/.*?$/);
     // Found including the whole match and the group
     // cf. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/match
@@ -138,7 +170,7 @@ export function getIdByUri(uri?: Uri): string | null {
 }
 
 export function getResourceTypeByUri(uri: Uri): string | null {
-    const path = uri.path || "";
+    const path = pathWithoutTenant(uri);
     const found = path.match(/^\/(.+?)\/.*?\/.*?/);
     // Found including the whole match and the group
     // cf. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/match
@@ -154,12 +186,12 @@ export function getNameByUri(uri: Uri): string | null {
 }
 
 /**
- * Will remove the "name" part
- * @param uri 
- * @returns 
+ * API path: tenant segment and trailing name removed.
+ * Do not use this to build another idn:// URI — start from the URI directory
+ * so the tenant hostname stays visible in the editor.
  */
 export function getPathByUri(uri?: Uri): string | null {
-    const path = uri?.path || "";
+    const path = pathWithoutTenant(uri);
     const found = path.match(/^(\/.+)\/.*?$/);
     // Found including the whole match and the group
     // cf. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/match
@@ -251,7 +283,7 @@ export function getResourceUriByKind(
     if (kind === "dimension") {
         if (!options?.parentId) return undefined;
         const parentUri = getResourceUri(tenantName, "roles", options.parentId, label);
-        return parentUri.with({ path: posix.join(getPathByUri(parentUri) || "", "dimensions", id, label) });
+        return parentUri.with({ path: posix.join(posix.dirname(parentUri.path), "dimensions", id, label) });
     }
     if (kind === "provisioning-policy") {
         if (!options?.parentId) return undefined;

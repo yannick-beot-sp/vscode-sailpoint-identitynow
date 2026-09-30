@@ -14,6 +14,15 @@
       "preLaunchTask": "${defaultBuildTask}"
     },
     {
+      "name": "Run Extension (no debug)",
+      "type": "extensionHost",
+      "request": "launch",
+      "noDebug": true,
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}","--preserve-symlinks"],
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    },
+    {
       "name": "Extension Tests",
       "type": "extensionHost",
       "request": "launch",

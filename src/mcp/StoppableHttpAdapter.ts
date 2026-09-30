@@ -184,7 +184,7 @@ function decorateRequest(req: http.IncomingMessage): ServerRequest {
     } catch {
         // Keep the path split from req.url.
     }
-    const decorated = req as ServerRequest & { originalUrl: string; protocol: string };
+    const decorated = req as unknown as ServerRequest & { originalUrl: string; protocol: string };
     decorated.path = pathname;
     decorated.originalUrl = rawUrl;
     decorated.protocol = "http";

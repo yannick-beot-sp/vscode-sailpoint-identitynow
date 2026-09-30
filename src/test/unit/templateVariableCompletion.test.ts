@@ -75,6 +75,18 @@ suite('template variable completion Test Suite', () => {
             );
         });
 
+        it('reads a default template id from a service-versioned body URI', () => {
+            const id = defaultNotificationTemplateId({
+                key: 'approval_request_notification',
+                medium: 'EMAIL',
+                locale: 'en',
+            });
+            assert.deepStrictEqual(
+                resolveTemplateIdentity(`/notification-template-body/v1/${id}/Approval`, '', ''),
+                { key: 'approval_request_notification', medium: 'EMAIL' },
+            );
+        });
+
         it('reads the key and medium from the template JSON', () => {
             assert.deepStrictEqual(
                 resolveTemplateIdentity(

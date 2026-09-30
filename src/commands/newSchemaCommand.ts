@@ -1,7 +1,7 @@
 import * as path from "node:path";
 import * as vscode from 'vscode';
 import { SchemasTreeItem } from "../models/ISCTreeItem.js";
-import { getIdByUri, getPathByUri } from '../utils/UriUtils.js';
+import { getIdByUri } from '../utils/UriUtils.js';
 import { openPreview } from '../utils/vsCodeHelpers.js';
 import { ISCClient } from '../services/ISCClient.js';
 import * as commands from './constants.js';
@@ -73,7 +73,7 @@ export class NewSchemaCommand {
 
             const newUri = item.parentUri!.with({
                 path: path.posix.join(
-                    getPathByUri(item.parentUri) || "",
+                    path.posix.dirname(item.parentUri!.path),
                     'schemas',
                     schema.id!,
                     schemaName

@@ -18,6 +18,18 @@ if (!Module._load.sdk2xVscodeStub) {
 				version: "1.105.0",
 				Uri: {
 					parse: (value: string) => ({ toString: () => value }),
+					from: (components: { scheme?: string; authority?: string; path?: string }) => ({
+						scheme: components.scheme ?? "",
+						authority: components.authority ?? "",
+						path: components.path ?? "",
+						with(change: { path?: string }) {
+							return { ...this, ...change };
+						},
+						toString() {
+							const authority = this.authority ? `//${this.authority}` : "";
+							return `${this.scheme}:${authority}${this.path}`;
+						},
+					}),
 				},
 				extensions: {
 					getExtension: () => ({ packageJSON: { version: "0.0.0-test" } }),

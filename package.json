@@ -2249,6 +2249,17 @@
         "id": "sailpoint-identitynow-mcp",
         "label": "SailPoint Identity Security Cloud"
       }
+    ],
+    "resourceLabelFormatters": [
+      {
+        "scheme": "idn",
+        "formatting": {
+          "label": "${path}",
+          "separator": "/",
+          "tildify": false,
+          "stripPathStartingSeparator": false
+        }
+      }
     ]
   },
   "scripts": {

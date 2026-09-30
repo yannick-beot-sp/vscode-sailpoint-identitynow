@@ -61,7 +61,7 @@ import { ManagedCluster, StandardLevel } from "sailpoint-api-client/dist/managed
 import { PasswordPolicyV3Dto } from "sailpoint-api-client/dist/password_policies/index.js";
 import { PasswordSyncGroup } from "sailpoint-api-client/dist/password_sync_groups/index.js";
 import { PendingApproval } from "sailpoint-api-client/dist/access_request_approvals/api.js";
-import { SourceApp, SourceAppPatchDto } from "sailpoint-api-client/dist/apps/api.js";
+import { AccessProfileDetails, SourceApp, SourceAppPatchDto } from "sailpoint-api-client/dist/apps/api.js";
 import { AuthUser } from "sailpoint-api-client/dist/auth_users/api.js";
 import { IdentityCertDecisionSummary } from "sailpoint-api-client/dist/certification_summaries/api.js";
 import { IdentityCertificationDto, AccessReviewItem, CertificationsApiMakeIdentityDecisionV1Request, CertificationsApiReassignIdentityCertificationsV1Request, CertificationsApiSubmitReassignCertsAsyncV1Request } from "sailpoint-api-client/dist/certifications/api.js";
@@ -2581,16 +2581,22 @@ export class ISCClient {
 	//region Applications
 	//////////////////////////////
 
-	public async createApplication({ name, description, sourceId }: { name: string; description: string; sourceId: string; }): Promise<any> {
-		return await this.createResource("/beta/source-apps", {
-			name,
-			description,
-			matchAllAccounts: false,
-			accountSource: {
-				id: sourceId,
-				type: "SOURCE"
+	public async createApplication({ name, description, sourceId }: { name: string; description: string; sourceId: string; }): Promise<SourceApp> {
+		console.log("> createApplication", name, sourceId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AppsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.createSourceAppV1({
+			sourceAppCreateDto: {
+				name,
+				description,
+				matchAllAccounts: false,
+				accountSource: {
+					id: sourceId,
+					type: "SOURCE"
+				}
 			}
-		})
+		});
+		return response.data;
 	}
 	/**
 	 * cf. SAASTRIAGE-7051
@@ -2645,38 +2651,37 @@ export class ISCClient {
 		return response.data;
 	}
 
-	public async getPaginatedApplicationAccessProfiles(appId: string, limit?: number, offset?: number): Promise<AxiosResponse<any[]>> {
+	public async getPaginatedApplicationAccessProfiles(appId: string, limit?: number, offset?: number): Promise<AxiosResponse<AccessProfileDetails[]>> {
 		console.log("> getPaginatedApplicationAccessProfile", limit, offset);
 
 		limit = limit ? Math.min(DEFAULT_PAGINATION, limit) : DEFAULT_PAGINATION;
-
-		const httpClient = await this.getAxios();
-		const baseUrl = `/beta/source-apps/${appId}/access-profiles`
-		const args: Record<string, any> = {
-			offset,
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AppsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		return await api.listAccessProfilesForSourceAppV1({
+			id: appId,
 			limit,
-		}
-		const path = addQueryParams(baseUrl, args)
-		const response = await httpClient.get(path);
-		return response;
+			offset,
+		});
 	}
 
 	public async removeAccessProfileFromApplication(appId: string, accessProfileId: string): Promise<void> {
 		console.log("> removeAccessProfileFromApplication", appId, accessProfileId);
-		const httpClient = await this.getAxios();
-		const path = `/beta/source-apps/${appId}/access-profiles/bulk-remove`
-		const response = await httpClient.post(path, [accessProfileId]);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AppsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		await api.deleteAccessProfilesFromSourceAppByBulkV1({
+			id: appId,
+			requestBody: [accessProfileId],
+		});
 	}
 
 	public async addAccessProfilesToApplication(appId: string, accessProfileIds: string[]): Promise<void> {
 		console.log("> addAccessProfileToApplication", appId, accessProfileIds);
-		const path = `/beta/source-apps/${appId}`
-		const payload = accessProfileIds.map(accessProfileId => ({
-			"op": "add",
-			"path": "/accessProfiles/-",
-			"value": accessProfileId
-		}))
-		const response = await this.patchResource(path, payload);
+		const payload: JsonPatchOperation[] = accessProfileIds.map(accessProfileId => ({
+			op: JsonPatchOperationOpEnum.Add,
+			path: "/accessProfiles/-",
+			value: accessProfileId,
+		}));
+		await this.updateApplication(appId, payload);
 	}
 
 	//////////////////////////////
@@ -2691,19 +2696,15 @@ export class ISCClient {
 		console.log("> getPaginatedCampaigns", filters, limit, offset);
 
 		limit = limit ? Math.min(DEFAULT_PAGINATION, limit) : DEFAULT_PAGINATION;
-
-		const httpClient = await this.getAxios();
-		const baseUrl = '/v3/campaigns'
-		const args: Record<string, any> = {
-			offset,
-			limit,
+		const apiConfig = await this.getApiConfiguration();
+		const api = new CertificationCampaignsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		return await api.getActiveCampaignsV1({
 			filters,
+			limit,
+			offset,
+			count,
 			sorters: "-created",
-			count
-		}
-		const path = addQueryParams(baseUrl, args)
-		const response = await httpClient.get(path);
-		return response;
+		});
 	}
 
 	public async getCampaign(campaignId: string): Promise<GetCampaignV1200Response> {

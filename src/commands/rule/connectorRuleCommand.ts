@@ -164,7 +164,7 @@ export class ConnectorRuleCommand {
             } else {
                 // NEW_RULE
                 rule.name = values["ruleName"];
-                const data = await client.createResource('/beta/connector-rules', JSON.stringify(rule));
+                const data = await client.createResource('/connector-rules/v1', JSON.stringify(rule));
                 newUri = buildResourceUri({
                     tenantName: values["tenant"].tenantName,
                     resourceType: RESOURCE_TYPES.connectorRule,
