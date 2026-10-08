@@ -16,6 +16,8 @@ export function convertToBaseTreeItem(x: TenantInfo | FolderTreeNode, tenantServ
                 x.name,
                 tenantService);
             tenantTreeItems.set(x.id, item);
+        } else {
+            item.applyDisplayName(x.name);
         }
         return item;
     } else {

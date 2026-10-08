@@ -16,6 +16,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Fixed
 
+- Renaming a tenant did not update its name in the tree view
+
 ### Removed
 
 ## [1.3.32] - 2026-09-28

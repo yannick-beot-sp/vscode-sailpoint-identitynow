@@ -30,7 +30,7 @@ export abstract class BaseTreeItem extends vscode.TreeItem {
 		label: string | vscode.TreeItemLabel,
 		public readonly tenantId: string,
 		public readonly tenantName: string,
-		public readonly tenantDisplayName: string,
+		public tenantDisplayName: string,
 		collapsibleState: vscode.TreeItemCollapsibleState = vscode.TreeItemCollapsibleState.None,
 	) {
 		super(label, collapsibleState);
@@ -114,6 +114,18 @@ export class TenantTreeItem extends BaseTreeItem {
 			this.cachedChildren = this.buildChildren();
 		}
 		return this.cachedChildren;
+	}
+
+	/**
+	 * The tree keeps one TenantTreeItem per tenant id. A rename must update that
+	 * instance, otherwise the next refresh still shows the previous label.
+	 */
+	applyDisplayName(name: string): void {
+		this.label = name;
+		this.tenantDisplayName = name;
+		for (const child of this.cachedChildren ?? []) {
+			child.tenantDisplayName = name;
+		}
 	}
 
 	get computedContextValue() {
