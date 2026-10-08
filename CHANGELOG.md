@@ -10,6 +10,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- When adding a tenant, a URL is accepted and its hostname is used as the tenant FQDN
+
 ### Changed
 
 - URI Path changed to display the tenant name

@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as commands from './constants.js';
 import { SailPointISCAuthenticationProvider } from '../services/AuthenticationProvider.js';
 import { TenantService } from '../services/TenantService.js';
-import { normalizeTenant } from '../utils.js';
+import { extractTenantName, normalizeTenant } from '../utils.js';
 import { askDisplayName } from '../utils/vsCodeHelpers.js';
 import { AuthenticationMethod } from '../models/TenantInfo.js';
 import { randomUUID } from 'crypto';
@@ -17,13 +17,11 @@ export class AddTenantCommand {
         const result = await vscode.window.showInputBox({
             value: '',
             ignoreFocusOut: true,
-            placeHolder: 'company or company.identitynow.com',
-            prompt: "Enter the tenant name",
+            placeHolder: 'company, company.identitynow.com or https://company.identitynow.com',
+            prompt: "Enter the tenant name, FQDN or URL",
             title: 'Identity Security Cloud',
             validateInput: text => {
-                // https://regexr.com/7798n
-                const regex = new RegExp('^([a-z0-9][a-z0-9\-]*[a-z0-9]\.)*([a-z0-9][a-z0-9\-]*[a-z0-9])$', 'i');
-                if (regex.test(text)) {
+                if (extractTenantName(text) !== undefined) {
                     return null;
                 }
                 return "Invalid tenant name";
@@ -54,8 +52,12 @@ export class AddTenantCommand {
 
     async execute(context: vscode.ExtensionContext): Promise<void> {
 
-        let tenantName = await this.askTenant() || "";
-        if (isEmpty(tenantName)) {
+        const tenantInput = await this.askTenant() || "";
+        if (isEmpty(tenantInput)) {
+            return;
+        }
+        const tenantName = extractTenantName(tenantInput);
+        if (tenantName === undefined) {
             return;
         }
         const normalizedTenantName = normalizeTenant(tenantName);

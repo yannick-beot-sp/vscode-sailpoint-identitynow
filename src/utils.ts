@@ -61,6 +61,36 @@ export function compareCaseInsensitive(a: any, b: any, property: string) {
     return a[property].localeCompare(b[property], undefined, { sensitivity: 'base' })
 }
 
+/** One DNS label of a tenant name: at least two characters, no leading or trailing hyphen. */
+const TENANT_LABEL = "[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]";
+
+/**
+ * Tenant short name (`company`) or FQDN (`company.identitynow.com`).
+ * https://regexr.com/7798n
+ */
+const TENANT_NAME_REGEX = new RegExp(`^(?:${TENANT_LABEL}\\.)*${TENANT_LABEL}$`);
+
+/**
+ * https URL whose host is a tenant name or FQDN.
+ * The host is captured; an optional port, path, query or fragment is ignored.
+ */
+const TENANT_HTTPS_URL_REGEX = new RegExp(
+    `^https://((?:${TENANT_LABEL}\\.)*${TENANT_LABEL})(?::\\d+)?(?:[/?#]\\S*)?$`
+);
+
+/**
+ * Accepts a tenant short name, an FQDN, or an https URL.
+ * When the input is an https URL, returns its hostname so it can be stored as the tenant FQDN.
+ */
+export function extractTenantName(input: string): string | undefined {
+    const trimmed = input.trim();
+    if (TENANT_NAME_REGEX.test(trimmed)) {
+        return trimmed;
+    }
+    const urlMatch = TENANT_HTTPS_URL_REGEX.exec(trimmed);
+    return urlMatch?.[1];
+}
+
 /**
  * Use to get the full tenant name. The idea is to prevent the creation of the same tenant if already present
  */
