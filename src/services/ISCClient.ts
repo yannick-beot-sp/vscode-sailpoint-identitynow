@@ -43,7 +43,7 @@ import { AccessProfileRead } from "../models/AccessProfiles.js";
 import { IdentityAccessItem, IdentityAccessItemType } from "../models/IdentityAccessItem.js";
 import { HecateJobStatus } from "../models/HecateJob.js";
 import { isDefaultNotificationTemplateId, notificationTemplateKeyFilter, parseDefaultNotificationTemplateId } from "../utils/notificationTemplateList.js";
-import { AccountDeleteConfigDto, AttrSyncSourceConfig, JsonPatchOperation, JsonPatchOperationOpEnum, NativeChangeDetectionConfig, PasswordPolicyHoldersDtoInner, Schema, Source, StatusResponse, TransformRead } from "sailpoint-api-client/dist/sources/index.js";
+import { AccountDeleteConfigDto, AttrSyncSourceConfig, JsonPatchOperation, JsonPatchOperationOpEnum, NativeChangeDetectionConfig, PasswordPolicyHoldersDtoInner, Schema, Source, SourceDataset, SourceDatasetResource, StatusResponse, TransformRead } from "sailpoint-api-client/dist/sources/index.js";
 import { CreateProvisioningPolicyV2, getProvisioningPoliciesPath, ProvisioningPolicyV2 } from "../models/ProvisioningPolicy.js";
 import { Search, AttributeDTO, Index } from "sailpoint-api-client/dist/access_model_metadata/api.js";
 import { AccessRequestResponse, RequestedItemStatus, RequestedItemStatusRequestState } from "sailpoint-api-client/dist/access_requests/api.js";
@@ -351,6 +351,26 @@ export class ISCClient {
 		return response.data;
 	}
 
+	public async getSourceDatasets(sourceId: string): Promise<SourceDataset[]> {
+		console.log("> getSourceDatasets", sourceId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await Paginator.paginate(api, api.getSourceDatasetsV1, { sourceId });
+		return result.data;
+	}
+
+	/**
+	 * cf. api-specs idn/apis/sources/paths/sources-v1-by-sourceid-resources.yaml
+	 * GET /sources/v1/{sourceId}/resources
+	 */
+	public async getSourceResources(sourceId: string): Promise<SourceDatasetResource[]> {
+		console.log("> getSourceResources", sourceId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await Paginator.paginate(api, api.getSourceResourcesV1, { sourceId });
+		return result.data;
+	}
+
 	public async createSchema(sourceId: string, schema: Schema): Promise<Schema> {
 		console.log("> createSchema", sourceId);
 		const apiConfig = await this.getApiConfiguration();
@@ -401,25 +421,6 @@ export class ISCClient {
 		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.deleteAccountsAsyncV1({ id: sourceId })
 		return response.data
-	}
-
-	public async startMachineIdentityAggregation(
-		sourceId: string,
-		datasetIds: string[],
-		disableOptimization = false
-	): Promise<any> {
-		console.log("> ISCClient.startMachineIdentityAggregation");
-
-		const apiConfig = await this.getApiConfiguration();
-		const api = new MachineIdentitiesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
-		const response = await api.startMachineIdentityAggregationV1({
-			sourceId,
-			machineIdentityAggregationRequest: {
-				disableOptimization, datasetIds
-			}
-		})
-
-		return response.data;
 	}
 
 	public async startAccountAggregation(

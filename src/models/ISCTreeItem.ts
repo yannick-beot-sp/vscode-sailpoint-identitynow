@@ -7,7 +7,7 @@ import { AxiosHeaders, AxiosResponse } from "axios";
 import { getConfigNumber } from '../utils/configurationUtils.js';
 import * as commands from "../commands/constants.js";
 import * as configuration from '../configurationConstants.js';
-import { convertConstantToTitleCase, escapeFilter, isEmpty, isNotEmpty } from "../utils/stringUtils.js";
+import { convertConstantToTitleCase, escapeFilter, isEmpty, isNotBlank, isNotEmpty } from "../utils/stringUtils.js";
 import { TenantService } from "../services/TenantService.js";
 import { CloudRuleService } from "../services/CloudRuleService.js";
 import { convertToBaseTreeItem } from "../views/utils.js";
@@ -17,8 +17,10 @@ import { Campaign2StatusEnum } from "sailpoint-api-client/dist/certification_cam
 import { Account } from "sailpoint-api-client/dist/accounts/api.js";
 import { Dimension } from "sailpoint-api-client/dist/dimensions/api.js";
 import { SourceSubtypeWithSource } from "sailpoint-api-client/dist/machine_account_subtypes/api.js";
+import { SourceDataset, SourceDatasetResource } from "sailpoint-api-client/dist/sources/index.js";
 import { MachineIdentityResponse } from "sailpoint-api-client/dist/machine_identities/api.js";
 import { truethy } from "../utils/booleanUtils.js";
+import { schemaHasDatasetId, sourceResourceIconName } from "../utils/sourceResources.js";
 
 
 /**
@@ -376,6 +378,10 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 	async getChildren(): Promise<BaseTreeItem[]> {
 		const results: BaseTreeItem[] = [];
 		results.push(new SchemasTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, this.uri));
+		if (this.features?.includes("MACHINE_IDENTITY_AGGREGATION")) {
+			results.push(new SourceDatasetsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, this.uri));
+			results.push(new SourceResourcesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, this.uri));
+		}
 		results.push(
 			new ProvisioningPoliciesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, this.uri)
 		);
@@ -616,6 +622,7 @@ export class SchemasTreeItem extends FolderTreeItem {
 		const schemas = await client.getResource(schemaPath);
 		if (schemas !== undefined && schemas instanceof Array) {
 			results = schemas
+				.filter((element) => !schemaHasDatasetId(element))
 				.sort(compareByName)
 				.map((element) =>
 					new SchemaTreeItem(
@@ -630,6 +637,131 @@ export class SchemasTreeItem extends FolderTreeItem {
 		}
 		return results;
 	}
+}
+
+/**
+ * Resources defined on a source.
+ * cf. GET /sources/v1/{sourceId}/resources
+ */
+export class SourceResourcesTreeItem extends FolderTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		parentUri: vscode.Uri
+	) {
+		super("Resources", "source-resources", tenantId, tenantName, tenantDisplayName, parentUri);
+	}
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		const client = new ISCClient(this.tenantId, this.tenantName);
+		const sourceId = getIdByUri(this.parentUri) || "";
+		const resources = await client.getSourceResources(sourceId);
+		return resources
+			.filter((resource): resource is SourceDatasetResource & { id: string; name: string } =>
+				isNotBlank(resource.id) && isNotBlank(resource.name))
+			.sort(compareByName)
+			.map((resource) => new SourceResourceTreeItem(
+				this.tenantId,
+				this.tenantName,
+				this.tenantDisplayName,
+				resource.name,
+				sourceId,
+				resource.id,
+				resource.type
+			));
+	}
+}
+
+export class SourceResourceTreeItem extends ISCResourceTreeItem {
+	contextValue = "resource-item";
+
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		sourceId: string,
+		resourceId: string,
+		public readonly type: string | undefined
+	) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			resourceType: "sources",
+			// Resource ids such as `aws:iam-role` can repeat across sources.
+			id: `${sourceId}/resources/${resourceId}`,
+			parentId: sourceId,
+			subResourceType: "resources",
+			subId: resourceId
+		});
+		this.description = type;
+		this.tooltip = type ? `${label}\n${type}` : label;
+		this.iconPath = new vscode.ThemeIcon(sourceResourceIconName(type));
+	}
+}
+
+/**
+ * Datasets defined on a source.
+ * cf. GET /sources/v1/{sourceId}/datasets
+ */
+export class SourceDatasetsTreeItem extends FolderTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		parentUri: vscode.Uri
+	) {
+		super("Datasets", "source-datasets", tenantId, tenantName, tenantDisplayName, parentUri);
+	}
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		const client = new ISCClient(this.tenantId, this.tenantName);
+		const sourceId = getIdByUri(this.parentUri) || "";
+		const datasets = await client.getSourceDatasets(sourceId);
+		return datasets
+			.sort(compareByName)
+			.map((dataset) => new SourceDatasetTreeItem(
+				this.tenantId,
+				this.tenantName,
+				this.tenantDisplayName,
+				dataset.name!,
+				sourceId,
+				dataset.id!,
+				dataset.description
+			));
+	}
+}
+
+export class SourceDatasetTreeItem extends ISCResourceTreeItem {
+	contextValue = "dataset";
+
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		sourceId: string,
+		datasetId: string,
+		description?: string
+	) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			resourceType: "sources",
+			id: `${sourceId}/datasets/${datasetId}`,
+			parentId: sourceId,
+			subResourceType: "datasets",
+			subId: datasetId
+		});
+		this.tooltip = description ? `${label}\n${description}` : label;
+	}
+
+	iconPath = new vscode.ThemeIcon("database");
 }
 
 export class SchemaTreeItem extends ISCResourceTreeItem {
@@ -654,7 +786,7 @@ export class SchemaTreeItem extends ISCResourceTreeItem {
 		})
 	}
 
-	iconPath = new vscode.ThemeIcon("symbol-class");
+	iconPath = new vscode.ThemeIcon("database");
 
 	contextValue = "schema";
 }
