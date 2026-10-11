@@ -21,12 +21,11 @@ import {
 } from "../utils.js";
 import { getIdByUri, getNameByUri, getPathByUri } from "../utils/UriUtils.js";
 import jsonpatch, { type Operation } from "fast-json-patch";
-import { SlimCampaign } from "sailpoint-api-client/dist/certification_campaigns/api.js";
 import { ConnectorRuleUpdateRequest } from "sailpoint-api-client/dist/connector_rule_management/api.js";
 import { FormDefinitionResponse } from "sailpoint-api-client/dist/custom_forms/api.js";
 import { TemplateDto } from "sailpoint-api-client/dist/notifications/api.js";
 
-const READONLY_RESOURCE_PATH = /\/cloud-rules\/|\/cloud-rule-script\/|\/identities\//;
+const READONLY_RESOURCE_PATH = /\/cloud-rules\/|\/cloud-rule-script\/|\/identities\/|\/resources\/|\/datasets\//;
 
 export class ISCResourceProvider implements FileSystemProvider {
 	private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
@@ -206,7 +205,7 @@ export class ISCResourceProvider implements FileSystemProvider {
 		} else {
 
 			if (READONLY_RESOURCE_PATH.test(resourcePath)) {
-				// View-only in the editor (cloud rules and identities cannot be modified directly).
+				// View-only in the editor (cloud rules, identities, source resources, and datasets cannot be modified directly).
 				throw vscode.FileSystemError.NoPermissions(uri);
 			}
 
