@@ -10,9 +10,9 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- When adding a tenant, a URL is accepted and its hostname is used as the tenant FQDN
 - Aggregate datasets and remove its aggregated objects
 - Show datasets, resources, and their commands for sources. Resources and datasets open as read-only
-- When adding a tenant, a URL is accepted and its hostname is used as the tenant FQDN
 
 ### Changed
 
@@ -23,6 +23,24 @@ This changelog is following the recommended format by [keepachangelog](https://k
 - Renaming a tenant did not update its name in the tree view
 
 ### Removed
+
+## [1.3.33] - 2026-10-11
+
+### Security
+
+### Added
+
+- When adding a tenant, a URL is accepted and its hostname is used as the tenant FQDN
+- Aggregate datasets and remove its aggregated objects
+- Show datasets, resources, and their commands for sources. Resources and datasets open as read-only
+
+### Changed
+
+- URI Path changed to display the tenant name
+
+### Fixed
+
+- Renaming a tenant did not update its name in the tree view
 
 ## [1.3.32] - 2026-09-28
 

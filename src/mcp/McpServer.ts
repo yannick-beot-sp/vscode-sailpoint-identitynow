@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import * as net from "net";
-import { FrontMcpInstance } from "@frontmcp/sdk";
+import { FrontMcpInstance, frontMcpMetadataSchema } from "@frontmcp/sdk";
 import { TenantService } from "../services/TenantService.js";
 import { setTenantService, TenantResolverPlugin } from "./plugins/TenantResolverPlugin.js";
 import { IdentityApp } from "./identities/IdentityApp.js";
@@ -42,7 +42,11 @@ export class McpServer {
         const resolvedPort = port > 0 ? port : await findFreePort();
         const adapter = new StoppableHttpAdapter();
 
-        this._instance = await FrontMcpInstance.createForGraph({
+        // createForGraph() is graph-only in FrontMCP 1.9 and installs a no-op
+        // host. Constructing the parsed config directly lets the extension own
+        // the HTTP lifecycle without bootstrap() installing process signal
+        // handlers that can terminate the VS Code extension host.
+        const config = frontMcpMetadataSchema.parse({
             info: { name: MCP_NAME, version: MCP_VERSION },
             apps: [IdentityApp, TransformApp, WorkflowApp, SourcesApp, SearchApp, EntitlementsApp, AccessProfilesApp, RolesApp, FormsApp, IdentityProfilesApp, TenantApp],
             plugins: [TenantResolverPlugin],
@@ -52,15 +56,17 @@ export class McpServer {
                 hostFactory: adapter,
             },
         });
-
-        await this._instance.start();
+        const instance = new FrontMcpInstance(config);
+        await instance.ready;
+        await instance.start();
+        this._instance = instance;
         this._adapter = adapter;
         this._port = resolvedPort;
     }
 
     /** Stops the HTTP server and resets state. */
     async stop(): Promise<void> {
-        await this._adapter?.stop();
+        await this._instance?.shutdown();
         this._adapter = undefined;
         this._instance = undefined;
         this._port = 0;

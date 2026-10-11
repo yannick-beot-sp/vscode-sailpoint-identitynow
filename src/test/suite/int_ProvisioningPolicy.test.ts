@@ -137,7 +137,7 @@ suite("Provisioning Policy V2 Test Suite", () => {
 
             assert.strictEqual(
                 uri?.path,
-                `/sources/v2/${sourceId}/provisioning-policies/${firstPolicyId}/CREATE_MACHINE_ACCOUNT`
+                `/example.identitynow.com/sources/v2/${sourceId}/provisioning-policies/${firstPolicyId}/CREATE_MACHINE_ACCOUNT`
             );
         });
     });

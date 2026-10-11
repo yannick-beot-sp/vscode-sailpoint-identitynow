@@ -9,7 +9,7 @@ import { FrontMcpServer, HttpMethod, ServerRequest, ServerRequestHandler, Server
  * provides that slice without pulling Express, body-parser, or iconv-lite
  * into the extension bundle.
  *
- * Passed to FrontMcpInstance.createForGraph() via http.hostFactory.
+ * Passed to FrontMcpInstance via http.hostFactory.
  * FrontMCP calls registerMiddleware / registerRoute / prepare during
  * initialisation, then start() when the listener should open.
  */

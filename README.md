@@ -677,8 +677,13 @@ The patterns defined above use the following tokens:
 
 ### Unreleased
 
-- URI Path changed to display the tenant name
+### 1.3.33
 
+- URI Path changed to display the tenant name
+- Renaming a tenant did not update its name in the tree view
+- Aggregate datasets and remove its aggregated objects
+- Show datasets, resources, and their commands for sources. Resources and datasets open as read-only
+- When adding a tenant, a URL is accepted and its hostname is used as the tenant FQDN
 
 ### 1.3.32
 

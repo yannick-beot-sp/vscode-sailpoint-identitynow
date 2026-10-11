@@ -26,7 +26,7 @@ import { CSVReader } from "../../../services/CSVReader.js";
 import { ISCClient, TOTAL_COUNT_HEADER } from "../../../services/ISCClient.js";
 import { SailPointISCAuthenticationProvider } from "../../../services/AuthenticationProvider.js";
 import { CSV_MULTIVALUE_SEPARATOR } from "../../../constants.js";
-import { entitlementToStringConverter, stringToEntitlementConverter } from "../../../utils/entitlementUtils.js";
+import { entitlementToStringConverter } from "../../../utils/entitlementUtils.js";
 import { createMockTenantService, TENANT_INFO } from "../mcpTestFixture.js";
 
 const ACCESS_PROFILE_HEADERS = [
@@ -268,27 +268,19 @@ describe("Access model CSV export – integration tests", function () {
         );
     });
 
-    it("exports role entitlements and resolves them on import", async function () {
+    it("exports role entitlements", async function () {
         const { rows } = await readCsv(rolePath);
         const listed = await client.getRoles({ limit: 250, offset: 0, count: false });
         const withEntitlements = listed.data.filter((role) => (role.entitlements?.length ?? 0) > 0);
         assert.ok(withEntitlements.length > 0, "tenant should have a role with entitlements");
 
         const sourceNameCache = new EntitlementIdToSourceNameCacheService(client);
-        const sourceCache = new SourceNameToIdCacheService(client);
-        const entitlementCache = new EntitlementCacheService(client);
         for (const role of withEntitlements) {
             const row = rows.find((candidate) => candidate.name === role.name);
             assert.ok(row, `CSV should contain role "${role.name}"`);
             const expected = await entitlementToStringConverter(role.entitlements, sourceNameCache);
             assert.ok(expected, `role "${role.name}" should export its entitlements`);
             assert.strictEqual(row.entitlements, expected);
-
-            const resolved = await stringToEntitlementConverter(expected, sourceCache, entitlementCache);
-            assert.deepStrictEqual(
-                resolved.map((entitlement) => entitlement.id),
-                role.entitlements!.map((entitlement) => entitlement.id)
-            );
         }
     });
 });

@@ -12,7 +12,8 @@ import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account.js";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements.js";
 import { Configuration, IdentityProfilesApi, LifecycleStatesApi, Paginator, ServiceDeskIntegrationApi, SourcesApi, TransformsApi, RolesApi, SearchApi, EntitlementsApi, AccessProfilesApi, AccessRequestApprovalsApi, AccessRequestsApi, AccountActivitiesApi, AppsApi, AuthUsersApi, CertificationCampaignsApi, CertificationsApi, CertificationSummariesApi, ConfigurationHubApi, ConnectorRuleManagementApi, CustomFormsApi, CustomUserLevelsApi, DimensionsApi, GovernanceGroupsApi, IdentitiesApi, IdentityAttributesApi, IdentityHistoryApi, MachineAccountSubtypesApi, MachineClassificationConfigApi, MachineIdentitiesApi, ManagedClustersApi, PasswordConfigurationApi, PasswordManagementApi, PasswordPoliciesApi, PasswordSyncGroupsApi, PrivilegeCriteriaApi, PrivilegeCriteriaConfigurationApi, PublicIdentitiesApi, SearchAttributeConfigurationApi, SegmentsApi, SODPoliciesApi, SPConfigApi, TaskManagementApi, WorkflowsApi, NotificationsApi } from 'sailpoint-api-client/dist/index.js';
 import { DEFAULT_PUBLIC_IDENTITIES_QUERY_PARAMS } from '../models/PublicIdentity.js';
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
+import type { AxiosInstance as SailPointAxiosInstance } from "axios" with { "resolution-mode": "require" };
 import { ImportEntitlementsResult } from '../models/JobStatus.js';
 import { basename } from 'path';
 import { createReadStream } from 'fs';
@@ -192,7 +193,7 @@ export class ISCClient {
 	 * @param contentType 
 	 * @returns Create an Axios Instance
 	 */
-	private getAxiosWithInterceptors(): AxiosInstance {
+	private getAxiosWithInterceptors(): SailPointAxiosInstance {
 		const instance = axios.create();
 		instance.defaults.headers.common = {
 			[USER_AGENT_HEADER]: USER_AGENT
@@ -205,7 +206,7 @@ export class ISCClient {
 				return onErrorResponse(error, instance)
 			}
 		);
-		return instance;
+		return instance as unknown as SailPointAxiosInstance;
 	}
 
 	/**
@@ -213,7 +214,7 @@ export class ISCClient {
 	 * @param contentType 
 	 * @returns an Axios Instance
 	 */
-	private async getAxios(contentType = CONTENT_TYPE_JSON): Promise<AxiosInstance> {
+	private async getAxios(contentType = CONTENT_TYPE_JSON): Promise<SailPointAxiosInstance> {
 		const session = await SailPointISCAuthenticationProvider.getInstance().getSessionByTenant(this.tenantId)
 
 		const instance = axios.create({
@@ -234,7 +235,7 @@ export class ISCClient {
 				return onErrorResponse(error, instance)
 			}
 		);
-		return instance;
+		return instance as unknown as SailPointAxiosInstance;
 	}
 
 	/////////////////////

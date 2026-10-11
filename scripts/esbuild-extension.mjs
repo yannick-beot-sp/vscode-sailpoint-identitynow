@@ -93,6 +93,23 @@ export const createResolverWithOverrides = fn("createResolverWithOverrides");
 export const renderComponent = fn("renderComponent");
 export const isUIType = fn("isUIType");
 export const buildShell = fn("buildShell");
+// FrontMCP 1.9 reads this key on every tools/call to detect widget traffic.
+export const WIDGET_CALL_META_KEY = "frontmcp/widgetCall";
+// Called while registering tools that declare a UI. This extension has none.
+export const warnIfComponentReference = () => false;
+// Predicate used while describing ui.csp. A throwing stub would fail that path.
+export function validateCSPDomain(domain) {
+	if (typeof domain !== "string" || /[?#]/.test(domain)) return false;
+	let url;
+	try {
+		url = new URL(domain);
+	} catch {
+		return false;
+	}
+	if (url.protocol === "https:" || url.protocol === "wss:") return true;
+	const loopback = url.hostname === "localhost" || url.hostname === "127.0.0.1" || url.hostname === "::1";
+	return (url.protocol === "http:" || url.protocol === "ws:") && loopback;
+}
 export default notBundled;
 `;
 
