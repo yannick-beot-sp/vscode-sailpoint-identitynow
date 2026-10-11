@@ -43,7 +43,7 @@ import { AccessProfileRead } from "../models/AccessProfiles.js";
 import { IdentityAccessItem, IdentityAccessItemType } from "../models/IdentityAccessItem.js";
 import { HecateJobStatus } from "../models/HecateJob.js";
 import { isDefaultNotificationTemplateId, notificationTemplateKeyFilter, parseDefaultNotificationTemplateId } from "../utils/notificationTemplateList.js";
-import { AccountDeleteConfigDto, AttrSyncSourceConfig, JsonPatchOperation, JsonPatchOperationOpEnum, NativeChangeDetectionConfig, PasswordPolicyHoldersDtoInner, Schema, Source, SourceDataset, SourceDatasetResource, StatusResponse, TransformRead } from "sailpoint-api-client/dist/sources/index.js";
+import { AccountDeleteConfigDto, AttrSyncSourceConfig, JsonPatchOperation, JsonPatchOperationOpEnum, NativeChangeDetectionConfig, PasswordPolicyHoldersDtoInner, Schema, Source, SourceDataset, SourceDatasetResource, StatusResponse, TaskResultDetails, TransformRead } from "sailpoint-api-client/dist/sources/index.js";
 import { CreateProvisioningPolicyV2, getProvisioningPoliciesPath, ProvisioningPolicyV2 } from "../models/ProvisioningPolicy.js";
 import { Search, AttributeDTO, Index } from "sailpoint-api-client/dist/access_model_metadata/api.js";
 import { AccessRequestResponse, RequestedItemStatus, RequestedItemStatusRequestState } from "sailpoint-api-client/dist/access_requests/api.js";
@@ -357,6 +357,36 @@ export class ISCClient {
 		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const result = await Paginator.paginate(api, api.getSourceDatasetsV1, { sourceId });
 		return result.data;
+	}
+
+	/**
+	 * cf. api-specs idn/apis/sources/paths/sources-v1-by-sourceid-datasets-by-datasetid-aggregate.yaml
+	 * POST /sources/v1/{sourceId}/datasets/{datasetId}/aggregate
+	 */
+	public async startDatasetAggregation(sourceId: string, datasetId: string): Promise<TaskResultDetails> {
+		console.log("> startDatasetAggregation", sourceId, datasetId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.importSourceDatasetV1({
+			sourceId,
+			datasetId,
+		});
+		return response.data;
+	}
+
+	/**
+	 * cf. api-specs idn/apis/sources/paths/sources-v1-by-sourceid-datasets-by-datasetid-delete-objects.yaml
+	 * POST /sources/v1/{sourceId}/datasets/{datasetId}/delete-objects
+	 */
+	public async deleteDatasetObjects(sourceId: string, datasetId: string): Promise<TaskResultDetails> {
+		console.log("> deleteDatasetObjects", sourceId, datasetId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.deleteSourceDatasetObjectsV1({
+			sourceId,
+			datasetId,
+		});
+		return response.data;
 	}
 
 	/**

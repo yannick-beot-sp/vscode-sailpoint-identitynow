@@ -214,6 +214,15 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.AGGREGATE_ENTITLEMENTS,
 			(sourceTreeItem) => treeManager.aggregateEntitlements(sourceTreeItem)));
 	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.AGGREGATE_DATASET,
+			(datasetTreeItem) => treeManager.aggregateDataset(datasetTreeItem)));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.AGGREGATE_ALL_DATASETS,
+			(datasetsTreeItem) => treeManager.aggregateAllDatasets(datasetsTreeItem)));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.REMOVE_DATASET_OBJECTS,
+			(datasetTreeItem) => treeManager.removeDatasetObjects(datasetTreeItem)));
+	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.RESET_SOURCE,
 			(sourceTreeItem) => treeManager.resetSource(sourceTreeItem)));
 	context.subscriptions.push(

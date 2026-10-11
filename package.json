@@ -235,6 +235,18 @@
         "title": "Aggregate entitlements"
       },
       {
+        "command": "vscode-sailpoint-identitynow.aggregate-dataset",
+        "title": "Aggregate dataset"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.aggregate-all-datasets",
+        "title": "Aggregate all datasets"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.dataset.remove-objects",
+        "title": "Remove objects"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.machine-identities.filter",
         "title": "Filter",
         "icon": "$(filter)"
@@ -934,6 +946,18 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.aggregate-dataset",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.aggregate-all-datasets",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.dataset.remove-objects",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.test-source",
           "when": "never"
         },
@@ -1467,6 +1491,21 @@
           "command": "vscode-sailpoint-identitynow.aggregate-entitlements",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/ && viewItem != DelimitedFilesource",
           "group": "aggregate@2"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.aggregate-dataset",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == dataset",
+          "group": "aggregate@0"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.aggregate-all-datasets",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == source-datasets",
+          "group": "aggregate@0"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.dataset.remove-objects",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == dataset",
+          "group": "reset"
         },
         {
           "command": "vscode-sailpoint-identitynow.test-source",

@@ -10,6 +10,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- Aggregate datasets and remove its aggregated objects
+- Show datasets, resources, and their commands for sources
 - When adding a tenant, a URL is accepted and its hostname is used as the tenant FQDN
 
 ### Changed

@@ -348,6 +348,15 @@ export class ISCResourceTreeItem extends BaseTreeItem {
 	}
 }
 
+/**
+ * Datasets and resources are exposed by machine-identity and AI-agent sources.
+ */
+const DATASET_SOURCE_FEATURES = ["MACHINE_IDENTITY_AGGREGATION", "AI_AGENT_AGGREGATION"];
+
+function sourceHasDatasetFeature(features: Array<string> | undefined): boolean {
+	return features?.some((feature) => DATASET_SOURCE_FEATURES.includes(feature)) === true;
+}
+
 export class SourceTreeItem extends ISCResourceTreeItem {
 	constructor(
 		tenantId: string,
@@ -378,8 +387,8 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 	async getChildren(): Promise<BaseTreeItem[]> {
 		const results: BaseTreeItem[] = [];
 		results.push(new SchemasTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, this.uri));
-		if (this.features?.includes("MACHINE_IDENTITY_AGGREGATION")) {
-			results.push(new SourceDatasetsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, this.uri));
+		if (sourceHasDatasetFeature(this.features)) {
+			results.push(new SourceDatasetsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, this.uri, this.label as string));
 			results.push(new SourceResourcesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, this.uri));
 		}
 		results.push(
@@ -712,14 +721,19 @@ export class SourceDatasetsTreeItem extends FolderTreeItem {
 		tenantId: string,
 		tenantName: string,
 		tenantDisplayName: string,
-		parentUri: vscode.Uri
+		parentUri: vscode.Uri,
+		public readonly sourceName: string
 	) {
 		super("Datasets", "source-datasets", tenantId, tenantName, tenantDisplayName, parentUri);
 	}
 
+	get sourceId(): string {
+		return getIdByUri(this.parentUri) || "";
+	}
+
 	async getChildren(): Promise<BaseTreeItem[]> {
 		const client = new ISCClient(this.tenantId, this.tenantName);
-		const sourceId = getIdByUri(this.parentUri) || "";
+		const sourceId = this.sourceId;
 		const datasets = await client.getSourceDatasets(sourceId);
 		return datasets
 			.sort(compareByName)
@@ -737,6 +751,7 @@ export class SourceDatasetsTreeItem extends FolderTreeItem {
 
 export class SourceDatasetTreeItem extends ISCResourceTreeItem {
 	contextValue = "dataset";
+	public readonly datasetId: string;
 
 	constructor(
 		tenantId: string,
@@ -758,6 +773,7 @@ export class SourceDatasetTreeItem extends ISCResourceTreeItem {
 			subResourceType: "datasets",
 			subId: datasetId
 		});
+		this.datasetId = datasetId;
 		this.tooltip = description ? `${label}\n${description}` : label;
 	}
 
