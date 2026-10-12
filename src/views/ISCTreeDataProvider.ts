@@ -1,7 +1,7 @@
 import { EventEmitter, ExtensionContext, TreeDataProvider, TreeItem, Event, TreeItemCollapsibleState, TreeDragAndDropController, DataTransfer, DataTransferItem, CancellationToken, TreeView, commands as vscodeCommands, ProviderResult } from 'vscode';
 import { BaseTreeItem, FolderTreeItem, IdentitiesTreeItem, TenantFolderTreeItem, TenantTreeItem } from '../models/ISCTreeItem.js';
 import { TenantService } from '../services/TenantService.js';
-import { convertToBaseTreeItem, getCachedTenantTreeItem, resolveIdentitiesTreeItem } from './utils.js';
+import { convertToBaseTreeItem, getCachedTenantTreeItem, getOrCreateFolderTreeItem, resolveIdentitiesTreeItem } from './utils.js';
 import * as commands from '../commands/constants.js';
 import { delay } from '../utils.js';
 
@@ -15,6 +15,12 @@ export class ISCTreeDataProvider implements TreeDataProvider<BaseTreeItem>, Tree
     private _onDidChangeTreeData: EventEmitter<BaseTreeItem | undefined | null | void> = new EventEmitter<BaseTreeItem | undefined | null | void>();
     readonly onDidChangeTreeData?: Event<BaseTreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
     private treeView?: TreeView<BaseTreeItem>;
+    /**
+     * Parents of nodes that live under a tenant (sources, identities, ...).
+     * Tenants and tenant folders resolve their parent from TenantService instead,
+     * because those instances are reused when they move between folders.
+     */
+    private readonly childParents = new WeakMap<BaseTreeItem, BaseTreeItem>();
 
     constructor(private readonly context: ExtensionContext,
         private readonly tenantService: TenantService) {
@@ -25,10 +31,23 @@ export class ISCTreeDataProvider implements TreeDataProvider<BaseTreeItem>, Tree
     }
 
     getParent(element: BaseTreeItem): ProviderResult<BaseTreeItem> {
-        if (element instanceof FolderTreeItem && element.parentNode) {
-            return element.parentNode;
+        if (element instanceof TenantTreeItem || element instanceof TenantFolderTreeItem) {
+            return this.getFolderParent(element.id);
         }
-        return undefined;
+        return this.childParents.get(element)
+            ?? (element instanceof FolderTreeItem ? element.parentNode : undefined);
+    }
+
+    private getFolderParent(nodeId: string | undefined): TenantFolderTreeItem | undefined {
+        if (!nodeId) {
+            return undefined;
+        }
+        const parentId = this.tenantService.getParentId(nodeId);
+        if (!parentId) {
+            return undefined;
+        }
+        const parent = this.tenantService.getFolder(parentId);
+        return parent ? getOrCreateFolderTreeItem(parent, this.tenantService) : undefined;
     }
 
     async resolveIdentitiesTreeItem(tenantId: string): Promise<IdentitiesTreeItem | undefined> {
@@ -110,16 +129,22 @@ export class ISCTreeDataProvider implements TreeDataProvider<BaseTreeItem>, Tree
     dragMimeTypes: readonly string[] = ["text/uri-list"];
 
     handleDrag(source: readonly BaseTreeItem[], dataTransfer: DataTransfer, token: CancellationToken): Thenable<void> | void {
-        source = source.filter(x => x instanceof TenantTreeItem || x instanceof TenantFolderTreeItem)
-        if (source && source.length > 0) {
-            dataTransfer.set(DROP_MIME_TYPE, new DataTransferItem(source));
+        const dragged = source
+            .filter((item): item is TenantTreeItem | TenantFolderTreeItem =>
+                (item instanceof TenantTreeItem || item instanceof TenantFolderTreeItem) && !!item.id)
+            .map(item => ({ id: item.id as string }));
+        // The tree item graph is cyclic (a tenant keeps its children, and those
+        // children point back through parentNode). VS Code JSON-serializes the
+        // drag payload, so only plain ids can be transferred.
+        if (dragged.length > 0) {
+            dataTransfer.set(DROP_MIME_TYPE, new DataTransferItem(dragged));
         }
     }
 
-    handleDrop(target: BaseTreeItem, dataTransfer: DataTransfer, token: CancellationToken): Thenable<void> | void {
-
-        if (!(target === undefined || target instanceof TenantFolderTreeItem)) {
-            return
+    handleDrop(target: BaseTreeItem | undefined, dataTransfer: DataTransfer, token: CancellationToken): Thenable<void> | void {
+        const targetFolderId = this.resolveDropFolderId(target);
+        if (targetFolderId === null) {
+            return;
         }
 
         const transferItem = dataTransfer.get(DROP_MIME_TYPE)
@@ -127,14 +152,32 @@ export class ISCTreeDataProvider implements TreeDataProvider<BaseTreeItem>, Tree
             return
         }
 
-        const treeItems: BaseTreeItem[] = transferItem.value
-        for (const item of treeItems) {
-            if (item instanceof TenantTreeItem || item instanceof TenantFolderTreeItem) {
-                this.tenantService.move(item.id, target?.id)
+        const treeItems: Array<{ id?: string }> = transferItem.value
+        for (const item of treeItems ?? []) {
+            if (item?.id) {
+                this.tenantService.move(item.id, targetFolderId)
             }
         }
         this.refresh()
 
+    }
+
+    /**
+     * undefined moves the node to the root. null rejects the drop.
+     * A drop on a tenant that already sits in a folder lands in that folder,
+     * so an expanded folder still accepts further tenants.
+     */
+    private resolveDropFolderId(target: BaseTreeItem | undefined): string | undefined | null {
+        if (target === undefined) {
+            return undefined;
+        }
+        if (target instanceof TenantFolderTreeItem) {
+            return target.id ?? null;
+        }
+        if (target instanceof TenantTreeItem) {
+            return this.tenantService.getParentId(target.id ?? "") ?? null;
+        }
+        return null;
     }
 
     /////////////////////////////////////
@@ -158,19 +201,24 @@ export class ISCTreeDataProvider implements TreeDataProvider<BaseTreeItem>, Tree
 
     async getChildren(item?: BaseTreeItem): Promise<BaseTreeItem[]> {
         console.log("> getChildren", item);
+        let results: BaseTreeItem[];
         if (item === undefined) {
             const roots = this.tenantService.getRoots();
-            const results = roots.map(x => convertToBaseTreeItem(x, this.tenantService))
-            console.log("< getChildren", results);
-            return results;
+            results = roots.map(x => convertToBaseTreeItem(x, this.tenantService))
         } else if (item.collapsibleState === TreeItemCollapsibleState.None) {
-            console.log("< getChildren []");
-            return [];
+            results = [];
         } else {
-            const results = await item.getChildren();
-            console.log("< getChildren", results);
-            return results;
+            results = await item.getChildren();
         }
+        if (item) {
+            for (const child of results) {
+                if (!(child instanceof TenantTreeItem || child instanceof TenantFolderTreeItem)) {
+                    this.childParents.set(child, item);
+                }
+            }
+        }
+        console.log("< getChildren", results);
+        return results;
     }
 
     getTreeItem(item: BaseTreeItem): TreeItem {

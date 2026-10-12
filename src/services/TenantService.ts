@@ -187,6 +187,40 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
         return folder;
     }
 
+    /**
+     * Parent folder of a tenant or folder. Undefined when the node is at the root
+     * or does not exist. The tree view must report this parent, otherwise VS Code
+     * treats every nested node as a root and drag-and-drop stops after the first item.
+     */
+    public getParentId(nodeId: string): string | undefined {
+        const seen = new Set<string>();
+
+        const search = (
+            items: Array<FolderTreeNode | TenantInfo>,
+            parentId?: string
+        ): { found: true; parentId?: string } | { found: false } => {
+            for (const item of items) {
+                if (!item?.id || seen.has(item.id)) {
+                    continue;
+                }
+                seen.add(item.id);
+                if (item.id === nodeId) {
+                    return { found: true, parentId };
+                }
+                if (isFolderTreeNode(item) && item.children) {
+                    const found = search(item.children, item.id);
+                    if (found.found) {
+                        return found;
+                    }
+                }
+            }
+            return { found: false };
+        };
+
+        const result = search(this.getRoots());
+        return result.found ? result.parentId : undefined;
+    }
+
     public getTenant(key: string): TenantInfo | undefined {
         let roots = this.getRoots()
 
@@ -351,6 +385,9 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
     }
 
     public move(nodeIdToMove: string, targetFolderId?: string) {
+        if (targetFolderId && !this.canMoveTo(nodeIdToMove, targetFolderId)) {
+            return;
+        }
         const items = this.getRoots()
         let nodeToMove: FolderTreeNode | TenantInfo | undefined;
         let nodeRemoved = false;
@@ -457,6 +494,22 @@ export class TenantService implements Subject<TenantServiceEventType, any> {
         }
         this.storage.update(TREE_KEY, items);
         this.notifyObservers(TenantServiceEventType.updateTree, {})
+    }
+
+    /**
+     * A folder cannot be dropped onto itself or onto one of its descendants.
+     */
+    private canMoveTo(nodeIdToMove: string, targetFolderId: string): boolean {
+        let current: string | undefined = targetFolderId;
+        const seen = new Set<string>();
+        while (current) {
+            if (current === nodeIdToMove || seen.has(current)) {
+                return false;
+            }
+            seen.add(current);
+            current = this.getParentId(current);
+        }
+        return true;
     }
 
     public async removeFolderRecursively(id: string) {

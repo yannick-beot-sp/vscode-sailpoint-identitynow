@@ -4,6 +4,7 @@ import { FolderTreeNode, isTenantInfo } from "../models/TreeNode.js";
 import { TenantService } from "../services/TenantService.js";
 
 const tenantTreeItems = new Map<string, TenantTreeItem>();
+const folderTreeItems = new Map<string, TenantFolderTreeItem>();
 
 export function convertToBaseTreeItem(x: TenantInfo | FolderTreeNode, tenantService: TenantService): BaseTreeItem {
     if (isTenantInfo(x)) {
@@ -21,12 +22,26 @@ export function convertToBaseTreeItem(x: TenantInfo | FolderTreeNode, tenantServ
         }
         return item;
     } else {
-        return new TenantFolderTreeItem(
-            x.id,
-            x.name,
-            tenantService
-        )
+        return getOrCreateFolderTreeItem(x, tenantService);
     }
+}
+
+/**
+ * VS Code matches tree parents by object identity. The same folder must be
+ * returned by getChildren and by getParent.
+ */
+export function getOrCreateFolderTreeItem(folder: FolderTreeNode, tenantService: TenantService): TenantFolderTreeItem {
+    let item = folderTreeItems.get(folder.id);
+    if (!item) {
+        item = new TenantFolderTreeItem(
+            folder.id,
+            folder.name,
+            tenantService);
+        folderTreeItems.set(folder.id, item);
+    } else {
+        item.applyName(folder.name);
+    }
+    return item;
 }
 
 export function getCachedTenantTreeItem(tenantId: string): TenantTreeItem | undefined {

@@ -145,6 +145,13 @@ export class TenantTreeItem extends BaseTreeItem {
  * Folder for tenants
  */
 export class TenantFolderTreeItem extends BaseTreeItem {
+	/**
+	 * A tenant folder is not a file. A resourceUri makes VS Code handle the row as
+	 * a file drop target, and an expanded folder that contains another folder then
+	 * stops accepting tenants.
+	 */
+	iconPath = new vscode.ThemeIcon("folder");
+
 	constructor(
 		id: string,
 		label: string,
@@ -154,7 +161,14 @@ export class TenantFolderTreeItem extends BaseTreeItem {
 			"", "", "",
 			vscode.TreeItemCollapsibleState.Collapsed);
 		this.id = id
-		this.resourceUri = vscode.Uri.parse(`${label}`)
+	}
+
+	/**
+	 * Folder instances are reused. A rename must update that instance, otherwise
+	 * the next refresh still shows the previous label.
+	 */
+	applyName(name: string): void {
+		this.label = name;
 	}
 
 	contextValue = "folder"
