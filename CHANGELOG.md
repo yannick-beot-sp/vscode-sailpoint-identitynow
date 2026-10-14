@@ -15,6 +15,7 @@ This changelog is following the recommended format by [keepachangelog](https://k
 ### Fixed
 
 - Drag and drop of a tenant failed when that tenant had already been expanded
+- Importing a comma-separated CSV failed when Excel removed quotes around fields that contain semicolons (cf. [#176](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/176))
 
 ### Removed
 

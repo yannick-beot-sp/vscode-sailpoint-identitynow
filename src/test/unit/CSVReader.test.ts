@@ -12,6 +12,8 @@ suite('CSVReader Test Suite', () => {
     const inputPath = path.join(dataFolder, 'testcsv1.csv');
     const inputPath2 = path.join(dataFolder, 'testcsv2.csv');
     const inputPath3 = path.join(dataFolder, 'testcsv3.csv');
+    const unquotedEntitlementsPath = path.join(dataFolder, 'unquoted-entitlements.csv');
+    const semicolonEntitlementsPath = path.join(dataFolder, 'semicolon-entitlements.csv');
     console.log("Reading to", inputPath);
     
     describe('CSVReader should read data', () => {
@@ -94,6 +96,30 @@ suite('CSVReader Test Suite', () => {
             assert.equal(headers.length, 8);
             assert.ok(headers[0].indexOf('"') === -1);
 
+        });
+    });
+
+    describe('CSVReader should use one delimiter from the header', () => {
+        it("should keep unquoted semicolons inside a comma-separated field", async () => {
+            const csvReader = new CSVReader<{ entitlements: string }>(unquotedEntitlementsPath);
+            const rows: { entitlements: string }[] = [];
+            await csvReader.processLine((data) => {
+                rows.push(data);
+            });
+            assert.equal(rows.length, 1);
+            assert.equal(rows[0].entitlements, "Active Directory|groups|Accounting;HR System|permissions|ViewEmployee");
+        });
+
+        it("should read a semicolon-separated file with a quoted multivalue field", async () => {
+            const csvReader = new CSVReader<{ entitlements: string }>(semicolonEntitlementsPath);
+            const headers = await csvReader.getHeaders();
+            assert.deepStrictEqual(headers, ["name", "owner", "entitlements"]);
+            const rows: { entitlements: string }[] = [];
+            await csvReader.processLine((data) => {
+                rows.push(data);
+            });
+            assert.equal(rows.length, 1);
+            assert.equal(rows[0].entitlements, "Active Directory|groups|Accounting;HR System|permissions|ViewEmployee");
         });
     });
 

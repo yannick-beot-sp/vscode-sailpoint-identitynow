@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 import { ISCClient } from '../services/ISCClient.js';
 import { CSVReader } from '../services/CSVReader.js';
-import { UserCancelledError } from '../errors.js';
+import { isUserCancelledError, UserCancelledError } from '../errors.js';
 import { Index, Search } from 'sailpoint-api-client/dist/search/api.js';
 
 const VALID_REVIEWER_ATTRIBUTES = ["id", "name", "email"]
@@ -70,6 +70,7 @@ export class CustomReviewerImporter {
 
         const customReviewerCoverageRecords: CustomReviewerCoverage[] = []
 
+        let parsingFailed = false;
         try {
             await csvReader.processLine(async (data: CustomReviewerCSVRecord) => {
                 if (token.isCancellationRequested) {
@@ -162,15 +163,24 @@ export class CustomReviewerImporter {
                     console.log(`> CustomReviewerImporter.importFile: Invalid configuration in Custom Reviewer line ${processedLines}: ${errorMessage}`);
                 }
             });
-        } catch { }
-        const message = `${processedLines} line(s) imported. ${result.success} successfully imported. ${result.error} invalid line(s).`;
+        } catch (error) {
+            if (!isUserCancelledError(error)) {
+                parsingFailed = true;
+                const message = error instanceof Error ? error.message : String(error);
+                console.log(`> CustomReviewerImporter.importFile: ${message}`);
+                vscode.window.showErrorMessage(message);
+            }
+        }
+        if (!parsingFailed) {
+            const message = `${processedLines} line(s) imported. ${result.success} successfully imported. ${result.error} invalid line(s).`;
 
-        if (result.error === processedLines) {
-            vscode.window.showErrorMessage(message);
-        } else if (result.error > 0) {
-            vscode.window.showWarningMessage(message);
-        } else {
-            vscode.window.showInformationMessage(message);
+            if (result.error === processedLines) {
+                vscode.window.showErrorMessage(message);
+            } else if (result.error > 0) {
+                vscode.window.showWarningMessage(message);
+            } else {
+                vscode.window.showInformationMessage(message);
+            }
         }
 
         return customReviewerCoverageRecords

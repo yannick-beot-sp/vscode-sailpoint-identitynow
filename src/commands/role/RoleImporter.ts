@@ -21,7 +21,7 @@ import { Parser } from '../../parser/parser.js';
 import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService.js';
 import { EntitlementCacheService, KEY_SEPARATOR } from '../../services/cache/EntitlementCacheService.js';
 import { truethy } from '../../utils/booleanUtils.js';
-import { UserCancelledError } from '../../errors.js';
+import { isUserCancelledError, UserCancelledError } from '../../errors.js';
 import { stringToAttributeMetadata } from '../../utils/metadataUtils.js';
 import { stringToDimensionAttributes } from '../../utils/dimensionUtils.js';
 import { ImportResult } from '../../models/ImportResult.js';
@@ -115,6 +115,7 @@ export class RoleImporter {
         const sourceCacheService = new SourceNameToIdCacheService(this.client);
         const entitlementCacheService = new EntitlementCacheService(this.client);
         const parser = new Parser();
+        let parsingFailed = false;
         try {
             await csvReader.processLine(async (data: RoleCSVRecord) => {
                 if (token.isCancellationRequested) {
@@ -381,15 +382,24 @@ export class RoleImporter {
                     }
                 }
             });
-        } catch { }
-        const message = `${processedLines} line(s) processed. ${result.success} successfully import. ${result.error} error(s).`;
+        } catch (error) {
+            if (!isUserCancelledError(error)) {
+                parsingFailed = true;
+                const message = error instanceof Error ? error.message : String(error);
+                await this.writeLog(null, 'Role', CSVLogWriterLogType.ERROR, message);
+                vscode.window.showErrorMessage(message);
+            }
+        }
+        if (!parsingFailed) {
+            const message = `${processedLines} line(s) processed. ${result.success} successfully import. ${result.error} error(s).`;
 
-        if (result.error === processedLines) {
-            vscode.window.showErrorMessage(message);
-        } else if (result.error > 0) {
-            vscode.window.showWarningMessage(message);
-        } else {
-            vscode.window.showInformationMessage(message);
+            if (result.error === processedLines) {
+                vscode.window.showErrorMessage(message);
+            } else if (result.error > 0) {
+                vscode.window.showWarningMessage(message);
+            } else {
+                vscode.window.showInformationMessage(message);
+            }
         }
 
         try {

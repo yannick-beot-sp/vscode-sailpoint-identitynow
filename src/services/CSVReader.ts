@@ -10,8 +10,45 @@ import { parse as parseSync } from 'csv-parse/sync';
 import { getFirstLine } from '../utils/fileutils.js';
 import { transformNewlines } from '../utils/CSVTransform.js';
 
+const UTF8_BOM = "\uFEFF";
+
+export type CsvDelimiter = "," | ";";
+
+/**
+ * Choose one delimiter from the header. Semicolon wins only when the header
+ * has more unquoted semicolons than commas. Otherwise the file is comma-separated,
+ * so a multivalue ';' stays inside the field when Excel drops the quotes.
+ */
+export function detectCsvDelimiter(headerLine: string): CsvDelimiter {
+    const line = headerLine.startsWith(UTF8_BOM) ? headerLine.slice(1) : headerLine;
+    let commas = 0;
+    let semicolons = 0;
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+            if (inQuotes && line[i + 1] === '"') {
+                i++;
+            } else {
+                inQuotes = !inQuotes;
+            }
+            continue;
+        }
+        if (inQuotes) {
+            continue;
+        }
+        if (char === ",") {
+            commas++;
+        } else if (char === ";") {
+            semicolons++;
+        }
+    }
+    return semicolons > commas ? ";" : ",";
+}
 
 export class CSVReader<T> {
+
+    private delimiter: CsvDelimiter | undefined;
 
     constructor(private filepath: string) {
 
@@ -19,6 +56,7 @@ export class CSVReader<T> {
 
     public async processLine(callback: ((line: T) => void | Promise<void>)): Promise<void> {
         this.checkExists();
+        const delimiter = await this.getDelimiter();
 
         const parser = fs
             .createReadStream(this.filepath)
@@ -27,9 +65,9 @@ export class CSVReader<T> {
                 skip_empty_lines: true,
                 columns: true,
                 comment: '#',
-                delimiter: [",", ";"],
+                delimiter,
                 bom: true,
-                cast:transformNewlines
+                cast: transformNewlines
             }));
 
         for await (const record of parser) {
@@ -46,11 +84,23 @@ export class CSVReader<T> {
         }
     }
 
+    private async getDelimiter(): Promise<CsvDelimiter> {
+        if (this.delimiter === undefined) {
+            const header = await getFirstLine(this.filepath);
+            this.delimiter = detectCsvDelimiter(header);
+        }
+        return this.delimiter;
+    }
+
     public async getHeaders(): Promise<string[]> {
         this.checkExists();
-        const headers = await getFirstLine(this.filepath);
+        const delimiter = await this.getDelimiter();
+        let headers = await getFirstLine(this.filepath);
+        if (headers.startsWith(UTF8_BOM)) {
+            headers = headers.slice(1);
+        }
 
-        const records = parseSync(headers, { columns: false });
+        const records = parseSync(headers, { columns: false, delimiter, bom: true });
         return records[0];
     }
 

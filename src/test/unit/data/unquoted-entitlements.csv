@@ -1,0 +1,2 @@
+name,owner,entitlements
+Role A,alice,Active Directory|groups|Accounting;HR System|permissions|ViewEmployee

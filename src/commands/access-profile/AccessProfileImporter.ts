@@ -14,7 +14,7 @@ import { stringToAccessProfileApprovalSchemeConverter } from '../../utils/approv
 import { importMode, ImportModeType, openPreview } from '../../utils/vsCodeHelpers.js';
 import { isEmpty, isNotBlank } from "../../utils/stringUtils.js";
 import { truethy } from "../../utils/booleanUtils.js";
-import { UserCancelledError } from "../../errors.js";
+import { isUserCancelledError, UserCancelledError } from "../../errors.js";
 import { stringToAttributeMetadata } from "../../utils/metadataUtils.js";
 import { ImportResult } from "../../models/ImportResult.js";
 import { resolveAdditionalOwners } from "../../utils/additionalOwners.js";
@@ -110,6 +110,7 @@ export class AccessProfileImporter {
         const headers = await csvReader.getHeaders();
 
         let processedLines = 0;
+        let parsingFailed = false;
         try {
             await csvReader.processLine(async (data: AccessProfileCSVRecord) => {
                 if (token.isCancellationRequested) {
@@ -373,16 +374,25 @@ export class AccessProfileImporter {
                 }
 
             })
-        } catch { }
+        } catch (error) {
+            if (!isUserCancelledError(error)) {
+                parsingFailed = true;
+                const message = error instanceof Error ? error.message : String(error);
+                await this.writeLog(null, 'Access Profile', CSVLogWriterLogType.ERROR, message);
+                vscode.window.showErrorMessage(message);
+            }
+        }
 
-        const message = `${processedLines} line(s) processed. ${result.success} successfully imported. ${result.error} error(s).`;
+        if (!parsingFailed) {
+            const message = `${processedLines} line(s) processed. ${result.success} successfully imported. ${result.error} error(s).`;
 
-        if (result.error === processedLines) {
-            vscode.window.showErrorMessage(message);
-        } else if (result.error > 0) {
-            vscode.window.showWarningMessage(message);
-        } else {
-            vscode.window.showInformationMessage(message);
+            if (result.error === processedLines) {
+                vscode.window.showErrorMessage(message);
+            } else if (result.error > 0) {
+                vscode.window.showWarningMessage(message);
+            } else {
+                vscode.window.showInformationMessage(message);
+            }
         }
 
         try {
