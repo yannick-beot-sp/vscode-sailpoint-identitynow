@@ -12,6 +12,9 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Changed
 
+- Tree items ordered alphabetically
+
+
 ### Fixed
 
 - Drag and drop of a tenant failed when that tenant had already been expanded

@@ -108,7 +108,7 @@ export class TenantTreeItem extends BaseTreeItem {
 			}
 		}
 
-		return children;
+		return children.sort(compareByLabel);
 	}
 
 	async getChildren(): Promise<BaseTreeItem[]> {
@@ -175,8 +175,8 @@ export class TenantFolderTreeItem extends BaseTreeItem {
 
 	async getChildren(): Promise<BaseTreeItem[]> {
 		const children = this.tenantService.getChildren(this.id!)
-		let results: BaseTreeItem[] = children?.map(x => convertToBaseTreeItem(x, this.tenantService)) ?? []
-		return results
+		const results: BaseTreeItem[] = children?.map(x => convertToBaseTreeItem(x, this.tenantService)) ?? []
+		return results.sort(compareByLabel)
 	}
 }
 
@@ -233,7 +233,8 @@ export class SourcesTreeItem extends FolderTreeItem {
 					source.connectorAttributes?.["delimiter"],
 					source.features,
 					source.cluster !== null && source.cluster !== undefined
-				));
+				))
+				.sort(compareByLabel);
 		}
 		return results;
 	}
@@ -429,7 +430,7 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 			console.log("Privilege classification not available:", error);
 		}
 
-		return results;
+		return results.sort(compareByLabel);
 	}
 
 	updateIcon(context: vscode.ExtensionContext): void {
@@ -469,7 +470,7 @@ export class TransformsTreeItem extends FolderTreeItem {
 					element.name,
 					element.id
 				)
-			);
+			).sort(compareByLabel);
 		}
 		return results;
 	}
@@ -917,7 +918,7 @@ export class MachineAccountSubtypesTreeItem extends FolderTreeItem {
 			subtype.displayName!,
 			subtype.id!,
 			subtype.technicalName!
-		));
+		)).sort(compareByLabel);
 	}
 }
 
@@ -981,7 +982,7 @@ export class PrivilegeClassificationTreeItem extends ISCResourceTreeItem {
 			c.id!,
 			c.type!,
 			c.privilegeLevel!
-		));
+		)).sort(compareByLabel);
 	}
 }
 
@@ -1035,7 +1036,7 @@ export class WorkflowsTreeItem extends FolderTreeItem {
 					truethy(w.enabled)
 				)
 		);
-		return workflowTreeItems;
+		return workflowTreeItems.sort(compareByLabel);
 	}
 }
 
@@ -1102,7 +1103,7 @@ export class RulesTreeItem extends FolderTreeItem {
 		const ruleTreeItems = rules.map(
 			(r) => new RuleTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName, r.name, r.id)
 		);
-		return ruleTreeItems;
+		return ruleTreeItems.sort(compareByLabel);
 	}
 }
 
@@ -1158,7 +1159,7 @@ export class CloudRulesTreeItem extends FolderTreeItem {
 				rule.name,
 				rule.id
 			)
-		);
+		).sort(compareByLabel);
 	}
 }
 
@@ -1218,7 +1219,7 @@ export class IdentityProfileTreeItem extends ISCResourceTreeItem {
 			this.id as string,
 			w.id!
 		))
-		return lifecycleStateItems;
+		return lifecycleStateItems.sort(compareByLabel);
 	}
 
 	getUrl(): vscode.Uri | undefined {
@@ -1286,7 +1287,7 @@ export class ServiceDesksTreeItem extends FolderTreeItem {
 				w.type
 			)
 		);
-		return serviceDeskItems;
+		return serviceDeskItems.sort(compareByLabel);
 	}
 }
 
@@ -1440,7 +1441,12 @@ export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implement
 		if (this.children.length === 0) {
 			await this.loadMore();
 		}
-		return this.children;
+		// Campaign pages stay in creation order. The next page is the next
+		// slice of that order, so a name sort would not match "Load more".
+		if (this instanceof CampaignsTreeItem) {
+			return this.children;
+		}
+		return sortLoadedTreeItems(this.children);
 	}
 }
 
@@ -1704,6 +1710,20 @@ export class MessageNode extends BaseTreeItem {
 }
 
 /**
+ * Alphabetical order of loaded rows. A trailing Load more or message row stays last,
+ * and the stored list is left unchanged so pagination can still drop that trailer.
+ */
+function sortLoadedTreeItems(items: BaseTreeItem[]): BaseTreeItem[] {
+	if (items.length <= 1) {
+		return items;
+	}
+	const last = items[items.length - 1];
+	const hasTrailer = last instanceof LoadMoreNode || last instanceof MessageNode;
+	const sorted = (hasTrailer ? items.slice(0, -1) : items.slice()).sort(compareByLabel);
+	return hasTrailer ? [...sorted, last] : sorted;
+}
+
+/**
  * Contains the Forms in tree view
  */
 export class FormsTreeItem extends FolderTreeItem {
@@ -1728,7 +1748,7 @@ export class FormsTreeItem extends FolderTreeItem {
 			))
 		}
 
-		return forms;
+		return forms.sort(compareByLabel);
 	}
 }
 
@@ -1776,7 +1796,7 @@ export class SearchAttributesTreeItem extends FolderTreeItem {
 			this.tenantName,
 			this.tenantDisplayName,
 			x.name!,
-		))
+		)).sort(compareByLabel)
 
 	}
 }
@@ -2209,7 +2229,7 @@ export class ApplicationTreeItem extends ISCResourceTreeItem implements Pageable
 		if (this.children.length === 0) {
 			await this.loadMore();
 		}
-		return this.children;
+		return sortLoadedTreeItems(this.children);
 	}
 
 	get hasMore(): boolean {
