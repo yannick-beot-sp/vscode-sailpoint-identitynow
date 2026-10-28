@@ -1,0 +1,63 @@
+{
+    "CONFLICTING_ACCESS_BASED": {
+        "label": "Conflicting access based",
+        "description": "Two sets of entitlements that must not be held together",
+        "template": {
+            "name": "<<NAME>>",
+            "description": "",
+            "ownerRef": {
+                "type": "IDENTITY",
+                "id": "<<OWNER_ID>>",
+                "name": "<<OWNER_NAME>>"
+            },
+            "state": "NOT_ENFORCED",
+            "type": "CONFLICTING_ACCESS_BASED",
+            "level": "MEDIUM",
+            "tags": [],
+            "compensatingControls": null,
+            "correctionAdvice": null,
+            "externalPolicyReference": null,
+            "conflictingAccessCriteria": {
+                "leftCriteria": {
+                    "name": "<<LEFT_CRITERIA_NAME>>",
+                    "criteriaList": [
+                        {
+                            "type": "ENTITLEMENT",
+                            "id": "<<ENTITLEMENT_ID>>"
+                        }
+                    ]
+                },
+                "rightCriteria": {
+                    "name": "<<RIGHT_CRITERIA_NAME>>",
+                    "criteriaList": [
+                        {
+                            "type": "ENTITLEMENT",
+                            "id": "<<ENTITLEMENT_ID>>"
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "GENERAL": {
+        "label": "General",
+        "description": "Rules and conditions defined by a search query",
+        "template": {
+            "name": "<<NAME>>",
+            "description": "",
+            "ownerRef": {
+                "type": "IDENTITY",
+                "id": "<<OWNER_ID>>",
+                "name": "<<OWNER_NAME>>"
+            },
+            "state": "ENFORCED",
+            "type": "GENERAL",
+            "level": "MEDIUM",
+            "tags": [],
+            "policyQuery": "<<SEARCH_QUERY>>",
+            "compensatingControls": null,
+            "correctionAdvice": null,
+            "externalPolicyReference": null
+        }
+    }
+}

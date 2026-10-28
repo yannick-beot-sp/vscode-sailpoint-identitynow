@@ -562,6 +562,64 @@
         "icon": "$(add)"
       },
       {
+        "command": "vscode-sailpoint-identitynow.new-segment.view",
+        "title": "New Segment",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.new-segment.palette",
+        "title": "ISC: Add a new segment...",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.new-segment.view-icon",
+        "title": "New Segment",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.segment.add-items.view",
+        "title": "Add to Segment..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.segment.add-items.view-icon",
+        "title": "Add to Segment...",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.segment.remove-item",
+        "title": "Remove from Segment"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.new-sod-policy.view",
+        "title": "New SoD Policy",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.new-sod-policy.palette",
+        "title": "ISC: Add a new SoD policy...",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.new-sod-policy.view-icon",
+        "title": "New SoD Policy",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.new-general-policy.view",
+        "title": "New General Policy",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.new-general-policy.palette",
+        "title": "ISC: Add a new general policy...",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.new-general-policy.view-icon",
+        "title": "New General Policy",
+        "icon": "$(add)"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.csv.export.access-profiles.view",
         "title": "Export all Access Profiles as CSV..."
       },
@@ -1102,6 +1160,42 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.new-segment.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-segment.view-icon",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.segment.add-items.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.segment.add-items.view-icon",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.segment.remove-item",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-sod-policy.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-sod-policy.view-icon",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-general-policy.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-general-policy.view-icon",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.csv.export.access-profiles.view",
           "when": "never"
         },
@@ -1386,12 +1480,12 @@
       "view/item/context": [
         {
           "command": "vscode-sailpoint-identitynow.open-url",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(tenantReadOnly|tenantWritable|.*source|disabledWorkflow|identity-profile|lifecycle-state|role|roleDimensional|dimension|access-profile|service-desk-integration|form-definition|source-app|campaign|identity|notification-template-EMAIL)$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(tenantReadOnly|tenantWritable|.*source|disabledWorkflow|identity-profile|lifecycle-state|role|roleDimensional|dimension|access-profile|service-desk-integration|form-definition|source-app|campaign|identity|notification-template-EMAIL|segment|general-policy|segment-access-profile-item|segment-role-item)$/",
           "group": "_@0"
         },
         {
           "command": "vscode-sailpoint-identitynow.open-resource",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|source|schema|provisioning-policy|role|roleDimensional|dimension|access-profile|lifecycle-state|identity-profile|connector-rule|cloud-rule|service-desk-integration|form-definition|identities|source-app|campaign|resource-item|dataset-item)$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|source|schema|provisioning-policy|role|roleDimensional|dimension|access-profile|lifecycle-state|identity-profile|connector-rule|cloud-rule|service-desk-integration|form-definition|identities|source-app|campaign|resource-item|dataset-item|segment|sod-policy|general-policy|segment-access-profile-item|segment-role-item|segment-entitlement-item)$/",
           "group": "_@0"
         },
         {
@@ -1406,12 +1500,12 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.remove-resource",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|schema|provisioning-policy|role|roleDimensional|dimension|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|search-attribute|identity-attribute|source-app|machine-identity|machine-account-subtype)$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(transform|Workflow|schema|provisioning-policy|role|roleDimensional|dimension|access-profile|lifecycle-state|identity-profile|connector-rule|service-desk-integration|form-definition|search-attribute|identity-attribute|source-app|machine-identity|machine-account-subtype|segment|sod-policy|general-policy)$/",
           "group": "zzzremove@100"
         },
         {
           "command": "vscode-sailpoint-identitynow.refresh-forced",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|privilege-classification|transforms|provisioning-policies|roles|roleDimensional|access-profiles|service-desk-integrations|identity-profiles|schemas|source-resources|source-datasets|workflows|connector-rules|cloud-rules|form-definitions|search-attributes|identity-attributes|source-apps|source-app|campaigns|machine-identities|machine-account-subtypes|privilege-criteria|notification-templates/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /sources|privilege-classification|transforms|provisioning-policies|roles|roleDimensional|access-profiles|service-desk-integrations|identity-profiles|schemas|source-resources|source-datasets|workflows|connector-rules|cloud-rules|form-definitions|search-attributes|identity-attributes|source-apps|source-app|campaigns|machine-identities|machine-account-subtypes|privilege-criteria|notification-templates|segments|sod-policies|general-policies|segment-entitlements/",
           "group": "inline@50"
         },
         {
@@ -1769,6 +1863,47 @@
         {
           "command": "vscode-sailpoint-identitynow.new-role.view-icon",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^roles/",
+          "group": "inline@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-segment.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == segments"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-segment.view-icon",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == segments",
+          "group": "inline@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.segment.add-items.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^segment-(access-profiles|entitlements|roles)$/"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.segment.add-items.view-icon",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^segment-(access-profiles|entitlements|roles)$/",
+          "group": "inline@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.segment.remove-item",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^segment-(access-profile|entitlement|role)-item$/",
+          "group": "zzzremove@100"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-sod-policy.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == sod-policies"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-sod-policy.view-icon",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == sod-policies",
+          "group": "inline@1"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-general-policy.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == general-policies"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.new-general-policy.view-icon",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == general-policies",
           "group": "inline@1"
         },
         {
@@ -2171,6 +2306,14 @@
       {
         "fileMatch": "idn://**/criteria/privilege/*/*",
         "url": "./schemas/privilege-criteria.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/segments/**/*",
+        "url": "./schemas/segment.schemas.json"
+      },
+      {
+        "fileMatch": "idn://**/sod-policies/**/*",
+        "url": "./schemas/sod-policy.schemas.json"
       }
     ],
     "configuration": {

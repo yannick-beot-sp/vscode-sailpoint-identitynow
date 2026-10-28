@@ -1,0 +1,120 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://developer.sailpoint.com/schemas/segment.json",
+  "title": "Segment",
+  "description": "Schema of a segment. Only name, description, owner, visibilityCriteria and active can be updated.",
+  "type": "object",
+  "additionalProperties": false,
+  "definitions": {
+    "value": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "The type of the value",
+          "examples": ["STRING"]
+        },
+        "value": {
+          "type": "string",
+          "description": "The value to compare the attribute with"
+        }
+      }
+    },
+    "expression": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "operator": {
+          "type": "string",
+          "enum": ["AND", "EQUALS"],
+          "description": "Operator for the expression. AND combines the children, EQUALS compares an attribute with a value."
+        },
+        "attribute": {
+          "anyOf": [{ "type": "string" }, { "type": "null" }],
+          "description": "Name of the identity attribute"
+        },
+        "value": {
+          "anyOf": [{ "$ref": "#/definitions/value" }, { "type": "null" }]
+        },
+        "children": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": { "$ref": "#/definitions/expression" }
+            },
+            { "type": "null" }
+          ],
+          "description": "Child expressions, combined by the operator"
+        }
+      }
+    }
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "The segment's ID. Must be left empty when creating a segment.",
+      "readOnly": true
+    },
+    "name": {
+      "type": "string",
+      "description": "The segment's business name"
+    },
+    "created": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The time when the segment is created",
+      "readOnly": true
+    },
+    "modified": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The time when the segment is modified",
+      "readOnly": true
+    },
+    "description": {
+      "anyOf": [{ "type": "string" }, { "type": "null" }],
+      "description": "The segment's optional description"
+    },
+    "owner": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["IDENTITY"],
+              "description": "Owner type"
+            },
+            "id": {
+              "type": "string",
+              "description": "Identity id"
+            },
+            "name": {
+              "type": "string",
+              "description": "Human-readable display name of the owner. If set, it must match the current display name of the owner."
+            }
+          }
+        },
+        { "type": "null" }
+      ],
+      "description": "Owner of the segment"
+    },
+    "visibilityCriteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Criteria that identities must match to belong to the segment",
+      "properties": {
+        "expression": {
+          "$ref": "#/definitions/expression"
+        }
+      }
+    },
+    "active": {
+      "type": "boolean",
+      "description": "Whether the segment is currently active. Inactive segments have no effect."
+    }
+  },
+  "required": ["name"]
+}

@@ -10,6 +10,12 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- Segments are listed in the tree view. They can be created, edited and deleted. 
+- The content of a segment is shown below it, by type (access profiles, entitlements and roles). Items can be added to or removed from a segment
+- SoD policies (conflicting access based) are listed in the tree view. They can be created, edited and deleted
+- General policies (SoD policies of type `GENERAL`) have their own folder in the tree view. They can be created, edited and deleted, and opened in the Web UI
+- Connector name as a description for sources
+
 ### Changed
 
 - Tree items ordered alphabetically

@@ -21,6 +21,7 @@ import { SourceDataset, SourceDatasetResource } from "sailpoint-api-client/dist/
 import { MachineIdentityResponse } from "sailpoint-api-client/dist/machine_identities/api.js";
 import { truethy } from "../utils/booleanUtils.js";
 import { schemaHasDatasetId, sourceResourceIconName } from "../utils/sourceResources.js";
+import type { SegmentMemberType } from "../utils/segmentPatch.js";
 
 
 /**
@@ -91,6 +92,9 @@ export class TenantTreeItem extends BaseTreeItem {
 			new AccessProfilesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
 			new RolesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
 			new FormsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
+			new SegmentsTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
+			new SodPoliciesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
+			new GeneralPoliciesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
 			new SearchAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
 			new IdentityAttributesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
 			new IdentitiesTreeItem(this.tenantId, this.tenantName, this.tenantDisplayName),
@@ -232,7 +236,8 @@ export class SourcesTreeItem extends FolderTreeItem {
 					source.type!,
 					source.connectorAttributes?.["delimiter"],
 					source.features,
-					source.cluster !== null && source.cluster !== undefined
+					source.cluster !== null && source.cluster !== undefined,
+					source.connectorName
 				))
 				.sort(compareByLabel);
 		}
@@ -383,6 +388,7 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 		public readonly delimiter: string,
 		public readonly features: Array<string> | undefined,
 		public readonly VABased: boolean,
+		connectorName?: string,
 	) {
 		super({
 			tenantId,
@@ -393,6 +399,7 @@ export class SourceTreeItem extends ISCResourceTreeItem {
 			id,
 			collapsible: vscode.TreeItemCollapsibleState.Collapsed
 		})
+		this.description = connectorName
 		this.contextValue = (features?.find(x => x === "MACHINE_IDENTITY_AGGREGATION") ?? "")
 			+ (type === "DelimitedFile" && VABased ? "VABased" : "")
 			+ type.replaceAll(" ", "")
@@ -1386,6 +1393,13 @@ export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implement
 
 	protected abstract loadNext(): Promise<AxiosResponse<T[]>>;
 
+	/**
+	 * Total number of elements, read from the `X-Total-Count` header
+	 */
+	protected computeTotal(response: AxiosResponse<T[]>): number {
+		return Number(response.headers[TOTAL_COUNT_HEADER]);
+	}
+
 	async loadMore(): Promise<void> {
 		await vscode.window.withProgress({
 			location: {
@@ -1401,7 +1415,7 @@ export abstract class PageableFolderTreeItem<T> extends FolderTreeItem implement
 			const response = await this.loadNext();
 
 			if (this._total === 0) {
-				this._total = Number(response.headers[TOTAL_COUNT_HEADER]);
+				this._total = this.computeTotal(response);
 			}
 
 			if (this._total === 0) {
@@ -1774,6 +1788,337 @@ export class FormTreeItem extends ISCResourceTreeItem {
 	iconPath = new vscode.ThemeIcon("preview");
 	getUrl(): vscode.Uri | undefined {
 		return getResourceWebUrl(this.tenantName, "form-definition", this.resourceId)
+	}
+}
+
+/**
+ * Contains the Segments in tree view
+ */
+export class SegmentsTreeItem extends FolderTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {
+		super("Segments", "segments", tenantId, tenantName, tenantDisplayName);
+	}
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		const client = new ISCClient(this.tenantId, this.tenantName);
+		return (await client.getSegments())
+			.filter(segment => segment.id && segment.name)
+			.map(segment => new SegmentTreeItem(
+				this.tenantId,
+				this.tenantName,
+				this.tenantDisplayName,
+				segment.name!,
+				segment.id!,
+				segment.active !== false
+			))
+			.sort(compareByLabel);
+	}
+}
+
+/**
+ * A segment. Its content (access profiles, entitlements and roles) is below it.
+ */
+export class SegmentTreeItem extends ISCResourceTreeItem {
+	contextValue = "segment";
+	private cachedChildren?: SegmentContentTreeItem[];
+
+	constructor(tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string,
+		active: boolean = true) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			resourceType: "segments",
+			id: `${tenantId}-${id}`,
+			resourceId: id,
+			collapsible: vscode.TreeItemCollapsibleState.Collapsed
+		})
+		if (!active) {
+			this.description = "inactive";
+		}
+	}
+
+	iconPath = new vscode.ThemeIcon("layers");
+
+	getUrl(): vscode.Uri | undefined {
+		return getResourceWebUrl(this.tenantName, "segment", this.resourceId)
+	}
+
+	reset(): void {
+		this.cachedChildren?.forEach(child => child.reset());
+	}
+
+	/**
+	 * The containers are kept so that a refresh of one of them targets the node known by the tree.
+	 */
+	async getChildren(): Promise<BaseTreeItem[]> {
+		if (!this.cachedChildren) {
+			this.cachedChildren = (["access-profiles", "entitlements", "roles"] as SegmentMemberType[])
+				.map(memberType => new SegmentContentTreeItem(
+					this.tenantId,
+					this.tenantName,
+					this.tenantDisplayName,
+					this.resourceId,
+					memberType
+				));
+		}
+		return this.cachedChildren;
+	}
+}
+
+const SEGMENT_MEMBER_SETTINGS: Record<SegmentMemberType, { label: string, noEntries: string, kind: string, icon: string }> = {
+	"access-profiles": { label: "Access Profiles", noEntries: "No access profile in this segment", kind: "access-profile", icon: "archive" },
+	"entitlements": { label: "Entitlements", noEntries: "No entitlement in this segment", kind: "entitlement", icon: "key" },
+	"roles": { label: "Roles", noEntries: "No role in this segment", kind: "role", icon: "combine" },
+};
+
+/**
+ * Lists the access profiles, entitlements or roles that belong to a segment
+ * (`for-segment-ids=<segment id>&include-unsegmented=false`).
+ */
+export class SegmentContentTreeItem extends PageableFolderTreeItem<any> {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		public readonly segmentId: string,
+		public readonly memberType: SegmentMemberType,
+	) {
+		super(
+			SEGMENT_MEMBER_SETTINGS[memberType].label,
+			`segment-${memberType}`,
+			tenantId, tenantName, tenantDisplayName,
+			SEGMENT_MEMBER_SETTINGS[memberType].noEntries,
+			(item => new SegmentMemberTreeItem(
+				tenantId,
+				tenantName,
+				tenantDisplayName,
+				memberType,
+				segmentId,
+				item.name ?? item.id,
+				item.id,
+				item.source?.name
+			))
+		);
+	}
+
+	protected async loadNext(): Promise<AxiosResponse<any[]>> {
+		const query = {
+			forSegmentIds: this.segmentId,
+			includeUnsegmented: false,
+			limit: getConfigNumber(configuration.TREEVIEW_PAGINATION).valueOf(),
+			offset: this.currentOffset,
+			count: (this._total === 0)
+		};
+		switch (this.memberType) {
+			case "access-profiles":
+				return await this.client.getAccessProfiles(query) as AxiosResponse<any[]>;
+			case "roles":
+				return await this.client.getRoles(query) as AxiosResponse<any[]>;
+			case "entitlements":
+				return await this.client.getEntitlements(query) as AxiosResponse<any[]>;
+		}
+	}
+
+	/**
+	 * With `for-segment-ids`, the `X-Total-Count` header can be missing or equal to 0
+	 * even though elements are returned. The content of the page is then the reference.
+	 */
+	protected computeTotal(response: AxiosResponse<any[]>): number {
+		const total = super.computeTotal(response);
+		const returned = Array.isArray(response.data) ? response.data.length : 0;
+		if ((!Number.isFinite(total) || total < returned) && returned > 0) {
+			console.log(`Segment ${this.memberType}: unreliable ${TOTAL_COUNT_HEADER} (${response.headers[TOTAL_COUNT_HEADER]}), using ${returned} returned elements`);
+			return returned;
+		}
+		return total;
+	}
+
+	// No filter: the context value does not need the "Filtered"/"Unfiltered" suffix
+	get computedContextValue() {
+		return this.contextValue;
+	}
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		const children = await super.getChildren();
+		for (const child of children) {
+			if (child instanceof SegmentMemberTreeItem) {
+				child.parentNode = this;
+			}
+		}
+		return children;
+	}
+}
+
+/**
+ * An access profile, entitlement or role that belongs to a segment.
+ * The context value is different from the one of the "real" object on purpose:
+ * the commands of these objects (e.g. delete) must not be available here.
+ */
+export class SegmentMemberTreeItem extends ISCResourceTreeItem {
+	public parentNode?: BaseTreeItem;
+
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		public readonly memberType: SegmentMemberType,
+		public readonly segmentId: string,
+		label: string,
+		memberId: string,
+		description?: string,
+	) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			resourceType: memberType,
+			id: `${segmentId}-${memberId}`,
+			resourceId: memberId
+		})
+		const settings = SEGMENT_MEMBER_SETTINGS[memberType];
+		this.contextValue = `segment-${settings.kind}-item`;
+		this.iconPath = new vscode.ThemeIcon(settings.icon);
+		if (description) {
+			this.description = description;
+		}
+	}
+
+	getUrl(): vscode.Uri | undefined {
+		const kind = SEGMENT_MEMBER_SETTINGS[this.memberType].kind;
+		return kind === "entitlement" ? undefined : getResourceWebUrl(this.tenantName, kind, this.resourceId);
+	}
+}
+
+const GENERAL_SOD_POLICY_TYPE = "GENERAL";
+
+/**
+ * Contains the SoD Policies of type CONFLICTING_ACCESS_BASED in tree view.
+ * GENERAL policies are in their own folder.
+ */
+export class SodPoliciesTreeItem extends FolderTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {
+		super("SoD Policies", "sod-policies", tenantId, tenantName, tenantDisplayName);
+	}
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		const client = new ISCClient(this.tenantId, this.tenantName);
+		return (await client.getSoDPolicies())
+			.filter(policy => policy.id && policy.name && policy.type !== GENERAL_SOD_POLICY_TYPE)
+			.map(policy => new SodPolicyTreeItem(
+				this.tenantId,
+				this.tenantName,
+				this.tenantDisplayName,
+				policy.name!,
+				policy.id!,
+				policy.state !== "NOT_ENFORCED",
+				policy.level
+			))
+			.sort(compareByLabel);
+	}
+}
+
+export class SodPolicyTreeItem extends ISCResourceTreeItem {
+	contextValue = "sod-policy";
+
+	constructor(tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string,
+		enforced: boolean = true,
+		level?: string | null) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			resourceType: "sod-policies",
+			id: `${tenantId}-${id}`,
+			resourceId: id
+		})
+		// The description is the severity level, completed when the policy is not enforced
+		const description = [level, enforced ? undefined : "not enforced"].filter(Boolean).join(" - ");
+		if (description) {
+			this.description = description;
+		}
+	}
+
+	iconPath = new vscode.ThemeIcon("law");
+}
+
+/**
+ * Contains the SoD Policies of type GENERAL in tree view
+ */
+export class GeneralPoliciesTreeItem extends FolderTreeItem {
+	constructor(
+		tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+	) {
+		super("General Policies", "general-policies", tenantId, tenantName, tenantDisplayName);
+	}
+
+	async getChildren(): Promise<BaseTreeItem[]> {
+		const client = new ISCClient(this.tenantId, this.tenantName);
+		return (await client.getSoDPolicies())
+			.filter(policy => policy.id && policy.name && policy.type === GENERAL_SOD_POLICY_TYPE)
+			.map(policy => new GeneralPolicyTreeItem(
+				this.tenantId,
+				this.tenantName,
+				this.tenantDisplayName,
+				policy.name!,
+				policy.id!,
+				policy.state !== "NOT_ENFORCED"
+			))
+			.sort(compareByLabel);
+	}
+}
+
+/**
+ * A GENERAL SoD policy. It is the same API object as a SoD policy, hence the `sod-policies` resource type.
+ */
+export class GeneralPolicyTreeItem extends ISCResourceTreeItem {
+	contextValue = "general-policy";
+
+	constructor(tenantId: string,
+		tenantName: string,
+		tenantDisplayName: string,
+		label: string,
+		id: string,
+		enforced: boolean = true) {
+		super({
+			tenantId,
+			tenantName,
+			tenantDisplayName,
+			label,
+			resourceType: "sod-policies",
+			id: `${tenantId}-${id}`,
+			resourceId: id
+		})
+		if (!enforced) {
+			this.description = "not enforced";
+		}
+	}
+
+	iconPath = new vscode.ThemeIcon("checklist");
+
+	getUrl(): vscode.Uri | undefined {
+		return getResourceWebUrl(this.tenantName, "general-policy", this.resourceId)
 	}
 }
 

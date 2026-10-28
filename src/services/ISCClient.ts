@@ -7,6 +7,8 @@ import { File } from 'node:buffer';
 import { EndpointUtils } from "../utils/EndpointUtils.js";
 import { SailPointISCAuthenticationProvider } from "./AuthenticationProvider.js";
 import { compareByName } from "../utils.js";
+import { escapeFilter } from "../utils/stringUtils.js";
+import { buildSegmentMembershipPatch, SegmentMemberType } from "../utils/segmentPatch.js";
 import { Account, AccountsApi, AccountsApiListAccountsV1Request, Entitlement, TaskResultDto } from "sailpoint-api-client/dist/accounts/api.js";
 import { DEFAULT_ACCOUNTS_QUERY_PARAMS } from "../models/Account.js";
 import { DEFAULT_ENTITLEMENTS_QUERY_PARAMS } from "../models/Entitlements.js";
@@ -954,6 +956,12 @@ export class ISCClient {
 		console.log("> searchAllAccessProfiles", query);
 		const search = buildSearchQuery({ index: Index.Accessprofiles, query, sort: "name", fields, includeNested })
 		return await this.searchAll(search, limit) as AccessProfileDocument[];
+	}
+
+	public async searchAllRoles(query: string, limit?: number, fields?: string[], includeNested = false): Promise<RoleDocument[]> {
+		console.log("> searchAllRoles", query);
+		const search = buildSearchQuery({ index: Index.Roles, query, sort: "name", fields, includeNested })
+		return await this.searchAll(search, limit) as RoleDocument[];
 	}
 
 	public async searchAllEntitlements(query: string, limit?: number, fields?: string[], includeNested = false): Promise<EntitlementDocument[]> {
@@ -3058,6 +3066,37 @@ export class ISCClient {
 		return result.data;
 	}
 
+	/**
+	 * `GET /segments` does not support filters. The name is unique, so the full list is searched.
+	 */
+	public async getSegmentByName(name: string): Promise<Segment | undefined> {
+		console.log("> getSegmentByName", name);
+		const segments = await this.getSegments();
+		return segments.find(segment => segment.name === name);
+	}
+
+	/**
+	 * Adds an access profile, a role or an entitlement to a segment, or removes it from the segment,
+	 * by updating its `segments` property (`PATCH /{resourceType}/{id}`).
+	 * @returns false if nothing had to be changed
+	 */
+	public async updateSegmentMembership(
+		resourceType: SegmentMemberType,
+		id: string,
+		segmentId: string,
+		action: "add" | "remove"
+	): Promise<boolean> {
+		console.log("> updateSegmentMembership", resourceType, id, segmentId, action);
+		const path = `/${resourceType}/v1/${id}`;
+		const current = await this.getResource(path);
+		const patch = buildSegmentMembershipPatch(current?.segments, segmentId, action);
+		if (patch.length === 0) {
+			return false;
+		}
+		await this.patchResource(path, JSON.stringify(patch));
+		return true;
+	}
+
 	/////////////////////////
 	//#endregion Segments
 	/////////////////////////
@@ -3072,6 +3111,14 @@ export class ISCClient {
 		const api = new SODPoliciesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const result = await Paginator.paginate(api, api.listSodPoliciesV1, { sorters: "name" });
 		return result.data;
+	}
+
+	public async getSoDPolicyByName(name: string): Promise<SodPolicy | undefined> {
+		console.log("> getSoDPolicyByName", name);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SODPoliciesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const result = await api.listSodPoliciesV1({ filters: `name eq "${escapeFilter(name)}"`, limit: 1 });
+		return result.data.find(policy => policy.name === name);
 	}
 
 	/////////////////////////

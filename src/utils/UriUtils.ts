@@ -249,6 +249,8 @@ export function getResourceWebUrl(
             return options?.parentId
                 ? getUIUrl(tenantName, "ui/a/admin/access/roles/manage", options.parentId, "dimensions", id, "basic-config")
                 : undefined;
+        case "segment": return getUIUrl(tenantName, "ui/a/admin/access/segments/manage", id, "name-segment");
+        case "general-policy": return getUIUrl(tenantName, "ui/search/policies/landing", id, "view");
         case "form-definition": return getUIUrl(tenantName, "ui/a/admin/globals/forms/edit", id);
         case "identity": return getUIUrl(tenantName, "ui/a/admin/identities", id, "details/attributes");
         case "machine-identity":

@@ -1,0 +1,215 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://developer.sailpoint.com/schemas/sod-policy.json",
+  "title": "SoD Policy",
+  "description": "Schema of a Separation of Duties policy",
+  "type": "object",
+  "additionalProperties": false,
+  "definitions": {
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["IDENTITY", "GOVERNANCE_GROUP"],
+          "description": "Type of the referenced object"
+        },
+        "id": {
+          "type": "string",
+          "description": "Id of the referenced object"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the referenced object"
+        }
+      }
+    },
+    "accessCriteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Business name for the access construct list"
+        },
+        "criteriaList": {
+          "type": "array",
+          "description": "List of entitlements. Maximum of 50 entitlements per criteria.",
+          "maxItems": 50,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["ENTITLEMENT"],
+                "description": "Type of the access construct"
+              },
+              "id": {
+                "type": "string",
+                "description": "Id of the entitlement"
+              },
+              "name": {
+                "type": "string",
+                "description": "Name of the entitlement"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Policy id. Must be left empty when creating a policy.",
+      "readOnly": true
+    },
+    "name": {
+      "type": "string",
+      "description": "Policy business name"
+    },
+    "created": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Creation date",
+      "readOnly": true
+    },
+    "modified": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last modification date",
+      "readOnly": true
+    },
+    "description": {
+      "anyOf": [{ "type": "string" }, { "type": "null" }],
+      "description": "Optional description of the policy"
+    },
+    "ownerRef": {
+      "$ref": "#/definitions/reference",
+      "description": "Owner of the policy"
+    },
+    "secondaryOwnerRefs": {
+      "type": "array",
+      "description": "Optional secondary owners of the policy",
+      "items": { "$ref": "#/definitions/reference" }
+    },
+    "allowedControls": {
+      "type": "array",
+      "description": "Compensating controls allowed for the policy",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["COMPENSATING_CONTROL"]
+          },
+          "id": { "type": "string" },
+          "name": { "type": "string" }
+        }
+      }
+    },
+    "level": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+        },
+        { "type": "null" }
+      ],
+      "description": "Severity of a violation of the policy"
+    },
+    "externalPolicyReference": {
+      "anyOf": [{ "type": "string" }, { "type": "null" }],
+      "description": "Optional reference to an external policy"
+    },
+    "policyQuery": {
+      "type": "string",
+      "description": "Search query of the policy. Used by GENERAL policies."
+    },
+    "compensatingControls": {
+      "anyOf": [{ "type": "string" }, { "type": "null" }],
+      "description": "Optional description of the compensating controls"
+    },
+    "correctionAdvice": {
+      "anyOf": [{ "type": "string" }, { "type": "null" }],
+      "description": "Optional advice to correct a violation"
+    },
+    "state": {
+      "type": "string",
+      "enum": ["ENFORCED", "NOT_ENFORCED"],
+      "description": "Whether the policy is enforced"
+    },
+    "tags": {
+      "type": "array",
+      "description": "Tags of the policy",
+      "items": { "type": "string" }
+    },
+    "creatorId": {
+      "type": "string",
+      "description": "Id of the creator",
+      "readOnly": true
+    },
+    "modifierId": {
+      "anyOf": [{ "type": "string" }, { "type": "null" }],
+      "description": "Id of the last modifier",
+      "readOnly": true
+    },
+    "violationOwnerAssignmentConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "How the owner of a violation is assigned",
+      "properties": {
+        "assignmentRule": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": ["MANAGER", "STATIC"]
+            },
+            { "type": "null" }
+          ],
+          "description": "MANAGER assigns the violation to the manager of the violator, STATIC to ownerRef"
+        },
+        "ownerRef": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["IDENTITY", "GOVERNANCE_GROUP", "MANAGER"]
+                },
+                "id": { "type": "string" },
+                "name": { "type": "string" }
+              }
+            },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "scheduled": {
+      "type": "boolean",
+      "description": "Whether a violation report schedule is defined for the policy",
+      "readOnly": true
+    },
+    "type": {
+      "type": "string",
+      "enum": ["GENERAL", "CONFLICTING_ACCESS_BASED"],
+      "description": "GENERAL policies rely on policyQuery. CONFLICTING_ACCESS_BASED policies rely on conflictingAccessCriteria."
+    },
+    "conflictingAccessCriteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Two sets of entitlements that must not be held together. Used by CONFLICTING_ACCESS_BASED policies.",
+      "properties": {
+        "leftCriteria": { "$ref": "#/definitions/accessCriteria" },
+        "rightCriteria": { "$ref": "#/definitions/accessCriteria" }
+      }
+    }
+  },
+  "required": ["name", "ownerRef"]
+}

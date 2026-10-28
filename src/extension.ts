@@ -108,6 +108,9 @@ import { CloneTransformCommand } from './commands/CloneTransformCommand.js';
 import { DimensionExporterCommand } from './commands/role/ExportDimensions.js';
 import { DimensionImporterTreeViewCommand } from './commands/role/DimensionImporterTreeViewCommand.js';
 import { EditOrgConfigCommand } from './commands/tenant/EditOrgConfigCommand.js';
+import { NewSegmentCommand } from './commands/segment/NewSegmentCommand.js';
+import { SegmentContentCommand } from './commands/segment/SegmentContentCommand.js';
+import { NewSodPolicyCommand } from './commands/sod-policy/NewSodPolicyCommand.js';
 import { McpServerManager } from './mcp/McpServerManager.js'
 
 // this method is called when your extension is activated
@@ -626,6 +629,40 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.NEW_ACCESS_PROFILE_PALETTE,
 			newAccessProfileCommand.newAccessProfile, newAccessProfileCommand));
 
+
+	// Segments
+	const newSegmentCommand = new NewSegmentCommand(tenantService);
+	for (const command of [commands.NEW_SEGMENT_VIEW, commands.NEW_SEGMENT_VIEW_ICON, commands.NEW_SEGMENT_PALETTE]) {
+		context.subscriptions.push(
+			vscode.commands.registerCommand(command,
+				newSegmentCommand.newSegment, newSegmentCommand));
+	}
+
+	const segmentContentCommand = new SegmentContentCommand(tenantService);
+	for (const command of [commands.SEGMENT_ADD_ITEMS_VIEW, commands.SEGMENT_ADD_ITEMS_VIEW_ICON]) {
+		context.subscriptions.push(
+			vscode.commands.registerCommand(command,
+				segmentContentCommand.addItems, segmentContentCommand));
+	}
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.SEGMENT_REMOVE_ITEM,
+			segmentContentCommand.removeItem, segmentContentCommand));
+
+	// SoD Policies
+	const newSodPolicyCommand = new NewSodPolicyCommand(tenantService, "CONFLICTING_ACCESS_BASED");
+	for (const command of [commands.NEW_SOD_POLICY_VIEW, commands.NEW_SOD_POLICY_VIEW_ICON, commands.NEW_SOD_POLICY_PALETTE]) {
+		context.subscriptions.push(
+			vscode.commands.registerCommand(command,
+				newSodPolicyCommand.newPolicy, newSodPolicyCommand));
+	}
+
+	// General policies
+	const newGeneralPolicyCommand = new NewSodPolicyCommand(tenantService, "GENERAL");
+	for (const command of [commands.NEW_GENERAL_POLICY_VIEW, commands.NEW_GENERAL_POLICY_VIEW_ICON, commands.NEW_GENERAL_POLICY_PALETTE]) {
+		context.subscriptions.push(
+			vscode.commands.registerCommand(command,
+				newGeneralPolicyCommand.newPolicy, newGeneralPolicyCommand));
+	}
 
 	//Forms
 	const formDefinitionExportCommand = new FormDefinitionExportCommand()

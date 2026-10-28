@@ -1,0 +1,25 @@
+{
+    "name": "<<NAME>>",
+    "description": "",
+    "owner": {
+        "type": "IDENTITY",
+        "id": "<<OWNER_ID>>",
+        "name": "<<OWNER_NAME>>"
+    },
+    "active": false,
+    "visibilityCriteria": {
+        "expression": {
+            "operator": "AND",
+            "children": [
+                {
+                    "operator": "EQUALS",
+                    "attribute": "<<IDENTITY_ATTRIBUTE>>",
+                    "value": {
+                        "type": "STRING",
+                        "value": "<<VALUE>>"
+                    }
+                }
+            ]
+        }
+    }
+}

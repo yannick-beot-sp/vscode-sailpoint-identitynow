@@ -11,6 +11,8 @@ enum FileHandlerObjectType {
     connectorRule = "connector-rules",
     role = "roles",
     accessProfile = "access-profiles",
+    segment = "segments",
+    sodPolicy = "sod-policies",
 }
 
 export class FileHandler {
@@ -73,6 +75,12 @@ export class FileHandler {
                 break;
             case FileHandlerObjectType.accessProfile:
                 data = await client.getAccessProfileByName(name);
+                break;
+            case FileHandlerObjectType.segment:
+                data = await client.getSegmentByName(name);
+                break;
+            case FileHandlerObjectType.sodPolicy:
+                data = await client.getSoDPolicyByName(name);
                 break;
             default:
                 break;

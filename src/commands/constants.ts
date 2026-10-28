@@ -107,6 +107,26 @@ export const NEW_ROLE_VIEW = `${COMMAND_PREFIX}.new-role.view`;
 export const NEW_ROLE_VIEW_ICON = `${COMMAND_PREFIX}.new-role.view-icon`;
 export const NEW_ROLE_PALETTE = `${COMMAND_PREFIX}.new-role.palette`;
 
+// New Segment
+export const NEW_SEGMENT_VIEW = `${COMMAND_PREFIX}.new-segment.view`;
+export const NEW_SEGMENT_VIEW_ICON = `${COMMAND_PREFIX}.new-segment.view-icon`;
+export const NEW_SEGMENT_PALETTE = `${COMMAND_PREFIX}.new-segment.palette`;
+
+// Segment content
+export const SEGMENT_ADD_ITEMS_VIEW = `${COMMAND_PREFIX}.segment.add-items.view`;
+export const SEGMENT_ADD_ITEMS_VIEW_ICON = `${COMMAND_PREFIX}.segment.add-items.view-icon`;
+export const SEGMENT_REMOVE_ITEM = `${COMMAND_PREFIX}.segment.remove-item`;
+
+// New SoD Policy
+export const NEW_SOD_POLICY_VIEW = `${COMMAND_PREFIX}.new-sod-policy.view`;
+export const NEW_SOD_POLICY_VIEW_ICON = `${COMMAND_PREFIX}.new-sod-policy.view-icon`;
+export const NEW_SOD_POLICY_PALETTE = `${COMMAND_PREFIX}.new-sod-policy.palette`;
+
+// New General Policy
+export const NEW_GENERAL_POLICY_VIEW = `${COMMAND_PREFIX}.new-general-policy.view`;
+export const NEW_GENERAL_POLICY_VIEW_ICON = `${COMMAND_PREFIX}.new-general-policy.view-icon`;
+export const NEW_GENERAL_POLICY_PALETTE = `${COMMAND_PREFIX}.new-general-policy.palette`;
+
 // Access Profile Import / Export
 export const EXPORT_ACCESS_PROFILE_VIEW = `${COMMAND_PREFIX}.csv.export.access-profiles.view`;
 export const EXPORT_ACCESS_PROFILE_ICON_VIEW = `${COMMAND_PREFIX}.csv.export.access-profiles-icon.view`;

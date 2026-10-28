@@ -24,8 +24,10 @@ import jsonpatch, { type Operation } from "fast-json-patch";
 import { ConnectorRuleUpdateRequest } from "sailpoint-api-client/dist/connector_rule_management/api.js";
 import { FormDefinitionResponse } from "sailpoint-api-client/dist/custom_forms/api.js";
 import { TemplateDto } from "sailpoint-api-client/dist/notifications/api.js";
+import { buildSegmentPatch } from "../utils/segmentPatch.js";
+import { buildSodPolicyUpdatePayload } from "../utils/sodPolicyPayload.js";
 
-const READONLY_RESOURCE_PATH = /\/cloud-rules\/|\/cloud-rule-script\/|\/identities\/|\/resources\/|\/datasets\//;
+const READONLY_RESOURCE_PATH = /\/cloud-rules\/|\/cloud-rule-script\/|\/identities\/|\/resources\/|\/datasets\/|\/entitlements\//;
 
 export class ISCResourceProvider implements FileSystemProvider {
 	private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
@@ -191,7 +193,9 @@ export class ISCResourceProvider implements FileSystemProvider {
 				resourcePath.match("provisioning-policies") ||
 				resourcePath.match("connector-rules") ||
 				resourcePath.match("access-profiles") ||
-				resourcePath.match("roles")
+				resourcePath.match("roles") ||
+				resourcePath.match("segments") ||
+				resourcePath.match("sod-policies")
 			) {
 				const createdData = await client.createResource(
 					path.posix.dirname(resourcePath),
@@ -264,6 +268,21 @@ export class ISCResourceProvider implements FileSystemProvider {
 					JSON.stringify(jsonpatch)
 				);
 
+			} else if (resourcePath.match("segments")) {
+				// PATCH is the only way to update a segment (no PUT)
+				const oldData = await client.getResource(resourcePath);
+				if (!oldData) {
+					throw vscode.FileSystemError.FileNotFound(uri);
+				}
+				const patch = buildSegmentPatch(oldData, JSON.parse(data));
+				if (patch.length > 0) {
+					await client.patchResource(resourcePath, JSON.stringify(patch));
+				}
+			} else if (resourcePath.match("sod-policies")) {
+				await client.updateResource(
+					resourcePath,
+					JSON.stringify(buildSodPolicyUpdatePayload(JSON.parse(data)))
+				);
 			} else if (resourcePath.match("identity-profiles|machine-identities|source-subtypes|access-profiles|roles|search-attribute-config|source-apps|campaigns|criteria-config\/privilege|\/org-config")) {
 				// special treatment to use PATCH method as PUT is not supported
 				let oldData
