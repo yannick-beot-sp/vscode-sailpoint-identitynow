@@ -6,7 +6,6 @@ import { TenantInfoQuickPickItem } from "../models/TenantInfoQuickPickItem.js";
 import { compareByLabel, compareByName } from "../utils.js";
 import { isBlank, isEmpty } from "./stringUtils.js";
 import { ObjectPickItem } from "../models/ObjectPickItem.js";
-import { browseForFile, prefersInEditorFileDialog } from "./quickPickFileDialog.js";
 
 export async function chooseTenant(tenantService: TenantService, title: string): Promise<TenantInfo | undefined> {
 	console.log("> chooseTenant");
@@ -221,13 +220,6 @@ export async function chooseFile(fileType: string, extension: string): Promise<u
 
 
 export async function chooseFileExtended(options: vscode.OpenDialogOptions): Promise<undefined | vscode.Uri | vscode.Uri[]> {
-	// Cursor attaches the native open panel to a hidden browser-view window.
-	// The panel never appears, the dialog lock stays held, and every later call
-	// with the same options is dropped. An in-editor picker avoids that path.
-	if (prefersInEditorFileDialog()) {
-		return await browseForFile(options ?? {});
-	}
-
 	const fileUri = await vscode.window.showOpenDialog(options);
 
 	if (fileUri === undefined || fileUri.length === 0) { return undefined }
