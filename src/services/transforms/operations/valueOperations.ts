@@ -1,4 +1,5 @@
 import { NotImplementedError, TransformError } from '../TransformError.js';
+import { getReferencedVariables, renderVelocity } from '../velocity.js';
 import { Operation } from './Operation.js';
 
 const ISO3166_FORMATS = ['alpha2', 'alpha3', 'numeric'];
@@ -71,11 +72,29 @@ export const VALUE_OPERATIONS: Record<string, Operation> = {
         return await engine.evaluateTransform(transform);
     },
 
+    // value is a Velocity template, whose variables are the other attributes.
+    // Only the referenced attributes are evaluated.
     static: async (attributes, _input, engine) => {
-        const value = attributes.value;
-        if (typeof value === 'string' && value.startsWith('#')) {
-            throw new NotImplementedError('Velocity template is not yet implemented');
+        const template = attributes.value;
+        if (typeof template !== 'string') {
+            return await engine.resolveValue(template);
         }
-        return await engine.resolveVariable(value, attributes);
+        const ignoreErrors = attributes.ignoreErrors === true || attributes.ignoreErrors === 'true';
+
+        const variables: Record<string, any> = {};
+        for (const name of getReferencedVariables(template)) {
+            if (attributes[name] === undefined) {
+                continue;
+            }
+            try {
+                variables[name] = await engine.resolveValue(attributes[name]);
+            } catch (error) {
+                if (!ignoreErrors || !(error instanceof TransformError)) {
+                    throw error;
+                }
+                console.warn(`> static: ignoring error for variable '${name}'`, error.message);
+            }
+        }
+        return renderVelocity(template, variables);
     },
 };

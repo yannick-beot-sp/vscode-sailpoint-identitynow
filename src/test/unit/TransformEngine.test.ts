@@ -133,9 +133,6 @@ suite('TransformEngine Test Suite', () => {
         it('should resolve a literal variable in static', async () => {
             assert.strictEqual(await evaluate({ type: 'static', attributes: { value: '$v', v: 'x' } }), 'x');
         });
-        it('should report Velocity in static as not implemented', async () => {
-            await assert.rejects(evaluate({ type: 'static', attributes: { value: '#if(true)a#end' } }), NotImplementedError);
-        });
         it('should return the first non-null value of firstValid', async () => {
             const result = await evaluate({
                 type: 'firstValid',
@@ -161,6 +158,50 @@ suite('TransformEngine Test Suite', () => {
                 attributes: { firstDate: '2020-01-01T00:00:00Z', secondDate: 'now', operator: 'LT', positiveCondition: 'past', negativeCondition: 'future' }
             });
             assert.strictEqual(result, 'past');
+        });
+    });
+
+    describe('static with Velocity', () => {
+        const tests = [
+            { title: 'several variables', attributes: { value: '$firstName.$lastName', firstName: 'john', lastName: 'doe' }, expected: 'john.doe' },
+            { title: 'Java string methods', attributes: { value: '$fn.substring(0,1).toUpperCase()$ln.toLowerCase()', fn: 'john', ln: 'DOE' }, expected: 'Jdoe' },
+            { title: 'length()', attributes: { value: '$v.length()', v: 'abcd' }, expected: '4' },
+            { title: 'equalsIgnoreCase()', attributes: { value: '#if($v.equalsIgnoreCase("EMPLOYEE"))E#{else}C#end', v: 'employee' }, expected: 'E' },
+            { title: 'Java replace() of every occurrence', attributes: { value: '$v.replace("-", "")', v: 'a-b-c' }, expected: 'abc' },
+            { title: 'Java split() with a regex', attributes: { value: '$v.split("[,;]")[1]', v: 'a;b,c' }, expected: 'b' },
+            { title: '#if/#else', attributes: { value: "#if($type == 'Employee')Full-Time#{else}Contingent#end", type: 'Contractor' }, expected: 'Contingent' },
+            { title: '#set', attributes: { value: '#set($sep = "_")$a$sep$b', a: 'x', b: 'y' }, expected: 'x_y' },
+            { title: 'undefined references as is', attributes: { value: '[$missing][$!missing]' }, expected: '[$missing][]' },
+            { title: 'no HTML escaping', attributes: { value: '$v & co', v: '<b>' }, expected: '<b> & co' },
+        ];
+        tests.forEach(({ title, attributes, expected }) => {
+            it(`should render ${title}`, async () => {
+                assert.strictEqual(await evaluate({ type: 'static', attributes }), expected);
+            });
+        });
+        it('should evaluate nested transforms as variables', async () => {
+            const result = await evaluate({
+                type: 'static',
+                attributes: {
+                    value: '$initial$last',
+                    initial: { type: 'substring', attributes: { input: 'john', begin: 0, end: 1 } },
+                    last: { type: 'lower', attributes: { input: 'DOE' } },
+                }
+            });
+            assert.strictEqual(result, 'jdoe');
+        });
+        it('should only evaluate the referenced attributes', async () => {
+            const context = new FakeContext();
+            await evaluate({ type: 'static', attributes: { value: 'fixed', unused: { type: 'upper' } } }, context);
+            assert.strictEqual(context.implicitInputCalls, 0);
+        });
+        it('should ignore errors of variables when ignoreErrors is true', async () => {
+            const attributes = { value: '$!email', email: { type: 'identityAttribute', attributes: { name: 'email' } } };
+            await assert.rejects(evaluate({ type: 'static', attributes }), TransformError);
+            assert.strictEqual(await evaluate({ type: 'static', attributes: { ...attributes, ignoreErrors: true } }), '');
+        });
+        it('should report an invalid template', async () => {
+            await assert.rejects(evaluate({ type: 'static', attributes: { value: '#if(' } }), /Invalid Velocity template/);
         });
     });
 
