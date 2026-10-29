@@ -1343,6 +1343,10 @@ interface Document {
 	 * The human readable name of the referenced object.
 	 */
 	name: string;
+	/**
+	 * Source of the object (e.g. access profile)
+	 */
+	source?: { id?: string, name?: string } | null;
 }
 
 export enum FilterType {
@@ -1479,7 +1483,8 @@ export class AccessProfilesTreeItem extends PageableFolderTreeItem<Document> {
 				tenantName,
 				tenantDisplayName,
 				role.name,
-				role.id
+				role.id,
+				role.source?.name
 			))
 		);
 	}
@@ -1513,7 +1518,8 @@ export class AccessProfileTreeItem extends ISCResourceTreeItem {
 		tenantName: string,
 		tenantDisplayName: string,
 		label: string,
-		id: string) {
+		id: string,
+		sourceName?: string) {
 		super({
 			tenantId,
 			tenantName,
@@ -1522,6 +1528,9 @@ export class AccessProfileTreeItem extends ISCResourceTreeItem {
 			resourceType: "access-profiles",
 			id
 		})
+		if (sourceName) {
+			this.description = sourceName
+		}
 	}
 
 	contextValue = "access-profile";
