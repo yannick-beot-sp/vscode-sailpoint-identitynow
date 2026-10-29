@@ -5,6 +5,7 @@ import { askFile } from '../../utils/vsCodeHelpers.js';
 import { PathProposer } from '../../services/PathProposer.js';
 import { GenericAsyncIterableIterator } from '../../utils/GenericAsyncIterableIterator.js';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService.js';
+import { FormIdToNameCacheService } from '../../services/cache/FormIdToNameCacheService.js';
 import { WorkflowIdToNameCacheService } from '../../services/cache/WorkflowIdToNameCacheService.js';
 import { approvalSchemeToStringConverter } from '../../utils/approvalSchemeConverter.js';
 import { metadataToString } from '../../utils/metadataUtils.js';
@@ -102,6 +103,11 @@ interface AccessProfileDto {
     'revokeApprovalSchemes'?: string;
 
     /**
+     * Name of the form to display during access request
+     */
+    'form'?: string;
+
+    /**
      * A list of entitlements associated with the Access Profile. If enabled is false this is allowed to be empty otherwise it needs to contain at least one Entitlement.
      */
     'entitlements'?: string;
@@ -160,6 +166,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
             "maxPermittedAccessDurationValue",
             "maxPermittedAccessDurationTimeUnit",
             "revokeApprovalSchemes",
+            "form",
             "entitlements",
             "metadata"
         ];
@@ -180,6 +187,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
             "accessRequestConfig.maxPermittedAccessDuration.value",
             "accessRequestConfig.maxPermittedAccessDuration.timeUnit",
             "revokeApprovalSchemes",
+            "form",
             "entitlements",
             "metadata"
         ];
@@ -188,6 +196,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
         const governanceGroupCache = new GovernanceGroupIdToNameCacheService(this.client);
         const workflowCache = new WorkflowIdToNameCacheService(this.client);
         await workflowCache.init();
+        const formCache = new FormIdToNameCacheService(this.client);
         const identityCacheIdToName = new IdentityIdToNameCacheService(this.client);
         const entitlementIdToSourceNameCacheService = new EntitlementIdToAttributeNameCacheService(this.client);
 
@@ -217,6 +226,16 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
                     console.warn(`Error converting entitlements for role "${item.name}:"`, error);
                 }
 
+                let form: string | undefined = undefined;
+                const formDefinitionId: string | null | undefined = item.accessRequestConfig?.formDefinitionId;
+                if (formDefinitionId) {
+                    try {
+                        form = await formCache.get(formDefinitionId);
+                    } catch (error) {
+                        console.warn(`Error converting form "${formDefinitionId}" for access profile "${item.name}":`, error);
+                    }
+                }
+
                 const itemDto: AccessProfileDto = {
                     name: item.name,
                     // Escape carriage returns in description.
@@ -230,6 +249,7 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
                     additionalOwners: additionalOwnersInfo.additionalOwners,
                     additionalOwnerGovernanceGroup: additionalOwnersInfo.additionalOwnerGovernanceGroup,
                     entitlements,
+                    form,
                     accessRequestConfig: {
                         commentsRequired: item.accessRequestConfig?.commentsRequired ?? false,
                         denialCommentsRequired: item.accessRequestConfig?.denialCommentsRequired ?? false,
@@ -254,6 +274,8 @@ class AccessProfileExporter extends BaseCSVExporter<AccessProfile> {
         governanceGroupCache.flushAll();
         console.log("Workflow Cache stats", workflowCache.getStats());
         workflowCache.flushAll();
+        console.log("Form Cache stats", formCache.getStats());
+        formCache.flushAll();
         console.log("Identity Cache stats", identityCacheIdToName.getStats());
         identityCacheIdToName.flushAll();
         console.log("Entitlement Cache stats", entitlementIdToSourceNameCacheService.getStats());

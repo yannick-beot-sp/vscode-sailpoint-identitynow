@@ -7,6 +7,7 @@ import { CSVReader } from '../../services/CSVReader.js';
 import { ISCClient } from "../../services/ISCClient.js";
 import { EntitlementCacheService, KEY_SEPARATOR } from '../../services/cache/EntitlementCacheService.js';
 import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService.js';
+import { FormNameToIdCacheService } from '../../services/cache/FormNameToIdCacheService.js';
 import { WorkflowNameToIdCacheService } from '../../services/cache/WorkflowNameToIdCacheService.js';
 import * as IdentityNameToIdCacheService from '../../services/cache/IdentityNameToIdCacheService.js';
 import { SourceNameToIdCacheService } from '../../services/cache/SourceNameToIdCacheService.js';
@@ -37,6 +38,7 @@ interface AccessProfileCSVRecord {
     denialCommentsRequired: boolean
     revokeApprovalSchemes: string
     approvalSchemes: string
+    form?: string
     reauthorizationRequired?: boolean
     requireEndDate?: boolean
     maxPermittedAccessDurationValue?: number
@@ -103,6 +105,7 @@ export class AccessProfileImporter {
         const governanceGroupCache = new GovernanceGroupNameToIdCacheService(this.client);
         const workflowCache = new WorkflowNameToIdCacheService(this.client);
         await workflowCache.init()
+        const formCache = new FormNameToIdCacheService(this.client);
         const identityCacheService = new IdentityNameToIdCacheService.IdentityUsernameToIdCacheService(this.client);
         const sourceCacheService = new SourceNameToIdCacheService(this.client);
         const entitlementCacheService = new EntitlementCacheService(this.client);
@@ -264,6 +267,19 @@ export class AccessProfileImporter {
                     return;
                 }
 
+                let formDefinitionId: string | undefined = undefined;
+                if (isNotBlank(data.form)) {
+                    try {
+                        formDefinitionId = await formCache.get(data.form.trim());
+                    } catch (error) {
+                        result.error++;
+                        const formMessage = `Unable to find form with name '${data.form}' in ISC`;
+                        await this.writeLog(processedLines, apName, CSVLogWriterLogType.ERROR, formMessage);
+                        vscode.window.showErrorMessage(formMessage);
+                        return;
+                    }
+                }
+
                 const accessProfilePayload: AccessProfile = {
                     "name": apName,
                     description,
@@ -285,7 +301,8 @@ export class AccessProfileImporter {
                         "approvalSchemes": approvalSchemes,
                         reauthorizationRequired: truethy(data.reauthorizationRequired),
                         requireEndDate: truethy(data.requireEndDate),
-                        maxPermittedAccessDuration
+                        maxPermittedAccessDuration,
+                        formDefinitionId
                     },
                     "revocationRequestConfig": {
                         "approvalSchemes": revokeApprovalSchemes
@@ -334,6 +351,7 @@ export class AccessProfileImporter {
                                 { columns: ['requireEndDate'], path: 'accessRequestConfig/requireEndDate', getValue: () => truethy(data.requireEndDate) },
                                 { columns: ['maxPermittedAccessDurationValue', 'maxPermittedAccessDurationTimeUnit'], path: 'accessRequestConfig/maxPermittedAccessDuration', getValue: () => maxPermittedAccessDuration },
                                 { columns: ['approvalSchemes'], path: 'accessRequestConfig/approvalSchemes', getValue: () => approvalSchemes },
+                                { columns: ['form'], path: 'accessRequestConfig/formDefinitionId', getValue: () => formDefinitionId ?? null },
                                 { columns: ['revokeApprovalSchemes'], path: 'revocationRequestConfig/approvalSchemes', getValue: () => revokeApprovalSchemes },
                                 { columns: ['entitlements'], path: 'entitlements', getValue: () => entitlements },
                                 { columns: ['metadata'], path: 'accessModelMetadata/attributes', getValue: () => stringToAttributeMetadata(data.metadata) ?? null },
@@ -404,6 +422,8 @@ export class AccessProfileImporter {
         governanceGroupCache.flushAll();
         console.log("Workflow Cache stats", workflowCache.getStats());
         workflowCache.flushAll();
+        console.log("Form Cache stats", formCache.getStats());
+        formCache.flushAll();
         console.log("Identity Cache stats", identityCacheService.getStats());
         identityCacheService.flushAll();
         console.log("Source Cache stats", sourceCacheService.getStats());

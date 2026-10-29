@@ -5,6 +5,7 @@ import { askFile } from '../../utils/vsCodeHelpers.js';
 import { PathProposer } from '../../services/PathProposer.js';
 import { RequestabilityForRole, RevocabilityForRole, RoleMembershipSelectorType, RolesApiListRolesV1Request, Role } from 'sailpoint-api-client/dist/roles/api.js';
 import { GovernanceGroupIdToNameCacheService } from '../../services/cache/GovernanceGroupIdToNameCacheService.js';
+import { FormIdToNameCacheService } from '../../services/cache/FormIdToNameCacheService.js';
 import { WorkflowIdToNameCacheService } from '../../services/cache/WorkflowIdToNameCacheService.js';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants.js';
 import { approvalSchemeToStringConverter } from '../../utils/approvalSchemeConverter.js';
@@ -125,6 +126,11 @@ export interface RoleDto {
      */
     membershipCriteria?: string;
 
+    /**
+     * Name of the form to display during access request
+     */
+    form?: string;
+
     dimensional?: boolean | null
     dimensionAttributes?: string
     /**
@@ -169,6 +175,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
             "maxPermittedAccessDurationValue",
             "maxPermittedAccessDurationTimeUnit",
             "revokeApprovalSchemes",
+            "form",
             "accessProfiles",
             "entitlements",
             "membershipCriteria",
@@ -192,6 +199,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
             "accessRequestConfig.maxPermittedAccessDuration.value",
             "accessRequestConfig.maxPermittedAccessDuration.timeUnit",
             "revokeApprovalSchemes",
+            "form",
             "accessProfiles",
             "entitlements",
             "membershipCriteria",
@@ -204,6 +212,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
         const governanceGroupCache = new GovernanceGroupIdToNameCacheService(this.client);
         const workflowCache = new WorkflowIdToNameCacheService(this.client);
         await workflowCache.init()
+        const formCache = new FormIdToNameCacheService(this.client);
         const identityCacheIdToName = new IdentityIdToNameCacheService(this.client);
         const sourceIdToNameCacheService = new SourceIdToNameCacheService(this.client);
         const entitlementIdToSourceNameCacheService = new EntitlementIdToSourceNameCacheService(this.client);
@@ -245,6 +254,16 @@ class RoleExporter extends BaseCSVExporter<Role> {
                     console.warn(`Error converting entitlements for role "${item.name}:"`, error);
                 }
 
+                let form: string | undefined = undefined;
+                const formDefinitionId: string | null | undefined = item.accessRequestConfig?.formDefinitionId;
+                if (formDefinitionId) {
+                    try {
+                        form = await formCache.get(formDefinitionId);
+                    } catch (error) {
+                        console.warn(`Error converting form "${formDefinitionId}" for role "${item.name}":`, error);
+                    }
+                }
+
                 const itemDto: RoleDto = {
                     name: item.name,
                     // Escape carriage returns in description.
@@ -276,6 +295,7 @@ class RoleExporter extends BaseCSVExporter<Role> {
                         item.revocationRequestConfig?.approvalSchemes,
                         governanceGroupCache,
                         workflowCache),
+                    form,
                     membershipCriteria,
                     dimensional: item.dimensional,
                     dimensionAttributes: dimensionSchemaToString(item.accessRequestConfig?.dimensionSchema),
@@ -288,6 +308,8 @@ class RoleExporter extends BaseCSVExporter<Role> {
         governanceGroupCache.flushAll();
         console.log("Workflow Cache stats", workflowCache.getStats());
         workflowCache.flushAll();
+        console.log("Form Cache stats", formCache.getStats());
+        formCache.flushAll();
         console.log("Identity Cache stats", identityCacheIdToName.getStats());
         identityCacheIdToName.flushAll();
         console.log("Source Cache stats", sourceIdToNameCacheService.getStats());

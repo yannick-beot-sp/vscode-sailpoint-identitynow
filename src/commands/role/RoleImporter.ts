@@ -9,6 +9,7 @@ import { AdditionalOwnerRef } from 'sailpoint-api-client/dist/accounts/api.js';
 import { Role } from 'sailpoint-api-client/dist/roles/api.js';
 import { CSVReader } from '../../services/CSVReader.js';
 import { GovernanceGroupNameToIdCacheService } from '../../services/cache/GovernanceGroupNameToIdCacheService.js';
+import { FormNameToIdCacheService } from '../../services/cache/FormNameToIdCacheService.js';
 import { WorkflowNameToIdCacheService } from '../../services/cache/WorkflowNameToIdCacheService.js';
 import { IdentityUsernameToIdCacheService } from '../../services/cache/IdentityNameToIdCacheService.js';
 import { CSV_MULTIVALUE_SEPARATOR } from '../../constants.js';
@@ -41,6 +42,7 @@ interface RoleCSVRecord {
     denialCommentsRequired: boolean
     approvalSchemes: string
     revokeApprovalSchemes: string
+    form?: string
     accessProfiles: string
     entitlements: string
     membershipCriteria: string
@@ -109,6 +111,7 @@ export class RoleImporter {
         const governanceGroupCache = new GovernanceGroupNameToIdCacheService(this.client);
         const workflowCache = new WorkflowNameToIdCacheService(this.client);
         await workflowCache.init()
+        const formCache = new FormNameToIdCacheService(this.client);
         const accessProfileNameToIdCacheService = new AccessProfileNameToIdCacheService(this.client);
         const headers = await csvReader.getHeaders();
         const identityCacheService = new IdentityUsernameToIdCacheService(this.client);
@@ -272,6 +275,19 @@ export class RoleImporter {
                     return;
                 }
 
+                let formDefinitionId: string | undefined = undefined;
+                if (isNotBlank(data.form)) {
+                    try {
+                        formDefinitionId = await formCache.get(data.form.trim());
+                    } catch (error) {
+                        result.error++;
+                        const formMessage = `Unable to find form with name '${data.form}' in ISC`;
+                        await this.writeLog(processedLines, roleName, CSVLogWriterLogType.ERROR, formMessage);
+                        vscode.window.showErrorMessage(formMessage);
+                        return;
+                    }
+                }
+
                 const rolePayload: Role = {
                     "name": roleName,
                     description,
@@ -289,7 +305,8 @@ export class RoleImporter {
                         dimensionSchema: stringToDimensionAttributes(data.dimensionAttributes),
                         reauthorizationRequired: truethy(data.reauthorizationRequired),
                         requireEndDate: truethy(data.requireEndDate),
-                        maxPermittedAccessDuration
+                        maxPermittedAccessDuration,
+                        formDefinitionId
                     },
                     "revocationRequestConfig": {
                         "approvalSchemes": revokeApprovalSchemes
@@ -342,6 +359,7 @@ export class RoleImporter {
                                 { columns: ['maxPermittedAccessDurationValue', 'maxPermittedAccessDurationTimeUnit'], path: 'accessRequestConfig/maxPermittedAccessDuration', getValue: () => maxPermittedAccessDuration },
                                 { columns: ['approvalSchemes'], path: 'accessRequestConfig/approvalSchemes', getValue: () => approvalSchemes },
                                 { columns: ['dimensionAttributes'], path: 'accessRequestConfig/dimensionSchema', getValue: () => stringToDimensionAttributes(data.dimensionAttributes) ?? {}, condition: () => truethy(role.dimensional) },
+                                { columns: ['form'], path: 'accessRequestConfig/formDefinitionId', getValue: () => formDefinitionId ?? null },
                                 { columns: ['revokeApprovalSchemes'], path: 'revocationRequestConfig/approvalSchemes', getValue: () => revokeApprovalSchemes },
                                 { columns: ['accessProfiles'], path: 'accessProfiles', getValue: () => accessProfiles ?? null },
                                 { columns: ['entitlements'], path: 'entitlements', getValue: () => entitlements ?? null },
@@ -412,6 +430,8 @@ export class RoleImporter {
         governanceGroupCache.flushAll();
         console.log("Workflow Cache stats", workflowCache.getStats());
         workflowCache.flushAll();
+        console.log("Form Cache stats", formCache.getStats());
+        formCache.flushAll();
         console.log("Identity Cache stats", identityCacheService.getStats());
         identityCacheService.flushAll();
         console.log("Access Profile Cache stats", accessProfileNameToIdCacheService.getStats());

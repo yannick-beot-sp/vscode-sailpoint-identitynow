@@ -10,6 +10,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- Access Profiles and Roles: export and import of the optional access request form in the new `form` column (form name)
+
 ### Changed
 
 ### Fixed

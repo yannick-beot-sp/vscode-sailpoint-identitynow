@@ -211,6 +211,7 @@ The following table provides the expected column for the CSV to import Access Pr
 | `maxPermittedAccessDurationValue`    | No   | The numeric value representing the amount of time, which is defined in the timeUnit.                                                                                       |               |
 | `maxPermittedAccessDurationTimeUnit` | No   | The unit of time that corresponds to the value among `HOURS`, `DAYS`, `WEEKS`, or `MONTHS`.                                                                                |               |
 | `revokeApprovalSchemes`              | No   | List of reviewers among `APP_OWNER`, `OWNER`, `SOURCE_OWNER`, `MANAGER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by `;`                                  |               |
+| `form`                               | No   | Name of the form to display during access request. Left empty for no form                                                                                                  |               |
 | `entitlements`                       | No   | Entitlements of the access profile                                                                                                                                         |               |
 | `metadata`                           | No   | Metadata of the access profile (cf. below for format)                                                                                                                      |               |
 
@@ -239,6 +240,7 @@ The following table provides the expected column for the CSV to import Roles:
 | `revokeCommentsRequired`             | No   | Require comments when the user requests revocation                                                                                             | `false`       |
 | `revokeDenialCommentsRequired`       | No   | Require comments when a reviewer denies the revocation request                                                                                 | `false`       |
 | `revokeApprovalSchemes`              | No   | List of reviewers among `OWNER`, `MANAGER`, `GOVERNANCE_GROUP:<name>`, or `WORKFLOW:<name>` separated by `;`                                   |               |
+| `form`                               | No   | Name of the form to display during access request. Left empty for no form                                                                      |               |
 | `entitlements`                       | No   | List of entitlements                                                                                                                           |               |
 | `accessProfiles`                     | No   | List of access profiles                                                                                                                        |               |
 | `membershipCriteria`                 | No   | Membership criteria for automatic assignment (cf. below for format)                                                                            |               |
