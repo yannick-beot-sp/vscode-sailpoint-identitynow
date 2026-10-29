@@ -39,12 +39,12 @@ export class TransformEngine {
         validateRequiredAttributes(definition, transform.attributes);
 
         const attributes = transform.attributes ?? {};
-        const input = await this.resolveInput(typeKey, definition, attributes);
-
         const operation = OPERATIONS[typeKey];
         if (operation === undefined) {
             throw new NotImplementedError(`Transform '${typeKey}' not yet implemented`);
         }
+
+        const input = operation.rawInput ? attributes.input : await this.resolveInput(typeKey, definition, attributes);
 
         const result = await operation(attributes, input, this);
         console.log(`> transform ${typeKey}:`, result);

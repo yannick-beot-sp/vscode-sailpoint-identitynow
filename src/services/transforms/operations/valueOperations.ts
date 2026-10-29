@@ -1,6 +1,7 @@
 import { NotImplementedError, TransformError } from '../TransformError.js';
+import { findCountry, findLanguageTag } from '../countries.js';
 import { getReferencedVariables, renderVelocity } from '../velocity.js';
-import { Operation } from './Operation.js';
+import { Operation, onInput } from './Operation.js';
 
 const ISO3166_FORMATS = ['alpha2', 'alpha3', 'numeric'];
 
@@ -48,13 +49,18 @@ export const VALUE_OPERATIONS: Record<string, Operation> = {
         return null;
     },
 
-    iso3166: async (attributes) => {
+    // The input is a country code (alpha-2, alpha-3 or numeric) or an English country name
+    iso3166: onInput((input, attributes) => {
         const format = attributes.format ?? 'alpha2';
         if (!ISO3166_FORMATS.includes(format)) {
             throw new TransformError(`Invalid format '${format}'. Valid values are 'alpha2', 'alpha3' and 'numeric'`);
         }
-        throw new NotImplementedError("Transform 'iso3166' not yet implemented");
-    },
+        const country = findCountry(input);
+        return country === undefined ? null : country[format as 'alpha2' | 'alpha3' | 'numeric'];
+    }),
+
+    // The input is an English language name or an ISO 639 code
+    rfc5646: onInput(input => findLanguageTag(input) ?? null),
 
     lookup: async (attributes, input) => {
         const table = attributes.table;
@@ -74,6 +80,10 @@ export const VALUE_OPERATIONS: Record<string, Operation> = {
 
     // value is a Velocity template, whose variables are the other attributes.
     // Only the referenced attributes are evaluated.
+    usernameGenerator: async () => {
+        throw new NotImplementedError("Transform 'usernameGenerator' cannot be evaluated locally: it only runs in an account create profile, and its uniqueness checks need the source");
+    },
+
     static: async (attributes, _input, engine) => {
         const template = attributes.value;
         if (typeof template !== 'string') {

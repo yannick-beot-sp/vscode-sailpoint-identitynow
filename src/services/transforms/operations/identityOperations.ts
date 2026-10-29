@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import { isEmpty } from '../../../utils/stringUtils.js';
 import { EvaluationContext } from '../EvaluationContext.js';
 import { TransformError } from '../TransformError.js';
 import { Operation, cloudServicesRule } from './Operation.js';
@@ -10,6 +11,23 @@ async function getIdentity(context: EvaluationContext, identityNameOrId: string)
     }
     return identity;
 }
+
+/**
+ * ("Preferred Name" or "Given Name") + "Family Name".
+ * The input is a map of givenName, familyName and optionally preferredName, whose values can be transforms.
+ */
+const displayName: Operation = async (attributes, _input, engine) => {
+    const input = attributes.input;
+    if (input === undefined || input === null || typeof input !== 'object' || input.type !== undefined) {
+        throw new TransformError("Attribute 'input' must be a map of 'givenName', 'familyName' and optionally 'preferredName'");
+    }
+
+    const preferredName = await engine.resolveValue(input.preferredName);
+    const firstName = isEmpty(preferredName) ? await engine.resolveValue(input.givenName) : preferredName;
+    const familyName = await engine.resolveValue(input.familyName);
+    return [firstName, familyName].filter(name => !isEmpty(name)).join(' ');
+};
+displayName.rawInput = true;
 
 export const IDENTITY_OPERATIONS: Record<string, Operation> = {
     // Optional attributes (accountFilter, accountSortAttribute, etc.) are not supported
@@ -41,6 +59,8 @@ export const IDENTITY_OPERATIONS: Record<string, Operation> = {
         }
         return value;
     },
+
+    displayName: displayName,
 
     identityAttribute: async (attributes, _input, engine) => {
         const identityNameOrId = await engine.getIdentityNameOrId();

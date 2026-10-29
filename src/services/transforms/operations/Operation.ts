@@ -4,8 +4,9 @@ import { TransformError } from '../TransformError.js';
 /**
  * Implementation of a transform type.
  * `input` is the resolved input, or undefined if the type does not accept one.
+ * With `rawInput`, `input` is `attributes.input` as is, for the operations that resolve it themselves.
  */
-export type Operation = (attributes: any, input: any, engine: TransformEngine) => Promise<any>;
+export type Operation = ((attributes: any, input: any, engine: TransformEngine) => Promise<any>) & { rawInput?: boolean };
 
 /**
  * Wraps an operation working on the input string. A null input gives a null result, as in ISC.

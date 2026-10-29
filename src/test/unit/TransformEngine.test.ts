@@ -205,6 +205,38 @@ suite('TransformEngine Test Suite', () => {
         });
     });
 
+    describe('country, language and name transforms', () => {
+        const tests = [
+            { transform: { type: 'iso3166', attributes: { input: 'France' } }, expected: 'FR' },
+            { transform: { type: 'iso3166', attributes: { input: 'us', format: 'alpha3' } }, expected: 'USA' },
+            { transform: { type: 'iso3166', attributes: { input: 'ESP', format: 'numeric' } }, expected: '724' },
+            { transform: { type: 'iso3166', attributes: { input: '4', format: 'alpha2' } }, expected: 'AF' },
+            { transform: { type: 'iso3166', attributes: { input: 'Atlantis' } }, expected: null },
+            { transform: { type: 'rfc5646', attributes: { input: 'English' } }, expected: 'en' },
+            { transform: { type: 'rfc5646', attributes: { input: 'fra' } }, expected: 'fr' },
+            { transform: { type: 'rfc5646', attributes: { input: 'Klingon' } }, expected: null },
+        ];
+        tests.forEach(({ transform, expected }) => {
+            it(`should convert '${transform.attributes.input}' with ${transform.type}`, async () => {
+                assert.strictEqual(await evaluate(transform), expected);
+            });
+        });
+        it('should reject an invalid iso3166 format', async () => {
+            await assert.rejects(evaluate({ type: 'iso3166', attributes: { input: 'FR', format: 'alpha4' } }), /Invalid format/);
+        });
+        it('should prefer the preferred name in displayName', async () => {
+            const input = { givenName: 'Robert', familyName: 'Smith', preferredName: { type: 'static', attributes: { value: 'Bob' } } };
+            assert.strictEqual(await evaluate({ type: 'displayName', attributes: { input } }), 'Bob Smith');
+            assert.strictEqual(await evaluate({ type: 'displayName', attributes: { input: { ...input, preferredName: '' } } }), 'Robert Smith');
+        });
+        it('should require a map as displayName input', async () => {
+            await assert.rejects(evaluate({ type: 'displayName', attributes: { input: 'Bob' } }), /must be a map/);
+        });
+        it('should explain why usernameGenerator is not evaluated', async () => {
+            await assert.rejects(evaluate({ type: 'usernameGenerator', attributes: { type: 'usernameGenerator', patterns: ['$fn'] } }), /cannot be evaluated locally/);
+        });
+    });
+
     describe('generators', () => {
         it('should accept a string length', async () => {
             assert.match(await evaluate({ type: 'randomNumeric', attributes: { length: '6' } }), /^[0-9]{6}$/);
