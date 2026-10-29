@@ -5,7 +5,7 @@ import { ISCClient } from './ISCClient.js';
 import { TenantService } from './TenantService.js';
 import { EvaluationContext } from './transforms/EvaluationContext.js';
 import { TransformEngine } from './transforms/TransformEngine.js';
-import { EvaluationCancelledError, NotImplementedError } from './transforms/TransformError.js';
+import { EvaluationCancelledError, NotImplementedError, TransformError } from './transforms/TransformError.js';
 import { requiredValidator } from '../validator/requiredValidator.js';
 import { InputPromptStep } from '../wizard/inputPromptStep.js';
 import { QuickPickAccountSchemaStep } from '../wizard/quickPickAccountSchemaStep.js';
@@ -185,8 +185,20 @@ class EditorEvaluationContext implements EvaluationContext {
         return values["identity"].name;
     }
 
-    getIdentity(identityNameOrId: string): Promise<any> {
-        return withProgress(`Getting identity '${identityNameOrId}'...`, () => this.client.getIdentity(identityNameOrId));
+    /**
+     * Gets the whole identity document (attributes, manager, accounts) by exact id or name.
+     * ISCClient.getIdentity only returns the name, display name and id.
+     */
+    async getIdentity(identityNameOrId: string): Promise<any> {
+        const value = identityNameOrId.replace(/[\\"]/g, '\\$&');
+        const results = await withProgress(`Getting identity '${identityNameOrId}'...`,
+            () => this.client.searchAllIdentities(`id:"${value}" OR name:"${value}"`, 10));
+
+        const identities = results.filter(identity => identity.id === identityNameOrId || identity.name?.toLowerCase() === identityNameOrId.toLowerCase());
+        if (identities.length > 1) {
+            throw new TransformError(`Several identities match '${identityNameOrId}'`);
+        }
+        return identities[0];
     }
 
     getSourceId(sourceName: string): Promise<string | undefined> {

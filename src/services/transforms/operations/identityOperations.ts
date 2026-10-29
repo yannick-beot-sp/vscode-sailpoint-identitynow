@@ -104,7 +104,7 @@ export const IDENTITY_OPERATIONS: Record<string, Operation> = {
         if (uid === 'manager') {
             const identityNameOrId = await engine.getIdentityNameOrId();
             const identity = await getIdentity(context, identityNameOrId);
-            referenceName = identity.manager?.name;
+            referenceName = identity.manager?.id ?? identity.manager?.name;
             if (referenceName === undefined) {
                 throw new TransformError(`Identity '${identityNameOrId}' has no manager`);
             }
