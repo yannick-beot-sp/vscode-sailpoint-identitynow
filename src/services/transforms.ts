@@ -1,4 +1,5 @@
 export function normalizeNames(input: string) {
+    console.log("> normalizeNames");
     let result = '';
 
     let searchPattern = new RegExp('(\\w+)(-|\')?', 'g');
@@ -66,6 +67,7 @@ export function normalizeNames(input: string) {
         result = result.replace(searchPattern, x => x.toUpperCase());
     }
 
+    console.log("< normalizeNames. result=" + result);
     return result;
 }
 

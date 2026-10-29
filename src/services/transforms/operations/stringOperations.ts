@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { CountryCode, isSupportedCountry, parsePhoneNumberFromString } from 'libphonenumber-js/max';
 import { TransformError } from '../TransformError.js';
-import { normalizeNames } from '../normalizeNames.js';
+import { normalizeNames } from '../../transforms.js';
 import { Operation, cloudServicesRule, onInput, parseNumber } from './Operation.js';
 
 export const STRING_OPERATIONS: Record<string, Operation> = {
