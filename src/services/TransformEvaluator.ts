@@ -122,8 +122,8 @@ class EditorEvaluationContext implements EvaluationContext {
         return withProgress(`Getting source '${sourceName}' id...`, () => this.client.getSourceId(sourceName));
     }
 
-    getAccountBySource(sourceId: string, nativeIdentity: string): Promise<any> {
-        return withProgress(`Getting account for nativeIdentity '${nativeIdentity}'...`, () => this.client.getAccountBySource(sourceId, nativeIdentity));
+    getAccountsByIdentity(identityId: string): Promise<any[]> {
+        return withProgress(`Getting accounts of identity '${identityId}'...`, () => this.client.getAccountsByIdentity(identityId));
     }
 
     getTransformByName(name: string): Promise<any> {

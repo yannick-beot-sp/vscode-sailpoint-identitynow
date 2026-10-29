@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { isEmpty } from '../../../utils/stringUtils.js';
 import { EvaluationContext } from '../EvaluationContext.js';
+import { compileFilter } from '../filters.js';
 import { TransformError } from '../TransformError.js';
 import { Operation, cloudServicesRule } from './Operation.js';
 
@@ -10,6 +11,22 @@ async function getIdentity(context: EvaluationContext, identityNameOrId: string)
         throw new TransformError(`Identity '${identityNameOrId}' couldn't be found`);
     }
     return identity;
+}
+
+/**
+ * Sorts by an account property (created, modified, name, nativeIdentity, etc.) or else by an account attribute.
+ * Accounts without a value come last.
+ */
+function sortAccounts(accounts: any[], sortAttribute: string, descending: boolean): void {
+    const valueOf = (account: any) => account[sortAttribute] ?? account.attributes?.[sortAttribute] ?? null;
+    accounts.sort((a, b) => {
+        const first = valueOf(a), second = valueOf(b);
+        if (first === null || second === null) {
+            return first === second ? 0 : first === null ? 1 : -1;
+        }
+        const order = String(first).localeCompare(String(second), undefined, { numeric: true });
+        return descending ? -order : order;
+    });
 }
 
 /**
@@ -30,7 +47,6 @@ const displayName: Operation = async (attributes, _input, engine) => {
 displayName.rawInput = true;
 
 export const IDENTITY_OPERATIONS: Record<string, Operation> = {
-    // Optional attributes (accountFilter, accountSortAttribute, etc.) are not supported
     accountAttribute: async (attributes, _input, engine) => {
         const { sourceName, attributeName } = attributes;
         const context = engine.context;
@@ -43,21 +59,28 @@ export const IDENTITY_OPERATIONS: Record<string, Operation> = {
         const identityNameOrId = await engine.getIdentityNameOrId();
         const identity = await getIdentity(context, identityNameOrId);
 
-        const nativeIdentity = identity.accounts?.find((account: any) => account.source?.id === sourceId)?.accountId;
-        if (nativeIdentity === undefined) {
+        let accounts = (await context.getAccountsByIdentity(identity.id)).filter(account => account.sourceId === sourceId);
+        if (accounts.length === 0) {
             throw new TransformError(`No account found for identity '${identityNameOrId}' in source '${sourceName}'`);
         }
 
-        const account = await context.getAccountBySource(sourceId, nativeIdentity);
-        if (account === undefined) {
-            throw new TransformError(`Account '${nativeIdentity}' in source '${sourceName}' couldn't be found`);
+        // accountFilter applies to the account properties, accountPropertyFilter to its attributes
+        if (attributes.accountFilter) {
+            const filter = compileFilter(attributes.accountFilter);
+            accounts = accounts.filter(account => filter({ ...account, displayName: account.name, entitlements: account.hasEntitlements }));
+        }
+        if (attributes.accountPropertyFilter) {
+            const filter = compileFilter(attributes.accountPropertyFilter);
+            accounts = accounts.filter(account => filter(account.attributes ?? {}));
         }
 
-        const value = account.attributes?.[attributeName];
-        if (value === undefined) {
-            throw new TransformError(`Attribute '${attributeName}' for account '${nativeIdentity}' in source '${sourceName}' does not exist or is null`);
+        sortAccounts(accounts, attributes.accountSortAttribute ?? 'created', attributes.accountSortDescending === true || attributes.accountSortDescending === 'true');
+
+        const values = accounts.map(account => account.attributes?.[attributeName] ?? null);
+        if (attributes.accountReturnFirstLink === true || attributes.accountReturnFirstLink === 'true') {
+            return values[0] ?? null;
         }
-        return value;
+        return values.find(value => value !== null) ?? null;
     },
 
     displayName: displayName,

@@ -18,7 +18,7 @@ export interface EvaluationContext {
 
     getSourceId(sourceName: string): Promise<string | undefined>;
 
-    getAccountBySource(sourceId: string, nativeIdentity: string): Promise<any>;
+    getAccountsByIdentity(identityId: string): Promise<any[]>;
 
     getTransformByName(name: string): Promise<any>;
 }

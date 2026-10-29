@@ -15,6 +15,7 @@ class FakeContext implements EvaluationContext {
         private readonly implicitInput = 'John Doe',
         private readonly identities: Record<string, any> = {},
         private readonly transforms: Record<string, any> = {},
+        private readonly accounts: any[] = [],
     ) { }
 
     async getImplicitInput() {
@@ -27,9 +28,7 @@ class FakeContext implements EvaluationContext {
     }
     async getIdentity(identityNameOrId: string) { return this.identities[identityNameOrId]; }
     async getSourceId(sourceName: string) { return sourceName === 'HR' ? 'hr-id' : undefined; }
-    async getAccountBySource(sourceId: string, nativeIdentity: string) {
-        return { attributes: { department: `${sourceId}/${nativeIdentity}` } };
-    }
+    async getAccountsByIdentity(identityId: string) { return this.accounts.filter(account => account.identityId === identityId); }
     async getTransformByName(name: string) { return this.transforms[name]; }
 }
 
@@ -306,19 +305,50 @@ suite('TransformEngine Test Suite', () => {
     describe('identity transforms', () => {
         const identities = {
             'john.doe': {
+                id: 'john-id',
                 attributes: { email: 'john@example.com' },
                 manager: { name: 'jane.boss' },
-                accounts: [{ source: { id: 'hr-id' }, accountId: 'E001' }],
             },
             'jane.boss': { attributes: { email: 'jane@example.com' } },
         };
+        const account = (nativeIdentity: string, created: string, attributes: any, properties: any = {}) =>
+            ({ identityId: 'john-id', sourceId: 'hr-id', nativeIdentity, name: nativeIdentity, created, attributes, ...properties });
+        const accounts = [
+            account('E002', '2021-06-01T00:00:00Z', { department: 'Sales', type: 'Employee' }),
+            account('E001', '2020-01-01T00:00:00Z', { department: null, type: 'Employee' }),
+            account('*DELETED*E000', '2019-01-01T00:00:00Z', { department: 'Legal', type: 'Contractor' }, { disabled: true }),
+            { ...account('X001', '2018-01-01T00:00:00Z', { department: 'Other source' }), sourceId: 'other-id' },
+        ];
+        const accountAttribute = (attributes: any) =>
+            evaluate({ type: 'accountAttribute', attributes: { sourceName: 'HR', attributeName: 'department', ...attributes } }, new FakeContext('', identities, {}, accounts));
 
         it('should get an identity attribute', async () => {
             assert.strictEqual(await evaluate({ type: 'identityAttribute', attributes: { name: 'email' } }, new FakeContext('', identities)), 'john@example.com');
         });
-        it('should get an account attribute', async () => {
-            const result = await evaluate({ type: 'accountAttribute', attributes: { sourceName: 'HR', attributeName: 'department' } }, new FakeContext('', identities));
-            assert.strictEqual(result, 'hr-id/E001');
+        it('should return the first non-null value of the oldest accounts first', async () => {
+            assert.strictEqual(await accountAttribute({}), 'Legal');
+        });
+        it('should return the value of the first account with accountReturnFirstLink', async () => {
+            assert.strictEqual(await accountAttribute({ accountFilter: '!(nativeIdentity.startsWith("*DELETED*"))', accountReturnFirstLink: true }), null);
+        });
+        it('should sort the accounts', async () => {
+            assert.strictEqual(await accountAttribute({ accountSortDescending: 'true' }), 'Sales');
+            assert.strictEqual(await accountAttribute({ accountSortAttribute: 'nativeIdentity', accountFilter: 'disabled != true' }), 'Sales');
+        });
+        it('should filter on account properties and attributes', async () => {
+            assert.strictEqual(await accountAttribute({ accountFilter: '!(nativeIdentity.startsWith("*DELETED*"))' }), 'Sales');
+            assert.strictEqual(await accountAttribute({ accountPropertyFilter: '(type == "Contractor" || department.isNull())', accountReturnFirstLink: true }), 'Legal');
+            assert.strictEqual(await accountAttribute({ accountPropertyFilter: 'type.in({"Employee"}) && department.notNull()' }), 'Sales');
+            assert.strictEqual(await accountAttribute({ accountPropertyFilter: 'type == "Nobody"' }), null);
+        });
+        it('should report an invalid filter', async () => {
+            await assert.rejects(accountAttribute({ accountFilter: 'nativeIdentity ==' }), /Invalid filter 'nativeIdentity =='/);
+            await assert.rejects(accountAttribute({ accountFilter: 'name.foo("x")' }), /unknown method/);
+        });
+        it('should report an identity without account on the source', async () => {
+            await assert.rejects(
+                evaluate({ type: 'accountAttribute', attributes: { sourceName: 'HR', attributeName: 'department' } }, new FakeContext('', identities)),
+                /No account found/);
         });
         it('should get a manager attribute', async () => {
             const result = await evaluate({
@@ -328,12 +358,12 @@ suite('TransformEngine Test Suite', () => {
             assert.strictEqual(result, 'jane@example.com');
         });
         it('should ask the identity once per evaluation', async () => {
-            const context = new FakeContext('', identities);
+            const context = new FakeContext('', identities, {}, accounts);
             const result = await evaluate({
                 type: 'concat',
                 attributes: { values: [{ type: 'identityAttribute', attributes: { name: 'email' } }, { type: 'accountAttribute', attributes: { sourceName: 'HR', attributeName: 'department' } }] }
             }, context);
-            assert.strictEqual(result, 'john@example.comhr-id/E001');
+            assert.strictEqual(result, 'john@example.comLegal');
             assert.strictEqual(context.identityCalls, 1);
         });
     });
