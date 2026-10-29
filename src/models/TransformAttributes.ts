@@ -35,6 +35,10 @@ export const ATTRIBUTES: any = {
         'required': [],
         'optional': ['requiresPeriodicRefresh', 'input']
     },
+    'displayName': {
+        'required': [],
+        'optional': ['requiresPeriodicRefresh', 'input']
+    },
     'e164phone': {
         'required': [],
         'optional': ['requiresPeriodicRefresh', 'input', 'defaultRegion']
@@ -99,9 +103,13 @@ export const ATTRIBUTES: any = {
         'required': ['length'],
         'optional': ['requiresPeriodicRefresh', 'padding', 'input']
     },
+    'rfc5646': {
+        'required': [],
+        'optional': ['requiresPeriodicRefresh', 'input']
+    },
     'rule:generateRandomString': {
         'required': ['name', 'operation', 'includeNumbers', 'includeSpecialChars'],
-        'optional': ['MISSING', 'requiresPeriodicRefresh']
+        'optional': ['requiresPeriodicRefresh', 'length']
     },
     'rule:getEndOfString': {
         'required': ['name', 'operation', 'numChars'],
