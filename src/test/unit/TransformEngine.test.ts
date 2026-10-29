@@ -52,9 +52,6 @@ suite('TransformEngine Test Suite', () => {
         it('should reject an input on a type without input', async () => {
             await assert.rejects(evaluate({ type: 'uuid', attributes: { input: 'a' } }), /do not require attribute 'input'/);
         });
-        it('should report unsupported types as not implemented', async () => {
-            await assert.rejects(evaluate({ type: 'dateMath', attributes: { expression: 'now' } }), NotImplementedError);
-        });
     });
 
     describe('input', () => {
@@ -202,6 +199,56 @@ suite('TransformEngine Test Suite', () => {
         });
         it('should report an invalid template', async () => {
             await assert.rejects(evaluate({ type: 'static', attributes: { value: '#if(' } }), /Invalid Velocity template/);
+        });
+    });
+
+    describe('date transforms', () => {
+        const dateFormats = [
+            { input: '2024-03-05T14:07:09.123Z', inputFormat: undefined, outputFormat: undefined, expected: '2024-03-05T14:07:09.123Z' },
+            { input: '2024-03-05T14:07:09Z', inputFormat: 'ISO8601', outputFormat: 'PEOPLE_SOFT', expected: '03/05/2024' },
+            { input: '03/05/2024', inputFormat: 'PEOPLE_SOFT', outputFormat: 'ISO8601', expected: '2024-03-05T00:00:00.000Z' },
+            { input: '20240305140709.0Z', inputFormat: 'LDAP', outputFormat: 'ISO8601', expected: '2024-03-05T14:07:09.000Z' },
+            { input: '2024-03-05T14:07:09Z', inputFormat: 'ISO8601', outputFormat: 'LDAP', expected: '20240305140709.+0000' },
+            { input: '1709647629000', inputFormat: 'EPOCH_TIME_JAVA', outputFormat: 'ISO8601', expected: '2024-03-05T14:07:09.000Z' },
+            { input: '2024-03-05T14:07:09Z', inputFormat: 'ISO8601', outputFormat: 'EPOCH_TIME_WIN32', expected: '133541212290000000' },
+            { input: '133541212290000000', inputFormat: 'EPOCH_TIME_WIN32', outputFormat: 'EPOCH_TIME_JAVA', expected: '1709647629000' },
+            { input: '20240305', inputFormat: 'yyyyMMdd', outputFormat: "EEEE d MMMM yyyy 'at' h:mm a", expected: 'Tuesday 5 March 2024 at 12:00 AM' },
+            { input: '5-Mar-24 2:07 PM', inputFormat: 'd-MMM-yy h:mm a', outputFormat: 'yyyy-MM-dd HH:mm', expected: '2024-03-05 14:07' },
+            { input: '2024-03-05 16:07 +0200', inputFormat: 'yyyy-MM-dd HH:mm Z', outputFormat: "HH:mm'Z'", expected: '14:07Z' },
+        ];
+        dateFormats.forEach(({ input, inputFormat, outputFormat, expected }) => {
+            it(`should format '${input}' from ${inputFormat ?? 'default'} to ${outputFormat ?? 'default'}`, async () => {
+                assert.strictEqual(await evaluate({ type: 'dateFormat', attributes: { input, inputFormat, outputFormat } }), expected);
+            });
+        });
+        it('should reject a date that does not match the input format', async () => {
+            await assert.rejects(evaluate({ type: 'dateFormat', attributes: { input: '2024-03-05', inputFormat: 'MM/dd/yyyy' } }), /does not match the format/);
+        });
+        it('should report unsupported pattern letters as not implemented', async () => {
+            await assert.rejects(evaluate({ type: 'dateFormat', attributes: { input: '2024-03-05T00:00:00Z', outputFormat: 'D' } }), NotImplementedError);
+        });
+
+        const dateMaths = [
+            { input: '2024-01-31T10:20:30Z', expression: '+1M', roundUp: false, expected: '2024-02-29T10:20:30.000Z' },
+            { input: '2024-03-05T10:20:30Z', expression: '-1y+2w-3d+4h-5m+6s', roundUp: false, expected: '2023-03-16T14:15:36.000Z' },
+            { input: '2024-03-05T10:20:30Z', expression: '/d', roundUp: false, expected: '2024-03-05T00:00:00.000Z' },
+            { input: '2024-03-05T10:20:30Z', expression: '/d', roundUp: true, expected: '2024-03-05T23:59:59.999Z' },
+            { input: '2024-03-07T10:20:30Z', expression: '/w', roundUp: false, expected: '2024-03-04T00:00:00.000Z' },
+            { input: '2024-03-05T10:20:30Z', expression: '+1d/M', roundUp: true, expected: '2024-03-31T23:59:59.999Z' },
+        ];
+        dateMaths.forEach(({ input, expression, roundUp, expected }) => {
+            it(`should apply '${expression}'${roundUp ? ' rounding up' : ''}`, async () => {
+                assert.strictEqual(await evaluate({ type: 'dateMath', attributes: { input, expression, roundUp } }), expected);
+            });
+        });
+        it('should not ask the input when the expression starts with now', async () => {
+            const context = new FakeContext();
+            const result = await evaluate({ type: 'dateMath', attributes: { expression: 'now/y' } }, context);
+            assert.strictEqual(result, `${new Date().getUTCFullYear()}-01-01T00:00:00.000Z`);
+            assert.strictEqual(context.implicitInputCalls, 0);
+        });
+        it('should only accept rounding at the end', async () => {
+            await assert.rejects(evaluate({ type: 'dateMath', attributes: { input: '2024-03-05T10:20:30Z', expression: '/d+1h' } }), /Invalid date math expression/);
         });
     });
 
