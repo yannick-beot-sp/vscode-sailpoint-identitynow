@@ -1,0 +1,213 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+import * as assert from 'assert';
+import { it, describe } from 'mocha';
+import { EvaluationContext } from '../../services/transforms/EvaluationContext.js';
+import { TransformEngine } from '../../services/transforms/TransformEngine.js';
+import { NotImplementedError, TransformError } from '../../services/transforms/TransformError.js';
+
+const RULE_NAME = 'Cloud Services Deployment Utility';
+
+class FakeContext implements EvaluationContext {
+    implicitInputCalls = 0;
+    identityCalls = 0;
+
+    constructor(
+        private readonly implicitInput = 'John Doe',
+        private readonly identities: Record<string, any> = {},
+        private readonly transforms: Record<string, any> = {},
+    ) { }
+
+    async getImplicitInput() {
+        this.implicitInputCalls++;
+        return this.implicitInput;
+    }
+    async getIdentityNameOrId() {
+        this.identityCalls++;
+        return 'john.doe';
+    }
+    async getIdentity(identityNameOrId: string) { return this.identities[identityNameOrId]; }
+    async getSourceId(sourceName: string) { return sourceName === 'HR' ? 'hr-id' : undefined; }
+    async getAccountBySource(sourceId: string, nativeIdentity: string) {
+        return { attributes: { department: `${sourceId}/${nativeIdentity}` } };
+    }
+    async getTransformByName(name: string) { return this.transforms[name]; }
+}
+
+function evaluate(transform: any, context = new FakeContext()) {
+    return new TransformEngine(context).evaluate({ name: 'Test', ...transform });
+}
+
+suite('TransformEngine Test Suite', () => {
+
+    describe('validation', () => {
+        it('should require a name', async () => {
+            await assert.rejects(new TransformEngine(new FakeContext()).evaluate({ type: 'lower' }), /Missing required attribute 'name'/);
+        });
+        it('should reject an unknown type', async () => {
+            await assert.rejects(evaluate({ type: 'foo' }), /Invalid transform type 'foo'/);
+        });
+        it('should list missing required attributes', async () => {
+            await assert.rejects(evaluate({ type: 'replace', attributes: { input: 'a' } }), /Missing required attribute\(s\) \[regex,replacement\]/);
+        });
+        it('should reject an input on a type without input', async () => {
+            await assert.rejects(evaluate({ type: 'uuid', attributes: { input: 'a' } }), /do not require attribute 'input'/);
+        });
+        it('should report unsupported types as not implemented', async () => {
+            await assert.rejects(evaluate({ type: 'dateMath', attributes: { expression: 'now' } }), NotImplementedError);
+        });
+    });
+
+    describe('input', () => {
+        it('should ask the implicit input once per evaluation', async () => {
+            const context = new FakeContext('Jean');
+            const result = await evaluate({
+                type: 'concat',
+                attributes: { values: [{ type: 'upper' }, '-', { type: 'lower' }] }
+            }, context);
+            assert.strictEqual(result, 'JEAN-jean');
+            assert.strictEqual(context.implicitInputCalls, 1);
+        });
+        it('should not leak the input of a nested transform to its parent', async () => {
+            const result = await evaluate({
+                type: 'substring',
+                attributes: {
+                    input: 'john.doe@example.com',
+                    begin: { type: 'indexOf', attributes: { input: 'xx@', substring: '@' } },
+                }
+            });
+            assert.strictEqual(result, 'hn.doe@example.com');
+        });
+        it('should give a null result for a null input', async () => {
+            const result = await evaluate({ type: 'upper', attributes: { input: { type: 'lookup', attributes: { input: 'x', table: {} } } } });
+            assert.strictEqual(result, null);
+        });
+    });
+
+    describe('string transforms', () => {
+        const tests = [
+            { transform: { type: 'leftPad', attributes: { input: '42', length: '5' } }, expected: '   42' },
+            { transform: { type: 'rightPad', attributes: { input: '42', length: 5, padding: '0' } }, expected: '42000' },
+            { transform: { type: 'lastIndexOf', attributes: { input: 'a.b.c', substring: { type: 'static', attributes: { value: '.' } } } }, expected: 3 },
+            { transform: { type: 'substring', attributes: { input: 'abcdef', begin: -1, beginOffset: 2, end: 3 } }, expected: 'abc' },
+            { transform: { type: 'substring', attributes: { input: 'abcdef', begin: 1, end: 0, endOffset: 4 } }, expected: 'bcd' },
+            { transform: { type: 'split', attributes: { input: 'a,b', delimiter: ',', index: 5 } }, expected: null },
+            { transform: { type: 'replaceAll', attributes: { input: 'a-b_c', table: { '-': ' ', '_': ' ' } } }, expected: 'a b c' },
+            { transform: { type: 'e164phone', attributes: { input: '(06) 12-34', defaultRegion: 'FR' } }, expected: '+33061234' },
+            { transform: { type: 'base64Encode', attributes: { input: 'hello' } }, expected: 'aGVsbG8=' },
+            { transform: { type: 'rule', attributes: { name: RULE_NAME, operation: 'getEndOfString', numChars: '3', input: 'abcdef' } }, expected: 'def' },
+        ];
+        tests.forEach(({ transform, expected }) => {
+            it(`should evaluate ${transform.type}`, async () => {
+                assert.strictEqual(await evaluate(transform), expected);
+            });
+        });
+        it('should throw when split is out of bounds and throws is true', async () => {
+            await assert.rejects(evaluate({ type: 'split', attributes: { input: 'a,b', delimiter: ',', index: 5, throws: true } }), /IndexOutOfBoundsException/);
+        });
+        it('should check the rule name', async () => {
+            await assert.rejects(evaluate({ type: 'rule', attributes: { name: 'Other', operation: 'getEndOfString', numChars: 1, input: 'a' } }), /Invalid attributes.name/);
+        });
+    });
+
+    describe('value transforms', () => {
+        it('should resolve variables in conditional', async () => {
+            const result = await evaluate({
+                type: 'conditional',
+                attributes: {
+                    expression: '$department eq Engineering',
+                    department: { type: 'static', attributes: { value: 'Engineering' } },
+                    positiveCondition: '$label',
+                    negativeCondition: 'other',
+                    label: 'eng',
+                }
+            });
+            assert.strictEqual(result, 'eng');
+        });
+        it('should only evaluate the selected branch of conditional', async () => {
+            const result = await evaluate({
+                type: 'conditional',
+                attributes: { expression: 'a eq b', positiveCondition: '$missing', negativeCondition: 'no' }
+            });
+            assert.strictEqual(result, 'no');
+        });
+        it('should resolve a literal variable in static', async () => {
+            assert.strictEqual(await evaluate({ type: 'static', attributes: { value: '$v', v: 'x' } }), 'x');
+        });
+        it('should report Velocity in static as not implemented', async () => {
+            await assert.rejects(evaluate({ type: 'static', attributes: { value: '#if(true)a#end' } }), NotImplementedError);
+        });
+        it('should return the first non-null value of firstValid', async () => {
+            const result = await evaluate({
+                type: 'firstValid',
+                attributes: { values: [{ type: 'lookup', attributes: { input: 'x', table: {} } }, 'second', 'third'] }
+            });
+            assert.strictEqual(result, 'second');
+        });
+        it('should ignore errors in firstValid when ignoreErrors is true', async () => {
+            const transform = { type: 'firstValid', attributes: { values: [{ type: 'identityAttribute', attributes: { name: 'email' } }, 'fallback'] } };
+            await assert.rejects(evaluate(transform), TransformError);
+            assert.strictEqual(await evaluate({ ...transform, attributes: { ...transform.attributes, ignoreErrors: 'true' } }), 'fallback');
+        });
+        it('should use the default of lookup', async () => {
+            assert.strictEqual(await evaluate({ type: 'lookup', attributes: { input: 'x', table: { a: '1', default: 'd' } } }), 'd');
+        });
+        it('should evaluate a reference', async () => {
+            const context = new FakeContext('Jean', {}, { 'To Upper': { name: 'To Upper', type: 'upper', attributes: {} } });
+            assert.strictEqual(await evaluate({ type: 'reference', attributes: { id: 'To Upper' } }, context), 'JEAN');
+        });
+        it('should compare dates', async () => {
+            const result = await evaluate({
+                type: 'dateCompare',
+                attributes: { firstDate: '2020-01-01T00:00:00Z', secondDate: 'now', operator: 'LT', positiveCondition: 'past', negativeCondition: 'future' }
+            });
+            assert.strictEqual(result, 'past');
+        });
+    });
+
+    describe('generators', () => {
+        it('should accept a string length', async () => {
+            assert.match(await evaluate({ type: 'randomNumeric', attributes: { length: '6' } }), /^[0-9]{6}$/);
+        });
+        it('should default to 32 characters', async () => {
+            assert.match(await evaluate({ type: 'randomAlphaNumeric' }), /^[a-zA-Z0-9]{32}$/);
+        });
+        it('should reject a length above 450', async () => {
+            await assert.rejects(evaluate({ type: 'randomNumeric', attributes: { length: 451 } }), /Maximum allowable length/);
+        });
+    });
+
+    describe('identity transforms', () => {
+        const identities = {
+            'john.doe': {
+                attributes: { email: 'john@example.com' },
+                manager: { name: 'jane.boss' },
+                accounts: [{ source: { id: 'hr-id' }, accountId: 'E001' }],
+            },
+            'jane.boss': { attributes: { email: 'jane@example.com' } },
+        };
+
+        it('should get an identity attribute', async () => {
+            assert.strictEqual(await evaluate({ type: 'identityAttribute', attributes: { name: 'email' } }, new FakeContext('', identities)), 'john@example.com');
+        });
+        it('should get an account attribute', async () => {
+            const result = await evaluate({ type: 'accountAttribute', attributes: { sourceName: 'HR', attributeName: 'department' } }, new FakeContext('', identities));
+            assert.strictEqual(result, 'hr-id/E001');
+        });
+        it('should get a manager attribute', async () => {
+            const result = await evaluate({
+                type: 'rule',
+                attributes: { name: RULE_NAME, operation: 'getReferenceIdentityAttribute', uid: 'manager', attributeName: 'email' }
+            }, new FakeContext('', identities));
+            assert.strictEqual(result, 'jane@example.com');
+        });
+        it('should ask the identity once per evaluation', async () => {
+            const context = new FakeContext('', identities);
+            const result = await evaluate({
+                type: 'concat',
+                attributes: { values: [{ type: 'identityAttribute', attributes: { name: 'email' } }, { type: 'accountAttribute', attributes: { sourceName: 'HR', attributeName: 'department' } }] }
+            }, context);
+            assert.strictEqual(result, 'john@example.comhr-id/E001');
+            assert.strictEqual(context.identityCalls, 1);
+        });
+    });
+});
