@@ -203,6 +203,11 @@ suite('TransformEngine Test Suite', () => {
             await assert.rejects(evaluate({ type: 'static', attributes }), TransformError);
             assert.strictEqual(await evaluate({ type: 'static', attributes: { ...attributes, ignoreErrors: true } }), '');
         });
+        it('should throw like Java for an index out of range', async () => {
+            await assert.rejects(evaluate({ type: 'static', attributes: { value: '$v.substring(0,5)', v: 'abc' } }), /StringIndexOutOfBoundsException: index 5, length 3 in Velocity template/);
+            await assert.rejects(evaluate({ type: 'static', attributes: { value: '$v.charAt(3)', v: 'abc' } }), /StringIndexOutOfBoundsException/);
+            assert.strictEqual(await evaluate({ type: 'static', attributes: { value: '$v.substring(1)$v.charAt(0)', v: 'abc' } }), 'bca');
+        });
         it('should report an invalid template', async () => {
             await assert.rejects(evaluate({ type: 'static', attributes: { value: '#if(' } }), /Invalid Velocity template/);
         });

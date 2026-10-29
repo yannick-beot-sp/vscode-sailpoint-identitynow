@@ -3,12 +3,25 @@ import { TransformError } from './TransformError.js';
 
 type MethodPayload = { property: string; context: any; params: any[] };
 
+function checkIndex(value: string, index: any, max: number): number {
+    if (!Number.isInteger(index) || index < 0 || index > max) {
+        throw new TransformError(`StringIndexOutOfBoundsException: index ${index}, length ${value.length}`);
+    }
+    return index;
+}
+
 /**
  * Java String methods that JavaScript strings lack or implement differently.
- * The other methods used in templates (substring, toLowerCase, trim, indexOf, startsWith, etc.) behave the same.
+ * The other methods used in templates (toLowerCase, trim, indexOf, startsWith, etc.) behave the same.
  */
 const JAVA_STRING_METHODS: Record<string, (value: string, ...params: any[]) => any> = {
     length: value => value.length,
+    // Java throws when an index is out of range, where JavaScript clamps it
+    substring: (value, begin, end = value.length) => {
+        checkIndex(value, end, value.length);
+        return value.substring(checkIndex(value, begin, end), end);
+    },
+    charAt: (value, index) => value.charAt(checkIndex(value, index, value.length - 1)),
     isEmpty: value => value.length === 0,
     equals: (value, other) => value === other,
     equalsIgnoreCase: (value, other) => typeof other === 'string' && value.toLowerCase() === other.toLowerCase(),
@@ -50,6 +63,9 @@ export function renderVelocity(template: string, variables: Record<string, any>)
     try {
         return render(template, variables, {}, { customMethodHandlers: [JAVA_STRING_HANDLER] });
     } catch (error) {
+        if (error instanceof TransformError) {
+            throw new TransformError(`${error.message} in Velocity template '${template}'`);
+        }
         throw new TransformError(`Invalid Velocity template '${template}': ${error instanceof Error ? error.message : error}`);
     }
 }
