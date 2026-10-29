@@ -2,9 +2,21 @@
  * Error raised when a transform is invalid or cannot be evaluated
  */
 export class TransformError extends Error {
+    /**
+     * Nested transforms from the root to the one that failed, set by the engine
+     */
+    path?: string[];
+
     constructor(message: string) {
         super(message);
         this.name = 'TransformError';
+    }
+
+    /**
+     * Message prefixed by the path, e.g. `concat › replace: Missing required attribute(s) [regex]`
+     */
+    get fullMessage(): string {
+        return this.path?.length ? `${this.path.join(' › ')}: ${this.message}` : this.message;
     }
 }
 

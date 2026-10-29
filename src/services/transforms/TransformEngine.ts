@@ -10,6 +10,20 @@ interface TransformDefinition {
 }
 
 /**
+ * Evaluation of one transform, with its nested transforms
+ */
+export interface TraceNode {
+    label: string;
+    input?: any;
+    result?: any;
+    error?: string;
+    children: TraceNode[];
+}
+
+// Their other attributes are variables
+const TYPES_WITH_VARIABLES = ['static', 'conditional'];
+
+/**
  * Evaluates a transform locally.
  * Errors are thrown as TransformError, and everything external goes through the EvaluationContext.
  * Use one instance per evaluation, as the prompted values are cached.
@@ -17,6 +31,17 @@ interface TransformDefinition {
 export class TransformEngine {
     private implicitInput?: Promise<any>;
     private identityNameOrId?: Promise<string>;
+    private readonly stack: TraceNode[] = [];
+
+    /**
+     * Evaluated transforms, in the order of the evaluation
+     */
+    readonly trace: TraceNode[] = [];
+
+    /**
+     * Possible mistakes that do not prevent the evaluation, e.g. unknown attributes
+     */
+    readonly warnings: string[] = [];
 
     constructor(readonly context: EvaluationContext) { }
 
@@ -35,20 +60,44 @@ export class TransformEngine {
      */
     async evaluateTransform(transform: any): Promise<any> {
         const typeKey = getTypeKey(transform);
-        const definition: TransformDefinition = ATTRIBUTES[typeKey];
-        validateRequiredAttributes(definition, transform.attributes);
+        const node: TraceNode = { label: transform.name ? `${typeKey} '${transform.name}'` : typeKey, children: [] };
+        (this.stack.length > 0 ? this.stack[this.stack.length - 1].children : this.trace).push(node);
+        this.stack.push(node);
 
-        const attributes = transform.attributes ?? {};
-        const operation = OPERATIONS[typeKey];
-        if (operation === undefined) {
-            throw new NotImplementedError(`Transform '${typeKey}' not yet implemented`);
+        try {
+            const definition: TransformDefinition = ATTRIBUTES[typeKey];
+            validateRequiredAttributes(definition, transform.attributes);
+
+            const attributes = transform.attributes ?? {};
+            for (const name of findUnknownAttributes(typeKey, definition, attributes)) {
+                this.warnings.push(`${this.currentPath()}: Unknown attribute '${name}'`);
+            }
+
+            const operation = OPERATIONS[typeKey];
+            if (operation === undefined) {
+                throw new NotImplementedError(`Transform '${typeKey}' not yet implemented`);
+            }
+
+            const input = operation.rawInput ? attributes.input : await this.resolveInput(typeKey, definition, attributes);
+            if (!operation.rawInput) {
+                node.input = input;
+            }
+
+            node.result = await operation(attributes, input, this);
+            return node.result;
+        } catch (error) {
+            if (error instanceof TransformError && error.path === undefined) {
+                error.path = this.stack.map(n => n.label);
+            }
+            node.error = error instanceof Error ? error.message : String(error);
+            throw error;
+        } finally {
+            this.stack.pop();
         }
+    }
 
-        const input = operation.rawInput ? attributes.input : await this.resolveInput(typeKey, definition, attributes);
-
-        const result = await operation(attributes, input, this);
-        console.log(`> transform ${typeKey}:`, result);
-        return result;
+    private currentPath(): string {
+        return this.stack.map(n => n.label).join(' › ');
     }
 
     /**
@@ -144,6 +193,14 @@ function getTypeKey(transform: any): string {
         throw new TransformError(`Invalid transform type '${typeKey}'`);
     }
     return typeKey;
+}
+
+function findUnknownAttributes(typeKey: string, definition: TransformDefinition, attributes: any): string[] {
+    if (TYPES_WITH_VARIABLES.includes(typeKey)) {
+        return [];
+    }
+    const known = new Set([...definition.required, ...definition.optional, 'input']);
+    return Object.keys(attributes).filter(name => !known.has(name));
 }
 
 function validateRequiredAttributes(definition: TransformDefinition, attributes: any): void {

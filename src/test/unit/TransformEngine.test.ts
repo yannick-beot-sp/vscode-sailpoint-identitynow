@@ -55,6 +55,37 @@ suite('TransformEngine Test Suite', () => {
         });
     });
 
+    describe('diagnostics', () => {
+        it('should give the path of the transform that failed', async () => {
+            const transform = { type: 'concat', attributes: { values: ['a', { type: 'upper', attributes: { input: { type: 'replace', attributes: { input: 'x' } } } }] } };
+            await assert.rejects(evaluate(transform), (error: TransformError) => {
+                assert.strictEqual(error.fullMessage, "concat 'Test' › upper › replace: Missing required attribute(s) [regex,replacement]");
+                return true;
+            });
+        });
+        it('should trace each transform with its input and result', async () => {
+            const engine = new TransformEngine(new FakeContext('jean'));
+            await engine.evaluate({ name: 'Test', type: 'concat', attributes: { values: [{ type: 'upper' }, { type: 'lookup', attributes: { input: 'x', table: {} } }] } });
+            const [root] = engine.trace;
+            assert.strictEqual(root.label, "concat 'Test'");
+            assert.strictEqual(root.result, 'JEANnull');
+            assert.deepStrictEqual(root.children.map(child => [child.label, child.input, child.result]), [['upper', 'jean', 'JEAN'], ['lookup', 'x', null]]);
+        });
+        it('should trace the error of a failed transform', async () => {
+            const engine = new TransformEngine(new FakeContext());
+            await assert.rejects(engine.evaluate({ name: 'Test', type: 'split', attributes: { input: 'a', delimiter: ',', index: 3, throws: true } }));
+            assert.match(engine.trace[0].error!, /IndexOutOfBoundsException/);
+        });
+        it('should warn about unknown attributes, except variables', async () => {
+            const engine = new TransformEngine(new FakeContext());
+            await engine.evaluate({
+                name: 'Test', type: 'static',
+                attributes: { value: '$v', v: { type: 'leftPad', attributes: { input: 'a', length: 3, paddng: '0' } } }
+            });
+            assert.deepStrictEqual(engine.warnings, ["static 'Test' › leftPad: Unknown attribute 'paddng'"]);
+        });
+    });
+
     describe('input', () => {
         it('should ask the implicit input once per evaluation', async () => {
             const context = new FakeContext('Jean');

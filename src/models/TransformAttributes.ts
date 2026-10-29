@@ -109,7 +109,7 @@ export const ATTRIBUTES: any = {
     },
     'rule:generateRandomString': {
         'required': ['name', 'operation', 'includeNumbers', 'includeSpecialChars'],
-        'optional': ['MISSING', 'requiresPeriodicRefresh']
+        'optional': ['requiresPeriodicRefresh', 'length']
     },
     'rule:getEndOfString': {
         'required': ['name', 'operation', 'numChars'],

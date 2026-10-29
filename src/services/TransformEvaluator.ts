@@ -4,7 +4,7 @@ import { OpenResourceCommand } from "../commands/openResource.js";
 import { ISCClient } from './ISCClient.js';
 import { TenantService } from './TenantService.js';
 import { EvaluationContext } from './transforms/EvaluationContext.js';
-import { TransformEngine } from './transforms/TransformEngine.js';
+import { TraceNode, TransformEngine } from './transforms/TransformEngine.js';
 import { EvaluationCancelledError, NotImplementedError, TransformError } from './transforms/TransformError.js';
 import { requiredValidator } from '../validator/requiredValidator.js';
 import { InputPromptStep } from '../wizard/inputPromptStep.js';
@@ -15,6 +15,7 @@ import { runWizard } from '../wizard/wizard.js';
 import { WizardContext } from '../wizard/wizardContext.js';
 
 const LBL_RETEST = "Test Again";
+const LBL_TRACE = "Show Trace";
 
 /**
  * Inputs kept across evaluations, so that the next evaluation can reuse them
@@ -31,6 +32,7 @@ interface LastInputs {
  */
 export class TransformEvaluator {
     private readonly lastInputs: LastInputs = {};
+    private outputChannel?: vscode.OutputChannel;
 
     constructor(
         private readonly tenantService: TenantService
@@ -61,27 +63,59 @@ export class TransformEvaluator {
             return;
         }
 
+        const engine = new TransformEngine(new EditorEvaluationContext(new ISCClient(tenantId, tenantName), this.lastInputs));
         let action: Thenable<string | undefined>;
         try {
-            const transform = JSON.parse(editor.document.getText());
-            const engine = new TransformEngine(new EditorEvaluationContext(new ISCClient(tenantId, tenantName), this.lastInputs));
-            const result = await engine.evaluate(transform);
-            action = vscode.window.showInformationMessage("Validation of transform successful. Result = " + (typeof result === 'string' ? ("'" + result + "'") : result), LBL_RETEST);
+            const result = await engine.evaluate(JSON.parse(editor.document.getText()));
+            this.writeTrace(engine, tenantName, `Result: ${formatValue(result)}`);
+            const warnings = engine.warnings.length > 0 ? ` (${engine.warnings.length} warning(s), see the trace)` : '';
+            action = vscode.window.showInformationMessage(
+                "Validation of transform successful. Result = " + (typeof result === 'string' ? ("'" + result + "'") : result) + warnings,
+                LBL_RETEST, LBL_TRACE);
         } catch (error) {
             if (error instanceof EvaluationCancelledError) {
                 return;
             }
             console.error(error);
+            const message = error instanceof TransformError ? error.fullMessage : error instanceof Error ? error.message : String(error);
+            this.writeTrace(engine, tenantName, `Error: ${message}`);
             action = error instanceof NotImplementedError
-                ? vscode.window.showWarningMessage(error.message, LBL_RETEST)
-                : vscode.window.showErrorMessage(error instanceof Error ? error.message : String(error), LBL_RETEST);
+                ? vscode.window.showWarningMessage(message, LBL_RETEST, LBL_TRACE)
+                : vscode.window.showErrorMessage(message, LBL_RETEST, LBL_TRACE);
         }
 
         action.then(label => {
             if (label === LBL_RETEST) {
                 this.evaluateActiveEditor(tenantId, tenantName);
+            } else if (label === LBL_TRACE) {
+                this.outputChannel?.show(true);
             }
         });
+    }
+
+    /**
+     * Writes each evaluated transform with its input and result, nested transforms being indented
+     */
+    private writeTrace(engine: TransformEngine, tenantName: string, outcome: string): void {
+        this.outputChannel ??= vscode.window.createOutputChannel("ISC Transform Evaluation");
+        const channel = this.outputChannel;
+        channel.clear();
+        channel.appendLine(`Local evaluation on ${tenantName || 'no tenant'} at ${new Date().toISOString()}`);
+        for (const warning of engine.warnings) {
+            channel.appendLine(`Warning: ${warning}`);
+        }
+        channel.appendLine('');
+
+        const write = (node: TraceNode, depth: number) => {
+            const input = node.input !== undefined ? ` input=${formatValue(node.input)}` : '';
+            const output = node.error !== undefined ? `failed: ${node.error}` : formatValue(node.result);
+            channel.appendLine(`${'  '.repeat(depth)}${node.label}${input} → ${output}`);
+            node.children.forEach(child => write(child, depth + 1));
+        };
+        engine.trace.forEach(node => write(node, 0));
+
+        channel.appendLine('');
+        channel.appendLine(outcome);
     }
 }
 
@@ -212,6 +246,10 @@ class EditorEvaluationContext implements EvaluationContext {
     getTransformByName(name: string): Promise<any> {
         return withProgress(`Getting transform '${name}' ...`, () => this.client.getTransformByName(name));
     }
+}
+
+function formatValue(value: any): string {
+    return value === undefined ? 'undefined' : JSON.stringify(value);
 }
 
 async function askInput(placeHolder: string, prompt: string, value = ''): Promise<string> {
