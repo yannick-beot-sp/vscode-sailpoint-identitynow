@@ -15,7 +15,7 @@ interface TransformDefinition {
  * Use one instance per evaluation, as the prompted values are cached.
  */
 export class TransformEngine {
-    private implicitInput?: Promise<string>;
+    private implicitInput?: Promise<any>;
     private identityNameOrId?: Promise<string>;
 
     constructor(readonly context: EvaluationContext) { }
@@ -54,8 +54,9 @@ export class TransformEngine {
     /**
      * Implicit input of the transforms that do not define `attributes.input`. Asked once per evaluation.
      */
-    getImplicitInput(): Promise<string> {
-        return this.implicitInput ??= this.context.getImplicitInput();
+    getImplicitInput(): Promise<any> {
+        return this.implicitInput ??= this.context.getImplicitInput((sourceName, attributeName) =>
+            this.evaluateTransform({ type: 'accountAttribute', attributes: { sourceName, attributeName } }));
     }
 
     /**

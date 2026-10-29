@@ -12,15 +12,17 @@ class FakeContext implements EvaluationContext {
     identityCalls = 0;
 
     constructor(
-        private readonly implicitInput = 'John Doe',
+        private readonly implicitInput: string | { sourceName: string, attributeName: string } = 'John Doe',
         private readonly identities: Record<string, any> = {},
         private readonly transforms: Record<string, any> = {},
         private readonly accounts: any[] = [],
     ) { }
 
-    async getImplicitInput() {
+    async getImplicitInput(readAccountAttribute: (sourceName: string, attributeName: string) => Promise<any>) {
         this.implicitInputCalls++;
-        return this.implicitInput;
+        return typeof this.implicitInput === 'string'
+            ? this.implicitInput
+            : await readAccountAttribute(this.implicitInput.sourceName, this.implicitInput.attributeName);
     }
     async getIdentityNameOrId() {
         this.identityCalls++;
@@ -349,6 +351,11 @@ suite('TransformEngine Test Suite', () => {
         it('should report an invalid filter', async () => {
             await assert.rejects(accountAttribute({ accountFilter: 'nativeIdentity ==' }), /Invalid filter 'nativeIdentity =='/);
             await assert.rejects(accountAttribute({ accountFilter: 'name.foo("x")' }), /unknown method/);
+        });
+        it('should read the implicit input from an account attribute', async () => {
+            const context = new FakeContext({ sourceName: 'HR', attributeName: 'department' }, identities, {}, accounts);
+            assert.strictEqual(await evaluate({ type: 'upper' }, context), 'LEGAL');
+            assert.strictEqual(context.identityCalls, 1);
         });
         it('should report an identity without account on the source', async () => {
             await assert.rejects(

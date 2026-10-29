@@ -6,8 +6,9 @@ export interface EvaluationContext {
     /**
      * Implicit input of the transforms that do not define `attributes.input`,
      * i.e. the source attribute of the identity profile mapping.
+     * It can be typed, or read from an account of the evaluated identity with `readAccountAttribute`.
      */
-    getImplicitInput(): Promise<string>;
+    getImplicitInput(readAccountAttribute: (sourceName: string, attributeName: string) => Promise<any>): Promise<any>;
 
     /**
      * Name or id of the identity the transform is evaluated for
