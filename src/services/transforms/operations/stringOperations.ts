@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { COUNTRYCODES } from '../../../models/CountryCodes.js';
+import { CountryCode, isSupportedCountry, parsePhoneNumberFromString } from 'libphonenumber-js/max';
 import { TransformError } from '../TransformError.js';
 import { normalizeNames } from '../normalizeNames.js';
 import { Operation, cloudServicesRule, onInput, parseNumber } from './Operation.js';
@@ -16,15 +16,17 @@ export const STRING_OPERATIONS: Record<string, Operation> = {
 
     decomposeDiacriticalMarks: onInput(input => input.normalize('NFKD').replace(/[̀-ͯ]/g, '')),
 
+    // An invalid phone number gives null
     e164phone: onInput((input, attributes) => {
         const defaultRegion = attributes.defaultRegion ?? 'US';
-        if (defaultRegion.length !== 2) {
+        if (!/^[A-Z]{2}$/.test(defaultRegion)) {
             throw new TransformError("The format of the 'defaultRegion' attribute should be in ISO 3166-1 alpha-2 format");
         }
-        if (COUNTRYCODES[defaultRegion] === undefined) {
+        if (!isSupportedCountry(defaultRegion)) {
             throw new TransformError(`Invalid defaultRegion '${defaultRegion}'`);
         }
-        return '+' + COUNTRYCODES[defaultRegion].countryCode + input.replace(/[^0-9]/g, '');
+        const phoneNumber = parsePhoneNumberFromString(input, defaultRegion as CountryCode);
+        return phoneNumber?.isValid() ? phoneNumber.number : null;
     }),
 
     indexOf: onInput(async (input, attributes, engine) => input.indexOf(await engine.resolveValue(attributes.substring))),

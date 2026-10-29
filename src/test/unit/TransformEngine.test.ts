@@ -89,7 +89,10 @@ suite('TransformEngine Test Suite', () => {
             { transform: { type: 'substring', attributes: { input: 'abcdef', begin: 1, end: 0, endOffset: 4 } }, expected: 'bcd' },
             { transform: { type: 'split', attributes: { input: 'a,b', delimiter: ',', index: 5 } }, expected: null },
             { transform: { type: 'replaceAll', attributes: { input: 'a-b_c', table: { '-': ' ', '_': ' ' } } }, expected: 'a b c' },
-            { transform: { type: 'e164phone', attributes: { input: '(06) 12-34', defaultRegion: 'FR' } }, expected: '+33061234' },
+            { transform: { type: 'e164phone', attributes: { input: '06 12 34 56 78', defaultRegion: 'FR' } }, expected: '+33612345678' },
+            { transform: { type: 'e164phone', attributes: { input: '(415) 555-2671' } }, expected: '+14155552671' },
+            { transform: { type: 'e164phone', attributes: { input: '+44 20 7946 0958' } }, expected: '+442079460958' },
+            { transform: { type: 'e164phone', attributes: { input: '12' } }, expected: null },
             { transform: { type: 'base64Encode', attributes: { input: 'hello' } }, expected: 'aGVsbG8=' },
             { transform: { type: 'rule', attributes: { name: RULE_NAME, operation: 'getEndOfString', numChars: '3', input: 'abcdef' } }, expected: 'def' },
         ];
@@ -100,6 +103,10 @@ suite('TransformEngine Test Suite', () => {
         });
         it('should throw when split is out of bounds and throws is true', async () => {
             await assert.rejects(evaluate({ type: 'split', attributes: { input: 'a,b', delimiter: ',', index: 5, throws: true } }), /IndexOutOfBoundsException/);
+        });
+        it('should reject an invalid e164phone region', async () => {
+            await assert.rejects(evaluate({ type: 'e164phone', attributes: { input: '1', defaultRegion: 'XX' } }), /Invalid defaultRegion 'XX'/);
+            await assert.rejects(evaluate({ type: 'e164phone', attributes: { input: '1', defaultRegion: 'FRA' } }), /ISO 3166-1 alpha-2/);
         });
         it('should check the rule name', async () => {
             await assert.rejects(evaluate({ type: 'rule', attributes: { name: 'Other', operation: 'getEndOfString', numChars: 1, input: 'a' } }), /Invalid attributes.name/);
