@@ -680,6 +680,39 @@ The patterns defined above use the following tokens:
 
 ### Unreleased
 
+### 1.3.34
+
+- Segments are listed in the tree view. They can be created, edited and deleted. 
+- The content of a segment is shown below it, by type (access profiles, entitlements and roles). Items can be added to or removed from a segment
+- SoD policies (conflicting access based) are listed in the tree view. They can be created, edited and deleted
+- General policies (SoD policies of type `GENERAL`) have their own folder in the tree view. They can be created, edited and deleted, and opened in the Web UI
+- Connector name as a description for sources
+- Tree items ordered alphabetically
+- Drag and drop of a tenant failed when that tenant had already been expanded
+- Importing a comma-separated CSV failed when Excel removed quotes around fields that contain semicolons (cf. [#176](https://github.com/yannick-beot-sp/vscode-sailpoint-identitynow/issues/176))
+- Local transform evaluation (everything is computed in the extension, so results may differ from ISC):
+  - Velocity templates in `static` transforms, with the Java String methods missing from JavaScript (`length()`, `equals()`, `equalsIgnoreCase()`, `contains()`, etc.)
+  - `dateMath`, `displayName`, `rfc5646` and `iso3166` transforms
+  - All the `dateFormat` formats: `ISO8601`, `LDAP`, `PEOPLE_SOFT`, `EPOCH_TIME_JAVA`, `EPOCH_TIME_WIN32` and Java `SimpleDateFormat` patterns. Dates are evaluated in UTC
+  - `accountAttribute` options: `accountFilter`, `accountPropertyFilter`, `accountSortAttribute`, `accountSortDescending` and `accountReturnFirstLink`
+  - `ignoreErrors` in `firstValid` and `static`
+  - The input can be read from an account attribute of the identity
+  - The identity is searched and picked from a list
+  - "Test Again" reuses the last input, account attribute and identity query
+  - "Show Trace" shows every evaluated transform with its input and result, and the warnings about unknown attributes
+  - Errors give the path of the nested transform that failed
+  - The input and the identity are asked once per evaluation
+  - `conditional` only evaluates the selected branch, and `firstValid` stops at the first non-null value
+  - `split` with `throws` raises an error, and string transforms return null for a null input
+  - `e164phone` parses phone numbers with libphonenumber-js, and returns null for invalid numbers
+  - `usernameGenerator` explains why it cannot be evaluated locally
+  - `identityAttribute` and `getReferenceIdentityAttribute` with the manager always failed
+  - Nested transforms overwrote the input of their parent
+  - `rule` transforms failed at the top level
+  - `leftPad`, `rightPad`, `lastIndexOf`, `reference`, `substring`, `randomAlphaNumeric` and `randomNumeric` gave wrong results or errors in some cases
+  - `e164phone` kept national prefixes, e.g. `06...` in France gave `+3306...`
+  - API errors were not reported
+
 ### 1.3.33
 
 - URI Path changed to display the tenant name

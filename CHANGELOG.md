@@ -10,6 +10,14 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+### Changed
+
+### Fixed
+
+## [1.3.34] - 2026-10-29
+
+### Added
+
 - Segments are listed in the tree view. They can be created, edited and deleted. 
 - The content of a segment is shown below it, by type (access profiles, entitlements and roles). Items can be added to or removed from a segment
 - SoD policies (conflicting access based) are listed in the tree view. They can be created, edited and deleted
@@ -49,8 +57,6 @@ This changelog is following the recommended format by [keepachangelog](https://k
   - `leftPad`, `rightPad`, `lastIndexOf`, `reference`, `substring`, `randomAlphaNumeric` and `randomNumeric` gave wrong results or errors in some cases
   - `e164phone` kept national prefixes, e.g. `06...` in France gave `+3306...`
   - API errors were not reported
-
-### Removed
 
 ## [1.3.33] - 2026-10-11
 
