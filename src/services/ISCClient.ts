@@ -2010,6 +2010,72 @@ export class ISCClient {
 		console.log("< patchAccount");
 	}
 
+	public async getAccountById(accountId: string): Promise<Account> {
+		console.log("> getAccountById", accountId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AccountsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.getAccountV1({ id: accountId });
+		return response.data;
+	}
+
+	/**
+	 * Lists a page of accounts with a server-side filter, and returns the total count of matching accounts.
+	 */
+	public async listAccountsPage(filters: string, offset: number, limit: number): Promise<{ accounts: Account[], total: number }> {
+		const resp = await this.getAccounts({
+			filters,
+			limit,
+			offset,
+			count: true,
+			sorters: "name"
+		});
+		return { accounts: resp.data, total: Number(resp.headers[TOTAL_COUNT_HEADER] ?? resp.data.length) };
+	}
+
+	/**
+	 * Creates an account (only relevant for Delimited File sources)
+	 * cf. https://developer.sailpoint.com/docs/api/create-account-v-1
+	 */
+	public async createAccount(sourceId: string, attributes: { [key: string]: any }): Promise<string | undefined> {
+		console.log("> createAccount", sourceId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AccountsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.createAccountV1({
+			accountAttributesCreate: { attributes: { ...attributes, sourceId } }
+		});
+		return response.data.id;
+	}
+
+	/**
+	 * Replaces the attributes of an account (only relevant for Delimited File sources)
+	 * cf. https://developer.sailpoint.com/docs/api/put-account-v-1
+	 */
+	public async putAccount(accountId: string, attributes: { [key: string]: any }): Promise<string | undefined> {
+		console.log("> putAccount", accountId);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AccountsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.putAccountV1({ id: accountId, accountAttributes: { attributes } });
+		return response.data.id;
+	}
+
+	/**
+	 * Searches public identities whose alias, email, firstname or lastname starts with the term
+	 */
+	public async searchPublicIdentities(term: string, limit = 20): Promise<PublicIdentity[]> {
+		const escaped = term.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+		const filters = ["alias", "email", "firstname", "lastname"]
+			.map(attr => `${attr} sw "${escaped}"`)
+			.join(" or ");
+		const response = await this.getPublicIdentities({
+			filters,
+			limit,
+			offset: 0,
+			addCoreFilters: true,
+			sorters: "name"
+		});
+		return response.data;
+	}
+
 	public async getAccountsByIdentity(identityId: string, limit = DEFAULT_PAGINATION): Promise<Account[]> {
 		console.log("> getAccountsByIdentity", identityId);
 		const resp = await this.getAccounts({

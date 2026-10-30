@@ -10,7 +10,10 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+- New command "Manage accounts" for sources allowing to list the accounts of a source , enable/disable/unlock/reload/deletion accounts, (re)correlation to an identity and, for Delimited File sources, account creation and edition
 - Access Profiles and Roles: export and import of the optional access request form in the new `form` column (form name)
+- Source name as the description for Access Profiles
+
 
 ### Changed
 

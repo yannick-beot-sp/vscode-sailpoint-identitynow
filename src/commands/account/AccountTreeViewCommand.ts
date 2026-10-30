@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { AccountTreeItem } from '../../models/ISCTreeItem.js';
 import { ISCClient } from '../../services/ISCClient.js';
 import * as commands from '../constants.js';
-import { formatTask, waifForJob } from '../source/sourceUtils.js';
+import { formatTask, waitForTask } from '../source/sourceUtils.js';
 import { formatHecateAggregateJob, waitForHecateJob } from './accountUtils.js';
 
 export class AccountTreeViewCommand {
@@ -91,7 +91,7 @@ export class AccountTreeViewCommand {
                 title: `${action} account ${accountName}`,
                 cancellable: true
             }, async (_progress, token) => {
-                const task = await waifForJob(client, taskId, token);
+                const task = await waitForTask(client, taskId, token);
                 formatTask(
                     task,
                     accountName,

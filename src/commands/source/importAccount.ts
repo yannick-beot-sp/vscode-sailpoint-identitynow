@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { SourceTreeItem } from "../../models/ISCTreeItem.js";
 import { ISCClient } from '../../services/ISCClient.js';
 import { chooseFile } from '../../utils/vsCodeHelpers.js';
-import { formatTask, waifForJob } from './sourceUtils.js';
+import { formatTask, waitForTask } from './sourceUtils.js';
 import { TenantService } from '../../services/TenantService.js';
 import { validateTenantReadonly } from '../validateTenantReadonly.js';
 
@@ -40,7 +40,7 @@ class AccountImporter {
         );
 
         console.log("job =", job);
-        const task = await waifForJob(this.client, job.task.id, token)
+        const task = await waitForTask(this.client, job.task.id, token)
         formatTask(task,
             this.sourceName,
             "Import successful to {0}",

@@ -8,7 +8,7 @@ import { TenantService } from "./TenantService.js";
 import { TransformEvaluator } from './TransformEvaluator.js';
 import { TaskStatus, TaskStatusCompletionStatusEnum as TaskStatusCompletionStatus } from 'sailpoint-api-client/dist/task_management/api.js';
 import { confirm } from '../utils/vsCodeHelpers.js';
-import { formatTask, waifForJob } from '../commands/source/sourceUtils.js';
+import { formatTask, waitForTask } from '../commands/source/sourceUtils.js';
 import { isTenantReadonly, validateTenantReadonly } from '../commands/validateTenantReadonly.js';
 
 export class TreeManager {
@@ -65,7 +65,7 @@ export class TreeManager {
             cancellable: true
         }, async (progress, token) => {
             const job = await client.startEntitlementReset(item.id);
-            const task = await waifForJob(client, job.id, token)
+            const task = await waitForTask(client, job.id, token)
             formatTask(task,
                 item.label as string,
                 "Entitlements for {0} successfully reset",
@@ -96,7 +96,7 @@ export class TreeManager {
             cancellable: true
         }, async (progress, token) => {
             const job = await client.startAccountReset(item.id);
-            const task = await waifForJob(client, job.id, token)
+            const task = await waitForTask(client, job.id, token)
             formatTask(task,
                 item.label as string,
                 "Accounts for {0} successfully reset",
@@ -121,7 +121,7 @@ export class TreeManager {
             cancellable: true
         }, async (progress, token) => {
             const job = await client.startEntitlementAggregation(item.id);
-            const task = await waifForJob(client, job.id, token)
+            const task = await waitForTask(client, job.id, token)
             formatTask(task,
                 item.label as string,
                 "Source entitlements {0} successfully aggregated",
@@ -159,7 +159,7 @@ export class TreeManager {
         if (!job.id) {
             throw new Error("Dataset aggregation did not return a task id");
         }
-        return await waifForJob(client, job.id, token)
+        return await waitForTask(client, job.id, token)
     }
 
     public async aggregateAllDatasets(item: SourceDatasetsTreeItem): Promise<void> {
@@ -257,7 +257,7 @@ export class TreeManager {
             if (!job.id) {
                 throw new Error("Dataset object removal did not return a task id");
             }
-            const task = await waifForJob(client, job.id, token)
+            const task = await waitForTask(client, job.id, token)
             formatTask(task,
                 item.label as string,
                 "Objects for dataset {0} successfully removed",
@@ -283,7 +283,7 @@ export class TreeManager {
 
 
             const job = await client.startAccountAggregation(item.id!, disableOptimization)
-            const task = await waifForJob(client, job.task.id, token)
+            const task = await waitForTask(client, job.task.id, token)
             formatTask(task,
                 item.label as string,
                 "Source {0} successfully aggregated",

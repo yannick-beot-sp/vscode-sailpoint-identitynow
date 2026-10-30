@@ -322,6 +322,10 @@
         "group": "reset@2"
       },
       {
+        "command": "vscode-sailpoint-identitynow.source.manage.accounts.view",
+        "title": "Manage accounts"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.source.import.accounts.view",
         "title": "Import accounts..."
       },
@@ -1048,6 +1052,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.source.manage.accounts.view",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.source.import.accounts.view",
           "when": "never"
         },
@@ -1640,6 +1648,11 @@
           "command": "vscode-sailpoint-identitynow.reset-source-entitlements",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/",
           "group": "reset"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.source.manage.accounts.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/",
+          "group": "accounts@0"
         },
         {
           "command": "vscode-sailpoint-identitynow.source.import.accounts.view",

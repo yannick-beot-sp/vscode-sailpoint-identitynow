@@ -12,6 +12,7 @@ import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from 
 import { ExportScriptFromRuleCommand } from './commands/rule/exportScriptFromRuleCommand.js';
 import { AccessProfileFilterCommand, RoleFilterCommand, IdentityDefinitionFilterCommand } from './commands/filterCommand.js';
 import { MachineIdentityFilterCommand } from './commands/machine-identity/machineIdentityFilterCommand.js';
+import { ManageAccountsCommand } from './commands/source/ManageAccountsCommand.js';
 import { AccountImportNodeCommand } from './commands/source/importAccount.js';
 import { EntitlementDetailsImportNodeCommand } from './commands/source/importEntitlementDetails.js';
 import { UncorrelatedAccountImportNodeCommand } from './commands/source/importUncorrelatedAccount.js';
@@ -281,6 +282,11 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(commands.ENABLE_LOGGING_PALETTE,
 			enableLoggingCommand.execute, enableLoggingCommand));
 
+
+	const manageAccountsCommand = new ManageAccountsCommand(context.extensionUri);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.MANAGE_ACCOUNTS_VIEW,
+			manageAccountsCommand.execute, manageAccountsCommand));
 
 	const accountImportNodeCommand = new AccountImportNodeCommand(tenantService);
 	context.subscriptions.push(
