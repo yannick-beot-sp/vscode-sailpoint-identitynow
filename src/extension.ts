@@ -12,6 +12,7 @@ import { EntitlementExporterCommand as EntitlementDetailsExporterCommand } from 
 import { ExportScriptFromRuleCommand } from './commands/rule/exportScriptFromRuleCommand.js';
 import { AccessProfileFilterCommand, RoleFilterCommand, IdentityDefinitionFilterCommand } from './commands/filterCommand.js';
 import { MachineIdentityFilterCommand } from './commands/machine-identity/machineIdentityFilterCommand.js';
+import { DeleteSourceWithDependenciesCommand } from './commands/source/DeleteSourceWithDependenciesCommand.js';
 import { ManageAccountsCommand } from './commands/source/ManageAccountsCommand.js';
 import { AccountImportNodeCommand } from './commands/source/importAccount.js';
 import { EntitlementDetailsImportNodeCommand } from './commands/source/importEntitlementDetails.js';
@@ -287,6 +288,11 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.MANAGE_ACCOUNTS_VIEW,
 			manageAccountsCommand.execute, manageAccountsCommand));
+
+	const deleteSourceWithDependenciesCommand = new DeleteSourceWithDependenciesCommand(tenantService);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.DELETE_SOURCE_WITH_DEPENDENCIES,
+			deleteSourceWithDependenciesCommand.execute, deleteSourceWithDependenciesCommand));
 
 	const accountImportNodeCommand = new AccountImportNodeCommand(tenantService);
 	context.subscriptions.push(

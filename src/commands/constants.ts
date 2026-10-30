@@ -35,6 +35,7 @@ export const MACHINE_IDENTITIES_UPDATE_FILTER_VIEW = `${COMMAND_PREFIX}.machine-
 export const EDIT_MACHINE_ACCOUNT_SUBTYPE_APPROVAL_CONFIG = `${COMMAND_PREFIX}.machine-account-subtype.edit.approval-config`;
 export const UPLOAD_FILE = `${COMMAND_PREFIX}.source.upload-file`;
 export const MANAGE_ACCOUNTS_VIEW = `${COMMAND_PREFIX}.source.manage.accounts.view`;
+export const DELETE_SOURCE_WITH_DEPENDENCIES = `${COMMAND_PREFIX}.source.delete-with-dependencies`;
 export const IMPORT_ACCOUNTS_VIEW = `${COMMAND_PREFIX}.source.import.accounts.view`;
 export const IMPORT_ACCOUNTS_DISABLE_OPTIMIZATION_VIEW = `${COMMAND_PREFIX}.source.import.accounts.disable-optimization.view`;
 export const IMPORT_ENTITLEMENTS_VIEW = `${COMMAND_PREFIX}.source.import.entitlements.view`;

@@ -326,6 +326,10 @@
         "title": "Manage accounts"
       },
       {
+        "command": "vscode-sailpoint-identitynow.source.delete-with-dependencies",
+        "title": "Delete with dependencies..."
+      },
+      {
         "command": "vscode-sailpoint-identitynow.source.import.accounts.view",
         "title": "Import accounts..."
       },
@@ -1056,6 +1060,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.source.delete-with-dependencies",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.source.import.accounts.view",
           "when": "never"
         },
@@ -1653,6 +1661,11 @@
           "command": "vscode-sailpoint-identitynow.source.manage.accounts.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/",
           "group": "accounts@0"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.source.delete-with-dependencies",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /source$/",
+          "group": "zzdelete@0"
         },
         {
           "command": "vscode-sailpoint-identitynow.source.import.accounts.view",

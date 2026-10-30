@@ -791,6 +791,89 @@ export class ISCClient {
 		})
 
 	}
+	/**
+	 * DELETE /sources/v1/{id}. Asynchronous: returns the task to wait for.
+	 */
+	public async deleteSource(id: string): Promise<{ id?: string }> {
+		console.log("> deleteSource", id);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new SourcesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.deleteSourceV1({ id });
+		return (response.data as any) ?? {};
+	}
+
+	public async getAllIdentityProfiles(): Promise<IdentityProfile[]> {
+		const apiConfig = await this.getApiConfiguration();
+		const api = new IdentityProfilesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		return (await Paginator.paginate(api, api.listIdentityProfilesV1, {})).data;
+	}
+
+	/**
+	 * Asynchronous: returns the task to wait for.
+	 */
+	public async deleteIdentityProfile(id: string): Promise<{ id?: string }> {
+		console.log("> deleteIdentityProfile", id);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new IdentityProfilesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		const response = await api.deleteIdentityProfileV1({ identityProfileId: id });
+		return (response.data as any) ?? {};
+	}
+
+	/**
+	 * Removes the mapping of an identity attribute from an identity profile
+	 */
+	public async removeIdentityProfileMapping(identityProfileId: string, identityAttributeName: string): Promise<void> {
+		console.log("> removeIdentityProfileMapping", identityProfileId, identityAttributeName);
+		const profile = await this.getIdentityProfileById(identityProfileId);
+		const index = (profile.identityAttributeConfig?.attributeTransforms ?? [])
+			.findIndex(t => t.identityAttributeName === identityAttributeName);
+		if (index < 0) {
+			return;
+		}
+		const apiConfig = await this.getApiConfiguration();
+		const axios = await this.getAxios(CONTENT_TYPE_FORM_JSON_PATCH);
+		const api = new IdentityProfilesApi(apiConfig, undefined, axios);
+		await api.updateIdentityProfileV1({
+			identityProfileId,
+			jsonPatchOperation: [{
+				op: "remove" as any,
+				path: `/identityAttributeConfig/attributeTransforms/${index}`,
+			}],
+		});
+	}
+
+	/**
+	 * Removes the sources of an identity attribute that come from the given source
+	 */
+	public async removeSourceFromIdentityAttribute(attributeName: string, sourceId: string): Promise<void> {
+		console.log("> removeSourceFromIdentityAttribute", attributeName, sourceId);
+		const attributes = await this.getIdentityAttributes();
+		const attribute = attributes.find(a => a.name === attributeName);
+		if (!attribute) {
+			return;
+		}
+		const normalize = (s: any) => String(s ?? "").replace(/-/g, "");
+		attribute.sources = (attribute.sources ?? [])
+			.filter(s => normalize((s.properties as any)?.applicationId) !== normalize(sourceId));
+		const apiConfig = await this.getApiConfiguration();
+		const api = new IdentityAttributesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		await api.putIdentityAttributeV1({ name: attributeName, identityAttribute2: attribute });
+	}
+
+	public async deleteAccessProfile(id: string): Promise<void> {
+		console.log("> deleteAccessProfile", id);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AccessProfilesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		await api.deleteAccessProfileV1({ id });
+	}
+
+	public async deleteApplication(id: string): Promise<void> {
+		console.log("> deleteApplication", id);
+		const apiConfig = await this.getApiConfiguration();
+		const api = new AppsApi(apiConfig, undefined, this.getAxiosWithInterceptors());
+		await api.deleteSourceAppV1({ id });
+	}
+
 	public async getTransformByName(name: string): Promise<TransformRead> {
 		console.log("> getTransformByName", name);
 		const apiConfig = await this.getApiConfiguration();

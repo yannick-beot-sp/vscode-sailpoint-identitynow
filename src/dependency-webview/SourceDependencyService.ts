@@ -1,6 +1,7 @@
 import { ExportPayloadIncludeTypesEnum as ExportPayloadIncludeTypes, SpConfigExportResults } from 'sailpoint-api-client/dist/sp_config/api.js';
 import { SimpleSPConfigExporter } from '../commands/spconfig-export/SimpleSPConfigExporter.js';
 import type { DependencyGraphData } from './app/src/services/Client.js';
+import { getSourceAccessProfiles, getSourceApplications, transformReferencesSource } from './SourceDependencies.js';
 import { DependencyService } from './DependencyService.js';
 
 export class SourceDependencyService extends DependencyService {
@@ -181,7 +182,7 @@ export class SourceDependencyService extends DependencyService {
      * access profiles endpoint again.
      */
     private async filterAccessProfile(): Promise<Set<string>> {
-        const accessProfiles = await this.client.getAllAccessProfiles(`source.id eq "${this.resourceId}"`);
+        const accessProfiles = await getSourceAccessProfiles(this.client, this.resourceId);
 
         const accessProfileIds = new Set<string>();
 
@@ -371,7 +372,7 @@ export class SourceDependencyService extends DependencyService {
      * Applications referencing this source as their account source.
      */
     private async filterApplication() {
-        const applications = await this.client.getAllApplications(`accountSource.id eq "${this.resourceId}"`);
+        const applications = await getSourceApplications(this.client, this.resourceId);
 
         for (const application of applications) {
             this.nodes.push({
@@ -396,15 +397,6 @@ export class SourceDependencyService extends DependencyService {
     }
 
     private transformReferencesSource(transform: any, sourceName: string): boolean {
-        if (!transform || typeof transform !== "object") {
-            return false;
-        }
-        if (transform.type === "accountAttribute" && transform.attributes?.sourceName === sourceName) {
-            return true;
-        }
-        return Object.values(transform.attributes ?? {}).some((value: any) =>
-            Array.isArray(value)
-                ? value.some((v: any) => this.transformReferencesSource(v, sourceName))
-                : this.transformReferencesSource(value, sourceName));
+        return transformReferencesSource(transform, sourceName);
     }
 }

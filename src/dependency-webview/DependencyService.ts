@@ -1,4 +1,5 @@
 import { ISCClient } from '../services/ISCClient.js';
+import { collectReferencedSourceNames, collectReferencedTransformNames } from './SourceDependencies.js';
 import type { DependencyEdgeData, DependencyGraphData, DependencyNodeData } from './app/src/services/Client.js';
 
 export abstract class DependencyService {
@@ -38,46 +39,12 @@ export abstract class DependencyService {
         this.nodes.push(node);
     }
 
-    /**
-     * Collects the distinct source names pulled from by "accountAttribute" transforms nested
-     * anywhere inside the given transform definition (e.g. inside a composite transform).
-     */
     protected collectReferencedSourceNames(transformDefinition: any): string[] {
-        const names = new Set<string>();
-        this.walkTransformDefinition(transformDefinition, t => {
-            if (t.type === "accountAttribute" && typeof t.attributes?.sourceName === "string") {
-                names.add(t.attributes.sourceName);
-            }
-        });
-        return Array.from(names);
+        return collectReferencedSourceNames(transformDefinition);
     }
 
-    /**
-     * Collects the distinct named transforms ("reference" transforms) used anywhere inside the
-     * given transform definition (e.g. inside a composite transform).
-     */
     protected collectReferencedTransformNames(transformDefinition: any): string[] {
-        const names = new Set<string>();
-        this.walkTransformDefinition(transformDefinition, t => {
-            if (t.type === "reference" && typeof t.attributes?.id === "string") {
-                names.add(t.attributes.id);
-            }
-        });
-        return Array.from(names);
-    }
-
-    private walkTransformDefinition(transform: any, visit: (transform: any) => void): void {
-        if (!transform || typeof transform !== "object") {
-            return;
-        }
-        visit(transform);
-        for (const value of Object.values(transform.attributes ?? {})) {
-            if (Array.isArray(value)) {
-                value.forEach((v: any) => this.walkTransformDefinition(v, visit));
-            } else {
-                this.walkTransformDefinition(value, visit);
-            }
-        }
+        return collectReferencedTransformNames(transformDefinition);
     }
 
     abstract getDependencyGraph(): Promise<DependencyGraphData>;

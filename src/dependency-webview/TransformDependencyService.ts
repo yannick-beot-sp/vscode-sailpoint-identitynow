@@ -1,6 +1,7 @@
 import { ExportPayloadIncludeTypesEnum as ExportPayloadIncludeTypes, SpConfigExportResults } from 'sailpoint-api-client/dist/sp_config/api.js';
 import { SimpleSPConfigExporter } from '../commands/spconfig-export/SimpleSPConfigExporter.js';
 import type { DependencyGraphData } from './app/src/services/Client.js';
+import { transformReferencesTransforms } from './SourceDependencies.js';
 import { DependencyService } from './DependencyService.js';
 
 export class TransformDependencyService extends DependencyService {
@@ -170,15 +171,6 @@ export class TransformDependencyService extends DependencyService {
      * attribute. The reference may be nested inside other transforms (composite transforms).
      */
     private transformReferencesTransform(transform: any, transformName: string): boolean {
-        if (!transform || typeof transform !== "object") {
-            return false;
-        }
-        if (transform.type === "reference" && transform.attributes?.id === transformName) {
-            return true;
-        }
-        return Object.values(transform.attributes ?? {}).some((value: any) =>
-            Array.isArray(value)
-                ? value.some((v: any) => this.transformReferencesTransform(v, transformName))
-                : this.transformReferencesTransform(value, transformName));
+        return transformReferencesTransforms(transform, new Set([transformName]));
     }
 }
