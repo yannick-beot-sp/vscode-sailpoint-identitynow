@@ -73,6 +73,8 @@ const css = `
 	thead th { position: sticky; top: 0; z-index: 1; text-align: left; padding: 8px 12px; background: var(--vscode-editor-inactiveSelectionBackground); border-bottom: 1px solid var(--vscode-panel-border); font-weight: 600; white-space: nowrap; }
 	tbody td { padding: 6px 12px; border-bottom: 1px solid var(--vscode-panel-border); vertical-align: top; word-break: break-word; overflow: hidden; box-sizing: border-box; }
 	thead th { overflow: hidden; text-overflow: ellipsis; box-sizing: border-box; }
+	thead th.sortable { cursor: pointer; user-select: none; }
+	thead th.sortable:hover { background: var(--vscode-list-hoverBackground); }
 	.col-resizer { position: absolute; top: 0; right: 0; width: 6px; height: 100%; cursor: col-resize; user-select: none; touch-action: none; }
 	.col-resizer:hover, .col-resizer.active { background: var(--vscode-focusBorder); }
 	body.col-resizing { cursor: col-resize; user-select: none; }
@@ -214,7 +216,7 @@ export function buildAccountsHtml(config: AccountsPanelConfig): string {
 		const DEFAULT_WIDTHS = { "@actions": 190, "@id": 280, "@identity": 180, "@status": 140 };
 		const MIN_WIDTH = 50;
 		function widthOf(key) { return widths[key] || DEFAULT_WIDTHS[key] || 200; }
-		const state = { rows: [], total: 0, page: 0, filter: { correlation: "all", identityId: "", identityName: "", search: "" }, pickerMode: "filter", pickerAccount: null, pending: {}, formMode: null, formAccount: null, requestId: 0 };
+		const state = { rows: [], total: 0, page: 0, filter: { correlation: "all", identityId: "", identityName: "", search: "" }, sort: { field: "name", desc: false }, pickerMode: "filter", pickerAccount: null, pending: {}, formMode: null, formAccount: null, requestId: 0 };
 
 		const $ = function (id) { return document.getElementById(id); };
 		function el(tag, cls, text) {
@@ -246,19 +248,40 @@ export function buildAccountsHtml(config: AccountsPanelConfig): string {
 
 		function load() {
 			setLoading(true);
-			vscode.postMessage({ command: "load", page: state.page, filter: state.filter });
+			vscode.postMessage({ command: "load", page: state.page, filter: state.filter, sort: state.sort });
 		}
 		function reloadFromStart() { state.page = 0; load(); }
 
 		// ---------- table ----------
 		function visibleColumns() { return allColumns.filter(function (c) { return visible.indexOf(c.key) >= 0; }); }
 
+		function sortFieldOf(key) {
+			if (key === "@identity") { return "identity.name"; }
+			if (key === config.identityAttribute) { return "nativeIdentity"; }
+			if (key === config.displayAttribute) { return "name"; }
+			return null;
+		}
+
 		function addTh(row, key, label, title) {
-			const th = el("th", "", label);
+			const field = sortFieldOf(key);
+			const th = el("th", field ? "sortable" : "", label);
 			if (title) { th.title = title; }
+			if (field) {
+				if (state.sort.field === field) {
+					th.appendChild(el("span", "sort-ind", state.sort.desc ? " \\u25BC" : " \\u25B2"));
+					th.setAttribute("aria-sort", state.sort.desc ? "descending" : "ascending");
+				}
+				th.title = (title ? title + " - " : "") + "Click to sort";
+				th.addEventListener("click", function () {
+					state.sort = { field: field, desc: state.sort.field === field ? !state.sort.desc : false };
+					renderHead();
+					reloadFromStart();
+				});
+			}
 			th.style.width = widthOf(key) + "px";
 			const handle = el("div", "col-resizer");
 			handle.addEventListener("mousedown", function (e) { startResize(e, key, th, handle); });
+			handle.addEventListener("click", function (e) { e.stopPropagation(); });
 			th.appendChild(handle);
 			row.appendChild(th);
 		}

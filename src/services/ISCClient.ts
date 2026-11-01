@@ -2104,13 +2104,13 @@ export class ISCClient {
 	/**
 	 * Lists a page of accounts with a server-side filter, and returns the total count of matching accounts.
 	 */
-	public async listAccountsPage(filters: string, offset: number, limit: number): Promise<{ accounts: Account[], total: number }> {
+	public async listAccountsPage(filters: string, offset: number, limit: number, sorters = "name"): Promise<{ accounts: Account[], total: number }> {
 		const resp = await this.getAccounts({
 			filters,
 			limit,
 			offset,
 			count: true,
-			sorters: "name"
+			sorters
 		});
 		return { accounts: resp.data, total: Number(resp.headers[TOTAL_COUNT_HEADER] ?? resp.data.length) };
 	}
@@ -3458,6 +3458,25 @@ export class ISCClient {
 		const api = new AccountActivitiesApi(apiConfig, undefined, this.getAxiosWithInterceptors());
 		const response = await api.getAccountActivityV1({ id: accountActivityId });
 		return response.data;
+	}
+
+	/**
+	 * Reads the account activity from the search index (accountactivities). Unlike the
+	 * account activity REST API, the indexed document contains the provisioning plan
+	 * details (accounts, attributes, sources, stage, ...).
+	 */
+	public async getAccountActivityDocument(accountActivityId: string): Promise<AccountActivityDocument | undefined> {
+		console.log("> getAccountActivityDocument", accountActivityId);
+		const result = await this.paginatedSearch<AccountActivityDocument>({
+			query: buildSearchQuery({
+				index: Index.Accountactivities,
+				query: `id:"${accountActivityId}"`,
+				includeNested: true,
+			}),
+			limit: 1,
+			offset: 0,
+		});
+		return result.data[0];
 	}
 
 	public async getIdentityProfileForIdentity(identityId: string): Promise<{ profileId: string; profileName?: string; currentLifecycleState?: string }> {

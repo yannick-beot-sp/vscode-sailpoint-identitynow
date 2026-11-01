@@ -36,6 +36,7 @@ export class AccountsPanel implements vscode.Disposable {
 	private disposed = false;
 	private filter: AccountsFilter = {};
 	private page = 0;
+	private sorters = "name";
 	private accounts: any[] = [];
 	private schemaAttributes: AccountsSchemaAttribute[] = [];
 	private identityAttribute = "";
@@ -63,6 +64,15 @@ export class AccountsPanel implements vscode.Disposable {
 
 	private get isDelimitedFile(): boolean {
 		return this.node.type === "DelimitedFile";
+	}
+
+	/** Converts the sort requested by the webview into an ISC "sorters" value (whitelisted fields) */
+	private static toSorters(sort: any): string {
+		const allowed = ["name", "nativeIdentity", "identity.name"];
+		if (!sort || !allowed.includes(sort.field)) {
+			return "name";
+		}
+		return `${sort.desc ? "-" : ""}${sort.field}`;
 	}
 
 	private static key(node: SourceTreeItem): string {
@@ -114,7 +124,9 @@ export class AccountsPanel implements vscode.Disposable {
 			const priority = [this.identityAttribute, displayAttribute].filter((x, i, arr) => x && arr.indexOf(x) === i);
 			this.schemaAttributes = [
 				...priority.map(n => attributes.find(a => a.name === n) ?? { name: n, type: "STRING", multiValued: false }),
-				...attributes.filter(a => !priority.includes(a.name)),
+				...attributes
+					.filter(a => !priority.includes(a.name))
+					.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" })),
 			];
 
 			const config: AccountsPanelConfig = {
@@ -170,7 +182,7 @@ export class AccountsPanel implements vscode.Disposable {
 	private async load(): Promise<void> {
 		try {
 			const { accounts, total } = await this.client.listAccountsPage(
-				this.buildFilters(), this.page * PAGE_SIZE, PAGE_SIZE);
+				this.buildFilters(), this.page * PAGE_SIZE, PAGE_SIZE, this.sorters);
 			if (this.disposed) {
 				return;
 			}
@@ -196,6 +208,7 @@ export class AccountsPanel implements vscode.Disposable {
 			case "load":
 				this.filter = message.filter ?? {};
 				this.page = Number(message.page) || 0;
+				this.sorters = AccountsPanel.toSorters(message.sort);
 				await this.load();
 				break;
 			case "enable":
