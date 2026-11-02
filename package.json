@@ -759,6 +759,10 @@
         "title": "View access"
       },
       {
+        "command": "vscode-sailpoint-identitynow.identities.request-access",
+        "title": "Request Access"
+      },
+      {
         "command": "vscode-sailpoint-identitynow.account.enable",
         "title": "Enable account"
       },
@@ -1345,6 +1349,10 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.identities.reassign-ownership",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.request-access",
           "when": "never"
         },
         {
@@ -2046,6 +2054,11 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.identities.view-access",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/",
+          "group": "identityActions@2"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.identities.request-access",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /^identity$/",
           "group": "identityActions@2"
         },

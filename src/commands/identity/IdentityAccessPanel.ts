@@ -4,10 +4,7 @@ import { IdentityAccessItem } from "../../models/IdentityAccessItem.js";
 import { ISCClient } from "../../services/ISCClient.js";
 import { buildAccessTableHtml, buildAccessTableRows, buildLoadingHtml } from "./identityAccessHtml.js";
 import { confirm } from "../../utils/vsCodeHelpers.js";
-import {
-	openAccessRequestStatusPanel,
-	openAccessRequestSubmitErrorPanel,
-} from "./AccessRequestStatusPanel.js";
+import { requestIdentityAccess } from "./requestIdentityAccess.js";
 
 export class IdentityAccessPanel implements vscode.Disposable {
 	public static readonly viewType = "identityAccessView";
@@ -70,6 +67,10 @@ export class IdentityAccessPanel implements vscode.Disposable {
 		const identityAccessPanel = new IdentityAccessPanel(extensionUri, panel, identityTreeItem);
 		IdentityAccessPanel.currentPanels.set(key, identityAccessPanel);
 		void identityAccessPanel.loadAndRender();
+	}
+
+	public static refreshIfOpen(identityTreeItem: IdentityTreeItem): void {
+		void IdentityAccessPanel.currentPanels.get(IdentityAccessPanel.panelKey(identityTreeItem))?.loadAndRender();
 	}
 
 	/**
@@ -186,105 +187,9 @@ export class IdentityAccessPanel implements vscode.Disposable {
 	}
 
 	private async requestAccess(): Promise<void> {
-		const identityName = this.identityName;
-		const accessItemTerm = await vscode.window.showInputBox({
-			title: "Request Access",
-			prompt: `Enter the name or ID of the role, access profile, or entitlement to grant to ${identityName}`,
-			placeHolder: "Access item name or ID",
-			validateInput: (value) => value.trim() ? undefined : "Access item name or ID is required",
-		});
-
-		if (!accessItemTerm?.trim()) {
-			return;
-		}
-
-		const trimmedTerm = accessItemTerm.trim();
-		const client = new ISCClient(this.identityTreeItem.tenantId, this.identityTreeItem.tenantName);
-		const tenantContext = {
-			tenantId: this.identityTreeItem.tenantId,
-			tenantName: this.identityTreeItem.tenantName,
-			identityName,
-		};
-
-		let matches: IdentityAccessItem[];
-		try {
-			matches = await vscode.window.withProgress(
-				{
-					location: vscode.ProgressLocation.Notification,
-					title: `Looking up access item ${trimmedTerm}...`,
-					cancellable: false,
-				},
-				async () => client.searchRequestableAccessItems(trimmedTerm)
-			);
-		} catch (error: unknown) {
-			openAccessRequestSubmitErrorPanel(
-				this.extensionUri,
-				{ ...tenantContext, accessItemName: trimmedTerm, accessItemType: "UNKNOWN" },
-				error
-			);
-			return;
-		}
-
-		if (matches.length === 0) {
-			openAccessRequestSubmitErrorPanel(
-				this.extensionUri,
-				{ ...tenantContext, accessItemName: trimmedTerm, accessItemType: "UNKNOWN" },
-				new Error(`No requestable role, access profile, or entitlement found for "${trimmedTerm}".`)
-			);
-			return;
-		}
-
-		const resolvedItem = await this.pickAccessItem(matches, identityName);
-		if (!resolvedItem) {
-			return;
-		}
-
-		const itemName = resolvedItem.displayName ?? resolvedItem.name ?? resolvedItem.id;
-		const statusContext = {
-			...tenantContext,
-			accessItemName: itemName,
-			accessItemType: resolvedItem.type,
-		};
-
-		try {
-			const response = await vscode.window.withProgress(
-				{
-					location: vscode.ProgressLocation.Notification,
-					title: `Submitting access request for ${itemName}...`,
-					cancellable: false,
-				},
-				async () => client.grantIdentityAccess(this.identityId, resolvedItem)
-			);
-
-			openAccessRequestStatusPanel(this.extensionUri, {
-				...statusContext,
-				accessRequestIds: client.extractAccessRequestIds(response),
-			});
-
+		if (await requestIdentityAccess(this.extensionUri, this.identityTreeItem)) {
 			await this.loadAndRender();
-		} catch (error: unknown) {
-			openAccessRequestSubmitErrorPanel(this.extensionUri, statusContext, error);
 		}
-	}
-
-	private async pickAccessItem(matches: IdentityAccessItem[], identityName: string): Promise<IdentityAccessItem | undefined> {
-		if (matches.length === 1) {
-			return matches[0];
-		}
-
-		const picked = await vscode.window.showQuickPick(
-			matches.map(item => ({
-				label: item.displayName ?? item.name ?? item.id,
-				description: formatAccessItemType(item.type),
-				detail: item.sourceName,
-				item,
-			})),
-			{
-				title: "Request Access",
-				placeHolder: `Select the access item to grant to ${identityName}`,
-			}
-		);
-		return picked?.item;
 	}
 
 	private async requestRemoval(index: number): Promise<void> {
@@ -337,16 +242,5 @@ export class IdentityAccessPanel implements vscode.Disposable {
 			const disposable = this.disposables.pop();
 			disposable?.dispose();
 		}
-	}
-}
-
-function formatAccessItemType(type: IdentityAccessItem["type"]): string {
-	switch (type) {
-		case "ROLE":
-			return "Role";
-		case "ACCESS_PROFILE":
-			return "Access Profile";
-		case "ENTITLEMENT":
-			return "Entitlement";
 	}
 }

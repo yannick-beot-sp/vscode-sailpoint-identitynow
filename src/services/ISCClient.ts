@@ -3461,22 +3461,29 @@ export class ISCClient {
 	}
 
 	/**
-	 * Reads the account activity from the search index (accountactivities). Unlike the
-	 * account activity REST API, the indexed document contains the provisioning plan
-	 * details (accounts, attributes, sources, stage, ...).
+	 * Reads the account activity of an access request from the search index (accountactivities).
+	 * It is the only source containing the provisioning plan (accountRequests, expansionItems, stage, warnings...).
+	 * The access request id of the request status is the `trackingNumber` of the activity
+	 * (the activity own `id` is different); the `id` is used as a fallback.
 	 */
-	public async getAccountActivityDocument(accountActivityId: string): Promise<AccountActivityDocument | undefined> {
-		console.log("> getAccountActivityDocument", accountActivityId);
-		const result = await this.paginatedSearch<AccountActivityDocument>({
-			query: buildSearchQuery({
-				index: Index.Accountactivities,
-				query: `id:"${accountActivityId}"`,
-				includeNested: true,
-			}),
-			limit: 1,
-			offset: 0,
-		});
-		return result.data[0];
+	public async getAccountActivityDocument(accessRequestId: string): Promise<Record<string, unknown> | undefined> {
+		console.log("> getAccountActivityDocument", accessRequestId);
+		for (const field of ["trackingNumber", "id"]) {
+			const result = await this.paginatedSearch<Record<string, unknown>>({
+				query: buildSearchQuery({
+					index: Index.Accountactivities,
+					query: `${field}:"${accessRequestId}"`,
+					sort: "-modified",
+					includeNested: true,
+				}),
+				limit: 1,
+				offset: 0,
+			});
+			if (result.data[0]) {
+				return result.data[0];
+			}
+		}
+		return undefined;
 	}
 
 	public async getIdentityProfileForIdentity(identityId: string): Promise<{ profileId: string; profileName?: string; currentLifecycleState?: string }> {

@@ -6,6 +6,11 @@ import {
 	AccessRequestStatusHistoryEntry,
 	AccessRequestStatusViewState,
 	buildAccessRequestStatusHtml,
+	buildAccountActivityHtml,
+	AccountActivityDocumentLike,
+	getAccountActivityTrackingKey,
+	isAccountActivityComplete,
+	isProvisioningStage,
 	buildErrorEntryHtml,
 	buildStatusEntryHtml,
 	buildStatusHistoryHtml,
@@ -26,6 +31,7 @@ const POLL_INTERVAL_MS = 5000;
 const MAX_WAIT_ATTEMPTS = 40;
 const MAX_TAIL_ATTEMPTS = 360;
 const MAX_CONSECUTIVE_FAILURES = 3;
+const MAX_ACTIVITY_ATTEMPTS = 24;
 
 export interface AccessRequestStatusContext {
 	tenantId: string;
@@ -49,6 +55,10 @@ export class AccessRequestStatusPanel implements vscode.Disposable {
 	private lastRecordedPhaseKey?: string;
 	private createdDate?: string;
 	private webviewReady = false;
+	private accountActivityDocument?: AccountActivityDocumentLike;
+	private accountActivityError?: string;
+	private lastActivityKey?: string;
+	private waitingForActivity = false;
 
 	private constructor(
 		private readonly panel: vscode.WebviewPanel,
@@ -64,6 +74,13 @@ export class AccessRequestStatusPanel implements vscode.Disposable {
 						command: "syncStatusHistory",
 						html: buildStatusHistoryHtml(this.statusHistory, this.error),
 					});
+					// Only replay when there is something to show: the message reveals the panel.
+					if (this.accountActivityDocument || this.accountActivityError) {
+						this.postToWebview({
+							command: "updateActivity",
+							html: buildAccountActivityHtml(this.accountActivityDocument, this.accountActivityError),
+						});
+					}
 					this.flushPendingWebviewMessages();
 				}
 			},
@@ -138,6 +155,7 @@ export class AccessRequestStatusPanel implements vscode.Disposable {
 						: `Access request found. Waiting for phase updates...`
 				);
 				this.recordStatus(currentStatus);
+				await this.refreshAccountActivity(client, currentStatus);
 				break;
 			}
 
@@ -210,6 +228,19 @@ export class AccessRequestStatusPanel implements vscode.Disposable {
 
 			currentStatus = nextStatus;
 			currentKey = nextKey;
+			await this.refreshAccountActivity(client, currentStatus);
+		}
+
+		// The activity can still be verifying/indexing after the request is terminal:
+		// keep refreshing it until it is complete so the final outcome is displayed.
+		for (let attempt = 0; attempt < MAX_ACTIVITY_ATTEMPTS && !this.disposed; attempt++) {
+			if (await this.refreshAccountActivity(client, currentStatus)) {
+				break;
+			}
+			if (!isProvisioningStage(currentStatus)) {
+				break;
+			}
+			await delay(POLL_INTERVAL_MS);
 		}
 
 		if (currentKey !== this.lastRecordedPhaseKey) {
@@ -223,6 +254,68 @@ export class AccessRequestStatusPanel implements vscode.Disposable {
 				: `Access request reached terminal state: ${currentStatus.state ?? "unknown"}.`
 		);
 		this.setTailingComplete(true);
+	}
+
+	/**
+	 * Fetches the account activity linked to the request from the search index (the
+	 * access request id is its tracking number) once provisioning started, and pushes it
+	 * to the dedicated panel when it changed.
+	 * @returns true when the activity is final (stage Completed) or cannot be read
+	 */
+	private async refreshAccountActivity(
+		client: ISCClient,
+		status: RequestedItemStatus,
+	): Promise<boolean> {
+		const requestId = status.accessRequestId ?? this.context.accessRequestIds[0];
+		if (!requestId || this.disposed || !isProvisioningStage(status)) {
+			return false;
+		}
+
+		try {
+			const document = await client.getAccountActivityDocument(requestId);
+			this.accountActivityError = undefined;
+			if (!document) {
+				// Not indexed yet: reveal the panel with a waiting message.
+				if (!this.accountActivityDocument && !this.lastActivityKey) {
+					this.lastActivityKey = "none";
+					this.postToWebview({
+						command: "updateActivity",
+						html: buildAccountActivityHtml(undefined, undefined),
+					});
+					this.waitingForActivity = true;
+				}
+				return false;
+			}
+
+			const key = getAccountActivityTrackingKey(document);
+			if (key !== this.lastActivityKey || this.waitingForActivity) {
+				this.waitingForActivity = false;
+				this.lastActivityKey = key;
+				this.accountActivityDocument = document;
+
+				const errors = Array.isArray(document.errors) ? document.errors.length : 0;
+				const warnings = Array.isArray(document.warnings) ? document.warnings.length : 0;
+				this.appendLog(
+					`Account activity ${document.id ?? requestId}: ${document.status ?? "unknown"} / ${document.stage ?? "unknown"}, ${errors} error(s), ${warnings} warning(s).`
+				);
+				this.postToWebview({
+					command: "updateActivity",
+					html: buildAccountActivityHtml(this.accountActivityDocument, this.accountActivityError),
+				});
+			}
+			return isAccountActivityComplete(document);
+		} catch (error: unknown) {
+			const message = formatApiError(error);
+			if (message !== this.accountActivityError) {
+				this.accountActivityError = message;
+				this.appendLog(`Could not read account activity for request ${requestId}: ${message}`);
+				this.postToWebview({
+					command: "updateActivity",
+					html: buildAccountActivityHtml(this.accountActivityDocument, this.accountActivityError),
+				});
+			}
+			return false;
+		}
 	}
 
 	private recordStatus(status: RequestedItemStatus): void {
@@ -284,6 +377,8 @@ export class AccessRequestStatusPanel implements vscode.Disposable {
 			createdDate: this.createdDate,
 			logs: [...this.logs],
 			statusHistory: [...this.statusHistory],
+			accountActivityDocument: this.accountActivityDocument,
+			accountActivityError: this.accountActivityError,
 			error: this.error,
 			complete,
 		};

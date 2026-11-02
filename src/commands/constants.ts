@@ -181,6 +181,7 @@ export const IDENTITIES_SET_LIFECYCLE_STATE = `${COMMAND_PREFIX}.identities.set-
 export const IDENTITIES_SET_USER_LEVEL = `${COMMAND_PREFIX}.identities.set-user-level`;
 export const IDENTITIES_VIEW_EVENTS = `${COMMAND_PREFIX}.identities.view-events`;
 export const IDENTITIES_VIEW_ACCESS = `${COMMAND_PREFIX}.identities.view-access`;
+export const IDENTITIES_REQUEST_ACCESS = `${COMMAND_PREFIX}.identities.request-access`;
 
 // Accounts
 export const ACCOUNT_ENABLE = `${COMMAND_PREFIX}.account.enable`;

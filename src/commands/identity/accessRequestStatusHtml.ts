@@ -1,5 +1,8 @@
 import { AccessRequestPhases, RequestedItemStatus } from "sailpoint-api-client/dist/access_requests/api.js";
 
+/** Account activity as returned by the search index (accountactivities). */
+export type AccountActivityDocumentLike = Record<string, any>;
+
 export interface AccessRequestStatusHistoryEntry {
 	status: RequestedItemStatus;
 }
@@ -12,6 +15,8 @@ export interface AccessRequestStatusViewState {
 	createdDate?: string;
 	logs: string[];
 	statusHistory: AccessRequestStatusHistoryEntry[];
+	accountActivityDocument?: AccountActivityDocumentLike;
+	accountActivityError?: string;
 	error?: string;
 	complete: boolean;
 }
@@ -198,6 +203,147 @@ export function buildStatusEntryHtml(status: RequestedItemStatus): string {
 	return `<div class="status-entry">${parts.join("")}</div>`;
 }
 
+/**
+ * True when the request has reached (or passed) the provisioning step, i.e. when
+ * the associated account activity is worth displaying.
+ */
+export function isProvisioningStage(status?: RequestedItemStatus): boolean {
+	if (!status) {
+		return false;
+	}
+	switch (status.state) {
+		case "PROVISIONING_VERIFICATION_PENDING":
+		case "PROVISIONING_FAILED":
+		case "NOT_ALL_ITEMS_PROVISIONED":
+		case "REQUEST_COMPLETED":
+			return true;
+	}
+	return (status.accessRequestPhases ?? []).some(phase => /provision/i.test(phase.name ?? ""));
+}
+
+export function getAccountActivityTrackingKey(document?: AccountActivityDocumentLike): string {
+	return JSON.stringify(document ?? null);
+}
+
+/** The activity is final once its stage is "Completed" (status "Complete"). */
+export function isAccountActivityComplete(document?: AccountActivityDocumentLike): boolean {
+	return document?.stage === "Completed" || document?.status === "Complete";
+}
+
+function statusBadge(label: string | null | undefined, kind: "ok" | "error" | "warn" | "info"): string {
+	return `<span class="badge badge-${kind}">${escapeHtml(label ?? "—")}</span>`;
+}
+
+function resultBadge(status?: string | null): string {
+	const value = (status ?? "").toLowerCase();
+	if (!value) {
+		return statusBadge("—", "info");
+	}
+	if (value === "committed" || value === "complete" || value === "completed" || value === "request_completed") {
+		return statusBadge(status, "ok");
+	}
+	if (/fail|error|reject|terminat/.test(value)) {
+		return statusBadge(status, "error");
+	}
+	if (/retry|manual|unverif|warn/.test(value)) {
+		return statusBadge(status, "warn");
+	}
+	return statusBadge(status, "info");
+}
+
+function toStringArray(value: unknown): string[] {
+	if (!Array.isArray(value)) {
+		return [];
+	}
+	return value.map(entry => typeof entry === "string" ? entry : JSON.stringify(entry));
+}
+
+function buildMessageList(messages: string[], kind: "error" | "warning"): string {
+	if (!messages.length) {
+		return "";
+	}
+	const title = kind === "error" ? "Errors" : "Warnings";
+	return `<div class="activity-messages activity-${kind}"><div class="activity-messages-title">${title} (${messages.length})</div>`
+		+ messages.map(message => `<div class="activity-message">${escapeHtml(message)}</div>`).join("")
+		+ `</div>`;
+}
+
+function refName(ref: any): string {
+	return ref?.name ?? ref?.id ?? "—";
+}
+
+function buildAttributeRequests(requests: any[] | undefined): string {
+	if (!requests?.length) {
+		return "—";
+	}
+	return requests
+		.map(r => `${escapeHtml(r.op ?? "")} <strong>${escapeHtml(r.name ?? "")}</strong>${r.value !== undefined ? ` = ${escapeHtml(typeof r.value === "string" ? r.value : JSON.stringify(r.value))}` : ""}`)
+		.join("<br>");
+}
+
+export function buildAccountActivityHtml(document?: AccountActivityDocumentLike, error?: string): string {
+	const parts: string[] = [];
+
+	if (error) {
+		parts.push(`<div class="error-box">${escapeHtml(`Could not read account activity: ${error}`)}</div>`);
+	}
+
+	if (!document) {
+		if (!error) {
+			parts.push(`<div class="status-history-empty">Waiting for the account activity to be indexed...</div>`);
+		}
+		return parts.join("");
+	}
+
+	const accountRequests: any[] = Array.isArray(document.accountRequests) ? document.accountRequests : [];
+
+	parts.push(`<div class="activity-summary">
+		<div><strong>Status:</strong> ${resultBadge(document.status)}</div>
+		<div><strong>Stage:</strong> ${resultBadge(document.stage)}</div>
+		<div><strong>Action:</strong> ${escapeHtml(document.action ?? "—")}</div>
+		<div><strong>Sources:</strong> ${escapeHtml(Array.isArray(document.sources) ? document.sources.join(", ") : (document.sources ?? "—"))}</div>
+		<div><strong>Recipient:</strong> ${escapeHtml(refName(document.recipient))}</div>
+		<div><strong>Requester:</strong> ${escapeHtml(refName(document.requester))}</div>
+		<div><strong>Created:</strong> ${escapeHtml(formatDateTime(document.created) ?? "—")}</div>
+		<div><strong>Modified:</strong> ${escapeHtml(formatDateTime(document.modified) ?? "—")}</div>
+		<div><strong>Activity ID:</strong> <span class="request-info-mono">${escapeHtml(document.id ?? "—")}</span></div>
+		<div><strong>Tracking number:</strong> <span class="request-info-mono">${escapeHtml(document.trackingNumber ?? "—")}</span></div>
+	</div>`);
+
+	// Messages: global ones plus those attached to each account request result.
+	const errors = [...toStringArray(document.errors)];
+	const warnings = [...toStringArray(document.warnings)];
+	for (const request of accountRequests) {
+		for (const message of toStringArray(request.result?.errors)) {
+			const text = `[${refName(request.source)}] ${message}`;
+			errors.includes(message) || errors.includes(text) || errors.push(text);
+		}
+		for (const message of toStringArray(request.result?.warnings)) {
+			const text = `[${refName(request.source)}] ${message}`;
+			warnings.includes(message) || warnings.includes(text) || warnings.push(text);
+		}
+	}
+	parts.push(buildMessageList(errors, "error"));
+	parts.push(buildMessageList(warnings, "warning"));
+
+	if (accountRequests.length > 0) {
+		const rows = accountRequests.map(request => `<tr>
+			<td>${escapeHtml(refName(request.provisioningTarget ?? request.source))}</td>
+			<td>${escapeHtml(request.op ?? "—")}</td>
+			<td>${escapeHtml(request.nativeIdentity ?? "—")}</td>
+			<td>${resultBadge(request.result?.status)}</td>
+			<td>${buildAttributeRequests(request.attributeRequests)}</td>
+		</tr>`).join("");
+		parts.push(`<table class="activity-table">
+			<thead><tr><th>Source</th><th>Operation</th><th>Native identity</th><th>Result</th><th>Attributes</th></tr></thead>
+			<tbody>${rows}</tbody>
+		</table>`);
+	}
+
+	parts.push(`<details class="json-details"><summary>Account Activity JSON</summary><pre>${escapeHtml(JSON.stringify(document, null, 2))}</pre></details>`);
+	return parts.join("");
+}
+
 export function buildErrorEntryHtml(error: string): string {
 	return `<div class="status-entry status-entry-error"><div class="error-box">${escapeHtml(error)}</div></div>`;
 }
@@ -231,6 +377,7 @@ export function buildAccessRequestStatusHtml(state: AccessRequestStatusViewState
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>${escapeHtml(title)}</title>
 	<style>
+		[hidden] { display: none !important; }
 		:root {
 			color: var(--vscode-foreground);
 			background-color: var(--vscode-editor-background);
@@ -430,6 +577,63 @@ export function buildAccessRequestStatusHtml(state: AccessRequestStatusViewState
 			border-radius: 6px;
 			background: color-mix(in srgb, var(--vscode-editor-background) 92%, var(--vscode-foreground) 8%);
 		}
+
+		.badge {
+			display: inline-block;
+			padding: 1px 8px;
+			border-radius: 10px;
+			font-size: 0.8rem;
+			font-weight: 600;
+			border: 1px solid transparent;
+		}
+		.badge-ok { color: #89d185; border-color: #89d185; }
+		.badge-error { color: var(--vscode-errorForeground, #f48771); border-color: var(--vscode-errorForeground, #f48771); }
+		.badge-warn { color: #cca700; border-color: #cca700; }
+		.badge-info { color: #9cdcfe; border-color: #3794ff; }
+
+		.activity-summary {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+			gap: 6px 20px;
+			margin-bottom: 10px;
+		}
+
+		.activity-messages {
+			margin-bottom: 10px;
+			padding: 10px 12px;
+			border-radius: 6px;
+			border: 1px solid;
+			white-space: pre-wrap;
+		}
+		.activity-error {
+			border-color: var(--vscode-inputValidation-errorBorder, #be1100);
+			background: color-mix(in srgb, var(--vscode-inputValidation-errorBackground, #5a1d1d) 80%, transparent);
+			color: var(--vscode-errorForeground, #f48771);
+		}
+		.activity-warning {
+			border-color: #cca700;
+			background: color-mix(in srgb, #cca700 15%, var(--vscode-editor-background));
+			color: #cca700;
+		}
+		.activity-messages-title { font-weight: 600; margin-bottom: 4px; }
+		.activity-message { padding: 2px 0; word-break: break-word; }
+
+		.activity-table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-bottom: 8px;
+		}
+		.activity-table th, .activity-table td {
+			text-align: left;
+			padding: 4px 8px;
+			border-bottom: 1px solid var(--vscode-panel-border);
+			word-break: break-word;
+		}
+		.activity-table th {
+			font-size: 0.78rem;
+			text-transform: uppercase;
+			color: var(--vscode-descriptionForeground);
+		}
 	</style>
 </head>
 <body>
@@ -442,6 +646,12 @@ export function buildAccessRequestStatusHtml(state: AccessRequestStatusViewState
 		<h2>Status history</h2>
 		<div id="status-history">
 			${buildStatusHistoryHtml(state.statusHistory, state.error)}
+		</div>
+	</div>
+	<div class="panel" id="activity-panel"${state.accountActivityDocument || state.accountActivityError ? "" : " hidden"}>
+		<h2>Provisioning (account activity)</h2>
+		<div id="activity-content">
+			${buildAccountActivityHtml(state.accountActivityDocument, state.accountActivityError)}
 		</div>
 	</div>
 	<div class="panel">
@@ -469,6 +679,19 @@ export function buildAccessRequestStatusHtml(state: AccessRequestStatusViewState
 			const history = document.getElementById("status-history");
 			if (history) {
 				history.innerHTML = html;
+			}
+		}
+
+		function updateActivity(html) {
+			const content = document.getElementById("activity-content");
+			const activityPanel = document.getElementById("activity-panel");
+			if (activityPanel) {
+				activityPanel.hidden = false;
+			}
+			if (content) {
+				const openIndexes = Array.from(content.querySelectorAll("details")).map(d => d.open);
+				content.innerHTML = html;
+				content.querySelectorAll("details").forEach((d, i) => { d.open = openIndexes[i] === true; });
 			}
 		}
 
@@ -516,6 +739,9 @@ export function buildAccessRequestStatusHtml(state: AccessRequestStatusViewState
 			}
 			if (message?.command === "appendError" && typeof message.html === "string") {
 				appendHistoryHtml(message.html);
+			}
+			if (message?.command === "updateActivity" && typeof message.html === "string") {
+				updateActivity(message.html);
 			}
 			if (message?.command === "updateRequestInfo" && typeof message.createdLabel === "string") {
 				updateRequestInfo(message.createdLabel);

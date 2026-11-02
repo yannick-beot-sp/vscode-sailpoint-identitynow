@@ -72,6 +72,7 @@ import { NotificationTemplateFilterCommand, NotificationTemplateMediumFilterComm
 import { IdentityTreeViewCommand } from './commands/identity/IdentityTreeViewCommand.js';
 import { ViewIdentityEventsCommand } from './commands/identity/viewIdentityEventsCommand.js';
 import { ViewIdentityAccessCommand } from './commands/identity/viewIdentityAccessCommand.js';
+import { RequestIdentityAccessCommand } from './commands/identity/requestIdentityAccessCommand.js';
 import { AccountTreeViewCommand } from './commands/account/AccountTreeViewCommand.js';
 import { ReassignOwnershipCommand } from './commands/identity/ReassignOwnershipCommand.js';
 import { TenantReadOnlyConfigCommand } from './commands/tenant/tenantReadOnlyConfigCommand.js';
@@ -742,6 +743,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IDENTITIES_VIEW_ACCESS,
 			viewIdentityAccessCommand.execute, viewIdentityAccessCommand));
+	const requestIdentityAccessCommand = new RequestIdentityAccessCommand(context.extensionUri);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.IDENTITIES_REQUEST_ACCESS,
+			requestIdentityAccessCommand.execute, requestIdentityAccessCommand));
 	const reassignOwnershipCommand = new ReassignOwnershipCommand();
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IDENTITIES_REASSIGN_OWNERSHIP,
