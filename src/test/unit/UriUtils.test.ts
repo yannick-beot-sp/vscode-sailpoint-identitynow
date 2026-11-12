@@ -11,7 +11,7 @@ import {
     getWorkflowExecutionDetailUri,
 } from "../../utils/UriUtils.js";
 
-const TENANT = "company10352-poc.identitynow-demo.com";
+const TENANT = "company.identitynow.com";
 const TENANT_ID = "8b1c0e2a4d5f67890123456789abcdef";
 
 suite("UriUtils Test Suite", () => {

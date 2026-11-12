@@ -6,7 +6,6 @@ node_modules
 *.vsix
 exportedObjects/
 *.zip
-.env
 .claude
 .frontmcp
 .cursor

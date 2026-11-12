@@ -60,7 +60,7 @@ You can add a tenant by using a Personal Access Token (PAT), a short-lived acces
 
 It is also possible to add a tenant by using the following URIs:
 `vscode://yannick-beot-sp.vscode-sailpoint-identitynow/addtenant?tenantName=company&accessToken=eyJh...&authenticationMethod=AccessToken` or
-`vscode://yannick-beot-sp.vscode-sailpoint-identitynow/addtenant?tenantName=company&clientId=806c451e057b442ba67b5d459716e97a&clientSecret=***&authenticationMethod=PersonalAccessToken`.
+`vscode://yannick-beot-sp.vscode-sailpoint-identitynow/addtenant?tenantName=company&clientId=***&clientSecret=***&authenticationMethod=PersonalAccessToken`.
 
 ## Import and export the config of a tenant
 

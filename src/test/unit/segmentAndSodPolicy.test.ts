@@ -30,16 +30,16 @@ suite("Segments and SoD policies Test Suite", () => {
             assert.strictEqual(getIdByUri(uri), segment.id);
         });
         it("builds the Web UI url of a segment", () => {
-            const url = getResourceWebUrl("company25714-poc.identitynow-demo.com", "segment", "e303dd2f-f3e2-4c3c-bd0d-aeb914c6b1bc");
+            const url = getResourceWebUrl("acme.identitynow.com", "segment", "e303dd2f-f3e2-4c3c-bd0d-aeb914c6b1bc");
             assert.strictEqual(
                 url?.toString(),
-                "https://company25714-poc.identitynow-demo.com/ui/a/admin/access/segments/manage/e303dd2f-f3e2-4c3c-bd0d-aeb914c6b1bc/name-segment");
+                "https://acme.identitynow.com/ui/a/admin/access/segments/manage/e303dd2f-f3e2-4c3c-bd0d-aeb914c6b1bc/name-segment");
         });
         it("builds the Web UI url of a general policy", () => {
-            const url = getResourceWebUrl("company25714-poc.identitynow-demo.com", "general-policy", "00c81208-b3f9-4ab7-ae8b-3e3a42317ae7");
+            const url = getResourceWebUrl("acme.identitynow.com", "general-policy", "00c81208-b3f9-4ab7-ae8b-3e3a42317ae7");
             assert.strictEqual(
                 url?.toString(),
-                "https://company25714-poc.identitynow-demo.com/ui/search/policies/landing/00c81208-b3f9-4ab7-ae8b-3e3a42317ae7/view");
+                "https://acme.identitynow.com/ui/search/policies/landing/00c81208-b3f9-4ab7-ae8b-3e3a42317ae7/view");
         });
         it("resolves the API path of a SoD policy", () => {
             const uri = getResourceUri(TENANT, "sod-policies", "abc", "No AP and Role");
