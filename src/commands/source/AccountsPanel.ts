@@ -63,7 +63,7 @@ export class AccountsPanel implements vscode.Disposable {
 	}
 
 	private get isDelimitedFile(): boolean {
-		return this.node.type === "DelimitedFile";
+		return this.node.type === "DelimitedFile" || this.node.type === "Delimited File";
 	}
 
 	/** Converts the sort requested by the webview into an ISC "sorters" value (whitelisted fields) */
