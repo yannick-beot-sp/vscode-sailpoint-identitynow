@@ -103,6 +103,8 @@ Export and Import workflows automatically:
 - Remove the properties `created`, `creator`, `modified`, `modifiedBy`, and `owner`
 - Nullify any value that starts with `$.secrets.`
 
+"Open in Web UI" opens the workflow in the read-only view if it is enabled, and in the editor if it is disabled.
+
 The extension allows you to test the workflow:
 
 ![Export config](https://raw.githubusercontent.com/yannick-beot-sp/vscode-sailpoint-identitynow/main/resources/readme/test-workflow.gif)
@@ -681,6 +683,10 @@ The patterns defined above use the following tokens:
 ## Release Notes
 
 ### Unreleased
+
+#### Changed
+
+- "Open in Web UI" for workflows opens the read-only view when the workflow is enabled and the editor otherwise
 
 ### 1.3.34
 

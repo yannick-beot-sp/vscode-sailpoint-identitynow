@@ -232,11 +232,12 @@ export function getResourceWebUrl(
     tenantName: string,
     kind: string,
     id: string,
-    options?: { parentId?: string; subtype?: string }
+    options?: { parentId?: string; subtype?: string; enabled?: boolean }
 ): Uri | undefined {
     switch (kind) {
         case "source": return getUIUrl(tenantName, "ui/a/admin/connections/sources", id);
-        case "workflow": return getUIUrl(tenantName, "ui/wf/edit", id);
+        // An enabled workflow cannot be edited: it is opened in read-only view
+        case "workflow": return getUIUrl(tenantName, options?.enabled ? "ui/wf/view" : "ui/wf/edit", id);
         case "identity-profile": return getUIUrl(tenantName, "ui/ip/admin/identity-profiles", id);
         case "lifecycle-state":
             return options?.parentId

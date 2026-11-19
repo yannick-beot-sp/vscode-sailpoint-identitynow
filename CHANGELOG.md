@@ -19,6 +19,8 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Changed
 
+- "Open in Web UI" for workflows opens the read-only view when the workflow is enabled and the editor otherwise
+
 ### Fixed
 
 ## [1.3.34] - 2026-10-29

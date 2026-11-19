@@ -1088,7 +1088,7 @@ export class WorkflowTreeItem extends ISCResourceTreeItem {
 	}
 
 	getUrl(): vscode.Uri | undefined {
-		return getResourceWebUrl(this.tenantName, "workflow", this.resourceId)
+		return getResourceWebUrl(this.tenantName, "workflow", this.resourceId, { enabled: this.enabled })
 	}
 }
 

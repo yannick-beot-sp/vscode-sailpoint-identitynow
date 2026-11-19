@@ -403,6 +403,10 @@
         }
       },
       {
+        "command": "vscode-sailpoint-identitynow.workflow.clone",
+        "title": "Clone..."
+      },
+      {
         "command": "vscode-sailpoint-identitynow.workflow.import.view-icon",
         "title": "Import...",
         "icon": {
@@ -694,6 +698,10 @@
       {
         "command": "vscode-sailpoint-identitynow.forms.export.view",
         "title": "Export forms..."
+      },
+      {
+        "command": "vscode-sailpoint-identitynow.form.clone.view",
+        "title": "Clone form..."
       },
       {
         "command": "vscode-sailpoint-identitynow.form.export.view",
@@ -1132,6 +1140,10 @@
           "when": "never"
         },
         {
+          "command": "vscode-sailpoint-identitynow.workflow.clone",
+          "when": "never"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.workflow.import",
           "when": "never"
         },
@@ -1265,6 +1277,10 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.forms.export.view",
+          "when": "never"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.form.clone.view",
           "when": "never"
         },
         {
@@ -1504,7 +1520,7 @@
       "view/item/context": [
         {
           "command": "vscode-sailpoint-identitynow.open-url",
-          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(tenantReadOnly|tenantWritable|.*source|disabledWorkflow|identity-profile|lifecycle-state|role|roleDimensional|dimension|access-profile|service-desk-integration|form-definition|source-app|campaign|identity|notification-template-EMAIL|segment|general-policy|segment-access-profile-item|segment-role-item)$/",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /(tenantReadOnly|tenantWritable|.*source|enabledWorkflow|disabledWorkflow|identity-profile|lifecycle-state|role|roleDimensional|dimension|access-profile|service-desk-integration|form-definition|source-app|campaign|identity|notification-template-EMAIL|segment|general-policy|segment-access-profile-item|segment-role-item)$/",
           "group": "_@0"
         },
         {
@@ -1760,6 +1776,11 @@
           "group": "workflow"
         },
         {
+          "command": "vscode-sailpoint-identitynow.workflow.clone",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem =~ /workflow$/i",
+          "group": "workflow"
+        },
+        {
           "command": "vscode-sailpoint-identitynow.transform.evaluate",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == transform",
           "group": "transform"
@@ -1997,6 +2018,10 @@
         },
         {
           "command": "vscode-sailpoint-identitynow.form.export.view",
+          "when": "view == vscode-sailpoint-identitynow.view && viewItem == form-definition"
+        },
+        {
+          "command": "vscode-sailpoint-identitynow.form.clone.view",
           "when": "view == vscode-sailpoint-identitynow.view && viewItem == form-definition"
         },
         {
