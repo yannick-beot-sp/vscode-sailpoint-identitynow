@@ -54,6 +54,8 @@ import { CloneSourceCommand } from './commands/source/CloneSourceCommand.js';
 import { FormDefinitionExportCommand } from './commands/form/FormDefinitionExportCommand.js';
 import { FormDefinitionImporterTreeViewCommand } from './commands/form/FormDefinitionImporterTreeViewCommand.js';
 import { WorkflowExportCommand } from './commands/workflow/WorkflowExportCommand.js';
+import { FormDefinitionCloneCommand } from './commands/form/FormDefinitionCloneCommand.js';
+import { WorkflowCloneCommand } from './commands/workflow/WorkflowCloneCommand.js';
 import { WorkflowImporterTreeViewCommand } from './commands/workflow/WorkflowImporterTreeViewCommand.js';
 import { EditPublicIdentitiesConfigCommand } from './commands/tenant/editPublicIdentitiesConfigCommand.js';
 import { EditAccessRequestConfigCommand } from './commands/tenant/editAccessRequestConfigCommand.js';
@@ -387,6 +389,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_WORKFLOW,
 			workflowExportCommand.execute, workflowExportCommand))
+	const workflowCloneCommand = new WorkflowCloneCommand(tenantService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.CLONE_WORKFLOW,
+			workflowCloneCommand.execute, workflowCloneCommand))
 	const workflowImporterTreeViewCommand = new WorkflowImporterTreeViewCommand(tenantService)
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.IMPORT_WORKFLOW,
@@ -678,6 +684,10 @@ export function activate(context: vscode.ExtensionContext) {
 	}
 
 	//Forms
+	const formDefinitionCloneCommand = new FormDefinitionCloneCommand(tenantService)
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.CLONE_FORM_VIEW,
+			formDefinitionCloneCommand.execute, formDefinitionCloneCommand));
 	const formDefinitionExportCommand = new FormDefinitionExportCommand()
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.EXPORT_FORM_VIEW,

@@ -5,6 +5,7 @@ import * as commands from '../constants.js';
 import { ISCClient } from "../../services/ISCClient.js";
 import { askChosenItems } from '../../utils/vsCodeHelpers.js';
 import { ImportFormDefinitionsV1RequestInner } from 'sailpoint-api-client/dist/custom_forms/api.js';
+import { cleanUpForms } from './utils.js';
 
 export class FormDefinitionImporter {
     readonly client: ISCClient;
@@ -13,23 +14,20 @@ export class FormDefinitionImporter {
         private tenantId: string,
         private tenantName: string,
         private tenantDisplayName: string,
-        private fileUri: vscode.Uri
+        private fileUri?: vscode.Uri
     ) {
         this.client = new ISCClient(this.tenantId, this.tenantName);
     }
 
     async chooseAndImport(): Promise<void> {
         console.log("> FormDefinitionImporter.chooseAndImport");
+        if (!this.fileUri) {
+            throw new Error("No file to import");
+        }
         const data = fs.readFileSync(this.fileUri.fsPath).toString();
         let json = JSON.parse(data) as ImportFormDefinitionsV1RequestInner[]
         // Cleaning "data" by removing usedBy
-        const pickItems = json.map(item => ({
-            ...item,
-            object: {
-                ...item.object,
-                usedBy: []
-            }
-        })).map(x => ({
+        const pickItems = cleanUpForms(json).map(x => ({
             ...x,
             id: x.object.id,
             name: x.object.name,
@@ -47,7 +45,7 @@ export class FormDefinitionImporter {
         await this.importFileWithProgression(items);
     }
 
-    protected async importFileWithProgression(data: ImportFormDefinitionsV1RequestInner[]): Promise<void> {
+    async importFileWithProgression(data: ImportFormDefinitionsV1RequestInner[]): Promise<void> {
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: `Importing forms to ${this.tenantDisplayName}...`,

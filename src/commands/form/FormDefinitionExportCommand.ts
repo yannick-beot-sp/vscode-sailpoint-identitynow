@@ -6,6 +6,7 @@ import { FormTreeItem, FormsTreeItem } from '../../models/ISCTreeItem.js';
 import { PathProposer } from '../../services/PathProposer.js';
 import { ISCClient } from '../../services/ISCClient.js';
 import { ensureFolderExists } from '../../utils/fileutils.js';
+import { cleanUpForms } from './utils.js';
 
 export class FormDefinitionExportCommand {
 
@@ -60,13 +61,7 @@ export class FormDefinitionExportCommand {
         }
 
         // Cleaning "data" by removing usedBy
-        data = data.map(item => ({
-            ...item,
-            object: {
-                ...item.object,
-                usedBy: []
-            }
-        }));
+        data = cleanUpForms(data);
 
         console.log('Writing to ', target);
         ensureFolderExists(target);

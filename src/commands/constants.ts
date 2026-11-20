@@ -62,6 +62,7 @@ export const NEW_SCHEMA = `${COMMAND_PREFIX}.new-schema`;
 export const ENABLE_WORKFLOW = `${COMMAND_PREFIX}.workflow.enable`;
 export const DISABLE_WORKFLOW = `${COMMAND_PREFIX}.workflow.disable`;
 export const EXPORT_WORKFLOW = `${COMMAND_PREFIX}.workflow.export`;
+export const CLONE_WORKFLOW = `${COMMAND_PREFIX}.workflow.clone`;
 export const IMPORT_WORKFLOW = `${COMMAND_PREFIX}.workflow.import`;
 export const IMPORT_WORKFLOW_VIEW_ICON = `${COMMAND_PREFIX}.workflow.import.view-icon`;
 export const VIEW_WORKFLOW_EXECUTION_HISTORY = `${COMMAND_PREFIX}.workflow.view-execution-history`;
@@ -152,6 +153,7 @@ export const IMPORT_DIMENSION_VIEW = `${COMMAND_PREFIX}.csv.import.dimensions.vi
 // FORMS
 export const EXPORT_FORMS_VIEW = `${COMMAND_PREFIX}.forms.export.view`;
 export const EXPORT_FORMS_ICON_VIEW = `${COMMAND_PREFIX}.forms.export.icon-view`;
+export const CLONE_FORM_VIEW = `${COMMAND_PREFIX}.form.clone.view`;
 export const EXPORT_FORM_VIEW = `${COMMAND_PREFIX}.form.export.view`;
 export const IMPORT_FORMS_VIEW = `${COMMAND_PREFIX}.forms.import.view`;
 export const IMPORT_FORMS_ICON_VIEW = `${COMMAND_PREFIX}.forms.import.icon-view`;

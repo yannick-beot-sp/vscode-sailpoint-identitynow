@@ -5,9 +5,8 @@ import { TenantInfo } from "../models/TenantInfo.js";
 import { TenantInfoQuickPickItem } from "../models/TenantInfoQuickPickItem.js";
 import { compareByLabel, compareByName } from "../utils.js";
 import { isBlank, isEmpty } from "./stringUtils.js";
-import { ObjectPickItem } from "../models/ObjectPickItem.js";
 
-export async function chooseTenant(tenantService: TenantService, title: string): Promise<TenantInfo | undefined> {
+export async function chooseTenant(tenantService: TenantService, title: string, defaultTenantId?: string): Promise<TenantInfo | undefined> {
 	console.log("> chooseTenant");
 	const tenants = tenantService.getTenants();
 	let tenantInfo: TenantInfo | undefined;
@@ -18,7 +17,15 @@ export async function chooseTenant(tenantService: TenantService, title: string):
 	} else {
 		// Compute properties for QuickPickItem
 		const tenantQuickPickItems = tenants
-			.map(obj => ({ ...obj, label: obj?.name, detail: obj?.tenantName }));
+			.map(obj => ({ ...obj, label: obj?.name, detail: obj?.tenantName }))
+			.sort((a, b) => {
+				const aDefault = a.id === defaultTenantId;
+				const bDefault = b.id === defaultTenantId;
+				if (aDefault !== bDefault) {
+					return aDefault ? -1 : 1;
+				}
+				return (a.name ?? "").localeCompare(b.name ?? "");
+			});
 		const tenantQuickPickItem = await vscode.window.showQuickPick(tenantQuickPickItems as TenantInfoQuickPickItem[], {
 			ignoreFocusOut: false,
 			title: title,
