@@ -684,8 +684,14 @@ The patterns defined above use the following tokens:
 
 ### Unreleased
 
-#### Changed
+### 1.3.35
 
+- New command "Request Access" for identities, equivalent to the "Request Access" button of the "Manage Access" view
+- New command "Delete with dependencies..." for sources: lists what will be deleted with the source.
+- New command "Manage accounts" for sources allowing to list the accounts of a source , enable/disable/unlock/reload/deletion accounts, (re)correlation to an identity and, for Delimited File sources, account creation and edition
+- Access Profiles and Roles: export and import of the optional access request form in the new `form` column (form name)
+- Source name as the description for Access Profiles
+- New command to clone Forms and Workflows
 - "Open in Web UI" for workflows opens the read-only view when the workflow is enabled and the editor otherwise
 
 ### 1.3.34

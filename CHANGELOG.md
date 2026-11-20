@@ -10,18 +10,26 @@ This changelog is following the recommended format by [keepachangelog](https://k
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Removed
+
+## [1.3.35] - 2026-11-20
+
+### Added
+
 - New command "Request Access" for identities, equivalent to the "Request Access" button of the "Manage Access" view
 - New command "Delete with dependencies..." for sources: lists what will be deleted with the source.
 - New command "Manage accounts" for sources allowing to list the accounts of a source , enable/disable/unlock/reload/deletion accounts, (re)correlation to an identity and, for Delimited File sources, account creation and edition
 - Access Profiles and Roles: export and import of the optional access request form in the new `form` column (form name)
 - Source name as the description for Access Profiles
-
+- New command to clone Forms and Workflows
 
 ### Changed
 
 - "Open in Web UI" for workflows opens the read-only view when the workflow is enabled and the editor otherwise
-
-### Fixed
 
 ## [1.3.34] - 2026-10-29
 
